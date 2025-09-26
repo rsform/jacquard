@@ -46,6 +46,17 @@
             };
           };
         };
+
+        "jacquard-common" = {
+          imports = [globalCrateConfig];
+          autoWire = ["crate" "clippy"];
+          path = ./../../crates/jacquard-common;
+          crane = {
+            args = {
+              buildInputs = commonBuildInputs;
+            };
+          };
+        };
       };
     };
     packages.default = self'.packages.jacquard;

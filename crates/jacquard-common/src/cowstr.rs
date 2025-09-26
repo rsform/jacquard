@@ -1,0 +1,285 @@
+use std::{
+    borrow::Cow,
+    fmt,
+    hash::{Hash, Hasher},
+    ops::Deref,
+};
+
+use compact_str::CompactString;
+
+use crate::IntoStatic;
+
+/// Shamelessly copied from https://github.com/bearcove/merde
+/// A copy-on-write string type that uses [`CompactString`] for
+/// the "owned" variant.
+///
+/// The standard [`Cow`] type cannot be used, since
+/// `<str as ToOwned>::Owned` is `String`, and not `CompactString`.
+#[derive(Clone)]
+pub enum CowStr<'s> {
+    Borrowed(&'s str),
+    Owned(CompactString),
+}
+
+impl CowStr<'static> {
+    /// Create a new `CowStr` by copying from a `&str` — this might allocate
+    /// if the `compact_str` feature is disabled, or if the string is longer
+    /// than `MAX_INLINE_SIZE`.
+    pub fn copy_from_str(s: &str) -> Self {
+        Self::Owned(CompactString::from(s))
+    }
+}
+
+impl<'s> CowStr<'s> {
+    #[inline]
+    pub fn from_utf8(s: &'s [u8]) -> Result<Self, std::str::Utf8Error> {
+        Ok(Self::Borrowed(std::str::from_utf8(s)?))
+    }
+
+    #[inline]
+    pub fn from_utf8_owned(s: Vec<u8>) -> Result<Self, std::str::Utf8Error> {
+        Ok(Self::Owned(CompactString::from_utf8(s)?))
+    }
+
+    #[inline]
+    pub fn from_utf8_lossy(s: &'s [u8]) -> Self {
+        Self::Owned(CompactString::from_utf8_lossy(s))
+    }
+
+    /// # Safety
+    ///
+    /// This function is unsafe because it does not check that the bytes are valid UTF-8.
+    #[inline]
+    pub unsafe fn from_utf8_unchecked(s: &'s [u8]) -> Self {
+        unsafe { Self::Owned(CompactString::from_utf8_unchecked(s)) }
+    }
+}
+
+impl AsRef<str> for CowStr<'_> {
+    #[inline]
+    fn as_ref(&self) -> &str {
+        match self {
+            CowStr::Borrowed(s) => s,
+            CowStr::Owned(s) => s.as_str(),
+        }
+    }
+}
+
+impl Deref for CowStr<'_> {
+    type Target = str;
+
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        match self {
+            CowStr::Borrowed(s) => s,
+            CowStr::Owned(s) => s.as_str(),
+        }
+    }
+}
+
+impl<'a> From<Cow<'a, str>> for CowStr<'a> {
+    #[inline]
+    fn from(s: Cow<'a, str>) -> Self {
+        match s {
+            Cow::Borrowed(s) => CowStr::Borrowed(s),
+            #[allow(clippy::useless_conversion)]
+            Cow::Owned(s) => CowStr::Owned(s.into()),
+        }
+    }
+}
+
+impl<'s> From<&'s str> for CowStr<'s> {
+    #[inline]
+    fn from(s: &'s str) -> Self {
+        CowStr::Borrowed(s)
+    }
+}
+
+impl From<String> for CowStr<'_> {
+    #[inline]
+    fn from(s: String) -> Self {
+        #[allow(clippy::useless_conversion)]
+        CowStr::Owned(s.into())
+    }
+}
+
+impl From<Box<str>> for CowStr<'_> {
+    #[inline]
+    fn from(s: Box<str>) -> Self {
+        CowStr::Owned(s.into())
+    }
+}
+
+impl<'s> From<&'s String> for CowStr<'s> {
+    #[inline]
+    fn from(s: &'s String) -> Self {
+        CowStr::Borrowed(s.as_str())
+    }
+}
+
+impl From<CowStr<'_>> for String {
+    #[inline]
+    fn from(s: CowStr<'_>) -> Self {
+        match s {
+            CowStr::Borrowed(s) => s.into(),
+            #[allow(clippy::useless_conversion)]
+            CowStr::Owned(s) => s.into(),
+        }
+    }
+}
+
+impl From<CowStr<'_>> for Box<str> {
+    #[inline]
+    fn from(s: CowStr<'_>) -> Self {
+        match s {
+            CowStr::Borrowed(s) => s.into(),
+            CowStr::Owned(s) => s.into(),
+        }
+    }
+}
+
+impl<'a> PartialEq<CowStr<'a>> for CowStr<'_> {
+    #[inline]
+    fn eq(&self, other: &CowStr<'a>) -> bool {
+        self.deref() == other.deref()
+    }
+}
+
+impl PartialEq<&str> for CowStr<'_> {
+    #[inline]
+    fn eq(&self, other: &&str) -> bool {
+        self.deref() == *other
+    }
+}
+
+impl PartialEq<CowStr<'_>> for &str {
+    #[inline]
+    fn eq(&self, other: &CowStr<'_>) -> bool {
+        *self == other.deref()
+    }
+}
+
+impl PartialEq<String> for CowStr<'_> {
+    #[inline]
+    fn eq(&self, other: &String) -> bool {
+        self.deref() == other.as_str()
+    }
+}
+
+impl PartialEq<CowStr<'_>> for String {
+    #[inline]
+    fn eq(&self, other: &CowStr<'_>) -> bool {
+        self.as_str() == other.deref()
+    }
+}
+
+impl Eq for CowStr<'_> {}
+
+impl Hash for CowStr<'_> {
+    #[inline]
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.deref().hash(state)
+    }
+}
+
+impl fmt::Debug for CowStr<'_> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.deref().fmt(f)
+    }
+}
+
+impl fmt::Display for CowStr<'_> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.deref().fmt(f)
+    }
+}
+
+impl IntoStatic for CowStr<'_> {
+    type Output = CowStr<'static>;
+
+    #[inline]
+    fn into_static(self) -> Self::Output {
+        match self {
+            CowStr::Borrowed(s) => CowStr::Owned((*s).into()),
+            CowStr::Owned(s) => CowStr::Owned(s),
+        }
+    }
+}
+
+use serde::{Deserialize, Serialize};
+
+impl Serialize for CowStr<'_> {
+    #[inline]
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self)
+    }
+}
+
+impl<'de: 'a, 'a> Deserialize<'de> for CowStr<'a> {
+    #[inline]
+    fn deserialize<D>(deserializer: D) -> Result<CowStr<'a>, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct CowStrVisitor;
+
+        impl<'de> serde::de::Visitor<'de> for CowStrVisitor {
+            type Value = CowStr<'de>;
+
+            #[inline]
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                write!(formatter, "a string")
+            }
+
+            #[inline]
+            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                Ok(CowStr::copy_from_str(v))
+            }
+
+            #[inline]
+            fn visit_borrowed_str<E>(self, v: &'de str) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                Ok(CowStr::Borrowed(v))
+            }
+
+            #[inline]
+            fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                Ok(v.into())
+            }
+        }
+
+        deserializer.deserialize_str(CowStrVisitor)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_partialeq_with_str() {
+        let cow_str1 = CowStr::Borrowed("hello");
+        let cow_str2 = CowStr::Borrowed("hello");
+        let cow_str3 = CowStr::Borrowed("world");
+
+        assert_eq!(cow_str1, "hello");
+        assert_eq!("hello", cow_str1);
+        assert_eq!(cow_str1, cow_str2);
+        assert_ne!(cow_str1, "world");
+        assert_ne!("world", cow_str1);
+        assert_ne!(cow_str1, cow_str3);
+    }
+}
