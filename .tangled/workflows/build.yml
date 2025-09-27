@@ -6,7 +6,7 @@ engine: nixery
 
 dependencies:
   nixpkgs:
-    - just
+    #- just
 
 steps:
   - name: build appview
