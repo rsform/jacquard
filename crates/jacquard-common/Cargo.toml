@@ -6,9 +6,11 @@ authors.workspace = true
 description.workspace = true
 
 [dependencies]
-cid = "0.11.1"
+cid = { version = "0.11.1", features = ["serde", "std"] }
 compact_str = "0.9.0"
+miette = "7.6.0"
 multibase = "0.9.1"
 multihash = "0.19.3"
 regex = "1.11.3"
 serde = { version = "1.0.227", features = ["derive"] }
+thiserror = "2.0.16"
