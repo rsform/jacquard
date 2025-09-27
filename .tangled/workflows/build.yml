@@ -6,9 +6,8 @@ engine: nixery
 
 dependencies:
   nixpkgs:
-    #- just
 
 steps:
-  - name: build appview
+  - name: build crate
     command: |
-      nix build
+      nix shell --command cargo build
