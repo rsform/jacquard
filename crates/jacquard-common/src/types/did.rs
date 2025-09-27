@@ -27,7 +27,7 @@ impl<'d> Did<'d> {
         }
     }
 
-    /// Fallible constructor from an existing CowStr, clones and takes
+    /// Fallible constructor from an existing CowStr, takes ownership
     pub fn from_cowstr(did: CowStr<'d>) -> Result<Did<'d>, &'static str> {
         if did.len() > 2048 {
             Err("DID too long")
@@ -72,7 +72,7 @@ impl FromStr for Did<'_> {
     /// Has to take ownership due to the lifetime constraints of the FromStr trait.
     /// Prefer `Did::new()` or `Did::raw` if you want to borrow.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::from_cowstr(CowStr::Owned(s.to_compact_string()))
+        Self::from_cowstr(CowStr::Borrowed(s).into_static())
     }
 }
 

@@ -1,0 +1,14 @@
+when:
+  - event: ["push", "pull_request"]
+    branch: ["main"]
+
+engine: nixery
+
+dependencies:
+  nixpkgs:
+    - just
+
+steps:
+  - name: build appview
+    command: |
+      nix build

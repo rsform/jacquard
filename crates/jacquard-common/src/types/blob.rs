@@ -1,4 +1,4 @@
-use crate::{CowStr, cid::Cid};
+use crate::{CowStr, types::cid::Cid};
 use compact_str::ToCompactString;
 #[allow(unused)]
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error};

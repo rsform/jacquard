@@ -1,11 +1,10 @@
 use compact_str::CompactString;
-use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error};
+use serde::{Deserialize, Serialize};
 use std::{
     borrow::Cow,
     fmt,
     hash::{Hash, Hasher},
     ops::Deref,
-    str::FromStr,
 };
 
 use crate::IntoStatic;
@@ -207,56 +206,6 @@ impl IntoStatic for CowStr<'_> {
             CowStr::Owned(s) => CowStr::Owned(s),
         }
     }
-}
-
-/// Common trait implementations for Lexicon string formats that are newtype wrappers
-/// around `String`.
-macro_rules! string_newtype {
-    ($name:ident) => {
-        impl FromStr for $name<'_> {
-            type Err = &'static str;
-
-            fn from_str(s: &str) -> Result<Self, Self::Err> {
-                Self::new(s)
-            }
-        }
-
-        impl<'de> Deserialize<'de> for $name<'de> {
-            fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-            where
-                D: Deserializer<'de>,
-            {
-                let value = Deserialize::deserialize(deserializer)?;
-                Self::new(value).map_err(D::Error::custom)
-            }
-        }
-
-        impl From<$name<'_>> for String {
-            fn from(value: $name) -> Self {
-                value.0.to_string()
-            }
-        }
-
-        impl From<$name> for CowStr<'s> {
-            fn from(value: $name) -> Self {
-                value.0
-            }
-        }
-
-        impl AsRef<str> for $name<'_> {
-            fn as_ref(&self) -> &str {
-                self.as_str()
-            }
-        }
-
-        impl Deref for $name<'_> {
-            type Target = str;
-
-            fn deref(&self) -> &Self::Target {
-                self.as_str()
-            }
-        }
-    };
 }
 
 impl Serialize for CowStr<'_> {

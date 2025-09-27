@@ -10,3 +10,4 @@ edition.workspace = true
 
 [dependencies]
 clap = { workspace = true }
+jacquard-common = { path = "../jacquard-common" }
