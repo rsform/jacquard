@@ -6,8 +6,10 @@ engine: nixery
 
 dependencies:
   nixpkgs:
+    - rustup
+    - just
 
 steps:
   - name: build crate
     command: |
-      nix shell --command cargo build
+      cargo build
