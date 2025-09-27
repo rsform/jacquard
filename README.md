@@ -1,24 +1,19 @@
-A template Rust project with fully functional and no-frills Nix support, as well as builtin VSCode configuration to get IDE experience without any manual setup (just [install direnv](https://nixos.asia/en/direnv), open in VSCode and accept the suggestions). It uses [crane](https://crane.dev/), via [rust-flake](https://github.com/juspay/rust-flake).
+# Jacquard
 
-> [!NOTE]
-> If you are looking for the original template based on [this blog post](https://srid.ca/rust-nix)'s use of `crate2nix`, browse from [this tag](https://github.com/srid/jacquard/tree/crate2nix). The evolution of this template can be gleaned from [releases](https://github.com/srid/jacquard/releases).
+A suite of Rust crates for the AT Protocol.
 
-## Usage
+## Goals
 
-You can use [omnix](https://omnix.page/om/init.html)[^omnix] to initialize this template:
-```
-nix run nixpkgs#omnix -- init github:srid/jacquard -o ~/my-rust-project
-```
+- Validated, spec-compliant, easy to work with, and performant baseline types (including typed at:// uris)
+- Batteries-included, but easily replaceable batteries.
+  - Easy to extend with custom lexicons
+- lexicon Value type for working with unknown atproto data (dag-cbor or json)
+- order of magnitude less boilerplate than some existing crates
+  - either the codegen produces code that's easy to work with, or there are good handwritten wrappers
+- didDoc type with helper methods for getting handles, multikey, and PDS endpoint
+- use as much or as little from the crates as you need
 
-[^omnix]: If initializing manually, make sure to:
-    - Change `name` in Cargo.toml.
-    - Run `cargo generate-lockfile` in the nix shelld
-
-## Adapting this template
-
-- There are two CI workflows, and one of them uses Nix which is slower (unless you configure a cache) than the other one based on rustup. Pick one or the other depending on your trade-offs.
-
-## Development (Flakes)
+## Development
 
 This repo uses [Flakes](https://nixos.asia/en/flakes) from the get-go.
 
@@ -33,18 +28,4 @@ nix develop -c cargo run
 nix build
 ```
 
-We also provide a [`justfile`](https://just.systems/) for Makefile'esque commands to be run inside of the devShell.
-
-## Tips
-
-- Run `nix flake update` to update all flake inputs.
-- Run `nix --accept-flake-config run github:juspay/omnix ci` to build _all_ outputs.
-- [pre-commit] hooks will automatically be setup in Nix shell. You can also run `pre-commit run -a` manually to run the hooks (e.g.: to autoformat the project tree using `rustfmt`, `nixpkgs-fmt`, etc.).
-
-## Discussion
-
-- [Zulip](https://nixos.zulipchat.com/#narrow/stream/413950-nix)
-
-## See Also
-
-- [nixos.wiki: Packaging Rust projects with nix](https://nixos.wiki/wiki/Rust#Packaging_Rust_projects_with_nix)
+There's also a [`justfile`](https://just.systems/) for Makefile-esque commands to be run inside of the devShell, and you can generally `cargo ...` or `just ...` whatever just fine if you don't want to use Nix and have the prerequisites installed.
