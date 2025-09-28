@@ -1,11 +1,8 @@
-use std::{convert::Infallible, fmt, marker::PhantomData, ops::Deref, str::FromStr};
-
-use compact_str::ToCompactString;
-use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Visitor};
-
+use crate::{CowStr, IntoStatic};
 pub use cid::Cid as IpldCid;
-
-use crate::CowStr;
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Visitor};
+use smol_str::ToSmolStr;
+use std::{convert::Infallible, fmt, marker::PhantomData, ops::Deref, str::FromStr};
 
 /// raw
 pub const ATP_CID_CODEC: u64 = 0x55;
@@ -47,7 +44,7 @@ impl<'c> Cid<'c> {
         let s = CowStr::Owned(
             cid.to_string_of_base(ATP_CID_BASE)
                 .unwrap_or_default()
-                .to_compact_string(),
+                .to_smolstr(),
         );
         Self::Ipld { cid, s }
     }
@@ -89,7 +86,21 @@ impl FromStr for Cid<'_> {
 
     /// Has to take ownership due to the lifetime constraints of the FromStr trait.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Cid::Str(CowStr::Owned(s.to_compact_string())))
+        Ok(Cid::Str(CowStr::Owned(s.to_smolstr())))
+    }
+}
+
+impl IntoStatic for Cid<'_> {
+    type Output = Cid<'static>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            Cid::Ipld { cid, s } => Cid::Ipld {
+                cid,
+                s: s.into_static(),
+            },
+            Cid::Str(cow_str) => Cid::Str(cow_str.into_static()),
+        }
     }
 }
 
@@ -164,7 +175,7 @@ impl<'d> From<Cid<'d>> for CowStr<'d> {
 
 impl From<String> for Cid<'_> {
     fn from(value: String) -> Self {
-        Cid::Str(CowStr::Owned(value.to_compact_string()))
+        Cid::Str(CowStr::Owned(value.to_smolstr()))
     }
 }
 

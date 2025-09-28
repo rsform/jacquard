@@ -1,5 +1,5 @@
-use crate::types::did::Did;
 use crate::types::handle::Handle;
+use crate::{IntoStatic, types::did::Did};
 use std::fmt;
 use std::str::FromStr;
 
@@ -26,12 +26,22 @@ impl<'i> AtIdentifier<'i> {
         }
     }
 
-    /// Fallible constructor from an existing CowStr, borrows
-    pub fn from_cowstr(ident: CowStr<'i>) -> Result<AtIdentifier<'i>, &'static str> {
-        if let Ok(did) = ident.parse() {
+    /// Fallible constructor, validates, takes ownership
+    pub fn new_owned(ident: impl AsRef<str>) -> Result<Self, &'static str> {
+        let ident = ident.as_ref();
+        if let Ok(did) = Did::new_owned(ident) {
             Ok(AtIdentifier::Did(did))
         } else {
-            ident.parse().map(AtIdentifier::Handle)
+            Ok(AtIdentifier::Handle(Handle::new_owned(ident)?))
+        }
+    }
+
+    /// Fallible constructor, validates, doesn't allocate
+    pub fn new_static(ident: &'static str) -> Result<AtIdentifier<'static>, &'static str> {
+        if let Ok(did) = Did::new_static(ident) {
+            Ok(AtIdentifier::Did(did))
+        } else {
+            Ok(AtIdentifier::Handle(Handle::new_static(ident)?))
         }
     }
 
@@ -90,6 +100,17 @@ impl FromStr for AtIdentifier<'_> {
             Ok(AtIdentifier::Did(did))
         } else {
             s.parse().map(AtIdentifier::Handle)
+        }
+    }
+}
+
+impl IntoStatic for AtIdentifier<'_> {
+    type Output = AtIdentifier<'static>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            AtIdentifier::Did(did) => AtIdentifier::Did(did.into_static()),
+            AtIdentifier::Handle(handle) => AtIdentifier::Handle(handle.into_static()),
         }
     }
 }

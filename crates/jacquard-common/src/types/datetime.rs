@@ -1,10 +1,9 @@
-use std::sync::LazyLock;
-use std::{cmp, str::FromStr};
-
 use chrono::DurationRound;
-use compact_str::ToCompactString;
 use serde::Serializer;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
+use smol_str::ToSmolStr;
+use std::sync::LazyLock;
+use std::{cmp, str::FromStr};
 
 use crate::{CowStr, IntoStatic};
 use regex::Regex;
@@ -58,7 +57,7 @@ impl Datetime {
         // This serialization format is compatible with ISO 8601.
         let serialized = CowStr::Owned(
             dt.to_rfc3339_opts(chrono::SecondsFormat::Micros, true)
-                .to_compact_string(),
+                .to_smolstr(),
         );
         Self { serialized, dt }
     }
@@ -139,7 +138,7 @@ impl TryFrom<String> for Datetime {
         if ISO8601_REGEX.is_match(&value) {
             let dt = chrono::DateTime::parse_from_rfc3339(&value)?;
             Ok(Self {
-                serialized: CowStr::Owned(value.to_compact_string()),
+                serialized: CowStr::Owned(value.to_smolstr()),
                 dt,
             })
         } else {

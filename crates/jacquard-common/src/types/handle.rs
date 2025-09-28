@@ -1,28 +1,32 @@
+use crate::{CowStr, IntoStatic};
+use regex::Regex;
+use serde::{Deserialize, Deserializer, Serialize, de::Error};
+use smol_str::ToSmolStr;
 use std::fmt;
 use std::sync::LazyLock;
 use std::{ops::Deref, str::FromStr};
 
-use compact_str::ToCompactString;
-use serde::{Deserialize, Deserializer, Serialize, de::Error};
-
-use crate::{CowStr, IntoStatic};
-use regex::Regex;
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Hash)]
+#[derive(Clone, PartialEq, Eq, Serialize, Hash)]
 #[serde(transparent)]
+#[repr(transparent)]
 pub struct Handle<'h>(CowStr<'h>);
 
 pub static HANDLE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$").unwrap()
 });
 
+/// AT Protocol handle
 impl<'h> Handle<'h> {
     /// Fallible constructor, validates, borrows from input
     ///
     /// Accepts (and strips) preceding '@' if present
     pub fn new(handle: &'h str) -> Result<Self, &'static str> {
-        let handle = handle.strip_prefix('@').unwrap_or(handle);
-        if handle.len() > 2048 {
+        let handle = handle
+            .strip_prefix("at://")
+            .unwrap_or(handle)
+            .strip_prefix('@')
+            .unwrap_or(handle);
+        if handle.len() > 253 {
             Err("handle too long")
         } else if !HANDLE_REGEX.is_match(handle) {
             Err("Invalid handle")
@@ -31,24 +35,38 @@ impl<'h> Handle<'h> {
         }
     }
 
-    /// Fallible constructor from an existing CowStr, takes ownership
-    ///
-    /// Accepts (and strips) preceding '@' if present
-    pub fn from_cowstr(handle: CowStr<'h>) -> Result<Handle<'h>, &'static str> {
-        let handle = if let Some(handle) = handle.strip_prefix('@') {
-            CowStr::Borrowed(handle)
-        } else {
-            handle
-        };
-        if handle.len() > 2048 {
+    /// Fallible constructor, validates, takes ownership
+    pub fn new_owned(handle: impl AsRef<str>) -> Result<Self, &'static str> {
+        let handle = handle.as_ref();
+        let handle = handle
+            .strip_prefix("at://")
+            .unwrap_or(handle)
+            .strip_prefix('@')
+            .unwrap_or(handle);
+        if handle.len() > 253 {
             Err("handle too long")
-        } else if !HANDLE_REGEX.is_match(&handle) {
+        } else if !HANDLE_REGEX.is_match(handle) {
             Err("Invalid handle")
         } else {
-            Ok(Self(handle.into_static()))
+            Ok(Self(CowStr::Owned(handle.to_smolstr())))
         }
     }
 
+    /// Fallible constructor, validates, doesn't allocate
+    pub fn new_static(handle: &'static str) -> Result<Self, &'static str> {
+        let handle = handle
+            .strip_prefix("at://")
+            .unwrap_or(handle)
+            .strip_prefix('@')
+            .unwrap_or(handle);
+        if handle.len() > 253 {
+            Err("handle too long")
+        } else if !HANDLE_REGEX.is_match(handle) {
+            Err("Invalid handle")
+        } else {
+            Ok(Self(CowStr::new_static(handle)))
+        }
+    }
     /// Infallible constructor for when you *know* the string is a valid handle.
     /// Will panic on invalid handles. If you're manually decoding atproto records
     /// or API values you know are valid (rather than using serde), this is the one to use.
@@ -56,8 +74,12 @@ impl<'h> Handle<'h> {
     ///
     /// Accepts (and strips) preceding '@' if present
     pub fn raw(handle: &'h str) -> Self {
-        let handle = handle.strip_prefix('@').unwrap_or(handle);
-        if handle.len() > 2048 {
+        let handle = handle
+            .strip_prefix("at://")
+            .unwrap_or(handle)
+            .strip_prefix('@')
+            .unwrap_or(handle);
+        if handle.len() > 253 {
             panic!("handle too long")
         } else if !HANDLE_REGEX.is_match(handle) {
             panic!("Invalid handle")
@@ -71,7 +93,11 @@ impl<'h> Handle<'h> {
     ///
     /// Accepts (and strips) preceding '@' if present
     pub unsafe fn unchecked(handle: &'h str) -> Self {
-        let handle = handle.strip_prefix('@').unwrap_or(handle);
+        let handle = handle
+            .strip_prefix("at://")
+            .unwrap_or(handle)
+            .strip_prefix('@')
+            .unwrap_or(handle);
         Self(CowStr::Borrowed(handle))
     }
 
@@ -89,7 +115,15 @@ impl FromStr for Handle<'_> {
     /// Has to take ownership due to the lifetime constraints of the FromStr trait.
     /// Prefer `Handle::new()` or `Handle::raw` if you want to borrow.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::from_cowstr(CowStr::Borrowed(s).into_static())
+        Self::new_owned(s)
+    }
+}
+
+impl IntoStatic for Handle<'_> {
+    type Output = Handle<'static>;
+
+    fn into_static(self) -> Self::Output {
+        Handle(self.0.into_static())
     }
 }
 
@@ -105,7 +139,13 @@ impl<'de> Deserialize<'de> for Handle<'de> {
 
 impl fmt::Display for Handle<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "@{}", self.0)
+        write!(f, "{}", self.0)
+    }
+}
+
+impl fmt::Debug for Handle<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "at://{}", self.0)
     }
 }
 
@@ -123,24 +163,42 @@ impl<'h> From<Handle<'h>> for CowStr<'h> {
 
 impl From<String> for Handle<'static> {
     fn from(value: String) -> Self {
-        if value.len() > 2048 {
+        let value = if let Some(handle) = value
+            .strip_prefix("at://")
+            .unwrap_or(&value)
+            .strip_prefix('@')
+        {
+            CowStr::Borrowed(handle)
+        } else {
+            value.into()
+        };
+        if value.len() > 253 {
             panic!("handle too long")
         } else if !HANDLE_REGEX.is_match(&value) {
             panic!("Invalid handle")
         } else {
-            Self(CowStr::Owned(value.to_compact_string()))
+            Self(value.into_static())
         }
     }
 }
 
 impl<'h> From<CowStr<'h>> for Handle<'h> {
     fn from(value: CowStr<'h>) -> Self {
-        if value.len() > 2048 {
+        let value = if let Some(handle) = value
+            .strip_prefix("at://")
+            .unwrap_or(&value)
+            .strip_prefix('@')
+        {
+            CowStr::Borrowed(handle)
+        } else {
+            value
+        };
+        if value.len() > 253 {
             panic!("handle too long")
         } else if !HANDLE_REGEX.is_match(&value) {
             panic!("Invalid handle")
         } else {
-            Self(value)
+            Self(value.into_static())
         }
     }
 }

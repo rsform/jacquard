@@ -1,65 +1,197 @@
+use crate::CowStr;
+use crate::types::ident::AtIdentifier;
+use crate::types::nsid::Nsid;
+use crate::types::recordkey::{RecordKey, Rkey};
+use regex::Regex;
+use serde::Serializer;
+use serde::{Deserialize, Deserializer, Serialize, de::Error};
+use smol_str::ToSmolStr;
 use std::fmt;
 use std::sync::LazyLock;
 use std::{ops::Deref, str::FromStr};
 
-use compact_str::ToCompactString;
-use serde::{Deserialize, Deserializer, Serialize, de::Error};
+/// at:// URI type
+///
+/// based on the regex here: https://github.com/bluesky-social/atproto/blob/main/packages/syntax/src/aturi_validation.ts
+///
+/// Doesn't support the query segment, but then neither does the Typescript SDK
+///
+/// TODO: support IntoStatic on string types. For composites like this where all borrow from (present) input,
+///       perhaps use some careful unsafe to launder the lifetimes.
+#[derive(Clone, PartialEq, Eq, Hash, Debug)]
+pub struct AtUri<'u> {
+    uri: CowStr<'u>,
+    pub authority: AtIdentifier<'u>,
+    pub path: Option<UriPath<'u>>,
+    pub fragment: Option<CowStr<'u>>,
+}
 
-use crate::{CowStr, IntoStatic};
-use regex::Regex;
+/// at:// URI path component (current subset)
+#[derive(Clone, PartialEq, Eq, Hash, Debug)]
+pub struct UriPath<'u> {
+    pub collection: Nsid<'u>,
+    pub rkey: Option<RecordKey<Rkey<'u>>>,
+}
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Hash)]
-#[serde(transparent)]
-pub struct AtUri<'a>(CowStr<'a>);
+pub type UriPathBuf = UriPath<'static>;
 
-pub static AT_URI_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^$").unwrap());
+pub static ATURI_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r##"^at://(?<authority>[a-zA-Z0-9._:%-]+)(/(?<collection>[a-zA-Z0-9-.]+)(/(?<rkey>[a-zA-Z0-9._~:@!$&%')(*+,;=-]+))?)?(#(?<fragment>/[a-zA-Z0-9._~:@!$&%')(*+,;=-[]/\]*))?$"##).unwrap()
+});
 
-impl<'a> AtUri<'a> {
+impl<'u> AtUri<'u> {
     /// Fallible constructor, validates, borrows from input
-    pub fn new(uri: &'a str) -> Result<Self, &'static str> {
-        if uri.len() > 2048 {
-            Err("AT_URI too long")
-        } else if !AT_URI_REGEX.is_match(uri) {
-            Err("Invalid AT_URI")
+    pub fn new(uri: &'u str) -> Result<Self, &'static str> {
+        if let Some(parts) = ATURI_REGEX.captures(uri) {
+            if let Some(authority) = parts.name("authority") {
+                let authority = AtIdentifier::new(authority.as_str())?;
+                let path = if let Some(collection) = parts.name("collection") {
+                    let collection = Nsid::new(collection.as_str())?;
+                    let rkey = if let Some(rkey) = parts.name("rkey") {
+                        let rkey = RecordKey::from(Rkey::new(rkey.as_str())?);
+                        Some(rkey)
+                    } else {
+                        None
+                    };
+                    Some(UriPath { collection, rkey })
+                } else {
+                    None
+                };
+                let fragment = parts.name("fragment").map(|fragment| {
+                    let fragment = CowStr::Borrowed(fragment.as_str());
+                    fragment
+                });
+                Ok(AtUri {
+                    uri: CowStr::Borrowed(uri),
+                    authority,
+                    path,
+                    fragment,
+                })
+            } else {
+                Err("at:// URI missing authority")
+            }
         } else {
-            Ok(Self(CowStr::Borrowed(uri)))
+            Err("Invalid at:// URI via regex")
         }
     }
 
-    /// Fallible constructor from an existing CowStr, clones and takes
-    pub fn from_cowstr(uri: CowStr<'a>) -> Result<AtUri<'a>, &'static str> {
-        if uri.len() > 2048 {
-            Err("AT_URI too long")
-        } else if !AT_URI_REGEX.is_match(&uri) {
-            Err("Invalid AT_URI")
+    pub fn new_owned(uri: impl AsRef<str>) -> Result<Self, &'static str> {
+        let uri = uri.as_ref();
+        if let Some(parts) = ATURI_REGEX.captures(uri) {
+            if let Some(authority) = parts.name("authority") {
+                let authority = AtIdentifier::new_owned(authority.as_str())?;
+                let path = if let Some(collection) = parts.name("collection") {
+                    let collection = Nsid::new_owned(collection.as_str())?;
+                    let rkey = if let Some(rkey) = parts.name("rkey") {
+                        let rkey = RecordKey::from(Rkey::new_owned(rkey.as_str())?);
+                        Some(rkey)
+                    } else {
+                        None
+                    };
+                    Some(UriPath { collection, rkey })
+                } else {
+                    None
+                };
+                let fragment = parts.name("fragment").map(|fragment| {
+                    let fragment = CowStr::Owned(fragment.as_str().to_smolstr());
+                    fragment
+                });
+                Ok(AtUri {
+                    uri: CowStr::Owned(uri.to_smolstr()),
+                    authority,
+                    path,
+                    fragment,
+                })
+            } else {
+                Err("at:// URI missing authority")
+            }
         } else {
-            Ok(Self(uri.into_static()))
+            Err("Invalid at:// URI via regex")
         }
     }
 
-    /// Infallible constructor for when you *know* the string slice is a valid at:// uri.
-    /// Will panic on invalid URIs. If you're manually decoding atproto records
-    /// or API values you know are valid (rather than using serde), this is the one to use.
-    /// The From<String> and From<CowStr> impls use the same logic.
-    pub fn raw(uri: &'a str) -> Self {
-        if uri.len() > 2048 {
-            panic!("AT_URI too long")
-        } else if !AT_URI_REGEX.is_match(uri) {
-            panic!("Invalid AT_URI")
+    pub fn new_static(uri: &'static str) -> Result<AtUri<'static>, &'static str> {
+        let uri = uri.as_ref();
+        if let Some(parts) = ATURI_REGEX.captures(uri) {
+            if let Some(authority) = parts.name("authority") {
+                let authority = AtIdentifier::new_static(authority.as_str())?;
+                let path = if let Some(collection) = parts.name("collection") {
+                    let collection = Nsid::new_static(collection.as_str())?;
+                    let rkey = if let Some(rkey) = parts.name("rkey") {
+                        let rkey = RecordKey::from(Rkey::new_static(rkey.as_str())?);
+                        Some(rkey)
+                    } else {
+                        None
+                    };
+                    Some(UriPath { collection, rkey })
+                } else {
+                    None
+                };
+                let fragment = parts.name("fragment").map(|fragment| {
+                    let fragment = CowStr::new_static(fragment.as_str());
+                    fragment
+                });
+                Ok(AtUri {
+                    uri: CowStr::new_static(uri),
+                    authority,
+                    path,
+                    fragment,
+                })
+            } else {
+                Err("at:// URI missing authority")
+            }
         } else {
-            Self(CowStr::Borrowed(uri))
+            Err("Invalid at:// URI via regex")
         }
     }
 
-    /// Infallible constructor for when you *know* the string is a valid AT_URI.
-    /// Marked unsafe because responsibility for upholding the invariant is on the developer.
-    pub unsafe fn unchecked(uri: &'a str) -> Self {
-        Self(CowStr::Borrowed(uri))
+    pub unsafe fn unchecked(uri: &'u str) -> Self {
+        if let Some(parts) = ATURI_REGEX.captures(uri) {
+            if let Some(authority) = parts.name("authority") {
+                let authority = unsafe { AtIdentifier::unchecked(authority.as_str()) };
+                let path = if let Some(collection) = parts.name("collection") {
+                    let collection = unsafe { Nsid::unchecked(collection.as_str()) };
+                    let rkey = if let Some(rkey) = parts.name("rkey") {
+                        let rkey = RecordKey::from(unsafe { Rkey::unchecked(rkey.as_str()) });
+                        Some(rkey)
+                    } else {
+                        None
+                    };
+                    Some(UriPath { collection, rkey })
+                } else {
+                    None
+                };
+                let fragment = parts.name("fragment").map(|fragment| {
+                    let fragment = CowStr::Borrowed(fragment.as_str());
+                    fragment
+                });
+                AtUri {
+                    uri: CowStr::Borrowed(uri),
+                    authority,
+                    path,
+                    fragment,
+                }
+            } else {
+                Self {
+                    uri: CowStr::Borrowed(uri),
+                    authority: unsafe { AtIdentifier::unchecked(uri) },
+                    path: None,
+                    fragment: None,
+                }
+            }
+        } else {
+            Self {
+                uri: CowStr::Borrowed(uri),
+                authority: unsafe { AtIdentifier::unchecked(uri) },
+                path: None,
+                fragment: None,
+            }
+        }
     }
 
     pub fn as_str(&self) -> &str {
         {
-            let this = &self.0;
+            let this = &self.uri;
             this
         }
     }
@@ -69,73 +201,68 @@ impl FromStr for AtUri<'_> {
     type Err = &'static str;
 
     /// Has to take ownership due to the lifetime constraints of the FromStr trait.
-    /// Prefer `AtUri::new()` or `AtUri::raw` if you want to borrow.
+    /// Prefer `AtUri::new()` or `AtUri::raw()` if you want to borrow.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::from_cowstr(CowStr::Owned(s.to_compact_string()))
+        Self::new_owned(s)
     }
 }
 
-impl<'ae> Deserialize<'ae> for AtUri<'ae> {
+impl<'de> Deserialize<'de> for AtUri<'de> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
-        D: Deserializer<'ae>,
+        D: Deserializer<'de>,
     {
         let value = Deserialize::deserialize(deserializer)?;
         Self::new(value).map_err(D::Error::custom)
     }
 }
 
+impl Serialize for AtUri<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(&self.uri)
+    }
+}
+
 impl fmt::Display for AtUri<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.0)
+        f.write_str(&self.uri)
     }
 }
 
-impl<'a> From<AtUri<'a>> for String {
-    fn from(value: AtUri<'a>) -> Self {
-        value.0.to_string()
+impl<'d> From<AtUri<'d>> for String {
+    fn from(value: AtUri<'d>) -> Self {
+        value.uri.to_string()
     }
 }
 
-impl<'s> From<&'s AtUri<'_>> for &'s str {
-    fn from(value: &'s AtUri<'_>) -> Self {
-        value.0.as_ref()
+impl<'d> From<AtUri<'d>> for CowStr<'d> {
+    fn from(value: AtUri<'d>) -> Self {
+        value.uri
     }
 }
 
-impl<'a> From<AtUri<'a>> for CowStr<'a> {
-    fn from(value: AtUri<'a>) -> Self {
-        value.0
+impl TryFrom<String> for AtUri<'static> {
+    type Error = &'static str;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        Self::new_owned(&value)
     }
 }
 
-impl From<String> for AtUri<'static> {
-    fn from(value: String) -> Self {
-        if value.len() > 2048 {
-            panic!("AT_URI too long")
-        } else if !AT_URI_REGEX.is_match(&value) {
-            panic!("Invalid AT_URI")
-        } else {
-            Self(CowStr::Owned(value.to_compact_string()))
-        }
-    }
-}
-
-impl<'a> From<CowStr<'a>> for AtUri<'a> {
-    fn from(value: CowStr<'a>) -> Self {
-        if value.len() > 2048 {
-            panic!("AT_URI too long")
-        } else if !AT_URI_REGEX.is_match(&value) {
-            panic!("Invalid AT_URI")
-        } else {
-            Self(value)
-        }
+impl<'d> TryFrom<CowStr<'d>> for AtUri<'d> {
+    type Error = &'static str;
+    /// TODO: rewrite to avoid taking ownership/cloning
+    fn try_from(value: CowStr<'d>) -> Result<Self, Self::Error> {
+        Self::new_owned(value)
     }
 }
 
 impl AsRef<str> for AtUri<'_> {
     fn as_ref(&self) -> &str {
-        self.as_str()
+        &self.uri.as_ref()
     }
 }
 
@@ -143,6 +270,6 @@ impl Deref for AtUri<'_> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
-        self.as_str()
+        self.uri.as_ref()
     }
 }

@@ -1,15 +1,14 @@
+use crate::{CowStr, IntoStatic};
+use regex::Regex;
+use serde::{Deserialize, Deserializer, Serialize, de::Error};
+use smol_str::ToSmolStr;
 use std::fmt;
 use std::sync::LazyLock;
 use std::{ops::Deref, str::FromStr};
 
-use compact_str::ToCompactString;
-use serde::{Deserialize, Deserializer, Serialize, de::Error};
-
-use crate::{CowStr, IntoStatic};
-use regex::Regex;
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Hash)]
+#[derive(Clone, PartialEq, Eq, Serialize, Hash)]
 #[serde(transparent)]
+#[repr(transparent)]
 pub struct Did<'d>(CowStr<'d>);
 
 pub static DID_REGEX: LazyLock<Regex> =
@@ -18,6 +17,7 @@ pub static DID_REGEX: LazyLock<Regex> =
 impl<'d> Did<'d> {
     /// Fallible constructor, validates, borrows from input
     pub fn new(did: &'d str) -> Result<Self, &'static str> {
+        let did = did.strip_prefix("at://").unwrap_or(did);
         if did.len() > 2048 {
             Err("DID too long")
         } else if !DID_REGEX.is_match(did) {
@@ -27,14 +27,28 @@ impl<'d> Did<'d> {
         }
     }
 
-    /// Fallible constructor from an existing CowStr, takes ownership
-    pub fn from_cowstr(did: CowStr<'d>) -> Result<Did<'d>, &'static str> {
+    /// Fallible constructor, validates, takes ownership
+    pub fn new_owned(did: impl AsRef<str>) -> Result<Self, &'static str> {
+        let did = did.as_ref();
+        let did = did.strip_prefix("at://").unwrap_or(did);
         if did.len() > 2048 {
             Err("DID too long")
-        } else if !DID_REGEX.is_match(&did) {
+        } else if !DID_REGEX.is_match(did) {
             Err("Invalid DID")
         } else {
-            Ok(Self(did.into_static()))
+            Ok(Self(CowStr::Owned(did.to_smolstr())))
+        }
+    }
+
+    /// Fallible constructor, validates, doesn't allocate
+    pub fn new_static(did: &'static str) -> Result<Self, &'static str> {
+        let did = did.strip_prefix("at://").unwrap_or(did);
+        if did.len() > 2048 {
+            Err("DID too long")
+        } else if !DID_REGEX.is_match(did) {
+            Err("Invalid DID")
+        } else {
+            Ok(Self(CowStr::new_static(did)))
         }
     }
 
@@ -43,6 +57,7 @@ impl<'d> Did<'d> {
     /// or API values you know are valid (rather than using serde), this is the one to use.
     /// The From<String> and From<CowStr> impls use the same logic.
     pub fn raw(did: &'d str) -> Self {
+        let did = did.strip_prefix("at://").unwrap_or(did);
         if did.len() > 2048 {
             panic!("DID too long")
         } else if !DID_REGEX.is_match(did) {
@@ -72,7 +87,15 @@ impl FromStr for Did<'_> {
     /// Has to take ownership due to the lifetime constraints of the FromStr trait.
     /// Prefer `Did::new()` or `Did::raw` if you want to borrow.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::from_cowstr(CowStr::Borrowed(s).into_static())
+        Self::new_owned(s)
+    }
+}
+
+impl IntoStatic for Did<'_> {
+    type Output = Did<'static>;
+
+    fn into_static(self) -> Self::Output {
+        Did(self.0.into_static())
     }
 }
 
@@ -92,6 +115,12 @@ impl fmt::Display for Did<'_> {
     }
 }
 
+impl fmt::Debug for Did<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "at://{}", self.0)
+    }
+}
+
 impl<'d> From<Did<'d>> for String {
     fn from(value: Did<'d>) -> Self {
         value.0.to_string()
@@ -106,24 +135,34 @@ impl<'d> From<Did<'d>> for CowStr<'d> {
 
 impl From<String> for Did<'static> {
     fn from(value: String) -> Self {
+        let value = if let Some(did) = value.strip_prefix("at://") {
+            CowStr::Borrowed(did)
+        } else {
+            value.into()
+        };
         if value.len() > 2048 {
             panic!("DID too long")
         } else if !DID_REGEX.is_match(&value) {
             panic!("Invalid DID")
         } else {
-            Self(CowStr::Owned(value.to_compact_string()))
+            Self(value.into_static())
         }
     }
 }
 
 impl<'d> From<CowStr<'d>> for Did<'d> {
     fn from(value: CowStr<'d>) -> Self {
+        let value = if let Some(did) = value.strip_prefix("at://") {
+            CowStr::Borrowed(did)
+        } else {
+            value
+        };
         if value.len() > 2048 {
             panic!("DID too long")
         } else if !DID_REGEX.is_match(&value) {
             panic!("Invalid DID")
         } else {
-            Self(value)
+            Self(value.into_static())
         }
     }
 }

@@ -1,7 +1,8 @@
-use crate::{CowStr, types::cid::Cid};
-use compact_str::ToCompactString;
+use crate::{CowStr, IntoStatic, types::cid::Cid};
 #[allow(unused)]
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error};
+use smol_str::ToSmolStr;
+use std::convert::Infallible;
 #[allow(unused)]
 use std::{
     borrow::Cow,
@@ -39,12 +40,21 @@ pub enum BlobRef<'r> {
 /// Wrapper for file type
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 #[serde(transparent)]
+#[repr(transparent)]
 pub struct MimeType<'m>(pub CowStr<'m>);
 
 impl<'m> MimeType<'m> {
     /// Fallible constructor, validates, borrows from input
     pub fn new(mime_type: &'m str) -> Result<MimeType<'m>, &'static str> {
         Ok(Self(CowStr::Borrowed(mime_type)))
+    }
+
+    pub fn new_owned(mime_type: impl AsRef<str>) -> Self {
+        Self(CowStr::Owned(mime_type.as_ref().to_smolstr()))
+    }
+
+    pub fn new_static(mime_type: &'static str) -> Self {
+        Self(CowStr::new_static(mime_type))
     }
 
     /// Fallible constructor from an existing CowStr, borrows
@@ -66,11 +76,19 @@ impl<'m> MimeType<'m> {
 }
 
 impl FromStr for MimeType<'_> {
-    type Err = &'static str;
+    type Err = Infallible;
 
     /// Has to take ownership due to the lifetime constraints of the FromStr trait.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::from_cowstr(CowStr::Owned(s.to_compact_string()))
+        Ok(Self::new_owned(s))
+    }
+}
+
+impl IntoStatic for MimeType<'_> {
+    type Output = MimeType<'static>;
+
+    fn into_static(self) -> Self::Output {
+        MimeType(self.0.into_static())
     }
 }
 
@@ -107,7 +125,7 @@ impl<'m> From<MimeType<'m>> for CowStr<'m> {
 
 impl From<String> for MimeType<'static> {
     fn from(value: String) -> Self {
-        Self(CowStr::Owned(value.to_compact_string()))
+        Self(CowStr::Owned(value.to_smolstr()))
     }
 }
 

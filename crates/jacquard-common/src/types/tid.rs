@@ -1,18 +1,17 @@
+use serde::{Deserialize, Deserializer, Serialize, de::Error};
+use smol_str::{SmolStr, SmolStrBuilder};
 use std::fmt;
 use std::sync::LazyLock;
 use std::{ops::Deref, str::FromStr};
 
-use compact_str::{CompactString, ToCompactString};
-use serde::{Deserialize, Deserializer, Serialize, de::Error};
-
+use crate::CowStr;
 use crate::types::integer::LimitedU32;
-use crate::{CowStr, IntoStatic};
 use regex::Regex;
 
-fn s32_encode(mut i: u64) -> CowStr<'static> {
+fn s32_encode(mut i: u64) -> SmolStr {
     const S32_CHAR: &[u8] = b"234567abcdefghijklmnopqrstuvwxyz";
 
-    let mut s = CompactString::with_capacity(13);
+    let mut s = SmolStrBuilder::new();
     for _ in 0..13 {
         let c = i & 0x1F;
         s.push(S32_CHAR[c as usize] as char);
@@ -20,8 +19,11 @@ fn s32_encode(mut i: u64) -> CowStr<'static> {
         i >>= 5;
     }
 
-    // Reverse the string to convert it to big-endian format.
-    CowStr::Owned(s.chars().rev().collect())
+    let mut builder = SmolStrBuilder::new();
+    for c in s.finish().chars().rev() {
+        builder.push(c);
+    }
+    builder.finish()
 }
 
 static TID_REGEX: LazyLock<Regex> = LazyLock::new(|| {
@@ -33,28 +35,19 @@ static TID_REGEX: LazyLock<Regex> = LazyLock::new(|| {
 /// [Timestamp Identifier]: https://atproto.com/specs/tid
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Hash)]
 #[serde(transparent)]
-pub struct Tid<'t>(CowStr<'t>);
+#[repr(transparent)]
+pub struct Tid(SmolStr);
 
-impl<'t> Tid<'t> {
+impl Tid {
     /// Parses a `TID` from the given string.
-    pub fn new(tid: &'t str) -> Result<Self, &'static str> {
+    pub fn new(tid: impl AsRef<str>) -> Result<Self, &'static str> {
+        let tid = tid.as_ref();
         if tid.len() != 13 {
             Err("TID must be 13 characters")
-        } else if !TID_REGEX.is_match(&tid) {
+        } else if !TID_REGEX.is_match(&tid.as_ref()) {
             Err("Invalid TID")
         } else {
-            Ok(Self(CowStr::Owned(tid.to_compact_string())))
-        }
-    }
-
-    /// Fallible constructor from an existing CowStr, takes ownership
-    pub fn from_cowstr(tid: CowStr<'t>) -> Result<Tid<'t>, &'static str> {
-        if tid.len() != 13 {
-            Err("TID must be 13 characters")
-        } else if !TID_REGEX.is_match(&tid) {
-            Err("Invalid TID")
-        } else {
-            Ok(Self(tid.into_static()))
+            Ok(Self(SmolStr::new_inline(&tid)))
         }
     }
 
@@ -62,20 +55,22 @@ impl<'t> Tid<'t> {
     /// Will panic on invalid TID. If you're manually decoding atproto records
     /// or API values you know are valid (rather than using serde), this is the one to use.
     /// The From<String> and From<CowStr> impls use the same logic.
-    pub fn raw(tid: &'t str) -> Self {
+    pub fn raw(tid: impl AsRef<str>) -> Self {
+        let tid = tid.as_ref();
         if tid.len() != 13 {
             panic!("TID must be 13 characters")
         } else if !TID_REGEX.is_match(&tid) {
             panic!("Invalid TID")
         } else {
-            Self(CowStr::Borrowed(tid))
+            Self(SmolStr::new_inline(tid))
         }
     }
 
     /// Infallible constructor for when you *know* the string is a valid TID.
     /// Marked unsafe because responsibility for upholding the invariant is on the developer.
-    pub unsafe fn unchecked(tid: &'t str) -> Self {
-        Self(CowStr::Borrowed(tid))
+    pub unsafe fn unchecked(tid: impl AsRef<str>) -> Self {
+        let tid = tid.as_ref();
+        Self(SmolStr::new_inline(tid))
     }
 
     /// Construct a new timestamp with the specified clock ID.
@@ -121,75 +116,75 @@ impl<'t> Tid<'t> {
     }
 }
 
-impl FromStr for Tid<'_> {
+impl FromStr for Tid {
     type Err = &'static str;
 
     /// Has to take ownership due to the lifetime constraints of the FromStr trait.
     /// Prefer `Did::new()` or `Did::raw` if you want to borrow.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::from_cowstr(CowStr::Borrowed(s).into_static())
+        Self::new(s)
     }
 }
 
-impl<'de> Deserialize<'de> for Tid<'de> {
+impl<'de> Deserialize<'de> for Tid {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
-        let value = Deserialize::deserialize(deserializer)?;
+        let value: &str = Deserialize::deserialize(deserializer)?;
         Self::new(value).map_err(D::Error::custom)
     }
 }
 
-impl fmt::Display for Tid<'_> {
+impl fmt::Display for Tid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(&self.0)
     }
 }
 
-impl<'t> From<Tid<'t>> for String {
-    fn from(value: Tid<'t>) -> Self {
+impl From<Tid> for String {
+    fn from(value: Tid) -> Self {
         value.0.to_string()
     }
 }
 
-impl<'t> From<Tid<'t>> for CowStr<'t> {
-    fn from(value: Tid<'t>) -> Self {
+impl From<Tid> for SmolStr {
+    fn from(value: Tid) -> Self {
         value.0
     }
 }
 
-impl From<String> for Tid<'static> {
+impl From<String> for Tid {
     fn from(value: String) -> Self {
         if value.len() != 13 {
             panic!("TID must be 13 characters")
         } else if !TID_REGEX.is_match(&value) {
             panic!("Invalid TID")
         } else {
-            Self(CowStr::Owned(value.to_compact_string()))
+            Self(SmolStr::new_inline(&value))
         }
     }
 }
 
-impl<'t> From<CowStr<'t>> for Tid<'t> {
+impl<'t> From<CowStr<'t>> for Tid {
     fn from(value: CowStr<'t>) -> Self {
         if value.len() != 13 {
             panic!("TID must be 13 characters")
         } else if !TID_REGEX.is_match(&value) {
             panic!("Invalid TID")
         } else {
-            Self(value)
+            Self(SmolStr::new_inline(&value))
         }
     }
 }
 
-impl AsRef<str> for Tid<'_> {
+impl AsRef<str> for Tid {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl Deref for Tid<'_> {
+impl Deref for Tid {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {

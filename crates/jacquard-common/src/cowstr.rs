@@ -1,5 +1,5 @@
-use compact_str::CompactString;
 use serde::{Deserialize, Serialize};
+use smol_str::SmolStr;
 use std::{
     borrow::Cow,
     fmt,
@@ -10,15 +10,15 @@ use std::{
 use crate::IntoStatic;
 
 /// Shamelessly copied from https://github.com/bearcove/merde
-/// A copy-on-write string type that uses [`CompactString`] for
+/// A copy-on-write immutable string type that uses [`SmolStr`] for
 /// the "owned" variant.
 ///
 /// The standard [`Cow`] type cannot be used, since
-/// `<str as ToOwned>::Owned` is `String`, and not `CompactString`.
+/// `<str as ToOwned>::Owned` is `String`, and not `SmolStr`.
 #[derive(Clone)]
 pub enum CowStr<'s> {
     Borrowed(&'s str),
-    Owned(CompactString),
+    Owned(SmolStr),
 }
 
 impl CowStr<'static> {
@@ -26,7 +26,11 @@ impl CowStr<'static> {
     /// if the `compact_str` feature is disabled, or if the string is longer
     /// than `MAX_INLINE_SIZE`.
     pub fn copy_from_str(s: &str) -> Self {
-        Self::Owned(CompactString::from(s))
+        Self::Owned(SmolStr::from(s))
+    }
+
+    pub fn new_static(s: &'static str) -> Self {
+        Self::Owned(SmolStr::new_static(s))
     }
 }
 
@@ -38,12 +42,12 @@ impl<'s> CowStr<'s> {
 
     #[inline]
     pub fn from_utf8_owned(s: Vec<u8>) -> Result<Self, std::str::Utf8Error> {
-        Ok(Self::Owned(CompactString::from_utf8(s)?))
+        Ok(Self::Owned(SmolStr::new(std::str::from_utf8(&s)?)))
     }
 
     #[inline]
     pub fn from_utf8_lossy(s: &'s [u8]) -> Self {
-        Self::Owned(CompactString::from_utf8_lossy(s))
+        Self::Owned(String::from_utf8_lossy(&s).into())
     }
 
     /// # Safety
@@ -51,7 +55,7 @@ impl<'s> CowStr<'s> {
     /// This function is unsafe because it does not check that the bytes are valid UTF-8.
     #[inline]
     pub unsafe fn from_utf8_unchecked(s: &'s [u8]) -> Self {
-        unsafe { Self::Owned(CompactString::from_utf8_unchecked(s)) }
+        unsafe { Self::Owned(SmolStr::new(std::str::from_utf8_unchecked(s))) }
     }
 }
 
@@ -133,7 +137,7 @@ impl From<CowStr<'_>> for Box<str> {
     fn from(s: CowStr<'_>) -> Self {
         match s {
             CowStr::Borrowed(s) => s.into(),
-            CowStr::Owned(s) => s.into(),
+            CowStr::Owned(s) => String::from(s).into_boxed_str(),
         }
     }
 }

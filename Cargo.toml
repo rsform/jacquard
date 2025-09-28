@@ -7,6 +7,13 @@ members = ["crates/*"]
 edition = "2024"
 version = "0.1.0"
 authors = ["Orual <orual@nonbinary.computer>"]
+repository = "https://tangled.org/@nonbinary.computer/jacquard"
+keywords = ["atproto", "at protocol", "bluesky", "api", "client"]
+categories = ["api-bindings", "web-programming::http-client"]
+readme = "README.md"
+documentation = "https://docs.rs/jacquard"
+exclude = [".direnv"]
+
 
 description = "A simple Rust project using Nix"
 
