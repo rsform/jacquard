@@ -7,6 +7,7 @@ pub mod did;
 pub mod handle;
 pub mod ident;
 pub mod integer;
+pub mod language;
 pub mod link;
 pub mod nsid;
 pub mod recordkey;
