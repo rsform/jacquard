@@ -1,8 +1,7 @@
-use bytes::Bytes;
 use miette::SourceSpan;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use smol_str::{SmolStr, ToSmolStr};
-use std::{collections::BTreeMap, str::FromStr, sync::Arc};
+use std::{str::FromStr, sync::Arc};
 
 use crate::IntoStatic;
 pub use crate::{
@@ -187,9 +186,7 @@ impl IntoStatic for AtprotoStr<'_> {
             AtprotoStr::Did(did) => AtprotoStr::Did(did.into_static()),
             AtprotoStr::Handle(handle) => AtprotoStr::Handle(handle.into_static()),
             AtprotoStr::AtIdentifier(ident) => AtprotoStr::AtIdentifier(ident.into_static()),
-            AtprotoStr::AtUri(at_uri) => {
-                AtprotoStr::AtUri(AtUri::new_owned(at_uri.as_str()).unwrap())
-            }
+            AtprotoStr::AtUri(at_uri) => AtprotoStr::AtUri(at_uri.into_static()),
             AtprotoStr::Uri(uri) => AtprotoStr::Uri(uri.into_static()),
             AtprotoStr::Cid(cid) => AtprotoStr::Cid(cid.into_static()),
             AtprotoStr::RecordKey(record_key) => AtprotoStr::RecordKey(record_key.into_static()),
@@ -214,7 +211,7 @@ impl IntoStatic for AtprotoStr<'_> {
 pub struct AtStrError {
     pub spec: SmolStr,
     #[source_code]
-    source: String,
+    pub source: String,
     #[source]
     #[diagnostic_source]
     pub kind: StrParseKind,

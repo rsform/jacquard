@@ -21,6 +21,29 @@ pub struct Blob<'b> {
     pub size: usize,
 }
 
+impl IntoStatic for Blob<'_> {
+    type Output = Blob<'static>;
+
+    fn into_static(self) -> Self::Output {
+        Blob {
+            r#ref: self.r#ref.into_static(),
+            mime_type: self.mime_type.into_static(),
+            size: self.size,
+        }
+    }
+}
+
+/// Current, typed blob reference.
+/// Quite dislike this nesting, but it serves the same purpose as it did in Atrium
+/// Couple of helper methods and conversions to make it less annoying.
+/// TODO: revisit nesting and maybe hand-roll a serde impl that supports this sans nesting
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type", rename_all = "lowercase")]
+pub enum BlobRef<'r> {
+    #[serde(borrow)]
+    Blob(Blob<'r>),
+}
+
 impl<'r> BlobRef<'r> {
     pub fn blob(&self) -> &Blob<'r> {
         match self {
@@ -29,12 +52,28 @@ impl<'r> BlobRef<'r> {
     }
 }
 
-/// Current, typed blob reference.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(tag = "$type", rename_all = "lowercase")]
-pub enum BlobRef<'r> {
-    #[serde(borrow)]
-    Blob(Blob<'r>),
+impl<'b> From<BlobRef<'b>> for Blob<'b> {
+    fn from(blob_ref: BlobRef<'b>) -> Self {
+        match blob_ref {
+            BlobRef::Blob(blob) => blob,
+        }
+    }
+}
+
+impl<'b> From<Blob<'b>> for BlobRef<'b> {
+    fn from(blob: Blob<'b>) -> Self {
+        BlobRef::Blob(blob)
+    }
+}
+
+impl IntoStatic for BlobRef<'_> {
+    type Output = BlobRef<'static>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            BlobRef::Blob(blob) => BlobRef::Blob(blob.into_static()),
+        }
+    }
 }
 
 /// Wrapper for file type

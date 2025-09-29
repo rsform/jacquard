@@ -1,13 +1,14 @@
-use crate::CowStr;
 use crate::types::ident::AtIdentifier;
 use crate::types::nsid::Nsid;
 use crate::types::recordkey::{RecordKey, Rkey};
 use crate::types::string::AtStrError;
+use crate::{CowStr, IntoStatic};
 use regex::Regex;
 use serde::Serializer;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, ToSmolStr};
 use std::fmt;
+use std::hash::{Hash, Hasher};
 use std::sync::LazyLock;
 use std::{ops::Deref, str::FromStr};
 
@@ -15,16 +16,69 @@ use std::{ops::Deref, str::FromStr};
 ///
 /// based on the regex here: https://github.com/bluesky-social/atproto/blob/main/packages/syntax/src/aturi_validation.ts
 ///
-/// Doesn't support the query segment, but then neither does the Typescript SDK
-///
-/// TODO: support IntoStatic on string types. For composites like this where all borrow from (present) input,
-///       perhaps use some careful unsafe to launder the lifetimes.
-#[derive(Clone, PartialEq, Eq, Hash, Debug)]
+/// Doesn't support the query segment, but then neither does the Typescript SDK.
+#[derive(PartialEq, Eq, Debug)]
 pub struct AtUri<'u> {
+    inner: Inner<'u>,
+}
+
+#[ouroboros::self_referencing]
+#[derive(PartialEq, Eq, Debug)]
+struct Inner<'u> {
     uri: CowStr<'u>,
-    pub authority: AtIdentifier<'u>,
-    pub path: Option<UriPath<'u>>,
-    pub fragment: Option<CowStr<'u>>,
+    #[borrows(uri)]
+    #[covariant]
+    pub authority: AtIdentifier<'this>,
+    #[borrows(uri)]
+    #[covariant]
+    pub path: Option<UriPath<'this>>,
+    #[borrows(uri)]
+    #[covariant]
+    pub fragment: Option<CowStr<'this>>,
+}
+
+impl Clone for AtUri<'_> {
+    fn clone(&self) -> Self {
+        let uri = self.inner.borrow_uri();
+
+        Self {
+            inner: Inner::new(
+                CowStr::Owned(uri.as_ref().to_smolstr()),
+                |uri| {
+                    let parts = ATURI_REGEX.captures(uri).unwrap();
+                    unsafe { AtIdentifier::unchecked(parts.name("authority").unwrap().as_str()) }
+                },
+                |uri| {
+                    let parts = ATURI_REGEX.captures(uri).unwrap();
+                    if let Some(collection) = parts.name("collection") {
+                        let collection = unsafe { Nsid::unchecked(collection.as_str()) };
+                        let rkey = if let Some(rkey) = parts.name("rkey") {
+                            let rkey = unsafe { RecordKey::from(Rkey::unchecked(rkey.as_str())) };
+                            Some(rkey)
+                        } else {
+                            None
+                        };
+                        Some(UriPath { collection, rkey })
+                    } else {
+                        None
+                    }
+                },
+                |uri| {
+                    let parts = ATURI_REGEX.captures(uri).unwrap();
+                    parts.name("fragment").map(|fragment| {
+                        let fragment = CowStr::Borrowed(fragment.as_str());
+                        fragment
+                    })
+                },
+            ),
+        }
+    }
+}
+
+impl Hash for AtUri<'_> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.inner.borrow_uri().hash(state);
+    }
 }
 
 /// at:// URI path component (current subset)
@@ -32,6 +86,17 @@ pub struct AtUri<'u> {
 pub struct UriPath<'u> {
     pub collection: Nsid<'u>,
     pub rkey: Option<RecordKey<Rkey<'u>>>,
+}
+
+impl IntoStatic for UriPath<'_> {
+    type Output = UriPath<'static>;
+
+    fn into_static(self) -> Self::Output {
+        UriPath {
+            collection: self.collection.into_static(),
+            rkey: self.rkey.map(|rkey| rkey.into_static()),
+        }
+    }
 }
 
 pub type UriPathBuf = UriPath<'static>;
@@ -68,10 +133,13 @@ impl<'u> AtUri<'u> {
                     fragment
                 });
                 Ok(AtUri {
-                    uri: CowStr::Borrowed(uri),
-                    authority,
-                    path,
-                    fragment,
+                    inner: InnerBuilder {
+                        uri: CowStr::Borrowed(uri),
+                        authority_builder: |_| authority,
+                        path_builder: |_| path,
+                        fragment_builder: |_| fragment,
+                    }
+                    .build(),
                 })
             } else {
                 Err(AtStrError::missing("at-uri-scheme", uri, "authority"))
@@ -106,10 +174,13 @@ impl<'u> AtUri<'u> {
                     fragment
                 });
                 AtUri {
-                    uri: CowStr::Borrowed(uri),
-                    authority,
-                    path,
-                    fragment,
+                    inner: InnerBuilder {
+                        uri: CowStr::Borrowed(uri),
+                        authority_builder: |_| authority,
+                        path_builder: |_| path,
+                        fragment_builder: |_| fragment,
+                    }
+                    .build(),
                 }
             } else {
                 panic!("at:// URI missing authority")
@@ -119,20 +190,18 @@ impl<'u> AtUri<'u> {
         }
     }
 
-    pub fn new_owned(uri: impl AsRef<str>) -> Result<Self, AtStrError> {
-        let uri = uri.as_ref();
+    /// Unchecked borrowing constructor. This one does do some validation but if that fails will just
+    /// dump everything in the authority field.
+    ///
+    /// TODO: do some fallback splitting, but really, if you use this on something invalid, you deserve it.
+    pub unsafe fn unchecked(uri: &'u str) -> Self {
         if let Some(parts) = ATURI_REGEX.captures(uri) {
             if let Some(authority) = parts.name("authority") {
-                let authority = AtIdentifier::new_owned(authority.as_str())
-                    .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
+                let authority = unsafe { AtIdentifier::unchecked(authority.as_str()) };
                 let path = if let Some(collection) = parts.name("collection") {
-                    let collection = Nsid::new_owned(collection.as_str())
-                        .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
+                    let collection = unsafe { Nsid::unchecked(collection.as_str()) };
                     let rkey = if let Some(rkey) = parts.name("rkey") {
-                        let rkey =
-                            RecordKey::from(Rkey::new_owned(rkey.as_str()).map_err(|e| {
-                                AtStrError::wrap("at-uri-scheme", uri.to_string(), e)
-                            })?);
+                        let rkey = RecordKey::from(unsafe { Rkey::unchecked(rkey.as_str()) });
                         Some(rkey)
                     } else {
                         None
@@ -142,28 +211,195 @@ impl<'u> AtUri<'u> {
                     None
                 };
                 let fragment = parts.name("fragment").map(|fragment| {
-                    let fragment = CowStr::Owned(fragment.as_str().to_smolstr());
+                    let fragment = CowStr::Borrowed(fragment.as_str());
                     fragment
                 });
+                AtUri {
+                    inner: InnerBuilder {
+                        uri: CowStr::Borrowed(uri),
+                        authority_builder: |_| authority,
+                        path_builder: |_| path,
+                        fragment_builder: |_| fragment,
+                    }
+                    .build(),
+                }
+            } else {
+                // let mut uriParts = uri.split('#');
+                // let mut parts = uriParts.next().unwrap_or(uri).split('/');
+                // let auth = parts.next().unwrap_or(uri);
+                Self {
+                    inner: InnerBuilder {
+                        uri: CowStr::Borrowed(uri),
+                        authority_builder: |_| unsafe { AtIdentifier::unchecked(uri) },
+                        path_builder: |_| None,
+                        fragment_builder: |_| None,
+                    }
+                    .build(),
+                }
+            }
+        } else {
+            Self {
+                inner: InnerBuilder {
+                    uri: CowStr::Borrowed(uri),
+                    authority_builder: |_| unsafe { AtIdentifier::unchecked(uri) },
+                    path_builder: |_| None,
+                    fragment_builder: |_| None,
+                }
+                .build(),
+            }
+        }
+    }
+
+    /// Clone method that should be O(1) in terms of time
+    ///
+    /// Calling on a borrowed variant will turn it into an owned variant, taking a little
+    /// more time and allocating memory for each part. Calling it on an owned variant will
+    /// increment all the internal reference counters (or, if constructed from a `&'static str`,
+    /// essentially do nothing).
+    pub fn fast_clone(&self) -> AtUri<'static> {
+        self.inner.with(move |u| {
+            let uri = u.uri.clone().into_static();
+            let authority = u.authority.clone().into_static();
+            let path = u.path.clone().into_static();
+            let fragment = u.fragment.clone().into_static();
+            AtUri {
+                inner: InnerBuilder {
+                    uri,
+                    authority_builder: |_| authority,
+                    path_builder: |_| path,
+                    fragment_builder: |_| fragment,
+                }
+                .build(),
+            }
+        })
+    }
+
+    pub fn as_str(&self) -> &str {
+        {
+            let this = &self.inner.borrow_uri();
+            this
+        }
+    }
+
+    pub fn authority(&self) -> &AtIdentifier<'_> {
+        self.inner.borrow_authority()
+    }
+
+    pub fn path(&self) -> &Option<UriPath<'_>> {
+        self.inner.borrow_path()
+    }
+
+    pub fn fragment(&self) -> &Option<CowStr<'_>> {
+        self.inner.borrow_fragment()
+    }
+
+    pub fn collection(&self) -> Option<&Nsid<'_>> {
+        self.inner.borrow_path().as_ref().map(|p| &p.collection)
+    }
+
+    pub fn rkey(&self) -> Option<&RecordKey<Rkey<'_>>> {
+        self.inner
+            .borrow_path()
+            .as_ref()
+            .and_then(|p| p.rkey.as_ref())
+    }
+}
+
+impl AtUri<'static> {
+    /// Owned constructor
+    ///
+    /// Uses ouroboros self-referential tricks internally to make sure everything
+    /// borrows efficiently from the uri `CowStr<'static>`.
+    ///
+    /// Performs validation up-front, but is slower than the borrowing constructor
+    /// due to currently having to re-run the main regex, in addition to allocating.
+    ///
+    /// `.into_static()` and Clone implementations have similar limitations.
+    ///
+    /// O(1) clone mathod is AtUri::fast_clone().
+    ///
+    /// Future optimization involves working out the indices borrowed and either using those
+    /// to avoid re-computing in some places, or, for a likely fully optimal version, only storing
+    /// the indices and constructing the borrowed components unsafely when asked.
+    pub fn new_owned(uri: impl AsRef<str>) -> Result<Self, AtStrError> {
+        if let Some(parts) = ATURI_REGEX.captures(uri.as_ref()) {
+            if let Some(authority) = parts.name("authority") {
+                let _authority = AtIdentifier::new(authority.as_str())
+                    .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.as_ref().to_string(), e))?;
+                let path = if let Some(collection) = parts.name("collection") {
+                    let collection = Nsid::new(collection.as_str()).map_err(|e| {
+                        AtStrError::wrap("at-uri-scheme", uri.as_ref().to_string(), e)
+                    })?;
+                    let rkey = if let Some(rkey) = parts.name("rkey") {
+                        let rkey = RecordKey::from(Rkey::new(rkey.as_str()).map_err(|e| {
+                            AtStrError::wrap("at-uri-scheme", uri.as_ref().to_string(), e)
+                        })?);
+                        Some(rkey)
+                    } else {
+                        None
+                    };
+                    Some(UriPath { collection, rkey })
+                } else {
+                    None
+                };
+
                 Ok(AtUri {
-                    uri: CowStr::Owned(uri.to_smolstr()),
-                    authority,
-                    path,
-                    fragment,
+                    inner: Inner::new(
+                        CowStr::Owned(uri.as_ref().to_smolstr()),
+                        |uri| {
+                            let parts = ATURI_REGEX.captures(uri).unwrap();
+                            unsafe {
+                                AtIdentifier::unchecked(parts.name("authority").unwrap().as_str())
+                            }
+                        },
+                        |uri| {
+                            if path.is_some() {
+                                let parts = ATURI_REGEX.captures(uri).unwrap();
+                                if let Some(collection) = parts.name("collection") {
+                                    let collection =
+                                        unsafe { Nsid::unchecked(collection.as_str()) };
+                                    let rkey = if let Some(rkey) = parts.name("rkey") {
+                                        let rkey = unsafe {
+                                            RecordKey::from(Rkey::unchecked(rkey.as_str()))
+                                        };
+                                        Some(rkey)
+                                    } else {
+                                        None
+                                    };
+                                    Some(UriPath { collection, rkey })
+                                } else {
+                                    None
+                                }
+                            } else {
+                                None
+                            }
+                        },
+                        |uri| {
+                            let parts = ATURI_REGEX.captures(uri).unwrap();
+                            parts.name("fragment").map(|fragment| {
+                                let fragment = CowStr::Borrowed(fragment.as_str());
+                                fragment
+                            })
+                        },
+                    ),
                 })
             } else {
-                Err(AtStrError::missing("at-uri-scheme", uri, "authority"))
+                Err(AtStrError::missing(
+                    "at-uri-scheme",
+                    &uri.as_ref(),
+                    "authority",
+                ))
             }
         } else {
             Err(AtStrError::regex(
                 "at-uri-scheme",
-                uri,
+                &uri.as_ref(),
                 SmolStr::new_static("doesn't match schema"),
             ))
         }
     }
 
-    pub fn new_static(uri: &'static str) -> Result<AtUri<'static>, AtStrError> {
+    pub fn new_static(uri: &'static str) -> Result<Self, AtStrError> {
         let uri = uri.as_ref();
         if let Some(parts) = ATURI_REGEX.captures(uri) {
             if let Some(authority) = parts.name("authority") {
@@ -190,10 +426,13 @@ impl<'u> AtUri<'u> {
                     fragment
                 });
                 Ok(AtUri {
-                    uri: CowStr::new_static(uri),
-                    authority,
-                    path,
-                    fragment,
+                    inner: InnerBuilder {
+                        uri: CowStr::new_static(uri),
+                        authority_builder: |_| authority,
+                        path_builder: |_| path,
+                        fragment_builder: |_| fragment,
+                    }
+                    .build(),
                 })
             } else {
                 Err(AtStrError::missing("at-uri-scheme", uri, "authority"))
@@ -206,15 +445,26 @@ impl<'u> AtUri<'u> {
             ))
         }
     }
+}
 
-    pub unsafe fn unchecked(uri: &'u str) -> Self {
-        if let Some(parts) = ATURI_REGEX.captures(uri) {
+impl FromStr for AtUri<'_> {
+    type Err = AtStrError;
+
+    /// Has to take ownership due to the lifetime constraints of the FromStr trait.
+    /// Prefer `AtUri::new()` or `AtUri::raw()` if you want to borrow.
+    fn from_str(uri: &str) -> Result<Self, Self::Err> {
+        if let Some(parts) = ATURI_REGEX.captures(uri.as_ref()) {
             if let Some(authority) = parts.name("authority") {
-                let authority = unsafe { AtIdentifier::unchecked(authority.as_str()) };
+                let _authority = AtIdentifier::new(authority.as_str())
+                    .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                 let path = if let Some(collection) = parts.name("collection") {
-                    let collection = unsafe { Nsid::unchecked(collection.as_str()) };
+                    let collection = Nsid::new(collection.as_str())
+                        .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                     let rkey = if let Some(rkey) = parts.name("rkey") {
-                        let rkey = RecordKey::from(unsafe { Rkey::unchecked(rkey.as_str()) });
+                        let rkey =
+                            RecordKey::from(Rkey::new(rkey.as_str()).map_err(|e| {
+                                AtStrError::wrap("at-uri-scheme", uri.to_string(), e)
+                            })?);
                         Some(rkey)
                     } else {
                         None
@@ -223,49 +473,108 @@ impl<'u> AtUri<'u> {
                 } else {
                     None
                 };
-                let fragment = parts.name("fragment").map(|fragment| {
-                    let fragment = CowStr::Borrowed(fragment.as_str());
-                    fragment
-                });
-                AtUri {
-                    uri: CowStr::Borrowed(uri),
-                    authority,
-                    path,
-                    fragment,
-                }
+
+                Ok(AtUri {
+                    inner: Inner::new(
+                        CowStr::Owned(uri.to_smolstr()),
+                        |uri| {
+                            let parts = ATURI_REGEX.captures(uri).unwrap();
+                            unsafe {
+                                AtIdentifier::unchecked(parts.name("authority").unwrap().as_str())
+                            }
+                        },
+                        |uri| {
+                            if path.is_some() {
+                                let parts = ATURI_REGEX.captures(uri).unwrap();
+                                if let Some(collection) = parts.name("collection") {
+                                    let collection =
+                                        unsafe { Nsid::unchecked(collection.as_str()) };
+                                    let rkey = if let Some(rkey) = parts.name("rkey") {
+                                        let rkey = unsafe {
+                                            RecordKey::from(Rkey::unchecked(rkey.as_str()))
+                                        };
+                                        Some(rkey)
+                                    } else {
+                                        None
+                                    };
+                                    Some(UriPath { collection, rkey })
+                                } else {
+                                    None
+                                }
+                            } else {
+                                None
+                            }
+                        },
+                        |uri| {
+                            let parts = ATURI_REGEX.captures(uri).unwrap();
+                            parts.name("fragment").map(|fragment| {
+                                let fragment = CowStr::Borrowed(fragment.as_str());
+                                fragment
+                            })
+                        },
+                    ),
+                })
             } else {
-                Self {
-                    uri: CowStr::Borrowed(uri),
-                    authority: unsafe { AtIdentifier::unchecked(uri) },
-                    path: None,
-                    fragment: None,
-                }
+                Err(AtStrError::missing(
+                    "at-uri-scheme",
+                    &uri.as_ref(),
+                    "authority",
+                ))
             }
         } else {
-            Self {
-                uri: CowStr::Borrowed(uri),
-                authority: unsafe { AtIdentifier::unchecked(uri) },
-                path: None,
-                fragment: None,
-            }
-        }
-    }
-
-    pub fn as_str(&self) -> &str {
-        {
-            let this = &self.uri;
-            this
+            Err(AtStrError::regex(
+                "at-uri-scheme",
+                &uri.as_ref(),
+                SmolStr::new_static("doesn't match schema"),
+            ))
         }
     }
 }
 
-impl FromStr for AtUri<'_> {
-    type Err = AtStrError;
+impl IntoStatic for AtUri<'_> {
+    type Output = AtUri<'static>;
 
-    /// Has to take ownership due to the lifetime constraints of the FromStr trait.
-    /// Prefer `AtUri::new()` or `AtUri::raw()` if you want to borrow.
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::new_owned(s)
+    fn into_static(self) -> AtUri<'static> {
+        AtUri {
+            inner: Inner::new(
+                self.inner.borrow_uri().clone().into_static(),
+                |uri| {
+                    let parts = ATURI_REGEX.captures(uri).unwrap();
+                    unsafe { AtIdentifier::unchecked(parts.name("authority").unwrap().as_str()) }
+                },
+                |uri| {
+                    if self.inner.borrow_path().is_some() {
+                        let parts = ATURI_REGEX.captures(uri).unwrap();
+                        if let Some(collection) = parts.name("collection") {
+                            let collection = unsafe { Nsid::unchecked(collection.as_str()) };
+                            let rkey = if let Some(rkey) = parts.name("rkey") {
+                                let rkey =
+                                    unsafe { RecordKey::from(Rkey::unchecked(rkey.as_str())) };
+                                Some(rkey)
+                            } else {
+                                None
+                            };
+                            Some(UriPath { collection, rkey })
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
+                    }
+                },
+                |uri| {
+                    if self.inner.borrow_fragment().is_some() {
+                        let parts = ATURI_REGEX.captures(uri).unwrap();
+                        parts.name("fragment").map(|fragment| {
+                            let fragment = CowStr::Borrowed(fragment.as_str());
+                            fragment
+                        })
+                    } else {
+                        None
+                    }
+                },
+            ),
+        }
     }
 }
 
@@ -284,25 +593,25 @@ impl Serialize for AtUri<'_> {
     where
         S: Serializer,
     {
-        serializer.serialize_str(&self.uri)
+        serializer.serialize_str(&self.inner.borrow_uri())
     }
 }
 
 impl fmt::Display for AtUri<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.uri)
+        f.write_str(&self.inner.borrow_uri())
     }
 }
 
 impl<'d> From<AtUri<'d>> for String {
     fn from(value: AtUri<'d>) -> Self {
-        value.uri.to_string()
+        value.inner.borrow_uri().to_string()
     }
 }
 
 impl<'d> From<AtUri<'d>> for CowStr<'d> {
     fn from(value: AtUri<'d>) -> Self {
-        value.uri
+        value.inner.borrow_uri().clone()
     }
 }
 
@@ -316,15 +625,83 @@ impl TryFrom<String> for AtUri<'static> {
 
 impl<'d> TryFrom<CowStr<'d>> for AtUri<'d> {
     type Error = AtStrError;
-    /// TODO: rewrite to avoid taking ownership/cloning
-    fn try_from(value: CowStr<'d>) -> Result<Self, Self::Error> {
-        Self::new_owned(value)
+    fn try_from(uri: CowStr<'d>) -> Result<Self, Self::Error> {
+        if let Some(parts) = ATURI_REGEX.captures(uri.as_ref()) {
+            if let Some(authority) = parts.name("authority") {
+                let _authority = AtIdentifier::new(authority.as_str())
+                    .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
+                let _path = if let Some(collection) = parts.name("collection") {
+                    let collection = Nsid::new(collection.as_str())
+                        .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
+                    let rkey = if let Some(rkey) = parts.name("rkey") {
+                        let rkey =
+                            RecordKey::from(Rkey::new(rkey.as_str()).map_err(|e| {
+                                AtStrError::wrap("at-uri-scheme", uri.to_string(), e)
+                            })?);
+                        Some(rkey)
+                    } else {
+                        None
+                    };
+                    Some(UriPath { collection, rkey })
+                } else {
+                    None
+                };
+                drop(parts);
+
+                Ok(AtUri {
+                    inner: Inner::new(
+                        uri,
+                        |uri| {
+                            let parts = ATURI_REGEX.captures(uri).unwrap();
+                            unsafe {
+                                AtIdentifier::unchecked(parts.name("authority").unwrap().as_str())
+                            }
+                        },
+                        |uri| {
+                            let parts = ATURI_REGEX.captures(uri).unwrap();
+                            if let Some(collection) = parts.name("collection") {
+                                let collection = unsafe { Nsid::unchecked(collection.as_str()) };
+                                let rkey = if let Some(rkey) = parts.name("rkey") {
+                                    let rkey =
+                                        unsafe { RecordKey::from(Rkey::unchecked(rkey.as_str())) };
+                                    Some(rkey)
+                                } else {
+                                    None
+                                };
+                                Some(UriPath { collection, rkey })
+                            } else {
+                                None
+                            }
+                        },
+                        |uri| {
+                            let parts = ATURI_REGEX.captures(uri).unwrap();
+                            parts.name("fragment").map(|fragment| {
+                                let fragment = CowStr::Borrowed(fragment.as_str());
+                                fragment
+                            })
+                        },
+                    ),
+                })
+            } else {
+                Err(AtStrError::missing(
+                    "at-uri-scheme",
+                    &uri.as_ref(),
+                    "authority",
+                ))
+            }
+        } else {
+            Err(AtStrError::regex(
+                "at-uri-scheme",
+                &uri.as_ref(),
+                SmolStr::new_static("doesn't match schema"),
+            ))
+        }
     }
 }
 
 impl AsRef<str> for AtUri<'_> {
     fn as_ref(&self) -> &str {
-        &self.uri.as_ref()
+        &self.inner.borrow_uri().as_ref()
     }
 }
 
@@ -332,6 +709,6 @@ impl Deref for AtUri<'_> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
-        self.uri.as_ref()
+        self.inner.borrow_uri().as_ref()
     }
 }

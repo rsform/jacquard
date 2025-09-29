@@ -20,6 +20,7 @@ langtag = { version = "0.4.0", features = ["serde"] }
 miette = "7.6.0"
 multibase = "0.9.1"
 multihash = "0.19.3"
+ouroboros = "0.18.5"
 regex = "1.11.3"
 serde = { version = "1.0.227", features = ["derive"] }
 serde_html_form = "0.2.8"
