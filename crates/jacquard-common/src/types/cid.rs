@@ -40,13 +40,23 @@ impl<'c> Cid<'c> {
             Ok(Self::Str(cid_str))
         }
     }
-    pub fn ipld(cid: IpldCid) -> Self {
+
+    pub fn new_owned(cid: &[u8]) -> Result<Cid<'static>, Error> {
+        if let Ok(cid) = IpldCid::try_from(cid.as_ref()) {
+            Ok(Self::ipld(cid))
+        } else {
+            let cid_str = CowStr::from_utf8(cid)?;
+            Ok(Cid::Str(cid_str.into_static()))
+        }
+    }
+
+    pub fn ipld(cid: IpldCid) -> Cid<'static> {
         let s = CowStr::Owned(
             cid.to_string_of_base(ATP_CID_BASE)
                 .unwrap_or_default()
                 .to_smolstr(),
         );
-        Self::Ipld { cid, s }
+        Cid::Ipld { cid, s }
     }
 
     pub fn str(cid: &'c str) -> Self {

@@ -13,7 +13,7 @@ pub static ISO8601_REGEX: LazyLock<Regex> = LazyLock::new(|| {
 });
 
 /// A Lexicon timestamp.
-#[derive(Clone, Debug, Eq)]
+#[derive(Clone, Debug, Eq, Hash)]
 pub struct Datetime {
     /// Serialized form. Preserved during parsing to ensure round-trip re-serialization.
     serialized: CowStr<'static>,
@@ -98,7 +98,7 @@ impl FromStr for Datetime {
         if ISO8601_REGEX.is_match(s) {
             let dt = chrono::DateTime::parse_from_rfc3339(s)?;
             Ok(Self {
-                serialized: CowStr::Borrowed(s).into_static(),
+                serialized: CowStr::Owned(s.to_smolstr()),
                 dt,
             })
         } else {

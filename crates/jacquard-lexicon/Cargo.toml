@@ -1,0 +1,14 @@
+[package]
+name = "jacquard-lexicon"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme.workspace = true
+documentation.workspace = true
+exclude.workspace = true
+description.workspace = true
+
+[dependencies]

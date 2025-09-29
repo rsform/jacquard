@@ -1,7 +1,9 @@
+use crate::types::string::AtStrError;
+use crate::types::{DISALLOWED_TLDS, ends_with};
 use crate::{CowStr, IntoStatic};
 use regex::Regex;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
-use smol_str::ToSmolStr;
+use smol_str::{SmolStr, ToSmolStr};
 use std::fmt;
 use std::sync::LazyLock;
 use std::{ops::Deref, str::FromStr};
@@ -20,23 +22,29 @@ impl<'h> Handle<'h> {
     /// Fallible constructor, validates, borrows from input
     ///
     /// Accepts (and strips) preceding '@' if present
-    pub fn new(handle: &'h str) -> Result<Self, &'static str> {
+    pub fn new(handle: &'h str) -> Result<Self, AtStrError> {
         let handle = handle
             .strip_prefix("at://")
             .unwrap_or(handle)
             .strip_prefix('@')
             .unwrap_or(handle);
         if handle.len() > 253 {
-            Err("handle too long")
+            Err(AtStrError::too_long("handle", handle, 253, handle.len()))
         } else if !HANDLE_REGEX.is_match(handle) {
-            Err("Invalid handle")
+            Err(AtStrError::regex(
+                "handle",
+                handle,
+                SmolStr::new_static("invalid"),
+            ))
+        } else if ends_with(handle, DISALLOWED_TLDS) {
+            Err(AtStrError::disallowed("handle", handle, DISALLOWED_TLDS))
         } else {
             Ok(Self(CowStr::Borrowed(handle)))
         }
     }
 
     /// Fallible constructor, validates, takes ownership
-    pub fn new_owned(handle: impl AsRef<str>) -> Result<Self, &'static str> {
+    pub fn new_owned(handle: impl AsRef<str>) -> Result<Self, AtStrError> {
         let handle = handle.as_ref();
         let handle = handle
             .strip_prefix("at://")
@@ -44,25 +52,37 @@ impl<'h> Handle<'h> {
             .strip_prefix('@')
             .unwrap_or(handle);
         if handle.len() > 253 {
-            Err("handle too long")
+            Err(AtStrError::too_long("handle", handle, 253, handle.len()))
         } else if !HANDLE_REGEX.is_match(handle) {
-            Err("Invalid handle")
+            Err(AtStrError::regex(
+                "handle",
+                handle,
+                SmolStr::new_static("invalid"),
+            ))
+        } else if ends_with(handle, DISALLOWED_TLDS) {
+            Err(AtStrError::disallowed("handle", handle, DISALLOWED_TLDS))
         } else {
             Ok(Self(CowStr::Owned(handle.to_smolstr())))
         }
     }
 
     /// Fallible constructor, validates, doesn't allocate
-    pub fn new_static(handle: &'static str) -> Result<Self, &'static str> {
+    pub fn new_static(handle: &'static str) -> Result<Self, AtStrError> {
         let handle = handle
             .strip_prefix("at://")
             .unwrap_or(handle)
             .strip_prefix('@')
             .unwrap_or(handle);
         if handle.len() > 253 {
-            Err("handle too long")
+            Err(AtStrError::too_long("handle", handle, 253, handle.len()))
         } else if !HANDLE_REGEX.is_match(handle) {
-            Err("Invalid handle")
+            Err(AtStrError::regex(
+                "handle",
+                handle,
+                SmolStr::new_static("invalid"),
+            ))
+        } else if ends_with(handle, DISALLOWED_TLDS) {
+            Err(AtStrError::disallowed("handle", handle, DISALLOWED_TLDS))
         } else {
             Ok(Self(CowStr::new_static(handle)))
         }
@@ -83,6 +103,8 @@ impl<'h> Handle<'h> {
             panic!("handle too long")
         } else if !HANDLE_REGEX.is_match(handle) {
             panic!("Invalid handle")
+        } else if ends_with(handle, DISALLOWED_TLDS) {
+            panic!("top-level domain not allowed in handles")
         } else {
             Self(CowStr::Borrowed(handle))
         }
@@ -110,7 +132,7 @@ impl<'h> Handle<'h> {
 }
 
 impl FromStr for Handle<'_> {
-    type Err = &'static str;
+    type Err = AtStrError;
 
     /// Has to take ownership due to the lifetime constraints of the FromStr trait.
     /// Prefer `Handle::new()` or `Handle::raw` if you want to borrow.
@@ -163,43 +185,13 @@ impl<'h> From<Handle<'h>> for CowStr<'h> {
 
 impl From<String> for Handle<'static> {
     fn from(value: String) -> Self {
-        let value = if let Some(handle) = value
-            .strip_prefix("at://")
-            .unwrap_or(&value)
-            .strip_prefix('@')
-        {
-            CowStr::Borrowed(handle)
-        } else {
-            value.into()
-        };
-        if value.len() > 253 {
-            panic!("handle too long")
-        } else if !HANDLE_REGEX.is_match(&value) {
-            panic!("Invalid handle")
-        } else {
-            Self(value.into_static())
-        }
+        Self::new_owned(value).unwrap()
     }
 }
 
 impl<'h> From<CowStr<'h>> for Handle<'h> {
     fn from(value: CowStr<'h>) -> Self {
-        let value = if let Some(handle) = value
-            .strip_prefix("at://")
-            .unwrap_or(&value)
-            .strip_prefix('@')
-        {
-            CowStr::Borrowed(handle)
-        } else {
-            value
-        };
-        if value.len() > 253 {
-            panic!("handle too long")
-        } else if !HANDLE_REGEX.is_match(&value) {
-            panic!("Invalid handle")
-        } else {
-            Self(value.into_static())
-        }
+        Self::new_owned(value).unwrap()
     }
 }
 

@@ -2,10 +2,11 @@ use crate::CowStr;
 use crate::types::ident::AtIdentifier;
 use crate::types::nsid::Nsid;
 use crate::types::recordkey::{RecordKey, Rkey};
+use crate::types::string::AtStrError;
 use regex::Regex;
 use serde::Serializer;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
-use smol_str::ToSmolStr;
+use smol_str::{SmolStr, ToSmolStr};
 use std::fmt;
 use std::sync::LazyLock;
 use std::{ops::Deref, str::FromStr};
@@ -41,14 +42,19 @@ pub static ATURI_REGEX: LazyLock<Regex> = LazyLock::new(|| {
 
 impl<'u> AtUri<'u> {
     /// Fallible constructor, validates, borrows from input
-    pub fn new(uri: &'u str) -> Result<Self, &'static str> {
+    pub fn new(uri: &'u str) -> Result<Self, AtStrError> {
         if let Some(parts) = ATURI_REGEX.captures(uri) {
             if let Some(authority) = parts.name("authority") {
-                let authority = AtIdentifier::new(authority.as_str())?;
+                let authority = AtIdentifier::new(authority.as_str())
+                    .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                 let path = if let Some(collection) = parts.name("collection") {
-                    let collection = Nsid::new(collection.as_str())?;
+                    let collection = Nsid::new(collection.as_str())
+                        .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                     let rkey = if let Some(rkey) = parts.name("rkey") {
-                        let rkey = RecordKey::from(Rkey::new(rkey.as_str())?);
+                        let rkey =
+                            RecordKey::from(Rkey::new(rkey.as_str()).map_err(|e| {
+                                AtStrError::wrap("at-uri-scheme", uri.to_string(), e)
+                            })?);
                         Some(rkey)
                     } else {
                         None
@@ -68,22 +74,65 @@ impl<'u> AtUri<'u> {
                     fragment,
                 })
             } else {
-                Err("at:// URI missing authority")
+                Err(AtStrError::missing("at-uri-scheme", uri, "authority"))
             }
         } else {
-            Err("Invalid at:// URI via regex")
+            Err(AtStrError::regex(
+                "at-uri-scheme",
+                uri,
+                SmolStr::new_static("doesn't match schema"),
+            ))
         }
     }
 
-    pub fn new_owned(uri: impl AsRef<str>) -> Result<Self, &'static str> {
+    pub fn raw(uri: &'u str) -> Self {
+        if let Some(parts) = ATURI_REGEX.captures(uri) {
+            if let Some(authority) = parts.name("authority") {
+                let authority = AtIdentifier::raw(authority.as_str());
+                let path = if let Some(collection) = parts.name("collection") {
+                    let collection = Nsid::raw(collection.as_str());
+                    let rkey = if let Some(rkey) = parts.name("rkey") {
+                        let rkey = RecordKey::from(Rkey::raw(rkey.as_str()));
+                        Some(rkey)
+                    } else {
+                        None
+                    };
+                    Some(UriPath { collection, rkey })
+                } else {
+                    None
+                };
+                let fragment = parts.name("fragment").map(|fragment| {
+                    let fragment = CowStr::Borrowed(fragment.as_str());
+                    fragment
+                });
+                AtUri {
+                    uri: CowStr::Borrowed(uri),
+                    authority,
+                    path,
+                    fragment,
+                }
+            } else {
+                panic!("at:// URI missing authority")
+            }
+        } else {
+            panic!("Invalid at:// URI via regex")
+        }
+    }
+
+    pub fn new_owned(uri: impl AsRef<str>) -> Result<Self, AtStrError> {
         let uri = uri.as_ref();
         if let Some(parts) = ATURI_REGEX.captures(uri) {
             if let Some(authority) = parts.name("authority") {
-                let authority = AtIdentifier::new_owned(authority.as_str())?;
+                let authority = AtIdentifier::new_owned(authority.as_str())
+                    .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                 let path = if let Some(collection) = parts.name("collection") {
-                    let collection = Nsid::new_owned(collection.as_str())?;
+                    let collection = Nsid::new_owned(collection.as_str())
+                        .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                     let rkey = if let Some(rkey) = parts.name("rkey") {
-                        let rkey = RecordKey::from(Rkey::new_owned(rkey.as_str())?);
+                        let rkey =
+                            RecordKey::from(Rkey::new_owned(rkey.as_str()).map_err(|e| {
+                                AtStrError::wrap("at-uri-scheme", uri.to_string(), e)
+                            })?);
                         Some(rkey)
                     } else {
                         None
@@ -103,22 +152,31 @@ impl<'u> AtUri<'u> {
                     fragment,
                 })
             } else {
-                Err("at:// URI missing authority")
+                Err(AtStrError::missing("at-uri-scheme", uri, "authority"))
             }
         } else {
-            Err("Invalid at:// URI via regex")
+            Err(AtStrError::regex(
+                "at-uri-scheme",
+                uri,
+                SmolStr::new_static("doesn't match schema"),
+            ))
         }
     }
 
-    pub fn new_static(uri: &'static str) -> Result<AtUri<'static>, &'static str> {
+    pub fn new_static(uri: &'static str) -> Result<AtUri<'static>, AtStrError> {
         let uri = uri.as_ref();
         if let Some(parts) = ATURI_REGEX.captures(uri) {
             if let Some(authority) = parts.name("authority") {
-                let authority = AtIdentifier::new_static(authority.as_str())?;
+                let authority = AtIdentifier::new_static(authority.as_str())
+                    .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                 let path = if let Some(collection) = parts.name("collection") {
-                    let collection = Nsid::new_static(collection.as_str())?;
+                    let collection = Nsid::new_static(collection.as_str())
+                        .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                     let rkey = if let Some(rkey) = parts.name("rkey") {
-                        let rkey = RecordKey::from(Rkey::new_static(rkey.as_str())?);
+                        let rkey =
+                            RecordKey::from(Rkey::new_static(rkey.as_str()).map_err(|e| {
+                                AtStrError::wrap("at-uri-scheme", uri.to_string(), e)
+                            })?);
                         Some(rkey)
                     } else {
                         None
@@ -138,10 +196,14 @@ impl<'u> AtUri<'u> {
                     fragment,
                 })
             } else {
-                Err("at:// URI missing authority")
+                Err(AtStrError::missing("at-uri-scheme", uri, "authority"))
             }
         } else {
-            Err("Invalid at:// URI via regex")
+            Err(AtStrError::regex(
+                "at-uri-scheme",
+                uri,
+                SmolStr::new_static("doesn't match schema"),
+            ))
         }
     }
 
@@ -198,7 +260,7 @@ impl<'u> AtUri<'u> {
 }
 
 impl FromStr for AtUri<'_> {
-    type Err = &'static str;
+    type Err = AtStrError;
 
     /// Has to take ownership due to the lifetime constraints of the FromStr trait.
     /// Prefer `AtUri::new()` or `AtUri::raw()` if you want to borrow.
@@ -245,7 +307,7 @@ impl<'d> From<AtUri<'d>> for CowStr<'d> {
 }
 
 impl TryFrom<String> for AtUri<'static> {
-    type Error = &'static str;
+    type Error = AtStrError;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
         Self::new_owned(&value)
@@ -253,7 +315,7 @@ impl TryFrom<String> for AtUri<'static> {
 }
 
 impl<'d> TryFrom<CowStr<'d>> for AtUri<'d> {
-    type Error = &'static str;
+    type Error = AtStrError;
     /// TODO: rewrite to avoid taking ownership/cloning
     fn try_from(value: CowStr<'d>) -> Result<Self, Self::Error> {
         Self::new_owned(value)

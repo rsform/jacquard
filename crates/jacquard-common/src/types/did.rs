@@ -1,7 +1,8 @@
+use crate::types::string::AtStrError;
 use crate::{CowStr, IntoStatic};
 use regex::Regex;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
-use smol_str::ToSmolStr;
+use smol_str::{SmolStr, ToSmolStr};
 use std::fmt;
 use std::sync::LazyLock;
 use std::{ops::Deref, str::FromStr};
@@ -16,37 +17,49 @@ pub static DID_REGEX: LazyLock<Regex> =
 
 impl<'d> Did<'d> {
     /// Fallible constructor, validates, borrows from input
-    pub fn new(did: &'d str) -> Result<Self, &'static str> {
+    pub fn new(did: &'d str) -> Result<Self, AtStrError> {
         let did = did.strip_prefix("at://").unwrap_or(did);
         if did.len() > 2048 {
-            Err("DID too long")
+            Err(AtStrError::too_long("did", did, 2048, did.len()))
         } else if !DID_REGEX.is_match(did) {
-            Err("Invalid DID")
+            Err(AtStrError::regex(
+                "did",
+                did,
+                SmolStr::new_static("invalid"),
+            ))
         } else {
             Ok(Self(CowStr::Borrowed(did)))
         }
     }
 
     /// Fallible constructor, validates, takes ownership
-    pub fn new_owned(did: impl AsRef<str>) -> Result<Self, &'static str> {
+    pub fn new_owned(did: impl AsRef<str>) -> Result<Self, AtStrError> {
         let did = did.as_ref();
         let did = did.strip_prefix("at://").unwrap_or(did);
         if did.len() > 2048 {
-            Err("DID too long")
+            Err(AtStrError::too_long("did", did, 2048, did.len()))
         } else if !DID_REGEX.is_match(did) {
-            Err("Invalid DID")
+            Err(AtStrError::regex(
+                "did",
+                did,
+                SmolStr::new_static("invalid"),
+            ))
         } else {
             Ok(Self(CowStr::Owned(did.to_smolstr())))
         }
     }
 
     /// Fallible constructor, validates, doesn't allocate
-    pub fn new_static(did: &'static str) -> Result<Self, &'static str> {
+    pub fn new_static(did: &'static str) -> Result<Self, AtStrError> {
         let did = did.strip_prefix("at://").unwrap_or(did);
         if did.len() > 2048 {
-            Err("DID too long")
+            Err(AtStrError::too_long("did", did, 2048, did.len()))
         } else if !DID_REGEX.is_match(did) {
-            Err("Invalid DID")
+            Err(AtStrError::regex(
+                "did",
+                did,
+                SmolStr::new_static("invalid"),
+            ))
         } else {
             Ok(Self(CowStr::new_static(did)))
         }
@@ -82,7 +95,7 @@ impl<'d> Did<'d> {
 }
 
 impl FromStr for Did<'_> {
-    type Err = &'static str;
+    type Err = AtStrError;
 
     /// Has to take ownership due to the lifetime constraints of the FromStr trait.
     /// Prefer `Did::new()` or `Did::raw` if you want to borrow.

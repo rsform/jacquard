@@ -5,22 +5,24 @@ use std::{ops::Deref, str::FromStr};
 
 use crate::CowStr;
 
-/// A [Timestamp Identifier].
+/// An IETF language tag.
 ///
-/// [Timestamp Identifier]: https://atproto.com/specs/lang
+/// Uses langtag crate for validation, but is stored as a SmolStr for size/avoiding allocations
+///
+/// TODO: Implement langtag-style semantic matching for this type, delegating to langtag
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Hash)]
 #[serde(transparent)]
 #[repr(transparent)]
-pub struct Lang(SmolStr);
+pub struct Language(SmolStr);
 
-impl Lang {
+impl Language {
     /// Parses an IETF language tag from the given string.
     pub fn new<T>(lang: &T) -> Result<Self, langtag::InvalidLangTag<&T>>
     where
         T: AsRef<str> + ?Sized,
     {
         let tag = langtag::LangTag::new(lang)?;
-        Ok(Lang(SmolStr::new_inline(tag.as_str())))
+        Ok(Language(SmolStr::new_inline(tag.as_str())))
     }
 
     /// Infallible constructor for when you *know* the string is a valid IETF language tag.
@@ -30,7 +32,7 @@ impl Lang {
     pub fn raw(lang: impl AsRef<str>) -> Self {
         let lang = lang.as_ref();
         let tag = langtag::LangTag::new(lang).expect("valid IETF language tag");
-        Lang(SmolStr::new_inline(tag.as_str()))
+        Language(SmolStr::new_inline(tag.as_str()))
     }
 
     /// Infallible constructor for when you *know* the string is a valid IETF language tag.
@@ -49,7 +51,7 @@ impl Lang {
     }
 }
 
-impl FromStr for Lang {
+impl FromStr for Language {
     type Err = SmolStr;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -57,7 +59,7 @@ impl FromStr for Lang {
     }
 }
 
-impl<'de> Deserialize<'de> for Lang {
+impl<'de> Deserialize<'de> for Language {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -67,43 +69,43 @@ impl<'de> Deserialize<'de> for Lang {
     }
 }
 
-impl fmt::Display for Lang {
+impl fmt::Display for Language {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(&self.0)
     }
 }
 
-impl From<Lang> for String {
-    fn from(value: Lang) -> Self {
+impl From<Language> for String {
+    fn from(value: Language) -> Self {
         value.0.to_string()
     }
 }
 
-impl From<Lang> for SmolStr {
-    fn from(value: Lang) -> Self {
+impl From<Language> for SmolStr {
+    fn from(value: Language) -> Self {
         value.0
     }
 }
 
-impl From<String> for Lang {
+impl From<String> for Language {
     fn from(value: String) -> Self {
         Self::raw(&value)
     }
 }
 
-impl<'t> From<CowStr<'t>> for Lang {
+impl<'t> From<CowStr<'t>> for Language {
     fn from(value: CowStr<'t>) -> Self {
         Self::raw(&value)
     }
 }
 
-impl AsRef<str> for Lang {
+impl AsRef<str> for Language {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl Deref for Lang {
+impl Deref for Language {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {

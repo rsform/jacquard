@@ -1,4 +1,5 @@
 use crate::types::handle::Handle;
+use crate::types::string::AtStrError;
 use crate::{IntoStatic, types::did::Did};
 use std::fmt;
 use std::str::FromStr;
@@ -18,7 +19,7 @@ pub enum AtIdentifier<'i> {
 
 impl<'i> AtIdentifier<'i> {
     /// Fallible constructor, validates, borrows from input
-    pub fn new(ident: &'i str) -> Result<Self, &'static str> {
+    pub fn new(ident: &'i str) -> Result<Self, AtStrError> {
         if let Ok(did) = ident.parse() {
             Ok(AtIdentifier::Did(did))
         } else {
@@ -27,7 +28,7 @@ impl<'i> AtIdentifier<'i> {
     }
 
     /// Fallible constructor, validates, takes ownership
-    pub fn new_owned(ident: impl AsRef<str>) -> Result<Self, &'static str> {
+    pub fn new_owned(ident: impl AsRef<str>) -> Result<Self, AtStrError> {
         let ident = ident.as_ref();
         if let Ok(did) = Did::new_owned(ident) {
             Ok(AtIdentifier::Did(did))
@@ -37,7 +38,7 @@ impl<'i> AtIdentifier<'i> {
     }
 
     /// Fallible constructor, validates, doesn't allocate
-    pub fn new_static(ident: &'static str) -> Result<AtIdentifier<'static>, &'static str> {
+    pub fn new_static(ident: &'static str) -> Result<AtIdentifier<'static>, AtStrError> {
         if let Ok(did) = Did::new_static(ident) {
             Ok(AtIdentifier::Did(did))
         } else {
@@ -93,7 +94,7 @@ impl<'i> From<Handle<'i>> for AtIdentifier<'i> {
 }
 
 impl FromStr for AtIdentifier<'_> {
-    type Err = &'static str;
+    type Err = AtStrError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if let Ok(did) = s.parse() {

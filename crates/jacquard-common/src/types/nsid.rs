@@ -1,4 +1,5 @@
 use crate::types::recordkey::RecordKeyType;
+use crate::types::string::AtStrError;
 use crate::{CowStr, IntoStatic};
 use regex::Regex;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
@@ -22,34 +23,46 @@ pub static NSID_REGEX: LazyLock<Regex> = LazyLock::new(|| {
 
 impl<'n> Nsid<'n> {
     /// Fallible constructor, validates, borrows from input
-    pub fn new(nsid: &'n str) -> Result<Self, &'static str> {
+    pub fn new(nsid: &'n str) -> Result<Self, AtStrError> {
         if nsid.len() > 317 {
-            Err("NSID too long")
+            Err(AtStrError::too_long("nsid", nsid, 317, nsid.len()))
         } else if !NSID_REGEX.is_match(nsid) {
-            Err("Invalid NSID")
+            Err(AtStrError::regex(
+                "nsid",
+                nsid,
+                SmolStr::new_static("invalid"),
+            ))
         } else {
             Ok(Self(CowStr::Borrowed(nsid)))
         }
     }
 
     /// Fallible constructor, validates, borrows from input
-    pub fn new_owned(nsid: impl AsRef<str>) -> Result<Self, &'static str> {
+    pub fn new_owned(nsid: impl AsRef<str>) -> Result<Self, AtStrError> {
         let nsid = nsid.as_ref();
         if nsid.len() > 317 {
-            Err("NSID too long")
+            Err(AtStrError::too_long("nsid", nsid, 317, nsid.len()))
         } else if !NSID_REGEX.is_match(nsid) {
-            Err("Invalid NSID")
+            Err(AtStrError::regex(
+                "nsid",
+                nsid,
+                SmolStr::new_static("invalid"),
+            ))
         } else {
             Ok(Self(CowStr::Owned(nsid.to_smolstr())))
         }
     }
 
     /// Fallible constructor, validates, doesn't allocate
-    pub fn new_static(nsid: &'static str) -> Result<Self, &'static str> {
+    pub fn new_static(nsid: &'static str) -> Result<Self, AtStrError> {
         if nsid.len() > 317 {
-            Err("NSID too long")
+            Err(AtStrError::too_long("nsid", nsid, 317, nsid.len()))
         } else if !NSID_REGEX.is_match(nsid) {
-            Err("Invalid NSID")
+            Err(AtStrError::regex(
+                "nsid",
+                nsid,
+                SmolStr::new_static("invalid"),
+            ))
         } else {
             Ok(Self(CowStr::new_static(nsid)))
         }
@@ -96,7 +109,7 @@ impl<'n> Nsid<'n> {
 }
 
 impl<'n> FromStr for Nsid<'n> {
-    type Err = &'static str;
+    type Err = AtStrError;
 
     /// Has to take ownership due to the lifetime constraints of the FromStr trait.
     /// Prefer `Nsid::new()` or `Nsid::raw` if you want to borrow.

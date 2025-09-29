@@ -12,7 +12,7 @@ use std::{
     str::FromStr,
 };
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
 pub struct Blob<'b> {
     pub r#ref: Cid<'b>,

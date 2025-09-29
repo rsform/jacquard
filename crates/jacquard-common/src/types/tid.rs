@@ -6,6 +6,7 @@ use std::{ops::Deref, str::FromStr};
 
 use crate::CowStr;
 use crate::types::integer::LimitedU32;
+use crate::types::string::{AtStrError, StrParseKind};
 use regex::Regex;
 
 fn s32_encode(mut i: u64) -> SmolStr {
@@ -40,12 +41,27 @@ pub struct Tid(SmolStr);
 
 impl Tid {
     /// Parses a `TID` from the given string.
-    pub fn new(tid: impl AsRef<str>) -> Result<Self, &'static str> {
+    pub fn new(tid: impl AsRef<str>) -> Result<Self, AtStrError> {
         let tid = tid.as_ref();
         if tid.len() != 13 {
-            Err("TID must be 13 characters")
+            let kind = if tid.len() > 13 {
+                StrParseKind::TooLong {
+                    max: 13,
+                    actual: tid.len(),
+                }
+            } else {
+                StrParseKind::TooShort {
+                    min: 13,
+                    actual: tid.len(),
+                }
+            };
+            Err(AtStrError::new("tid", tid.to_string(), kind))
         } else if !TID_REGEX.is_match(&tid.as_ref()) {
-            Err("Invalid TID")
+            let kind = StrParseKind::RegexFail {
+                span: None,
+                message: SmolStr::new_static("didn't match schema"),
+            };
+            Err(AtStrError::new("tid", tid.to_string(), kind))
         } else {
             Ok(Self(SmolStr::new_inline(&tid)))
         }
@@ -117,7 +133,7 @@ impl Tid {
 }
 
 impl FromStr for Tid {
-    type Err = &'static str;
+    type Err = AtStrError;
 
     /// Has to take ownership due to the lifetime constraints of the FromStr trait.
     /// Prefer `Did::new()` or `Did::raw` if you want to borrow.

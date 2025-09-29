@@ -1,4 +1,5 @@
 use crate::types::Literal;
+use crate::types::string::AtStrError;
 use crate::{CowStr, IntoStatic};
 use regex::Regex;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
@@ -74,34 +75,46 @@ pub static RKEY_REGEX: LazyLock<Regex> =
 /// AT Protocol rkey
 impl<'r> Rkey<'r> {
     /// Fallible constructor, validates, borrows from input
-    pub fn new(rkey: &'r str) -> Result<Self, &'static str> {
+    pub fn new(rkey: &'r str) -> Result<Self, AtStrError> {
         if [".", ".."].contains(&rkey) {
-            Err("Disallowed rkey")
+            Err(AtStrError::disallowed("record-key", rkey, &[".", ".."]))
         } else if !RKEY_REGEX.is_match(rkey) {
-            Err("Invalid rkey")
+            Err(AtStrError::regex(
+                "record-key",
+                rkey,
+                SmolStr::new_static("doesn't match 'any' schema"),
+            ))
         } else {
             Ok(Self(CowStr::Borrowed(rkey)))
         }
     }
 
     /// Fallible constructor, validates, borrows from input
-    pub fn new_owned(rkey: impl AsRef<str>) -> Result<Self, &'static str> {
+    pub fn new_owned(rkey: impl AsRef<str>) -> Result<Self, AtStrError> {
         let rkey = rkey.as_ref();
         if [".", ".."].contains(&rkey) {
-            Err("Disallowed rkey")
+            Err(AtStrError::disallowed("record-key", rkey, &[".", ".."]))
         } else if !RKEY_REGEX.is_match(rkey) {
-            Err("Invalid rkey")
+            Err(AtStrError::regex(
+                "record-key",
+                rkey,
+                SmolStr::new_static("doesn't match 'any' schema"),
+            ))
         } else {
             Ok(Self(CowStr::Owned(rkey.to_smolstr())))
         }
     }
 
     /// Fallible constructor, validates, doesn't allocate
-    pub fn new_static(rkey: &'static str) -> Result<Self, &'static str> {
+    pub fn new_static(rkey: &'static str) -> Result<Self, AtStrError> {
         if [".", ".."].contains(&rkey) {
-            Err("Disallowed rkey")
+            Err(AtStrError::disallowed("record-key", rkey, &[".", ".."]))
         } else if !RKEY_REGEX.is_match(rkey) {
-            Err("Invalid rkey")
+            Err(AtStrError::regex(
+                "record-key",
+                rkey,
+                SmolStr::new_static("doesn't match 'any' schema"),
+            ))
         } else {
             Ok(Self(CowStr::new_static(rkey)))
         }
@@ -136,13 +149,17 @@ impl<'r> Rkey<'r> {
 }
 
 impl<'r> FromStr for Rkey<'r> {
-    type Err = &'static str;
+    type Err = AtStrError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if [".", ".."].contains(&s) {
-            Err("Disallowed rkey")
+            Err(AtStrError::disallowed("record-key", s, &[".", ".."]))
         } else if !RKEY_REGEX.is_match(s) {
-            Err("Invalid rkey")
+            Err(AtStrError::regex(
+                "record-key",
+                s,
+                SmolStr::new_static("doesn't match 'any' schema"),
+            ))
         } else {
             Ok(Self(CowStr::Owned(s.to_smolstr())))
         }
