@@ -699,6 +699,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f4c7245a08504955605670dbf141fceab975f15ca21570696aebe9d2e71576bd"
 
 [[package]]
+name = "ipld-core"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "104718b1cc124d92a6d01ca9c9258a7df311405debb3408c445a36452f9bf8db"
+dependencies = [
+ "cid",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
 name = "is_terminal_polyfill"
 version = "1.70.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -722,10 +733,12 @@ dependencies = [
 name = "jacquard-common"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "bytes",
  "chrono",
  "cid",
  "enum_dispatch",
+ "ipld-core",
  "langtag",
  "miette",
  "multibase",

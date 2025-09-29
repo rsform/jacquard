@@ -12,10 +12,12 @@ exclude.workspace = true
 description.workspace = true
 
 [dependencies]
+base64 = "0.22.1"
 bytes = "1.10.1"
 chrono = "0.4.42"
 cid = { version = "0.11.1", features = ["serde", "std"] }
 enum_dispatch = "0.3.13"
+ipld-core = { version = "0.4.2", features = ["serde"] }
 langtag = { version = "0.4.0", features = ["serde"] }
 miette = "7.6.0"
 multibase = "0.9.1"
