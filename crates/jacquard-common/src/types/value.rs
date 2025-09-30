@@ -110,10 +110,7 @@ impl<'s> Object<'s> {
                 }
                 DataModelType::CidLink => {
                     if let Some(value) = value.as_str() {
-                        map.insert(
-                            key.to_smolstr(),
-                            Data::String(AtprotoStr::Cid(Cid::Str(value.into()))),
-                        );
+                        map.insert(key.to_smolstr(), Data::CidLink(Cid::Str(value.into())));
                     } else {
                         map.insert(key.to_smolstr(), Data::from_json(value));
                     }
