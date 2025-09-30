@@ -28,38 +28,45 @@ pub enum Data<'s> {
     Blob(Blob<'s>),
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic)]
+pub enum AtDataError {
+    #[error("floating point numbers not allowed in AT protocol data")]
+    FloatNotAllowed,
+}
+
 impl<'s> Data<'s> {
-    pub fn from_json(json: &'s serde_json::Value) -> Self {
-        if let Some(value) = json.as_bool() {
+    pub fn from_json(json: &'s serde_json::Value) -> Result<Self, AtDataError> {
+        Ok(if let Some(value) = json.as_bool() {
             Self::Boolean(value)
         } else if let Some(value) = json.as_i64() {
             Self::Integer(value)
         } else if let Some(value) = json.as_str() {
             Self::String(AtprotoStr::new(value))
         } else if let Some(value) = json.as_array() {
-            Self::Array(Array::from_json(value))
+            Self::Array(Array::from_json(value)?)
         } else if let Some(value) = json.as_object() {
-            Object::from_json(value)
-        } else if let Some(num) = json.as_number() {
-            // deliberately permissive here, just in case.
-            Self::String(AtprotoStr::new_owned(num.to_smolstr()))
+            Object::from_json(value)?
+        } else if json.is_f64() {
+            return Err(AtDataError::FloatNotAllowed);
         } else {
             Self::Null
-        }
+        })
     }
 
-    pub fn from_cbor(cbor: &'s Ipld) -> Self {
-        match cbor {
+    pub fn from_cbor(cbor: &'s Ipld) -> Result<Self, AtDataError> {
+        Ok(match cbor {
             Ipld::Null => Data::Null,
             Ipld::Bool(bool) => Data::Boolean(*bool),
             Ipld::Integer(int) => Data::Integer(*int as i64),
-            Ipld::Float(_) => todo!(),
+            Ipld::Float(_) => {
+                return Err(AtDataError::FloatNotAllowed);
+            }
             Ipld::String(string) => Self::String(AtprotoStr::new(string)),
             Ipld::Bytes(items) => Self::Bytes(Bytes::copy_from_slice(items.as_slice())),
-            Ipld::List(iplds) => Self::Array(Array::from_cbor(iplds)),
-            Ipld::Map(btree_map) => Object::from_cbor(btree_map),
+            Ipld::List(iplds) => Self::Array(Array::from_cbor(iplds)?),
+            Ipld::Map(btree_map) => Object::from_cbor(btree_map)?,
             Ipld::Link(cid) => Self::CidLink(Cid::ipld(*cid)),
-        }
+        })
     }
 }
 
@@ -67,19 +74,19 @@ impl<'s> Data<'s> {
 pub struct Array<'s>(pub Vec<Data<'s>>);
 
 impl<'s> Array<'s> {
-    pub fn from_json(json: &'s Vec<serde_json::Value>) -> Self {
+    pub fn from_json(json: &'s Vec<serde_json::Value>) -> Result<Self, AtDataError> {
         let mut array = Vec::with_capacity(json.len());
         for item in json {
-            array.push(Data::from_json(item));
+            array.push(Data::from_json(item)?);
         }
-        Self(array)
+        Ok(Self(array))
     }
-    pub fn from_cbor(cbor: &'s Vec<Ipld>) -> Self {
+    pub fn from_cbor(cbor: &'s Vec<Ipld>) -> Result<Self, AtDataError> {
         let mut array = Vec::with_capacity(cbor.len());
         for item in cbor {
-            array.push(Data::from_cbor(item));
+            array.push(Data::from_cbor(item)?);
         }
-        Self(array)
+        Ok(Self(array))
     }
 }
 
@@ -87,11 +94,13 @@ impl<'s> Array<'s> {
 pub struct Object<'s>(pub BTreeMap<SmolStr, Data<'s>>);
 
 impl<'s> Object<'s> {
-    pub fn from_json(json: &'s serde_json::Map<String, serde_json::Value>) -> Data<'s> {
+    pub fn from_json(
+        json: &'s serde_json::Map<String, serde_json::Value>,
+    ) -> Result<Data<'s>, AtDataError> {
         if let Some(type_field) = json.get("$type").and_then(|v| v.as_str()) {
             if infer_from_type(type_field) == DataModelType::Blob {
                 if let Some(blob) = json_to_blob(json) {
-                    return Data::Blob(blob);
+                    return Ok(Data::Blob(blob));
                 }
             }
         }
@@ -99,7 +108,7 @@ impl<'s> Object<'s> {
 
         for (key, value) in json {
             if key == "$type" {
-                map.insert(key.to_smolstr(), Data::from_json(value));
+                map.insert(key.to_smolstr(), Data::from_json(value)?);
             }
             match string_key_type_guess(key) {
                 DataModelType::Null if value.is_null() => {
@@ -119,47 +128,47 @@ impl<'s> Object<'s> {
                         if let Some(value) = value.get("$link").and_then(|v| v.as_str()) {
                             map.insert(key.to_smolstr(), Data::CidLink(Cid::Str(value.into())));
                         } else {
-                            map.insert(key.to_smolstr(), Object::from_json(value));
+                            map.insert(key.to_smolstr(), Object::from_json(value)?);
                         }
                     } else {
-                        map.insert(key.to_smolstr(), Data::from_json(value));
+                        map.insert(key.to_smolstr(), Data::from_json(value)?);
                     }
                 }
                 DataModelType::Blob if value.is_object() => {
                     map.insert(
                         key.to_smolstr(),
-                        Object::from_json(value.as_object().unwrap()),
+                        Object::from_json(value.as_object().unwrap())?,
                     );
                 }
                 DataModelType::Array if value.is_array() => {
                     map.insert(
                         key.to_smolstr(),
-                        Data::Array(Array::from_json(value.as_array().unwrap())),
+                        Data::Array(Array::from_json(value.as_array().unwrap())?),
                     );
                 }
                 DataModelType::Object if value.is_object() => {
                     map.insert(
                         key.to_smolstr(),
-                        Object::from_json(value.as_object().unwrap()),
+                        Object::from_json(value.as_object().unwrap())?,
                     );
                 }
                 DataModelType::String(string_type) if value.is_string() => {
                     insert_string(&mut map, key, value.as_str().unwrap(), string_type);
                 }
                 _ => {
-                    map.insert(key.to_smolstr(), Data::from_json(value));
+                    map.insert(key.to_smolstr(), Data::from_json(value)?);
                 }
             }
         }
 
-        Data::Object(Object(map))
+        Ok(Data::Object(Object(map)))
     }
 
-    pub fn from_cbor(cbor: &'s BTreeMap<String, Ipld>) -> Data<'s> {
+    pub fn from_cbor(cbor: &'s BTreeMap<String, Ipld>) -> Result<Data<'s>, AtDataError> {
         if let Some(Ipld::String(type_field)) = cbor.get("$type") {
             if infer_from_type(type_field) == DataModelType::Blob {
                 if let Some(blob) = cbor_to_blob(cbor) {
-                    return Data::Blob(blob);
+                    return Ok(Data::Blob(blob));
                 }
             }
         }
@@ -167,7 +176,7 @@ impl<'s> Object<'s> {
 
         for (key, value) in cbor {
             if key == "$type" {
-                map.insert(key.to_smolstr(), Data::from_cbor(value));
+                map.insert(key.to_smolstr(), Data::from_cbor(value)?);
             }
             match (string_key_type_guess(key), value) {
                 (DataModelType::Null, Ipld::Null) => {
@@ -183,24 +192,24 @@ impl<'s> Object<'s> {
                     map.insert(key.to_smolstr(), Data::Bytes(Bytes::copy_from_slice(value)));
                 }
                 (DataModelType::Blob, Ipld::Map(value)) => {
-                    map.insert(key.to_smolstr(), Object::from_cbor(value));
+                    map.insert(key.to_smolstr(), Object::from_cbor(value)?);
                 }
                 (DataModelType::Array, Ipld::List(value)) => {
-                    map.insert(key.to_smolstr(), Data::Array(Array::from_cbor(value)));
+                    map.insert(key.to_smolstr(), Data::Array(Array::from_cbor(value)?));
                 }
                 (DataModelType::Object, Ipld::Map(value)) => {
-                    map.insert(key.to_smolstr(), Object::from_cbor(value));
+                    map.insert(key.to_smolstr(), Object::from_cbor(value)?);
                 }
                 (DataModelType::String(string_type), Ipld::String(value)) => {
                     insert_string(&mut map, key, value, string_type);
                 }
                 _ => {
-                    map.insert(key.to_smolstr(), Data::from_cbor(value));
+                    map.insert(key.to_smolstr(), Data::from_cbor(value)?);
                 }
             }
         }
 
-        Data::Object(Object(map))
+        Ok(Data::Object(Object(map)))
     }
 }
 
@@ -209,7 +218,7 @@ pub fn insert_string<'s>(
     key: &'s str,
     value: &'s str,
     string_type: LexiconStringType,
-) {
+) -> Result<(), AtDataError> {
     match string_type {
         LexiconStringType::Datetime => {
             if let Ok(datetime) = Datetime::from_str(value) {
@@ -334,6 +343,7 @@ pub fn insert_string<'s>(
             map.insert(key.to_smolstr(), Data::String(parse_string(value)));
         }
     }
+    Ok(())
 }
 
 /// smarter parsing to avoid trying as many posibilities.
