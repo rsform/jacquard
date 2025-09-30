@@ -131,8 +131,12 @@ impl<'s> Object<'s> {
                     }
                 }
                 DataModelType::CidLink => {
-                    if let Some(value) = value.as_str() {
-                        map.insert(key.to_smolstr(), Data::CidLink(Cid::Str(value.into())));
+                    if let Some(value) = value.as_object() {
+                        if let Some(value) = value.get("$link").and_then(|v| v.as_str()) {
+                            map.insert(key.to_smolstr(), Data::CidLink(Cid::Str(value.into())));
+                        } else {
+                            map.insert(key.to_smolstr(), Object::from_json(value));
+                        }
                     } else {
                         map.insert(key.to_smolstr(), Data::from_json(value));
                     }
