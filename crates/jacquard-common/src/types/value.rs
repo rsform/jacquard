@@ -99,36 +99,20 @@ impl<'s> Object<'s> {
 
         for (key, value) in json {
             if key == "$type" {
-                continue; // skip, because we've already handled it
+                map.insert(key.to_smolstr(), Data::from_json(value));
             }
             match string_key_type_guess(key) {
-                DataModelType::Null => {
-                    if value.is_null() {
-                        map.insert(key.to_smolstr(), Data::Null);
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_json(value));
-                    }
+                DataModelType::Null if value.is_null() => {
+                    map.insert(key.to_smolstr(), Data::Null);
                 }
-                DataModelType::Boolean => {
-                    if let Some(value) = value.as_bool() {
-                        map.insert(key.to_smolstr(), Data::Boolean(value));
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_json(value));
-                    }
+                DataModelType::Boolean if value.is_boolean() => {
+                    map.insert(key.to_smolstr(), Data::Boolean(value.as_bool().unwrap()));
                 }
-                DataModelType::Integer => {
-                    if let Some(int) = value.as_i64() {
-                        map.insert(key.to_smolstr(), Data::Integer(int));
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_json(value));
-                    }
+                DataModelType::Integer if value.is_i64() => {
+                    map.insert(key.to_smolstr(), Data::Integer(value.as_i64().unwrap()));
                 }
-                DataModelType::Bytes => {
-                    if let Some(value) = value.as_str() {
-                        map.insert(key.to_smolstr(), decode_bytes(value));
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_json(value));
-                    }
+                DataModelType::Bytes if value.is_string() => {
+                    map.insert(key.to_smolstr(), decode_bytes(value.as_str().unwrap()));
                 }
                 DataModelType::CidLink => {
                     if let Some(value) = value.as_object() {
@@ -141,180 +125,29 @@ impl<'s> Object<'s> {
                         map.insert(key.to_smolstr(), Data::from_json(value));
                     }
                 }
-                DataModelType::Blob => {
-                    if let Some(value) = value.as_object() {
-                        map.insert(key.to_smolstr(), Object::from_json(value));
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_json(value));
-                    }
+                DataModelType::Blob if value.is_object() => {
+                    map.insert(
+                        key.to_smolstr(),
+                        Object::from_json(value.as_object().unwrap()),
+                    );
                 }
-                DataModelType::Array => {
-                    if let Some(value) = value.as_array() {
-                        map.insert(key.to_smolstr(), Data::Array(Array::from_json(value)));
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_json(value));
-                    }
+                DataModelType::Array if value.is_array() => {
+                    map.insert(
+                        key.to_smolstr(),
+                        Data::Array(Array::from_json(value.as_array().unwrap())),
+                    );
                 }
-                DataModelType::Object => {
-                    if let Some(value) = value.as_object() {
-                        map.insert(key.to_smolstr(), Object::from_json(value));
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_json(value));
-                    }
+                DataModelType::Object if value.is_object() => {
+                    map.insert(
+                        key.to_smolstr(),
+                        Object::from_json(value.as_object().unwrap()),
+                    );
                 }
-                DataModelType::String(string_type) => {
-                    if let Some(value) = value.as_str() {
-                        match string_type {
-                            LexiconStringType::Datetime => {
-                                if let Ok(datetime) = Datetime::from_str(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Datetime(datetime)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::AtUri => {
-                                if let Ok(value) = AtUri::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::AtUri(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::Did => {
-                                if let Ok(value) = Did::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Did(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::Handle => {
-                                if let Ok(value) = Handle::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Handle(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::AtIdentifier => {
-                                if let Ok(value) = AtIdentifier::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::AtIdentifier(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::Nsid => {
-                                if let Ok(value) = Nsid::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Nsid(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::Cid => {
-                                if let Ok(value) = Cid::new(value.as_bytes()) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Cid(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::Language => {
-                                if let Ok(value) = Language::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Language(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::Tid => {
-                                if let Ok(value) = Tid::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Tid(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::RecordKey => {
-                                if let Ok(value) = Rkey::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::RecordKey(RecordKey::from(value))),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::Uri(_) => {
-                                if let Ok(uri) = Uri::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Uri(uri)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::String => {
-                                map.insert(key.to_smolstr(), Data::String(parse_string(value)));
-                            }
-                        }
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_json(value));
-                    }
+                DataModelType::String(string_type) if value.is_string() => {
+                    insert_string(&mut map, key, value.as_str().unwrap(), string_type);
+                }
+                _ => {
+                    map.insert(key.to_smolstr(), Data::from_json(value));
                 }
             }
         }
@@ -334,211 +167,32 @@ impl<'s> Object<'s> {
 
         for (key, value) in cbor {
             if key == "$type" {
-                continue; // skip, because we've already handled it
+                map.insert(key.to_smolstr(), Data::from_cbor(value));
             }
-            match string_key_type_guess(key) {
-                DataModelType::Null => {
-                    if *value == Ipld::Null {
-                        map.insert(key.to_smolstr(), Data::Null);
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_cbor(value));
-                    }
+            match (string_key_type_guess(key), value) {
+                (DataModelType::Null, Ipld::Null) => {
+                    map.insert(key.to_smolstr(), Data::Null);
                 }
-                DataModelType::Boolean => {
-                    if let Ipld::Bool(value) = value {
-                        map.insert(key.to_smolstr(), Data::Boolean(*value));
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_cbor(value));
-                    }
+                (DataModelType::Boolean, Ipld::Bool(value)) => {
+                    map.insert(key.to_smolstr(), Data::Boolean(*value));
                 }
-                DataModelType::Integer => {
-                    if let Ipld::Integer(int) = value {
-                        map.insert(key.to_smolstr(), Data::Integer(*int as i64));
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_cbor(value));
-                    }
+                (DataModelType::Integer, Ipld::Integer(int)) => {
+                    map.insert(key.to_smolstr(), Data::Integer(*int as i64));
                 }
-                DataModelType::Bytes => {
-                    if let Ipld::Bytes(value) = value {
-                        map.insert(key.to_smolstr(), Data::Bytes(Bytes::copy_from_slice(value)));
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_cbor(value));
-                    }
+                (DataModelType::Bytes, Ipld::Bytes(value)) => {
+                    map.insert(key.to_smolstr(), Data::Bytes(Bytes::copy_from_slice(value)));
                 }
-                DataModelType::Blob => {
-                    if let Ipld::Map(value) = value {
-                        map.insert(key.to_smolstr(), Object::from_cbor(value));
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_cbor(value));
-                    }
+                (DataModelType::Blob, Ipld::Map(value)) => {
+                    map.insert(key.to_smolstr(), Object::from_cbor(value));
                 }
-                DataModelType::Array => {
-                    if let Ipld::List(value) = value {
-                        map.insert(key.to_smolstr(), Data::Array(Array::from_cbor(value)));
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_cbor(value));
-                    }
+                (DataModelType::Array, Ipld::List(value)) => {
+                    map.insert(key.to_smolstr(), Data::Array(Array::from_cbor(value)));
                 }
-                DataModelType::Object => {
-                    if let Ipld::Map(value) = value {
-                        map.insert(key.to_smolstr(), Object::from_cbor(value));
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_cbor(value));
-                    }
+                (DataModelType::Object, Ipld::Map(value)) => {
+                    map.insert(key.to_smolstr(), Object::from_cbor(value));
                 }
-                DataModelType::String(string_type) => {
-                    if let Ipld::String(value) = value {
-                        match string_type {
-                            LexiconStringType::Datetime => {
-                                if let Ok(datetime) = Datetime::from_str(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Datetime(datetime)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::AtUri => {
-                                if let Ok(value) = AtUri::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::AtUri(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::Did => {
-                                if let Ok(value) = Did::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Did(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::Handle => {
-                                if let Ok(value) = Handle::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Handle(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::AtIdentifier => {
-                                if let Ok(value) = AtIdentifier::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::AtIdentifier(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::Nsid => {
-                                if let Ok(value) = Nsid::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Nsid(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::Cid => {
-                                if let Ok(value) = Cid::new(value.as_bytes()) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Cid(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::Language => {
-                                if let Ok(value) = Language::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Language(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::Tid => {
-                                if let Ok(value) = Tid::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Tid(value)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::RecordKey => {
-                                if let Ok(value) = Rkey::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::RecordKey(RecordKey::from(value))),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::Uri(_) => {
-                                if let Ok(uri) = Uri::new(value) {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::Uri(uri)),
-                                    );
-                                } else {
-                                    map.insert(
-                                        key.to_smolstr(),
-                                        Data::String(AtprotoStr::String(value.into())),
-                                    );
-                                }
-                            }
-                            LexiconStringType::String => {
-                                map.insert(key.to_smolstr(), Data::String(parse_string(value)));
-                            }
-                        }
-                    } else {
-                        map.insert(key.to_smolstr(), Data::from_cbor(value));
-                    }
+                (DataModelType::String(string_type), Ipld::String(value)) => {
+                    insert_string(&mut map, key, value, string_type);
                 }
                 _ => {
                     map.insert(key.to_smolstr(), Data::from_cbor(value));
@@ -547,6 +201,138 @@ impl<'s> Object<'s> {
         }
 
         Data::Object(Object(map))
+    }
+}
+
+pub fn insert_string<'s>(
+    map: &mut BTreeMap<SmolStr, Data<'s>>,
+    key: &'s str,
+    value: &'s str,
+    string_type: LexiconStringType,
+) {
+    match string_type {
+        LexiconStringType::Datetime => {
+            if let Ok(datetime) = Datetime::from_str(value) {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::Datetime(datetime)),
+                );
+            } else {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::String(value.into())),
+                );
+            }
+        }
+        LexiconStringType::AtUri => {
+            if let Ok(value) = AtUri::new(value) {
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::AtUri(value)));
+            } else {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::String(value.into())),
+                );
+            }
+        }
+        LexiconStringType::Did => {
+            if let Ok(value) = Did::new(value) {
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::Did(value)));
+            } else {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::String(value.into())),
+                );
+            }
+        }
+        LexiconStringType::Handle => {
+            if let Ok(value) = Handle::new(value) {
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::Handle(value)));
+            } else {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::String(value.into())),
+                );
+            }
+        }
+        LexiconStringType::AtIdentifier => {
+            if let Ok(value) = AtIdentifier::new(value) {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::AtIdentifier(value)),
+                );
+            } else {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::String(value.into())),
+                );
+            }
+        }
+        LexiconStringType::Nsid => {
+            if let Ok(value) = Nsid::new(value) {
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::Nsid(value)));
+            } else {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::String(value.into())),
+                );
+            }
+        }
+        LexiconStringType::Cid => {
+            if let Ok(value) = Cid::new(value.as_bytes()) {
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::Cid(value)));
+            } else {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::String(value.into())),
+                );
+            }
+        }
+        LexiconStringType::Language => {
+            if let Ok(value) = Language::new(value) {
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::Language(value)));
+            } else {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::String(value.into())),
+                );
+            }
+        }
+        LexiconStringType::Tid => {
+            if let Ok(value) = Tid::new(value) {
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::Tid(value)));
+            } else {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::String(value.into())),
+                );
+            }
+        }
+        LexiconStringType::RecordKey => {
+            if let Ok(value) = Rkey::new(value) {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::RecordKey(RecordKey::from(value))),
+                );
+            } else {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::String(value.into())),
+                );
+            }
+        }
+        LexiconStringType::Uri(_) => {
+            if let Ok(uri) = Uri::new(value) {
+                map.insert(key.to_smolstr(), Data::String(AtprotoStr::Uri(uri)));
+            } else {
+                map.insert(
+                    key.to_smolstr(),
+                    Data::String(AtprotoStr::String(value.into())),
+                );
+            }
+        }
+        LexiconStringType::String => {
+            map.insert(key.to_smolstr(), Data::String(parse_string(value)));
+        }
     }
 }
 
