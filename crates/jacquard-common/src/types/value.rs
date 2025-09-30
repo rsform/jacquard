@@ -634,24 +634,20 @@ pub fn cbor_to_blob<'b>(blob: &'b BTreeMap<String, Ipld>) -> Option<Blob<'b>> {
             None
         }
     });
-    if let Some(value) = blob.get("ref") {
-        if let Ipld::Map(value) = value {
-            if let Some(Ipld::String(value)) = value.get("$link") {
-                let size = blob.get("size").and_then(|o| {
-                    if let Ipld::Integer(i) = o {
-                        Some(*i as i64)
-                    } else {
-                        None
-                    }
-                });
-                if let (Some(mime_type), Some(size)) = (mime_type, size) {
-                    return Some(Blob {
-                        r#ref: Cid::str(value),
-                        mime_type: MimeType::raw(mime_type),
-                        size: size as usize,
-                    });
-                }
+    if let Some(Ipld::Link(value)) = blob.get("ref") {
+        let size = blob.get("size").and_then(|o| {
+            if let Ipld::Integer(i) = o {
+                Some(*i as i64)
+            } else {
+                None
             }
+        });
+        if let (Some(mime_type), Some(size)) = (mime_type, size) {
+            return Some(Blob {
+                r#ref: Cid::ipld(*value),
+                mime_type: MimeType::raw(mime_type),
+                size: size as usize,
+            });
         }
     } else if let Some(Ipld::String(value)) = blob.get("cid") {
         if let Some(mime_type) = mime_type {
