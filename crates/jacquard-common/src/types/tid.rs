@@ -2,6 +2,7 @@ use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, SmolStrBuilder};
 use std::fmt;
 use std::sync::LazyLock;
+use std::time::SystemTime;
 use std::{ops::Deref, str::FromStr};
 
 use crate::CowStr;
@@ -9,13 +10,13 @@ use crate::types::integer::LimitedU32;
 use crate::types::string::{AtStrError, StrParseKind};
 use regex::Regex;
 
-fn s32_encode(mut i: u64) -> SmolStr {
-    const S32_CHAR: &[u8] = b"234567abcdefghijklmnopqrstuvwxyz";
+const S32_CHAR: &str = "234567abcdefghijklmnopqrstuvwxyz";
 
+fn s32_encode(mut i: u64) -> SmolStr {
     let mut s = SmolStrBuilder::new();
     for _ in 0..13 {
         let c = i & 0x1F;
-        s.push(S32_CHAR[c as usize] as char);
+        s.push(S32_CHAR.chars().nth(c as usize).unwrap());
 
         i >>= 5;
     }
@@ -104,6 +105,46 @@ impl Tid {
         Self(s32_encode(tid))
     }
 
+    pub fn from_time(timestamp: usize, clkid: u32) -> Self {
+        let str = smol_str::format_smolstr!(
+            "{0}{1:2>2}",
+            s32_encode(timestamp as u64),
+            s32_encode(Into::<u32>::into(clkid) as u64)
+        );
+        Self(str)
+    }
+
+    pub fn timestamp(&self) -> usize {
+        s32decode(self.0[0..11].to_owned())
+    }
+
+    // newer > older
+    pub fn compare_to(&self, other: &Tid) -> i8 {
+        if self.0 > other.0 {
+            return 1;
+        }
+        if self.0 < other.0 {
+            return -1;
+        }
+        0
+    }
+
+    pub fn newer_than(&self, other: &Tid) -> bool {
+        self.compare_to(other) > 0
+    }
+
+    pub fn older_than(&self, other: &Tid) -> bool {
+        self.compare_to(other) < 0
+    }
+
+    pub fn next_str(prev: Option<Tid>) -> Result<Self, AtStrError> {
+        let prev = match prev {
+            None => None,
+            Some(prev) => Some(Tid::new(prev)?),
+        };
+        Ok(Ticker::new().next(prev))
+    }
+
     /// Construct a new [Tid] that represents the current time.
     ///
     /// If you have multiple clock sources, you can use `clkid` to distinguish between them
@@ -130,6 +171,14 @@ impl Tid {
             this
         }
     }
+}
+
+pub fn s32decode(s: String) -> usize {
+    let mut i: usize = 0;
+    for c in s.chars() {
+        i = i * 32 + S32_CHAR.chars().position(|x| x == c).unwrap();
+    }
+    i
 }
 
 impl FromStr for Tid {
@@ -205,5 +254,56 @@ impl Deref for Tid {
 
     fn deref(&self) -> &Self::Target {
         self.as_str()
+    }
+}
+
+/// Based on adenosine/adenosine/src/identifiers.rs
+/// TODO: clean up and normalize stuff between this and the stuff pulled from atrium
+pub struct Ticker {
+    last_timestamp: usize,
+    clock_id: u32,
+}
+
+impl Ticker {
+    pub fn new() -> Self {
+        let mut ticker = Self {
+            last_timestamp: 0,
+            // mask to 10 bits
+            clock_id: rand::random::<u32>() & 0x03FF,
+        };
+        // prime the pump
+        ticker.next(None);
+        ticker
+    }
+
+    pub fn next(&mut self, prev: Option<Tid>) -> Tid {
+        let now = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .expect("timestamp in micros since UNIX epoch")
+            .as_micros() as usize;
+        // mask to 53 bits
+        let now = now & 0x001FFFFFFFFFFFFF;
+        if now > self.last_timestamp {
+            self.last_timestamp = now;
+        } else {
+            self.last_timestamp += 1;
+        }
+        // 53 bits of millis
+        let micros = self.last_timestamp & 0x001FFFFFFFFFFFFF;
+        // 10 bits of clock ID
+        let clock_id = self.clock_id & 0x03FF;
+
+        let tid = Tid::from_time(micros, clock_id as u32);
+        match prev {
+            Some(ref prev) if tid.newer_than(prev) => tid,
+            Some(prev) => Tid::from_time(prev.timestamp() + 1, clock_id as u32),
+            None => tid,
+        }
+    }
+}
+
+impl Default for Ticker {
+    fn default() -> Self {
+        Self::new()
     }
 }

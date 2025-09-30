@@ -3,6 +3,7 @@ use base64::{
     prelude::{BASE64_STANDARD, BASE64_STANDARD_NO_PAD, BASE64_URL_SAFE, BASE64_URL_SAFE_NO_PAD},
 };
 use bytes::Bytes;
+use ipld_core::ipld::Ipld;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use smol_str::{SmolStr, ToSmolStr};
 use std::{collections::BTreeMap, str::FromStr};
@@ -46,6 +47,20 @@ impl<'s> Data<'s> {
             Self::Null
         }
     }
+
+    pub fn from_cbor(cbor: &'s Ipld) -> Self {
+        match cbor {
+            Ipld::Null => Data::Null,
+            Ipld::Bool(bool) => Data::Boolean(*bool),
+            Ipld::Integer(int) => Data::Integer(*int as i64),
+            Ipld::Float(_) => todo!(),
+            Ipld::String(string) => Self::String(AtprotoStr::new(string)),
+            Ipld::Bytes(items) => Self::Bytes(Bytes::copy_from_slice(items.as_slice())),
+            Ipld::List(iplds) => Self::Array(Array::from_cbor(iplds)),
+            Ipld::Map(btree_map) => Object::from_cbor(btree_map),
+            Ipld::Link(cid) => Self::CidLink(Cid::ipld(*cid)),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -56,6 +71,13 @@ impl<'s> Array<'s> {
         let mut array = Vec::with_capacity(json.len());
         for item in json {
             array.push(Data::from_json(item));
+        }
+        Self(array)
+    }
+    pub fn from_cbor(cbor: &'s Vec<Ipld>) -> Self {
+        let mut array = Vec::with_capacity(cbor.len());
+        for item in cbor {
+            array.push(Data::from_cbor(item));
         }
         Self(array)
     }
@@ -296,7 +318,232 @@ impl<'s> Object<'s> {
         Data::Object(Object(map))
     }
 
-    //pub fn from_cbor(cbor: BTreeMap<String, ipld_core::ipld::Ipld>) -> Self {}
+    pub fn from_cbor(cbor: &'s BTreeMap<String, Ipld>) -> Data<'s> {
+        if let Some(Ipld::String(type_field)) = cbor.get("$type") {
+            if infer_from_type(type_field) == DataModelType::Blob {
+                if let Some(blob) = cbor_to_blob(cbor) {
+                    return Data::Blob(blob);
+                }
+            }
+        }
+        let mut map = BTreeMap::new();
+
+        for (key, value) in cbor {
+            if key == "$type" {
+                continue; // skip, because we've already handled it
+            }
+            match string_key_type_guess(key) {
+                DataModelType::Null => {
+                    if *value == Ipld::Null {
+                        map.insert(key.to_smolstr(), Data::Null);
+                    } else {
+                        map.insert(key.to_smolstr(), Data::from_cbor(value));
+                    }
+                }
+                DataModelType::Boolean => {
+                    if let Ipld::Bool(value) = value {
+                        map.insert(key.to_smolstr(), Data::Boolean(*value));
+                    } else {
+                        map.insert(key.to_smolstr(), Data::from_cbor(value));
+                    }
+                }
+                DataModelType::Integer => {
+                    if let Ipld::Integer(int) = value {
+                        map.insert(key.to_smolstr(), Data::Integer(*int as i64));
+                    } else {
+                        map.insert(key.to_smolstr(), Data::from_cbor(value));
+                    }
+                }
+                DataModelType::Bytes => {
+                    if let Ipld::Bytes(value) = value {
+                        map.insert(key.to_smolstr(), Data::Bytes(Bytes::copy_from_slice(value)));
+                    } else {
+                        map.insert(key.to_smolstr(), Data::from_cbor(value));
+                    }
+                }
+                DataModelType::Blob => {
+                    if let Ipld::Map(value) = value {
+                        map.insert(key.to_smolstr(), Object::from_cbor(value));
+                    } else {
+                        map.insert(key.to_smolstr(), Data::from_cbor(value));
+                    }
+                }
+                DataModelType::Array => {
+                    if let Ipld::List(value) = value {
+                        map.insert(key.to_smolstr(), Data::Array(Array::from_cbor(value)));
+                    } else {
+                        map.insert(key.to_smolstr(), Data::from_cbor(value));
+                    }
+                }
+                DataModelType::Object => {
+                    if let Ipld::Map(value) = value {
+                        map.insert(key.to_smolstr(), Object::from_cbor(value));
+                    } else {
+                        map.insert(key.to_smolstr(), Data::from_cbor(value));
+                    }
+                }
+                DataModelType::String(string_type) => {
+                    if let Ipld::String(value) = value {
+                        match string_type {
+                            LexiconStringType::Datetime => {
+                                if let Ok(datetime) = Datetime::from_str(value) {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::Datetime(datetime)),
+                                    );
+                                } else {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::String(value.into())),
+                                    );
+                                }
+                            }
+                            LexiconStringType::AtUri => {
+                                if let Ok(value) = AtUri::new(value) {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::AtUri(value)),
+                                    );
+                                } else {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::String(value.into())),
+                                    );
+                                }
+                            }
+                            LexiconStringType::Did => {
+                                if let Ok(value) = Did::new(value) {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::Did(value)),
+                                    );
+                                } else {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::String(value.into())),
+                                    );
+                                }
+                            }
+                            LexiconStringType::Handle => {
+                                if let Ok(value) = Handle::new(value) {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::Handle(value)),
+                                    );
+                                } else {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::String(value.into())),
+                                    );
+                                }
+                            }
+                            LexiconStringType::AtIdentifier => {
+                                if let Ok(value) = AtIdentifier::new(value) {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::AtIdentifier(value)),
+                                    );
+                                } else {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::String(value.into())),
+                                    );
+                                }
+                            }
+                            LexiconStringType::Nsid => {
+                                if let Ok(value) = Nsid::new(value) {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::Nsid(value)),
+                                    );
+                                } else {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::String(value.into())),
+                                    );
+                                }
+                            }
+                            LexiconStringType::Cid => {
+                                if let Ok(value) = Cid::new(value.as_bytes()) {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::Cid(value)),
+                                    );
+                                } else {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::String(value.into())),
+                                    );
+                                }
+                            }
+                            LexiconStringType::Language => {
+                                if let Ok(value) = Language::new(value) {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::Language(value)),
+                                    );
+                                } else {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::String(value.into())),
+                                    );
+                                }
+                            }
+                            LexiconStringType::Tid => {
+                                if let Ok(value) = Tid::new(value) {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::Tid(value)),
+                                    );
+                                } else {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::String(value.into())),
+                                    );
+                                }
+                            }
+                            LexiconStringType::RecordKey => {
+                                if let Ok(value) = Rkey::new(value) {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::RecordKey(RecordKey::from(value))),
+                                    );
+                                } else {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::String(value.into())),
+                                    );
+                                }
+                            }
+                            LexiconStringType::Uri(_) => {
+                                if let Ok(uri) = Uri::new(value) {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::Uri(uri)),
+                                    );
+                                } else {
+                                    map.insert(
+                                        key.to_smolstr(),
+                                        Data::String(AtprotoStr::String(value.into())),
+                                    );
+                                }
+                            }
+                            LexiconStringType::String => {
+                                map.insert(key.to_smolstr(), Data::String(parse_string(value)));
+                            }
+                        }
+                    } else {
+                        map.insert(key.to_smolstr(), Data::from_cbor(value));
+                    }
+                }
+                _ => {
+                    map.insert(key.to_smolstr(), Data::from_cbor(value));
+                }
+            }
+        }
+
+        Data::Object(Object(map))
+    }
 }
 
 /// smarter parsing to avoid trying as many posibilities.
@@ -377,6 +624,46 @@ pub fn string_key_type_guess(key: &str) -> DataModelType {
         // or Ipld value is at least a string, and then we fall back to Object/Map.
         _ => DataModelType::String(LexiconStringType::String),
     }
+}
+
+pub fn cbor_to_blob<'b>(blob: &'b BTreeMap<String, Ipld>) -> Option<Blob<'b>> {
+    let mime_type = blob.get("mimeType").and_then(|o| {
+        if let Ipld::String(string) = o {
+            Some(string)
+        } else {
+            None
+        }
+    });
+    if let Some(value) = blob.get("ref") {
+        if let Ipld::Map(value) = value {
+            if let Some(Ipld::String(value)) = value.get("$link") {
+                let size = blob.get("size").and_then(|o| {
+                    if let Ipld::Integer(i) = o {
+                        Some(*i as i64)
+                    } else {
+                        None
+                    }
+                });
+                if let (Some(mime_type), Some(size)) = (mime_type, size) {
+                    return Some(Blob {
+                        r#ref: Cid::str(value),
+                        mime_type: MimeType::raw(mime_type),
+                        size: size as usize,
+                    });
+                }
+            }
+        }
+    } else if let Some(Ipld::String(value)) = blob.get("cid") {
+        if let Some(mime_type) = mime_type {
+            return Some(Blob {
+                r#ref: Cid::str(value),
+                mime_type: MimeType::raw(mime_type),
+                size: 0,
+            });
+        }
+    }
+
+    None
 }
 
 pub fn json_to_blob<'b>(blob: &'b serde_json::Map<String, serde_json::Value>) -> Option<Blob<'b>> {
