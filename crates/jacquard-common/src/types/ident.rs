@@ -168,3 +168,40 @@ impl AsRef<str> for AtIdentifier<'_> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_did() {
+        let ident = AtIdentifier::new("did:plc:foo").unwrap();
+        assert!(matches!(ident, AtIdentifier::Did(_)));
+        assert_eq!(ident.as_str(), "did:plc:foo");
+    }
+
+    #[test]
+    fn parses_handle() {
+        let ident = AtIdentifier::new("alice.test").unwrap();
+        assert!(matches!(ident, AtIdentifier::Handle(_)));
+        assert_eq!(ident.as_str(), "alice.test");
+    }
+
+    #[test]
+    fn did_takes_precedence() {
+        // DID is tried first, so valid DIDs are parsed as DIDs
+        let ident = AtIdentifier::new("did:web:alice.test").unwrap();
+        assert!(matches!(ident, AtIdentifier::Did(_)));
+    }
+
+    #[test]
+    fn from_types() {
+        let did = Did::new("did:plc:foo").unwrap();
+        let ident: AtIdentifier = did.into();
+        assert!(matches!(ident, AtIdentifier::Did(_)));
+
+        let handle = Handle::new("alice.test").unwrap();
+        let ident: AtIdentifier = handle.into();
+        assert!(matches!(ident, AtIdentifier::Handle(_)));
+    }
+}

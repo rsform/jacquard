@@ -417,3 +417,72 @@ impl<T: Literal> Deref for LiteralKey<T> {
         self.as_str()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn valid_rkeys() {
+        assert!(Rkey::new("3jzfcijpj2z2a").is_ok()); // TID format
+        assert!(Rkey::new("self").is_ok()); // literal
+        assert!(Rkey::new("com.example.foo").is_ok()); // NSID format
+        assert!(Rkey::new("foo-bar_baz").is_ok());
+        assert!(Rkey::new("foo:bar").is_ok());
+        assert!(Rkey::new("foo~bar").is_ok());
+    }
+
+    #[test]
+    fn length_constraints() {
+        assert!(Rkey::new("a").is_ok()); // min 1
+        let valid_512 = "a".repeat(512);
+        assert_eq!(valid_512.len(), 512);
+        assert!(Rkey::new(&valid_512).is_ok());
+
+        let too_long_513 = "a".repeat(513);
+        assert_eq!(too_long_513.len(), 513);
+        assert!(Rkey::new(&too_long_513).is_err());
+    }
+
+    #[test]
+    fn disallowed_literals() {
+        assert!(Rkey::new(".").is_err());
+        assert!(Rkey::new("..").is_err());
+        assert!(Rkey::new("...").is_ok()); // 3+ dots is fine
+    }
+
+    #[test]
+    fn allowed_characters() {
+        assert!(Rkey::new("abc123").is_ok());
+        assert!(Rkey::new("ABC123").is_ok());
+        assert!(Rkey::new("foo-bar").is_ok());
+        assert!(Rkey::new("foo_bar").is_ok());
+        assert!(Rkey::new("foo.bar").is_ok());
+        assert!(Rkey::new("foo:bar").is_ok());
+        assert!(Rkey::new("foo~bar").is_ok());
+    }
+
+    #[test]
+    fn disallowed_characters() {
+        assert!(Rkey::new("foo bar").is_err());
+        assert!(Rkey::new("foo@bar").is_err());
+        assert!(Rkey::new("foo#bar").is_err());
+        assert!(Rkey::new("foo/bar").is_err());
+        assert!(Rkey::new("foo\\bar").is_err());
+    }
+
+    #[test]
+    fn literal_key_self() {
+        let key = LiteralKey::<SelfRecord>::new("self").unwrap();
+        assert_eq!(key.as_str(), "self");
+
+        assert!(LiteralKey::<SelfRecord>::new("Self").is_ok()); // case insensitive
+        assert!(LiteralKey::<SelfRecord>::new("other").is_err());
+    }
+
+    #[test]
+    fn literal_key_disallowed() {
+        assert!(LiteralKey::<SelfRecord>::new(".").is_err());
+        assert!(LiteralKey::<SelfRecord>::new("..").is_err());
+    }
+}

@@ -12,13 +12,45 @@ use std::{
     str::FromStr,
 };
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
 pub struct Blob<'b> {
     pub r#ref: Cid<'b>,
     #[serde(borrow)]
     pub mime_type: MimeType<'b>,
     pub size: usize,
+}
+
+impl Serialize for Blob<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        use serde::ser::SerializeMap;
+
+        if serializer.is_human_readable() {
+            // JSON: ref needs to be {"$link": "cid"}
+            let mut map = serializer.serialize_map(Some(4))?;
+            map.serialize_entry("$type", "blob")?;
+
+            // Serialize ref as {"$link": "cid_string"}
+            let mut ref_map = std::collections::BTreeMap::new();
+            ref_map.insert("$link", self.r#ref.as_str());
+            map.serialize_entry("ref", &ref_map)?;
+
+            map.serialize_entry("mimeType", &self.mime_type)?;
+            map.serialize_entry("size", &self.size)?;
+            map.end()
+        } else {
+            // CBOR: ref is just the CID directly
+            let mut map = serializer.serialize_map(Some(4))?;
+            map.serialize_entry("$type", "blob")?;
+            map.serialize_entry("ref", &self.r#ref)?;
+            map.serialize_entry("mimeType", &self.mime_type)?;
+            map.serialize_entry("size", &self.size)?;
+            map.end()
+        }
+    }
 }
 
 impl IntoStatic for Blob<'_> {

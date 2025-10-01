@@ -21,36 +21,36 @@ pub static HANDLE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
 impl<'h> Handle<'h> {
     /// Fallible constructor, validates, borrows from input
     ///
-    /// Accepts (and strips) preceding '@' if present
+    /// Accepts (and strips) preceding '@' or 'at://' if present
     pub fn new(handle: &'h str) -> Result<Self, AtStrError> {
-        let handle = handle
+        let stripped = handle
             .strip_prefix("at://")
-            .unwrap_or(handle)
-            .strip_prefix('@')
+            .or_else(|| handle.strip_prefix('@'))
             .unwrap_or(handle);
-        if handle.len() > 253 {
-            Err(AtStrError::too_long("handle", handle, 253, handle.len()))
-        } else if !HANDLE_REGEX.is_match(handle) {
+
+        if stripped.len() > 253 {
+            Err(AtStrError::too_long("handle", stripped, 253, stripped.len()))
+        } else if !HANDLE_REGEX.is_match(stripped) {
             Err(AtStrError::regex(
                 "handle",
-                handle,
+                stripped,
                 SmolStr::new_static("invalid"),
             ))
-        } else if ends_with(handle, DISALLOWED_TLDS) {
-            Err(AtStrError::disallowed("handle", handle, DISALLOWED_TLDS))
+        } else if ends_with(stripped, DISALLOWED_TLDS) {
+            Err(AtStrError::disallowed("handle", stripped, DISALLOWED_TLDS))
         } else {
-            Ok(Self(CowStr::Borrowed(handle)))
+            Ok(Self(CowStr::Borrowed(stripped)))
         }
     }
 
     /// Fallible constructor, validates, takes ownership
     pub fn new_owned(handle: impl AsRef<str>) -> Result<Self, AtStrError> {
         let handle = handle.as_ref();
-        let handle = handle
+        let stripped = handle
             .strip_prefix("at://")
-            .unwrap_or(handle)
-            .strip_prefix('@')
+            .or_else(|| handle.strip_prefix('@'))
             .unwrap_or(handle);
+        let handle = stripped;
         if handle.len() > 253 {
             Err(AtStrError::too_long("handle", handle, 253, handle.len()))
         } else if !HANDLE_REGEX.is_match(handle) {
@@ -68,11 +68,11 @@ impl<'h> Handle<'h> {
 
     /// Fallible constructor, validates, doesn't allocate
     pub fn new_static(handle: &'static str) -> Result<Self, AtStrError> {
-        let handle = handle
+        let stripped = handle
             .strip_prefix("at://")
-            .unwrap_or(handle)
-            .strip_prefix('@')
+            .or_else(|| handle.strip_prefix('@'))
             .unwrap_or(handle);
+        let handle = stripped;
         if handle.len() > 253 {
             Err(AtStrError::too_long("handle", handle, 253, handle.len()))
         } else if !HANDLE_REGEX.is_match(handle) {
@@ -92,13 +92,13 @@ impl<'h> Handle<'h> {
     /// or API values you know are valid (rather than using serde), this is the one to use.
     /// The From<String> and From<CowStr> impls use the same logic.
     ///
-    /// Accepts (and strips) preceding '@' if present
+    /// Accepts (and strips) preceding '@' or 'at://' if present
     pub fn raw(handle: &'h str) -> Self {
-        let handle = handle
+        let stripped = handle
             .strip_prefix("at://")
-            .unwrap_or(handle)
-            .strip_prefix('@')
+            .or_else(|| handle.strip_prefix('@'))
             .unwrap_or(handle);
+        let handle = stripped;
         if handle.len() > 253 {
             panic!("handle too long")
         } else if !HANDLE_REGEX.is_match(handle) {
@@ -113,14 +113,13 @@ impl<'h> Handle<'h> {
     /// Infallible constructor for when you *know* the string is a valid handle.
     /// Marked unsafe because responsibility for upholding the invariant is on the developer.
     ///
-    /// Accepts (and strips) preceding '@' if present
+    /// Accepts (and strips) preceding '@' or 'at://' if present
     pub unsafe fn unchecked(handle: &'h str) -> Self {
-        let handle = handle
+        let stripped = handle
             .strip_prefix("at://")
-            .unwrap_or(handle)
-            .strip_prefix('@')
+            .or_else(|| handle.strip_prefix('@'))
             .unwrap_or(handle);
-        Self(CowStr::Borrowed(handle))
+        Self(CowStr::Borrowed(stripped))
     }
 
     pub fn as_str(&self) -> &str {
@@ -206,5 +205,100 @@ impl Deref for Handle<'_> {
 
     fn deref(&self) -> &Self::Target {
         self.as_str()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn valid_handles() {
+        assert!(Handle::new("alice.test").is_ok());
+        assert!(Handle::new("foo.bsky.social").is_ok());
+        assert!(Handle::new("a.b.c.d.e").is_ok());
+        assert!(Handle::new("a1.b2.c3").is_ok());
+        assert!(Handle::new("name-with-dash.com").is_ok());
+    }
+
+    #[test]
+    fn prefix_stripping() {
+        assert_eq!(Handle::new("@alice.test").unwrap().as_str(), "alice.test");
+        assert_eq!(Handle::new("at://alice.test").unwrap().as_str(), "alice.test");
+        assert_eq!(Handle::new("alice.test").unwrap().as_str(), "alice.test");
+    }
+
+    #[test]
+    fn max_length() {
+        // 253 chars: three 63-char segments + one 61-char segment + 3 dots = 253
+        let s1 = format!("a{}a", "b".repeat(61)); // 63
+        let s2 = format!("c{}c", "d".repeat(61)); // 63
+        let s3 = format!("e{}e", "f".repeat(61)); // 63
+        let s4 = format!("g{}g", "h".repeat(59)); // 61
+        let valid_253 = format!("{}.{}.{}.{}", s1, s2, s3, s4);
+        assert_eq!(valid_253.len(), 253);
+        assert!(Handle::new(&valid_253).is_ok());
+
+        // 254 chars: make last segment 62 chars
+        let s4_long = format!("g{}g", "h".repeat(60)); // 62
+        let too_long_254 = format!("{}.{}.{}.{}", s1, s2, s3, s4_long);
+        assert_eq!(too_long_254.len(), 254);
+        assert!(Handle::new(&too_long_254).is_err());
+    }
+
+    #[test]
+    fn segment_length_constraints() {
+        let valid_63_char_segment = format!("{}.com", "a".repeat(63));
+        assert!(Handle::new(&valid_63_char_segment).is_ok());
+
+        let too_long_64_char_segment = format!("{}.com", "a".repeat(64));
+        assert!(Handle::new(&too_long_64_char_segment).is_err());
+    }
+
+    #[test]
+    fn hyphen_placement() {
+        assert!(Handle::new("valid-label.com").is_ok());
+        assert!(Handle::new("-nope.com").is_err());
+        assert!(Handle::new("nope-.com").is_err());
+    }
+
+    #[test]
+    fn tld_must_start_with_letter() {
+        assert!(Handle::new("foo.bar").is_ok());
+        assert!(Handle::new("foo.9bar").is_err());
+    }
+
+    #[test]
+    fn disallowed_tlds() {
+        assert!(Handle::new("foo.local").is_err());
+        assert!(Handle::new("foo.localhost").is_err());
+        assert!(Handle::new("foo.arpa").is_err());
+        assert!(Handle::new("foo.invalid").is_err());
+        assert!(Handle::new("foo.internal").is_err());
+        assert!(Handle::new("foo.example").is_err());
+        assert!(Handle::new("foo.alt").is_err());
+        assert!(Handle::new("foo.onion").is_err());
+    }
+
+    #[test]
+    fn minimum_segments() {
+        assert!(Handle::new("a.b").is_ok());
+        assert!(Handle::new("a").is_err());
+        assert!(Handle::new("com").is_err());
+    }
+
+    #[test]
+    fn invalid_characters() {
+        assert!(Handle::new("foo!bar.com").is_err());
+        assert!(Handle::new("foo_bar.com").is_err());
+        assert!(Handle::new("foo bar.com").is_err());
+        assert!(Handle::new("foo@bar.com").is_err());
+    }
+
+    #[test]
+    fn empty_segments() {
+        assert!(Handle::new("foo..com").is_err());
+        assert!(Handle::new(".foo.com").is_err());
+        assert!(Handle::new("foo.com.").is_err());
     }
 }

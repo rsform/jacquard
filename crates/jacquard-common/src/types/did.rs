@@ -12,6 +12,14 @@ use std::{ops::Deref, str::FromStr};
 #[repr(transparent)]
 pub struct Did<'d>(CowStr<'d>);
 
+/// Regex for DID validation per AT Protocol spec.
+///
+/// Note: This regex allows `%` in the identifier but prevents DIDs from ending with `:` or `%`.
+/// It does NOT validate that percent-encoding is well-formed (i.e., `%XX` where XX are hex digits).
+/// This matches the behavior of the official TypeScript implementation, which also does not
+/// enforce percent-encoding validity at validation time. While the spec states "percent sign
+/// must be followed by two hex characters," this is treated as a best practice rather than
+/// a hard validation requirement.
 pub static DID_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^did:[a-z]+:[a-zA-Z0-9._:%-]*[a-zA-Z0-9._-]$").unwrap());
 
@@ -191,5 +199,94 @@ impl Deref for Did<'_> {
 
     fn deref(&self) -> &Self::Target {
         self.as_str()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn valid_dids() {
+        assert!(Did::new("did:plc:abc123").is_ok());
+        assert!(Did::new("did:web:example.com").is_ok());
+        assert!(Did::new("did:method:val_ue").is_ok());
+        assert!(Did::new("did:method:val-ue").is_ok());
+        assert!(Did::new("did:method:val.ue").is_ok());
+        assert!(Did::new("did:method:val%20ue").is_ok());
+    }
+
+    #[test]
+    fn prefix_stripping() {
+        assert_eq!(Did::new("at://did:plc:foo").unwrap().as_str(), "did:plc:foo");
+        assert_eq!(Did::new("did:plc:foo").unwrap().as_str(), "did:plc:foo");
+    }
+
+    #[test]
+    fn must_start_with_did() {
+        assert!(Did::new("DID:plc:foo").is_err());
+        assert!(Did::new("plc:foo").is_err());
+        assert!(Did::new("foo").is_err());
+    }
+
+    #[test]
+    fn method_must_be_lowercase() {
+        assert!(Did::new("did:plc:foo").is_ok());
+        assert!(Did::new("did:PLC:foo").is_err());
+        assert!(Did::new("did:Plc:foo").is_err());
+    }
+
+    #[test]
+    fn cannot_end_with_colon_or_percent() {
+        assert!(Did::new("did:plc:foo:").is_err());
+        assert!(Did::new("did:plc:foo%").is_err());
+        assert!(Did::new("did:plc:foo:bar").is_ok());
+    }
+
+    #[test]
+    fn max_length() {
+        let valid_2048 = format!("did:plc:{}", "a".repeat(2048 - 8));
+        assert_eq!(valid_2048.len(), 2048);
+        assert!(Did::new(&valid_2048).is_ok());
+
+        let too_long_2049 = format!("did:plc:{}", "a".repeat(2049 - 8));
+        assert_eq!(too_long_2049.len(), 2049);
+        assert!(Did::new(&too_long_2049).is_err());
+    }
+
+    #[test]
+    fn allowed_characters() {
+        assert!(Did::new("did:method:abc123").is_ok());
+        assert!(Did::new("did:method:ABC123").is_ok());
+        assert!(Did::new("did:method:a_b_c").is_ok());
+        assert!(Did::new("did:method:a-b-c").is_ok());
+        assert!(Did::new("did:method:a.b.c").is_ok());
+        assert!(Did::new("did:method:a:b:c").is_ok());
+    }
+
+    #[test]
+    fn disallowed_characters() {
+        assert!(Did::new("did:method:a b").is_err());
+        assert!(Did::new("did:method:a@b").is_err());
+        assert!(Did::new("did:method:a#b").is_err());
+        assert!(Did::new("did:method:a?b").is_err());
+    }
+
+    #[test]
+    fn percent_encoding() {
+        // Valid percent encoding
+        assert!(Did::new("did:method:foo%20bar").is_ok());
+        assert!(Did::new("did:method:foo%2Fbar").is_ok());
+
+        // DIDs cannot end with %
+        assert!(Did::new("did:method:foo%").is_err());
+
+        // IMPORTANT: The regex does NOT validate that percent-encoding is well-formed.
+        // This matches the TypeScript reference implementation's behavior.
+        // While the spec says "percent sign must be followed by two hex characters",
+        // implementations treat this as a best practice, not a hard validation requirement.
+        // Thus, malformed percent encoding like %2x is accepted by the regex.
+        assert!(Did::new("did:method:foo%2x").is_ok());
+        assert!(Did::new("did:method:foo%ZZ").is_ok());
     }
 }

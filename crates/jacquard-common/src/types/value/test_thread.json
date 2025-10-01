@@ -1,0 +1,364 @@
+{
+  "hasOtherReplies": false,
+  "thread": [
+    {
+      "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.post/3m25k3p7lek2k",
+      "depth": 0,
+      "value": {
+        "$type": "app.bsky.unspecced.defs#threadItemPost",
+        "post": {
+          "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.post/3m25k3p7lek2k",
+          "cid": "bafyreicvplbzmlrbwdxv2zpbhibziexxnwmiskvzbapjtnidofzlh4yk64",
+          "author": {
+            "did": "did:plc:hbpefio3f5csc44msmbgioxz",
+            "handle": "sharonk.bsky.social",
+            "displayName": "Sharon",
+            "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:hbpefio3f5csc44msmbgioxz/bafkreia7dcruptjvvv7t46322zqsuqukkwblihzrm3f45r246o5zjulyn4@jpeg",
+            "associated": {
+              "chat": { "allowIncoming": "following" },
+              "activitySubscription": { "allowSubscriptions": "mutuals" }
+            },
+            "viewer": {
+              "muted": false,
+              "blockedBy": false,
+              "following": "at://did:plc:yfvwmnlztr4dwkb7hwz55r2g/app.bsky.graph.follow/3l6aft4mu2324",
+              "followedBy": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.graph.follow/3kygkag25zo2v"
+            },
+            "labels": [
+              {
+                "cts": "2024-05-11T03:48:55.341Z",
+                "src": "did:plc:e4elbtctnfqocyfcml6h2lf7",
+                "uri": "did:plc:hbpefio3f5csc44msmbgioxz",
+                "val": "bluesky-elder",
+                "ver": 1
+              },
+              {
+                "src": "did:plc:hbpefio3f5csc44msmbgioxz",
+                "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.actor.profile/self",
+                "cid": "bafyreihtzylnytd2224tatvvpktt5rwvdwppkyhlsrweshlrmnqcq32vsy",
+                "val": "!no-unauthenticated",
+                "cts": "1970-01-01T00:00:00.000Z"
+              }
+            ],
+            "createdAt": "2023-04-13T22:29:27.076Z"
+          },
+          "record": {
+            "$type": "app.bsky.feed.post",
+            "createdAt": "2025-10-01T17:15:19.282Z",
+            "embed": {
+              "$type": "app.bsky.embed.record",
+              "record": {
+                "cid": "bafyreidmo5ot3qoctmgw2vcckrqzy5hexocp5vto554a5kprwxhbsy3oqi",
+                "uri": "at://did:plc:2whlowi5jjjqrdrrj4lxh2lx/app.bsky.feed.post/3m25ixj2fec2a"
+              }
+            },
+            "langs": ["en"],
+            "text": "Sora 2 going to hit boomer epistemology like a hurricane"
+          },
+          "embed": {
+            "$type": "app.bsky.embed.record#view",
+            "record": {
+              "$type": "app.bsky.embed.record#viewRecord",
+              "uri": "at://did:plc:2whlowi5jjjqrdrrj4lxh2lx/app.bsky.feed.post/3m25ixj2fec2a",
+              "cid": "bafyreidmo5ot3qoctmgw2vcckrqzy5hexocp5vto554a5kprwxhbsy3oqi",
+              "author": {
+                "did": "did:plc:2whlowi5jjjqrdrrj4lxh2lx",
+                "handle": "eliothiggins.bsky.social",
+                "displayName": "Eliot Higgins",
+                "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:2whlowi5jjjqrdrrj4lxh2lx/bafkreiarcjakxx7hkgtfocqilj22vxgmyskl43blurk6vwu2nfvd5ihueu@jpeg",
+                "associated": { "activitySubscription": { "allowSubscriptions": "followers" } },
+                "viewer": { "muted": false, "blockedBy": false },
+                "labels": [],
+                "createdAt": "2024-11-06T08:20:47.084Z",
+                "verification": {
+                  "verifications": [
+                    {
+                      "issuer": "did:plc:z72i7hdynmk6r22z27h6tvur",
+                      "uri": "at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.graph.verification/3lv44jce72j2q",
+                      "isValid": true,
+                      "createdAt": "2025-07-29T12:33:45.033Z"
+                    }
+                  ],
+                  "verifiedStatus": "valid",
+                  "trustedVerifierStatus": "none"
+                }
+              },
+              "value": {
+                "$type": "app.bsky.feed.post",
+                "createdAt": "2025-10-01T16:55:04.861Z",
+                "embed": {
+                  "$type": "app.bsky.embed.video",
+                  "aspectRatio": { "height": 720, "width": 1280 },
+                  "video": {
+                    "$type": "blob",
+                    "ref": { "$link": "bafkreid7ybejd5s2vv2j7d4aajjlmdgazguemcnuliiyfn6coxpwp2mi6y" },
+                    "mimeType": "video/mp4",
+                    "size": 2244592
+                  }
+                },
+                "langs": ["en"],
+                "text": "Really good news for fans of garbage in their timelines, Sora 2 allows anyone to use copyrighted characters to sell you cryptocurrency."
+              },
+              "labels": [],
+              "likeCount": 248,
+              "replyCount": 18,
+              "repostCount": 67,
+              "quoteCount": 52,
+              "indexedAt": "2025-10-01T16:55:06.653Z",
+              "embeds": [
+                {
+                  "$type": "app.bsky.embed.video#view",
+                  "cid": "bafkreid7ybejd5s2vv2j7d4aajjlmdgazguemcnuliiyfn6coxpwp2mi6y",
+                  "playlist": "https://video.bsky.app/watch/did%3Aplc%3A2whlowi5jjjqrdrrj4lxh2lx/bafkreid7ybejd5s2vv2j7d4aajjlmdgazguemcnuliiyfn6coxpwp2mi6y/playlist.m3u8",
+                  "thumbnail": "https://video.bsky.app/watch/did%3Aplc%3A2whlowi5jjjqrdrrj4lxh2lx/bafkreid7ybejd5s2vv2j7d4aajjlmdgazguemcnuliiyfn6coxpwp2mi6y/thumbnail.jpg",
+                  "aspectRatio": { "height": 720, "width": 1280 }
+                }
+              ]
+            }
+          },
+          "bookmarkCount": 3,
+          "replyCount": 1,
+          "repostCount": 7,
+          "likeCount": 76,
+          "quoteCount": 1,
+          "indexedAt": "2025-10-01T17:15:19.523Z",
+          "viewer": { "bookmarked": false, "threadMuted": false, "replyDisabled": false, "embeddingDisabled": false },
+          "labels": [],
+          "threadgate": {
+            "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.threadgate/3m25k3p7lek2k",
+            "cid": "bafyreiclfmvpqfsfhpl4cffaw6elfdusx5wosinugljpwy2u3ckjse3rse",
+            "record": {
+              "$type": "app.bsky.feed.threadgate",
+              "allow": [
+                { "$type": "app.bsky.feed.threadgate#followingRule" },
+                { "$type": "app.bsky.feed.threadgate#mentionRule" },
+                { "$type": "app.bsky.feed.threadgate#followerRule" }
+              ],
+              "createdAt": "2025-10-01T17:15:19.285Z",
+              "hiddenReplies": [],
+              "post": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.post/3m25k3p7lek2k"
+            },
+            "lists": []
+          }
+        },
+        "moreParents": false,
+        "moreReplies": 0,
+        "opThread": true,
+        "hiddenByThreadgate": false,
+        "mutedByViewer": false
+      }
+    },
+    {
+      "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.post/3m25k6zjhps2k",
+      "depth": 1,
+      "value": {
+        "$type": "app.bsky.unspecced.defs#threadItemPost",
+        "post": {
+          "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.post/3m25k6zjhps2k",
+          "cid": "bafyreieqxxi7nwep5nuhogkv3tgub4rk4pv5tbh3m6yyf66nqdmmrknwsa",
+          "author": {
+            "did": "did:plc:hbpefio3f5csc44msmbgioxz",
+            "handle": "sharonk.bsky.social",
+            "displayName": "Sharon",
+            "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:hbpefio3f5csc44msmbgioxz/bafkreia7dcruptjvvv7t46322zqsuqukkwblihzrm3f45r246o5zjulyn4@jpeg",
+            "associated": {
+              "chat": { "allowIncoming": "following" },
+              "activitySubscription": { "allowSubscriptions": "mutuals" }
+            },
+            "viewer": {
+              "muted": false,
+              "blockedBy": false,
+              "following": "at://did:plc:yfvwmnlztr4dwkb7hwz55r2g/app.bsky.graph.follow/3l6aft4mu2324",
+              "followedBy": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.graph.follow/3kygkag25zo2v"
+            },
+            "labels": [
+              {
+                "cts": "2024-05-11T03:48:55.341Z",
+                "src": "did:plc:e4elbtctnfqocyfcml6h2lf7",
+                "uri": "did:plc:hbpefio3f5csc44msmbgioxz",
+                "val": "bluesky-elder",
+                "ver": 1
+              },
+              {
+                "src": "did:plc:hbpefio3f5csc44msmbgioxz",
+                "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.actor.profile/self",
+                "cid": "bafyreihtzylnytd2224tatvvpktt5rwvdwppkyhlsrweshlrmnqcq32vsy",
+                "val": "!no-unauthenticated",
+                "cts": "1970-01-01T00:00:00.000Z"
+              }
+            ],
+            "createdAt": "2023-04-13T22:29:27.076Z"
+          },
+          "record": {
+            "$type": "app.bsky.feed.post",
+            "createdAt": "2025-10-01T17:17:10.755Z",
+            "langs": ["en"],
+            "reply": {
+              "parent": {
+                "cid": "bafyreicvplbzmlrbwdxv2zpbhibziexxnwmiskvzbapjtnidofzlh4yk64",
+                "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.post/3m25k3p7lek2k"
+              },
+              "root": {
+                "cid": "bafyreicvplbzmlrbwdxv2zpbhibziexxnwmiskvzbapjtnidofzlh4yk64",
+                "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.post/3m25k3p7lek2k"
+              }
+            },
+            "text": "it's funny how these all feel like stuff that would be playing on the Cyberpunk 2077 mediafeeds"
+          },
+          "bookmarkCount": 0,
+          "replyCount": 2,
+          "repostCount": 1,
+          "likeCount": 28,
+          "quoteCount": 0,
+          "indexedAt": "2025-10-01T17:17:11.164Z",
+          "viewer": { "bookmarked": false, "threadMuted": false, "replyDisabled": false, "embeddingDisabled": false },
+          "labels": []
+        },
+        "moreParents": false,
+        "moreReplies": 0,
+        "opThread": true,
+        "hiddenByThreadgate": false,
+        "mutedByViewer": false
+      }
+    },
+    {
+      "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.post/3m25l6doydc26",
+      "depth": 2,
+      "value": {
+        "$type": "app.bsky.unspecced.defs#threadItemPost",
+        "post": {
+          "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.post/3m25l6doydc26",
+          "cid": "bafyreia7yd5gbxdw4djkmocr6sbg2bgczup6d6pdmctsspdrne3vhcll6q",
+          "author": {
+            "did": "did:plc:hbpefio3f5csc44msmbgioxz",
+            "handle": "sharonk.bsky.social",
+            "displayName": "Sharon",
+            "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:hbpefio3f5csc44msmbgioxz/bafkreia7dcruptjvvv7t46322zqsuqukkwblihzrm3f45r246o5zjulyn4@jpeg",
+            "associated": {
+              "chat": { "allowIncoming": "following" },
+              "activitySubscription": { "allowSubscriptions": "mutuals" }
+            },
+            "viewer": {
+              "muted": false,
+              "blockedBy": false,
+              "following": "at://did:plc:yfvwmnlztr4dwkb7hwz55r2g/app.bsky.graph.follow/3l6aft4mu2324",
+              "followedBy": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.graph.follow/3kygkag25zo2v"
+            },
+            "labels": [
+              {
+                "cts": "2024-05-11T03:48:55.341Z",
+                "src": "did:plc:e4elbtctnfqocyfcml6h2lf7",
+                "uri": "did:plc:hbpefio3f5csc44msmbgioxz",
+                "val": "bluesky-elder",
+                "ver": 1
+              },
+              {
+                "src": "did:plc:hbpefio3f5csc44msmbgioxz",
+                "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.actor.profile/self",
+                "cid": "bafyreihtzylnytd2224tatvvpktt5rwvdwppkyhlsrweshlrmnqcq32vsy",
+                "val": "!no-unauthenticated",
+                "cts": "1970-01-01T00:00:00.000Z"
+              }
+            ],
+            "createdAt": "2023-04-13T22:29:27.076Z"
+          },
+          "record": {
+            "$type": "app.bsky.feed.post",
+            "createdAt": "2025-10-01T17:34:41.609Z",
+            "langs": ["en"],
+            "reply": {
+              "parent": {
+                "cid": "bafyreieqxxi7nwep5nuhogkv3tgub4rk4pv5tbh3m6yyf66nqdmmrknwsa",
+                "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.post/3m25k6zjhps2k"
+              },
+              "root": {
+                "cid": "bafyreicvplbzmlrbwdxv2zpbhibziexxnwmiskvzbapjtnidofzlh4yk64",
+                "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.post/3m25k3p7lek2k"
+              }
+            },
+            "text": "\"Morty, I've turned myself into a rugpull, Morty!\""
+          },
+          "bookmarkCount": 0,
+          "replyCount": 0,
+          "repostCount": 0,
+          "likeCount": 3,
+          "quoteCount": 0,
+          "indexedAt": "2025-10-01T17:34:41.858Z",
+          "viewer": { "bookmarked": false, "threadMuted": false, "replyDisabled": false, "embeddingDisabled": false },
+          "labels": []
+        },
+        "moreParents": false,
+        "moreReplies": 0,
+        "opThread": true,
+        "hiddenByThreadgate": false,
+        "mutedByViewer": false
+      }
+    },
+    {
+      "uri": "at://did:plc:duaatzbzy7qm4ppl2hluilpg/app.bsky.feed.post/3m25knxro3s2t",
+      "depth": 2,
+      "value": {
+        "$type": "app.bsky.unspecced.defs#threadItemPost",
+        "post": {
+          "uri": "at://did:plc:duaatzbzy7qm4ppl2hluilpg/app.bsky.feed.post/3m25knxro3s2t",
+          "cid": "bafyreidppmo5vaepnafjlwc5doxmk7n3hrctve6cmcz67hhkcuxf5cr6tm",
+          "author": {
+            "did": "did:plc:duaatzbzy7qm4ppl2hluilpg",
+            "handle": "gentlemanengineer.bsky.social",
+            "displayName": "Chris Magerkurth",
+            "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:duaatzbzy7qm4ppl2hluilpg/bafkreifqxgriyccwjt5pwahsx6sju2bdmtoytqyubxoxlfwk4rv3eedkia@jpeg",
+            "associated": { "activitySubscription": { "allowSubscriptions": "followers" } },
+            "viewer": { "muted": false, "blockedBy": false },
+            "labels": [],
+            "createdAt": "2025-02-22T02:03:41.644Z"
+          },
+          "record": {
+            "$type": "app.bsky.feed.post",
+            "createdAt": "2025-10-01T17:25:32.243Z",
+            "langs": ["en"],
+            "reply": {
+              "parent": {
+                "cid": "bafyreieqxxi7nwep5nuhogkv3tgub4rk4pv5tbh3m6yyf66nqdmmrknwsa",
+                "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.post/3m25k6zjhps2k"
+              },
+              "root": {
+                "cid": "bafyreicvplbzmlrbwdxv2zpbhibziexxnwmiskvzbapjtnidofzlh4yk64",
+                "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.post/3m25k3p7lek2k"
+              }
+            },
+            "text": "Or on Interdimensional Cable from Rick and Morty."
+          },
+          "bookmarkCount": 0,
+          "replyCount": 0,
+          "repostCount": 0,
+          "likeCount": 1,
+          "quoteCount": 0,
+          "indexedAt": "2025-10-01T17:25:25.858Z",
+          "viewer": { "bookmarked": false, "threadMuted": false, "replyDisabled": false, "embeddingDisabled": false },
+          "labels": []
+        },
+        "moreParents": false,
+        "moreReplies": 0,
+        "opThread": false,
+        "hiddenByThreadgate": false,
+        "mutedByViewer": false
+      }
+    }
+  ],
+  "threadgate": {
+    "uri": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.threadgate/3m25k3p7lek2k",
+    "cid": "bafyreiclfmvpqfsfhpl4cffaw6elfdusx5wosinugljpwy2u3ckjse3rse",
+    "record": {
+      "$type": "app.bsky.feed.threadgate",
+      "allow": [
+        { "$type": "app.bsky.feed.threadgate#followingRule" },
+        { "$type": "app.bsky.feed.threadgate#mentionRule" },
+        { "$type": "app.bsky.feed.threadgate#followerRule" }
+      ],
+      "createdAt": "2025-10-01T17:15:19.285Z",
+      "hiddenReplies": [],
+      "post": "at://did:plc:hbpefio3f5csc44msmbgioxz/app.bsky.feed.post/3m25k3p7lek2k"
+    },
+    "lists": []
+  }
+}

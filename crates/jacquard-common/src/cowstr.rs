@@ -177,6 +177,28 @@ impl PartialEq<CowStr<'_>> for String {
     }
 }
 
+impl PartialOrd for CowStr<'_> {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(match (self, other) {
+            (CowStr::Borrowed(s1), CowStr::Borrowed(s2)) => s1.cmp(s2),
+            (CowStr::Borrowed(s1), CowStr::Owned(s2)) => s1.cmp(&s2.as_ref()),
+            (CowStr::Owned(s1), CowStr::Borrowed(s2)) => s1.as_str().cmp(s2),
+            (CowStr::Owned(s1), CowStr::Owned(s2)) => s1.cmp(s2),
+        })
+    }
+}
+
+impl Ord for CowStr<'_> {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        match (self, other) {
+            (CowStr::Borrowed(s1), CowStr::Borrowed(s2)) => s1.cmp(s2),
+            (CowStr::Borrowed(s1), CowStr::Owned(s2)) => s1.cmp(&s2.as_ref()),
+            (CowStr::Owned(s1), CowStr::Borrowed(s2)) => s1.as_str().cmp(s2),
+            (CowStr::Owned(s1), CowStr::Owned(s2)) => s1.cmp(s2),
+        }
+    }
+}
+
 impl Eq for CowStr<'_> {}
 
 impl Hash for CowStr<'_> {

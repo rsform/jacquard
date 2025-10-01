@@ -214,3 +214,269 @@ impl Deref for Cid<'_> {
         self.as_str()
     }
 }
+
+/// CID link wrapper that serializes as {"$link": "cid"} in JSON
+/// and as raw CID in CBOR
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[repr(transparent)]
+pub struct CidLink<'c>(pub Cid<'c>);
+
+impl<'c> CidLink<'c> {
+    pub fn new(cid: &'c [u8]) -> Result<Self, Error> {
+        Ok(Self(Cid::new(cid)?))
+    }
+
+    pub fn new_owned(cid: &[u8]) -> Result<CidLink<'static>, Error> {
+        Ok(CidLink(Cid::new_owned(cid)?))
+    }
+
+    pub fn new_static(cid: &'static str) -> Self {
+        Self(Cid::str(cid))
+    }
+
+    pub fn ipld(cid: IpldCid) -> CidLink<'static> {
+        CidLink(Cid::ipld(cid))
+    }
+
+    pub fn str(cid: &'c str) -> Self {
+        Self(Cid::str(cid))
+    }
+
+    pub fn cow_str(cid: CowStr<'c>) -> Self {
+        Self(Cid::cow_str(cid))
+    }
+
+    pub fn as_str(&self) -> &str {
+        self.0.as_str()
+    }
+
+    pub fn to_ipld(&self) -> Result<IpldCid, cid::Error> {
+        self.0.to_ipld()
+    }
+
+    pub fn into_inner(self) -> Cid<'c> {
+        self.0
+    }
+}
+
+impl fmt::Display for CidLink<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl FromStr for CidLink<'_> {
+    type Err = Infallible;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(CidLink(Cid::from_str(s)?))
+    }
+}
+
+impl IntoStatic for CidLink<'_> {
+    type Output = CidLink<'static>;
+
+    fn into_static(self) -> Self::Output {
+        CidLink(self.0.into_static())
+    }
+}
+
+impl Serialize for CidLink<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        if serializer.is_human_readable() {
+            // JSON: {"$link": "cid_string"}
+            use serde::ser::SerializeMap;
+            let mut map = serializer.serialize_map(Some(1))?;
+            map.serialize_entry("$link", self.0.as_str())?;
+            map.end()
+        } else {
+            // CBOR: raw CID
+            self.0.serialize(serializer)
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for CidLink<'_> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        if deserializer.is_human_readable() {
+            // JSON: expect {"$link": "cid_string"}
+            struct LinkVisitor;
+
+            impl<'de> Visitor<'de> for LinkVisitor {
+                type Value = CidLink<'static>;
+
+                fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                    formatter.write_str("a CID link object with $link field")
+                }
+
+                fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
+                where
+                    A: serde::de::MapAccess<'de>,
+                {
+                    use serde::de::Error;
+
+                    let mut link: Option<String> = None;
+
+                    while let Some(key) = map.next_key::<String>()? {
+                        if key == "$link" {
+                            link = Some(map.next_value()?);
+                        } else {
+                            // Skip unknown fields
+                            let _: serde::de::IgnoredAny = map.next_value()?;
+                        }
+                    }
+
+                    if let Some(cid_str) = link {
+                        Ok(CidLink(Cid::from(cid_str)))
+                    } else {
+                        Err(A::Error::missing_field("$link"))
+                    }
+                }
+            }
+
+            deserializer.deserialize_map(LinkVisitor)
+        } else {
+            // CBOR: raw CID
+            Ok(CidLink(Cid::deserialize(deserializer)?))
+        }
+    }
+}
+
+impl From<CidLink<'_>> for String {
+    fn from(value: CidLink) -> Self {
+        value.0.into()
+    }
+}
+
+impl<'c> From<CidLink<'c>> for CowStr<'c> {
+    fn from(value: CidLink<'c>) -> Self {
+        value.0.into()
+    }
+}
+
+impl From<String> for CidLink<'_> {
+    fn from(value: String) -> Self {
+        CidLink(Cid::from(value))
+    }
+}
+
+impl<'c> From<CowStr<'c>> for CidLink<'c> {
+    fn from(value: CowStr<'c>) -> Self {
+        CidLink(Cid::from(value))
+    }
+}
+
+impl From<IpldCid> for CidLink<'_> {
+    fn from(value: IpldCid) -> Self {
+        CidLink(Cid::from(value))
+    }
+}
+
+impl<'c> From<Cid<'c>> for CidLink<'c> {
+    fn from(value: Cid<'c>) -> Self {
+        CidLink(value)
+    }
+}
+
+impl<'c> From<CidLink<'c>> for Cid<'c> {
+    fn from(value: CidLink<'c>) -> Self {
+        value.0
+    }
+}
+
+impl AsRef<str> for CidLink<'_> {
+    fn as_ref(&self) -> &str {
+        self.0.as_ref()
+    }
+}
+
+impl Deref for CidLink<'_> {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        self.0.deref()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const TEST_CID: &str = "bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha";
+
+    #[test]
+    fn cidlink_serialize_json() {
+        let link = CidLink::str(TEST_CID);
+        let json = serde_json::to_string(&link).unwrap();
+        assert_eq!(json, r#"{"$link":"bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha"}"#);
+    }
+
+    #[test]
+    fn cidlink_deserialize_json() {
+        let json = r#"{"$link":"bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha"}"#;
+        let link: CidLink = serde_json::from_str(json).unwrap();
+        assert_eq!(link.as_str(), TEST_CID);
+    }
+
+    #[test]
+    fn cidlink_roundtrip_json() {
+        let link = CidLink::str(TEST_CID);
+        let json = serde_json::to_string(&link).unwrap();
+        let parsed: CidLink = serde_json::from_str(&json).unwrap();
+        assert_eq!(link, parsed);
+        assert_eq!(link.as_str(), TEST_CID);
+    }
+
+    #[test]
+    fn cidlink_constructors() {
+        let link1 = CidLink::str(TEST_CID);
+        let link2 = CidLink::cow_str(CowStr::Borrowed(TEST_CID));
+        let link3 = CidLink::from(TEST_CID.to_string());
+        let link4 = CidLink::new_static(TEST_CID);
+
+        assert_eq!(link1.as_str(), TEST_CID);
+        assert_eq!(link2.as_str(), TEST_CID);
+        assert_eq!(link3.as_str(), TEST_CID);
+        assert_eq!(link4.as_str(), TEST_CID);
+    }
+
+    #[test]
+    fn cidlink_conversions() {
+        let link = CidLink::str(TEST_CID);
+
+        // CidLink -> Cid
+        let cid: Cid = link.clone().into();
+        assert_eq!(cid.as_str(), TEST_CID);
+
+        // Cid -> CidLink
+        let link2: CidLink = cid.into();
+        assert_eq!(link2.as_str(), TEST_CID);
+
+        // CidLink -> String
+        let s: String = link.clone().into();
+        assert_eq!(s, TEST_CID);
+
+        // CidLink -> CowStr
+        let cow: CowStr = link.into();
+        assert_eq!(cow.as_ref(), TEST_CID);
+    }
+
+    #[test]
+    fn cidlink_display() {
+        let link = CidLink::str(TEST_CID);
+        assert_eq!(format!("{}", link), TEST_CID);
+    }
+
+    #[test]
+    fn cidlink_deref() {
+        let link = CidLink::str(TEST_CID);
+        assert_eq!(&*link, TEST_CID);
+        assert_eq!(link.as_ref(), TEST_CID);
+    }
+}

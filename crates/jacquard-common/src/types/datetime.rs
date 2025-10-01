@@ -1,7 +1,8 @@
 use chrono::DurationRound;
 use serde::Serializer;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
-use smol_str::ToSmolStr;
+use smol_str::{SmolStr, ToSmolStr};
+use std::fmt;
 use std::sync::LazyLock;
 use std::{cmp, str::FromStr};
 
@@ -161,5 +162,76 @@ impl TryFrom<CowStr<'_>> for Datetime {
             // Simulate an invalid `ParseError`.
             Err(chrono::DateTime::parse_from_rfc3339("invalid").expect_err("invalid"))
         }
+    }
+}
+
+impl From<chrono::DateTime<chrono::FixedOffset>> for Datetime {
+    fn from(dt: chrono::DateTime<chrono::FixedOffset>) -> Self {
+        Self::new(dt)
+    }
+}
+
+impl From<Datetime> for String {
+    fn from(value: Datetime) -> Self {
+        value.serialized.to_string()
+    }
+}
+
+impl From<Datetime> for SmolStr {
+    fn from(value: Datetime) -> Self {
+        match value.serialized {
+            CowStr::Borrowed(s) => SmolStr::new(s),
+            CowStr::Owned(s) => s,
+        }
+    }
+}
+
+impl From<Datetime> for CowStr<'static> {
+    fn from(value: Datetime) -> Self {
+        value.serialized
+    }
+}
+
+impl AsRef<str> for Datetime {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl fmt::Display for Datetime {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn valid_datetimes() {
+        assert!(Datetime::from_str("2023-01-15T12:30:45.123456Z").is_ok());
+        assert!(Datetime::from_str("2023-01-15T12:30:45Z").is_ok());
+        assert!(Datetime::from_str("2023-01-15T12:30:45+00:00").is_ok());
+        assert!(Datetime::from_str("2023-01-15T12:30:45-05:00").is_ok());
+    }
+
+    #[test]
+    fn microsecond_precision() {
+        let dt = Datetime::from_str("2023-01-15T12:30:45.123456Z").unwrap();
+        assert!(dt.as_str().contains(".123456"));
+    }
+
+    #[test]
+    fn requires_timezone() {
+        // Missing timezone should fail
+        assert!(Datetime::from_str("2023-01-15T12:30:45").is_err());
+    }
+
+    #[test]
+    fn round_trip() {
+        let original = "2023-01-15T12:30:45.123456Z";
+        let dt = Datetime::from_str(original).unwrap();
+        assert_eq!(dt.as_str(), original);
     }
 }

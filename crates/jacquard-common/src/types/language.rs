@@ -22,7 +22,13 @@ impl Language {
         T: AsRef<str> + ?Sized,
     {
         let tag = langtag::LangTag::new(lang)?;
-        Ok(Language(SmolStr::new_inline(tag.as_str())))
+        Ok(Language(SmolStr::new(tag.as_str())))
+    }
+
+    /// Parses an IETF language tag from a static string.
+    pub fn new_static(lang: &'static str) -> Result<Self, langtag::InvalidLangTag<&'static str>> {
+        let tag = langtag::LangTag::new(lang)?;
+        Ok(Language(SmolStr::new_static(tag.as_str())))
     }
 
     /// Infallible constructor for when you *know* the string is a valid IETF language tag.
@@ -32,14 +38,14 @@ impl Language {
     pub fn raw(lang: impl AsRef<str>) -> Self {
         let lang = lang.as_ref();
         let tag = langtag::LangTag::new(lang).expect("valid IETF language tag");
-        Language(SmolStr::new_inline(tag.as_str()))
+        Language(SmolStr::new(tag.as_str()))
     }
 
     /// Infallible constructor for when you *know* the string is a valid IETF language tag.
     /// Marked unsafe because responsibility for upholding the invariant is on the developer.
     pub unsafe fn unchecked(lang: impl AsRef<str>) -> Self {
         let lang = lang.as_ref();
-        Self(SmolStr::new_inline(lang))
+        Self(SmolStr::new(lang))
     }
 
     /// Returns the LANG as a string slice.
@@ -110,5 +116,31 @@ impl Deref for Language {
 
     fn deref(&self) -> &Self::Target {
         self.as_str()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn valid_language_tags() {
+        assert!(Language::new("en").is_ok());
+        assert!(Language::new("en-US").is_ok());
+        assert!(Language::new("zh-Hans").is_ok());
+        assert!(Language::new("es-419").is_ok());
+    }
+
+    #[test]
+    fn case_insensitive_but_preserves() {
+        let lang = Language::new("en-US").unwrap();
+        assert_eq!(lang.as_str(), "en-US");
+    }
+
+    #[test]
+    fn invalid_tags() {
+        assert!(Language::new("").is_err());
+        assert!(Language::new("not_a_tag").is_err());
+        assert!(Language::new("123").is_err());
     }
 }

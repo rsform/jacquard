@@ -221,3 +221,97 @@ unsafe impl RecordKeyType for Nsid<'_> {
         self.as_str()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn valid_nsids() {
+        assert!(Nsid::new("com.example.foo").is_ok());
+        assert!(Nsid::new("com.example.fooBar").is_ok());
+        assert!(Nsid::new("com.long-domain.foo").is_ok());
+        assert!(Nsid::new("a.b.c").is_ok());
+        assert!(Nsid::new("a1.b2.c3").is_ok());
+    }
+
+    #[test]
+    fn minimum_segments() {
+        assert!(Nsid::new("a.b.c").is_ok()); // 3 segments minimum
+        assert!(Nsid::new("a.b").is_err());
+        assert!(Nsid::new("a").is_err());
+    }
+
+    #[test]
+    fn domain_and_name_parsing() {
+        let nsid = Nsid::new("com.example.fooBar").unwrap();
+        assert_eq!(nsid.domain_authority(), "com.example");
+        assert_eq!(nsid.name(), "fooBar");
+    }
+
+    #[test]
+    fn max_length() {
+        // 317 chars: 63 + 63 + 63 + 63 + 63 = 315 + 4 dots + 1 = 320, too much
+        // try: 63 + 63 + 63 + 63 + 62 = 314 + 4 dots = 318, still too much
+        // try: 63 + 63 + 63 + 63 + 61 = 313 + 4 dots = 317
+        let s1 = format!("a{}a", "b".repeat(61));
+        let s2 = format!("c{}c", "d".repeat(61));
+        let s3 = format!("e{}e", "f".repeat(61));
+        let s4 = format!("g{}g", "h".repeat(61));
+        let s5 = format!("i{}i", "j".repeat(59));
+        let valid_317 = format!("{}.{}.{}.{}.{}", s1, s2, s3, s4, s5);
+        assert_eq!(valid_317.len(), 317);
+        assert!(Nsid::new(&valid_317).is_ok());
+
+        let s5_long = format!("i{}i", "j".repeat(60));
+        let too_long_318 = format!("{}.{}.{}.{}.{}", s1, s2, s3, s4, s5_long);
+        assert_eq!(too_long_318.len(), 318);
+        assert!(Nsid::new(&too_long_318).is_err());
+    }
+
+    #[test]
+    fn segment_length() {
+        let valid_63 = format!("{}.{}.foo", "a".repeat(63), "b".repeat(63));
+        assert!(Nsid::new(&valid_63).is_ok());
+
+        let too_long_64 = format!("{}.b.foo", "a".repeat(64));
+        assert!(Nsid::new(&too_long_64).is_err());
+    }
+
+    #[test]
+    fn first_segment_cannot_start_with_digit() {
+        assert!(Nsid::new("com.example.foo").is_ok());
+        assert!(Nsid::new("9com.example.foo").is_err());
+    }
+
+    #[test]
+    fn name_segment_rules() {
+        assert!(Nsid::new("com.example.foo").is_ok());
+        assert!(Nsid::new("com.example.fooBar123").is_ok());
+        assert!(Nsid::new("com.example.9foo").is_err()); // can't start with digit
+        assert!(Nsid::new("com.example.foo-bar").is_err()); // no hyphens in name
+    }
+
+    #[test]
+    fn domain_segment_rules() {
+        assert!(Nsid::new("foo-bar.example.baz").is_ok());
+        assert!(Nsid::new("foo.bar-baz.qux").is_ok());
+        assert!(Nsid::new("-foo.bar.baz").is_err()); // can't start with hyphen
+        assert!(Nsid::new("foo-.bar.baz").is_err()); // can't end with hyphen
+    }
+
+    #[test]
+    fn case_sensitivity() {
+        // Domain should be case-insensitive per spec (but not enforced in validation)
+        // Name is case-sensitive
+        assert!(Nsid::new("com.example.fooBar").is_ok());
+        assert!(Nsid::new("com.example.FooBar").is_ok());
+    }
+
+    #[test]
+    fn no_hyphens_in_name() {
+        assert!(Nsid::new("com.example.foo").is_ok());
+        assert!(Nsid::new("com.example.foo-bar").is_err());
+        assert!(Nsid::new("com.example.fooBar").is_ok());
+    }
+}

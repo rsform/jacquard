@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-use crate::types::nsid::Nsid;
-
 pub mod aturi;
 pub mod blob;
 pub mod cid;

@@ -8,7 +8,7 @@ pub use crate::{
     CowStr,
     types::{
         aturi::AtUri,
-        cid::Cid,
+        cid::{Cid, CidLink},
         datetime::Datetime,
         did::Did,
         handle::Handle,

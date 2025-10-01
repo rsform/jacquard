@@ -307,3 +307,73 @@ impl Default for Ticker {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn valid_tids() {
+        assert!(Tid::new("3jzfcijpj2z2a").is_ok());
+        assert!(Tid::new("2222222222222").is_ok());
+        assert!(Tid::new("j7777777777777").is_err()); // j is valid for first char but makes high bit set
+    }
+
+    #[test]
+    fn exact_length() {
+        assert!(Tid::new("3jzfcijpj2z2a").is_ok());
+        assert!(Tid::new("3jzfcijpj2z2").is_err()); // 12 chars
+        assert!(Tid::new("3jzfcijpj2z2aa").is_err()); // 14 chars
+    }
+
+    #[test]
+    fn first_char_constraint() {
+        // First char must be 2-7 or a-j (not k-z)
+        assert!(Tid::new("2222222222222").is_ok());
+        assert!(Tid::new("7777777777777").is_ok());
+        assert!(Tid::new("a222222222222").is_ok());
+        assert!(Tid::new("j222222222222").is_ok());
+        assert!(Tid::new("k222222222222").is_err());
+        assert!(Tid::new("z222222222222").is_err());
+    }
+
+    #[test]
+    fn remaining_chars_constraint() {
+        // Remaining 12 chars must be 2-7 or a-z
+        assert!(Tid::new("3abcdefghijkl").is_ok());
+        assert!(Tid::new("3zzzzzzzzzzzz").is_ok());
+        assert!(Tid::new("3222222222222").is_ok());
+        assert!(Tid::new("3777777777777").is_ok());
+    }
+
+    #[test]
+    fn disallowed_characters() {
+        assert!(Tid::new("3jzfcijpj2z2A").is_err()); // uppercase
+        assert!(Tid::new("3jzfcijpj2z21").is_err()); // 1 not allowed
+        assert!(Tid::new("3jzfcijpj2z28").is_err()); // 8 not allowed
+        assert!(Tid::new("3jzfcijpj2z2-").is_err()); // special char
+    }
+
+    #[test]
+    fn generation_and_comparison() {
+        let tid1 = Tid::now_0();
+        std::thread::sleep(std::time::Duration::from_micros(10));
+        let tid2 = Tid::now_0();
+
+        assert!(tid1.as_str().len() == 13);
+        assert!(tid2.as_str().len() == 13);
+        assert!(tid2.newer_than(&tid1));
+        assert!(tid1.older_than(&tid2));
+    }
+
+    #[test]
+    fn ticker_monotonic() {
+        let mut ticker = Ticker::new();
+        let tid1 = ticker.next(None);
+        let tid2 = ticker.next(Some(tid1.clone()));
+        let tid3 = ticker.next(Some(tid2.clone()));
+
+        assert!(tid2.newer_than(&tid1));
+        assert!(tid3.newer_than(&tid2));
+    }
+}
