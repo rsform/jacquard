@@ -129,7 +129,7 @@ Same as queries but with both `Input` and `Output` structs.
 
 **Tasks**:
 1. Create `LexiconCorpus` struct
-   - `HashMap<SmolStr, LexiconDoc<'static>>` - NSID → doc
+   - `BTreeMap<SmolStr, LexiconDoc<'static>>` - NSID → doc
    - Methods: `load_from_dir()`, `get()`, `resolve_ref()`
 2. Load all `.json` files from lexicon directory
 3. Parse into `LexiconDoc` and insert into registry
@@ -261,9 +261,9 @@ pub struct Post<'a> {
     // ... fields
 }
 
-impl Collection for Post<'_> {
+impl Collection for Post<'p> {
     const NSID: &'static str = "app.bsky.feed.post";
-    type Record = Post<'static>;
+    type Record = Post<'p>;
 }
 ```
 
@@ -275,7 +275,7 @@ pub trait XrpcRequest<'x> {
     /// The NSID for this XRPC method
     const NSID: &'static str;
 
-    /// HTTP method (GET for queries, POST for procedures)
+    /// XRPC method (query/GET, procedure/POST)
     const METHOD: XrpcMethod;
 
     /// Input encoding (MIME type, e.g., "application/json")
@@ -290,6 +290,8 @@ pub trait XrpcRequest<'x> {
 
     /// Response output type
     type Output: Deserialize<'x>;
+
+    type Err: Error;
 }
 
 pub enum XrpcMethod {
@@ -297,6 +299,8 @@ pub enum XrpcMethod {
     Procedure, // POST
 }
 ```
+
+
 
 **Generated implementation:**
 ```rust
@@ -319,6 +323,7 @@ impl XrpcRequest for GetAuthorFeedParams<'_> {
 
     type Params = Self;
     type Output = GetAuthorFeedOutput<'static>;
+    type Err = GetAuthorFeedError;
 }
 ```
 
@@ -332,6 +337,12 @@ impl XrpcRequest for GetAuthorFeedParams<'_> {
 - Allows monomorphization (static dispatch) for performance
 - Also supports `dyn XrpcRequest` for dynamic dispatch if needed
 - Client code can be generic over `impl XrpcRequest`
+
+
+#### XRPC Errors
+Lexicons contain information on the kind of errors they can return.
+Trait contains an associated error type. Error enum with thiserror::Error and
+miette:Diagnostic derives and appropriate content generated based on lexicon info.
 
 ### Subscriptions
 WebSocket streams - defer for now. Will need separate trait with message types.

@@ -1,17 +1,13 @@
-use core::{any::TypeId, fmt};
-use std::{borrow::ToOwned, boxed::Box, collections::BTreeMap, vec::Vec};
-
-use crate::{
-    CowStr,
-    types::{
-        DataModelType,
-        cid::Cid,
-        string::AtprotoStr,
-        value::{Array, Data, Object},
-    },
+use crate::types::{
+    DataModelType,
+    cid::Cid,
+    string::AtprotoStr,
+    value::{Array, Data, Object},
 };
 use bytes::Bytes;
+use core::{any::TypeId, fmt};
 use smol_str::SmolStr;
+use std::{borrow::ToOwned, boxed::Box, collections::BTreeMap, vec::Vec};
 
 /// Error used for converting from and into [`crate::types::value::Data`].
 #[derive(Clone, Debug)]

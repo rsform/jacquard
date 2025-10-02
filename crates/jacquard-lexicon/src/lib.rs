@@ -1,3 +1,4 @@
+pub mod corpus;
 pub mod fs;
 pub mod lexicon;
 pub mod output;

@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::collections::VecDeque;
@@ -67,7 +68,24 @@ macro_rules! impl_into_static_passthru {
 }
 
 impl_into_static_passthru!(
-    String, u128, u64, u32, u16, u8, i128, i64, i32, i16, i8, bool, char, usize, isize, f32, f64
+    String,
+    u128,
+    u64,
+    u32,
+    u16,
+    u8,
+    i128,
+    i64,
+    i32,
+    i16,
+    i8,
+    bool,
+    char,
+    usize,
+    isize,
+    f32,
+    f64,
+    crate::smol_str::SmolStr
 );
 
 impl<T: IntoStatic> IntoStatic for Box<T> {
@@ -111,6 +129,21 @@ where
     K::Output: Eq + Hash,
 {
     type Output = HashMap<K::Output, V::Output, S>;
+
+    fn into_static(self) -> Self::Output {
+        self.into_iter()
+            .map(|(k, v)| (k.into_static(), v.into_static()))
+            .collect()
+    }
+}
+
+impl<K, V> IntoStatic for BTreeMap<K, V>
+where
+    K: IntoStatic + Ord,
+    V: IntoStatic,
+    K::Output: Ord,
+{
+    type Output = BTreeMap<K::Output, V::Output>;
 
     fn into_static(self) -> Self::Output {
         self.into_iter()
