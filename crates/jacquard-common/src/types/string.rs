@@ -195,6 +195,32 @@ impl IntoStatic for AtprotoStr<'_> {
     }
 }
 
+impl From<AtprotoStr<'_>> for String {
+    fn from(value: AtprotoStr<'_>) -> Self {
+        match value {
+            AtprotoStr::AtIdentifier(ident) => ident.to_string(),
+            AtprotoStr::AtUri(at_uri) => at_uri.to_string(),
+            AtprotoStr::Uri(uri) => match uri {
+                Uri::At(at_uri) => at_uri.to_string(),
+                Uri::Cid(cid) => cid.to_string(),
+                Uri::Did(did) => did.to_string(),
+                Uri::Https(url) => url.to_string(),
+                Uri::Wss(url) => url.to_string(),
+                Uri::Any(cow_str) => cow_str.to_string(),
+            },
+            AtprotoStr::Cid(cid) => cid.to_string(),
+            AtprotoStr::RecordKey(record_key) => record_key.as_ref().to_string(),
+            AtprotoStr::String(cow_str) => cow_str.to_string(),
+            AtprotoStr::Datetime(datetime) => datetime.to_string(),
+            AtprotoStr::Language(language) => language.to_string(),
+            AtprotoStr::Tid(tid) => tid.to_string(),
+            AtprotoStr::Nsid(nsid) => nsid.to_string(),
+            AtprotoStr::Did(did) => did.to_string(),
+            AtprotoStr::Handle(handle) => handle.to_string(),
+        }
+    }
+}
+
 /// Parsing Error for atproto string types which don't have third-party specs
 /// (e.g. datetime, CIDs, language tags).
 ///

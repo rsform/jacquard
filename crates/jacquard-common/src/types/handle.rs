@@ -29,7 +29,12 @@ impl<'h> Handle<'h> {
             .unwrap_or(handle);
 
         if stripped.len() > 253 {
-            Err(AtStrError::too_long("handle", stripped, 253, stripped.len()))
+            Err(AtStrError::too_long(
+                "handle",
+                stripped,
+                253,
+                stripped.len(),
+            ))
         } else if !HANDLE_REGEX.is_match(stripped) {
             Err(AtStrError::regex(
                 "handle",
@@ -224,7 +229,10 @@ mod tests {
     #[test]
     fn prefix_stripping() {
         assert_eq!(Handle::new("@alice.test").unwrap().as_str(), "alice.test");
-        assert_eq!(Handle::new("at://alice.test").unwrap().as_str(), "alice.test");
+        assert_eq!(
+            Handle::new("at://alice.test").unwrap().as_str(),
+            "alice.test"
+        );
         assert_eq!(Handle::new("alice.test").unwrap().as_str(), "alice.test");
     }
 

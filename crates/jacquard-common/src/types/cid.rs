@@ -414,7 +414,10 @@ mod tests {
     fn cidlink_serialize_json() {
         let link = CidLink::str(TEST_CID);
         let json = serde_json::to_string(&link).unwrap();
-        assert_eq!(json, r#"{"$link":"bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha"}"#);
+        assert_eq!(
+            json,
+            r#"{"$link":"bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha"}"#
+        );
     }
 
     #[test]

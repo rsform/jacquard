@@ -1,9 +1,10 @@
-use crate::types::{DataModelType, blob::Blob, string::*};
+use crate::types::{DataModelType, LexiconStringType, UriType, blob::Blob, string::*};
 use bytes::Bytes;
 use ipld_core::ipld::Ipld;
 use smol_str::{SmolStr, ToSmolStr};
 use std::collections::BTreeMap;
 
+pub mod convert;
 pub mod parsing;
 pub mod serde_impl;
 
@@ -30,13 +31,48 @@ pub enum AtDataError {
 }
 
 impl<'s> Data<'s> {
+    pub fn data_type(&self) -> DataModelType {
+        match self {
+            Data::Null => DataModelType::Null,
+            Data::Boolean(_) => DataModelType::Boolean,
+            Data::Integer(_) => DataModelType::Integer,
+            Data::String(s) => match s {
+                AtprotoStr::Datetime(_) => DataModelType::String(LexiconStringType::Datetime),
+                AtprotoStr::Language(_) => DataModelType::String(LexiconStringType::Language),
+                AtprotoStr::Tid(_) => DataModelType::String(LexiconStringType::Tid),
+                AtprotoStr::Nsid(_) => DataModelType::String(LexiconStringType::Nsid),
+                AtprotoStr::Did(_) => DataModelType::String(LexiconStringType::Did),
+                AtprotoStr::Handle(_) => DataModelType::String(LexiconStringType::Handle),
+                AtprotoStr::AtIdentifier(_) => {
+                    DataModelType::String(LexiconStringType::AtIdentifier)
+                }
+                AtprotoStr::AtUri(_) => DataModelType::String(LexiconStringType::AtUri),
+                AtprotoStr::Uri(uri) => match uri {
+                    Uri::Did(_) => DataModelType::String(LexiconStringType::Uri(UriType::Did)),
+                    Uri::At(_) => DataModelType::String(LexiconStringType::Uri(UriType::At)),
+                    Uri::Https(_) => DataModelType::String(LexiconStringType::Uri(UriType::Https)),
+                    Uri::Wss(_) => DataModelType::String(LexiconStringType::Uri(UriType::Wss)),
+                    Uri::Cid(_) => DataModelType::String(LexiconStringType::Uri(UriType::Cid)),
+                    Uri::Any(_) => DataModelType::String(LexiconStringType::Uri(UriType::Any)),
+                },
+                AtprotoStr::Cid(_) => DataModelType::String(LexiconStringType::Cid),
+                AtprotoStr::RecordKey(_) => DataModelType::String(LexiconStringType::RecordKey),
+                AtprotoStr::String(_) => DataModelType::String(LexiconStringType::String),
+            },
+            Data::Bytes(_) => DataModelType::Bytes,
+            Data::CidLink(_) => DataModelType::CidLink,
+            Data::Array(_) => DataModelType::Array,
+            Data::Object(_) => DataModelType::Object,
+            Data::Blob(_) => DataModelType::Blob,
+        }
+    }
     pub fn from_json(json: &'s serde_json::Value) -> Result<Self, AtDataError> {
         Ok(if let Some(value) = json.as_bool() {
             Self::Boolean(value)
         } else if let Some(value) = json.as_i64() {
             Self::Integer(value)
         } else if let Some(value) = json.as_str() {
-            Self::String(AtprotoStr::new(value))
+            Self::String(parsing::parse_string(value))
         } else if let Some(value) = json.as_array() {
             Self::Array(Array::from_json(value)?)
         } else if let Some(value) = json.as_object() {
@@ -56,7 +92,7 @@ impl<'s> Data<'s> {
             Ipld::Float(_) => {
                 return Err(AtDataError::FloatNotAllowed);
             }
-            Ipld::String(string) => Self::String(AtprotoStr::new(string)),
+            Ipld::String(string) => Self::String(parsing::parse_string(string)),
             Ipld::Bytes(items) => Self::Bytes(Bytes::copy_from_slice(items.as_slice())),
             Ipld::List(iplds) => Self::Array(Array::from_cbor(iplds)?),
             Ipld::Map(btree_map) => Object::from_cbor(btree_map)?,
@@ -209,4 +245,26 @@ impl<'s> Object<'s> {
 
         Ok(Data::Object(Object(map)))
     }
+}
+
+/// Level 1 deserialization of raw atproto data
+///
+/// Maximally permissive with zero inference for cases where you just want to pass through the data
+/// and don't necessarily care if it's totally valid, or you want to validate later.
+/// E.g. lower-level services, PDS implementations, firehose indexers, relay implementations.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RawData<'s> {
+    Null,
+    Boolean(bool),
+    SignedInt(i64),
+    UnsignedInt(u64),
+    String(CowStr<'s>),
+    Bytes(Bytes),
+    CidLink(Cid<'s>),
+    Array(Vec<RawData<'s>>),
+    Object(BTreeMap<SmolStr, RawData<'s>>),
+    Blob(Blob<'s>),
+    InvalidBlob(Box<RawData<'s>>),
+    InvalidNumber(Bytes),
+    InvalidData(Bytes),
 }

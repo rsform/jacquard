@@ -4,7 +4,7 @@ use crate::{
         DataModelType, LexiconStringType, UriType,
         blob::{Blob, MimeType},
         string::*,
-        value::{AtDataError, Data},
+        value::{AtDataError, Data, RawData},
     },
 };
 use base64::{
@@ -316,5 +316,20 @@ pub fn decode_bytes<'s>(bytes: &str) -> Data<'s> {
         Data::Bytes(Bytes::from_owner(bytes))
     } else {
         Data::String(AtprotoStr::String(CowStr::Borrowed(bytes).into_static()))
+    }
+}
+
+pub fn decode_raw_bytes<'s>(bytes: &str) -> RawData<'s> {
+    // First one should just work. rest are insurance.
+    if let Ok(bytes) = BASE64_STANDARD.decode(bytes) {
+        RawData::Bytes(Bytes::from_owner(bytes))
+    } else if let Ok(bytes) = BASE64_STANDARD_NO_PAD.decode(bytes) {
+        RawData::Bytes(Bytes::from_owner(bytes))
+    } else if let Ok(bytes) = BASE64_URL_SAFE.decode(bytes) {
+        RawData::Bytes(Bytes::from_owner(bytes))
+    } else if let Ok(bytes) = BASE64_URL_SAFE_NO_PAD.decode(bytes) {
+        RawData::Bytes(Bytes::from_owner(bytes))
+    } else {
+        RawData::String(CowStr::Borrowed(bytes).into_static())
     }
 }

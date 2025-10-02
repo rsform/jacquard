@@ -218,7 +218,10 @@ mod tests {
 
     #[test]
     fn prefix_stripping() {
-        assert_eq!(Did::new("at://did:plc:foo").unwrap().as_str(), "did:plc:foo");
+        assert_eq!(
+            Did::new("at://did:plc:foo").unwrap().as_str(),
+            "did:plc:foo"
+        );
         assert_eq!(Did::new("did:plc:foo").unwrap().as_str(), "did:plc:foo");
     }
 

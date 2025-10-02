@@ -3,7 +3,7 @@ use std::{collections::BTreeMap, str::FromStr};
 
 use base64::{Engine, prelude::BASE64_STANDARD};
 use bytes::Bytes;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::VariantAccess};
 use smol_str::SmolStr;
 
 use crate::{
@@ -13,8 +13,11 @@ use crate::{
         blob::{Blob, MimeType},
         string::*,
         value::{
-            Array, AtDataError, Data, Object,
-            parsing::{decode_bytes, infer_from_type, parse_string, string_key_type_guess},
+            Array, AtDataError, Data, Object, RawData,
+            parsing::{
+                decode_bytes, decode_raw_bytes, infer_from_type, parse_string,
+                string_key_type_guess,
+            },
         },
     },
 };
@@ -61,6 +64,9 @@ impl Serialize for Data<'_> {
 }
 
 impl<'de> Deserialize<'de> for Data<'de> {
+    /// Currently only works for self-describing formats
+    /// Thankfully the supported atproto data formats are both self-describing (json and dag-cbor).
+    /// TODO: see if there's any way to make this work with Postcard.
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -83,6 +89,13 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
         E: serde::de::Error,
     {
         Ok(Data::Null)
+    }
+
+    fn visit_some<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
+    where
+        D: Deserializer<'v>,
+    {
+        Ok(deserializer.deserialize_any(self)?)
     }
 
     fn visit_unit<E>(self) -> Result<Self::Value, E>
@@ -110,7 +123,7 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
     where
         E: serde::de::Error,
     {
-        Ok(Data::Integer(v as i64))
+        Ok(Data::Integer((v % (i64::MAX as u64)) as i64))
     }
 
     fn visit_f64<E>(self, _v: f64) -> Result<Self::Value, E>
@@ -154,6 +167,36 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
         Ok(Data::Bytes(Bytes::copy_from_slice(v)))
     }
 
+    fn visit_borrowed_bytes<E>(self, v: &'v [u8]) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(Data::Bytes(Bytes::copy_from_slice(v)))
+    }
+
+    fn visit_byte_buf<E>(self, v: Vec<u8>) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(Data::Bytes(Bytes::from_owner(v)))
+    }
+
+    fn visit_enum<A>(self, data: A) -> Result<Self::Value, A::Error>
+    where
+        A: serde::de::EnumAccess<'v>,
+    {
+        match data.variant::<SmolStr>() {
+            Ok((key, value)) => {
+                let mut map = BTreeMap::new();
+                if let Ok(variant) = value.newtype_variant::<Data>() {
+                    map.insert(key, variant);
+                }
+                Ok(Data::Object(Object(map)))
+            }
+            Err(e) => Err(e),
+        }
+    }
+
     fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
     where
         A: serde::de::SeqAccess<'v>,
@@ -163,6 +206,13 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
             array.push(elem);
         }
         Ok(Data::Array(Array(array)))
+    }
+
+    fn visit_newtype_struct<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
+    where
+        D: Deserializer<'v>,
+    {
+        deserializer.deserialize_map(self)
     }
 
     fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
@@ -236,7 +286,7 @@ fn apply_type_inference<'s>(mut map: BTreeMap<SmolStr, Data<'s>>) -> Result<Data
 
     // Check for blob
     if let Some(type_str) = type_field {
-        if type_str == "blob" && infer_from_type(type_str) == DataModelType::Blob {
+        if infer_from_type(type_str) == DataModelType::Blob {
             // Try to construct blob from the collected data
             let ref_cid = map.get("ref").and_then(|v| {
                 if let Data::CidLink(cid) = v {
@@ -387,4 +437,312 @@ impl<'de> Deserialize<'de> for Object<'de> {
             _ => Err(D::Error::custom("expected object, got something else")),
         }
     }
+}
+
+impl Serialize for RawData<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            RawData::Null => serializer.serialize_none(),
+            RawData::Boolean(b) => serializer.serialize_bool(*b),
+            RawData::SignedInt(i) => serializer.serialize_i64(*i),
+            RawData::UnsignedInt(u) => serializer.serialize_u64(*u),
+            RawData::String(s) => serializer.serialize_str(&s),
+            RawData::Bytes(bytes) => {
+                if serializer.is_human_readable() {
+                    // JSON: {"$bytes": "base64 string"}
+                    use serde::ser::SerializeMap;
+                    let mut map = serializer.serialize_map(Some(1))?;
+                    map.serialize_entry("$bytes", &BASE64_STANDARD.encode(bytes))?;
+                    map.end()
+                } else {
+                    // CBOR: raw bytes
+                    serializer.serialize_bytes(bytes)
+                }
+            }
+            RawData::CidLink(cid) => {
+                if serializer.is_human_readable() {
+                    // JSON: {"$link": "cid_string"}
+                    use serde::ser::SerializeMap;
+                    let mut map = serializer.serialize_map(Some(1))?;
+                    map.serialize_entry("$link", cid.as_str())?;
+                    map.end()
+                } else {
+                    // CBOR: raw cid (Cid's serialize handles this)
+                    cid.serialize(serializer)
+                }
+            }
+            RawData::Array(arr) => arr.serialize(serializer),
+            RawData::Object(obj) => obj.serialize(serializer),
+            RawData::Blob(blob) => blob.serialize(serializer),
+            RawData::InvalidBlob(raw_data) => raw_data.serialize(serializer),
+            RawData::InvalidNumber(bytes) => serializer.serialize_bytes(bytes),
+            RawData::InvalidData(bytes) => serializer.serialize_bytes(bytes),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for RawData<'de> {
+    /// Currently only works for self-describing formats
+    /// Thankfully the supported atproto data formats are both self-describing (json and dag-cbor).
+    /// TODO: see if there's any way to make this work with Postcard.
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer.deserialize_any(RawDataVisitor)
+    }
+}
+
+struct RawDataVisitor;
+
+impl<'de: 'v, 'v> serde::de::Visitor<'v> for RawDataVisitor {
+    type Value = RawData<'v>;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("any valid AT Protocol data value")
+    }
+
+    fn visit_none<E>(self) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(RawData::Null)
+    }
+
+    fn visit_some<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
+    where
+        D: Deserializer<'v>,
+    {
+        Ok(deserializer.deserialize_option(self)?)
+    }
+
+    fn visit_unit<E>(self) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(RawData::Null)
+    }
+
+    fn visit_bool<E>(self, v: bool) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(RawData::Boolean(v))
+    }
+
+    fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(RawData::SignedInt(v))
+    }
+
+    fn visit_u64<E>(self, v: u64) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(RawData::UnsignedInt(v))
+    }
+
+    fn visit_f64<E>(self, v: f64) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(RawData::InvalidNumber(Bytes::from_owner(v.to_be_bytes())))
+    }
+
+    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(RawData::String(CowStr::Borrowed(v).into_static()))
+    }
+
+    fn visit_borrowed_str<E>(self, v: &'v str) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(RawData::String(v.into()))
+    }
+
+    fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(RawData::String(v.into()))
+    }
+
+    fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(RawData::Bytes(Bytes::copy_from_slice(v)))
+    }
+
+    fn visit_borrowed_bytes<E>(self, v: &'v [u8]) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(RawData::Bytes(Bytes::copy_from_slice(v)))
+    }
+
+    fn visit_byte_buf<E>(self, v: Vec<u8>) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(RawData::Bytes(Bytes::from_owner(v)))
+    }
+
+    // check on this, feels weird
+    fn visit_enum<A>(self, data: A) -> Result<Self::Value, A::Error>
+    where
+        A: serde::de::EnumAccess<'v>,
+    {
+        match data.variant::<SmolStr>() {
+            Ok((key, value)) => {
+                let mut map = BTreeMap::new();
+                if let Ok(variant) = value.newtype_variant::<RawData>() {
+                    map.insert(key, variant);
+                }
+                Ok(RawData::Object(map))
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    where
+        A: serde::de::SeqAccess<'v>,
+    {
+        let mut array = Vec::new();
+        while let Some(elem) = seq.next_element()? {
+            array.push(elem);
+        }
+        Ok(RawData::Array(array))
+    }
+
+    fn visit_newtype_struct<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
+    where
+        D: Deserializer<'v>,
+    {
+        deserializer.deserialize_map(self)
+    }
+
+    fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
+    where
+        A: serde::de::MapAccess<'v>,
+    {
+        use serde::de::Error;
+
+        // Peek at first key to check for special single-key patterns
+        let mut temp_map: BTreeMap<SmolStr, RawData<'v>> = BTreeMap::new();
+
+        while let Some(key) = map.next_key::<SmolStr>()? {
+            // Check for special patterns on single-key maps
+            if temp_map.is_empty() {
+                if key.as_str() == "$link" {
+                    // {"$link": "cid_string"} pattern
+                    let cid_str: String = map.next_value()?;
+                    // Check if there are more keys
+                    if let Some(next_key) = map.next_key::<SmolStr>()? {
+                        // More keys, treat as regular object
+                        temp_map.insert(key, RawData::String(cid_str.into()));
+                        let next_value: RawData = map.next_value()?;
+                        temp_map.insert(next_key, next_value);
+                        continue;
+                    } else {
+                        // Only key, return CidLink
+                        return Ok(RawData::CidLink(Cid::from(cid_str)));
+                    }
+                } else if key.as_str() == "$bytes" {
+                    // {"$bytes": "base64_string"} pattern
+                    let bytes_str: String = map.next_value()?;
+                    // Check if there are more keys
+                    if map.next_key::<SmolStr>()?.is_some() {
+                        // More keys, treat as regular object - shouldn't happen but handle it
+                        temp_map.insert(key, RawData::String(bytes_str.into()));
+                        continue;
+                    } else {
+                        // Only key, decode and return bytes
+                        return Ok(decode_raw_bytes(&bytes_str));
+                    }
+                }
+            }
+
+            let value: RawData = map.next_value()?;
+            temp_map.insert(key, value);
+        }
+
+        // Second pass: apply type inference and check for special patterns
+        apply_raw_type_inference(temp_map).map_err(A::Error::custom)
+    }
+}
+
+fn apply_raw_type_inference<'s>(
+    map: BTreeMap<SmolStr, RawData<'s>>,
+) -> Result<RawData<'s>, AtDataError> {
+    // Check for CID link pattern first: {"$link": "cid_string"}
+    if map.len() == 1 {
+        if let Some(RawData::String(link)) = map.get("$link") {
+            // Need to extract ownership, can't borrow from map we're about to consume
+            let link_owned = link.clone();
+            return Ok(RawData::CidLink(Cid::cow_str(link_owned)));
+        }
+    }
+
+    // Check for $type field to detect special structures
+    let type_field = map.get("$type").and_then(|v| {
+        if let RawData::String(s) = v {
+            Some(s.as_ref())
+        } else {
+            None
+        }
+    });
+
+    // Check for blob
+    if let Some(type_str) = type_field {
+        if infer_from_type(type_str) == DataModelType::Blob {
+            // Try to construct blob from the collected data
+            let ref_cid = map.get("ref").and_then(|v| {
+                if let RawData::CidLink(cid) = v {
+                    Some(cid.clone())
+                } else {
+                    None
+                }
+            });
+
+            let mime_type = map.get("mimeType").and_then(|v| {
+                if let RawData::String(s) = v {
+                    Some(s.clone())
+                } else {
+                    None
+                }
+            });
+
+            let size = map.get("size").and_then(|v| {
+                if let RawData::UnsignedInt(i) = v {
+                    Some(*i as usize)
+                } else if let RawData::SignedInt(i) = v {
+                    Some(*i as usize)
+                } else {
+                    None
+                }
+            });
+
+            if let (Some(ref_cid), Some(mime_cowstr), Some(size)) = (ref_cid, mime_type, size) {
+                return Ok(RawData::Blob(Blob {
+                    r#ref: ref_cid,
+                    mime_type: MimeType::from(mime_cowstr),
+                    size,
+                }));
+            } else {
+                return Ok(RawData::InvalidBlob(Box::new(RawData::Object(map))));
+            }
+        }
+    }
+
+    Ok(RawData::Object(map))
 }
