@@ -1,0 +1,286 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ConvoView<'a> {
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub last_message: std::option::Option<ConvoViewRecordLastMessage<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub last_reaction: std::option::Option<ConvoViewRecordLastReaction<'a>>,
+    #[serde(borrow)]
+    pub members: Vec<crate::chat_bsky::actor::ProfileViewBasic<'a>>,
+    pub muted: bool,
+    #[serde(borrow)]
+    pub rev: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub unread_count: i64,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ConvoViewRecordLastMessage<'a> {}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ConvoViewRecordLastReaction<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct DeletedMessageView<'a> {
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub rev: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub sender: jacquard_common::types::value::Data<'a>,
+    pub sent_at: jacquard_common::types::string::Datetime,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct LogAcceptConvo<'a> {
+    #[serde(borrow)]
+    pub convo_id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub rev: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct LogAddReaction<'a> {
+    #[serde(borrow)]
+    pub convo_id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub message: LogAddReactionRecordMessage<'a>,
+    #[serde(borrow)]
+    pub reaction: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub rev: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum LogAddReactionRecordMessage<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct LogBeginConvo<'a> {
+    #[serde(borrow)]
+    pub convo_id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub rev: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct LogCreateMessage<'a> {
+    #[serde(borrow)]
+    pub convo_id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub message: LogCreateMessageRecordMessage<'a>,
+    #[serde(borrow)]
+    pub rev: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum LogCreateMessageRecordMessage<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct LogDeleteMessage<'a> {
+    #[serde(borrow)]
+    pub convo_id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub message: LogDeleteMessageRecordMessage<'a>,
+    #[serde(borrow)]
+    pub rev: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum LogDeleteMessageRecordMessage<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct LogLeaveConvo<'a> {
+    #[serde(borrow)]
+    pub convo_id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub rev: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct LogMuteConvo<'a> {
+    #[serde(borrow)]
+    pub convo_id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub rev: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct LogReadMessage<'a> {
+    #[serde(borrow)]
+    pub convo_id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub message: LogReadMessageRecordMessage<'a>,
+    #[serde(borrow)]
+    pub rev: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum LogReadMessageRecordMessage<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct LogRemoveReaction<'a> {
+    #[serde(borrow)]
+    pub convo_id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub message: LogRemoveReactionRecordMessage<'a>,
+    #[serde(borrow)]
+    pub reaction: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub rev: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum LogRemoveReactionRecordMessage<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct LogUnmuteConvo<'a> {
+    #[serde(borrow)]
+    pub convo_id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub rev: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct MessageAndReactionView<'a> {
+    #[serde(borrow)]
+    pub message: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub reaction: jacquard_common::types::value::Data<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct MessageInput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub embed: std::option::Option<MessageInputRecordEmbed<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    #[serde(borrow)]
+    pub text: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum MessageInputRecordEmbed<'a> {
+    #[serde(rename = "app.bsky.embed.record")]
+    Record(Box<crate::app_bsky::embed::record::Record<'a>>),
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct MessageRef<'a> {
+    #[serde(borrow)]
+    pub convo_id: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(borrow)]
+    pub message_id: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct MessageView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub embed: std::option::Option<MessageViewRecordEmbed<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    #[serde(borrow)]
+    pub id: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub reactions: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    #[serde(borrow)]
+    pub rev: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub sender: jacquard_common::types::value::Data<'a>,
+    pub sent_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub text: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum MessageViewRecordEmbed<'a> {
+    #[serde(rename = "app.bsky.embed.record#view")]
+    RecordView(Box<crate::app_bsky::embed::record::View<'a>>),
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct MessageViewSender<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ReactionView<'a> {
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub sender: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub value: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ReactionViewSender<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+}
+pub mod accept_convo;
+pub mod add_reaction;
+pub mod delete_message_for_self;
+pub mod get_convo;
+pub mod get_convo_availability;
+pub mod get_convo_for_members;
+pub mod get_log;
+pub mod get_messages;
+pub mod leave_convo;
+pub mod list_convos;
+pub mod mute_convo;
+pub mod remove_reaction;
+pub mod send_message;
+pub mod send_message_batch;
+pub mod unmute_convo;
+pub mod update_all_read;
+pub mod update_read;

@@ -84,7 +84,10 @@ impl Serialize for Uri<'_> {
     }
 }
 
-impl<'de> Deserialize<'de> for Uri<'de> {
+impl<'de, 'a> Deserialize<'de> for Uri<'a>
+where
+    'de: 'a,
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,

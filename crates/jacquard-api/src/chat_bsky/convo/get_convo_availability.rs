@@ -1,0 +1,15 @@
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetConvoAvailabilityParams<'a> {
+    #[serde(borrow)]
+    pub members: Vec<jacquard_common::types::string::Did<'a>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetConvoAvailabilityOutput<'a> {
+    pub can_chat: bool,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub convo: std::option::Option<crate::chat_bsky::convo::ConvoView<'a>>,
+}

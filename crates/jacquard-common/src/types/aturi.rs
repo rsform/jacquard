@@ -579,7 +579,10 @@ impl IntoStatic for AtUri<'_> {
     }
 }
 
-impl<'de> Deserialize<'de> for AtUri<'de> {
+impl<'de, 'a> Deserialize<'de> for AtUri<'a>
+where
+    'de: 'a,
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,

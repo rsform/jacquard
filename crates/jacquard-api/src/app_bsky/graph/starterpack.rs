@@ -1,0 +1,29 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct FeedItem<'a> {
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+///Record defining a starter pack of actors and feeds for new users.
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct Starterpack<'a> {
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description_facets: std::option::Option<
+        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub feeds: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    #[serde(borrow)]
+    pub list: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+}

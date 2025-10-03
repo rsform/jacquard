@@ -1,0 +1,250 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ListItemView<'a> {
+    #[serde(borrow)]
+    pub subject: crate::app_bsky::actor::ProfileView<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListPurpose<'a> {
+    AppBskyGraphDefsModlist,
+    AppBskyGraphDefsCuratelist,
+    AppBskyGraphDefsReferencelist,
+    Other(jacquard_common::CowStr<'a>),
+}
+impl<'a> ListPurpose<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::AppBskyGraphDefsModlist => "app.bsky.graph.defs#modlist",
+            Self::AppBskyGraphDefsCuratelist => "app.bsky.graph.defs#curatelist",
+            Self::AppBskyGraphDefsReferencelist => "app.bsky.graph.defs#referencelist",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+impl<'a> From<&'a str> for ListPurpose<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "app.bsky.graph.defs#modlist" => Self::AppBskyGraphDefsModlist,
+            "app.bsky.graph.defs#curatelist" => Self::AppBskyGraphDefsCuratelist,
+            "app.bsky.graph.defs#referencelist" => Self::AppBskyGraphDefsReferencelist,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+impl<'a> From<String> for ListPurpose<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "app.bsky.graph.defs#modlist" => Self::AppBskyGraphDefsModlist,
+            "app.bsky.graph.defs#curatelist" => Self::AppBskyGraphDefsCuratelist,
+            "app.bsky.graph.defs#referencelist" => Self::AppBskyGraphDefsReferencelist,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+impl<'a> AsRef<str> for ListPurpose<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+impl<'a> serde::Serialize for ListPurpose<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de, 'a> serde::Deserialize<'de> for ListPurpose<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ListView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub creator: crate::app_bsky::actor::ProfileView<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description_facets: std::option::Option<
+        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
+    >,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub list_item_count: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub purpose: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer: std::option::Option<jacquard_common::types::value::Data<'a>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ListViewBasic<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub list_item_count: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub purpose: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer: std::option::Option<jacquard_common::types::value::Data<'a>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ListViewerState<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub blocked: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub muted: std::option::Option<bool>,
+}
+///indicates that a handle or DID could not be resolved
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct NotFoundActor<'a> {
+    #[serde(borrow)]
+    pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub not_found: bool,
+}
+///lists the bi-directional graph relationships between one actor (not indicated in the object), and the target actors (the DID included in the object)
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct Relationship<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub followed_by: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub following: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct StarterPackView<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub creator: crate::app_bsky::actor::ProfileViewBasic<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub feeds: std::option::Option<Vec<crate::app_bsky::feed::GeneratorView<'a>>>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub joined_all_time_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub joined_week_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub list: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub list_items_sample: std::option::Option<
+        Vec<jacquard_common::types::value::Data<'a>>,
+    >,
+    #[serde(borrow)]
+    pub record: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct StarterPackViewBasic<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub creator: crate::app_bsky::actor::ProfileViewBasic<'a>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub joined_all_time_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub joined_week_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub list_item_count: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub record: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+pub mod block;
+pub mod follow;
+pub mod get_actor_starter_packs;
+pub mod get_blocks;
+pub mod get_followers;
+pub mod get_follows;
+pub mod get_known_followers;
+pub mod get_list;
+pub mod get_list_blocks;
+pub mod get_list_mutes;
+pub mod get_lists;
+pub mod get_lists_with_membership;
+pub mod get_mutes;
+pub mod get_relationships;
+pub mod get_starter_pack;
+pub mod get_starter_packs;
+pub mod get_starter_packs_with_membership;
+pub mod get_suggested_follows_by_actor;
+pub mod list;
+pub mod listblock;
+pub mod listitem;
+pub mod mute_actor;
+pub mod mute_actor_list;
+pub mod mute_thread;
+pub mod search_starter_packs;
+pub mod starterpack;
+pub mod unmute_actor;
+pub mod unmute_actor_list;
+pub mod unmute_thread;
+pub mod verification;

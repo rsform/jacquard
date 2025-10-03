@@ -1,8 +1,8 @@
-use crate::lexicon::{LexiconDoc, LexUserType};
+use crate::error::Result;
+use crate::lexicon::{LexUserType, LexiconDoc};
 use jacquard_common::{into_static::IntoStatic, smol_str::SmolStr};
 use std::collections::BTreeMap;
 use std::fs;
-use std::io;
 use std::path::Path;
 
 /// Registry of all loaded lexicons for reference resolution
@@ -10,6 +10,8 @@ use std::path::Path;
 pub struct LexiconCorpus {
     /// Map from NSID to lexicon document
     docs: BTreeMap<SmolStr, LexiconDoc<'static>>,
+    /// Map from NSID to original source text (for error reporting)
+    sources: BTreeMap<SmolStr, String>,
 }
 
 impl LexiconCorpus {
@@ -17,25 +19,27 @@ impl LexiconCorpus {
     pub fn new() -> Self {
         Self {
             docs: BTreeMap::new(),
+            sources: BTreeMap::new(),
         }
     }
 
     /// Load all lexicons from a directory
-    pub fn load_from_dir(path: impl AsRef<Path>) -> io::Result<Self> {
+    pub fn load_from_dir(path: impl AsRef<Path>) -> Result<Self> {
         let mut corpus = Self::new();
 
         let schemas = crate::fs::find_schemas(path.as_ref())?;
         for schema_path in schemas {
             let content = fs::read_to_string(schema_path.as_ref())?;
-            let doc: LexiconDoc = serde_json::from_str(&content).map_err(|e| {
-                io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    format!("Failed to parse {}: {}", schema_path.as_ref().display(), e),
-                )
-            })?;
+
+            // Try to parse as lexicon doc - skip files that aren't lexicon schemas
+            let doc: LexiconDoc = match serde_json::from_str(&content) {
+                Ok(doc) => doc,
+                Err(_) => continue, // Skip non-lexicon JSON files
+            };
 
             let nsid = SmolStr::from(doc.id.to_string());
-            corpus.docs.insert(nsid, doc.into_static());
+            corpus.docs.insert(nsid.clone(), doc.into_static());
+            corpus.sources.insert(nsid, content);
         }
 
         Ok(corpus)
@@ -46,12 +50,20 @@ impl LexiconCorpus {
         self.docs.get(nsid)
     }
 
+    /// Get the source text for a lexicon by NSID
+    pub fn get_source(&self, nsid: &str) -> Option<&str> {
+        self.sources.get(nsid).map(|s| s.as_str())
+    }
+
     /// Resolve a reference, handling fragments
     ///
     /// Examples:
     /// - `app.bsky.feed.post` → main def from that lexicon
     /// - `app.bsky.feed.post#replyRef` → replyRef def from that lexicon
-    pub fn resolve_ref(&self, ref_str: &str) -> Option<(&LexiconDoc<'static>, &LexUserType<'static>)> {
+    pub fn resolve_ref(
+        &self,
+        ref_str: &str,
+    ) -> Option<(&LexiconDoc<'static>, &LexUserType<'static>)> {
         let (nsid, def_name) = if let Some((nsid, fragment)) = ref_str.split_once('#') {
             (nsid, fragment)
         } else {
@@ -103,8 +115,8 @@ mod tests {
     }
 
     #[test]
-    fn test_load_real_lexicons() {
-        let corpus = LexiconCorpus::load_from_dir("tests/fixtures/lexicons")
+    fn test_load_lexicons() {
+        let corpus = LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons")
             .expect("failed to load lexicons");
 
         assert!(!corpus.is_empty());

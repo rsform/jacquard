@@ -174,7 +174,10 @@ impl IntoStatic for Rkey<'_> {
     }
 }
 
-impl<'de> Deserialize<'de> for Rkey<'de> {
+impl<'de, 'a> Deserialize<'de> for Rkey<'a>
+where
+    'de: 'a,
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,

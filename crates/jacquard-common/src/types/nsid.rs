@@ -126,7 +126,10 @@ impl IntoStatic for Nsid<'_> {
     }
 }
 
-impl<'de> Deserialize<'de> for Nsid<'de> {
+impl<'de, 'a> Deserialize<'de> for Nsid<'a>
+where
+    'de: 'a,
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,

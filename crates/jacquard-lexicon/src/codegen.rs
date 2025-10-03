@@ -1,0 +1,1789 @@
+use crate::corpus::LexiconCorpus;
+use crate::error::{CodegenError, Result};
+use crate::lexicon::{
+    LexArrayItem, LexBlob, LexBoolean, LexBytes, LexCidLink, LexInteger, LexObject,
+    LexObjectProperty, LexRecord, LexRef, LexRefUnion, LexString, LexStringFormat, LexUnknown,
+    LexUserType, LexXrpcBody, LexXrpcBodySchema, LexXrpcError, LexXrpcParameters, LexXrpcProcedure,
+    LexXrpcQuery, LexXrpcSubscription, LexXrpcSubscriptionMessageSchema,
+};
+use heck::{ToPascalCase, ToSnakeCase};
+use proc_macro2::TokenStream;
+use quote::quote;
+
+/// Convert a value string to a valid Rust variant name
+fn value_to_variant_name(value: &str) -> String {
+    // Remove leading special chars and convert to pascal case
+    let clean = value.trim_start_matches(|c: char| !c.is_alphanumeric());
+    let variant = clean.replace('-', "_").to_pascal_case();
+
+    // Prefix with underscore if starts with digit
+    if variant.chars().next().map_or(false, |c| c.is_ascii_digit()) {
+        format!("_{}", variant)
+    } else if variant.is_empty() {
+        "Unknown".to_string()
+    } else {
+        variant
+    }
+}
+
+/// Create an identifier, using raw identifier if necessary for keywords
+fn make_ident(s: &str) -> syn::Ident {
+    syn::parse_str::<syn::Ident>(s)
+        .unwrap_or_else(|_| syn::Ident::new_raw(s, proc_macro2::Span::call_site()))
+}
+
+/// Code generator for lexicon types
+pub struct CodeGenerator<'c> {
+    corpus: &'c LexiconCorpus,
+    root_module: String,
+}
+
+impl<'c> CodeGenerator<'c> {
+    /// Create a new code generator
+    pub fn new(corpus: &'c LexiconCorpus, root_module: impl Into<String>) -> Self {
+        Self {
+            corpus,
+            root_module: root_module.into(),
+        }
+    }
+
+    /// Generate code for a lexicon def
+    pub fn generate_def(
+        &self,
+        nsid: &str,
+        def_name: &str,
+        def: &LexUserType<'static>,
+    ) -> Result<TokenStream> {
+        match def {
+            LexUserType::Record(record) => self.generate_record(nsid, def_name, record),
+            LexUserType::Object(obj) => self.generate_object(nsid, def_name, obj),
+            LexUserType::XrpcQuery(query) => self.generate_query(nsid, def_name, query),
+            LexUserType::XrpcProcedure(proc) => self.generate_procedure(nsid, def_name, proc),
+            LexUserType::Token(_) => {
+                // Token types are marker types used in knownValues enums.
+                // We don't generate anything for them - the knownValues enum
+                // is the actual type that gets used.
+                Ok(quote! {})
+            }
+            LexUserType::String(s) if s.known_values.is_some() => {
+                self.generate_known_values_enum(nsid, def_name, s)
+            }
+            LexUserType::String(s) => {
+                // Plain string type alias
+                let type_name = self.def_to_type_name(nsid, def_name);
+                let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
+                let rust_type = self.string_to_rust_type(s);
+                let doc = self.generate_doc_comment(s.description.as_ref());
+                Ok(quote! {
+                    #doc
+                    pub type #ident<'a> = #rust_type;
+                })
+            }
+            LexUserType::Integer(i) if i.r#enum.is_some() => {
+                self.generate_integer_enum(nsid, def_name, i)
+            }
+            LexUserType::Array(array) => {
+                // Top-level array becomes type alias to Vec<ItemType>
+                let type_name = self.def_to_type_name(nsid, def_name);
+                let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
+                let item_type = self.array_item_to_rust_type(nsid, &array.items)?;
+                let doc = self.generate_doc_comment(array.description.as_ref());
+                let needs_lifetime = self.array_item_needs_lifetime(&array.items);
+                if needs_lifetime {
+                    Ok(quote! {
+                        #doc
+                        pub type #ident<'a> = Vec<#item_type>;
+                    })
+                } else {
+                    Ok(quote! {
+                        #doc
+                        pub type #ident = Vec<#item_type>;
+                    })
+                }
+            }
+            LexUserType::Boolean(_)
+            | LexUserType::Integer(_)
+            | LexUserType::Bytes(_)
+            | LexUserType::CidLink(_)
+            | LexUserType::Unknown(_) => {
+                // These are rarely top-level defs, but if they are, make type aliases
+                let type_name = self.def_to_type_name(nsid, def_name);
+                let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
+                let (rust_type, needs_lifetime) = match def {
+                    LexUserType::Boolean(_) => (quote! { bool }, false),
+                    LexUserType::Integer(_) => (quote! { i64 }, false),
+                    LexUserType::Bytes(_) => (quote! { bytes::Bytes }, false),
+                    LexUserType::CidLink(_) => {
+                        (quote! { jacquard_common::types::cid::CidLink<'a> }, true)
+                    }
+                    LexUserType::Unknown(_) => {
+                        (quote! { jacquard_common::types::value::Data<'a> }, true)
+                    }
+                    _ => unreachable!(),
+                };
+                if needs_lifetime {
+                    Ok(quote! {
+                        pub type #ident<'a> = #rust_type;
+                    })
+                } else {
+                    Ok(quote! {
+                        pub type #ident = #rust_type;
+                    })
+                }
+            }
+            LexUserType::Blob(_) => Err(CodegenError::unsupported(
+                format!("top-level def type {:?}", def),
+                nsid,
+                None::<String>,
+            )),
+            LexUserType::XrpcSubscription(sub) => self.generate_subscription(nsid, def_name, sub),
+        }
+    }
+
+    /// Generate a record type
+    fn generate_record(
+        &self,
+        nsid: &str,
+        def_name: &str,
+        record: &LexRecord<'static>,
+    ) -> Result<TokenStream> {
+        match &record.record {
+            crate::lexicon::LexRecordRecord::Object(obj) => {
+                let type_name = self.def_to_type_name(nsid, def_name);
+                let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
+
+                // Generate main struct fields
+                let fields = self.generate_object_fields(nsid, &type_name, obj)?;
+                let doc = self.generate_doc_comment(record.description.as_ref());
+
+                // Records always get a lifetime since they have the #[lexicon] attribute
+                // which adds extra_data: BTreeMap<..., Data<'a>>
+                let struct_def = quote! {
+                    #doc
+                    #[jacquard_derive::lexicon]
+                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                    #[serde(rename_all = "camelCase")]
+                    pub struct #ident<'a> {
+                        #fields
+                    }
+                };
+
+                // Generate union types for this record
+                let mut unions = Vec::new();
+                for (field_name, field_type) in &obj.properties {
+                    if let LexObjectProperty::Union(union) = field_type {
+                        let union_name =
+                            format!("{}Record{}", type_name, field_name.to_pascal_case());
+                        // Clone refs to avoid lifetime issues
+                        let refs: Vec<_> = union.refs.iter().cloned().collect();
+                        let union_def =
+                            self.generate_union(&union_name, &refs, None, union.closed)?;
+                        unions.push(union_def);
+                    }
+                }
+
+                Ok(quote! {
+                    #struct_def
+                    #(#unions)*
+                })
+            }
+        }
+    }
+
+    /// Generate an object type
+    fn generate_object(
+        &self,
+        nsid: &str,
+        def_name: &str,
+        obj: &LexObject<'static>,
+    ) -> Result<TokenStream> {
+        let type_name = self.def_to_type_name(nsid, def_name);
+        let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
+
+        let fields = self.generate_object_fields(nsid, &type_name, obj)?;
+        let doc = self.generate_doc_comment(obj.description.as_ref());
+
+        // Objects always get a lifetime since they have the #[lexicon] attribute
+        // which adds extra_data: BTreeMap<..., Data<'a>>
+        let struct_def = quote! {
+            #doc
+            #[jacquard_derive::lexicon]
+            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+            #[serde(rename_all = "camelCase")]
+            pub struct #ident<'a> {
+                #fields
+            }
+        };
+
+        // Generate union types for this object
+        let mut unions = Vec::new();
+        for (field_name, field_type) in &obj.properties {
+            if let LexObjectProperty::Union(union) = field_type {
+                let union_name = format!("{}Record{}", type_name, field_name.to_pascal_case());
+                let refs: Vec<_> = union.refs.iter().cloned().collect();
+                let union_def = self.generate_union(&union_name, &refs, None, union.closed)?;
+                unions.push(union_def);
+            }
+        }
+
+        Ok(quote! {
+            #struct_def
+            #(#unions)*
+        })
+    }
+
+    /// Generate fields for an object
+    fn generate_object_fields(
+        &self,
+        nsid: &str,
+        parent_type_name: &str,
+        obj: &LexObject<'static>,
+    ) -> Result<TokenStream> {
+        let required = obj.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
+
+        let mut fields = Vec::new();
+        for (field_name, field_type) in &obj.properties {
+            let is_required = required.contains(field_name);
+            let field_tokens =
+                self.generate_field(nsid, parent_type_name, field_name, field_type, is_required)?;
+            fields.push(field_tokens);
+        }
+
+        Ok(quote! { #(#fields)* })
+    }
+
+    /// Generate a single field
+    fn generate_field(
+        &self,
+        nsid: &str,
+        parent_type_name: &str,
+        field_name: &str,
+        field_type: &LexObjectProperty<'static>,
+        is_required: bool,
+    ) -> Result<TokenStream> {
+        let field_ident = make_ident(&field_name.to_snake_case());
+
+        let rust_type =
+            self.property_to_rust_type(nsid, parent_type_name, field_name, field_type)?;
+        let needs_lifetime = self.property_needs_lifetime(field_type);
+
+        let rust_type = if is_required {
+            rust_type
+        } else {
+            quote! { std::option::Option<#rust_type> }
+        };
+
+        let mut attrs = Vec::new();
+
+        if !is_required {
+            attrs.push(quote! { #[serde(skip_serializing_if = "std::option::Option::is_none")] });
+        }
+
+        // Add serde(borrow) to all fields with lifetimes
+        if needs_lifetime {
+            attrs.push(quote! { #[serde(borrow)] });
+        }
+
+        Ok(quote! {
+            #(#attrs)*
+            pub #field_ident: #rust_type,
+        })
+    }
+
+    /// Check if a property type needs a lifetime parameter
+    fn property_needs_lifetime(&self, prop: &LexObjectProperty<'static>) -> bool {
+        match prop {
+            LexObjectProperty::Boolean(_) | LexObjectProperty::Integer(_) => false,
+            LexObjectProperty::String(s) => self.string_needs_lifetime(s),
+            LexObjectProperty::Bytes(_) => false, // Bytes is owned
+            LexObjectProperty::CidLink(_)
+            | LexObjectProperty::Blob(_)
+            | LexObjectProperty::Unknown(_) => true,
+            LexObjectProperty::Array(array) => self.array_item_needs_lifetime(&array.items),
+            LexObjectProperty::Ref(ref_type) => {
+                // Check if the ref target actually needs a lifetime
+                self.ref_needs_lifetime(&ref_type.r#ref)
+            }
+            LexObjectProperty::Union(_) => true, // Unions generally have lifetimes
+        }
+    }
+
+    /// Check if an array item type needs a lifetime parameter
+    fn array_item_needs_lifetime(&self, item: &LexArrayItem) -> bool {
+        match item {
+            LexArrayItem::Boolean(_) | LexArrayItem::Integer(_) => false,
+            LexArrayItem::String(s) => self.string_needs_lifetime(s),
+            LexArrayItem::Bytes(_) => false,
+            LexArrayItem::CidLink(_) | LexArrayItem::Blob(_) | LexArrayItem::Unknown(_) => true,
+            LexArrayItem::Ref(ref_type) => self.ref_needs_lifetime(&ref_type.r#ref),
+            LexArrayItem::Union(_) => true,
+        }
+    }
+
+    /// Check if a string type needs a lifetime parameter
+    fn string_needs_lifetime(&self, s: &LexString) -> bool {
+        match s.format {
+            Some(LexStringFormat::Datetime)
+            | Some(LexStringFormat::Language)
+            | Some(LexStringFormat::Tid) => false,
+            _ => true, // Most string types borrow
+        }
+    }
+
+    /// Check if a ref needs a lifetime parameter
+    fn ref_needs_lifetime(&self, ref_str: &str) -> bool {
+        // Try to resolve the ref
+        if let Some((_doc, def)) = self.corpus.resolve_ref(ref_str) {
+            self.def_needs_lifetime(def)
+        } else {
+            // If we can't resolve it, assume it needs a lifetime (safe default)
+            true
+        }
+    }
+
+    /// Check if a lexicon def needs a lifetime parameter
+    fn def_needs_lifetime(&self, def: &LexUserType<'static>) -> bool {
+        match def {
+            // Records and Objects always have lifetimes now since they get #[lexicon] attribute
+            LexUserType::Record(_) => true,
+            LexUserType::Object(_) => true,
+            LexUserType::Token(_) => false,
+            LexUserType::String(s) => {
+                // Check if it's a known values enum or a regular string
+                if s.known_values.is_some() {
+                    // Known values enums have Other(CowStr<'a>) variant
+                    true
+                } else {
+                    self.string_needs_lifetime(s)
+                }
+            }
+            LexUserType::Integer(_) => false,
+            LexUserType::Boolean(_) => false,
+            LexUserType::Bytes(_) => false,
+            LexUserType::CidLink(_) | LexUserType::Blob(_) | LexUserType::Unknown(_) => true,
+            LexUserType::Array(array) => self.array_item_needs_lifetime(&array.items),
+            LexUserType::XrpcQuery(_)
+            | LexUserType::XrpcProcedure(_)
+            | LexUserType::XrpcSubscription(_) => {
+                // XRPC types generate multiple structs, not a single type we can reference
+                // Shouldn't be referenced directly
+                true
+            }
+        }
+    }
+
+    /// Check if xrpc params need a lifetime parameter
+    fn params_need_lifetime(&self, params: &crate::lexicon::LexXrpcParameters<'static>) -> bool {
+        params.properties.values().any(|prop| {
+            use crate::lexicon::LexXrpcParametersProperty;
+            match prop {
+                LexXrpcParametersProperty::Boolean(_) | LexXrpcParametersProperty::Integer(_) => {
+                    false
+                }
+                LexXrpcParametersProperty::String(s) => self.string_needs_lifetime(s),
+                LexXrpcParametersProperty::Unknown(_) => true,
+                LexXrpcParametersProperty::Array(arr) => {
+                    use crate::lexicon::LexPrimitiveArrayItem;
+                    match &arr.items {
+                        LexPrimitiveArrayItem::Boolean(_) | LexPrimitiveArrayItem::Integer(_) => {
+                            false
+                        }
+                        LexPrimitiveArrayItem::String(s) => self.string_needs_lifetime(s),
+                        LexPrimitiveArrayItem::Unknown(_) => true,
+                    }
+                }
+            }
+        })
+    }
+
+    /// Convert a property type to Rust type
+    fn property_to_rust_type(
+        &self,
+        nsid: &str,
+        parent_type_name: &str,
+        field_name: &str,
+        prop: &LexObjectProperty<'static>,
+    ) -> Result<TokenStream> {
+        match prop {
+            LexObjectProperty::Boolean(_) => Ok(quote! { bool }),
+            LexObjectProperty::Integer(_) => Ok(quote! { i64 }),
+            LexObjectProperty::String(s) => Ok(self.string_to_rust_type(s)),
+            LexObjectProperty::Bytes(_) => Ok(quote! { bytes::Bytes }),
+            LexObjectProperty::CidLink(_) => {
+                Ok(quote! { jacquard_common::types::cid::CidLink<'a> })
+            }
+            LexObjectProperty::Blob(_) => Ok(quote! { jacquard_common::types::blob::Blob<'a> }),
+            LexObjectProperty::Unknown(_) => Ok(quote! { jacquard_common::types::value::Data<'a> }),
+            LexObjectProperty::Array(array) => {
+                let item_type = self.array_item_to_rust_type(nsid, &array.items)?;
+                Ok(quote! { Vec<#item_type> })
+            }
+            LexObjectProperty::Ref(ref_type) => self.ref_to_rust_type(&ref_type.r#ref),
+            LexObjectProperty::Union(_union) => {
+                // Generate unique union type name: StatusView + embed -> StatusViewRecordEmbed
+                let union_name =
+                    format!("{}Record{}", parent_type_name, field_name.to_pascal_case());
+                let union_ident = syn::Ident::new(&union_name, proc_macro2::Span::call_site());
+                Ok(quote! { #union_ident<'a> })
+            }
+        }
+    }
+
+    /// Convert array item to Rust type
+    fn array_item_to_rust_type(&self, _nsid: &str, item: &LexArrayItem) -> Result<TokenStream> {
+        match item {
+            LexArrayItem::Boolean(_) => Ok(quote! { bool }),
+            LexArrayItem::Integer(_) => Ok(quote! { i64 }),
+            LexArrayItem::String(s) => Ok(self.string_to_rust_type(s)),
+            LexArrayItem::Bytes(_) => Ok(quote! { bytes::Bytes }),
+            LexArrayItem::CidLink(_) => Ok(quote! { jacquard_common::types::cid::CidLink<'a> }),
+            LexArrayItem::Blob(_) => Ok(quote! { jacquard_common::types::blob::Blob<'a> }),
+            LexArrayItem::Unknown(_) => Ok(quote! { jacquard_common::types::value::Data<'a> }),
+            LexArrayItem::Ref(ref_type) => self.ref_to_rust_type(&ref_type.r#ref),
+            LexArrayItem::Union(_) => {
+                // For now, use Data
+                Ok(quote! { jacquard_common::types::value::Data<'a> })
+            }
+        }
+    }
+
+    /// Convert string type to Rust type
+    fn string_to_rust_type(&self, s: &LexString) -> TokenStream {
+        match s.format {
+            Some(LexStringFormat::Datetime) => {
+                quote! { jacquard_common::types::string::Datetime }
+            }
+            Some(LexStringFormat::Did) => quote! { jacquard_common::types::string::Did<'a> },
+            Some(LexStringFormat::Handle) => quote! { jacquard_common::types::string::Handle<'a> },
+            Some(LexStringFormat::AtIdentifier) => {
+                quote! { jacquard_common::types::ident::AtIdentifier<'a> }
+            }
+            Some(LexStringFormat::Nsid) => quote! { jacquard_common::types::string::Nsid<'a> },
+            Some(LexStringFormat::AtUri) => quote! { jacquard_common::types::string::AtUri<'a> },
+            Some(LexStringFormat::Uri) => quote! { jacquard_common::types::string::Uri<'a> },
+            Some(LexStringFormat::Cid) => quote! { jacquard_common::types::string::Cid<'a> },
+            Some(LexStringFormat::Language) => {
+                quote! { jacquard_common::types::string::Language }
+            }
+            Some(LexStringFormat::Tid) => quote! { jacquard_common::types::string::Tid },
+            Some(LexStringFormat::RecordKey) => {
+                quote! { jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>> }
+            }
+            None => quote! { jacquard_common::CowStr<'a> },
+        }
+    }
+
+    /// Convert ref to Rust type path
+    fn ref_to_rust_type(&self, ref_str: &str) -> Result<TokenStream> {
+        // Parse NSID and fragment
+        let (ref_nsid, ref_def) = if let Some((nsid, fragment)) = ref_str.split_once('#') {
+            (nsid, fragment)
+        } else {
+            (ref_str, "main")
+        };
+
+        // Check if ref exists
+        if !self.corpus.ref_exists(ref_str) {
+            // Fallback to Data
+            return Ok(quote! { jacquard_common::types::value::Data<'a> });
+        }
+
+        // Convert NSID to module path
+        // com.atproto.repo.strongRef -> com_atproto::repo::strong_ref::StrongRef
+        // app.bsky.richtext.facet -> app_bsky::richtext::facet::Facet
+        // app.bsky.actor.defs#nux -> app_bsky::actor::Nux (defs go in parent module)
+        let parts: Vec<&str> = ref_nsid.split('.').collect();
+        let last_segment = parts.last().unwrap();
+
+        let type_name = self.def_to_type_name(ref_nsid, ref_def);
+
+        let path_str = if *last_segment == "defs" && parts.len() >= 3 {
+            // defs types go in parent module
+            let first_two = format!("{}_{}", parts[0], parts[1]);
+            if parts.len() == 3 {
+                // com.atproto.defs -> com_atproto::TypeName
+                format!("{}::{}::{}", self.root_module, first_two, type_name)
+            } else {
+                // app.bsky.actor.defs -> app_bsky::actor::TypeName
+                let middle: Vec<&str> = parts[2..parts.len() - 1].iter().copied().collect();
+                format!(
+                    "{}::{}::{}::{}",
+                    self.root_module,
+                    first_two,
+                    middle.join("::"),
+                    type_name
+                )
+            }
+        } else {
+            // Regular types go in their own module file
+            let (module_path, file_module) = if parts.len() >= 3 {
+                // Join first two segments with underscore
+                let first_two = format!("{}_{}", parts[0], parts[1]);
+                let file_name = last_segment.to_snake_case();
+
+                if parts.len() > 3 {
+                    // Middle segments form the module path
+                    let middle: Vec<&str> = parts[2..parts.len() - 1].iter().copied().collect();
+                    let base_path = format!("{}::{}", first_two, middle.join("::"));
+                    (base_path, file_name)
+                } else {
+                    // Only 3 parts: com.atproto.label -> com_atproto, file: label
+                    (first_two, file_name)
+                }
+            } else if parts.len() == 2 {
+                // e.g., "com.example" -> "com_example", file: example
+                let first = parts[0].to_string();
+                let file_name = parts[1].to_snake_case();
+                (first, file_name)
+            } else {
+                (parts[0].to_string(), "main".to_string())
+            };
+
+            format!(
+                "{}::{}::{}::{}",
+                self.root_module, module_path, file_module, type_name
+            )
+        };
+
+        let path: syn::Path = syn::parse_str(&path_str).map_err(|e| CodegenError::Other {
+            message: format!("Failed to parse path: {}", e),
+            source: None,
+        })?;
+
+        // Only add lifetime if the target type needs it
+        if self.ref_needs_lifetime(ref_str) {
+            Ok(quote! { #path<'a> })
+        } else {
+            Ok(quote! { #path })
+        }
+    }
+
+    /// Generate query type
+    fn generate_query(
+        &self,
+        nsid: &str,
+        def_name: &str,
+        query: &LexXrpcQuery<'static>,
+    ) -> Result<TokenStream> {
+        let type_base = self.def_to_type_name(nsid, def_name);
+        let mut output = Vec::new();
+
+        if let Some(params) = &query.parameters {
+            let params_struct = self.generate_params_struct(&type_base, params)?;
+            output.push(params_struct);
+        }
+
+        if let Some(body) = &query.output {
+            let output_struct = self.generate_output_struct(&type_base, body)?;
+            output.push(output_struct);
+        }
+
+        if let Some(errors) = &query.errors {
+            let error_enum = self.generate_error_enum(&type_base, errors)?;
+            output.push(error_enum);
+        }
+
+        Ok(quote! {
+            #(#output)*
+        })
+    }
+
+    /// Generate procedure type
+    fn generate_procedure(
+        &self,
+        nsid: &str,
+        def_name: &str,
+        proc: &LexXrpcProcedure<'static>,
+    ) -> Result<TokenStream> {
+        let type_base = self.def_to_type_name(nsid, def_name);
+        let mut output = Vec::new();
+
+        if let Some(params) = &proc.parameters {
+            let params_struct = self.generate_params_struct_proc(&type_base, params)?;
+            output.push(params_struct);
+        }
+
+        if let Some(body) = &proc.input {
+            let input_struct = self.generate_input_struct(&type_base, body)?;
+            output.push(input_struct);
+        }
+
+        if let Some(body) = &proc.output {
+            let output_struct = self.generate_output_struct(&type_base, body)?;
+            output.push(output_struct);
+        }
+
+        if let Some(errors) = &proc.errors {
+            let error_enum = self.generate_error_enum(&type_base, errors)?;
+            output.push(error_enum);
+        }
+
+        Ok(quote! {
+            #(#output)*
+        })
+    }
+
+    fn generate_subscription(
+        &self,
+        nsid: &str,
+        def_name: &str,
+        sub: &LexXrpcSubscription<'static>,
+    ) -> Result<TokenStream> {
+        let type_base = self.def_to_type_name(nsid, def_name);
+        let mut output = Vec::new();
+
+        if let Some(params) = &sub.parameters {
+            // Extract LexXrpcParameters from the enum
+            match params {
+                crate::lexicon::LexXrpcSubscriptionParameter::Params(params_inner) => {
+                    let params_struct =
+                        self.generate_params_struct_inner(&type_base, params_inner)?;
+                    output.push(params_struct);
+                }
+            }
+        }
+
+        if let Some(message) = &sub.message {
+            if let Some(schema) = &message.schema {
+                let message_type = self.generate_subscription_message(&type_base, schema)?;
+                output.push(message_type);
+            }
+        }
+
+        if let Some(errors) = &sub.errors {
+            let error_enum = self.generate_error_enum(&type_base, errors)?;
+            output.push(error_enum);
+        }
+
+        Ok(quote! {
+            #(#output)*
+        })
+    }
+
+    fn generate_subscription_message(
+        &self,
+        type_base: &str,
+        schema: &LexXrpcSubscriptionMessageSchema<'static>,
+    ) -> Result<TokenStream> {
+        use crate::lexicon::LexXrpcSubscriptionMessageSchema;
+
+        match schema {
+            LexXrpcSubscriptionMessageSchema::Union(union) => {
+                // Generate a union enum for the message
+                let enum_name = format!("{}Message", type_base);
+                let enum_ident = syn::Ident::new(&enum_name, proc_macro2::Span::call_site());
+
+                let mut variants = Vec::new();
+                for ref_str in &union.refs {
+                    let ref_str_s = ref_str.as_ref();
+                    // Parse ref to get NSID and def name
+                    let (ref_nsid, ref_def) =
+                        if let Some((nsid, fragment)) = ref_str.split_once('#') {
+                            (nsid, fragment)
+                        } else {
+                            (ref_str.as_ref(), "main")
+                        };
+
+                    let variant_name = if ref_def == "main" {
+                        ref_nsid.split('.').last().unwrap().to_pascal_case()
+                    } else {
+                        ref_def.to_pascal_case()
+                    };
+                    let variant_ident =
+                        syn::Ident::new(&variant_name, proc_macro2::Span::call_site());
+                    let type_path = self.ref_to_rust_type(ref_str)?;
+
+                    variants.push(quote! {
+                        #[serde(rename = #ref_str_s)]
+                        #variant_ident(Box<#type_path>)
+                    });
+                }
+
+                let doc = self.generate_doc_comment(union.description.as_ref());
+
+                Ok(quote! {
+                    #doc
+                    #[jacquard_derive::open_union]
+                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                    #[serde(tag = "$type")]
+                    #[serde(bound(deserialize = "'de: 'a"))]
+                    pub enum #enum_ident<'a> {
+                        #(#variants,)*
+                    }
+                })
+            }
+            LexXrpcSubscriptionMessageSchema::Object(obj) => {
+                // Generate a struct for the message
+                let struct_name = format!("{}Message", type_base);
+                let struct_ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
+
+                let fields = self.generate_object_fields("", &struct_name, obj)?;
+                let doc = self.generate_doc_comment(obj.description.as_ref());
+
+                // Subscription message structs always get a lifetime since they have the #[lexicon] attribute
+                // which adds extra_data: BTreeMap<..., Data<'a>>
+                let struct_def = quote! {
+                    #doc
+                    #[jacquard_derive::lexicon]
+                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                    #[serde(rename_all = "camelCase")]
+                    pub struct #struct_ident<'a> {
+                        #fields
+                    }
+                };
+
+                // Generate union types for this message
+                let mut unions = Vec::new();
+                for (field_name, field_type) in &obj.properties {
+                    if let LexObjectProperty::Union(union) = field_type {
+                        let union_name =
+                            format!("{}Record{}", struct_name, field_name.to_pascal_case());
+                        let refs: Vec<_> = union.refs.iter().cloned().collect();
+                        let union_def =
+                            self.generate_union(&union_name, &refs, None, union.closed)?;
+                        unions.push(union_def);
+                    }
+                }
+
+                Ok(quote! {
+                    #struct_def
+                    #(#unions)*
+                })
+            }
+            LexXrpcSubscriptionMessageSchema::Ref(ref_type) => {
+                // Just a type alias to the referenced type
+                // Refs generally have lifetimes, so always add <'a>
+                let type_name = format!("{}Message", type_base);
+                let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
+                let rust_type = self.ref_to_rust_type(&ref_type.r#ref)?;
+                let doc = self.generate_doc_comment(ref_type.description.as_ref());
+
+                Ok(quote! {
+                    #doc
+                    pub type #ident<'a> = #rust_type;
+                })
+            }
+        }
+    }
+
+    /// Convert def name to Rust type name
+    fn def_to_type_name(&self, nsid: &str, def_name: &str) -> String {
+        if def_name == "main" {
+            // Use last segment of NSID
+            let base_name = nsid.split('.').last().unwrap().to_pascal_case();
+
+            // Check if any other def would collide with this name
+            if let Some(doc) = self.corpus.get(nsid) {
+                let has_collision = doc.defs.keys().any(|other_def| {
+                    let other_def_str: &str = other_def.as_ref();
+                    other_def_str != "main" && other_def_str.to_pascal_case() == base_name
+                });
+
+                if has_collision {
+                    return format!("{}Record", base_name);
+                }
+            }
+
+            base_name
+        } else {
+            def_name.to_pascal_case()
+        }
+    }
+
+    /// Convert NSID to file path relative to output directory
+    ///
+    /// - `app.bsky.feed.post` → `app_bsky/feed/post.rs`
+    /// - `com.atproto.label.defs` → `com_atproto/label.rs` (defs go in parent)
+    fn nsid_to_file_path(&self, nsid: &str) -> std::path::PathBuf {
+        let parts: Vec<&str> = nsid.split('.').collect();
+
+        if parts.len() < 2 {
+            // Shouldn't happen with valid NSIDs, but handle gracefully
+            return format!("{}.rs", parts[0]).into();
+        }
+
+        let last = parts.last().unwrap();
+
+        if *last == "defs" && parts.len() >= 3 {
+            // defs go in parent module: com.atproto.label.defs → com_atproto/label.rs
+            let first_two = format!("{}_{}", parts[0], parts[1]);
+            if parts.len() == 3 {
+                // com.atproto.defs → com_atproto.rs
+                format!("{}.rs", first_two).into()
+            } else {
+                // com.atproto.label.defs → com_atproto/label.rs
+                let middle: Vec<&str> = parts[2..parts.len() - 1].iter().copied().collect();
+                let mut path = std::path::PathBuf::from(first_two);
+                for segment in &middle[..middle.len() - 1] {
+                    path.push(segment);
+                }
+                path.push(format!("{}.rs", middle.last().unwrap()));
+                path
+            }
+        } else {
+            // Regular path: app.bsky.feed.post → app_bsky/feed/post.rs
+            let first_two = format!("{}_{}", parts[0], parts[1]);
+            let mut path = std::path::PathBuf::from(first_two);
+
+            for segment in &parts[2..parts.len() - 1] {
+                path.push(segment);
+            }
+
+            path.push(format!("{}.rs", last.to_snake_case()));
+            path
+        }
+    }
+
+    /// Generate all code for the corpus, organized by file
+    pub fn generate_all(
+        &self,
+    ) -> Result<std::collections::BTreeMap<std::path::PathBuf, TokenStream>> {
+        use std::collections::BTreeMap;
+
+        let mut file_contents: BTreeMap<std::path::PathBuf, Vec<TokenStream>> = BTreeMap::new();
+
+        // Generate code for all lexicons
+        for (nsid, doc) in self.corpus.iter() {
+            let file_path = self.nsid_to_file_path(nsid.as_ref());
+
+            for (def_name, def) in &doc.defs {
+                let tokens = self.generate_def(nsid.as_ref(), def_name.as_ref(), def)?;
+                file_contents
+                    .entry(file_path.clone())
+                    .or_default()
+                    .push(tokens);
+            }
+        }
+
+        // Combine all tokens for each file
+        let mut result = BTreeMap::new();
+        for (path, tokens_vec) in file_contents {
+            result.insert(path, quote! { #(#tokens_vec)* });
+        }
+
+        Ok(result)
+    }
+
+    /// Generate parent module files with pub mod declarations
+    pub fn generate_module_tree(
+        &self,
+        file_map: &std::collections::BTreeMap<std::path::PathBuf, TokenStream>,
+        defs_only: &std::collections::BTreeMap<std::path::PathBuf, TokenStream>,
+    ) -> std::collections::BTreeMap<std::path::PathBuf, TokenStream> {
+        use std::collections::{BTreeMap, BTreeSet};
+
+        // Track what modules each directory needs to declare
+        // Key: directory path, Value: set of module names (file stems)
+        let mut dir_modules: BTreeMap<std::path::PathBuf, BTreeSet<String>> = BTreeMap::new();
+
+        // Collect all parent directories that have files
+        let mut all_dirs: BTreeSet<std::path::PathBuf> = BTreeSet::new();
+        for path in file_map.keys() {
+            if let Some(parent_dir) = path.parent() {
+                all_dirs.insert(parent_dir.to_path_buf());
+            }
+        }
+
+        for path in file_map.keys() {
+            if let Some(parent_dir) = path.parent() {
+                if let Some(file_stem) = path.file_stem().and_then(|s| s.to_str()) {
+                    // Skip mod.rs and lib.rs - they're module files, not modules to declare
+                    if file_stem == "mod" || file_stem == "lib" {
+                        continue;
+                    }
+
+                    // Always add the module declaration to parent
+                    dir_modules
+                        .entry(parent_dir.to_path_buf())
+                        .or_default()
+                        .insert(file_stem.to_string());
+                }
+            }
+        }
+
+        // Generate module files
+        let mut result = BTreeMap::new();
+
+        for (dir, module_names) in dir_modules {
+            let mod_file_path = if dir.components().count() == 0 {
+                // Root directory -> lib.rs for library crates
+                std::path::PathBuf::from("lib.rs")
+            } else {
+                // Subdirectory: app_bsky/feed -> app_bsky/feed.rs (Rust 2018 style)
+                let dir_name = dir.file_name().and_then(|s| s.to_str()).unwrap_or("mod");
+                let mut path = dir
+                    .parent()
+                    .unwrap_or_else(|| std::path::Path::new(""))
+                    .to_path_buf();
+                path.push(format!("{}.rs", dir_name));
+                path
+            };
+
+            let mods: Vec<_> = module_names
+                .iter()
+                .map(|name| {
+                    let ident = syn::Ident::new(name, proc_macro2::Span::call_site());
+                    quote! { pub mod #ident; }
+                })
+                .collect();
+
+            // If this file already exists in defs_only (e.g., from defs), merge the content
+            let module_tokens = quote! { #(#mods)* };
+            if let Some(existing) = defs_only.get(&mod_file_path) {
+                // Combine existing defs content with module declarations
+                result.insert(mod_file_path, quote! { #existing #module_tokens });
+            } else {
+                result.insert(mod_file_path, module_tokens);
+            }
+        }
+
+        result
+    }
+
+    /// Write all generated code to disk
+    pub fn write_to_disk(&self, output_dir: &std::path::Path) -> Result<()> {
+        // Generate all code (defs only)
+        let defs_files = self.generate_all()?;
+        let mut all_files = defs_files.clone();
+
+        // Generate module tree iteratively until no new files appear
+        loop {
+            let module_map = self.generate_module_tree(&all_files, &defs_files);
+            let old_count = all_files.len();
+
+            // Merge new module files
+            for (path, tokens) in module_map {
+                all_files.insert(path, tokens);
+            }
+
+            if all_files.len() == old_count {
+                // No new files added
+                break;
+            }
+        }
+
+        // Write to disk
+        for (path, tokens) in all_files {
+            let full_path = output_dir.join(&path);
+
+            // Create parent directories
+            if let Some(parent) = full_path.parent() {
+                std::fs::create_dir_all(parent).map_err(|e| CodegenError::Other {
+                    message: format!("Failed to create directory {:?}: {}", parent, e),
+                    source: None,
+                })?;
+            }
+
+            // Format code
+            let file: syn::File = syn::parse2(tokens.clone()).map_err(|e| CodegenError::Other {
+                message: format!(
+                    "Failed to parse tokens for {:?}: {}\nTokens: {}",
+                    path, e, tokens
+                ),
+                source: None,
+            })?;
+            let formatted = prettyplease::unparse(&file);
+
+            // Write file
+            std::fs::write(&full_path, formatted).map_err(|e| CodegenError::Other {
+                message: format!("Failed to write file {:?}: {}", full_path, e),
+                source: None,
+            })?;
+        }
+
+        Ok(())
+    }
+
+    /// Generate doc comment from description
+    fn generate_doc_comment(&self, desc: Option<&jacquard_common::CowStr>) -> TokenStream {
+        if let Some(desc) = desc {
+            let doc = desc.as_ref();
+            quote! { #[doc = #doc] }
+        } else {
+            quote! {}
+        }
+    }
+
+    /// Generate params struct from XRPC query parameters
+    fn generate_params_struct(
+        &self,
+        type_base: &str,
+        params: &crate::lexicon::LexXrpcQueryParameter<'static>,
+    ) -> Result<TokenStream> {
+        use crate::lexicon::LexXrpcQueryParameter;
+        match params {
+            LexXrpcQueryParameter::Params(p) => self.generate_params_struct_inner(type_base, p),
+        }
+    }
+
+    /// Generate params struct from XRPC procedure parameters
+    fn generate_params_struct_proc(
+        &self,
+        type_base: &str,
+        params: &crate::lexicon::LexXrpcProcedureParameter<'static>,
+    ) -> Result<TokenStream> {
+        use crate::lexicon::LexXrpcProcedureParameter;
+        match params {
+            LexXrpcProcedureParameter::Params(p) => self.generate_params_struct_inner(type_base, p),
+        }
+    }
+
+    /// Generate params struct inner (shared implementation)
+    fn generate_params_struct_inner(
+        &self,
+        type_base: &str,
+        p: &crate::lexicon::LexXrpcParameters<'static>,
+    ) -> Result<TokenStream> {
+        let struct_name = format!("{}Params", type_base);
+        let ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
+
+        let required = p.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
+        let mut fields = Vec::new();
+
+        for (field_name, field_type) in &p.properties {
+            let is_required = required.contains(field_name);
+            let field_tokens =
+                self.generate_param_field("", field_name, field_type, is_required)?;
+            fields.push(field_tokens);
+        }
+
+        let doc = self.generate_doc_comment(p.description.as_ref());
+
+        let needs_lifetime = self.params_need_lifetime(p);
+
+        if needs_lifetime {
+            Ok(quote! {
+                #doc
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                #[serde(rename_all = "camelCase")]
+                pub struct #ident<'a> {
+                    #(#fields)*
+                }
+            })
+        } else {
+            Ok(quote! {
+                #doc
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                #[serde(rename_all = "camelCase")]
+                pub struct #ident {
+                    #(#fields)*
+                }
+            })
+        }
+    }
+
+    /// Generate input struct from XRPC body
+    fn generate_input_struct(
+        &self,
+        type_base: &str,
+        body: &LexXrpcBody<'static>,
+    ) -> Result<TokenStream> {
+        let struct_name = format!("{}Input", type_base);
+        let ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
+
+        let fields = if let Some(schema) = &body.schema {
+            self.generate_body_fields("", &struct_name, schema)?
+        } else {
+            quote! {}
+        };
+
+        let doc = self.generate_doc_comment(body.description.as_ref());
+
+        // Input structs always get a lifetime since they have the #[lexicon] attribute
+        // which adds extra_data: BTreeMap<..., Data<'a>>
+        let struct_def = quote! {
+            #doc
+            #[jacquard_derive::lexicon]
+            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+            #[serde(rename_all = "camelCase")]
+            pub struct #ident<'a> {
+                #fields
+            }
+        };
+
+        // Generate union types if schema is an Object
+        let mut unions = Vec::new();
+        if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
+            for (field_name, field_type) in &obj.properties {
+                if let LexObjectProperty::Union(union) = field_type {
+                    let union_name =
+                        format!("{}Record{}", struct_name, field_name.to_pascal_case());
+                    let refs: Vec<_> = union.refs.iter().cloned().collect();
+                    let union_def = self.generate_union(&union_name, &refs, None, union.closed)?;
+                    unions.push(union_def);
+                }
+            }
+        }
+
+        Ok(quote! {
+            #struct_def
+            #(#unions)*
+        })
+    }
+
+    /// Generate output struct from XRPC body
+    fn generate_output_struct(
+        &self,
+        type_base: &str,
+        body: &LexXrpcBody<'static>,
+    ) -> Result<TokenStream> {
+        let struct_name = format!("{}Output", type_base);
+        let ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
+
+        let fields = if let Some(schema) = &body.schema {
+            self.generate_body_fields("", &struct_name, schema)?
+        } else {
+            quote! {}
+        };
+
+        let doc = self.generate_doc_comment(body.description.as_ref());
+
+        // Output structs always get a lifetime since they have the #[lexicon] attribute
+        // which adds extra_data: BTreeMap<..., Data<'a>>
+        let struct_def = quote! {
+            #doc
+            #[jacquard_derive::lexicon]
+            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+            #[serde(rename_all = "camelCase")]
+            pub struct #ident<'a> {
+                #fields
+            }
+        };
+
+        // Generate union types if schema is an Object
+        let mut unions = Vec::new();
+        if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
+            for (field_name, field_type) in &obj.properties {
+                if let LexObjectProperty::Union(union) = field_type {
+                    let union_name =
+                        format!("{}Record{}", struct_name, field_name.to_pascal_case());
+                    let refs: Vec<_> = union.refs.iter().cloned().collect();
+                    let union_def = self.generate_union(&union_name, &refs, None, union.closed)?;
+                    unions.push(union_def);
+                }
+            }
+        }
+
+        Ok(quote! {
+            #struct_def
+            #(#unions)*
+        })
+    }
+
+    /// Generate fields from XRPC body schema
+    fn generate_body_fields(
+        &self,
+        nsid: &str,
+        parent_type_name: &str,
+        schema: &LexXrpcBodySchema<'static>,
+    ) -> Result<TokenStream> {
+        use crate::lexicon::LexXrpcBodySchema;
+
+        match schema {
+            LexXrpcBodySchema::Object(obj) => {
+                self.generate_object_fields(nsid, parent_type_name, obj)
+            }
+            LexXrpcBodySchema::Ref(ref_type) => {
+                let rust_type = self.ref_to_rust_type(&ref_type.r#ref)?;
+                Ok(quote! {
+                    #[serde(flatten)]
+                    #[serde(borrow)]
+                    pub value: #rust_type,
+                })
+            }
+            LexXrpcBodySchema::Union(_union) => {
+                let rust_type = quote! { jacquard_common::types::value::Data<'a> };
+                Ok(quote! {
+                    #[serde(flatten)]
+                    #[serde(borrow)]
+                    pub value: #rust_type,
+                })
+            }
+        }
+    }
+
+    /// Generate a field for XRPC parameters
+    fn generate_param_field(
+        &self,
+        _nsid: &str,
+        field_name: &str,
+        field_type: &crate::lexicon::LexXrpcParametersProperty<'static>,
+        is_required: bool,
+    ) -> Result<TokenStream> {
+        use crate::lexicon::LexXrpcParametersProperty;
+
+        let field_ident = make_ident(&field_name.to_snake_case());
+
+        let (rust_type, needs_lifetime) = match field_type {
+            LexXrpcParametersProperty::Boolean(_) => (quote! { bool }, false),
+            LexXrpcParametersProperty::Integer(_) => (quote! { i64 }, false),
+            LexXrpcParametersProperty::String(s) => {
+                (self.string_to_rust_type(s), self.string_needs_lifetime(s))
+            }
+            LexXrpcParametersProperty::Unknown(_) => {
+                (quote! { jacquard_common::types::value::Data<'a> }, true)
+            }
+            LexXrpcParametersProperty::Array(arr) => {
+                let needs_lifetime = match &arr.items {
+                    crate::lexicon::LexPrimitiveArrayItem::Boolean(_)
+                    | crate::lexicon::LexPrimitiveArrayItem::Integer(_) => false,
+                    crate::lexicon::LexPrimitiveArrayItem::String(s) => {
+                        self.string_needs_lifetime(s)
+                    }
+                    crate::lexicon::LexPrimitiveArrayItem::Unknown(_) => true,
+                };
+                let item_type = match &arr.items {
+                    crate::lexicon::LexPrimitiveArrayItem::Boolean(_) => quote! { bool },
+                    crate::lexicon::LexPrimitiveArrayItem::Integer(_) => quote! { i64 },
+                    crate::lexicon::LexPrimitiveArrayItem::String(s) => self.string_to_rust_type(s),
+                    crate::lexicon::LexPrimitiveArrayItem::Unknown(_) => {
+                        quote! { jacquard_common::types::value::Data<'a> }
+                    }
+                };
+                (quote! { Vec<#item_type> }, needs_lifetime)
+            }
+        };
+
+        let rust_type = if is_required {
+            rust_type
+        } else {
+            quote! { std::option::Option<#rust_type> }
+        };
+
+        let mut attrs = Vec::new();
+
+        if !is_required {
+            attrs.push(quote! { #[serde(skip_serializing_if = "std::option::Option::is_none")] });
+        }
+
+        // Add serde(borrow) to all fields with lifetimes
+        if needs_lifetime {
+            attrs.push(quote! { #[serde(borrow)] });
+        }
+
+        Ok(quote! {
+            #(#attrs)*
+            pub #field_ident: #rust_type,
+        })
+    }
+
+    /// Generate error enum from XRPC errors
+    fn generate_error_enum(
+        &self,
+        type_base: &str,
+        errors: &[LexXrpcError<'static>],
+    ) -> Result<TokenStream> {
+        let enum_name = format!("{}Error", type_base);
+        let ident = syn::Ident::new(&enum_name, proc_macro2::Span::call_site());
+
+        let mut variants = Vec::new();
+        let mut display_arms = Vec::new();
+
+        for error in errors {
+            let variant_name = error.name.to_pascal_case();
+            let variant_ident = syn::Ident::new(&variant_name, proc_macro2::Span::call_site());
+
+            let error_name = error.name.as_ref();
+            let doc = self.generate_doc_comment(error.description.as_ref());
+
+            variants.push(quote! {
+                #doc
+                #[serde(rename = #error_name)]
+                #variant_ident(std::option::Option<String>)
+            });
+
+            display_arms.push(quote! {
+                Self::#variant_ident(msg) => {
+                    write!(f, #error_name)?;
+                    if let Some(msg) = msg {
+                        write!(f, ": {}", msg)?;
+                    }
+                    Ok(())
+                }
+            });
+        }
+
+        Ok(quote! {
+            #[jacquard_derive::open_union]
+            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic)]
+            #[serde(tag = "error", content = "message")]
+            #[serde(bound(deserialize = "'de: 'a"))]
+            pub enum #ident<'a> {
+                #(#variants,)*
+            }
+
+            impl std::fmt::Display for #ident<'_> {
+                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    match self {
+                        #(#display_arms)*
+                        Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+                    }
+                }
+            }
+        })
+    }
+
+    /// Generate enum for string with known values
+    fn generate_known_values_enum(
+        &self,
+        nsid: &str,
+        def_name: &str,
+        string: &LexString<'static>,
+    ) -> Result<TokenStream> {
+        let type_name = self.def_to_type_name(nsid, def_name);
+        let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
+
+        let known_values = string.known_values.as_ref().unwrap();
+        let mut variants = Vec::new();
+        let mut from_str_arms = Vec::new();
+        let mut as_str_arms = Vec::new();
+
+        for value in known_values {
+            // Convert value to valid Rust identifier
+            let value_str = value.as_ref();
+            let variant_name = value_to_variant_name(value_str);
+            let variant_ident = syn::Ident::new(&variant_name, proc_macro2::Span::call_site());
+
+            variants.push(quote! {
+                #variant_ident
+            });
+
+            from_str_arms.push(quote! {
+                #value_str => Self::#variant_ident
+            });
+
+            as_str_arms.push(quote! {
+                Self::#variant_ident => #value_str
+            });
+        }
+
+        let doc = self.generate_doc_comment(string.description.as_ref());
+
+        Ok(quote! {
+            #doc
+            #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+            pub enum #ident<'a> {
+                #(#variants,)*
+                Other(jacquard_common::CowStr<'a>),
+            }
+
+            impl<'a> #ident<'a> {
+                pub fn as_str(&self) -> &str {
+                    match self {
+                        #(#as_str_arms,)*
+                        Self::Other(s) => s.as_ref(),
+                    }
+                }
+            }
+
+            impl<'a> From<&'a str> for #ident<'a> {
+                fn from(s: &'a str) -> Self {
+                    match s {
+                        #(#from_str_arms,)*
+                        _ => Self::Other(jacquard_common::CowStr::from(s)),
+                    }
+                }
+            }
+
+            impl<'a> From<String> for #ident<'a> {
+                fn from(s: String) -> Self {
+                    match s.as_str() {
+                        #(#from_str_arms,)*
+                        _ => Self::Other(jacquard_common::CowStr::from(s)),
+                    }
+                }
+            }
+
+            impl<'a> AsRef<str> for #ident<'a> {
+                fn as_ref(&self) -> &str {
+                    self.as_str()
+                }
+            }
+
+            impl<'a> serde::Serialize for #ident<'a> {
+                fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+                where
+                    S: serde::Serializer,
+                {
+                    serializer.serialize_str(self.as_str())
+                }
+            }
+
+            impl<'de, 'a> serde::Deserialize<'de> for #ident<'a>
+            where
+                'de: 'a,
+            {
+                fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+                where
+                    D: serde::Deserializer<'de>,
+                {
+                    let s = <&'de str>::deserialize(deserializer)?;
+                    Ok(Self::from(s))
+                }
+            }
+        })
+    }
+
+    /// Generate enum for integer with enum values
+    fn generate_integer_enum(
+        &self,
+        nsid: &str,
+        def_name: &str,
+        integer: &LexInteger<'static>,
+    ) -> Result<TokenStream> {
+        let type_name = self.def_to_type_name(nsid, def_name);
+        let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
+
+        let enum_values = integer.r#enum.as_ref().unwrap();
+        let mut variants = Vec::new();
+        let mut from_i64_arms = Vec::new();
+        let mut to_i64_arms = Vec::new();
+
+        for value in enum_values {
+            let variant_name = format!("Value{}", value.abs());
+            let variant_ident = syn::Ident::new(&variant_name, proc_macro2::Span::call_site());
+
+            variants.push(quote! {
+                #[serde(rename = #value)]
+                #variant_ident
+            });
+
+            from_i64_arms.push(quote! {
+                #value => Self::#variant_ident
+            });
+
+            to_i64_arms.push(quote! {
+                Self::#variant_ident => #value
+            });
+        }
+
+        let doc = self.generate_doc_comment(integer.description.as_ref());
+
+        Ok(quote! {
+            #doc
+            #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+            pub enum #ident {
+                #(#variants,)*
+                #[serde(untagged)]
+                Other(i64),
+            }
+
+            impl #ident {
+                pub fn as_i64(&self) -> i64 {
+                    match self {
+                        #(#to_i64_arms,)*
+                        Self::Other(n) => *n,
+                    }
+                }
+            }
+
+            impl From<i64> for #ident {
+                fn from(n: i64) -> Self {
+                    match n {
+                        #(#from_i64_arms,)*
+                        _ => Self::Other(n),
+                    }
+                }
+            }
+
+            impl serde::Serialize for #ident {
+                fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+                where
+                    S: serde::Serializer,
+                {
+                    serializer.serialize_i64(self.as_i64())
+                }
+            }
+
+            impl<'de> serde::Deserialize<'de> for #ident {
+                fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+                where
+                    D: serde::Deserializer<'de>,
+                {
+                    let n = i64::deserialize(deserializer)?;
+                    Ok(Self::from(n))
+                }
+            }
+        })
+    }
+
+    /// Generate a union enum
+    pub fn generate_union(
+        &self,
+        union_name: &str,
+        refs: &[jacquard_common::CowStr<'static>],
+        description: Option<&str>,
+        closed: Option<bool>,
+    ) -> Result<TokenStream> {
+        let enum_ident = syn::Ident::new(union_name, proc_macro2::Span::call_site());
+
+        let mut variants = Vec::new();
+        for ref_str in refs {
+            // Parse ref to get NSID and def name
+            let (ref_nsid, ref_def) = if let Some((nsid, fragment)) = ref_str.split_once('#') {
+                (nsid, fragment)
+            } else {
+                (ref_str.as_ref(), "main")
+            };
+
+            // Skip unknown refs - they'll be handled by Unknown variant
+            if !self.corpus.ref_exists(ref_str.as_ref()) {
+                continue;
+            }
+
+            // Generate variant name from def name (or last NSID segment if main)
+            // For non-main refs, include the last NSID segment to avoid collisions
+            // e.g. app.bsky.embed.images#view -> ImagesView
+            //      app.bsky.embed.video#view -> VideoView
+            let variant_name = if ref_def == "main" {
+                ref_nsid.split('.').last().unwrap().to_pascal_case()
+            } else {
+                let last_segment = ref_nsid.split('.').last().unwrap().to_pascal_case();
+                format!("{}{}", last_segment, ref_def.to_pascal_case())
+            };
+            let variant_ident = syn::Ident::new(&variant_name, proc_macro2::Span::call_site());
+
+            // Get the Rust type for this ref
+            let rust_type = self.ref_to_rust_type(ref_str.as_ref())?;
+
+            // Add serde rename for the full NSID
+            let ref_str_literal = ref_str.as_ref();
+            variants.push(quote! {
+                #[serde(rename = #ref_str_literal)]
+                #variant_ident(Box<#rust_type>)
+            });
+        }
+
+        let doc = description
+            .map(|d| quote! { #[doc = #d] })
+            .unwrap_or_else(|| quote! {});
+
+        // Only add open_union if not closed
+        let is_open = closed != Some(true);
+
+        if is_open {
+            Ok(quote! {
+                #doc
+                #[jacquard_derive::open_union]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                #[serde(tag = "$type")]
+                #[serde(bound(deserialize = "'de: 'a"))]
+                pub enum #enum_ident<'a> {
+                    #(#variants,)*
+                }
+            })
+        } else {
+            Ok(quote! {
+                #doc
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                #[serde(tag = "$type")]
+                #[serde(bound(deserialize = "'de: 'a"))]
+                pub enum #enum_ident<'a> {
+                    #(#variants,)*
+                }
+            })
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_generate_record() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        let doc = corpus.get("app.bsky.feed.post").expect("get post");
+        let def = doc.defs.get("main").expect("get main def");
+
+        let tokens = codegen
+            .generate_def("app.bsky.feed.post", "main", def)
+            .expect("generate");
+
+        // Format and print for inspection
+        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+        let formatted = prettyplease::unparse(&file);
+        println!("\n{}\n", formatted);
+
+        // Check basic structure
+        assert!(formatted.contains("struct Post"));
+        assert!(formatted.contains("pub text"));
+        assert!(formatted.contains("CowStr<'a>"));
+    }
+
+    #[test]
+    fn test_generate_union() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        // Create a union with embed types
+        let refs = vec![
+            "app.bsky.embed.images".into(),
+            "app.bsky.embed.video".into(),
+            "app.bsky.embed.external".into(),
+        ];
+
+        let tokens = codegen
+            .generate_union("RecordEmbed", &refs, Some("Post embed union"), None)
+            .expect("generate union");
+
+        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+        let formatted = prettyplease::unparse(&file);
+        println!("\n{}\n", formatted);
+
+        // Check structure
+        assert!(formatted.contains("enum RecordEmbed"));
+        assert!(formatted.contains("Images"));
+        assert!(formatted.contains("Video"));
+        assert!(formatted.contains("External"));
+        assert!(formatted.contains("#[serde(tag = \"$type\")]"));
+        assert!(formatted.contains("#[jacquard_derive::open_union]"));
+    }
+
+    #[test]
+    fn test_generate_query() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        let doc = corpus
+            .get("app.bsky.feed.getAuthorFeed")
+            .expect("get getAuthorFeed");
+        let def = doc.defs.get("main").expect("get main def");
+
+        let tokens = codegen
+            .generate_def("app.bsky.feed.getAuthorFeed", "main", def)
+            .expect("generate");
+
+        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+        let formatted = prettyplease::unparse(&file);
+        println!("\n{}\n", formatted);
+
+        // Check structure
+        assert!(formatted.contains("struct GetAuthorFeedParams"));
+        assert!(formatted.contains("struct GetAuthorFeedOutput"));
+        assert!(formatted.contains("enum GetAuthorFeedError"));
+        assert!(formatted.contains("pub actor"));
+        assert!(formatted.contains("pub limit"));
+        assert!(formatted.contains("pub cursor"));
+        assert!(formatted.contains("pub feed"));
+        assert!(formatted.contains("BlockedActor"));
+        assert!(formatted.contains("BlockedByActor"));
+    }
+
+    #[test]
+    fn test_generate_known_values_enum() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        let doc = corpus
+            .get("com.atproto.label.defs")
+            .expect("get label defs");
+        let def = doc.defs.get("labelValue").expect("get labelValue def");
+
+        let tokens = codegen
+            .generate_def("com.atproto.label.defs", "labelValue", def)
+            .expect("generate");
+
+        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+        let formatted = prettyplease::unparse(&file);
+        println!("\n{}\n", formatted);
+
+        // Check structure
+        assert!(formatted.contains("enum LabelValue"));
+        assert!(formatted.contains("Hide"));
+        assert!(formatted.contains("NoPromote"));
+        assert!(formatted.contains("Warn"));
+        assert!(formatted.contains("DmcaViolation"));
+        assert!(formatted.contains("Other(jacquard_common::CowStr"));
+        assert!(formatted.contains("impl<'a> From<&'a str>"));
+        assert!(formatted.contains("fn as_str(&self)"));
+    }
+
+    #[test]
+    fn test_nsid_to_file_path() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        // Regular paths
+        assert_eq!(
+            codegen.nsid_to_file_path("app.bsky.feed.post"),
+            std::path::PathBuf::from("app_bsky/feed/post.rs")
+        );
+
+        assert_eq!(
+            codegen.nsid_to_file_path("app.bsky.feed.getAuthorFeed"),
+            std::path::PathBuf::from("app_bsky/feed/get_author_feed.rs")
+        );
+
+        // Defs paths - should go in parent
+        assert_eq!(
+            codegen.nsid_to_file_path("com.atproto.label.defs"),
+            std::path::PathBuf::from("com_atproto/label.rs")
+        );
+    }
+
+    #[test]
+    fn test_write_to_disk() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "test_generated");
+
+        let output_dir = std::path::PathBuf::from("target/test_codegen_output");
+
+        // Clean up any previous test output
+        let _ = std::fs::remove_dir_all(&output_dir);
+
+        // Generate and write
+        codegen.write_to_disk(&output_dir).expect("write to disk");
+
+        // Verify some files were created
+        assert!(output_dir.join("app_bsky/feed/post.rs").exists());
+        assert!(output_dir.join("app_bsky/feed/get_author_feed.rs").exists());
+        assert!(output_dir.join("com_atproto/label.rs").exists());
+
+        // Verify module files were created
+        assert!(output_dir.join("lib.rs").exists());
+        assert!(output_dir.join("app_bsky.rs").exists());
+
+        // Read and verify post.rs contains expected content
+        let post_content = std::fs::read_to_string(output_dir.join("app_bsky/feed/post.rs"))
+            .expect("read post.rs");
+        assert!(post_content.contains("pub struct Post"));
+        assert!(post_content.contains("jacquard_common"));
+    }
+
+    #[test]
+    #[ignore] // run manually: cargo test test_generate_full_atproto -- --ignored
+    fn test_generate_full_atproto() {
+        let corpus = LexiconCorpus::load_from_dir("tests/fixtures/lexicons/atproto/lexicons")
+            .expect("load atproto corpus");
+        let codegen = CodeGenerator::new(&corpus, "crate");
+
+        let output_dir = std::path::PathBuf::from("../jacquard-api/src");
+
+        // Clean up existing generated code
+        if output_dir.exists() {
+            for entry in std::fs::read_dir(&output_dir).expect("read output dir") {
+                let entry = entry.expect("dir entry");
+                let path = entry.path();
+                if path.is_dir() {
+                    std::fs::remove_dir_all(&path).ok();
+                } else if path.extension().map_or(false, |e| e == "rs") {
+                    std::fs::remove_file(&path).ok();
+                }
+            }
+        }
+
+        // Generate and write
+        codegen.write_to_disk(&output_dir).expect("write to disk");
+
+        println!("\n✨ Generated full atproto API to {:?}", output_dir);
+    }
+}

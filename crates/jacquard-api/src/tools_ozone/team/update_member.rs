@@ -1,0 +1,52 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateMemberInput<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub disabled: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub role: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateMemberOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::tools_ozone::team::Member<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum UpdateMemberError<'a> {
+    ///The member being updated does not exist in the team
+    #[serde(rename = "MemberNotFound")]
+    MemberNotFound(std::option::Option<String>),
+}
+impl std::fmt::Display for UpdateMemberError<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::MemberNotFound(msg) => {
+                write!(f, "MemberNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(_) => write!(f, "Unknown error"),
+        }
+    }
+}

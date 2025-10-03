@@ -127,7 +127,10 @@ impl Serialize for Cid<'_> {
 }
 
 // TODO: take another look at this, see if we can do more borrowed and such
-impl<'de> Deserialize<'de> for Cid<'_> {
+impl<'de, 'a> Deserialize<'de> for Cid<'a>
+where
+    'de: 'a,
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -299,7 +302,10 @@ impl Serialize for CidLink<'_> {
     }
 }
 
-impl<'de> Deserialize<'de> for CidLink<'_> {
+impl<'de, 'a> Deserialize<'de> for CidLink<'a>
+where
+    'de: 'a,
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,

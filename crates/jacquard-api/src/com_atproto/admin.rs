@@ -1,0 +1,92 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct AccountView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub deactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub email_confirmed_at: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub invite_note: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub invited_by: std::option::Option<crate::com_atproto::server::InviteCode<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub invites: std::option::Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub invites_disabled: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub related_records: std::option::Option<
+        Vec<jacquard_common::types::value::Data<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub threat_signatures: std::option::Option<
+        Vec<jacquard_common::types::value::Data<'a>>,
+    >,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RepoBlobRef<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub record_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RepoRef<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct StatusAttr<'a> {
+    pub applied: bool,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreatSignature<'a> {
+    #[serde(borrow)]
+    pub property: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub value: jacquard_common::CowStr<'a>,
+}
+pub mod delete_account;
+pub mod disable_account_invites;
+pub mod disable_invite_codes;
+pub mod enable_account_invites;
+pub mod get_account_info;
+pub mod get_account_infos;
+pub mod get_invite_codes;
+pub mod get_subject_status;
+pub mod search_accounts;
+pub mod send_email;
+pub mod update_account_email;
+pub mod update_account_handle;
+pub mod update_account_password;
+pub mod update_account_signing_key;
+pub mod update_subject_status;

@@ -1,0 +1,25 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct Member<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub disabled: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub last_updated_by: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub profile: std::option::Option<crate::app_bsky::actor::ProfileViewDetailed<'a>>,
+    #[serde(borrow)]
+    pub role: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+pub mod add_member;
+pub mod delete_member;
+pub mod list_members;
+pub mod update_member;

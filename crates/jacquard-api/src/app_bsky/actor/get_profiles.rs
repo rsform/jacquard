@@ -1,0 +1,13 @@
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetProfilesParams<'a> {
+    #[serde(borrow)]
+    pub actors: Vec<jacquard_common::types::ident::AtIdentifier<'a>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetProfilesOutput<'a> {
+    #[serde(borrow)]
+    pub profiles: Vec<crate::app_bsky::actor::ProfileViewDetailed<'a>>,
+}

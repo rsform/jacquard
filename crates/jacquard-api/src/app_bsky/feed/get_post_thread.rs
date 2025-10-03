@@ -1,0 +1,63 @@
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPostThreadParams<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub depth: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub parent_height: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPostThreadOutput<'a> {
+    #[serde(borrow)]
+    pub thread: GetPostThreadOutputRecordThread<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub threadgate: std::option::Option<crate::app_bsky::feed::ThreadgateView<'a>>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetPostThreadOutputRecordThread<'a> {
+    #[serde(rename = "app.bsky.feed.defs#threadViewPost")]
+    DefsThreadViewPost(Box<crate::app_bsky::feed::ThreadViewPost<'a>>),
+    #[serde(rename = "app.bsky.feed.defs#notFoundPost")]
+    DefsNotFoundPost(Box<crate::app_bsky::feed::NotFoundPost<'a>>),
+    #[serde(rename = "app.bsky.feed.defs#blockedPost")]
+    DefsBlockedPost(Box<crate::app_bsky::feed::BlockedPost<'a>>),
+}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetPostThreadError<'a> {
+    #[serde(rename = "NotFound")]
+    NotFound(std::option::Option<String>),
+}
+impl std::fmt::Display for GetPostThreadError<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::NotFound(msg) => {
+                write!(f, "NotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(_) => write!(f, "Unknown error"),
+        }
+    }
+}

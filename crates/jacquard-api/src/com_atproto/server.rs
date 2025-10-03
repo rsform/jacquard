@@ -1,0 +1,49 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct InviteCode<'a> {
+    pub available: i64,
+    #[serde(borrow)]
+    pub code: jacquard_common::CowStr<'a>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub created_by: jacquard_common::CowStr<'a>,
+    pub disabled: bool,
+    #[serde(borrow)]
+    pub for_account: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub uses: Vec<jacquard_common::types::value::Data<'a>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct InviteCodeUse<'a> {
+    pub used_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub used_by: jacquard_common::types::string::Did<'a>,
+}
+pub mod activate_account;
+pub mod check_account_status;
+pub mod confirm_email;
+pub mod create_account;
+pub mod create_app_password;
+pub mod create_invite_code;
+pub mod create_invite_codes;
+pub mod create_session;
+pub mod deactivate_account;
+pub mod delete_account;
+pub mod delete_session;
+pub mod describe_server;
+pub mod get_account_invite_codes;
+pub mod get_service_auth;
+pub mod get_session;
+pub mod list_app_passwords;
+pub mod refresh_session;
+pub mod request_account_delete;
+pub mod request_email_confirmation;
+pub mod request_email_update;
+pub mod request_password_reset;
+pub mod reserve_signing_key;
+pub mod reset_password;
+pub mod revoke_app_password;
+pub mod update_email;

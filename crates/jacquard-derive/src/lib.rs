@@ -39,13 +39,27 @@ pub fn lexicon(_attr: TokenStream, item: TokenStream) -> TokenStream {
                         quote! { 'static }
                     };
 
-                    // Add the extra_data field
-                    let new_field: syn::Field = syn::parse_quote! {
-                        #[serde(flatten)]
-                        pub extra_data: ::std::collections::BTreeMap<
-                            ::jacquard_common::smol_str::SmolStr,
-                            ::jacquard_common::types::value::Data<#lifetime>
-                        >
+                    // Add the extra_data field with serde(borrow) if there's a lifetime
+                    let new_field: syn::Field = if input.generics.lifetimes().next().is_some() {
+                        syn::parse_quote! {
+                            #[serde(flatten)]
+                            #[serde(borrow)]
+                            pub extra_data: ::std::collections::BTreeMap<
+                                ::jacquard_common::smol_str::SmolStr,
+                                ::jacquard_common::types::value::Data<#lifetime>
+                            >
+                        }
+                    } else {
+                        // For types without lifetimes, make it optional to avoid lifetime conflicts
+                        syn::parse_quote! {
+                            #[serde(flatten)]
+                            #[serde(skip_serializing_if = "std::option::Option::is_none")]
+                            #[serde(default)]
+                            pub extra_data: std::option::Option<::std::collections::BTreeMap<
+                                ::jacquard_common::smol_str::SmolStr,
+                                ::jacquard_common::types::value::Data<#lifetime>
+                            >>
+                        }
                     };
                     fields.named.push(new_field);
                 }

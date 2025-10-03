@@ -17,6 +17,7 @@ pub mod string;
 pub mod tid;
 pub mod uri;
 pub mod value;
+pub mod xrpc;
 
 /// Trait for a constant string literal type
 pub trait Literal: Clone + Copy + PartialEq + Eq + Send + Sync + 'static {

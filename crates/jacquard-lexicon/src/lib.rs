@@ -1,8 +1,9 @@
+pub mod codegen;
 pub mod corpus;
+pub mod error;
 pub mod fs;
 pub mod lexicon;
-pub mod output;
-pub mod schema;
+pub mod union_registry;
 
 // #[lexicon]
 // #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]

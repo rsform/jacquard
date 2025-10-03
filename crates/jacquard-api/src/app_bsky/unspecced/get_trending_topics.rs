@@ -1,0 +1,18 @@
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetTrendingTopicsParams<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetTrendingTopicsOutput<'a> {
+    #[serde(borrow)]
+    pub suggested: Vec<crate::app_bsky::unspecced::TrendingTopic<'a>>,
+    #[serde(borrow)]
+    pub topics: Vec<crate::app_bsky::unspecced::TrendingTopic<'a>>,
+}

@@ -1,0 +1,66 @@
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ResolveIdentityParams<'a> {
+    #[serde(borrow)]
+    pub identifier: jacquard_common::types::ident::AtIdentifier<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ResolveIdentityOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::com_atproto::identity::IdentityInfo<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ResolveIdentityError<'a> {
+    ///The resolution process confirmed that the handle does not resolve to any DID.
+    #[serde(rename = "HandleNotFound")]
+    HandleNotFound(std::option::Option<String>),
+    ///The DID resolution process confirmed that there is no current DID.
+    #[serde(rename = "DidNotFound")]
+    DidNotFound(std::option::Option<String>),
+    ///The DID previously existed, but has been deactivated.
+    #[serde(rename = "DidDeactivated")]
+    DidDeactivated(std::option::Option<String>),
+}
+impl std::fmt::Display for ResolveIdentityError<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::HandleNotFound(msg) => {
+                write!(f, "HandleNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::DidNotFound(msg) => {
+                write!(f, "DidNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::DidDeactivated(msg) => {
+                write!(f, "DidDeactivated")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(_) => write!(f, "Unknown error"),
+        }
+    }
+}

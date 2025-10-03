@@ -1,0 +1,35 @@
+///A list and an optional list item indicating membership of a target user to that list.
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ListWithMembership<'a> {
+    #[serde(borrow)]
+    pub list: crate::app_bsky::graph::ListView<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub list_item: std::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
+}
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetListsWithMembershipParams<'a> {
+    #[serde(borrow)]
+    pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub purposes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetListsWithMembershipOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub lists_with_membership: Vec<jacquard_common::types::value::Data<'a>>,
+}

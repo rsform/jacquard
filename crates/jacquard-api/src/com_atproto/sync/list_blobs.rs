@@ -1,0 +1,81 @@
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ListBlobsParams<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub since: std::option::Option<jacquard_common::types::string::Tid>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ListBlobsOutput<'a> {
+    #[serde(borrow)]
+    pub cids: Vec<jacquard_common::types::string::Cid<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ListBlobsError<'a> {
+    #[serde(rename = "RepoNotFound")]
+    RepoNotFound(std::option::Option<String>),
+    #[serde(rename = "RepoTakendown")]
+    RepoTakendown(std::option::Option<String>),
+    #[serde(rename = "RepoSuspended")]
+    RepoSuspended(std::option::Option<String>),
+    #[serde(rename = "RepoDeactivated")]
+    RepoDeactivated(std::option::Option<String>),
+}
+impl std::fmt::Display for ListBlobsError<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::RepoNotFound(msg) => {
+                write!(f, "RepoNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RepoTakendown(msg) => {
+                write!(f, "RepoTakendown")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RepoSuspended(msg) => {
+                write!(f, "RepoSuspended")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::RepoDeactivated(msg) => {
+                write!(f, "RepoDeactivated")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(_) => write!(f, "Unknown error"),
+        }
+    }
+}

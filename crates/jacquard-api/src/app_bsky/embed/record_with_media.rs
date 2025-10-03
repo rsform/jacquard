@@ -1,0 +1,42 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordWithMedia<'a> {
+    #[serde(borrow)]
+    pub media: RecordWithMediaRecordMedia<'a>,
+    #[serde(borrow)]
+    pub record: crate::app_bsky::embed::record::Record<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum RecordWithMediaRecordMedia<'a> {
+    #[serde(rename = "app.bsky.embed.images")]
+    Images(Box<crate::app_bsky::embed::images::Images<'a>>),
+    #[serde(rename = "app.bsky.embed.video")]
+    Video(Box<crate::app_bsky::embed::video::Video<'a>>),
+    #[serde(rename = "app.bsky.embed.external")]
+    External(Box<crate::app_bsky::embed::external::ExternalRecord<'a>>),
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct View<'a> {
+    #[serde(borrow)]
+    pub media: ViewRecordMedia<'a>,
+    #[serde(borrow)]
+    pub record: crate::app_bsky::embed::record::View<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ViewRecordMedia<'a> {
+    #[serde(rename = "app.bsky.embed.images#view")]
+    ImagesView(Box<crate::app_bsky::embed::images::View<'a>>),
+    #[serde(rename = "app.bsky.embed.video#view")]
+    VideoView(Box<crate::app_bsky::embed::video::View<'a>>),
+    #[serde(rename = "app.bsky.embed.external#view")]
+    ExternalView(Box<crate::app_bsky::embed::external::View<'a>>),
+}

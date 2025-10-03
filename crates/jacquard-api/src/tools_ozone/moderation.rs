@@ -1,0 +1,793 @@
+///Logs account status related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct AccountEvent<'a> {
+    pub active: bool,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub timestamp: jacquard_common::types::string::Datetime,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct AccountHosting<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub deactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub deleted_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub status: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+///Statistics about a particular account subject
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct AccountStats<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub appeal_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub escalate_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub report_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub suspend_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub takedown_count: std::option::Option<i64>,
+}
+///Age assurance info coming directly from users. Only works on DID subjects.
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct AgeAssuranceEvent<'a> {
+    #[serde(borrow)]
+    pub attempt_id: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub complete_ip: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub complete_ua: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub init_ip: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub init_ua: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub status: jacquard_common::CowStr<'a>,
+}
+///Age assurance status override by moderators. Only works on DID subjects.
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct AgeAssuranceOverrideEvent<'a> {
+    #[serde(borrow)]
+    pub comment: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub status: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct BlobView<'a> {
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub details: std::option::Option<BlobViewRecordDetails<'a>>,
+    #[serde(borrow)]
+    pub mime_type: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub moderation: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub size: i64,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum BlobViewRecordDetails<'a> {}
+///Logs identity related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct IdentityEvent<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub pds_host: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub timestamp: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub tombstone: std::option::Option<bool>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ImageDetails<'a> {
+    pub height: i64,
+    pub width: i64,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventAcknowledge<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub acknowledge_account_subjects: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+///Add a comment to a subject. An empty comment will clear any previously set sticky comment.
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventComment<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sticky: std::option::Option<bool>,
+}
+///Divert a record's blobs to a 3rd party service for further scanning/tagging
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventDivert<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+///Keep a log of outgoing email to a user
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventEmail<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub content: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub subject_line: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventEscalate<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+///Apply/Negate labels on a subject
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventLabel<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub create_label_vals: Vec<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub duration_in_hours: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub negate_label_vals: Vec<jacquard_common::CowStr<'a>>,
+}
+///Mute incoming reports on a subject
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventMute<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub duration_in_hours: i64,
+}
+///Mute incoming reports from an account
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventMuteReporter<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub duration_in_hours: std::option::Option<i64>,
+}
+///Set priority score of the subject. Higher score means higher priority.
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventPriorityScore<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub score: i64,
+}
+///Report a subject
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventReport<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_reporter_muted: std::option::Option<bool>,
+    #[serde(borrow)]
+    pub report_type: crate::com_atproto::moderation::ReasonType<'a>,
+}
+///Resolve appeal on a subject
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventResolveAppeal<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+///Revert take down action on a subject
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventReverseTakedown<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+///Add/Remove a tag on a subject
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventTag<'a> {
+    #[serde(borrow)]
+    pub add: Vec<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub remove: Vec<jacquard_common::CowStr<'a>>,
+}
+///Take down a subject permanently or temporarily
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventTakedown<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub acknowledge_account_subjects: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub duration_in_hours: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub policies: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+///Unmute action on a subject
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventUnmute<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+///Unmute incoming reports from an account
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventUnmuteReporter<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventView<'a> {
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub created_by: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub creator_handle: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub event: ModEventViewRecordEvent<'a>,
+    pub id: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mod_tool: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(borrow)]
+    pub subject: ModEventViewRecordSubject<'a>,
+    #[serde(borrow)]
+    pub subject_blob_cids: Vec<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub subject_handle: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ModEventViewRecordEvent<'a> {}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ModEventViewRecordSubject<'a> {
+    #[serde(rename = "com.atproto.admin.defs#repoRef")]
+    DefsRepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    #[serde(rename = "com.atproto.repo.strongRef")]
+    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#messageRef")]
+    DefsMessageRef(Box<crate::chat_bsky::convo::MessageRef<'a>>),
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModEventViewDetail<'a> {
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub created_by: jacquard_common::types::string::Did<'a>,
+    #[serde(borrow)]
+    pub event: ModEventViewDetailRecordEvent<'a>,
+    pub id: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mod_tool: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(borrow)]
+    pub subject: ModEventViewDetailRecordSubject<'a>,
+    #[serde(borrow)]
+    pub subject_blobs: Vec<jacquard_common::types::value::Data<'a>>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ModEventViewDetailRecordEvent<'a> {}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ModEventViewDetailRecordSubject<'a> {}
+///Moderation tool information for tracing the source of the action
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModTool<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub meta: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct Moderation<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub subject_status: std::option::Option<jacquard_common::types::value::Data<'a>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ModerationDetail<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub subject_status: std::option::Option<jacquard_common::types::value::Data<'a>>,
+}
+///Logs lifecycle event on a record subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordEvent<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub op: jacquard_common::CowStr<'a>,
+    pub timestamp: jacquard_common::types::string::Datetime,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordHosting<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub deleted_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub status: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordView<'a> {
+    #[serde(borrow)]
+    pub blob_cids: Vec<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(borrow)]
+    pub moderation: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub repo: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordViewDetail<'a> {
+    #[serde(borrow)]
+    pub blobs: Vec<jacquard_common::types::value::Data<'a>>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(borrow)]
+    pub moderation: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub repo: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordViewNotFound<'a> {
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+///Statistics about a set of record subject items
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordsStats<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub appealed_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub escalated_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub pending_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub processed_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reported_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub subject_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub takendown_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub total_reports: std::option::Option<i64>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RepoView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub deactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub invite_note: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub invited_by: std::option::Option<crate::com_atproto::server::InviteCode<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub invites_disabled: std::option::Option<bool>,
+    #[serde(borrow)]
+    pub moderation: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub related_records: Vec<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub threat_signatures: std::option::Option<
+        Vec<crate::com_atproto::admin::ThreatSignature<'a>>,
+    >,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RepoViewDetail<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub deactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub email_confirmed_at: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub invite_note: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub invited_by: std::option::Option<crate::com_atproto::server::InviteCode<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub invites: std::option::Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub invites_disabled: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(borrow)]
+    pub moderation: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub related_records: Vec<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub threat_signatures: std::option::Option<
+        Vec<crate::com_atproto::admin::ThreatSignature<'a>>,
+    >,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RepoViewNotFound<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ReporterStats<'a> {
+    pub account_report_count: i64,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    pub labeled_account_count: i64,
+    pub labeled_record_count: i64,
+    pub record_report_count: i64,
+    pub reported_account_count: i64,
+    pub reported_record_count: i64,
+    pub takendown_account_count: i64,
+    pub takendown_record_count: i64,
+}
+///Account credentials revocation by moderators. Only works on DID subjects.
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RevokeAccountCredentialsEvent<'a> {
+    #[serde(borrow)]
+    pub comment: jacquard_common::CowStr<'a>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SubjectReviewState<'a> {
+    ReviewOpen,
+    ReviewEscalated,
+    ReviewClosed,
+    ReviewNone,
+    Other(jacquard_common::CowStr<'a>),
+}
+impl<'a> SubjectReviewState<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::ReviewOpen => "#reviewOpen",
+            Self::ReviewEscalated => "#reviewEscalated",
+            Self::ReviewClosed => "#reviewClosed",
+            Self::ReviewNone => "#reviewNone",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+impl<'a> From<&'a str> for SubjectReviewState<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "#reviewOpen" => Self::ReviewOpen,
+            "#reviewEscalated" => Self::ReviewEscalated,
+            "#reviewClosed" => Self::ReviewClosed,
+            "#reviewNone" => Self::ReviewNone,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+impl<'a> From<String> for SubjectReviewState<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "#reviewOpen" => Self::ReviewOpen,
+            "#reviewEscalated" => Self::ReviewEscalated,
+            "#reviewClosed" => Self::ReviewClosed,
+            "#reviewNone" => Self::ReviewNone,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+impl<'a> AsRef<str> for SubjectReviewState<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+impl<'a> serde::Serialize for SubjectReviewState<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+impl<'de, 'a> serde::Deserialize<'de> for SubjectReviewState<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct SubjectStatusView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub account_stats: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub age_assurance_state: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub age_assurance_updated_by: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub appealed: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub hosting: std::option::Option<SubjectStatusViewRecordHosting<'a>>,
+    pub id: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_appealed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_reported_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_reviewed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub last_reviewed_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub mute_reporting_until: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub mute_until: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub priority_score: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub records_stats: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(borrow)]
+    pub review_state: jacquard_common::types::value::Data<'a>,
+    #[serde(borrow)]
+    pub subject: SubjectStatusViewRecordSubject<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub subject_blob_cids: std::option::Option<
+        Vec<jacquard_common::types::string::Cid<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub subject_repo_handle: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub suspend_until: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub takendown: std::option::Option<bool>,
+    pub updated_at: jacquard_common::types::string::Datetime,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SubjectStatusViewRecordHosting<'a> {}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SubjectStatusViewRecordSubject<'a> {
+    #[serde(rename = "com.atproto.admin.defs#repoRef")]
+    DefsRepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    #[serde(rename = "com.atproto.repo.strongRef")]
+    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#messageRef")]
+    DefsMessageRef(Box<crate::chat_bsky::convo::MessageRef<'a>>),
+}
+///Detailed view of a subject. For record subjects, the author's repo and profile will be returned.
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct SubjectView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub profile: std::option::Option<SubjectViewRecordProfile<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub record: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub repo: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(borrow)]
+    pub subject: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub r#type: crate::com_atproto::moderation::SubjectType<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum SubjectViewRecordProfile<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct VideoDetails<'a> {
+    pub height: i64,
+    pub length: i64,
+    pub width: i64,
+}
+pub mod emit_event;
+pub mod get_account_timeline;
+pub mod get_event;
+pub mod get_record;
+pub mod get_records;
+pub mod get_repo;
+pub mod get_reporter_stats;
+pub mod get_repos;
+pub mod get_subjects;
+pub mod query_events;
+pub mod query_statuses;
+pub mod search_repos;

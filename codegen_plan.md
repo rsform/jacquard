@@ -355,6 +355,17 @@ WebSocket streams - defer for now. Will need separate trait with message types.
 4. **Incremental**: Support incremental codegen (only changed lexicons)?
 5. **Formatting**: Always run rustfmt or rely on prettyplease?
 6. **XrpcRequest location**: Should trait live in jacquard-common or separate jacquard-xrpc crate?
+7. **Import shortening**: Track imports and shorten ref paths in generated code
+   - Instead of `jacquard_api::app_bsky::richtext::Facet<'a>` emit `use jacquard_api::app_bsky::richtext::Facet;` and just `Facet<'a>`
+   - Would require threading `ImportTracker` through all generate functions or post-processing token stream
+   - Long paths are ugly but explicit - revisit once basic codegen is confirmed working
+8. **Web-based lexicon resolution**: Fetch lexicons from the web instead of requiring local files
+   - Implement [lexicon publication and resolution](https://atproto.com/specs/lexicon#lexicon-publication-and-resolution) spec
+   - `LexiconCorpus::fetch_from_web(nsids: &[&str])` - fetch specific NSIDs
+   - `LexiconCorpus::fetch_from_authority(authority: &str)` - fetch all from DID/domain
+   - Resolution: `https://{authority}/.well-known/atproto/lexicon/{nsid}.json`
+   - Recursively fetch refs, handle redirects/errors
+   - Use `reqwest` for HTTP - still fits in jacquard-lexicon as it's corpus loading
 
 ## Success Criteria
 

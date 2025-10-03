@@ -1,0 +1,32 @@
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetStarterPacksWithMembershipParams<'a> {
+    #[serde(borrow)]
+    pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub limit: std::option::Option<i64>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetStarterPacksWithMembershipOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub starter_packs_with_membership: Vec<jacquard_common::types::value::Data<'a>>,
+}
+///A starter pack and an optional list item indicating membership of a target user to that starter pack.
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct StarterPackWithMembership<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub list_item: std::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
+    #[serde(borrow)]
+    pub starter_pack: crate::app_bsky::graph::StarterPackView<'a>,
+}

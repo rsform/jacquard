@@ -120,7 +120,10 @@ impl IntoStatic for Did<'_> {
     }
 }
 
-impl<'de> Deserialize<'de> for Did<'de> {
+impl<'de, 'a> Deserialize<'de> for Did<'a>
+where
+    'de: 'a,
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,

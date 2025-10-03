@@ -1,0 +1,82 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct Record<'a> {
+    #[serde(borrow)]
+    pub record: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct View<'a> {
+    #[serde(borrow)]
+    pub record: ViewRecordRecord<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ViewRecordRecord<'a> {
+    #[serde(rename = "app.bsky.feed.defs#generatorView")]
+    DefsGeneratorView(Box<crate::app_bsky::feed::GeneratorView<'a>>),
+    #[serde(rename = "app.bsky.graph.defs#listView")]
+    DefsListView(Box<crate::app_bsky::graph::ListView<'a>>),
+    #[serde(rename = "app.bsky.labeler.defs#labelerView")]
+    DefsLabelerView(Box<crate::app_bsky::labeler::LabelerView<'a>>),
+    #[serde(rename = "app.bsky.graph.defs#starterPackViewBasic")]
+    DefsStarterPackViewBasic(Box<crate::app_bsky::graph::StarterPackViewBasic<'a>>),
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewBlocked<'a> {
+    #[serde(borrow)]
+    pub author: crate::app_bsky::feed::BlockedAuthor<'a>,
+    pub blocked: bool,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewDetached<'a> {
+    pub detached: bool,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewNotFound<'a> {
+    pub not_found: bool,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewRecord<'a> {
+    #[serde(borrow)]
+    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub embeds: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub indexed_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub like_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub quote_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reply_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub repost_count: std::option::Option<i64>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}

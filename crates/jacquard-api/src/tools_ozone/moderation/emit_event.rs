@@ -1,0 +1,147 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct EmitEventInput<'a> {
+    #[serde(borrow)]
+    pub created_by: jacquard_common::types::string::Did<'a>,
+    #[serde(borrow)]
+    pub event: EmitEventInputRecordEvent<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub external_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    #[serde(borrow)]
+    pub subject: EmitEventInputRecordSubject<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub subject_blob_cids: std::option::Option<
+        Vec<jacquard_common::types::string::Cid<'a>>,
+    >,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum EmitEventInputRecordEvent<'a> {
+    #[serde(rename = "tools.ozone.moderation.defs#modEventTakedown")]
+    DefsModEventTakedown(Box<crate::tools_ozone::moderation::ModEventTakedown<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventAcknowledge")]
+    DefsModEventAcknowledge(
+        Box<crate::tools_ozone::moderation::ModEventAcknowledge<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventEscalate")]
+    DefsModEventEscalate(Box<crate::tools_ozone::moderation::ModEventEscalate<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventComment")]
+    DefsModEventComment(Box<crate::tools_ozone::moderation::ModEventComment<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventLabel")]
+    DefsModEventLabel(Box<crate::tools_ozone::moderation::ModEventLabel<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventReport")]
+    DefsModEventReport(Box<crate::tools_ozone::moderation::ModEventReport<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventMute")]
+    DefsModEventMute(Box<crate::tools_ozone::moderation::ModEventMute<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventUnmute")]
+    DefsModEventUnmute(Box<crate::tools_ozone::moderation::ModEventUnmute<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventMuteReporter")]
+    DefsModEventMuteReporter(
+        Box<crate::tools_ozone::moderation::ModEventMuteReporter<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventUnmuteReporter")]
+    DefsModEventUnmuteReporter(
+        Box<crate::tools_ozone::moderation::ModEventUnmuteReporter<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventReverseTakedown")]
+    DefsModEventReverseTakedown(
+        Box<crate::tools_ozone::moderation::ModEventReverseTakedown<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventResolveAppeal")]
+    DefsModEventResolveAppeal(
+        Box<crate::tools_ozone::moderation::ModEventResolveAppeal<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventEmail")]
+    DefsModEventEmail(Box<crate::tools_ozone::moderation::ModEventEmail<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventDivert")]
+    DefsModEventDivert(Box<crate::tools_ozone::moderation::ModEventDivert<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventTag")]
+    DefsModEventTag(Box<crate::tools_ozone::moderation::ModEventTag<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#accountEvent")]
+    DefsAccountEvent(Box<crate::tools_ozone::moderation::AccountEvent<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#identityEvent")]
+    DefsIdentityEvent(Box<crate::tools_ozone::moderation::IdentityEvent<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#recordEvent")]
+    DefsRecordEvent(Box<crate::tools_ozone::moderation::RecordEvent<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventPriorityScore")]
+    DefsModEventPriorityScore(
+        Box<crate::tools_ozone::moderation::ModEventPriorityScore<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#ageAssuranceEvent")]
+    DefsAgeAssuranceEvent(Box<crate::tools_ozone::moderation::AgeAssuranceEvent<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#ageAssuranceOverrideEvent")]
+    DefsAgeAssuranceOverrideEvent(
+        Box<crate::tools_ozone::moderation::AgeAssuranceOverrideEvent<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#revokeAccountCredentialsEvent")]
+    DefsRevokeAccountCredentialsEvent(
+        Box<crate::tools_ozone::moderation::RevokeAccountCredentialsEvent<'a>>,
+    ),
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum EmitEventInputRecordSubject<'a> {
+    #[serde(rename = "com.atproto.admin.defs#repoRef")]
+    DefsRepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    #[serde(rename = "com.atproto.repo.strongRef")]
+    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct EmitEventOutput<'a> {
+    #[serde(flatten)]
+    #[serde(borrow)]
+    pub value: crate::tools_ozone::moderation::ModEventView<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum EmitEventError<'a> {
+    #[serde(rename = "SubjectHasAction")]
+    SubjectHasAction(std::option::Option<String>),
+    ///An event with the same external ID already exists for the subject.
+    #[serde(rename = "DuplicateExternalId")]
+    DuplicateExternalId(std::option::Option<String>),
+}
+impl std::fmt::Display for EmitEventError<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::SubjectHasAction(msg) => {
+                write!(f, "SubjectHasAction")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::DuplicateExternalId(msg) => {
+                write!(f, "DuplicateExternalId")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(_) => write!(f, "Unknown error"),
+        }
+    }
+}

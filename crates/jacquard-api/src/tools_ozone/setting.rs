@@ -1,0 +1,30 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct Option<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub created_by: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(borrow)]
+    pub key: jacquard_common::types::string::Nsid<'a>,
+    #[serde(borrow)]
+    pub last_updated_by: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub manager_role: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub scope: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(borrow)]
+    pub value: jacquard_common::types::value::Data<'a>,
+}
+pub mod list_options;
+pub mod remove_options;
+pub mod upsert_option;

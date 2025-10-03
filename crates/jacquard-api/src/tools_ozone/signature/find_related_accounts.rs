@@ -1,0 +1,33 @@
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct FindRelatedAccountsParams<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub limit: std::option::Option<i64>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct FindRelatedAccountsOutput<'a> {
+    #[serde(borrow)]
+    pub accounts: Vec<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RelatedAccount<'a> {
+    #[serde(borrow)]
+    pub account: crate::com_atproto::admin::AccountView<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub similarities: std::option::Option<
+        Vec<crate::tools_ozone::signature::SigDetail<'a>>,
+    >,
+}

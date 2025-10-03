@@ -1,0 +1,67 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ConfirmEmailInput<'a> {
+    #[serde(borrow)]
+    pub email: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub token: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ConfirmEmailError<'a> {
+    #[serde(rename = "AccountNotFound")]
+    AccountNotFound(std::option::Option<String>),
+    #[serde(rename = "ExpiredToken")]
+    ExpiredToken(std::option::Option<String>),
+    #[serde(rename = "InvalidToken")]
+    InvalidToken(std::option::Option<String>),
+    #[serde(rename = "InvalidEmail")]
+    InvalidEmail(std::option::Option<String>),
+}
+impl std::fmt::Display for ConfirmEmailError<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::AccountNotFound(msg) => {
+                write!(f, "AccountNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::ExpiredToken(msg) => {
+                write!(f, "ExpiredToken")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidToken(msg) => {
+                write!(f, "InvalidToken")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidEmail(msg) => {
+                write!(f, "InvalidEmail")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(_) => write!(f, "Unknown error"),
+        }
+    }
+}

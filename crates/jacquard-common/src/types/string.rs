@@ -164,7 +164,10 @@ impl Serialize for AtprotoStr<'_> {
     }
 }
 
-impl<'de> Deserialize<'de> for AtprotoStr<'de> {
+impl<'de, 'a> Deserialize<'de> for AtprotoStr<'a>
+where
+    'de: 'a,
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,

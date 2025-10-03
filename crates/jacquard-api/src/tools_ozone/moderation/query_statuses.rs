@@ -1,0 +1,109 @@
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct QueryStatusesParams<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub age_assurance_state: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub appealed: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub collections: std::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub exclude_tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hosting_deleted_after: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hosting_deleted_before: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub hosting_statuses: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hosting_updated_after: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub hosting_updated_before: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub ignore_subjects: std::option::Option<
+        Vec<jacquard_common::types::string::Uri<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub include_all_user_records: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub include_muted: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub last_reviewed_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub min_account_suspend_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub min_priority_score: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub min_reported_records_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub min_takendown_records_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub only_muted: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub queue_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub queue_index: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub queue_seed: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reported_after: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reported_before: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub review_state: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reviewed_after: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reviewed_before: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub sort_direction: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub sort_field: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub subject: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub subject_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub takendown: std::option::Option<bool>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct QueryStatusesOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub subject_statuses: Vec<crate::tools_ozone::moderation::SubjectStatusView<'a>>,
+}

@@ -1,0 +1,29 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct Set<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct SetView<'a> {
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub name: jacquard_common::CowStr<'a>,
+    pub set_size: i64,
+    pub updated_at: jacquard_common::types::string::Datetime,
+}
+pub mod add_values;
+pub mod delete_set;
+pub mod delete_values;
+pub mod get_values;
+pub mod query_sets;
+pub mod upsert_set;

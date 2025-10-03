@@ -1,0 +1,38 @@
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSubjectStatusParams<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub blob: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetSubjectStatusOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub deactivated: std::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    #[serde(borrow)]
+    pub subject: GetSubjectStatusOutputRecordSubject<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub takedown: std::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+}
+#[jacquard_derive::open_union]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetSubjectStatusOutputRecordSubject<'a> {
+    #[serde(rename = "com.atproto.admin.defs#repoRef")]
+    DefsRepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    #[serde(rename = "com.atproto.repo.strongRef")]
+    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
+    #[serde(rename = "com.atproto.admin.defs#repoBlobRef")]
+    DefsRepoBlobRef(Box<crate::com_atproto::admin::RepoBlobRef<'a>>),
+}

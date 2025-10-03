@@ -63,7 +63,10 @@ impl Serialize for Data<'_> {
     }
 }
 
-impl<'de> Deserialize<'de> for Data<'de> {
+impl<'de, 'a> Deserialize<'de> for Data<'a>
+where
+    'de: 'a,
+{
     /// Currently only works for self-describing formats
     /// Thankfully the supported atproto data formats are both self-describing (json and dag-cbor).
     /// TODO: see if there's any way to make this work with Postcard.
@@ -397,13 +400,16 @@ impl Serialize for Array<'_> {
     }
 }
 
-impl<'de> Deserialize<'de> for Array<'de> {
+impl<'de, 'a> Deserialize<'de> for Array<'a>
+where
+    'de: 'a,
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
         // Just deserialize as Vec<Data> directly - the Data visitor handles everything
-        let vec: Vec<Data<'de>> = Deserialize::deserialize(deserializer)?;
+        let vec: Vec<Data<'a>> = Deserialize::deserialize(deserializer)?;
         Ok(Array(vec))
     }
 }
@@ -422,7 +428,10 @@ impl Serialize for Object<'_> {
     }
 }
 
-impl<'de> Deserialize<'de> for Object<'de> {
+impl<'de, 'a> Deserialize<'de> for Object<'a>
+where
+    'de: 'a,
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -431,7 +440,7 @@ impl<'de> Deserialize<'de> for Object<'de> {
 
         // Deserialize via Data, then extract the Object
         // The Data visitor handles all the type inference and special cases
-        let data: Data<'de> = Data::deserialize(deserializer)?;
+        let data: Data<'a> = Data::deserialize(deserializer)?;
         match data {
             Data::Object(obj) => Ok(obj),
             _ => Err(D::Error::custom("expected object, got something else")),
@@ -484,7 +493,10 @@ impl Serialize for RawData<'_> {
     }
 }
 
-impl<'de> Deserialize<'de> for RawData<'de> {
+impl<'de, 'a> Deserialize<'de> for RawData<'a>
+where
+    'de: 'a,
+{
     /// Currently only works for self-describing formats
     /// Thankfully the supported atproto data formats are both self-describing (json and dag-cbor).
     /// TODO: see if there's any way to make this work with Postcard.

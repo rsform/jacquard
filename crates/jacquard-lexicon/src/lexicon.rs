@@ -2,7 +2,7 @@
 // https://github.com/atrium-rs/atrium/blob/main/lexicon/atrium-lex/src/lexicon.rs
 // https://github.com/atrium-rs/atrium/blob/main/lexicon/atrium-lex/src/lib.rs
 
-use jacquard_common::{into_static::IntoStatic, smol_str::SmolStr, types::blob::MimeType, CowStr};
+use jacquard_common::{CowStr, into_static::IntoStatic, smol_str::SmolStr, types::blob::MimeType};
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use serde_with::skip_serializing_none;
@@ -407,6 +407,7 @@ pub enum LexUserType<'s> {
 // IntoStatic implementations for all lexicon types
 // These enable converting borrowed lexicon docs to owned 'static versions
 
+#[allow(unused)]
 macro_rules! impl_into_static_for_lex_struct {
     ($($ty:ident),+ $(,)?) => {
         $(

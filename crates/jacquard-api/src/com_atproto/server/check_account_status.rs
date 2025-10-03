@@ -1,0 +1,16 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct CheckAccountStatusOutput<'a> {
+    pub activated: bool,
+    pub expected_blobs: i64,
+    pub imported_blobs: i64,
+    pub indexed_records: i64,
+    pub private_state_values: i64,
+    pub repo_blocks: i64,
+    #[serde(borrow)]
+    pub repo_commit: jacquard_common::types::string::Cid<'a>,
+    #[serde(borrow)]
+    pub repo_rev: jacquard_common::CowStr<'a>,
+    pub valid_did: bool,
+}

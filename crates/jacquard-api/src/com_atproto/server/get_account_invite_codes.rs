@@ -1,0 +1,46 @@
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetAccountInviteCodesParams {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub create_available: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub include_used: std::option::Option<bool>,
+}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GetAccountInviteCodesOutput<'a> {
+    #[serde(borrow)]
+    pub codes: Vec<crate::com_atproto::server::InviteCode<'a>>,
+}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetAccountInviteCodesError<'a> {
+    #[serde(rename = "DuplicateCreate")]
+    DuplicateCreate(std::option::Option<String>),
+}
+impl std::fmt::Display for GetAccountInviteCodesError<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::DuplicateCreate(msg) => {
+                write!(f, "DuplicateCreate")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(_) => write!(f, "Unknown error"),
+        }
+    }
+}

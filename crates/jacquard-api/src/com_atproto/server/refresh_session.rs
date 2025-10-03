@@ -1,0 +1,52 @@
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RefreshSessionOutput<'a> {
+    #[serde(borrow)]
+    pub access_jwt: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub active: std::option::Option<bool>,
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub did_doc: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(borrow)]
+    pub handle: jacquard_common::types::string::Handle<'a>,
+    #[serde(borrow)]
+    pub refresh_jwt: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum RefreshSessionError<'a> {
+    #[serde(rename = "AccountTakedown")]
+    AccountTakedown(std::option::Option<String>),
+}
+impl std::fmt::Display for RefreshSessionError<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::AccountTakedown(msg) => {
+                write!(f, "AccountTakedown")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(_) => write!(f, "Unknown error"),
+        }
+    }
+}
