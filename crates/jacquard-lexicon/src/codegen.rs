@@ -1,10 +1,9 @@
 use crate::corpus::LexiconCorpus;
 use crate::error::{CodegenError, Result};
 use crate::lexicon::{
-    LexArrayItem, LexBlob, LexBoolean, LexBytes, LexCidLink, LexInteger, LexObject,
-    LexObjectProperty, LexRecord, LexRef, LexRefUnion, LexString, LexStringFormat, LexUnknown,
-    LexUserType, LexXrpcBody, LexXrpcBodySchema, LexXrpcError, LexXrpcParameters, LexXrpcProcedure,
-    LexXrpcQuery, LexXrpcSubscription, LexXrpcSubscriptionMessageSchema,
+    LexArrayItem, LexInteger, LexObject, LexObjectProperty, LexRecord, LexString, LexStringFormat,
+    LexUserType, LexXrpcBody, LexXrpcBodySchema, LexXrpcError, LexXrpcProcedure, LexXrpcQuery,
+    LexXrpcSubscription, LexXrpcSubscriptionMessageSchema,
 };
 use heck::{ToPascalCase, ToSnakeCase};
 use proc_macro2::TokenStream;
@@ -273,6 +272,21 @@ impl<'c> CodeGenerator<'c> {
             quote! { std::option::Option<#rust_type> }
         };
 
+        // Extract description from field type
+        let description = match field_type {
+            LexObjectProperty::Ref(r) => r.description.as_ref(),
+            LexObjectProperty::Union(u) => u.description.as_ref(),
+            LexObjectProperty::Bytes(b) => b.description.as_ref(),
+            LexObjectProperty::CidLink(c) => c.description.as_ref(),
+            LexObjectProperty::Array(a) => a.description.as_ref(),
+            LexObjectProperty::Blob(b) => b.description.as_ref(),
+            LexObjectProperty::Boolean(b) => b.description.as_ref(),
+            LexObjectProperty::Integer(i) => i.description.as_ref(),
+            LexObjectProperty::String(s) => s.description.as_ref(),
+            LexObjectProperty::Unknown(u) => u.description.as_ref(),
+        };
+        let doc = self.generate_doc_comment(description);
+
         let mut attrs = Vec::new();
 
         if !is_required {
@@ -285,6 +299,7 @@ impl<'c> CodeGenerator<'c> {
         }
 
         Ok(quote! {
+            #doc
             #(#attrs)*
             pub #field_ident: #rust_type,
         })
@@ -418,7 +433,15 @@ impl<'c> CodeGenerator<'c> {
                 let item_type = self.array_item_to_rust_type(nsid, &array.items)?;
                 Ok(quote! { Vec<#item_type> })
             }
-            LexObjectProperty::Ref(ref_type) => self.ref_to_rust_type(&ref_type.r#ref),
+            LexObjectProperty::Ref(ref_type) => {
+                // Handle local refs (starting with #) by prepending the current NSID
+                let ref_str = if ref_type.r#ref.starts_with('#') {
+                    format!("{}{}", nsid, ref_type.r#ref)
+                } else {
+                    ref_type.r#ref.to_string()
+                };
+                self.ref_to_rust_type(&ref_str)
+            }
             LexObjectProperty::Union(_union) => {
                 // Generate unique union type name: StatusView + embed -> StatusViewRecordEmbed
                 let union_name =
@@ -430,7 +453,7 @@ impl<'c> CodeGenerator<'c> {
     }
 
     /// Convert array item to Rust type
-    fn array_item_to_rust_type(&self, _nsid: &str, item: &LexArrayItem) -> Result<TokenStream> {
+    fn array_item_to_rust_type(&self, nsid: &str, item: &LexArrayItem) -> Result<TokenStream> {
         match item {
             LexArrayItem::Boolean(_) => Ok(quote! { bool }),
             LexArrayItem::Integer(_) => Ok(quote! { i64 }),
@@ -439,7 +462,15 @@ impl<'c> CodeGenerator<'c> {
             LexArrayItem::CidLink(_) => Ok(quote! { jacquard_common::types::cid::CidLink<'a> }),
             LexArrayItem::Blob(_) => Ok(quote! { jacquard_common::types::blob::Blob<'a> }),
             LexArrayItem::Unknown(_) => Ok(quote! { jacquard_common::types::value::Data<'a> }),
-            LexArrayItem::Ref(ref_type) => self.ref_to_rust_type(&ref_type.r#ref),
+            LexArrayItem::Ref(ref_type) => {
+                // Handle local refs (starting with #) by prepending the current NSID
+                let ref_str = if ref_type.r#ref.starts_with('#') {
+                    format!("{}{}", nsid, ref_type.r#ref)
+                } else {
+                    ref_type.r#ref.to_string()
+                };
+                self.ref_to_rust_type(&ref_str)
+            }
             LexArrayItem::Union(_) => {
                 // For now, use Data
                 Ok(quote! { jacquard_common::types::value::Data<'a> })
@@ -835,16 +866,21 @@ impl<'c> CodeGenerator<'c> {
     }
 
     /// Generate all code for the corpus, organized by file
+    /// Returns a map of file paths to (tokens, optional NSID)
     pub fn generate_all(
         &self,
-    ) -> Result<std::collections::BTreeMap<std::path::PathBuf, TokenStream>> {
+    ) -> Result<std::collections::BTreeMap<std::path::PathBuf, (TokenStream, Option<String>)>> {
         use std::collections::BTreeMap;
 
         let mut file_contents: BTreeMap<std::path::PathBuf, Vec<TokenStream>> = BTreeMap::new();
+        let mut file_nsids: BTreeMap<std::path::PathBuf, String> = BTreeMap::new();
 
         // Generate code for all lexicons
         for (nsid, doc) in self.corpus.iter() {
             let file_path = self.nsid_to_file_path(nsid.as_ref());
+
+            // Track which NSID this file is for
+            file_nsids.insert(file_path.clone(), nsid.to_string());
 
             for (def_name, def) in &doc.defs {
                 let tokens = self.generate_def(nsid.as_ref(), def_name.as_ref(), def)?;
@@ -858,7 +894,8 @@ impl<'c> CodeGenerator<'c> {
         // Combine all tokens for each file
         let mut result = BTreeMap::new();
         for (path, tokens_vec) in file_contents {
-            result.insert(path, quote! { #(#tokens_vec)* });
+            let nsid = file_nsids.get(&path).cloned();
+            result.insert(path, (quote! { #(#tokens_vec)* }, nsid));
         }
 
         Ok(result)
@@ -867,9 +904,9 @@ impl<'c> CodeGenerator<'c> {
     /// Generate parent module files with pub mod declarations
     pub fn generate_module_tree(
         &self,
-        file_map: &std::collections::BTreeMap<std::path::PathBuf, TokenStream>,
-        defs_only: &std::collections::BTreeMap<std::path::PathBuf, TokenStream>,
-    ) -> std::collections::BTreeMap<std::path::PathBuf, TokenStream> {
+        file_map: &std::collections::BTreeMap<std::path::PathBuf, (TokenStream, Option<String>)>,
+        defs_only: &std::collections::BTreeMap<std::path::PathBuf, (TokenStream, Option<String>)>,
+    ) -> std::collections::BTreeMap<std::path::PathBuf, (TokenStream, Option<String>)> {
         use std::collections::{BTreeMap, BTreeSet};
 
         // Track what modules each directory needs to declare
@@ -929,11 +966,14 @@ impl<'c> CodeGenerator<'c> {
 
             // If this file already exists in defs_only (e.g., from defs), merge the content
             let module_tokens = quote! { #(#mods)* };
-            if let Some(existing) = defs_only.get(&mod_file_path) {
-                // Combine existing defs content with module declarations
-                result.insert(mod_file_path, quote! { #existing #module_tokens });
+            if let Some((existing_tokens, nsid)) = defs_only.get(&mod_file_path) {
+                // Put module declarations FIRST, then existing defs content
+                result.insert(
+                    mod_file_path,
+                    (quote! { #module_tokens #existing_tokens }, nsid.clone()),
+                );
             } else {
-                result.insert(mod_file_path, module_tokens);
+                result.insert(mod_file_path, (module_tokens, None));
             }
         }
 
@@ -963,7 +1003,7 @@ impl<'c> CodeGenerator<'c> {
         }
 
         // Write to disk
-        for (path, tokens) in all_files {
+        for (path, (tokens, nsid)) in all_files {
             let full_path = output_dir.join(&path);
 
             // Create parent directories
@@ -982,7 +1022,41 @@ impl<'c> CodeGenerator<'c> {
                 ),
                 source: None,
             })?;
-            let formatted = prettyplease::unparse(&file);
+            let mut formatted = prettyplease::unparse(&file);
+
+            // Add blank lines between top-level items for better readability
+            let lines: Vec<&str> = formatted.lines().collect();
+            let mut result_lines = Vec::new();
+
+            for (i, line) in lines.iter().enumerate() {
+                result_lines.push(*line);
+
+                // Add blank line after closing braces that are at column 0 (top-level items)
+                if *line == "}" && i + 1 < lines.len() && !lines[i + 1].is_empty() {
+                    result_lines.push("");
+                }
+
+                // Add blank line after last pub mod declaration before structs/enums
+                if line.starts_with("pub mod ") && i + 1 < lines.len() {
+                    let next_line = lines[i + 1];
+                    if !next_line.starts_with("pub mod ") && !next_line.is_empty() {
+                        result_lines.push("");
+                    }
+                }
+            }
+
+            formatted = result_lines.join("\n");
+
+            // Add header comment
+            let header = if let Some(nsid) = nsid {
+                format!(
+                    "// @generated by jacquard-lexicon. DO NOT EDIT.\n//\n// Lexicon: {}\n//\n// This file was automatically generated from Lexicon schemas.\n// Any manual changes will be overwritten on the next regeneration.\n\n",
+                    nsid
+                )
+            } else {
+                "// @generated by jacquard-lexicon. DO NOT EDIT.\n//\n// This file was automatically generated from Lexicon schemas.\n// Any manual changes will be overwritten on the next regeneration.\n\n".to_string()
+            };
+            formatted = format!("{}{}", header, formatted);
 
             // Write file
             std::fs::write(&full_path, formatted).map_err(|e| CodegenError::Other {

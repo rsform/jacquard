@@ -11,7 +11,12 @@ documentation.workspace = true
 exclude.workspace = true
 description.workspace = true
 
+[[bin]]
+name = "jacquard-codegen"
+path = "src/bin/codegen.rs"
+
 [dependencies]
+clap = { workspace = true }
 heck = "0.5.0"
 itertools = "0.14.0"
 jacquard-common = { version = "0.1.0", path = "../jacquard-common" }

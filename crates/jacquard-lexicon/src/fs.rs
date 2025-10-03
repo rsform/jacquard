@@ -28,9 +28,3 @@ pub(crate) fn find_schemas(path: &Path) -> Result<Vec<impl AsRef<Path>>> {
     })?;
     Ok(results)
 }
-
-pub(crate) fn find_dirs(path: &Path) -> Result<Vec<impl AsRef<Path>>> {
-    let mut results = Vec::new();
-    walk(path, &mut results, &mut |path| path.is_dir())?;
-    Ok(results)
-}

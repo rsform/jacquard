@@ -1,144 +1,8 @@
-///Object used to store age assurance data in stash.
-#[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct AgeAssuranceEvent<'a> {
-    #[serde(borrow)]
-    pub attempt_id: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub complete_ip: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub complete_ua: std::option::Option<jacquard_common::CowStr<'a>>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub init_ip: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub init_ua: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub status: jacquard_common::CowStr<'a>,
-}
-///The computed state of the age assurance process, returned to the user in question on certain authenticated requests.
-#[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct AgeAssuranceState<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_initiated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(borrow)]
-    pub status: jacquard_common::CowStr<'a>,
-}
-#[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct SkeletonSearchActor<'a> {
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-}
-#[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct SkeletonSearchPost<'a> {
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-#[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct SkeletonSearchStarterPack<'a> {
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-#[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct SkeletonTrend<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub dids: Vec<jacquard_common::types::string::Did<'a>>,
-    #[serde(borrow)]
-    pub display_name: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub link: jacquard_common::CowStr<'a>,
-    pub post_count: i64,
-    pub started_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub topic: jacquard_common::CowStr<'a>,
-}
-#[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadItemBlocked<'a> {
-    #[serde(borrow)]
-    pub author: crate::app_bsky::feed::BlockedAuthor<'a>,
-}
-#[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadItemNoUnauthenticated<'a> {}
-#[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadItemNotFound<'a> {}
-#[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadItemPost<'a> {
-    pub hidden_by_threadgate: bool,
-    pub more_parents: bool,
-    pub more_replies: i64,
-    pub muted_by_viewer: bool,
-    pub op_thread: bool,
-    #[serde(borrow)]
-    pub post: crate::app_bsky::feed::PostView<'a>,
-}
-#[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct TrendView<'a> {
-    #[serde(borrow)]
-    pub actors: Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub display_name: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub link: jacquard_common::CowStr<'a>,
-    pub post_count: i64,
-    pub started_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub topic: jacquard_common::CowStr<'a>,
-}
-#[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct TrendingTopic<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub link: jacquard_common::CowStr<'a>,
-    #[serde(borrow)]
-    pub topic: jacquard_common::CowStr<'a>,
-}
+// @generated by jacquard-lexicon. DO NOT EDIT.
+//
+// This file was automatically generated from Lexicon schemas.
+// Any manual changes will be overwritten on the next regeneration.
+
 pub mod get_age_assurance_state;
 pub mod get_config;
 pub mod get_onboarding_suggested_starter_packs;
@@ -161,3 +25,169 @@ pub mod init_age_assurance;
 pub mod search_actors_skeleton;
 pub mod search_posts_skeleton;
 pub mod search_starter_packs_skeleton;
+
+///Object used to store age assurance data in stash.
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct AgeAssuranceEvent<'a> {
+    ///The unique identifier for this instance of the age assurance flow, in UUID format.
+    #[serde(borrow)]
+    pub attempt_id: jacquard_common::CowStr<'a>,
+    ///The IP address used when completing the AA flow.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub complete_ip: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The user agent used when completing the AA flow.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub complete_ua: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The date and time of this write operation.
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///The email used for AA.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The IP address used when initiating the AA flow.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub init_ip: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The user agent used when initiating the AA flow.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub init_ua: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The status of the age assurance process.
+    #[serde(borrow)]
+    pub status: jacquard_common::CowStr<'a>,
+}
+
+///The computed state of the age assurance process, returned to the user in question on certain authenticated requests.
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct AgeAssuranceState<'a> {
+    ///The timestamp when this state was last updated.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_initiated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///The status of the age assurance process.
+    #[serde(borrow)]
+    pub status: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct SkeletonSearchActor<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct SkeletonSearchPost<'a> {
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct SkeletonSearchStarterPack<'a> {
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct SkeletonTrend<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub dids: Vec<jacquard_common::types::string::Did<'a>>,
+    #[serde(borrow)]
+    pub display_name: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub link: jacquard_common::CowStr<'a>,
+    pub post_count: i64,
+    pub started_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub topic: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadItemBlocked<'a> {
+    #[serde(borrow)]
+    pub author: crate::app_bsky::feed::BlockedAuthor<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadItemNoUnauthenticated<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadItemNotFound<'a> {}
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadItemPost<'a> {
+    ///The threadgate created by the author indicates this post as a reply to be hidden for everyone consuming the thread.
+    pub hidden_by_threadgate: bool,
+    ///This post has more parents that were not present in the response. This is just a boolean, without the number of parents.
+    pub more_parents: bool,
+    ///This post has more replies that were not present in the response. This is a numeric value, which is best-effort and might not be accurate.
+    pub more_replies: i64,
+    ///This is by an account muted by the viewer requesting it.
+    pub muted_by_viewer: bool,
+    ///This post is part of a contiguous thread by the OP from the thread root. Many different OP threads can happen in the same thread.
+    pub op_thread: bool,
+    #[serde(borrow)]
+    pub post: crate::app_bsky::feed::PostView<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct TrendView<'a> {
+    #[serde(borrow)]
+    pub actors: Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub display_name: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub link: jacquard_common::CowStr<'a>,
+    pub post_count: i64,
+    pub started_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub topic: jacquard_common::CowStr<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct TrendingTopic<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub link: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub topic: jacquard_common::CowStr<'a>,
+}
