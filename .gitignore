@@ -5,3 +5,5 @@
 .claude
 /.pre-commit-config.yaml
 CLAUDE.md
+crates/jacquard-lexicon/tests/fixtures/lexicons/atproto
+crates/jacquard-lexicon/target
