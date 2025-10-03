@@ -14,6 +14,17 @@ pub struct Caption<'a> {
     pub lang: jacquard_common::types::string::Language,
 }
 
+impl jacquard_common::IntoStatic for Caption<'_> {
+    type Output = Caption<'static>;
+    fn into_static(self) -> Self::Output {
+        Caption {
+            file: self.file.into_static(),
+            lang: self.lang.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -33,6 +44,19 @@ pub struct Video<'a> {
     pub video: jacquard_common::types::blob::Blob<'a>,
 }
 
+impl jacquard_common::IntoStatic for Video<'_> {
+    type Output = Video<'static>;
+    fn into_static(self) -> Self::Output {
+        Video {
+            alt: self.alt.into_static(),
+            aspect_ratio: self.aspect_ratio.into_static(),
+            captions: self.captions.into_static(),
+            video: self.video.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -50,4 +74,18 @@ pub struct View<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub thumbnail: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+}
+
+impl jacquard_common::IntoStatic for View<'_> {
+    type Output = View<'static>;
+    fn into_static(self) -> Self::Output {
+        View {
+            alt: self.alt.into_static(),
+            aspect_ratio: self.aspect_ratio.into_static(),
+            cid: self.cid.into_static(),
+            playlist: self.playlist.into_static(),
+            thumbnail: self.thumbnail.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

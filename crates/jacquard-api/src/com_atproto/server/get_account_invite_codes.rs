@@ -5,13 +5,22 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountInviteCodes {
+    ///(default: true)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub create_available: std::option::Option<bool>,
+    ///(default: true)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub include_used: std::option::Option<bool>,
+}
+
+impl jacquard_common::IntoStatic for GetAccountInviteCodes {
+    type Output = GetAccountInviteCodes;
+    fn into_static(self) -> Self::Output {
+        self
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -20,6 +29,16 @@ pub struct GetAccountInviteCodes {
 pub struct GetAccountInviteCodesOutput<'a> {
     #[serde(borrow)]
     pub codes: Vec<crate::com_atproto::server::InviteCode<'a>>,
+}
+
+impl jacquard_common::IntoStatic for GetAccountInviteCodesOutput<'_> {
+    type Output = GetAccountInviteCodesOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetAccountInviteCodesOutput {
+            codes: self.codes.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -51,6 +70,20 @@ impl std::fmt::Display for GetAccountInviteCodesError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetAccountInviteCodesError<'_> {
+    type Output = GetAccountInviteCodesError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetAccountInviteCodesError::DuplicateCreate(v) => {
+                GetAccountInviteCodesError::DuplicateCreate(v.into_static())
+            }
+            GetAccountInviteCodesError::Unknown(v) => {
+                GetAccountInviteCodesError::Unknown(v.into_static())
+            }
         }
     }
 }

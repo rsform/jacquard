@@ -119,6 +119,14 @@ impl Deref for Language {
     }
 }
 
+impl crate::IntoStatic for Language {
+    type Output = Language;
+
+    fn into_static(self) -> Self::Output {
+        self
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

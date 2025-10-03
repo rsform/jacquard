@@ -13,6 +13,16 @@ pub struct RefreshIdentity<'a> {
     pub identifier: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+impl jacquard_common::IntoStatic for RefreshIdentity<'_> {
+    type Output = RefreshIdentity<'static>;
+    fn into_static(self) -> Self::Output {
+        RefreshIdentity {
+            identifier: self.identifier.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -20,6 +30,16 @@ pub struct RefreshIdentityOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
     pub value: crate::com_atproto::identity::IdentityInfo<'a>,
+}
+
+impl jacquard_common::IntoStatic for RefreshIdentityOutput<'_> {
+    type Output = RefreshIdentityOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        RefreshIdentityOutput {
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -72,6 +92,26 @@ impl std::fmt::Display for RefreshIdentityError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for RefreshIdentityError<'_> {
+    type Output = RefreshIdentityError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RefreshIdentityError::HandleNotFound(v) => {
+                RefreshIdentityError::HandleNotFound(v.into_static())
+            }
+            RefreshIdentityError::DidNotFound(v) => {
+                RefreshIdentityError::DidNotFound(v.into_static())
+            }
+            RefreshIdentityError::DidDeactivated(v) => {
+                RefreshIdentityError::DidDeactivated(v.into_static())
+            }
+            RefreshIdentityError::Unknown(v) => {
+                RefreshIdentityError::Unknown(v.into_static())
+            }
         }
     }
 }

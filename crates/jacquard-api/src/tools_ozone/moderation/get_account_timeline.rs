@@ -12,12 +12,31 @@ pub struct GetAccountTimeline<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetAccountTimeline<'_> {
+    type Output = GetAccountTimeline<'static>;
+    fn into_static(self) -> Self::Output {
+        GetAccountTimeline {
+            did: self.did.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountTimelineOutput<'a> {
     #[serde(borrow)]
     pub timeline: Vec<jacquard_common::types::value::Data<'a>>,
+}
+
+impl jacquard_common::IntoStatic for GetAccountTimelineOutput<'_> {
+    type Output = GetAccountTimelineOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetAccountTimelineOutput {
+            timeline: self.timeline.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -53,6 +72,20 @@ impl std::fmt::Display for GetAccountTimelineError<'_> {
     }
 }
 
+impl jacquard_common::IntoStatic for GetAccountTimelineError<'_> {
+    type Output = GetAccountTimelineError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetAccountTimelineError::RepoNotFound(v) => {
+                GetAccountTimelineError::RepoNotFound(v.into_static())
+            }
+            GetAccountTimelineError::Unknown(v) => {
+                GetAccountTimelineError::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetAccountTimeline<'_> {
     const NSID: &'static str = "tools.ozone.moderation.getAccountTimeline";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
@@ -73,6 +106,17 @@ pub struct TimelineItem<'a> {
     >,
 }
 
+impl jacquard_common::IntoStatic for TimelineItem<'_> {
+    type Output = TimelineItem<'static>;
+    fn into_static(self) -> Self::Output {
+        TimelineItem {
+            day: self.day.into_static(),
+            summary: self.summary.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -82,4 +126,16 @@ pub struct TimelineItemSummary<'a> {
     pub event_subject_type: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub event_type: jacquard_common::CowStr<'a>,
+}
+
+impl jacquard_common::IntoStatic for TimelineItemSummary<'_> {
+    type Output = TimelineItemSummary<'static>;
+    fn into_static(self) -> Self::Output {
+        TimelineItemSummary {
+            count: self.count.into_static(),
+            event_subject_type: self.event_subject_type.into_static(),
+            event_type: self.event_type.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

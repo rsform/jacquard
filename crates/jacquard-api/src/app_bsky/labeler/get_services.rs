@@ -5,20 +5,22 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetServices<'a> {
+    ///(default: false)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub detailed: std::option::Option<bool>,
     #[serde(borrow)]
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
-impl Default for GetServices<'_> {
-    fn default() -> Self {
-        Self {
-            detailed: Some(false),
-            dids: Default::default(),
+impl jacquard_common::IntoStatic for GetServices<'_> {
+    type Output = GetServices<'static>;
+    fn into_static(self) -> Self::Output {
+        GetServices {
+            detailed: self.detailed.into_static(),
+            dids: self.dids.into_static(),
         }
     }
 }
@@ -31,10 +33,20 @@ pub struct GetServicesOutput<'a> {
     pub views: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetServicesOutput<'_> {
+    type Output = GetServicesOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetServicesOutput {
+            views: self.views.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetServices<'_> {
     const NSID: &'static str = "app.bsky.labeler.getServices";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetServicesOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

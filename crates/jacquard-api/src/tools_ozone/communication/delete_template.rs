@@ -13,6 +13,16 @@ pub struct DeleteTemplate<'a> {
     pub id: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for DeleteTemplate<'_> {
+    type Output = DeleteTemplate<'static>;
+    fn into_static(self) -> Self::Output {
+        DeleteTemplate {
+            id: self.id.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for DeleteTemplate<'_> {
     const NSID: &'static str = "tools.ozone.communication.deleteTemplate";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -20,5 +30,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for DeleteTemplate<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -219,6 +219,14 @@ impl From<Tid> for SmolStr {
     }
 }
 
+impl crate::IntoStatic for Tid {
+    type Output = Tid;
+
+    fn into_static(self) -> Self::Output {
+        self
+    }
+}
+
 impl From<String> for Tid {
     fn from(value: String) -> Self {
         if value.len() != 13 {

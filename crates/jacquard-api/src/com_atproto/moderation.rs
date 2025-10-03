@@ -584,6 +584,171 @@ where
     }
 }
 
+impl jacquard_common::IntoStatic for ReasonType<'_> {
+    type Output = ReasonType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ReasonType::ComAtprotoModerationDefsReasonSpam => {
+                ReasonType::ComAtprotoModerationDefsReasonSpam
+            }
+            ReasonType::ComAtprotoModerationDefsReasonViolation => {
+                ReasonType::ComAtprotoModerationDefsReasonViolation
+            }
+            ReasonType::ComAtprotoModerationDefsReasonMisleading => {
+                ReasonType::ComAtprotoModerationDefsReasonMisleading
+            }
+            ReasonType::ComAtprotoModerationDefsReasonSexual => {
+                ReasonType::ComAtprotoModerationDefsReasonSexual
+            }
+            ReasonType::ComAtprotoModerationDefsReasonRude => {
+                ReasonType::ComAtprotoModerationDefsReasonRude
+            }
+            ReasonType::ComAtprotoModerationDefsReasonOther => {
+                ReasonType::ComAtprotoModerationDefsReasonOther
+            }
+            ReasonType::ComAtprotoModerationDefsReasonAppeal => {
+                ReasonType::ComAtprotoModerationDefsReasonAppeal
+            }
+            ReasonType::ToolsOzoneReportDefsReasonAppeal => {
+                ReasonType::ToolsOzoneReportDefsReasonAppeal
+            }
+            ReasonType::ToolsOzoneReportDefsReasonViolenceAnimalWelfare => {
+                ReasonType::ToolsOzoneReportDefsReasonViolenceAnimalWelfare
+            }
+            ReasonType::ToolsOzoneReportDefsReasonViolenceThreats => {
+                ReasonType::ToolsOzoneReportDefsReasonViolenceThreats
+            }
+            ReasonType::ToolsOzoneReportDefsReasonViolenceGraphicContent => {
+                ReasonType::ToolsOzoneReportDefsReasonViolenceGraphicContent
+            }
+            ReasonType::ToolsOzoneReportDefsReasonViolenceSelfHarm => {
+                ReasonType::ToolsOzoneReportDefsReasonViolenceSelfHarm
+            }
+            ReasonType::ToolsOzoneReportDefsReasonViolenceGlorification => {
+                ReasonType::ToolsOzoneReportDefsReasonViolenceGlorification
+            }
+            ReasonType::ToolsOzoneReportDefsReasonViolenceExtremistContent => {
+                ReasonType::ToolsOzoneReportDefsReasonViolenceExtremistContent
+            }
+            ReasonType::ToolsOzoneReportDefsReasonViolenceTrafficking => {
+                ReasonType::ToolsOzoneReportDefsReasonViolenceTrafficking
+            }
+            ReasonType::ToolsOzoneReportDefsReasonViolenceOther => {
+                ReasonType::ToolsOzoneReportDefsReasonViolenceOther
+            }
+            ReasonType::ToolsOzoneReportDefsReasonSexualAbuseContent => {
+                ReasonType::ToolsOzoneReportDefsReasonSexualAbuseContent
+            }
+            ReasonType::ToolsOzoneReportDefsReasonSexualNcii => {
+                ReasonType::ToolsOzoneReportDefsReasonSexualNcii
+            }
+            ReasonType::ToolsOzoneReportDefsReasonSexualSextortion => {
+                ReasonType::ToolsOzoneReportDefsReasonSexualSextortion
+            }
+            ReasonType::ToolsOzoneReportDefsReasonSexualDeepfake => {
+                ReasonType::ToolsOzoneReportDefsReasonSexualDeepfake
+            }
+            ReasonType::ToolsOzoneReportDefsReasonSexualAnimal => {
+                ReasonType::ToolsOzoneReportDefsReasonSexualAnimal
+            }
+            ReasonType::ToolsOzoneReportDefsReasonSexualUnlabeled => {
+                ReasonType::ToolsOzoneReportDefsReasonSexualUnlabeled
+            }
+            ReasonType::ToolsOzoneReportDefsReasonSexualOther => {
+                ReasonType::ToolsOzoneReportDefsReasonSexualOther
+            }
+            ReasonType::ToolsOzoneReportDefsReasonChildSafetyCsam => {
+                ReasonType::ToolsOzoneReportDefsReasonChildSafetyCsam
+            }
+            ReasonType::ToolsOzoneReportDefsReasonChildSafetyGroom => {
+                ReasonType::ToolsOzoneReportDefsReasonChildSafetyGroom
+            }
+            ReasonType::ToolsOzoneReportDefsReasonChildSafetyMinorPrivacy => {
+                ReasonType::ToolsOzoneReportDefsReasonChildSafetyMinorPrivacy
+            }
+            ReasonType::ToolsOzoneReportDefsReasonChildSafetyEndangerment => {
+                ReasonType::ToolsOzoneReportDefsReasonChildSafetyEndangerment
+            }
+            ReasonType::ToolsOzoneReportDefsReasonChildSafetyHarassment => {
+                ReasonType::ToolsOzoneReportDefsReasonChildSafetyHarassment
+            }
+            ReasonType::ToolsOzoneReportDefsReasonChildSafetyPromotion => {
+                ReasonType::ToolsOzoneReportDefsReasonChildSafetyPromotion
+            }
+            ReasonType::ToolsOzoneReportDefsReasonChildSafetyOther => {
+                ReasonType::ToolsOzoneReportDefsReasonChildSafetyOther
+            }
+            ReasonType::ToolsOzoneReportDefsReasonHarassmentTroll => {
+                ReasonType::ToolsOzoneReportDefsReasonHarassmentTroll
+            }
+            ReasonType::ToolsOzoneReportDefsReasonHarassmentTargeted => {
+                ReasonType::ToolsOzoneReportDefsReasonHarassmentTargeted
+            }
+            ReasonType::ToolsOzoneReportDefsReasonHarassmentHateSpeech => {
+                ReasonType::ToolsOzoneReportDefsReasonHarassmentHateSpeech
+            }
+            ReasonType::ToolsOzoneReportDefsReasonHarassmentDoxxing => {
+                ReasonType::ToolsOzoneReportDefsReasonHarassmentDoxxing
+            }
+            ReasonType::ToolsOzoneReportDefsReasonHarassmentOther => {
+                ReasonType::ToolsOzoneReportDefsReasonHarassmentOther
+            }
+            ReasonType::ToolsOzoneReportDefsReasonMisleadingBot => {
+                ReasonType::ToolsOzoneReportDefsReasonMisleadingBot
+            }
+            ReasonType::ToolsOzoneReportDefsReasonMisleadingImpersonation => {
+                ReasonType::ToolsOzoneReportDefsReasonMisleadingImpersonation
+            }
+            ReasonType::ToolsOzoneReportDefsReasonMisleadingSpam => {
+                ReasonType::ToolsOzoneReportDefsReasonMisleadingSpam
+            }
+            ReasonType::ToolsOzoneReportDefsReasonMisleadingScam => {
+                ReasonType::ToolsOzoneReportDefsReasonMisleadingScam
+            }
+            ReasonType::ToolsOzoneReportDefsReasonMisleadingSyntheticContent => {
+                ReasonType::ToolsOzoneReportDefsReasonMisleadingSyntheticContent
+            }
+            ReasonType::ToolsOzoneReportDefsReasonMisleadingMisinformation => {
+                ReasonType::ToolsOzoneReportDefsReasonMisleadingMisinformation
+            }
+            ReasonType::ToolsOzoneReportDefsReasonMisleadingOther => {
+                ReasonType::ToolsOzoneReportDefsReasonMisleadingOther
+            }
+            ReasonType::ToolsOzoneReportDefsReasonRuleSiteSecurity => {
+                ReasonType::ToolsOzoneReportDefsReasonRuleSiteSecurity
+            }
+            ReasonType::ToolsOzoneReportDefsReasonRuleStolenContent => {
+                ReasonType::ToolsOzoneReportDefsReasonRuleStolenContent
+            }
+            ReasonType::ToolsOzoneReportDefsReasonRuleProhibitedSales => {
+                ReasonType::ToolsOzoneReportDefsReasonRuleProhibitedSales
+            }
+            ReasonType::ToolsOzoneReportDefsReasonRuleBanEvasion => {
+                ReasonType::ToolsOzoneReportDefsReasonRuleBanEvasion
+            }
+            ReasonType::ToolsOzoneReportDefsReasonRuleOther => {
+                ReasonType::ToolsOzoneReportDefsReasonRuleOther
+            }
+            ReasonType::ToolsOzoneReportDefsReasonCivicElectoralProcess => {
+                ReasonType::ToolsOzoneReportDefsReasonCivicElectoralProcess
+            }
+            ReasonType::ToolsOzoneReportDefsReasonCivicDisclosure => {
+                ReasonType::ToolsOzoneReportDefsReasonCivicDisclosure
+            }
+            ReasonType::ToolsOzoneReportDefsReasonCivicInterference => {
+                ReasonType::ToolsOzoneReportDefsReasonCivicInterference
+            }
+            ReasonType::ToolsOzoneReportDefsReasonCivicMisinformation => {
+                ReasonType::ToolsOzoneReportDefsReasonCivicMisinformation
+            }
+            ReasonType::ToolsOzoneReportDefsReasonCivicImpersonation => {
+                ReasonType::ToolsOzoneReportDefsReasonCivicImpersonation
+            }
+            ReasonType::Other(v) => ReasonType::Other(v.into_static()),
+        }
+    }
+}
+
 ///Tag describing a type of subject that might be reported.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SubjectType<'a> {
@@ -651,5 +816,17 @@ where
     {
         let s = <&'de str>::deserialize(deserializer)?;
         Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for SubjectType<'_> {
+    type Output = SubjectType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SubjectType::Account => SubjectType::Account,
+            SubjectType::Record => SubjectType::Record,
+            SubjectType::Chat => SubjectType::Chat,
+            SubjectType::Other(v) => SubjectType::Other(v.into_static()),
+        }
     }
 }

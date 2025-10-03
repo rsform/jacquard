@@ -12,6 +12,15 @@ pub struct GetRecords<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetRecords<'_> {
+    type Output = GetRecords<'static>;
+    fn into_static(self) -> Self::Output {
+        GetRecords {
+            uris: self.uris.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -20,10 +29,20 @@ pub struct GetRecordsOutput<'a> {
     pub records: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetRecordsOutput<'_> {
+    type Output = GetRecordsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetRecordsOutput {
+            records: self.records.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetRecords<'_> {
     const NSID: &'static str = "tools.ozone.moderation.getRecords";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetRecordsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

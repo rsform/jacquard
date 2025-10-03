@@ -15,6 +15,16 @@ pub struct ListTemplatesOutput<'a> {
     >,
 }
 
+impl jacquard_common::IntoStatic for ListTemplatesOutput<'_> {
+    type Output = ListTemplatesOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        ListTemplatesOutput {
+            communication_templates: self.communication_templates.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct ListTemplates;
@@ -23,5 +33,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for ListTemplates {
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ListTemplatesOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

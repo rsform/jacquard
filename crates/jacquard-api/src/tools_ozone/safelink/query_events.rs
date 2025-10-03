@@ -30,6 +30,20 @@ pub struct QueryEvents<'a> {
     pub urls: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
+impl jacquard_common::IntoStatic for QueryEvents<'_> {
+    type Output = QueryEvents<'static>;
+    fn into_static(self) -> Self::Output {
+        QueryEvents {
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
+            pattern_type: self.pattern_type.into_static(),
+            sort_direction: self.sort_direction.into_static(),
+            urls: self.urls.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -42,6 +56,17 @@ pub struct QueryEventsOutput<'a> {
     pub events: Vec<crate::tools_ozone::safelink::Event<'a>>,
 }
 
+impl jacquard_common::IntoStatic for QueryEventsOutput<'_> {
+    type Output = QueryEventsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        QueryEventsOutput {
+            cursor: self.cursor.into_static(),
+            events: self.events.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for QueryEvents<'_> {
     const NSID: &'static str = "tools.ozone.safelink.queryEvents";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -49,5 +74,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for QueryEvents<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = QueryEventsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

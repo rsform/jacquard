@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ListReposByCollection<'a> {
     #[serde(borrow)]
@@ -13,16 +13,18 @@ pub struct ListReposByCollection<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 500, min: 1, max: 2000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
-impl Default for ListReposByCollection<'_> {
-    fn default() -> Self {
-        Self {
-            collection: Default::default(),
-            cursor: Default::default(),
-            limit: Some(500i64),
+impl jacquard_common::IntoStatic for ListReposByCollection<'_> {
+    type Output = ListReposByCollection<'static>;
+    fn into_static(self) -> Self::Output {
+        ListReposByCollection {
+            collection: self.collection.into_static(),
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
         }
     }
 }
@@ -38,12 +40,23 @@ pub struct ListReposByCollectionOutput<'a> {
     pub repos: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
+impl jacquard_common::IntoStatic for ListReposByCollectionOutput<'_> {
+    type Output = ListReposByCollectionOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        ListReposByCollectionOutput {
+            cursor: self.cursor.into_static(),
+            repos: self.repos.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for ListReposByCollection<'_> {
     const NSID: &'static str = "com.atproto.sync.listReposByCollection";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ListReposByCollectionOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]
@@ -52,4 +65,14 @@ impl jacquard_common::types::xrpc::XrpcRequest for ListReposByCollection<'_> {
 pub struct Repo<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
+}
+
+impl jacquard_common::IntoStatic for Repo<'_> {
+    type Output = Repo<'static>;
+    fn into_static(self) -> Self::Output {
+        Repo {
+            did: self.did.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

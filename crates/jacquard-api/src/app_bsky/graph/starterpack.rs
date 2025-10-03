@@ -13,6 +13,16 @@ pub struct FeedItem<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+impl jacquard_common::IntoStatic for FeedItem<'_> {
+    type Output = FeedItem<'static>;
+    fn into_static(self) -> Self::Output {
+        FeedItem {
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 ///Record defining a starter pack of actors and feeds for new users.
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -42,4 +52,19 @@ pub struct Starterpack<'a> {
 
 impl jacquard_common::types::collection::Collection for Starterpack<'_> {
     const NSID: &'static str = "app.bsky.graph.starterpack";
+}
+
+impl jacquard_common::IntoStatic for Starterpack<'_> {
+    type Output = Starterpack<'static>;
+    fn into_static(self) -> Self::Output {
+        Starterpack {
+            created_at: self.created_at.into_static(),
+            description: self.description.into_static(),
+            description_facets: self.description_facets.into_static(),
+            feeds: self.feeds.into_static(),
+            list: self.list.into_static(),
+            name: self.name.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

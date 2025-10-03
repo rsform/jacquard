@@ -1,7 +1,9 @@
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt::{self, Debug};
 
+use crate::IntoStatic;
 use crate::types::value::Data;
 
 /// XRPC method type
@@ -47,20 +49,28 @@ pub trait XrpcRequest: Serialize {
     const OUTPUT_ENCODING: &'static str;
 
     /// Response output type
-    type Output<'de>: Deserialize<'de>;
+    type Output<'de>: Deserialize<'de> + IntoStatic;
 
     /// Error type for this request
-    type Err<'de>: Error;
+    type Err<'de>: Error + Deserialize<'de> + IntoStatic;
 }
 
 /// Error type for XRPC endpoints that don't define any errors
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GenericError(Data<'static>);
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub struct GenericError<'a>(Data<'a>);
 
-impl fmt::Display for GenericError {
+impl fmt::Display for GenericError<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
     }
 }
 
-impl Error for GenericError {}
+impl Error for GenericError<'_> {}
+
+impl IntoStatic for GenericError<'_> {
+    type Output = GenericError<'static>;
+    fn into_static(self) -> Self::Output {
+        GenericError(self.0.into_static())
+    }
+}

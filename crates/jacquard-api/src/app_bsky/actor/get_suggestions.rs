@@ -5,21 +5,23 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestions<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
-impl Default for GetSuggestions<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            limit: Some(50i64),
+impl jacquard_common::IntoStatic for GetSuggestions<'_> {
+    type Output = GetSuggestions<'static>;
+    fn into_static(self) -> Self::Output {
+        GetSuggestions {
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
         }
     }
 }
@@ -38,10 +40,22 @@ pub struct GetSuggestionsOutput<'a> {
     pub rec_id: std::option::Option<i64>,
 }
 
+impl jacquard_common::IntoStatic for GetSuggestionsOutput<'_> {
+    type Output = GetSuggestionsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetSuggestionsOutput {
+            actors: self.actors.into_static(),
+            cursor: self.cursor.into_static(),
+            rec_id: self.rec_id.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetSuggestions<'_> {
     const NSID: &'static str = "app.bsky.actor.getSuggestions";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetSuggestionsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

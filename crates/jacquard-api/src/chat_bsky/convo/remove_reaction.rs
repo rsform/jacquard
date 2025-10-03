@@ -17,12 +17,34 @@ pub struct RemoveReaction<'a> {
     pub value: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for RemoveReaction<'_> {
+    type Output = RemoveReaction<'static>;
+    fn into_static(self) -> Self::Output {
+        RemoveReaction {
+            convo_id: self.convo_id.into_static(),
+            message_id: self.message_id.into_static(),
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveReactionOutput<'a> {
     #[serde(borrow)]
     pub message: crate::chat_bsky::convo::MessageView<'a>,
+}
+
+impl jacquard_common::IntoStatic for RemoveReactionOutput<'_> {
+    type Output = RemoveReactionOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        RemoveReactionOutput {
+            message: self.message.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -65,6 +87,23 @@ impl std::fmt::Display for RemoveReactionError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for RemoveReactionError<'_> {
+    type Output = RemoveReactionError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RemoveReactionError::ReactionMessageDeleted(v) => {
+                RemoveReactionError::ReactionMessageDeleted(v.into_static())
+            }
+            RemoveReactionError::ReactionInvalidValue(v) => {
+                RemoveReactionError::ReactionInvalidValue(v.into_static())
+            }
+            RemoveReactionError::Unknown(v) => {
+                RemoveReactionError::Unknown(v.into_static())
+            }
         }
     }
 }

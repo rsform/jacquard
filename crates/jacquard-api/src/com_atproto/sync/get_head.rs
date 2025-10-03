@@ -12,12 +12,31 @@ pub struct GetHead<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetHead<'_> {
+    type Output = GetHead<'static>;
+    fn into_static(self) -> Self::Output {
+        GetHead {
+            did: self.did.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHeadOutput<'a> {
     #[serde(borrow)]
     pub root: jacquard_common::types::string::Cid<'a>,
+}
+
+impl jacquard_common::IntoStatic for GetHeadOutput<'_> {
+    type Output = GetHeadOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetHeadOutput {
+            root: self.root.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -49,6 +68,16 @@ impl std::fmt::Display for GetHeadError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetHeadError<'_> {
+    type Output = GetHeadError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetHeadError::HeadNotFound(v) => GetHeadError::HeadNotFound(v.into_static()),
+            GetHeadError::Unknown(v) => GetHeadError::Unknown(v.into_static()),
         }
     }
 }

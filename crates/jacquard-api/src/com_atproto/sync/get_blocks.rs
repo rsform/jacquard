@@ -14,10 +14,29 @@ pub struct GetBlocks<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetBlocks<'_> {
+    type Output = GetBlocks<'static>;
+    fn into_static(self) -> Self::Output {
+        GetBlocks {
+            cids: self.cids.into_static(),
+            did: self.did.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlocksOutput<'a> {}
+impl jacquard_common::IntoStatic for GetBlocksOutput<'_> {
+    type Output = GetBlocksOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetBlocksOutput {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -83,6 +102,30 @@ impl std::fmt::Display for GetBlocksError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetBlocksError<'_> {
+    type Output = GetBlocksError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetBlocksError::BlockNotFound(v) => {
+                GetBlocksError::BlockNotFound(v.into_static())
+            }
+            GetBlocksError::RepoNotFound(v) => {
+                GetBlocksError::RepoNotFound(v.into_static())
+            }
+            GetBlocksError::RepoTakendown(v) => {
+                GetBlocksError::RepoTakendown(v.into_static())
+            }
+            GetBlocksError::RepoSuspended(v) => {
+                GetBlocksError::RepoSuspended(v.into_static())
+            }
+            GetBlocksError::RepoDeactivated(v) => {
+                GetBlocksError::RepoDeactivated(v.into_static())
+            }
+            GetBlocksError::Unknown(v) => GetBlocksError::Unknown(v.into_static()),
         }
     }
 }

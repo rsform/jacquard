@@ -16,6 +16,18 @@ pub struct CheckSignupQueueOutput<'a> {
     pub place_in_queue: std::option::Option<i64>,
 }
 
+impl jacquard_common::IntoStatic for CheckSignupQueueOutput<'_> {
+    type Output = CheckSignupQueueOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        CheckSignupQueueOutput {
+            activated: self.activated.into_static(),
+            estimated_time_ms: self.estimated_time_ms.into_static(),
+            place_in_queue: self.place_in_queue.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct CheckSignupQueue;
@@ -24,5 +36,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for CheckSignupQueue {
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = CheckSignupQueueOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

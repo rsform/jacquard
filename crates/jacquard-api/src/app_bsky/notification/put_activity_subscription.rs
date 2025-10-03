@@ -15,6 +15,17 @@ pub struct PutActivitySubscription<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for PutActivitySubscription<'_> {
+    type Output = PutActivitySubscription<'static>;
+    fn into_static(self) -> Self::Output {
+        PutActivitySubscription {
+            activity_subscription: self.activity_subscription.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -28,6 +39,17 @@ pub struct PutActivitySubscriptionOutput<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for PutActivitySubscriptionOutput<'_> {
+    type Output = PutActivitySubscriptionOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        PutActivitySubscriptionOutput {
+            activity_subscription: self.activity_subscription.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for PutActivitySubscription<'_> {
     const NSID: &'static str = "app.bsky.notification.putActivitySubscription";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -35,5 +57,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for PutActivitySubscription<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = PutActivitySubscriptionOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

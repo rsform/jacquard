@@ -63,6 +63,23 @@ pub struct AgeAssuranceEvent<'a> {
     pub status: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for AgeAssuranceEvent<'_> {
+    type Output = AgeAssuranceEvent<'static>;
+    fn into_static(self) -> Self::Output {
+        AgeAssuranceEvent {
+            attempt_id: self.attempt_id.into_static(),
+            complete_ip: self.complete_ip.into_static(),
+            complete_ua: self.complete_ua.into_static(),
+            created_at: self.created_at.into_static(),
+            email: self.email.into_static(),
+            init_ip: self.init_ip.into_static(),
+            init_ua: self.init_ua.into_static(),
+            status: self.status.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 ///The computed state of the age assurance process, returned to the user in question on certain authenticated requests.
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -76,12 +93,33 @@ pub struct AgeAssuranceState<'a> {
     pub status: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for AgeAssuranceState<'_> {
+    type Output = AgeAssuranceState<'static>;
+    fn into_static(self) -> Self::Output {
+        AgeAssuranceState {
+            last_initiated_at: self.last_initiated_at.into_static(),
+            status: self.status.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonSearchActor<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
+}
+
+impl jacquard_common::IntoStatic for SkeletonSearchActor<'_> {
+    type Output = SkeletonSearchActor<'static>;
+    fn into_static(self) -> Self::Output {
+        SkeletonSearchActor {
+            did: self.did.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -92,12 +130,32 @@ pub struct SkeletonSearchPost<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+impl jacquard_common::IntoStatic for SkeletonSearchPost<'_> {
+    type Output = SkeletonSearchPost<'static>;
+    fn into_static(self) -> Self::Output {
+        SkeletonSearchPost {
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonSearchStarterPack<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+impl jacquard_common::IntoStatic for SkeletonSearchStarterPack<'_> {
+    type Output = SkeletonSearchStarterPack<'static>;
+    fn into_static(self) -> Self::Output {
+        SkeletonSearchStarterPack {
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -122,6 +180,23 @@ pub struct SkeletonTrend<'a> {
     pub topic: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for SkeletonTrend<'_> {
+    type Output = SkeletonTrend<'static>;
+    fn into_static(self) -> Self::Output {
+        SkeletonTrend {
+            category: self.category.into_static(),
+            dids: self.dids.into_static(),
+            display_name: self.display_name.into_static(),
+            link: self.link.into_static(),
+            post_count: self.post_count.into_static(),
+            started_at: self.started_at.into_static(),
+            status: self.status.into_static(),
+            topic: self.topic.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -130,14 +205,42 @@ pub struct ThreadItemBlocked<'a> {
     pub author: crate::app_bsky::feed::BlockedAuthor<'a>,
 }
 
+impl jacquard_common::IntoStatic for ThreadItemBlocked<'_> {
+    type Output = ThreadItemBlocked<'static>;
+    fn into_static(self) -> Self::Output {
+        ThreadItemBlocked {
+            author: self.author.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItemNoUnauthenticated<'a> {}
+impl jacquard_common::IntoStatic for ThreadItemNoUnauthenticated<'_> {
+    type Output = ThreadItemNoUnauthenticated<'static>;
+    fn into_static(self) -> Self::Output {
+        ThreadItemNoUnauthenticated {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItemNotFound<'a> {}
+impl jacquard_common::IntoStatic for ThreadItemNotFound<'_> {
+    type Output = ThreadItemNotFound<'static>;
+    fn into_static(self) -> Self::Output {
+        ThreadItemNotFound {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -154,6 +257,21 @@ pub struct ThreadItemPost<'a> {
     pub op_thread: bool,
     #[serde(borrow)]
     pub post: crate::app_bsky::feed::PostView<'a>,
+}
+
+impl jacquard_common::IntoStatic for ThreadItemPost<'_> {
+    type Output = ThreadItemPost<'static>;
+    fn into_static(self) -> Self::Output {
+        ThreadItemPost {
+            hidden_by_threadgate: self.hidden_by_threadgate.into_static(),
+            more_parents: self.more_parents.into_static(),
+            more_replies: self.more_replies.into_static(),
+            muted_by_viewer: self.muted_by_viewer.into_static(),
+            op_thread: self.op_thread.into_static(),
+            post: self.post.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -178,6 +296,23 @@ pub struct TrendView<'a> {
     pub topic: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for TrendView<'_> {
+    type Output = TrendView<'static>;
+    fn into_static(self) -> Self::Output {
+        TrendView {
+            actors: self.actors.into_static(),
+            category: self.category.into_static(),
+            display_name: self.display_name.into_static(),
+            link: self.link.into_static(),
+            post_count: self.post_count.into_static(),
+            started_at: self.started_at.into_static(),
+            status: self.status.into_static(),
+            topic: self.topic.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -192,4 +327,17 @@ pub struct TrendingTopic<'a> {
     pub link: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub topic: jacquard_common::CowStr<'a>,
+}
+
+impl jacquard_common::IntoStatic for TrendingTopic<'_> {
+    type Output = TrendingTopic<'static>;
+    fn into_static(self) -> Self::Output {
+        TrendingTopic {
+            description: self.description.into_static(),
+            display_name: self.display_name.into_static(),
+            link: self.link.into_static(),
+            topic: self.topic.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

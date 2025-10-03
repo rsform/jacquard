@@ -42,6 +42,24 @@ pub struct CreateAccount<'a> {
     pub verification_phone: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for CreateAccount<'_> {
+    type Output = CreateAccount<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateAccount {
+            did: self.did.into_static(),
+            email: self.email.into_static(),
+            handle: self.handle.into_static(),
+            invite_code: self.invite_code.into_static(),
+            password: self.password.into_static(),
+            plc_op: self.plc_op.into_static(),
+            recovery_key: self.recovery_key.into_static(),
+            verification_code: self.verification_code.into_static(),
+            verification_phone: self.verification_phone.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -59,6 +77,20 @@ pub struct CreateAccountOutput<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(borrow)]
     pub refresh_jwt: jacquard_common::CowStr<'a>,
+}
+
+impl jacquard_common::IntoStatic for CreateAccountOutput<'_> {
+    type Output = CreateAccountOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateAccountOutput {
+            access_jwt: self.access_jwt.into_static(),
+            did: self.did.into_static(),
+            did_doc: self.did_doc.into_static(),
+            handle: self.handle.into_static(),
+            refresh_jwt: self.refresh_jwt.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -144,6 +176,38 @@ impl std::fmt::Display for CreateAccountError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for CreateAccountError<'_> {
+    type Output = CreateAccountError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CreateAccountError::InvalidHandle(v) => {
+                CreateAccountError::InvalidHandle(v.into_static())
+            }
+            CreateAccountError::InvalidPassword(v) => {
+                CreateAccountError::InvalidPassword(v.into_static())
+            }
+            CreateAccountError::InvalidInviteCode(v) => {
+                CreateAccountError::InvalidInviteCode(v.into_static())
+            }
+            CreateAccountError::HandleNotAvailable(v) => {
+                CreateAccountError::HandleNotAvailable(v.into_static())
+            }
+            CreateAccountError::UnsupportedDomain(v) => {
+                CreateAccountError::UnsupportedDomain(v.into_static())
+            }
+            CreateAccountError::UnresolvableDid(v) => {
+                CreateAccountError::UnresolvableDid(v.into_static())
+            }
+            CreateAccountError::IncompatibleDidDoc(v) => {
+                CreateAccountError::IncompatibleDidDoc(v.into_static())
+            }
+            CreateAccountError::Unknown(v) => {
+                CreateAccountError::Unknown(v.into_static())
+            }
         }
     }
 }

@@ -17,6 +17,17 @@ pub struct CheckHandleAvailability<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
+impl jacquard_common::IntoStatic for CheckHandleAvailability<'_> {
+    type Output = CheckHandleAvailability<'static>;
+    fn into_static(self) -> Self::Output {
+        CheckHandleAvailability {
+            birth_date: self.birth_date.into_static(),
+            email: self.email.into_static(),
+            handle: self.handle.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -33,6 +44,28 @@ pub struct CheckHandleAvailabilityOutput<'a> {
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CheckHandleAvailabilityOutputRecordResult<'a> {}
+impl jacquard_common::IntoStatic for CheckHandleAvailabilityOutputRecordResult<'_> {
+    type Output = CheckHandleAvailabilityOutputRecordResult<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CheckHandleAvailabilityOutputRecordResult::Unknown(v) => {
+                CheckHandleAvailabilityOutputRecordResult::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for CheckHandleAvailabilityOutput<'_> {
+    type Output = CheckHandleAvailabilityOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        CheckHandleAvailabilityOutput {
+            handle: self.handle.into_static(),
+            result: self.result.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -67,6 +100,20 @@ impl std::fmt::Display for CheckHandleAvailabilityError<'_> {
     }
 }
 
+impl jacquard_common::IntoStatic for CheckHandleAvailabilityError<'_> {
+    type Output = CheckHandleAvailabilityError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CheckHandleAvailabilityError::InvalidEmail(v) => {
+                CheckHandleAvailabilityError::InvalidEmail(v.into_static())
+            }
+            CheckHandleAvailabilityError::Unknown(v) => {
+                CheckHandleAvailabilityError::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for CheckHandleAvailability<'_> {
     const NSID: &'static str = "com.atproto.temp.checkHandleAvailability";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
@@ -80,6 +127,15 @@ impl jacquard_common::types::xrpc::XrpcRequest for CheckHandleAvailability<'_> {
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ResultAvailable<'a> {}
+impl jacquard_common::IntoStatic for ResultAvailable<'_> {
+    type Output = ResultAvailable<'static>;
+    fn into_static(self) -> Self::Output {
+        ResultAvailable {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 ///Indicates the provided handle is unavailable and gives suggestions of available handles.
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -92,6 +148,16 @@ pub struct ResultUnavailable<'a> {
     >,
 }
 
+impl jacquard_common::IntoStatic for ResultUnavailable<'_> {
+    type Output = ResultUnavailable<'static>;
+    fn into_static(self) -> Self::Output {
+        ResultUnavailable {
+            suggestions: self.suggestions.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -101,4 +167,15 @@ pub struct Suggestion<'a> {
     ///Method used to build this suggestion. Should be considered opaque to clients. Can be used for metrics.
     #[serde(borrow)]
     pub method: jacquard_common::CowStr<'a>,
+}
+
+impl jacquard_common::IntoStatic for Suggestion<'_> {
+    type Output = Suggestion<'static>;
+    fn into_static(self) -> Self::Output {
+        Suggestion {
+            handle: self.handle.into_static(),
+            method: self.method.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

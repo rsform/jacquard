@@ -24,11 +24,35 @@ pub struct SendEmail<'a> {
     pub subject: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for SendEmail<'_> {
+    type Output = SendEmail<'static>;
+    fn into_static(self) -> Self::Output {
+        SendEmail {
+            comment: self.comment.into_static(),
+            content: self.content.into_static(),
+            recipient_did: self.recipient_did.into_static(),
+            sender_did: self.sender_did.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SendEmailOutput<'a> {
     pub sent: bool,
+}
+
+impl jacquard_common::IntoStatic for SendEmailOutput<'_> {
+    type Output = SendEmailOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        SendEmailOutput {
+            sent: self.sent.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 impl jacquard_common::types::xrpc::XrpcRequest for SendEmail<'_> {
@@ -38,5 +62,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for SendEmail<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = SendEmailOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

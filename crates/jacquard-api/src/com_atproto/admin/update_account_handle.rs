@@ -15,6 +15,17 @@ pub struct UpdateAccountHandle<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
+impl jacquard_common::IntoStatic for UpdateAccountHandle<'_> {
+    type Output = UpdateAccountHandle<'static>;
+    fn into_static(self) -> Self::Output {
+        UpdateAccountHandle {
+            did: self.did.into_static(),
+            handle: self.handle.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for UpdateAccountHandle<'_> {
     const NSID: &'static str = "com.atproto.admin.updateAccountHandle";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -22,5 +33,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for UpdateAccountHandle<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

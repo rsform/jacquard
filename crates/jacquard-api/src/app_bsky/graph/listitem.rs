@@ -22,3 +22,15 @@ pub struct Listitem<'a> {
 impl jacquard_common::types::collection::Collection for Listitem<'_> {
     const NSID: &'static str = "app.bsky.graph.listitem";
 }
+
+impl jacquard_common::IntoStatic for Listitem<'_> {
+    type Output = Listitem<'static>;
+    fn into_static(self) -> Self::Output {
+        Listitem {
+            created_at: self.created_at.into_static(),
+            list: self.list.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

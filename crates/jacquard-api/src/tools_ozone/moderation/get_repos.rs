@@ -12,6 +12,15 @@ pub struct GetRepos<'a> {
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetRepos<'_> {
+    type Output = GetRepos<'static>;
+    fn into_static(self) -> Self::Output {
+        GetRepos {
+            dids: self.dids.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -20,10 +29,20 @@ pub struct GetReposOutput<'a> {
     pub repos: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetReposOutput<'_> {
+    type Output = GetReposOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetReposOutput {
+            repos: self.repos.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetRepos<'_> {
     const NSID: &'static str = "tools.ozone.moderation.getRepos";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetReposOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

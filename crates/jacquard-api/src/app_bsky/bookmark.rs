@@ -19,6 +19,16 @@ pub struct Bookmark<'a> {
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+impl jacquard_common::IntoStatic for Bookmark<'_> {
+    type Output = Bookmark<'static>;
+    fn into_static(self) -> Self::Output {
+        Bookmark {
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -43,4 +53,36 @@ pub enum BookmarkViewRecordItem<'a> {
     DefsNotFoundPost(Box<crate::app_bsky::feed::NotFoundPost<'a>>),
     #[serde(rename = "app.bsky.feed.defs#postView")]
     DefsPostView(Box<crate::app_bsky::feed::PostView<'a>>),
+}
+
+impl jacquard_common::IntoStatic for BookmarkViewRecordItem<'_> {
+    type Output = BookmarkViewRecordItem<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            BookmarkViewRecordItem::DefsBlockedPost(v) => {
+                BookmarkViewRecordItem::DefsBlockedPost(v.into_static())
+            }
+            BookmarkViewRecordItem::DefsNotFoundPost(v) => {
+                BookmarkViewRecordItem::DefsNotFoundPost(v.into_static())
+            }
+            BookmarkViewRecordItem::DefsPostView(v) => {
+                BookmarkViewRecordItem::DefsPostView(v.into_static())
+            }
+            BookmarkViewRecordItem::Unknown(v) => {
+                BookmarkViewRecordItem::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for BookmarkView<'_> {
+    type Output = BookmarkView<'static>;
+    fn into_static(self) -> Self::Output {
+        BookmarkView {
+            created_at: self.created_at.into_static(),
+            item: self.item.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

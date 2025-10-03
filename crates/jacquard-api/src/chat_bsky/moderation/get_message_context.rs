@@ -5,11 +5,13 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetMessageContext<'a> {
+    ///(default: 5)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub after: std::option::Option<i64>,
+    ///(default: 5)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub before: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -19,13 +21,14 @@ pub struct GetMessageContext<'a> {
     pub message_id: jacquard_common::CowStr<'a>,
 }
 
-impl Default for GetMessageContext<'_> {
-    fn default() -> Self {
-        Self {
-            after: Some(5i64),
-            before: Some(5i64),
-            convo_id: Default::default(),
-            message_id: Default::default(),
+impl jacquard_common::IntoStatic for GetMessageContext<'_> {
+    type Output = GetMessageContext<'static>;
+    fn into_static(self) -> Self::Output {
+        GetMessageContext {
+            after: self.after.into_static(),
+            before: self.before.into_static(),
+            convo_id: self.convo_id.into_static(),
+            message_id: self.message_id.into_static(),
         }
     }
 }
@@ -38,10 +41,20 @@ pub struct GetMessageContextOutput<'a> {
     pub messages: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetMessageContextOutput<'_> {
+    type Output = GetMessageContextOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetMessageContextOutput {
+            messages: self.messages.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetMessageContext<'_> {
     const NSID: &'static str = "chat.bsky.moderation.getMessageContext";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetMessageContextOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

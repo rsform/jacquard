@@ -12,6 +12,15 @@ pub struct GetHostStatus<'a> {
     pub hostname: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetHostStatus<'_> {
+    type Output = GetHostStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        GetHostStatus {
+            hostname: self.hostname.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -27,6 +36,19 @@ pub struct GetHostStatusOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<crate::com_atproto::sync::HostStatus<'a>>,
+}
+
+impl jacquard_common::IntoStatic for GetHostStatusOutput<'_> {
+    type Output = GetHostStatusOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetHostStatusOutput {
+            account_count: self.account_count.into_static(),
+            hostname: self.hostname.into_static(),
+            seq: self.seq.into_static(),
+            status: self.status.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -58,6 +80,20 @@ impl std::fmt::Display for GetHostStatusError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetHostStatusError<'_> {
+    type Output = GetHostStatusError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetHostStatusError::HostNotFound(v) => {
+                GetHostStatusError::HostNotFound(v.into_static())
+            }
+            GetHostStatusError::Unknown(v) => {
+                GetHostStatusError::Unknown(v.into_static())
+            }
         }
     }
 }

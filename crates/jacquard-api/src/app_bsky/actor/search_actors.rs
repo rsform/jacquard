@@ -5,12 +5,13 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchActors<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 25, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -21,13 +22,14 @@ pub struct SearchActors<'a> {
     pub term: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl Default for SearchActors<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            limit: Some(25i64),
-            q: Default::default(),
-            term: Default::default(),
+impl jacquard_common::IntoStatic for SearchActors<'_> {
+    type Output = SearchActors<'static>;
+    fn into_static(self) -> Self::Output {
+        SearchActors {
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
+            q: self.q.into_static(),
+            term: self.term.into_static(),
         }
     }
 }
@@ -43,10 +45,21 @@ pub struct SearchActorsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for SearchActorsOutput<'_> {
+    type Output = SearchActorsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        SearchActorsOutput {
+            actors: self.actors.into_static(),
+            cursor: self.cursor.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for SearchActors<'_> {
     const NSID: &'static str = "app.bsky.actor.searchActors";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = SearchActorsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

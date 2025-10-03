@@ -5,9 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchActorsTypeahead<'a> {
+    ///(default: 10, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -18,12 +19,13 @@ pub struct SearchActorsTypeahead<'a> {
     pub term: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl Default for SearchActorsTypeahead<'_> {
-    fn default() -> Self {
-        Self {
-            limit: Some(10i64),
-            q: Default::default(),
-            term: Default::default(),
+impl jacquard_common::IntoStatic for SearchActorsTypeahead<'_> {
+    type Output = SearchActorsTypeahead<'static>;
+    fn into_static(self) -> Self::Output {
+        SearchActorsTypeahead {
+            limit: self.limit.into_static(),
+            q: self.q.into_static(),
+            term: self.term.into_static(),
         }
     }
 }
@@ -36,10 +38,20 @@ pub struct SearchActorsTypeaheadOutput<'a> {
     pub actors: Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>,
 }
 
+impl jacquard_common::IntoStatic for SearchActorsTypeaheadOutput<'_> {
+    type Output = SearchActorsTypeaheadOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        SearchActorsTypeaheadOutput {
+            actors: self.actors.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for SearchActorsTypeahead<'_> {
     const NSID: &'static str = "app.bsky.actor.searchActorsTypeahead";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = SearchActorsTypeaheadOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -16,6 +16,17 @@ pub struct UpdateAccountSigningKey<'a> {
     pub signing_key: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for UpdateAccountSigningKey<'_> {
+    type Output = UpdateAccountSigningKey<'static>;
+    fn into_static(self) -> Self::Output {
+        UpdateAccountSigningKey {
+            did: self.did.into_static(),
+            signing_key: self.signing_key.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for UpdateAccountSigningKey<'_> {
     const NSID: &'static str = "com.atproto.admin.updateAccountSigningKey";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -23,5 +34,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for UpdateAccountSigningKey<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

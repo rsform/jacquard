@@ -12,6 +12,15 @@ pub struct GetLatestCommit<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetLatestCommit<'_> {
+    type Output = GetLatestCommit<'static>;
+    fn into_static(self) -> Self::Output {
+        GetLatestCommit {
+            did: self.did.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -19,6 +28,17 @@ pub struct GetLatestCommitOutput<'a> {
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub rev: jacquard_common::types::string::Tid,
+}
+
+impl jacquard_common::IntoStatic for GetLatestCommitOutput<'_> {
+    type Output = GetLatestCommitOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetLatestCommitOutput {
+            cid: self.cid.into_static(),
+            rev: self.rev.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -77,6 +97,29 @@ impl std::fmt::Display for GetLatestCommitError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetLatestCommitError<'_> {
+    type Output = GetLatestCommitError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetLatestCommitError::RepoNotFound(v) => {
+                GetLatestCommitError::RepoNotFound(v.into_static())
+            }
+            GetLatestCommitError::RepoTakendown(v) => {
+                GetLatestCommitError::RepoTakendown(v.into_static())
+            }
+            GetLatestCommitError::RepoSuspended(v) => {
+                GetLatestCommitError::RepoSuspended(v.into_static())
+            }
+            GetLatestCommitError::RepoDeactivated(v) => {
+                GetLatestCommitError::RepoDeactivated(v.into_static())
+            }
+            GetLatestCommitError::Unknown(v) => {
+                GetLatestCommitError::Unknown(v.into_static())
+            }
         }
     }
 }

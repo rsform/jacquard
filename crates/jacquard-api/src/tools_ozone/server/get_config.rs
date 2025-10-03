@@ -30,6 +30,21 @@ pub struct GetConfigOutput<'a> {
     pub viewer: std::option::Option<jacquard_common::types::value::Data<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetConfigOutput<'_> {
+    type Output = GetConfigOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetConfigOutput {
+            appview: self.appview.into_static(),
+            blob_divert: self.blob_divert.into_static(),
+            chat: self.chat.into_static(),
+            pds: self.pds.into_static(),
+            verifier_did: self.verifier_did.into_static(),
+            viewer: self.viewer.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct GetConfig;
@@ -38,7 +53,7 @@ impl jacquard_common::types::xrpc::XrpcRequest for GetConfig {
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetConfigOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]
@@ -50,6 +65,16 @@ pub struct ServiceConfig<'a> {
     pub url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
 }
 
+impl jacquard_common::IntoStatic for ServiceConfig<'_> {
+    type Output = ServiceConfig<'static>;
+    fn into_static(self) -> Self::Output {
+        ServiceConfig {
+            url: self.url.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -57,4 +82,14 @@ pub struct ViewerConfig<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub role: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl jacquard_common::IntoStatic for ViewerConfig<'_> {
+    type Output = ViewerConfig<'static>;
+    fn into_static(self) -> Self::Output {
+        ViewerConfig {
+            role: self.role.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

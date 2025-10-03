@@ -14,6 +14,16 @@ pub struct UpsertSet<'a> {
     pub value: crate::tools_ozone::set::Set<'a>,
 }
 
+impl jacquard_common::IntoStatic for UpsertSet<'_> {
+    type Output = UpsertSet<'static>;
+    fn into_static(self) -> Self::Output {
+        UpsertSet {
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -23,6 +33,16 @@ pub struct UpsertSetOutput<'a> {
     pub value: crate::tools_ozone::set::SetView<'a>,
 }
 
+impl jacquard_common::IntoStatic for UpsertSetOutput<'_> {
+    type Output = UpsertSetOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        UpsertSetOutput {
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for UpsertSet<'_> {
     const NSID: &'static str = "tools.ozone.set.upsertSet";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -30,5 +50,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for UpsertSet<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = UpsertSetOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

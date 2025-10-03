@@ -117,6 +117,9 @@ The `jacquard-codegen` binary generates Rust types from AT Protocol Lexicon sche
 - Adds header comments with `@generated` marker and lexicon NSID
 - Handles XRPC queries, procedures, subscriptions, and errors
 - Generates proper module tree with Rust 2018 style
+- **XrpcRequest trait**: Implemented directly on params/input structs (not marker types), with GATs for Output<'de> and Err<'de>
+- **IntoStatic trait**: All generated types implement `IntoStatic` to convert borrowed types to owned ('static) variants
+- **Collection trait**: Implemented on record types directly, with const NSID
 
 ## Current State & Next Steps
 
@@ -128,13 +131,21 @@ The `jacquard-codegen` binary generates Rust types from AT Protocol Lexicon sche
 - ✅ CidLink wrapper type with automatic `{"$link": "cid"}` serialization in JSON
 - ✅ Integration test with real Bluesky thread data validates round-trip correctness
 - ✅ Lexicon code generation with forward compatibility and proper lifetime handling
+- ✅ IntoStatic implementations for all generated types (structs, enums, unions)
+- ✅ XrpcRequest trait with GATs, implemented on params/input types directly
+- ✅ HttpClient and XrpcClient traits with generic send_xrpc implementation
+- ✅ Response wrapper with parse() (borrowed) and into_output() (owned) methods
+- ✅ Structured error types (ClientError, TransportError, EncodeError, DecodeError, HttpError, AuthError)
 
 ### Next Steps
-1. **Lexicon Resolution**: Fetch lexicons from web sources (atproto authorities, git repositories) and parse into corpus
-2. **Custom Lexicon Support**: Allow users to plug in their own generated lexicons alongside jacquard-api types in the client/server layer
-3. **Client Implementation**: Build HTTP client layer for XRPC operations in the main `jacquard` crate
-4. **Public API**: Design the main API surface in `jacquard` that re-exports and wraps generated types
-5. **DID Document Support**: Parsing, validation, and resolution of DID documents
-6. **OAuth Implementation**: OAuth flow support for authentication
-7. **Examples & Documentation**: Create examples and improve documentation
-8. **Testing**: Comprehensive tests for generated code and round-trip serialization
+1. **Concrete HttpClient Implementation**: Implement HttpClient for reqwest::Client and potentially other HTTP clients
+2. **Error Handling Improvements**: Add XRPC error parsing, better HTTP status code handling, structured error responses
+3. **Authentication**: Session management, token refresh, DPoP support
+4. **Body Encoding**: Support for non-JSON encodings (CBOR, multipart, etc.) in procedures
+5. **Lexicon Resolution**: Fetch lexicons from web sources (atproto authorities, git repositories) and parse into corpus
+6. **Custom Lexicon Support**: Allow users to plug in their own generated lexicons alongside jacquard-api types in the client/server layer
+7. **Public API**: Design the main API surface in `jacquard` that re-exports and wraps generated types
+8. **DID Document Support**: Parsing, validation, and resolution of DID documents
+9. **OAuth Implementation**: OAuth flow support for authentication
+10. **Examples & Documentation**: Create examples and improve documentation
+11. **Testing**: Comprehensive tests for generated code and round-trip serialization

@@ -18,6 +18,19 @@ pub struct AppPassword<'a> {
     pub privileged: std::option::Option<bool>,
 }
 
+impl jacquard_common::IntoStatic for AppPassword<'_> {
+    type Output = AppPassword<'static>;
+    fn into_static(self) -> Self::Output {
+        AppPassword {
+            created_at: self.created_at.into_static(),
+            name: self.name.into_static(),
+            password: self.password.into_static(),
+            privileged: self.privileged.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -30,6 +43,17 @@ pub struct CreateAppPassword<'a> {
     pub privileged: std::option::Option<bool>,
 }
 
+impl jacquard_common::IntoStatic for CreateAppPassword<'_> {
+    type Output = CreateAppPassword<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateAppPassword {
+            name: self.name.into_static(),
+            privileged: self.privileged.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -37,6 +61,16 @@ pub struct CreateAppPasswordOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
     pub value: jacquard_common::types::value::Data<'a>,
+}
+
+impl jacquard_common::IntoStatic for CreateAppPasswordOutput<'_> {
+    type Output = CreateAppPasswordOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateAppPasswordOutput {
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -68,6 +102,20 @@ impl std::fmt::Display for CreateAppPasswordError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for CreateAppPasswordError<'_> {
+    type Output = CreateAppPasswordError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CreateAppPasswordError::AccountTakedown(v) => {
+                CreateAppPasswordError::AccountTakedown(v.into_static())
+            }
+            CreateAppPasswordError::Unknown(v) => {
+                CreateAppPasswordError::Unknown(v.into_static())
+            }
         }
     }
 }

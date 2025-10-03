@@ -19,6 +19,19 @@ pub struct UnregisterPush<'a> {
     pub token: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for UnregisterPush<'_> {
+    type Output = UnregisterPush<'static>;
+    fn into_static(self) -> Self::Output {
+        UnregisterPush {
+            app_id: self.app_id.into_static(),
+            platform: self.platform.into_static(),
+            service_did: self.service_did.into_static(),
+            token: self.token.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for UnregisterPush<'_> {
     const NSID: &'static str = "app.bsky.notification.unregisterPush";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -26,5 +39,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for UnregisterPush<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

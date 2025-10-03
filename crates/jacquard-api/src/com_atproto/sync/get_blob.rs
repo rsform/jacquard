@@ -14,10 +14,29 @@ pub struct GetBlob<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetBlob<'_> {
+    type Output = GetBlob<'static>;
+    fn into_static(self) -> Self::Output {
+        GetBlob {
+            cid: self.cid.into_static(),
+            did: self.did.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlobOutput<'a> {}
+impl jacquard_common::IntoStatic for GetBlobOutput<'_> {
+    type Output = GetBlobOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetBlobOutput {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -83,6 +102,26 @@ impl std::fmt::Display for GetBlobError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetBlobError<'_> {
+    type Output = GetBlobError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetBlobError::BlobNotFound(v) => GetBlobError::BlobNotFound(v.into_static()),
+            GetBlobError::RepoNotFound(v) => GetBlobError::RepoNotFound(v.into_static()),
+            GetBlobError::RepoTakendown(v) => {
+                GetBlobError::RepoTakendown(v.into_static())
+            }
+            GetBlobError::RepoSuspended(v) => {
+                GetBlobError::RepoSuspended(v.into_static())
+            }
+            GetBlobError::RepoDeactivated(v) => {
+                GetBlobError::RepoDeactivated(v.into_static())
+            }
+            GetBlobError::Unknown(v) => GetBlobError::Unknown(v.into_static()),
         }
     }
 }

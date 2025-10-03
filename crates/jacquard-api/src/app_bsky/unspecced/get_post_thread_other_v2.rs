@@ -5,20 +5,22 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThreadOtherV2<'a> {
     #[serde(borrow)]
     pub anchor: jacquard_common::types::string::AtUri<'a>,
+    ///(default: false)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub prioritize_followed_users: std::option::Option<bool>,
 }
 
-impl Default for GetPostThreadOtherV2<'_> {
-    fn default() -> Self {
-        Self {
-            anchor: Default::default(),
-            prioritize_followed_users: Some(false),
+impl jacquard_common::IntoStatic for GetPostThreadOtherV2<'_> {
+    type Output = GetPostThreadOtherV2<'static>;
+    fn into_static(self) -> Self::Output {
+        GetPostThreadOtherV2 {
+            anchor: self.anchor.into_static(),
+            prioritize_followed_users: self.prioritize_followed_users.into_static(),
         }
     }
 }
@@ -32,12 +34,22 @@ pub struct GetPostThreadOtherV2Output<'a> {
     pub thread: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetPostThreadOtherV2Output<'_> {
+    type Output = GetPostThreadOtherV2Output<'static>;
+    fn into_static(self) -> Self::Output {
+        GetPostThreadOtherV2Output {
+            thread: self.thread.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetPostThreadOtherV2<'_> {
     const NSID: &'static str = "app.bsky.unspecced.getPostThreadOtherV2";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetPostThreadOtherV2Output<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]
@@ -59,4 +71,30 @@ pub struct ThreadItem<'a> {
 pub enum ThreadItemRecordValue<'a> {
     #[serde(rename = "app.bsky.unspecced.defs#threadItemPost")]
     DefsThreadItemPost(Box<crate::app_bsky::unspecced::ThreadItemPost<'a>>),
+}
+
+impl jacquard_common::IntoStatic for ThreadItemRecordValue<'_> {
+    type Output = ThreadItemRecordValue<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThreadItemRecordValue::DefsThreadItemPost(v) => {
+                ThreadItemRecordValue::DefsThreadItemPost(v.into_static())
+            }
+            ThreadItemRecordValue::Unknown(v) => {
+                ThreadItemRecordValue::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for ThreadItem<'_> {
+    type Output = ThreadItem<'static>;
+    fn into_static(self) -> Self::Output {
+        ThreadItem {
+            depth: self.depth.into_static(),
+            uri: self.uri.into_static(),
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

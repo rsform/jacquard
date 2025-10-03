@@ -24,6 +24,18 @@ pub struct Create<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
+impl jacquard_common::IntoStatic for Create<'_> {
+    type Output = Create<'static>;
+    fn into_static(self) -> Self::Output {
+        Create {
+            collection: self.collection.into_static(),
+            rkey: self.rkey.into_static(),
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -35,6 +47,18 @@ pub struct CreateResult<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub validation_status: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl jacquard_common::IntoStatic for CreateResult<'_> {
+    type Output = CreateResult<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateResult {
+            cid: self.cid.into_static(),
+            uri: self.uri.into_static(),
+            validation_status: self.validation_status.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 ///Operation which deletes an existing record.
@@ -50,10 +74,30 @@ pub struct Delete<'a> {
     >,
 }
 
+impl jacquard_common::IntoStatic for Delete<'_> {
+    type Output = Delete<'static>;
+    fn into_static(self) -> Self::Output {
+        Delete {
+            collection: self.collection.into_static(),
+            rkey: self.rkey.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteResult<'a> {}
+impl jacquard_common::IntoStatic for DeleteResult<'_> {
+    type Output = DeleteResult<'static>;
+    fn into_static(self) -> Self::Output {
+        DeleteResult {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -72,6 +116,19 @@ pub struct ApplyWrites<'a> {
     pub writes: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
+impl jacquard_common::IntoStatic for ApplyWrites<'_> {
+    type Output = ApplyWrites<'static>;
+    fn into_static(self) -> Self::Output {
+        ApplyWrites {
+            repo: self.repo.into_static(),
+            swap_commit: self.swap_commit.into_static(),
+            validate: self.validate.into_static(),
+            writes: self.writes.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -82,6 +139,17 @@ pub struct ApplyWritesOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub results: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+}
+
+impl jacquard_common::IntoStatic for ApplyWritesOutput<'_> {
+    type Output = ApplyWritesOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        ApplyWritesOutput {
+            commit: self.commit.into_static(),
+            results: self.results.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -118,6 +186,18 @@ impl std::fmt::Display for ApplyWritesError<'_> {
     }
 }
 
+impl jacquard_common::IntoStatic for ApplyWritesError<'_> {
+    type Output = ApplyWritesError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ApplyWritesError::InvalidSwap(v) => {
+                ApplyWritesError::InvalidSwap(v.into_static())
+            }
+            ApplyWritesError::Unknown(v) => ApplyWritesError::Unknown(v.into_static()),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for ApplyWrites<'_> {
     const NSID: &'static str = "com.atproto.repo.applyWrites";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -143,6 +223,18 @@ pub struct Update<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
+impl jacquard_common::IntoStatic for Update<'_> {
+    type Output = Update<'static>;
+    fn into_static(self) -> Self::Output {
+        Update {
+            collection: self.collection.into_static(),
+            rkey: self.rkey.into_static(),
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -154,4 +246,16 @@ pub struct UpdateResult<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub validation_status: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl jacquard_common::IntoStatic for UpdateResult<'_> {
+    type Output = UpdateResult<'static>;
+    fn into_static(self) -> Self::Output {
+        UpdateResult {
+            cid: self.cid.into_static(),
+            uri: self.uri.into_static(),
+            validation_status: self.validation_status.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

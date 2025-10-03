@@ -28,6 +28,37 @@ pub enum RecordWithMediaRecordMedia<'a> {
     External(Box<crate::app_bsky::embed::external::ExternalRecord<'a>>),
 }
 
+impl jacquard_common::IntoStatic for RecordWithMediaRecordMedia<'_> {
+    type Output = RecordWithMediaRecordMedia<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RecordWithMediaRecordMedia::Images(v) => {
+                RecordWithMediaRecordMedia::Images(v.into_static())
+            }
+            RecordWithMediaRecordMedia::Video(v) => {
+                RecordWithMediaRecordMedia::Video(v.into_static())
+            }
+            RecordWithMediaRecordMedia::External(v) => {
+                RecordWithMediaRecordMedia::External(v.into_static())
+            }
+            RecordWithMediaRecordMedia::Unknown(v) => {
+                RecordWithMediaRecordMedia::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for RecordWithMedia<'_> {
+    type Output = RecordWithMedia<'static>;
+    fn into_static(self) -> Self::Output {
+        RecordWithMedia {
+            media: self.media.into_static(),
+            record: self.record.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -49,4 +80,31 @@ pub enum ViewRecordMedia<'a> {
     VideoView(Box<crate::app_bsky::embed::video::View<'a>>),
     #[serde(rename = "app.bsky.embed.external#view")]
     ExternalView(Box<crate::app_bsky::embed::external::View<'a>>),
+}
+
+impl jacquard_common::IntoStatic for ViewRecordMedia<'_> {
+    type Output = ViewRecordMedia<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ViewRecordMedia::ImagesView(v) => {
+                ViewRecordMedia::ImagesView(v.into_static())
+            }
+            ViewRecordMedia::VideoView(v) => ViewRecordMedia::VideoView(v.into_static()),
+            ViewRecordMedia::ExternalView(v) => {
+                ViewRecordMedia::ExternalView(v.into_static())
+            }
+            ViewRecordMedia::Unknown(v) => ViewRecordMedia::Unknown(v.into_static()),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for View<'_> {
+    type Output = View<'static>;
+    fn into_static(self) -> Self::Output {
+        View {
+            media: self.media.into_static(),
+            record: self.record.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

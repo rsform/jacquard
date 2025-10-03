@@ -13,6 +13,16 @@ pub struct RequestPhoneVerification<'a> {
     pub phone_number: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for RequestPhoneVerification<'_> {
+    type Output = RequestPhoneVerification<'static>;
+    fn into_static(self) -> Self::Output {
+        RequestPhoneVerification {
+            phone_number: self.phone_number.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for RequestPhoneVerification<'_> {
     const NSID: &'static str = "com.atproto.temp.requestPhoneVerification";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -20,5 +30,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for RequestPhoneVerification<'_> 
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

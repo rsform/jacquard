@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAuthorFeed<'a> {
     #[serde(borrow)]
@@ -13,23 +13,27 @@ pub struct GetAuthorFeed<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: "posts_with_replies")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub filter: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: false)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub include_pins: std::option::Option<bool>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
-impl Default for GetAuthorFeed<'_> {
-    fn default() -> Self {
-        Self {
-            actor: Default::default(),
-            cursor: Default::default(),
-            filter: Some(jacquard_common::CowStr::from("posts_with_replies")),
-            include_pins: Some(false),
-            limit: Some(50i64),
+impl jacquard_common::IntoStatic for GetAuthorFeed<'_> {
+    type Output = GetAuthorFeed<'static>;
+    fn into_static(self) -> Self::Output {
+        GetAuthorFeed {
+            actor: self.actor.into_static(),
+            cursor: self.cursor.into_static(),
+            filter: self.filter.into_static(),
+            include_pins: self.include_pins.into_static(),
+            limit: self.limit.into_static(),
         }
     }
 }
@@ -43,6 +47,17 @@ pub struct GetAuthorFeedOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub feed: Vec<crate::app_bsky::feed::FeedViewPost<'a>>,
+}
+
+impl jacquard_common::IntoStatic for GetAuthorFeedOutput<'_> {
+    type Output = GetAuthorFeedOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetAuthorFeedOutput {
+            cursor: self.cursor.into_static(),
+            feed: self.feed.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -83,6 +98,23 @@ impl std::fmt::Display for GetAuthorFeedError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetAuthorFeedError<'_> {
+    type Output = GetAuthorFeedError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetAuthorFeedError::BlockedActor(v) => {
+                GetAuthorFeedError::BlockedActor(v.into_static())
+            }
+            GetAuthorFeedError::BlockedByActor(v) => {
+                GetAuthorFeedError::BlockedByActor(v.into_static())
+            }
+            GetAuthorFeedError::Unknown(v) => {
+                GetAuthorFeedError::Unknown(v.into_static())
+            }
         }
     }
 }

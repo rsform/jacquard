@@ -19,3 +19,14 @@ pub struct AspectRatio<'a> {
     pub height: i64,
     pub width: i64,
 }
+
+impl jacquard_common::IntoStatic for AspectRatio<'_> {
+    type Output = AspectRatio<'static>;
+    fn into_static(self) -> Self::Output {
+        AspectRatio {
+            height: self.height.into_static(),
+            width: self.width.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

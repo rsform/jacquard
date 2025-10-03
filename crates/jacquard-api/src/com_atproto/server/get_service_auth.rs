@@ -17,12 +17,33 @@ pub struct GetServiceAuth<'a> {
     pub lxm: std::option::Option<jacquard_common::types::string::Nsid<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetServiceAuth<'_> {
+    type Output = GetServiceAuth<'static>;
+    fn into_static(self) -> Self::Output {
+        GetServiceAuth {
+            aud: self.aud.into_static(),
+            exp: self.exp.into_static(),
+            lxm: self.lxm.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetServiceAuthOutput<'a> {
     #[serde(borrow)]
     pub token: jacquard_common::CowStr<'a>,
+}
+
+impl jacquard_common::IntoStatic for GetServiceAuthOutput<'_> {
+    type Output = GetServiceAuthOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetServiceAuthOutput {
+            token: self.token.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -55,6 +76,20 @@ impl std::fmt::Display for GetServiceAuthError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetServiceAuthError<'_> {
+    type Output = GetServiceAuthError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetServiceAuthError::BadExpiration(v) => {
+                GetServiceAuthError::BadExpiration(v.into_static())
+            }
+            GetServiceAuthError::Unknown(v) => {
+                GetServiceAuthError::Unknown(v.into_static())
+            }
         }
     }
 }

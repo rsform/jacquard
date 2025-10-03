@@ -96,6 +96,22 @@ impl<T: IntoStatic> IntoStatic for Box<T> {
     }
 }
 
+impl IntoStatic for bytes::Bytes {
+    type Output = bytes::Bytes;
+
+    fn into_static(self) -> Self::Output {
+        self
+    }
+}
+
+impl IntoStatic for () {
+    type Output = ();
+
+    fn into_static(self) -> Self::Output {
+        self
+    }
+}
+
 impl<T: IntoStatic> IntoStatic for Option<T> {
     type Output = Option<T::Output>;
 

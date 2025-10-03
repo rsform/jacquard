@@ -19,6 +19,18 @@ pub struct UpdateEmail<'a> {
     pub token: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for UpdateEmail<'_> {
+    type Output = UpdateEmail<'static>;
+    fn into_static(self) -> Self::Output {
+        UpdateEmail {
+            email: self.email.into_static(),
+            email_auth_factor: self.email_auth_factor.into_static(),
+            token: self.token.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -66,6 +78,24 @@ impl std::fmt::Display for UpdateEmailError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for UpdateEmailError<'_> {
+    type Output = UpdateEmailError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            UpdateEmailError::ExpiredToken(v) => {
+                UpdateEmailError::ExpiredToken(v.into_static())
+            }
+            UpdateEmailError::InvalidToken(v) => {
+                UpdateEmailError::InvalidToken(v.into_static())
+            }
+            UpdateEmailError::TokenRequired(v) => {
+                UpdateEmailError::TokenRequired(v.into_static())
+            }
+            UpdateEmailError::Unknown(v) => UpdateEmailError::Unknown(v.into_static()),
         }
     }
 }

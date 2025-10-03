@@ -12,6 +12,16 @@ pub struct RequestEmailUpdateOutput<'a> {
     pub token_required: bool,
 }
 
+impl jacquard_common::IntoStatic for RequestEmailUpdateOutput<'_> {
+    type Output = RequestEmailUpdateOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        RequestEmailUpdateOutput {
+            token_required: self.token_required.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct RequestEmailUpdate;
@@ -22,5 +32,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for RequestEmailUpdate {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = RequestEmailUpdateOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -13,6 +13,16 @@ pub struct RevokeAccountCredentials<'a> {
     pub account: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+impl jacquard_common::IntoStatic for RevokeAccountCredentials<'_> {
+    type Output = RevokeAccountCredentials<'static>;
+    fn into_static(self) -> Self::Output {
+        RevokeAccountCredentials {
+            account: self.account.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for RevokeAccountCredentials<'_> {
     const NSID: &'static str = "com.atproto.temp.revokeAccountCredentials";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -20,5 +30,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for RevokeAccountCredentials<'_> 
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

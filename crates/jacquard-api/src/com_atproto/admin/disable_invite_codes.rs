@@ -17,6 +17,17 @@ pub struct DisableInviteCodes<'a> {
     pub codes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
+impl jacquard_common::IntoStatic for DisableInviteCodes<'_> {
+    type Output = DisableInviteCodes<'static>;
+    fn into_static(self) -> Self::Output {
+        DisableInviteCodes {
+            accounts: self.accounts.into_static(),
+            codes: self.codes.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for DisableInviteCodes<'_> {
     const NSID: &'static str = "com.atproto.admin.disableInviteCodes";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -24,5 +35,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for DisableInviteCodes<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

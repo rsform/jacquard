@@ -22,6 +22,19 @@ pub struct CreateSession<'a> {
     pub password: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for CreateSession<'_> {
+    type Output = CreateSession<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateSession {
+            allow_takendown: self.allow_takendown.into_static(),
+            auth_factor_token: self.auth_factor_token.into_static(),
+            identifier: self.identifier.into_static(),
+            password: self.password.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -50,6 +63,25 @@ pub struct CreateSessionOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl jacquard_common::IntoStatic for CreateSessionOutput<'_> {
+    type Output = CreateSessionOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateSessionOutput {
+            access_jwt: self.access_jwt.into_static(),
+            active: self.active.into_static(),
+            did: self.did.into_static(),
+            did_doc: self.did_doc.into_static(),
+            email: self.email.into_static(),
+            email_auth_factor: self.email_auth_factor.into_static(),
+            email_confirmed: self.email_confirmed.into_static(),
+            handle: self.handle.into_static(),
+            refresh_jwt: self.refresh_jwt.into_static(),
+            status: self.status.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -90,6 +122,23 @@ impl std::fmt::Display for CreateSessionError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for CreateSessionError<'_> {
+    type Output = CreateSessionError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CreateSessionError::AccountTakedown(v) => {
+                CreateSessionError::AccountTakedown(v.into_static())
+            }
+            CreateSessionError::AuthFactorTokenRequired(v) => {
+                CreateSessionError::AuthFactorTokenRequired(v.into_static())
+            }
+            CreateSessionError::Unknown(v) => {
+                CreateSessionError::Unknown(v.into_static())
+            }
         }
     }
 }

@@ -5,12 +5,13 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchStarterPacksSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 25, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
@@ -20,13 +21,14 @@ pub struct SearchStarterPacksSkeleton<'a> {
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-impl Default for SearchStarterPacksSkeleton<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            limit: Some(25i64),
-            q: Default::default(),
-            viewer: Default::default(),
+impl jacquard_common::IntoStatic for SearchStarterPacksSkeleton<'_> {
+    type Output = SearchStarterPacksSkeleton<'static>;
+    fn into_static(self) -> Self::Output {
+        SearchStarterPacksSkeleton {
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
+            q: self.q.into_static(),
+            viewer: self.viewer.into_static(),
         }
     }
 }
@@ -43,6 +45,18 @@ pub struct SearchStarterPacksSkeletonOutput<'a> {
     pub hits_total: std::option::Option<i64>,
     #[serde(borrow)]
     pub starter_packs: Vec<crate::app_bsky::unspecced::SkeletonSearchStarterPack<'a>>,
+}
+
+impl jacquard_common::IntoStatic for SearchStarterPacksSkeletonOutput<'_> {
+    type Output = SearchStarterPacksSkeletonOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        SearchStarterPacksSkeletonOutput {
+            cursor: self.cursor.into_static(),
+            hits_total: self.hits_total.into_static(),
+            starter_packs: self.starter_packs.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -74,6 +88,20 @@ impl std::fmt::Display for SearchStarterPacksSkeletonError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for SearchStarterPacksSkeletonError<'_> {
+    type Output = SearchStarterPacksSkeletonError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SearchStarterPacksSkeletonError::BadQueryString(v) => {
+                SearchStarterPacksSkeletonError::BadQueryString(v.into_static())
+            }
+            SearchStarterPacksSkeletonError::Unknown(v) => {
+                SearchStarterPacksSkeletonError::Unknown(v.into_static())
+            }
         }
     }
 }

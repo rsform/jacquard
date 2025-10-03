@@ -12,6 +12,15 @@ pub struct ResolveDid<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for ResolveDid<'_> {
+    type Output = ResolveDid<'static>;
+    fn into_static(self) -> Self::Output {
+        ResolveDid {
+            did: self.did.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -19,6 +28,16 @@ pub struct ResolveDidOutput<'a> {
     ///The complete DID document for the identity.
     #[serde(borrow)]
     pub did_doc: jacquard_common::types::value::Data<'a>,
+}
+
+impl jacquard_common::IntoStatic for ResolveDidOutput<'_> {
+    type Output = ResolveDidOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        ResolveDidOutput {
+            did_doc: self.did_doc.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -61,6 +80,21 @@ impl std::fmt::Display for ResolveDidError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for ResolveDidError<'_> {
+    type Output = ResolveDidError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ResolveDidError::DidNotFound(v) => {
+                ResolveDidError::DidNotFound(v.into_static())
+            }
+            ResolveDidError::DidDeactivated(v) => {
+                ResolveDidError::DidDeactivated(v.into_static())
+            }
+            ResolveDidError::Unknown(v) => ResolveDidError::Unknown(v.into_static()),
         }
     }
 }

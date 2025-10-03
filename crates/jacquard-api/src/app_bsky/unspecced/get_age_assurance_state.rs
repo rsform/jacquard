@@ -14,6 +14,16 @@ pub struct GetAgeAssuranceStateOutput<'a> {
     pub value: crate::app_bsky::unspecced::AgeAssuranceState<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetAgeAssuranceStateOutput<'_> {
+    type Output = GetAgeAssuranceStateOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetAgeAssuranceStateOutput {
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct GetAgeAssuranceState;
@@ -22,5 +32,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for GetAgeAssuranceState {
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetAgeAssuranceStateOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

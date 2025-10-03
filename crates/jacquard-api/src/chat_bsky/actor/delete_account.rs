@@ -9,6 +9,15 @@
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteAccountOutput<'a> {}
+impl jacquard_common::IntoStatic for DeleteAccountOutput<'_> {
+    type Output = DeleteAccountOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        DeleteAccountOutput {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct DeleteAccount;
@@ -19,5 +28,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for DeleteAccount {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = DeleteAccountOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -15,6 +15,17 @@ pub struct ResetPassword<'a> {
     pub token: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for ResetPassword<'_> {
+    type Output = ResetPassword<'static>;
+    fn into_static(self) -> Self::Output {
+        ResetPassword {
+            password: self.password.into_static(),
+            token: self.token.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -53,6 +64,23 @@ impl std::fmt::Display for ResetPasswordError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for ResetPasswordError<'_> {
+    type Output = ResetPasswordError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ResetPasswordError::ExpiredToken(v) => {
+                ResetPasswordError::ExpiredToken(v.into_static())
+            }
+            ResetPasswordError::InvalidToken(v) => {
+                ResetPasswordError::InvalidToken(v.into_static())
+            }
+            ResetPasswordError::Unknown(v) => {
+                ResetPasswordError::Unknown(v.into_static())
+            }
         }
     }
 }

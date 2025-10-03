@@ -5,12 +5,13 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedUsersSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 25, min: 1, max: 50)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -18,12 +19,13 @@ pub struct GetSuggestedUsersSkeleton<'a> {
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-impl Default for GetSuggestedUsersSkeleton<'_> {
-    fn default() -> Self {
-        Self {
-            category: Default::default(),
-            limit: Some(25i64),
-            viewer: Default::default(),
+impl jacquard_common::IntoStatic for GetSuggestedUsersSkeleton<'_> {
+    type Output = GetSuggestedUsersSkeleton<'static>;
+    fn into_static(self) -> Self::Output {
+        GetSuggestedUsersSkeleton {
+            category: self.category.into_static(),
+            limit: self.limit.into_static(),
+            viewer: self.viewer.into_static(),
         }
     }
 }
@@ -36,10 +38,20 @@ pub struct GetSuggestedUsersSkeletonOutput<'a> {
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetSuggestedUsersSkeletonOutput<'_> {
+    type Output = GetSuggestedUsersSkeletonOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetSuggestedUsersSkeletonOutput {
+            dids: self.dids.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetSuggestedUsersSkeleton<'_> {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedUsersSkeleton";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetSuggestedUsersSkeletonOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

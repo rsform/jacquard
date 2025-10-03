@@ -5,21 +5,23 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetListMutes<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
-impl Default for GetListMutes<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            limit: Some(50i64),
+impl jacquard_common::IntoStatic for GetListMutes<'_> {
+    type Output = GetListMutes<'static>;
+    fn into_static(self) -> Self::Output {
+        GetListMutes {
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
         }
     }
 }
@@ -35,10 +37,21 @@ pub struct GetListMutesOutput<'a> {
     pub lists: Vec<crate::app_bsky::graph::ListView<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetListMutesOutput<'_> {
+    type Output = GetListMutesOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetListMutesOutput {
+            cursor: self.cursor.into_static(),
+            lists: self.lists.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetListMutes<'_> {
     const NSID: &'static str = "app.bsky.graph.getListMutes";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetListMutesOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

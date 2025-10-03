@@ -12,6 +12,16 @@ pub struct UpdateSeen<'a> {
     pub seen_at: jacquard_common::types::string::Datetime,
 }
 
+impl jacquard_common::IntoStatic for UpdateSeen<'_> {
+    type Output = UpdateSeen<'static>;
+    fn into_static(self) -> Self::Output {
+        UpdateSeen {
+            seen_at: self.seen_at.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for UpdateSeen<'_> {
     const NSID: &'static str = "app.bsky.notification.updateSeen";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -19,5 +29,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for UpdateSeen<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

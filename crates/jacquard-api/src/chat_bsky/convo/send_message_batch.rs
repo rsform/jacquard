@@ -15,12 +15,33 @@ pub struct BatchItem<'a> {
     pub message: crate::chat_bsky::convo::MessageInput<'a>,
 }
 
+impl jacquard_common::IntoStatic for BatchItem<'_> {
+    type Output = BatchItem<'static>;
+    fn into_static(self) -> Self::Output {
+        BatchItem {
+            convo_id: self.convo_id.into_static(),
+            message: self.message.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SendMessageBatch<'a> {
     #[serde(borrow)]
     pub items: Vec<jacquard_common::types::value::Data<'a>>,
+}
+
+impl jacquard_common::IntoStatic for SendMessageBatch<'_> {
+    type Output = SendMessageBatch<'static>;
+    fn into_static(self) -> Self::Output {
+        SendMessageBatch {
+            items: self.items.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -31,6 +52,16 @@ pub struct SendMessageBatchOutput<'a> {
     pub items: Vec<crate::chat_bsky::convo::MessageView<'a>>,
 }
 
+impl jacquard_common::IntoStatic for SendMessageBatchOutput<'_> {
+    type Output = SendMessageBatchOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        SendMessageBatchOutput {
+            items: self.items.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for SendMessageBatch<'_> {
     const NSID: &'static str = "chat.bsky.convo.sendMessageBatch";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -38,5 +69,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for SendMessageBatch<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = SendMessageBatchOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

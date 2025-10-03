@@ -16,6 +16,17 @@ pub struct Info<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for Info<'_> {
+    type Output = Info<'static>;
+    fn into_static(self) -> Self::Output {
+        Info {
+            message: self.message.into_static(),
+            name: self.name.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -25,11 +36,29 @@ pub struct Labels<'a> {
     pub seq: i64,
 }
 
+impl jacquard_common::IntoStatic for Labels<'_> {
+    type Output = Labels<'static>;
+    fn into_static(self) -> Self::Output {
+        Labels {
+            labels: self.labels.into_static(),
+            seq: self.seq.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeLabels {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub cursor: std::option::Option<i64>,
+}
+
+impl jacquard_common::IntoStatic for SubscribeLabels {
+    type Output = SubscribeLabels;
+    fn into_static(self) -> Self::Output {
+        self
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -41,6 +70,23 @@ pub enum SubscribeLabelsMessage<'a> {
     Labels(Box<jacquard_common::types::value::Data<'a>>),
     #[serde(rename = "#info")]
     Info(Box<jacquard_common::types::value::Data<'a>>),
+}
+
+impl jacquard_common::IntoStatic for SubscribeLabelsMessage<'_> {
+    type Output = SubscribeLabelsMessage<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SubscribeLabelsMessage::Labels(v) => {
+                SubscribeLabelsMessage::Labels(v.into_static())
+            }
+            SubscribeLabelsMessage::Info(v) => {
+                SubscribeLabelsMessage::Info(v.into_static())
+            }
+            SubscribeLabelsMessage::Unknown(v) => {
+                SubscribeLabelsMessage::Unknown(v.into_static())
+            }
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -72,6 +118,20 @@ impl std::fmt::Display for SubscribeLabelsError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for SubscribeLabelsError<'_> {
+    type Output = SubscribeLabelsError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SubscribeLabelsError::FutureCursor(v) => {
+                SubscribeLabelsError::FutureCursor(v.into_static())
+            }
+            SubscribeLabelsError::Unknown(v) => {
+                SubscribeLabelsError::Unknown(v.into_static())
+            }
         }
     }
 }

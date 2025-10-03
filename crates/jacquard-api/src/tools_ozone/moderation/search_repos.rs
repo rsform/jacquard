@@ -5,12 +5,13 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchRepos<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -21,13 +22,14 @@ pub struct SearchRepos<'a> {
     pub term: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl Default for SearchRepos<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            limit: Some(50i64),
-            q: Default::default(),
-            term: Default::default(),
+impl jacquard_common::IntoStatic for SearchRepos<'_> {
+    type Output = SearchRepos<'static>;
+    fn into_static(self) -> Self::Output {
+        SearchRepos {
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
+            q: self.q.into_static(),
+            term: self.term.into_static(),
         }
     }
 }
@@ -43,10 +45,21 @@ pub struct SearchReposOutput<'a> {
     pub repos: Vec<crate::tools_ozone::moderation::RepoView<'a>>,
 }
 
+impl jacquard_common::IntoStatic for SearchReposOutput<'_> {
+    type Output = SearchReposOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        SearchReposOutput {
+            cursor: self.cursor.into_static(),
+            repos: self.repos.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for SearchRepos<'_> {
     const NSID: &'static str = "tools.ozone.moderation.searchRepos";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = SearchReposOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

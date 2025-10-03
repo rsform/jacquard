@@ -22,6 +22,24 @@ pub struct CheckAccountStatusOutput<'a> {
     pub valid_did: bool,
 }
 
+impl jacquard_common::IntoStatic for CheckAccountStatusOutput<'_> {
+    type Output = CheckAccountStatusOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        CheckAccountStatusOutput {
+            activated: self.activated.into_static(),
+            expected_blobs: self.expected_blobs.into_static(),
+            imported_blobs: self.imported_blobs.into_static(),
+            indexed_records: self.indexed_records.into_static(),
+            private_state_values: self.private_state_values.into_static(),
+            repo_blocks: self.repo_blocks.into_static(),
+            repo_commit: self.repo_commit.into_static(),
+            repo_rev: self.repo_rev.into_static(),
+            valid_did: self.valid_did.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct CheckAccountStatus;
@@ -30,5 +48,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for CheckAccountStatus {
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = CheckAccountStatusOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

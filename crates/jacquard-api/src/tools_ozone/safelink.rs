@@ -80,6 +80,18 @@ where
     }
 }
 
+impl jacquard_common::IntoStatic for ActionType<'_> {
+    type Output = ActionType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ActionType::Block => ActionType::Block,
+            ActionType::Warn => ActionType::Warn,
+            ActionType::Whitelist => ActionType::Whitelist,
+            ActionType::Other(v) => ActionType::Other(v.into_static()),
+        }
+    }
+}
+
 ///An event for URL safety decisions
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -106,6 +118,24 @@ pub struct Event<'a> {
     ///The URL that this rule applies to
     #[serde(borrow)]
     pub url: jacquard_common::CowStr<'a>,
+}
+
+impl jacquard_common::IntoStatic for Event<'_> {
+    type Output = Event<'static>;
+    fn into_static(self) -> Self::Output {
+        Event {
+            action: self.action.into_static(),
+            comment: self.comment.into_static(),
+            created_at: self.created_at.into_static(),
+            created_by: self.created_by.into_static(),
+            event_type: self.event_type.into_static(),
+            id: self.id.into_static(),
+            pattern: self.pattern.into_static(),
+            reason: self.reason.into_static(),
+            url: self.url.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -177,6 +207,18 @@ where
     }
 }
 
+impl jacquard_common::IntoStatic for EventType<'_> {
+    type Output = EventType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            EventType::AddRule => EventType::AddRule,
+            EventType::UpdateRule => EventType::UpdateRule,
+            EventType::RemoveRule => EventType::RemoveRule,
+            EventType::Other(v) => EventType::Other(v.into_static()),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PatternType<'a> {
     Domain,
@@ -239,6 +281,17 @@ where
     {
         let s = <&'de str>::deserialize(deserializer)?;
         Ok(Self::from(s))
+    }
+}
+
+impl jacquard_common::IntoStatic for PatternType<'_> {
+    type Output = PatternType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            PatternType::Domain => PatternType::Domain,
+            PatternType::Url => PatternType::Url,
+            PatternType::Other(v) => PatternType::Other(v.into_static()),
+        }
     }
 }
 
@@ -315,6 +368,19 @@ where
     }
 }
 
+impl jacquard_common::IntoStatic for ReasonType<'_> {
+    type Output = ReasonType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ReasonType::Csam => ReasonType::Csam,
+            ReasonType::Spam => ReasonType::Spam,
+            ReasonType::Phishing => ReasonType::Phishing,
+            ReasonType::None => ReasonType::None,
+            ReasonType::Other(v) => ReasonType::Other(v.into_static()),
+        }
+    }
+}
+
 ///Input for creating a URL safety rule
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -340,4 +406,21 @@ pub struct UrlRule<'a> {
     ///The URL or domain to apply the rule to
     #[serde(borrow)]
     pub url: jacquard_common::CowStr<'a>,
+}
+
+impl jacquard_common::IntoStatic for UrlRule<'_> {
+    type Output = UrlRule<'static>;
+    fn into_static(self) -> Self::Output {
+        UrlRule {
+            action: self.action.into_static(),
+            comment: self.comment.into_static(),
+            created_at: self.created_at.into_static(),
+            created_by: self.created_by.into_static(),
+            pattern: self.pattern.into_static(),
+            reason: self.reason.into_static(),
+            updated_at: self.updated_at.into_static(),
+            url: self.url.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

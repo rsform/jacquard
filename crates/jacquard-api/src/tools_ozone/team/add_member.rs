@@ -15,6 +15,17 @@ pub struct AddMember<'a> {
     pub role: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for AddMember<'_> {
+    type Output = AddMember<'static>;
+    fn into_static(self) -> Self::Output {
+        AddMember {
+            did: self.did.into_static(),
+            role: self.role.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -22,6 +33,16 @@ pub struct AddMemberOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
     pub value: crate::tools_ozone::team::Member<'a>,
+}
+
+impl jacquard_common::IntoStatic for AddMemberOutput<'_> {
+    type Output = AddMemberOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        AddMemberOutput {
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -54,6 +75,18 @@ impl std::fmt::Display for AddMemberError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for AddMemberError<'_> {
+    type Output = AddMemberError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AddMemberError::MemberAlreadyExists(v) => {
+                AddMemberError::MemberAlreadyExists(v.into_static())
+            }
+            AddMemberError::Unknown(v) => AddMemberError::Unknown(v.into_static()),
         }
     }
 }

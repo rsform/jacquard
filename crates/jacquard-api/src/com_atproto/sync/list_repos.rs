@@ -5,21 +5,23 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ListRepos<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 500, min: 1, max: 1000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
-impl Default for ListRepos<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            limit: Some(500i64),
+impl jacquard_common::IntoStatic for ListRepos<'_> {
+    type Output = ListRepos<'static>;
+    fn into_static(self) -> Self::Output {
+        ListRepos {
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
         }
     }
 }
@@ -35,12 +37,23 @@ pub struct ListReposOutput<'a> {
     pub repos: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
+impl jacquard_common::IntoStatic for ListReposOutput<'_> {
+    type Output = ListReposOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        ListReposOutput {
+            cursor: self.cursor.into_static(),
+            repos: self.repos.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for ListRepos<'_> {
     const NSID: &'static str = "com.atproto.sync.listRepos";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ListReposOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]
@@ -59,4 +72,18 @@ pub struct Repo<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl jacquard_common::IntoStatic for Repo<'_> {
+    type Output = Repo<'static>;
+    fn into_static(self) -> Self::Output {
+        Repo {
+            active: self.active.into_static(),
+            did: self.did.into_static(),
+            head: self.head.into_static(),
+            rev: self.rev.into_static(),
+            status: self.status.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

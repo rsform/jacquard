@@ -13,6 +13,16 @@ pub struct MuteActor<'a> {
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+impl jacquard_common::IntoStatic for MuteActor<'_> {
+    type Output = MuteActor<'static>;
+    fn into_static(self) -> Self::Output {
+        MuteActor {
+            actor: self.actor.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for MuteActor<'_> {
     const NSID: &'static str = "app.bsky.graph.muteActor";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -20,5 +30,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for MuteActor<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

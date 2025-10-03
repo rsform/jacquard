@@ -23,12 +23,36 @@ pub struct UpsertOption<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
+impl jacquard_common::IntoStatic for UpsertOption<'_> {
+    type Output = UpsertOption<'static>;
+    fn into_static(self) -> Self::Output {
+        UpsertOption {
+            description: self.description.into_static(),
+            key: self.key.into_static(),
+            manager_role: self.manager_role.into_static(),
+            scope: self.scope.into_static(),
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UpsertOptionOutput<'a> {
     #[serde(borrow)]
     pub option: crate::tools_ozone::setting::Option<'a>,
+}
+
+impl jacquard_common::IntoStatic for UpsertOptionOutput<'_> {
+    type Output = UpsertOptionOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        UpsertOptionOutput {
+            option: self.option.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 impl jacquard_common::types::xrpc::XrpcRequest for UpsertOption<'_> {
@@ -38,5 +62,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for UpsertOption<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = UpsertOptionOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

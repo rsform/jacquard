@@ -12,6 +12,15 @@ pub struct GetConvoForMembers<'a> {
     pub members: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetConvoForMembers<'_> {
+    type Output = GetConvoForMembers<'static>;
+    fn into_static(self) -> Self::Output {
+        GetConvoForMembers {
+            members: self.members.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -20,10 +29,20 @@ pub struct GetConvoForMembersOutput<'a> {
     pub convo: crate::chat_bsky::convo::ConvoView<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetConvoForMembersOutput<'_> {
+    type Output = GetConvoForMembersOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetConvoForMembersOutput {
+            convo: self.convo.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetConvoForMembers<'_> {
     const NSID: &'static str = "chat.bsky.convo.getConvoForMembers";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetConvoForMembersOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetKnownFollowers<'a> {
     #[serde(borrow)]
@@ -13,16 +13,18 @@ pub struct GetKnownFollowers<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
-impl Default for GetKnownFollowers<'_> {
-    fn default() -> Self {
-        Self {
-            actor: Default::default(),
-            cursor: Default::default(),
-            limit: Some(50i64),
+impl jacquard_common::IntoStatic for GetKnownFollowers<'_> {
+    type Output = GetKnownFollowers<'static>;
+    fn into_static(self) -> Self::Output {
+        GetKnownFollowers {
+            actor: self.actor.into_static(),
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
         }
     }
 }
@@ -40,10 +42,22 @@ pub struct GetKnownFollowersOutput<'a> {
     pub subject: crate::app_bsky::actor::ProfileView<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetKnownFollowersOutput<'_> {
+    type Output = GetKnownFollowersOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetKnownFollowersOutput {
+            cursor: self.cursor.into_static(),
+            followers: self.followers.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetKnownFollowers<'_> {
     const NSID: &'static str = "app.bsky.graph.getKnownFollowers";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetKnownFollowersOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

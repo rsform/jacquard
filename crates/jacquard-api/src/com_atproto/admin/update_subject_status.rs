@@ -32,6 +32,38 @@ pub enum UpdateSubjectStatusRecordSubject<'a> {
     DefsRepoBlobRef(Box<crate::com_atproto::admin::RepoBlobRef<'a>>),
 }
 
+impl jacquard_common::IntoStatic for UpdateSubjectStatusRecordSubject<'_> {
+    type Output = UpdateSubjectStatusRecordSubject<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            UpdateSubjectStatusRecordSubject::DefsRepoRef(v) => {
+                UpdateSubjectStatusRecordSubject::DefsRepoRef(v.into_static())
+            }
+            UpdateSubjectStatusRecordSubject::StrongRef(v) => {
+                UpdateSubjectStatusRecordSubject::StrongRef(v.into_static())
+            }
+            UpdateSubjectStatusRecordSubject::DefsRepoBlobRef(v) => {
+                UpdateSubjectStatusRecordSubject::DefsRepoBlobRef(v.into_static())
+            }
+            UpdateSubjectStatusRecordSubject::Unknown(v) => {
+                UpdateSubjectStatusRecordSubject::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for UpdateSubjectStatus<'_> {
+    type Output = UpdateSubjectStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        UpdateSubjectStatus {
+            deactivated: self.deactivated.into_static(),
+            subject: self.subject.into_static(),
+            takedown: self.takedown.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -56,6 +88,37 @@ pub enum UpdateSubjectStatusOutputRecordSubject<'a> {
     DefsRepoBlobRef(Box<crate::com_atproto::admin::RepoBlobRef<'a>>),
 }
 
+impl jacquard_common::IntoStatic for UpdateSubjectStatusOutputRecordSubject<'_> {
+    type Output = UpdateSubjectStatusOutputRecordSubject<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            UpdateSubjectStatusOutputRecordSubject::DefsRepoRef(v) => {
+                UpdateSubjectStatusOutputRecordSubject::DefsRepoRef(v.into_static())
+            }
+            UpdateSubjectStatusOutputRecordSubject::StrongRef(v) => {
+                UpdateSubjectStatusOutputRecordSubject::StrongRef(v.into_static())
+            }
+            UpdateSubjectStatusOutputRecordSubject::DefsRepoBlobRef(v) => {
+                UpdateSubjectStatusOutputRecordSubject::DefsRepoBlobRef(v.into_static())
+            }
+            UpdateSubjectStatusOutputRecordSubject::Unknown(v) => {
+                UpdateSubjectStatusOutputRecordSubject::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for UpdateSubjectStatusOutput<'_> {
+    type Output = UpdateSubjectStatusOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        UpdateSubjectStatusOutput {
+            subject: self.subject.into_static(),
+            takedown: self.takedown.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for UpdateSubjectStatus<'_> {
     const NSID: &'static str = "com.atproto.admin.updateSubjectStatus";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -63,5 +126,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for UpdateSubjectStatus<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = UpdateSubjectStatusOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

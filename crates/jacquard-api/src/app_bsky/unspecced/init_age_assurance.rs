@@ -20,6 +20,18 @@ pub struct InitAgeAssurance<'a> {
     pub language: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for InitAgeAssurance<'_> {
+    type Output = InitAgeAssurance<'static>;
+    fn into_static(self) -> Self::Output {
+        InitAgeAssurance {
+            country_code: self.country_code.into_static(),
+            email: self.email.into_static(),
+            language: self.language.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -27,6 +39,16 @@ pub struct InitAgeAssuranceOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
     pub value: crate::app_bsky::unspecced::AgeAssuranceState<'a>,
+}
+
+impl jacquard_common::IntoStatic for InitAgeAssuranceOutput<'_> {
+    type Output = InitAgeAssuranceOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        InitAgeAssuranceOutput {
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -76,6 +98,26 @@ impl std::fmt::Display for InitAgeAssuranceError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for InitAgeAssuranceError<'_> {
+    type Output = InitAgeAssuranceError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            InitAgeAssuranceError::InvalidEmail(v) => {
+                InitAgeAssuranceError::InvalidEmail(v.into_static())
+            }
+            InitAgeAssuranceError::DidTooLong(v) => {
+                InitAgeAssuranceError::DidTooLong(v.into_static())
+            }
+            InitAgeAssuranceError::InvalidInitiation(v) => {
+                InitAgeAssuranceError::InvalidInitiation(v.into_static())
+            }
+            InitAgeAssuranceError::Unknown(v) => {
+                InitAgeAssuranceError::Unknown(v.into_static())
+            }
         }
     }
 }

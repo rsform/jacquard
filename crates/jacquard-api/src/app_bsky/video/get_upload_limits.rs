@@ -22,6 +22,20 @@ pub struct GetUploadLimitsOutput<'a> {
     pub remaining_daily_videos: std::option::Option<i64>,
 }
 
+impl jacquard_common::IntoStatic for GetUploadLimitsOutput<'_> {
+    type Output = GetUploadLimitsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetUploadLimitsOutput {
+            can_upload: self.can_upload.into_static(),
+            error: self.error.into_static(),
+            message: self.message.into_static(),
+            remaining_daily_bytes: self.remaining_daily_bytes.into_static(),
+            remaining_daily_videos: self.remaining_daily_videos.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct GetUploadLimits;
@@ -30,5 +44,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for GetUploadLimits {
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetUploadLimitsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

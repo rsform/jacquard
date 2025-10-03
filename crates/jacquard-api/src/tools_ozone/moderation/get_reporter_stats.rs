@@ -12,6 +12,15 @@ pub struct GetReporterStats<'a> {
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetReporterStats<'_> {
+    type Output = GetReporterStats<'static>;
+    fn into_static(self) -> Self::Output {
+        GetReporterStats {
+            dids: self.dids.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -20,10 +29,20 @@ pub struct GetReporterStatsOutput<'a> {
     pub stats: Vec<crate::tools_ozone::moderation::ReporterStats<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetReporterStatsOutput<'_> {
+    type Output = GetReporterStatsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetReporterStatsOutput {
+            stats: self.stats.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetReporterStats<'_> {
     const NSID: &'static str = "tools.ozone.moderation.getReporterStats";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetReporterStatsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

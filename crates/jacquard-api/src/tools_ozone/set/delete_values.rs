@@ -17,6 +17,17 @@ pub struct DeleteValues<'a> {
     pub values: Vec<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for DeleteValues<'_> {
+    type Output = DeleteValues<'static>;
+    fn into_static(self) -> Self::Output {
+        DeleteValues {
+            name: self.name.into_static(),
+            values: self.values.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -47,6 +58,18 @@ impl std::fmt::Display for DeleteValuesError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for DeleteValuesError<'_> {
+    type Output = DeleteValuesError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            DeleteValuesError::SetNotFound(v) => {
+                DeleteValuesError::SetNotFound(v.into_static())
+            }
+            DeleteValuesError::Unknown(v) => DeleteValuesError::Unknown(v.into_static()),
         }
     }
 }

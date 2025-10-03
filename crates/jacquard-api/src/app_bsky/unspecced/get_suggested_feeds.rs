@@ -5,11 +5,19 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedFeeds {
+    ///(default: 10, min: 1, max: 25)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+impl jacquard_common::IntoStatic for GetSuggestedFeeds {
+    type Output = GetSuggestedFeeds;
+    fn into_static(self) -> Self::Output {
+        self
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -20,10 +28,20 @@ pub struct GetSuggestedFeedsOutput<'a> {
     pub feeds: Vec<crate::app_bsky::feed::GeneratorView<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetSuggestedFeedsOutput<'_> {
+    type Output = GetSuggestedFeedsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetSuggestedFeedsOutput {
+            feeds: self.feeds.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetSuggestedFeeds {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedFeeds";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetSuggestedFeedsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

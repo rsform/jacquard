@@ -18,6 +18,17 @@ pub struct GrantError<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for GrantError<'_> {
+    type Output = GrantError<'static>;
+    fn into_static(self) -> Self::Output {
+        GrantError {
+            error: self.error.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -25,6 +36,16 @@ pub struct GrantVerifications<'a> {
     ///Array of verification requests to process
     #[serde(borrow)]
     pub verifications: Vec<jacquard_common::types::value::Data<'a>>,
+}
+
+impl jacquard_common::IntoStatic for GrantVerifications<'_> {
+    type Output = GrantVerifications<'static>;
+    fn into_static(self) -> Self::Output {
+        GrantVerifications {
+            verifications: self.verifications.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -37,6 +58,17 @@ pub struct GrantVerificationsOutput<'a> {
     pub verifications: Vec<crate::tools_ozone::verification::VerificationView<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GrantVerificationsOutput<'_> {
+    type Output = GrantVerificationsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GrantVerificationsOutput {
+            failed_verifications: self.failed_verifications.into_static(),
+            verifications: self.verifications.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GrantVerifications<'_> {
     const NSID: &'static str = "tools.ozone.verification.grantVerifications";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -44,7 +76,7 @@ impl jacquard_common::types::xrpc::XrpcRequest for GrantVerifications<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GrantVerificationsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]
@@ -63,4 +95,17 @@ pub struct VerificationInput<'a> {
     ///The did of the subject being verified
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
+}
+
+impl jacquard_common::IntoStatic for VerificationInput<'_> {
+    type Output = VerificationInput<'static>;
+    fn into_static(self) -> Self::Output {
+        VerificationInput {
+            created_at: self.created_at.into_static(),
+            display_name: self.display_name.into_static(),
+            handle: self.handle.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

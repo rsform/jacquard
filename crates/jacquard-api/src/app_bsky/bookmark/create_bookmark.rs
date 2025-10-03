@@ -15,6 +15,17 @@ pub struct CreateBookmark<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+impl jacquard_common::IntoStatic for CreateBookmark<'_> {
+    type Output = CreateBookmark<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateBookmark {
+            cid: self.cid.into_static(),
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -45,6 +56,20 @@ impl std::fmt::Display for CreateBookmarkError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for CreateBookmarkError<'_> {
+    type Output = CreateBookmarkError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CreateBookmarkError::UnsupportedCollection(v) => {
+                CreateBookmarkError::UnsupportedCollection(v.into_static())
+            }
+            CreateBookmarkError::Unknown(v) => {
+                CreateBookmarkError::Unknown(v.into_static())
+            }
         }
     }
 }

@@ -5,13 +5,21 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct FetchLabels {
+    ///(default: 50, min: 1, max: 250)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub since: std::option::Option<i64>,
+}
+
+impl jacquard_common::IntoStatic for FetchLabels {
+    type Output = FetchLabels;
+    fn into_static(self) -> Self::Output {
+        self
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -22,10 +30,20 @@ pub struct FetchLabelsOutput<'a> {
     pub labels: Vec<crate::com_atproto::label::Label<'a>>,
 }
 
+impl jacquard_common::IntoStatic for FetchLabelsOutput<'_> {
+    type Output = FetchLabelsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        FetchLabelsOutput {
+            labels: self.labels.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for FetchLabels {
     const NSID: &'static str = "com.atproto.temp.fetchLabels";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = FetchLabelsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

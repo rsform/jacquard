@@ -188,10 +188,16 @@ impl<'c> CodeGenerator<'c> {
                     }
                 };
 
+                // Generate IntoStatic impl
+                let field_names: Vec<&str> = obj.properties.keys().map(|k| k.as_str()).collect();
+                let into_static_impl =
+                    self.generate_into_static_for_struct(&type_name, &field_names, true, true);
+
                 Ok(quote! {
                     #struct_def
                     #(#unions)*
                     #collection_impl
+                    #into_static_impl
                 })
             }
         }
@@ -233,9 +239,15 @@ impl<'c> CodeGenerator<'c> {
             }
         }
 
+        // Generate IntoStatic impl
+        let field_names: Vec<&str> = obj.properties.keys().map(|k| k.as_str()).collect();
+        let into_static_impl =
+            self.generate_into_static_for_struct(&type_name, &field_names, true, true);
+
         Ok(quote! {
             #struct_def
             #(#unions)*
+            #into_static_impl
         })
     }
 
@@ -607,9 +619,13 @@ impl<'c> CodeGenerator<'c> {
         let type_base = self.def_to_type_name(nsid, def_name);
         let mut output = Vec::new();
 
-        let params_has_lifetime = query.parameters.as_ref()
+        let params_has_lifetime = query
+            .parameters
+            .as_ref()
             .map(|p| match p {
-                crate::lexicon::LexXrpcQueryParameter::Params(params) => self.params_need_lifetime(params),
+                crate::lexicon::LexXrpcQueryParameter::Params(params) => {
+                    self.params_need_lifetime(params)
+                }
             })
             .unwrap_or(false);
         let has_params = query.parameters.is_some();
@@ -632,7 +648,9 @@ impl<'c> CodeGenerator<'c> {
         }
 
         // Generate XrpcRequest impl
-        let output_encoding = query.output.as_ref()
+        let output_encoding = query
+            .output
+            .as_ref()
             .map(|o| o.encoding.as_ref())
             .unwrap_or("application/json");
         let xrpc_impl = self.generate_xrpc_request_impl(
@@ -689,10 +707,14 @@ impl<'c> CodeGenerator<'c> {
         }
 
         // Generate XrpcRequest impl
-        let input_encoding = proc.input.as_ref()
+        let input_encoding = proc
+            .input
+            .as_ref()
             .map(|i| i.encoding.as_ref())
             .unwrap_or("application/json");
-        let output_encoding = proc.output.as_ref()
+        let output_encoding = proc
+            .output
+            .as_ref()
             .map(|o| o.encoding.as_ref())
             .unwrap_or("application/json");
         let xrpc_impl = self.generate_xrpc_request_impl(
@@ -790,6 +812,31 @@ impl<'c> CodeGenerator<'c> {
 
                 let doc = self.generate_doc_comment(union.description.as_ref());
 
+                // Generate IntoStatic impl for the enum
+                let variant_info: Vec<(String, EnumVariantKind)> = union
+                    .refs
+                    .iter()
+                    .map(|ref_str| {
+                        let ref_def = if let Some((_, fragment)) = ref_str.split_once('#') {
+                            fragment
+                        } else {
+                            "main"
+                        };
+                        let variant_name = if ref_def == "main" {
+                            ref_str.split('.').last().unwrap().to_pascal_case()
+                        } else {
+                            ref_def.to_pascal_case()
+                        };
+                        (variant_name, EnumVariantKind::Tuple)
+                    })
+                    .collect();
+                let into_static_impl = self.generate_into_static_for_enum(
+                    &enum_name,
+                    &variant_info,
+                    true,
+                    true, // open union
+                );
+
                 Ok(quote! {
                     #doc
                     #[jacquard_derive::open_union]
@@ -799,6 +846,8 @@ impl<'c> CodeGenerator<'c> {
                     pub enum #enum_ident<'a> {
                         #(#variants,)*
                     }
+
+                    #into_static_impl
                 })
             }
             LexXrpcSubscriptionMessageSchema::Object(obj) => {
@@ -834,9 +883,15 @@ impl<'c> CodeGenerator<'c> {
                     }
                 }
 
+                // Generate IntoStatic impl
+                let field_names: Vec<&str> = obj.properties.keys().map(|k| k.as_str()).collect();
+                let into_static_impl =
+                    self.generate_into_static_for_struct(&struct_name, &field_names, true, true);
+
                 Ok(quote! {
                     #struct_def
                     #(#unions)*
+                    #into_static_impl
                 })
             }
             LexXrpcSubscriptionMessageSchema::Ref(ref_type) => {
@@ -1181,63 +1236,36 @@ impl<'c> CodeGenerator<'c> {
         ident: &syn::Ident,
         p: &crate::lexicon::LexXrpcParameters<'static>,
     ) -> Result<TokenStream> {
-
         let required = p.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
         let mut fields = Vec::new();
-        let mut default_fields = Vec::new();
+        let mut default_fns = Vec::new();
 
         for (field_name, field_type) in &p.properties {
             let is_required = required.contains(field_name);
-            let field_tokens =
-                self.generate_param_field("", field_name, field_type, is_required)?;
+            let (field_tokens, default_fn) =
+                self.generate_param_field_with_default("", field_name, field_type, is_required)?;
             fields.push(field_tokens);
-
-            // Track field defaults
-            let field_ident = make_ident(&field_name.to_snake_case());
-            let default_value = self.get_param_default_value(field_type, is_required);
-            default_fields.push((field_ident, default_value));
+            if let Some(fn_def) = default_fn {
+                default_fns.push(fn_def);
+            }
         }
 
         let doc = self.generate_doc_comment(p.description.as_ref());
         let needs_lifetime = self.params_need_lifetime(p);
 
-        // Check if we should generate Default impl
-        let has_any_defaults = default_fields.iter().any(|(_, default)| default.is_some());
+        let derives =
+            quote! { #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)] };
 
-        let derives = if has_any_defaults {
-            quote! { #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)] }
-        } else {
-            quote! { #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)] }
-        };
-
-        let default_impl = if has_any_defaults {
-            let field_inits: Vec<_> = default_fields.iter().map(|(field_ident, default_value)| {
-                if let Some(value) = default_value {
-                    quote! { #field_ident: #value }
-                } else {
-                    quote! { #field_ident: Default::default() }
-                }
-            }).collect();
-
-            if needs_lifetime {
-                quote! {
-                    impl Default for #ident<'_> {
-                        fn default() -> Self {
-                            Self {
-                                #(#field_inits,)*
-                            }
-                        }
-                    }
-                }
-            } else {
-                quote! {} // Default derive handles this
-            }
-        } else {
-            quote! {}
-        };
+        // Generate IntoStatic impl
+        let field_names: Vec<&str> = p.properties.keys().map(|k| k.as_str()).collect();
+        let type_name = ident.to_string();
+        let into_static_impl =
+            self.generate_into_static_for_struct(&type_name, &field_names, needs_lifetime, false);
 
         if needs_lifetime {
             Ok(quote! {
+                #(#default_fns)*
+
                 #doc
                 #derives
                 #[serde(rename_all = "camelCase")]
@@ -1245,44 +1273,147 @@ impl<'c> CodeGenerator<'c> {
                     #(#fields)*
                 }
 
-                #default_impl
+                #into_static_impl
             })
         } else {
             Ok(quote! {
+                #(#default_fns)*
+
                 #doc
                 #derives
                 #[serde(rename_all = "camelCase")]
                 pub struct #ident {
                     #(#fields)*
                 }
+
+                #into_static_impl
             })
         }
     }
 
-    /// Get default value for a param field
-    fn get_param_default_value(
+    /// Generate param field with serde default if present
+    /// Returns (field_tokens, optional_default_function)
+    fn generate_param_field_with_default(
         &self,
+        nsid: &str,
+        field_name: &str,
         field_type: &crate::lexicon::LexXrpcParametersProperty<'static>,
         is_required: bool,
-    ) -> Option<TokenStream> {
+    ) -> Result<(TokenStream, Option<TokenStream>)> {
         use crate::lexicon::LexXrpcParametersProperty;
+        use heck::ToSnakeCase;
 
-        let default_opt = match field_type {
-            LexXrpcParametersProperty::Boolean(b) => b.default.map(|v| quote! { #v }),
-            LexXrpcParametersProperty::Integer(i) => i.default.map(|v| quote! { #v }),
-            LexXrpcParametersProperty::String(s) => s.default.as_ref().map(|v| {
-                let s = v.as_ref();
-                quote! { jacquard_common::CowStr::from(#s) }
-            }),
-            LexXrpcParametersProperty::Unknown(_) | LexXrpcParametersProperty::Array(_) => None,
+        // Get base field
+        let base_field = self.generate_param_field(nsid, field_name, field_type, is_required)?;
+
+        // Generate default function and attribute for required fields with defaults
+        // For optional fields, just add doc comments
+        let (doc_comment, serde_attr, default_fn) = if is_required {
+            match field_type {
+                LexXrpcParametersProperty::Boolean(b) if b.default.is_some() => {
+                    let v = b.default.unwrap();
+                    let fn_name = format!("_default_{}", field_name.to_snake_case());
+                    let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
+                    (
+                        Some(format!("Defaults to `{}`", v)),
+                        Some(quote! { #[serde(default = #fn_name)] }),
+                        Some(quote! {
+                            fn #fn_ident() -> bool { #v }
+                        }),
+                    )
+                }
+                LexXrpcParametersProperty::Integer(i) if i.default.is_some() => {
+                    let v = i.default.unwrap();
+                    let fn_name = format!("_default_{}", field_name.to_snake_case());
+                    let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
+                    (
+                        Some(format!("Defaults to `{}`", v)),
+                        Some(quote! { #[serde(default = #fn_name)] }),
+                        Some(quote! {
+                            fn #fn_ident() -> i64 { #v }
+                        }),
+                    )
+                }
+                LexXrpcParametersProperty::String(s) if s.default.is_some() => {
+                    let v = s.default.as_ref().unwrap().as_ref();
+                    let fn_name = format!("_default_{}", field_name.to_snake_case());
+                    let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
+                    (
+                        Some(format!("Defaults to `\"{}\"`", v)),
+                        Some(quote! { #[serde(default = #fn_name)] }),
+                        Some(quote! {
+                            fn #fn_ident() -> jacquard_common::CowStr<'static> {
+                                jacquard_common::CowStr::from(#v)
+                            }
+                        }),
+                    )
+                }
+                _ => (None, None, None),
+            }
+        } else {
+            // Optional fields - just doc comments, no serde defaults
+            let doc = match field_type {
+                LexXrpcParametersProperty::Integer(i) => {
+                    let mut parts = Vec::new();
+                    if let Some(def) = i.default {
+                        parts.push(format!("default: {}", def));
+                    }
+                    if let Some(min) = i.minimum {
+                        parts.push(format!("min: {}", min));
+                    }
+                    if let Some(max) = i.maximum {
+                        parts.push(format!("max: {}", max));
+                    }
+                    if !parts.is_empty() {
+                        Some(format!("({})", parts.join(", ")))
+                    } else {
+                        None
+                    }
+                }
+                LexXrpcParametersProperty::String(s) => {
+                    let mut parts = Vec::new();
+                    if let Some(def) = s.default.as_ref() {
+                        parts.push(format!("default: \"{}\"", def.as_ref()));
+                    }
+                    if let Some(min) = s.min_length {
+                        parts.push(format!("min length: {}", min));
+                    }
+                    if let Some(max) = s.max_length {
+                        parts.push(format!("max length: {}", max));
+                    }
+                    if !parts.is_empty() {
+                        Some(format!("({})", parts.join(", ")))
+                    } else {
+                        None
+                    }
+                }
+                LexXrpcParametersProperty::Boolean(b) => {
+                    b.default.map(|v| format!("(default: {})", v))
+                }
+                _ => None,
+            };
+            (doc, None, None)
         };
 
-        if is_required {
-            default_opt
-        } else {
-            // Optional fields: wrap in Some() if there's a default, otherwise None
-            default_opt.map(|v| quote! { Some(#v) })
-        }
+        let doc = doc_comment.as_ref().map(|d| quote! { #[doc = #d] });
+        let field_with_attrs = match (doc, serde_attr) {
+            (Some(doc), Some(attr)) => quote! {
+                #doc
+                #attr
+                #base_field
+            },
+            (Some(doc), None) => quote! {
+                #doc
+                #base_field
+            },
+            (None, Some(attr)) => quote! {
+                #attr
+                #base_field
+            },
+            (None, None) => base_field,
+        };
+
+        Ok((field_with_attrs, default_fn))
     }
 
     /// Generate input struct from XRPC body
@@ -1318,8 +1449,7 @@ impl<'c> CodeGenerator<'c> {
         if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
             for (field_name, field_type) in &obj.properties {
                 if let LexObjectProperty::Union(union) = field_type {
-                    let union_name =
-                        format!("{}Record{}", type_base, field_name.to_pascal_case());
+                    let union_name = format!("{}Record{}", type_base, field_name.to_pascal_case());
                     let refs: Vec<_> = union.refs.iter().cloned().collect();
                     let union_def = self.generate_union(&union_name, &refs, None, union.closed)?;
                     unions.push(union_def);
@@ -1327,9 +1457,27 @@ impl<'c> CodeGenerator<'c> {
             }
         }
 
+        // Generate IntoStatic impl
+        let field_names: Vec<&str> = match &body.schema {
+            Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) => {
+                obj.properties.keys().map(|k| k.as_str()).collect()
+            }
+            Some(_) => {
+                // For Ref or Union schemas, there's just a single flattened field
+                vec!["value"]
+            }
+            None => {
+                // No schema means no fields, just extra_data
+                vec![]
+            }
+        };
+        let into_static_impl =
+            self.generate_into_static_for_struct(type_base, &field_names, true, true);
+
         Ok(quote! {
             #struct_def
             #(#unions)*
+            #into_static_impl
         })
     }
 
@@ -1376,9 +1524,27 @@ impl<'c> CodeGenerator<'c> {
             }
         }
 
+        // Generate IntoStatic impl
+        let field_names: Vec<&str> = match &body.schema {
+            Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) => {
+                obj.properties.keys().map(|k| k.as_str()).collect()
+            }
+            Some(_) => {
+                // For Ref or Union schemas, there's just a single flattened field
+                vec!["value"]
+            }
+            None => {
+                // No schema means no fields, just extra_data
+                vec![]
+            }
+        };
+        let into_static_impl =
+            self.generate_into_static_for_struct(&struct_name, &field_names, true, true);
+
         Ok(quote! {
             #struct_def
             #(#unions)*
+            #into_static_impl
         })
     }
 
@@ -1515,6 +1681,14 @@ impl<'c> CodeGenerator<'c> {
             });
         }
 
+        // Generate IntoStatic impl
+        let variant_info: Vec<(String, EnumVariantKind)> = errors
+            .iter()
+            .map(|e| (e.name.to_pascal_case(), EnumVariantKind::Tuple))
+            .collect();
+        let into_static_impl =
+            self.generate_into_static_for_enum(&enum_name, &variant_info, true, true);
+
         Ok(quote! {
             #[jacquard_derive::open_union]
             #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic)]
@@ -1532,6 +1706,8 @@ impl<'c> CodeGenerator<'c> {
                     }
                 }
             }
+
+            #into_static_impl
         })
     }
 
@@ -1570,6 +1746,21 @@ impl<'c> CodeGenerator<'c> {
         }
 
         let doc = self.generate_doc_comment(string.description.as_ref());
+
+        // Generate IntoStatic impl
+        let variant_info: Vec<(String, EnumVariantKind)> = known_values
+            .iter()
+            .map(|value| {
+                let variant_name = value_to_variant_name(value.as_ref());
+                (variant_name, EnumVariantKind::Unit)
+            })
+            .chain(std::iter::once((
+                "Other".to_string(),
+                EnumVariantKind::Tuple,
+            )))
+            .collect();
+        let into_static_impl =
+            self.generate_into_static_for_enum(&type_name, &variant_info, true, false);
 
         Ok(quote! {
             #doc
@@ -1633,6 +1824,8 @@ impl<'c> CodeGenerator<'c> {
                     Ok(Self::from(s))
                 }
             }
+
+            #into_static_impl
         })
     }
 
@@ -1732,17 +1925,23 @@ impl<'c> CodeGenerator<'c> {
         has_errors: bool,
     ) -> Result<TokenStream> {
         let output_type = if has_output {
-            let output_ident = syn::Ident::new(&format!("{}Output", type_base), proc_macro2::Span::call_site());
+            let output_ident = syn::Ident::new(
+                &format!("{}Output", type_base),
+                proc_macro2::Span::call_site(),
+            );
             quote! { #output_ident<'de> }
         } else {
             quote! { () }
         };
 
         let error_type = if has_errors {
-            let error_ident = syn::Ident::new(&format!("{}Error", type_base), proc_macro2::Span::call_site());
+            let error_ident = syn::Ident::new(
+                &format!("{}Error", type_base),
+                proc_macro2::Span::call_site(),
+            );
             quote! { #error_ident<'de> }
         } else {
-            quote! { jacquard_common::types::xrpc::GenericError }
+            quote! { jacquard_common::types::xrpc::GenericError<'de> }
         };
 
         if has_params {
@@ -1839,6 +2038,33 @@ impl<'c> CodeGenerator<'c> {
         // Only add open_union if not closed
         let is_open = closed != Some(true);
 
+        // Generate IntoStatic impl
+        let variant_info: Vec<(String, EnumVariantKind)> = refs
+            .iter()
+            .filter_map(|ref_str| {
+                // Skip unknown refs
+                if !self.corpus.ref_exists(ref_str.as_ref()) {
+                    return None;
+                }
+
+                let (ref_nsid, ref_def) = if let Some((nsid, fragment)) = ref_str.split_once('#') {
+                    (nsid, fragment)
+                } else {
+                    (ref_str.as_ref(), "main")
+                };
+
+                let variant_name = if ref_def == "main" {
+                    ref_nsid.split('.').last().unwrap().to_pascal_case()
+                } else {
+                    let last_segment = ref_nsid.split('.').last().unwrap().to_pascal_case();
+                    format!("{}{}", last_segment, ref_def.to_pascal_case())
+                };
+                Some((variant_name, EnumVariantKind::Tuple))
+            })
+            .collect();
+        let into_static_impl =
+            self.generate_into_static_for_enum(union_name, &variant_info, true, is_open);
+
         if is_open {
             Ok(quote! {
                 #doc
@@ -1849,6 +2075,8 @@ impl<'c> CodeGenerator<'c> {
                 pub enum #enum_ident<'a> {
                     #(#variants,)*
                 }
+
+                #into_static_impl
             })
         } else {
             Ok(quote! {
@@ -1859,9 +2087,150 @@ impl<'c> CodeGenerator<'c> {
                 pub enum #enum_ident<'a> {
                     #(#variants,)*
                 }
+
+                #into_static_impl
             })
         }
     }
+
+    /// Generate IntoStatic impl for a struct
+    fn generate_into_static_for_struct(
+        &self,
+        type_name: &str,
+        field_names: &[&str],
+        has_lifetime: bool,
+        has_extra_data: bool,
+    ) -> TokenStream {
+        let ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
+
+        let field_idents: Vec<_> = field_names
+            .iter()
+            .map(|name| make_ident(&name.to_snake_case()))
+            .collect();
+
+        if has_lifetime {
+            let field_conversions: Vec<_> = field_idents
+                .iter()
+                .map(|field| quote! { #field: self.#field.into_static() })
+                .collect();
+
+            let extra_data_conversion = if has_extra_data {
+                quote! { extra_data: self.extra_data.into_static(), }
+            } else {
+                quote! {}
+            };
+
+            quote! {
+                impl jacquard_common::IntoStatic for #ident<'_> {
+                    type Output = #ident<'static>;
+
+                    fn into_static(self) -> Self::Output {
+                        #ident {
+                            #(#field_conversions,)*
+                            #extra_data_conversion
+                        }
+                    }
+                }
+            }
+        } else {
+            quote! {
+                impl jacquard_common::IntoStatic for #ident {
+                    type Output = #ident;
+
+                    fn into_static(self) -> Self::Output {
+                        self
+                    }
+                }
+            }
+        }
+    }
+
+    /// Generate IntoStatic impl for an enum
+    fn generate_into_static_for_enum(
+        &self,
+        type_name: &str,
+        variant_info: &[(String, EnumVariantKind)],
+        has_lifetime: bool,
+        is_open: bool,
+    ) -> TokenStream {
+        let ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
+
+        if has_lifetime {
+            let variant_conversions: Vec<_> = variant_info
+                .iter()
+                .map(|(variant_name, kind)| {
+                    let variant_ident = syn::Ident::new(variant_name, proc_macro2::Span::call_site());
+                    match kind {
+                        EnumVariantKind::Unit => {
+                            quote! {
+                                #ident::#variant_ident => #ident::#variant_ident
+                            }
+                        }
+                        EnumVariantKind::Tuple => {
+                            quote! {
+                                #ident::#variant_ident(v) => #ident::#variant_ident(v.into_static())
+                            }
+                        }
+                        EnumVariantKind::Struct(fields) => {
+                            let field_idents: Vec<_> = fields
+                                .iter()
+                                .map(|f| make_ident(&f.to_snake_case()))
+                                .collect();
+                            let field_conversions: Vec<_> = field_idents
+                                .iter()
+                                .map(|f| quote! { #f: #f.into_static() })
+                                .collect();
+                            quote! {
+                                #ident::#variant_ident { #(#field_idents,)* } => #ident::#variant_ident {
+                                    #(#field_conversions,)*
+                                }
+                            }
+                        }
+                    }
+                })
+                .collect();
+
+            let unknown_conversion = if is_open {
+                quote! {
+                    #ident::Unknown(v) => #ident::Unknown(v.into_static()),
+                }
+            } else {
+                quote! {}
+            };
+
+            quote! {
+                impl jacquard_common::IntoStatic for #ident<'_> {
+                    type Output = #ident<'static>;
+
+                    fn into_static(self) -> Self::Output {
+                        match self {
+                            #(#variant_conversions,)*
+                            #unknown_conversion
+                        }
+                    }
+                }
+            }
+        } else {
+            quote! {
+                impl jacquard_common::IntoStatic for #ident {
+                    type Output = #ident;
+
+                    fn into_static(self) -> Self::Output {
+                        self
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Enum variant kind for IntoStatic generation
+#[derive(Debug, Clone)]
+#[allow(dead_code)]
+enum EnumVariantKind {
+    Unit,
+    Tuple,
+    Struct(Vec<String>),
 }
 
 #[cfg(test)]

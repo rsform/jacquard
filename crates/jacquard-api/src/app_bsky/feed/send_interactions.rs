@@ -13,10 +13,29 @@ pub struct SendInteractions<'a> {
     pub interactions: Vec<crate::app_bsky::feed::Interaction<'a>>,
 }
 
+impl jacquard_common::IntoStatic for SendInteractions<'_> {
+    type Output = SendInteractions<'static>;
+    fn into_static(self) -> Self::Output {
+        SendInteractions {
+            interactions: self.interactions.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SendInteractionsOutput<'a> {}
+impl jacquard_common::IntoStatic for SendInteractionsOutput<'_> {
+    type Output = SendInteractionsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        SendInteractionsOutput {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for SendInteractions<'_> {
     const NSID: &'static str = "app.bsky.feed.sendInteractions";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -24,5 +43,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for SendInteractions<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = SendInteractionsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

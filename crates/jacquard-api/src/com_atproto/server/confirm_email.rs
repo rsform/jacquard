@@ -15,6 +15,17 @@ pub struct ConfirmEmail<'a> {
     pub token: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for ConfirmEmail<'_> {
+    type Output = ConfirmEmail<'static>;
+    fn into_static(self) -> Self::Output {
+        ConfirmEmail {
+            email: self.email.into_static(),
+            token: self.token.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -71,6 +82,27 @@ impl std::fmt::Display for ConfirmEmailError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for ConfirmEmailError<'_> {
+    type Output = ConfirmEmailError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ConfirmEmailError::AccountNotFound(v) => {
+                ConfirmEmailError::AccountNotFound(v.into_static())
+            }
+            ConfirmEmailError::ExpiredToken(v) => {
+                ConfirmEmailError::ExpiredToken(v.into_static())
+            }
+            ConfirmEmailError::InvalidToken(v) => {
+                ConfirmEmailError::InvalidToken(v.into_static())
+            }
+            ConfirmEmailError::InvalidEmail(v) => {
+                ConfirmEmailError::InvalidEmail(v.into_static())
+            }
+            ConfirmEmailError::Unknown(v) => ConfirmEmailError::Unknown(v.into_static()),
         }
     }
 }

@@ -13,6 +13,16 @@ pub struct DeleteBookmark<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+impl jacquard_common::IntoStatic for DeleteBookmark<'_> {
+    type Output = DeleteBookmark<'static>;
+    fn into_static(self) -> Self::Output {
+        DeleteBookmark {
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -43,6 +53,20 @@ impl std::fmt::Display for DeleteBookmarkError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for DeleteBookmarkError<'_> {
+    type Output = DeleteBookmarkError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            DeleteBookmarkError::UnsupportedCollection(v) => {
+                DeleteBookmarkError::UnsupportedCollection(v.into_static())
+            }
+            DeleteBookmarkError::Unknown(v) => {
+                DeleteBookmarkError::Unknown(v.into_static())
+            }
         }
     }
 }

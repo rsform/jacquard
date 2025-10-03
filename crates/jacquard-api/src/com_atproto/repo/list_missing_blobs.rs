@@ -5,21 +5,23 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ListMissingBlobs<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 500, min: 1, max: 1000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
-impl Default for ListMissingBlobs<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            limit: Some(500i64),
+impl jacquard_common::IntoStatic for ListMissingBlobs<'_> {
+    type Output = ListMissingBlobs<'static>;
+    fn into_static(self) -> Self::Output {
+        ListMissingBlobs {
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
         }
     }
 }
@@ -35,12 +37,23 @@ pub struct ListMissingBlobsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for ListMissingBlobsOutput<'_> {
+    type Output = ListMissingBlobsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        ListMissingBlobsOutput {
+            blobs: self.blobs.into_static(),
+            cursor: self.cursor.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for ListMissingBlobs<'_> {
     const NSID: &'static str = "com.atproto.repo.listMissingBlobs";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ListMissingBlobsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]
@@ -51,4 +64,15 @@ pub struct RecordBlob<'a> {
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(borrow)]
     pub record_uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+impl jacquard_common::IntoStatic for RecordBlob<'_> {
+    type Output = RecordBlob<'static>;
+    fn into_static(self) -> Self::Output {
+        RecordBlob {
+            cid: self.cid.into_static(),
+            record_uri: self.record_uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryStatuses<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -56,10 +56,12 @@ pub struct QueryStatuses<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub last_reviewed_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub min_account_suspend_count: std::option::Option<i64>,
+    ///(min: 0, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub min_priority_score: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -86,9 +88,11 @@ pub struct QueryStatuses<'a> {
     pub reviewed_after: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub reviewed_before: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///(default: "desc")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sort_direction: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: "lastReportedAt")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sort_field: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -105,44 +109,45 @@ pub struct QueryStatuses<'a> {
     pub takendown: std::option::Option<bool>,
 }
 
-impl Default for QueryStatuses<'_> {
-    fn default() -> Self {
-        Self {
-            age_assurance_state: Default::default(),
-            appealed: Default::default(),
-            collections: Default::default(),
-            comment: Default::default(),
-            cursor: Default::default(),
-            exclude_tags: Default::default(),
-            hosting_deleted_after: Default::default(),
-            hosting_deleted_before: Default::default(),
-            hosting_statuses: Default::default(),
-            hosting_updated_after: Default::default(),
-            hosting_updated_before: Default::default(),
-            ignore_subjects: Default::default(),
-            include_all_user_records: Default::default(),
-            include_muted: Default::default(),
-            last_reviewed_by: Default::default(),
-            limit: Some(50i64),
-            min_account_suspend_count: Default::default(),
-            min_priority_score: Default::default(),
-            min_reported_records_count: Default::default(),
-            min_takendown_records_count: Default::default(),
-            only_muted: Default::default(),
-            queue_count: Default::default(),
-            queue_index: Default::default(),
-            queue_seed: Default::default(),
-            reported_after: Default::default(),
-            reported_before: Default::default(),
-            review_state: Default::default(),
-            reviewed_after: Default::default(),
-            reviewed_before: Default::default(),
-            sort_direction: Some(jacquard_common::CowStr::from("desc")),
-            sort_field: Some(jacquard_common::CowStr::from("lastReportedAt")),
-            subject: Default::default(),
-            subject_type: Default::default(),
-            tags: Default::default(),
-            takendown: Default::default(),
+impl jacquard_common::IntoStatic for QueryStatuses<'_> {
+    type Output = QueryStatuses<'static>;
+    fn into_static(self) -> Self::Output {
+        QueryStatuses {
+            age_assurance_state: self.age_assurance_state.into_static(),
+            appealed: self.appealed.into_static(),
+            collections: self.collections.into_static(),
+            comment: self.comment.into_static(),
+            cursor: self.cursor.into_static(),
+            exclude_tags: self.exclude_tags.into_static(),
+            hosting_deleted_after: self.hosting_deleted_after.into_static(),
+            hosting_deleted_before: self.hosting_deleted_before.into_static(),
+            hosting_statuses: self.hosting_statuses.into_static(),
+            hosting_updated_after: self.hosting_updated_after.into_static(),
+            hosting_updated_before: self.hosting_updated_before.into_static(),
+            ignore_subjects: self.ignore_subjects.into_static(),
+            include_all_user_records: self.include_all_user_records.into_static(),
+            include_muted: self.include_muted.into_static(),
+            last_reviewed_by: self.last_reviewed_by.into_static(),
+            limit: self.limit.into_static(),
+            min_account_suspend_count: self.min_account_suspend_count.into_static(),
+            min_priority_score: self.min_priority_score.into_static(),
+            min_reported_records_count: self.min_reported_records_count.into_static(),
+            min_takendown_records_count: self.min_takendown_records_count.into_static(),
+            only_muted: self.only_muted.into_static(),
+            queue_count: self.queue_count.into_static(),
+            queue_index: self.queue_index.into_static(),
+            queue_seed: self.queue_seed.into_static(),
+            reported_after: self.reported_after.into_static(),
+            reported_before: self.reported_before.into_static(),
+            review_state: self.review_state.into_static(),
+            reviewed_after: self.reviewed_after.into_static(),
+            reviewed_before: self.reviewed_before.into_static(),
+            sort_direction: self.sort_direction.into_static(),
+            sort_field: self.sort_field.into_static(),
+            subject: self.subject.into_static(),
+            subject_type: self.subject_type.into_static(),
+            tags: self.tags.into_static(),
+            takendown: self.takendown.into_static(),
         }
     }
 }
@@ -158,10 +163,21 @@ pub struct QueryStatusesOutput<'a> {
     pub subject_statuses: Vec<crate::tools_ozone::moderation::SubjectStatusView<'a>>,
 }
 
+impl jacquard_common::IntoStatic for QueryStatusesOutput<'_> {
+    type Output = QueryStatusesOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        QueryStatusesOutput {
+            cursor: self.cursor.into_static(),
+            subject_statuses: self.subject_statuses.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for QueryStatuses<'_> {
     const NSID: &'static str = "tools.ozone.moderation.queryStatuses";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = QueryStatusesOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

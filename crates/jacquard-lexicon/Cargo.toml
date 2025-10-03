@@ -20,7 +20,7 @@ clap = { workspace = true }
 heck = "0.5.0"
 itertools = "0.14.0"
 jacquard-common = { version = "0.1.0", path = "../jacquard-common" }
-miette = "7.6.0"
+miette = { version = "7.6.0", features = ["fancy"] }
 prettyplease = "0.2.37"
 proc-macro2 = "1.0.101"
 quote = "1.0.41"

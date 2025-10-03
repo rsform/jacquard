@@ -16,12 +16,34 @@ pub struct AppPassword<'a> {
     pub privileged: std::option::Option<bool>,
 }
 
+impl jacquard_common::IntoStatic for AppPassword<'_> {
+    type Output = AppPassword<'static>;
+    fn into_static(self) -> Self::Output {
+        AppPassword {
+            created_at: self.created_at.into_static(),
+            name: self.name.into_static(),
+            privileged: self.privileged.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ListAppPasswordsOutput<'a> {
     #[serde(borrow)]
     pub passwords: Vec<jacquard_common::types::value::Data<'a>>,
+}
+
+impl jacquard_common::IntoStatic for ListAppPasswordsOutput<'_> {
+    type Output = ListAppPasswordsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        ListAppPasswordsOutput {
+            passwords: self.passwords.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -53,6 +75,20 @@ impl std::fmt::Display for ListAppPasswordsError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for ListAppPasswordsError<'_> {
+    type Output = ListAppPasswordsError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListAppPasswordsError::AccountTakedown(v) => {
+                ListAppPasswordsError::AccountTakedown(v.into_static())
+            }
+            ListAppPasswordsError::Unknown(v) => {
+                ListAppPasswordsError::Unknown(v.into_static())
+            }
         }
     }
 }

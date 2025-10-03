@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchPostsSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -19,6 +19,7 @@ pub struct SearchPostsSkeleton<'a> {
     pub domain: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub lang: std::option::Option<jacquard_common::types::string::Language>,
+    ///(default: 25, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -29,6 +30,7 @@ pub struct SearchPostsSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub since: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: "latest")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -46,22 +48,23 @@ pub struct SearchPostsSkeleton<'a> {
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-impl Default for SearchPostsSkeleton<'_> {
-    fn default() -> Self {
-        Self {
-            author: Default::default(),
-            cursor: Default::default(),
-            domain: Default::default(),
-            lang: Default::default(),
-            limit: Some(25i64),
-            mentions: Default::default(),
-            q: Default::default(),
-            since: Default::default(),
-            sort: Some(jacquard_common::CowStr::from("latest")),
-            tag: Default::default(),
-            until: Default::default(),
-            url: Default::default(),
-            viewer: Default::default(),
+impl jacquard_common::IntoStatic for SearchPostsSkeleton<'_> {
+    type Output = SearchPostsSkeleton<'static>;
+    fn into_static(self) -> Self::Output {
+        SearchPostsSkeleton {
+            author: self.author.into_static(),
+            cursor: self.cursor.into_static(),
+            domain: self.domain.into_static(),
+            lang: self.lang.into_static(),
+            limit: self.limit.into_static(),
+            mentions: self.mentions.into_static(),
+            q: self.q.into_static(),
+            since: self.since.into_static(),
+            sort: self.sort.into_static(),
+            tag: self.tag.into_static(),
+            until: self.until.into_static(),
+            url: self.url.into_static(),
+            viewer: self.viewer.into_static(),
         }
     }
 }
@@ -78,6 +81,18 @@ pub struct SearchPostsSkeletonOutput<'a> {
     pub hits_total: std::option::Option<i64>,
     #[serde(borrow)]
     pub posts: Vec<crate::app_bsky::unspecced::SkeletonSearchPost<'a>>,
+}
+
+impl jacquard_common::IntoStatic for SearchPostsSkeletonOutput<'_> {
+    type Output = SearchPostsSkeletonOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        SearchPostsSkeletonOutput {
+            cursor: self.cursor.into_static(),
+            hits_total: self.hits_total.into_static(),
+            posts: self.posts.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -109,6 +124,20 @@ impl std::fmt::Display for SearchPostsSkeletonError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for SearchPostsSkeletonError<'_> {
+    type Output = SearchPostsSkeletonError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SearchPostsSkeletonError::BadQueryString(v) => {
+                SearchPostsSkeletonError::BadQueryString(v.into_static())
+            }
+            SearchPostsSkeletonError::Unknown(v) => {
+                SearchPostsSkeletonError::Unknown(v.into_static())
+            }
         }
     }
 }

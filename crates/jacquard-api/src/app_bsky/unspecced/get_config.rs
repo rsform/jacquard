@@ -15,6 +15,17 @@ pub struct LiveNowConfig<'a> {
     pub domains: Vec<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for LiveNowConfig<'_> {
+    type Output = LiveNowConfig<'static>;
+    fn into_static(self) -> Self::Output {
+        LiveNowConfig {
+            did: self.did.into_static(),
+            domains: self.domains.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -26,6 +37,17 @@ pub struct GetConfigOutput<'a> {
     pub live_now: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
 }
 
+impl jacquard_common::IntoStatic for GetConfigOutput<'_> {
+    type Output = GetConfigOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetConfigOutput {
+            check_email_confirmed: self.check_email_confirmed.into_static(),
+            live_now: self.live_now.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct GetConfig;
@@ -34,5 +56,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for GetConfig {
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetConfigOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -13,6 +13,16 @@ pub struct Feed<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+impl jacquard_common::IntoStatic for Feed<'_> {
+    type Output = Feed<'static>;
+    fn into_static(self) -> Self::Output {
+        Feed {
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -23,6 +33,17 @@ pub struct Links<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub terms_of_service: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl jacquard_common::IntoStatic for Links<'_> {
+    type Output = Links<'static>;
+    fn into_static(self) -> Self::Output {
+        Links {
+            privacy_policy: self.privacy_policy.into_static(),
+            terms_of_service: self.terms_of_service.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -38,6 +59,18 @@ pub struct DescribeFeedGeneratorOutput<'a> {
     pub links: std::option::Option<jacquard_common::types::value::Data<'a>>,
 }
 
+impl jacquard_common::IntoStatic for DescribeFeedGeneratorOutput<'_> {
+    type Output = DescribeFeedGeneratorOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        DescribeFeedGeneratorOutput {
+            did: self.did.into_static(),
+            feeds: self.feeds.into_static(),
+            links: self.links.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct DescribeFeedGenerator;
@@ -46,5 +79,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for DescribeFeedGenerator {
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = DescribeFeedGeneratorOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

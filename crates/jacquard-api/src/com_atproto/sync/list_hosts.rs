@@ -22,21 +22,36 @@ pub struct Host<'a> {
     pub status: std::option::Option<crate::com_atproto::sync::HostStatus<'a>>,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+impl jacquard_common::IntoStatic for Host<'_> {
+    type Output = Host<'static>;
+    fn into_static(self) -> Self::Output {
+        Host {
+            account_count: self.account_count.into_static(),
+            hostname: self.hostname.into_static(),
+            seq: self.seq.into_static(),
+            status: self.status.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ListHosts<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 200, min: 1, max: 1000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
-impl Default for ListHosts<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            limit: Some(200i64),
+impl jacquard_common::IntoStatic for ListHosts<'_> {
+    type Output = ListHosts<'static>;
+    fn into_static(self) -> Self::Output {
+        ListHosts {
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
         }
     }
 }
@@ -53,10 +68,21 @@ pub struct ListHostsOutput<'a> {
     pub hosts: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
+impl jacquard_common::IntoStatic for ListHostsOutput<'_> {
+    type Output = ListHostsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        ListHostsOutput {
+            cursor: self.cursor.into_static(),
+            hosts: self.hosts.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for ListHosts<'_> {
     const NSID: &'static str = "com.atproto.sync.listHosts";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ListHostsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

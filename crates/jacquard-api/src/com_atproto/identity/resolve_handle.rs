@@ -12,12 +12,31 @@ pub struct ResolveHandle<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
+impl jacquard_common::IntoStatic for ResolveHandle<'_> {
+    type Output = ResolveHandle<'static>;
+    fn into_static(self) -> Self::Output {
+        ResolveHandle {
+            handle: self.handle.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveHandleOutput<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
+}
+
+impl jacquard_common::IntoStatic for ResolveHandleOutput<'_> {
+    type Output = ResolveHandleOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        ResolveHandleOutput {
+            did: self.did.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -50,6 +69,20 @@ impl std::fmt::Display for ResolveHandleError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for ResolveHandleError<'_> {
+    type Output = ResolveHandleError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ResolveHandleError::HandleNotFound(v) => {
+                ResolveHandleError::HandleNotFound(v.into_static())
+            }
+            ResolveHandleError::Unknown(v) => {
+                ResolveHandleError::Unknown(v.into_static())
+            }
         }
     }
 }

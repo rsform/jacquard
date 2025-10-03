@@ -14,6 +14,16 @@ pub struct DeactivateAccount<'a> {
     pub delete_after: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+impl jacquard_common::IntoStatic for DeactivateAccount<'_> {
+    type Output = DeactivateAccount<'static>;
+    fn into_static(self) -> Self::Output {
+        DeactivateAccount {
+            delete_after: self.delete_after.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for DeactivateAccount<'_> {
     const NSID: &'static str = "com.atproto.server.deactivateAccount";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -21,5 +31,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for DeactivateAccount<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

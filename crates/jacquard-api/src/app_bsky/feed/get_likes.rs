@@ -15,7 +15,19 @@ pub struct Like<'a> {
     pub indexed_at: jacquard_common::types::string::Datetime,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+impl jacquard_common::IntoStatic for Like<'_> {
+    type Output = Like<'static>;
+    fn into_static(self) -> Self::Output {
+        Like {
+            actor: self.actor.into_static(),
+            created_at: self.created_at.into_static(),
+            indexed_at: self.indexed_at.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLikes<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -24,19 +36,21 @@ pub struct GetLikes<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl Default for GetLikes<'_> {
-    fn default() -> Self {
-        Self {
-            cid: Default::default(),
-            cursor: Default::default(),
-            limit: Some(50i64),
-            uri: Default::default(),
+impl jacquard_common::IntoStatic for GetLikes<'_> {
+    type Output = GetLikes<'static>;
+    fn into_static(self) -> Self::Output {
+        GetLikes {
+            cid: self.cid.into_static(),
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
+            uri: self.uri.into_static(),
         }
     }
 }
@@ -57,10 +71,23 @@ pub struct GetLikesOutput<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetLikesOutput<'_> {
+    type Output = GetLikesOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetLikesOutput {
+            cid: self.cid.into_static(),
+            cursor: self.cursor.into_static(),
+            likes: self.likes.into_static(),
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetLikes<'_> {
     const NSID: &'static str = "app.bsky.feed.getLikes";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetLikesOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

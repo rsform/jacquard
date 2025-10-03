@@ -31,6 +31,23 @@ pub struct GetSessionOutput<'a> {
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetSessionOutput<'_> {
+    type Output = GetSessionOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetSessionOutput {
+            active: self.active.into_static(),
+            did: self.did.into_static(),
+            did_doc: self.did_doc.into_static(),
+            email: self.email.into_static(),
+            email_auth_factor: self.email_auth_factor.into_static(),
+            email_confirmed: self.email_confirmed.into_static(),
+            handle: self.handle.into_static(),
+            status: self.status.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct GetSession;
@@ -39,5 +56,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for GetSession {
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetSessionOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

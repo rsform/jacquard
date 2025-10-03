@@ -9,6 +9,15 @@
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ExportAccountDataOutput<'a> {}
+impl jacquard_common::IntoStatic for ExportAccountDataOutput<'_> {
+    type Output = ExportAccountDataOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        ExportAccountDataOutput {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct ExportAccountData;
@@ -17,5 +26,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for ExportAccountData {
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/jsonl";
     type Output<'de> = ExportAccountDataOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

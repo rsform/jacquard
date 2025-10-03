@@ -12,6 +12,15 @@ pub struct GetActorMetadata<'a> {
     pub actor: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetActorMetadata<'_> {
+    type Output = GetActorMetadata<'static>;
+    fn into_static(self) -> Self::Output {
+        GetActorMetadata {
+            actor: self.actor.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -24,12 +33,24 @@ pub struct GetActorMetadataOutput<'a> {
     pub month: jacquard_common::types::value::Data<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetActorMetadataOutput<'_> {
+    type Output = GetActorMetadataOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetActorMetadataOutput {
+            all: self.all.into_static(),
+            day: self.day.into_static(),
+            month: self.month.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetActorMetadata<'_> {
     const NSID: &'static str = "chat.bsky.moderation.getActorMetadata";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetActorMetadataOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]
@@ -40,4 +61,17 @@ pub struct Metadata<'a> {
     pub convos_started: i64,
     pub messages_received: i64,
     pub messages_sent: i64,
+}
+
+impl jacquard_common::IntoStatic for Metadata<'_> {
+    type Output = Metadata<'static>;
+    fn into_static(self) -> Self::Output {
+        Metadata {
+            convos: self.convos.into_static(),
+            convos_started: self.convos_started.into_static(),
+            messages_received: self.messages_received.into_static(),
+            messages_sent: self.messages_sent.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

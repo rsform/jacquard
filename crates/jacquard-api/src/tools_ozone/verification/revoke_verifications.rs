@@ -18,6 +18,17 @@ pub struct RevokeVerifications<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+impl jacquard_common::IntoStatic for RevokeVerifications<'_> {
+    type Output = RevokeVerifications<'static>;
+    fn into_static(self) -> Self::Output {
+        RevokeVerifications {
+            revoke_reason: self.revoke_reason.into_static(),
+            uris: self.uris.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -30,6 +41,17 @@ pub struct RevokeVerificationsOutput<'a> {
     pub revoked_verifications: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+impl jacquard_common::IntoStatic for RevokeVerificationsOutput<'_> {
+    type Output = RevokeVerificationsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        RevokeVerificationsOutput {
+            failed_revocations: self.failed_revocations.into_static(),
+            revoked_verifications: self.revoked_verifications.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for RevokeVerifications<'_> {
     const NSID: &'static str = "tools.ozone.verification.revokeVerifications";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -37,7 +59,7 @@ impl jacquard_common::types::xrpc::XrpcRequest for RevokeVerifications<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = RevokeVerificationsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 ///Error object for failed revocations
@@ -51,4 +73,15 @@ pub struct RevokeError<'a> {
     ///The AT-URI of the verification record that failed to revoke.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+impl jacquard_common::IntoStatic for RevokeError<'_> {
+    type Output = RevokeError<'static>;
+    fn into_static(self) -> Self::Output {
+        RevokeError {
+            error: self.error.into_static(),
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

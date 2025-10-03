@@ -15,6 +15,17 @@ pub struct DeleteMessageForSelf<'a> {
     pub message_id: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for DeleteMessageForSelf<'_> {
+    type Output = DeleteMessageForSelf<'static>;
+    fn into_static(self) -> Self::Output {
+        DeleteMessageForSelf {
+            convo_id: self.convo_id.into_static(),
+            message_id: self.message_id.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -24,6 +35,16 @@ pub struct DeleteMessageForSelfOutput<'a> {
     pub value: crate::chat_bsky::convo::DeletedMessageView<'a>,
 }
 
+impl jacquard_common::IntoStatic for DeleteMessageForSelfOutput<'_> {
+    type Output = DeleteMessageForSelfOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        DeleteMessageForSelfOutput {
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for DeleteMessageForSelf<'_> {
     const NSID: &'static str = "chat.bsky.convo.deleteMessageForSelf";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -31,5 +52,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for DeleteMessageForSelf<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = DeleteMessageForSelfOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

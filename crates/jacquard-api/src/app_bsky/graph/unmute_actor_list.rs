@@ -13,6 +13,16 @@ pub struct UnmuteActorList<'a> {
     pub list: jacquard_common::types::string::AtUri<'a>,
 }
 
+impl jacquard_common::IntoStatic for UnmuteActorList<'_> {
+    type Output = UnmuteActorList<'static>;
+    fn into_static(self) -> Self::Output {
+        UnmuteActorList {
+            list: self.list.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for UnmuteActorList<'_> {
     const NSID: &'static str = "app.bsky.graph.unmuteActorList";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -20,5 +30,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for UnmuteActorList<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

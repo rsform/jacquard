@@ -14,6 +14,16 @@ pub struct RequestCrawl<'a> {
     pub hostname: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for RequestCrawl<'_> {
+    type Output = RequestCrawl<'static>;
+    fn into_static(self) -> Self::Output {
+        RequestCrawl {
+            hostname: self.hostname.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -43,6 +53,18 @@ impl std::fmt::Display for RequestCrawlError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for RequestCrawlError<'_> {
+    type Output = RequestCrawlError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RequestCrawlError::HostBanned(v) => {
+                RequestCrawlError::HostBanned(v.into_static())
+            }
+            RequestCrawlError::Unknown(v) => RequestCrawlError::Unknown(v.into_static()),
         }
     }
 }

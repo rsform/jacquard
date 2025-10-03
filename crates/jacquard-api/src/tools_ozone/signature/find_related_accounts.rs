@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct FindRelatedAccounts<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -13,16 +13,18 @@ pub struct FindRelatedAccounts<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
-impl Default for FindRelatedAccounts<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            did: Default::default(),
-            limit: Some(50i64),
+impl jacquard_common::IntoStatic for FindRelatedAccounts<'_> {
+    type Output = FindRelatedAccounts<'static>;
+    fn into_static(self) -> Self::Output {
+        FindRelatedAccounts {
+            cursor: self.cursor.into_static(),
+            did: self.did.into_static(),
+            limit: self.limit.into_static(),
         }
     }
 }
@@ -38,12 +40,23 @@ pub struct FindRelatedAccountsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for FindRelatedAccountsOutput<'_> {
+    type Output = FindRelatedAccountsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        FindRelatedAccountsOutput {
+            accounts: self.accounts.into_static(),
+            cursor: self.cursor.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for FindRelatedAccounts<'_> {
     const NSID: &'static str = "tools.ozone.signature.findRelatedAccounts";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = FindRelatedAccountsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]
@@ -57,4 +70,15 @@ pub struct RelatedAccount<'a> {
     pub similarities: std::option::Option<
         Vec<crate::tools_ozone::signature::SigDetail<'a>>,
     >,
+}
+
+impl jacquard_common::IntoStatic for RelatedAccount<'_> {
+    type Output = RelatedAccount<'static>;
+    fn into_static(self) -> Self::Output {
+        RelatedAccount {
+            account: self.account.into_static(),
+            similarities: self.similarities.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

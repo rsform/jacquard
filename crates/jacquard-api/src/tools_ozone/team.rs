@@ -31,3 +31,19 @@ pub struct Member<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
+
+impl jacquard_common::IntoStatic for Member<'_> {
+    type Output = Member<'static>;
+    fn into_static(self) -> Self::Output {
+        Member {
+            created_at: self.created_at.into_static(),
+            did: self.did.into_static(),
+            disabled: self.disabled.into_static(),
+            last_updated_by: self.last_updated_by.into_static(),
+            profile: self.profile.into_static(),
+            role: self.role.into_static(),
+            updated_at: self.updated_at.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

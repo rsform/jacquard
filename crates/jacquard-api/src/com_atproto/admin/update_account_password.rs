@@ -15,6 +15,17 @@ pub struct UpdateAccountPassword<'a> {
     pub password: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for UpdateAccountPassword<'_> {
+    type Output = UpdateAccountPassword<'static>;
+    fn into_static(self) -> Self::Output {
+        UpdateAccountPassword {
+            did: self.did.into_static(),
+            password: self.password.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for UpdateAccountPassword<'_> {
     const NSID: &'static str = "com.atproto.admin.updateAccountPassword";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -22,5 +33,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for UpdateAccountPassword<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

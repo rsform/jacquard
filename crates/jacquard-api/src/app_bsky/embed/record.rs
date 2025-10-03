@@ -13,6 +13,16 @@ pub struct Record<'a> {
     pub record: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+impl jacquard_common::IntoStatic for Record<'_> {
+    type Output = Record<'static>;
+    fn into_static(self) -> Self::Output {
+        Record {
+            record: self.record.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -36,6 +46,37 @@ pub enum ViewRecordRecord<'a> {
     DefsStarterPackViewBasic(Box<crate::app_bsky::graph::StarterPackViewBasic<'a>>),
 }
 
+impl jacquard_common::IntoStatic for ViewRecordRecord<'_> {
+    type Output = ViewRecordRecord<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ViewRecordRecord::DefsGeneratorView(v) => {
+                ViewRecordRecord::DefsGeneratorView(v.into_static())
+            }
+            ViewRecordRecord::DefsListView(v) => {
+                ViewRecordRecord::DefsListView(v.into_static())
+            }
+            ViewRecordRecord::DefsLabelerView(v) => {
+                ViewRecordRecord::DefsLabelerView(v.into_static())
+            }
+            ViewRecordRecord::DefsStarterPackViewBasic(v) => {
+                ViewRecordRecord::DefsStarterPackViewBasic(v.into_static())
+            }
+            ViewRecordRecord::Unknown(v) => ViewRecordRecord::Unknown(v.into_static()),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for View<'_> {
+    type Output = View<'static>;
+    fn into_static(self) -> Self::Output {
+        View {
+            record: self.record.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -47,6 +88,18 @@ pub struct ViewBlocked<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+impl jacquard_common::IntoStatic for ViewBlocked<'_> {
+    type Output = ViewBlocked<'static>;
+    fn into_static(self) -> Self::Output {
+        ViewBlocked {
+            author: self.author.into_static(),
+            blocked: self.blocked.into_static(),
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -56,6 +109,17 @@ pub struct ViewDetached<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+impl jacquard_common::IntoStatic for ViewDetached<'_> {
+    type Output = ViewDetached<'static>;
+    fn into_static(self) -> Self::Output {
+        ViewDetached {
+            detached: self.detached.into_static(),
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -63,6 +127,17 @@ pub struct ViewNotFound<'a> {
     pub not_found: bool,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+impl jacquard_common::IntoStatic for ViewNotFound<'_> {
+    type Output = ViewNotFound<'static>;
+    fn into_static(self) -> Self::Output {
+        ViewNotFound {
+            not_found: self.not_found.into_static(),
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -93,4 +168,24 @@ pub struct ViewRecord<'a> {
     ///The record data itself.
     #[serde(borrow)]
     pub value: jacquard_common::types::value::Data<'a>,
+}
+
+impl jacquard_common::IntoStatic for ViewRecord<'_> {
+    type Output = ViewRecord<'static>;
+    fn into_static(self) -> Self::Output {
+        ViewRecord {
+            author: self.author.into_static(),
+            cid: self.cid.into_static(),
+            embeds: self.embeds.into_static(),
+            indexed_at: self.indexed_at.into_static(),
+            labels: self.labels.into_static(),
+            like_count: self.like_count.into_static(),
+            quote_count: self.quote_count.into_static(),
+            reply_count: self.reply_count.into_static(),
+            repost_count: self.repost_count.into_static(),
+            uri: self.uri.into_static(),
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

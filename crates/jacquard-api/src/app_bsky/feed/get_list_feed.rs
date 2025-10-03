@@ -5,24 +5,26 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetListFeed<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub list: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl Default for GetListFeed<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            limit: Some(50i64),
-            list: Default::default(),
+impl jacquard_common::IntoStatic for GetListFeed<'_> {
+    type Output = GetListFeed<'static>;
+    fn into_static(self) -> Self::Output {
+        GetListFeed {
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
+            list: self.list.into_static(),
         }
     }
 }
@@ -36,6 +38,17 @@ pub struct GetListFeedOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub feed: Vec<crate::app_bsky::feed::FeedViewPost<'a>>,
+}
+
+impl jacquard_common::IntoStatic for GetListFeedOutput<'_> {
+    type Output = GetListFeedOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetListFeedOutput {
+            cursor: self.cursor.into_static(),
+            feed: self.feed.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -67,6 +80,18 @@ impl std::fmt::Display for GetListFeedError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetListFeedError<'_> {
+    type Output = GetListFeedError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetListFeedError::UnknownList(v) => {
+                GetListFeedError::UnknownList(v.into_static())
+            }
+            GetListFeedError::Unknown(v) => GetListFeedError::Unknown(v.into_static()),
         }
     }
 }

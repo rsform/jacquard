@@ -14,10 +14,29 @@ pub struct GetRepo<'a> {
     pub since: std::option::Option<jacquard_common::types::string::Tid>,
 }
 
+impl jacquard_common::IntoStatic for GetRepo<'_> {
+    type Output = GetRepo<'static>;
+    fn into_static(self) -> Self::Output {
+        GetRepo {
+            did: self.did.into_static(),
+            since: self.since.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepoOutput<'a> {}
+impl jacquard_common::IntoStatic for GetRepoOutput<'_> {
+    type Output = GetRepoOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetRepoOutput {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -74,6 +93,25 @@ impl std::fmt::Display for GetRepoError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetRepoError<'_> {
+    type Output = GetRepoError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetRepoError::RepoNotFound(v) => GetRepoError::RepoNotFound(v.into_static()),
+            GetRepoError::RepoTakendown(v) => {
+                GetRepoError::RepoTakendown(v.into_static())
+            }
+            GetRepoError::RepoSuspended(v) => {
+                GetRepoError::RepoSuspended(v.into_static())
+            }
+            GetRepoError::RepoDeactivated(v) => {
+                GetRepoError::RepoDeactivated(v.into_static())
+            }
+            GetRepoError::Unknown(v) => GetRepoError::Unknown(v.into_static()),
         }
     }
 }

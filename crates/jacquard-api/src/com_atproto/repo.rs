@@ -25,3 +25,14 @@ pub struct CommitMeta<'a> {
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub rev: jacquard_common::types::string::Tid,
 }
+
+impl jacquard_common::IntoStatic for CommitMeta<'_> {
+    type Output = CommitMeta<'static>;
+    fn into_static(self) -> Self::Output {
+        CommitMeta {
+            cid: self.cid.into_static(),
+            rev: self.rev.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

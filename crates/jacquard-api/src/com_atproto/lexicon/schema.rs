@@ -17,3 +17,13 @@ pub struct Schema<'a> {
 impl jacquard_common::types::collection::Collection for Schema<'_> {
     const NSID: &'static str = "com.atproto.lexicon.schema";
 }
+
+impl jacquard_common::IntoStatic for Schema<'_> {
+    type Output = Schema<'static>;
+    fn into_static(self) -> Self::Output {
+        Schema {
+            lexicon: self.lexicon.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

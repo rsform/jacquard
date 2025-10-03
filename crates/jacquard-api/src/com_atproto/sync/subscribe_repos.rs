@@ -22,6 +22,20 @@ pub struct Account<'a> {
     pub time: jacquard_common::types::string::Datetime,
 }
 
+impl jacquard_common::IntoStatic for Account<'_> {
+    type Output = Account<'static>;
+    fn into_static(self) -> Self::Output {
+        Account {
+            active: self.active.into_static(),
+            did: self.did.into_static(),
+            seq: self.seq.into_static(),
+            status: self.status.into_static(),
+            time: self.time.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 ///Represents an update of repository state. Note that empty commits are allowed, which include no repo data changes, but an update to rev and signature.
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -57,6 +71,27 @@ pub struct Commit<'a> {
     pub too_big: bool,
 }
 
+impl jacquard_common::IntoStatic for Commit<'_> {
+    type Output = Commit<'static>;
+    fn into_static(self) -> Self::Output {
+        Commit {
+            blobs: self.blobs.into_static(),
+            blocks: self.blocks.into_static(),
+            commit: self.commit.into_static(),
+            ops: self.ops.into_static(),
+            prev_data: self.prev_data.into_static(),
+            rebase: self.rebase.into_static(),
+            repo: self.repo.into_static(),
+            rev: self.rev.into_static(),
+            seq: self.seq.into_static(),
+            since: self.since.into_static(),
+            time: self.time.into_static(),
+            too_big: self.too_big.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 ///Represents a change to an account's identity. Could be an updated handle, signing key, or pds hosting endpoint. Serves as a prod to all downstream services to refresh their identity cache.
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -72,6 +107,19 @@ pub struct Identity<'a> {
     pub time: jacquard_common::types::string::Datetime,
 }
 
+impl jacquard_common::IntoStatic for Identity<'_> {
+    type Output = Identity<'static>;
+    fn into_static(self) -> Self::Output {
+        Identity {
+            did: self.did.into_static(),
+            handle: self.handle.into_static(),
+            seq: self.seq.into_static(),
+            time: self.time.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -83,11 +131,29 @@ pub struct Info<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for Info<'_> {
+    type Output = Info<'static>;
+    fn into_static(self) -> Self::Output {
+        Info {
+            message: self.message.into_static(),
+            name: self.name.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeRepos {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub cursor: std::option::Option<i64>,
+}
+
+impl jacquard_common::IntoStatic for SubscribeRepos {
+    type Output = SubscribeRepos;
+    fn into_static(self) -> Self::Output {
+        self
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -105,6 +171,32 @@ pub enum SubscribeReposMessage<'a> {
     Account(Box<jacquard_common::types::value::Data<'a>>),
     #[serde(rename = "#info")]
     Info(Box<jacquard_common::types::value::Data<'a>>),
+}
+
+impl jacquard_common::IntoStatic for SubscribeReposMessage<'_> {
+    type Output = SubscribeReposMessage<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SubscribeReposMessage::Commit(v) => {
+                SubscribeReposMessage::Commit(v.into_static())
+            }
+            SubscribeReposMessage::Sync(v) => {
+                SubscribeReposMessage::Sync(v.into_static())
+            }
+            SubscribeReposMessage::Identity(v) => {
+                SubscribeReposMessage::Identity(v.into_static())
+            }
+            SubscribeReposMessage::Account(v) => {
+                SubscribeReposMessage::Account(v.into_static())
+            }
+            SubscribeReposMessage::Info(v) => {
+                SubscribeReposMessage::Info(v.into_static())
+            }
+            SubscribeReposMessage::Unknown(v) => {
+                SubscribeReposMessage::Unknown(v.into_static())
+            }
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -150,6 +242,23 @@ impl std::fmt::Display for SubscribeReposError<'_> {
     }
 }
 
+impl jacquard_common::IntoStatic for SubscribeReposError<'_> {
+    type Output = SubscribeReposError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SubscribeReposError::FutureCursor(v) => {
+                SubscribeReposError::FutureCursor(v.into_static())
+            }
+            SubscribeReposError::ConsumerTooSlow(v) => {
+                SubscribeReposError::ConsumerTooSlow(v.into_static())
+            }
+            SubscribeReposError::Unknown(v) => {
+                SubscribeReposError::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
 ///A repo operation, ie a mutation of a single record.
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -166,6 +275,19 @@ pub struct RepoOp<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub prev: std::option::Option<jacquard_common::types::cid::CidLink<'a>>,
+}
+
+impl jacquard_common::IntoStatic for RepoOp<'_> {
+    type Output = RepoOp<'static>;
+    fn into_static(self) -> Self::Output {
+        RepoOp {
+            action: self.action.into_static(),
+            cid: self.cid.into_static(),
+            path: self.path.into_static(),
+            prev: self.prev.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 ///Updates the repo to a new state, without necessarily including that state on the firehose. Used to recover from broken commit streams, data loss incidents, or in situations where upstream host does not know recent state of the repository.
@@ -185,4 +307,18 @@ pub struct Sync<'a> {
     pub seq: i64,
     ///Timestamp of when this message was originally broadcast.
     pub time: jacquard_common::types::string::Datetime,
+}
+
+impl jacquard_common::IntoStatic for Sync<'_> {
+    type Output = Sync<'static>;
+    fn into_static(self) -> Self::Output {
+        Sync {
+            blocks: self.blocks.into_static(),
+            did: self.did.into_static(),
+            rev: self.rev.into_static(),
+            seq: self.seq.into_static(),
+            time: self.time.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

@@ -13,6 +13,16 @@ pub struct DeleteMember<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for DeleteMember<'_> {
+    type Output = DeleteMember<'static>;
+    fn into_static(self) -> Self::Output {
+        DeleteMember {
+            did: self.did.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -53,6 +63,21 @@ impl std::fmt::Display for DeleteMemberError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for DeleteMemberError<'_> {
+    type Output = DeleteMemberError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            DeleteMemberError::MemberNotFound(v) => {
+                DeleteMemberError::MemberNotFound(v.into_static())
+            }
+            DeleteMemberError::CannotDeleteSelf(v) => {
+                DeleteMemberError::CannotDeleteSelf(v.into_static())
+            }
+            DeleteMemberError::Unknown(v) => DeleteMemberError::Unknown(v.into_static()),
         }
     }
 }

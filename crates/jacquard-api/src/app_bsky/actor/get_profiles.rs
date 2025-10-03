@@ -12,6 +12,15 @@ pub struct GetProfiles<'a> {
     pub actors: Vec<jacquard_common::types::ident::AtIdentifier<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetProfiles<'_> {
+    type Output = GetProfiles<'static>;
+    fn into_static(self) -> Self::Output {
+        GetProfiles {
+            actors: self.actors.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -20,10 +29,20 @@ pub struct GetProfilesOutput<'a> {
     pub profiles: Vec<crate::app_bsky::actor::ProfileViewDetailed<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetProfilesOutput<'_> {
+    type Output = GetProfilesOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetProfilesOutput {
+            profiles: self.profiles.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetProfiles<'_> {
     const NSID: &'static str = "app.bsky.actor.getProfiles";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetProfilesOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

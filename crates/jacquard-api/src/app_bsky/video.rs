@@ -33,3 +33,19 @@ pub struct JobStatus<'a> {
     #[serde(borrow)]
     pub state: jacquard_common::CowStr<'a>,
 }
+
+impl jacquard_common::IntoStatic for JobStatus<'_> {
+    type Output = JobStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        JobStatus {
+            blob: self.blob.into_static(),
+            did: self.did.into_static(),
+            error: self.error.into_static(),
+            job_id: self.job_id.into_static(),
+            message: self.message.into_static(),
+            progress: self.progress.into_static(),
+            state: self.state.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

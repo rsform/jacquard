@@ -15,6 +15,17 @@ pub struct SendMessage<'a> {
     pub message: crate::chat_bsky::convo::MessageInput<'a>,
 }
 
+impl jacquard_common::IntoStatic for SendMessage<'_> {
+    type Output = SendMessage<'static>;
+    fn into_static(self) -> Self::Output {
+        SendMessage {
+            convo_id: self.convo_id.into_static(),
+            message: self.message.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -24,6 +35,16 @@ pub struct SendMessageOutput<'a> {
     pub value: crate::chat_bsky::convo::MessageView<'a>,
 }
 
+impl jacquard_common::IntoStatic for SendMessageOutput<'_> {
+    type Output = SendMessageOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        SendMessageOutput {
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for SendMessage<'_> {
     const NSID: &'static str = "chat.bsky.convo.sendMessage";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -31,5 +52,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for SendMessage<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = SendMessageOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

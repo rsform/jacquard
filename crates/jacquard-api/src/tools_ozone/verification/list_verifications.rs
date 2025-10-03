@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ListVerifications<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -20,8 +20,10 @@ pub struct ListVerifications<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub issuers: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+    ///(default: "desc")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sort_direction: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -30,17 +32,18 @@ pub struct ListVerifications<'a> {
     pub subjects: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
 }
 
-impl Default for ListVerifications<'_> {
-    fn default() -> Self {
-        Self {
-            created_after: Default::default(),
-            created_before: Default::default(),
-            cursor: Default::default(),
-            is_revoked: Default::default(),
-            issuers: Default::default(),
-            limit: Some(50i64),
-            sort_direction: Some(jacquard_common::CowStr::from("desc")),
-            subjects: Default::default(),
+impl jacquard_common::IntoStatic for ListVerifications<'_> {
+    type Output = ListVerifications<'static>;
+    fn into_static(self) -> Self::Output {
+        ListVerifications {
+            created_after: self.created_after.into_static(),
+            created_before: self.created_before.into_static(),
+            cursor: self.cursor.into_static(),
+            is_revoked: self.is_revoked.into_static(),
+            issuers: self.issuers.into_static(),
+            limit: self.limit.into_static(),
+            sort_direction: self.sort_direction.into_static(),
+            subjects: self.subjects.into_static(),
         }
     }
 }
@@ -56,10 +59,21 @@ pub struct ListVerificationsOutput<'a> {
     pub verifications: Vec<crate::tools_ozone::verification::VerificationView<'a>>,
 }
 
+impl jacquard_common::IntoStatic for ListVerificationsOutput<'_> {
+    type Output = ListVerificationsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        ListVerificationsOutput {
+            cursor: self.cursor.into_static(),
+            verifications: self.verifications.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for ListVerifications<'_> {
     const NSID: &'static str = "tools.ozone.verification.listVerifications";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ListVerificationsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

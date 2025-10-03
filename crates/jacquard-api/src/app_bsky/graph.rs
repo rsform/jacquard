@@ -46,6 +46,17 @@ pub struct ListItemView<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+impl jacquard_common::IntoStatic for ListItemView<'_> {
+    type Output = ListItemView<'static>;
+    fn into_static(self) -> Self::Output {
+        ListItemView {
+            subject: self.subject.into_static(),
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ListPurpose<'a> {
     AppBskyGraphDefsModlist,
@@ -115,6 +126,22 @@ where
     }
 }
 
+impl jacquard_common::IntoStatic for ListPurpose<'_> {
+    type Output = ListPurpose<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListPurpose::AppBskyGraphDefsModlist => ListPurpose::AppBskyGraphDefsModlist,
+            ListPurpose::AppBskyGraphDefsCuratelist => {
+                ListPurpose::AppBskyGraphDefsCuratelist
+            }
+            ListPurpose::AppBskyGraphDefsReferencelist => {
+                ListPurpose::AppBskyGraphDefsReferencelist
+            }
+            ListPurpose::Other(v) => ListPurpose::Other(v.into_static()),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -151,6 +178,27 @@ pub struct ListView<'a> {
     pub viewer: std::option::Option<crate::app_bsky::graph::ListViewerState<'a>>,
 }
 
+impl jacquard_common::IntoStatic for ListView<'_> {
+    type Output = ListView<'static>;
+    fn into_static(self) -> Self::Output {
+        ListView {
+            avatar: self.avatar.into_static(),
+            cid: self.cid.into_static(),
+            creator: self.creator.into_static(),
+            description: self.description.into_static(),
+            description_facets: self.description_facets.into_static(),
+            indexed_at: self.indexed_at.into_static(),
+            labels: self.labels.into_static(),
+            list_item_count: self.list_item_count.into_static(),
+            name: self.name.into_static(),
+            purpose: self.purpose.into_static(),
+            uri: self.uri.into_static(),
+            viewer: self.viewer.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -178,6 +226,24 @@ pub struct ListViewBasic<'a> {
     pub viewer: std::option::Option<crate::app_bsky::graph::ListViewerState<'a>>,
 }
 
+impl jacquard_common::IntoStatic for ListViewBasic<'_> {
+    type Output = ListViewBasic<'static>;
+    fn into_static(self) -> Self::Output {
+        ListViewBasic {
+            avatar: self.avatar.into_static(),
+            cid: self.cid.into_static(),
+            indexed_at: self.indexed_at.into_static(),
+            labels: self.labels.into_static(),
+            list_item_count: self.list_item_count.into_static(),
+            name: self.name.into_static(),
+            purpose: self.purpose.into_static(),
+            uri: self.uri.into_static(),
+            viewer: self.viewer.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -189,6 +255,17 @@ pub struct ListViewerState<'a> {
     pub muted: std::option::Option<bool>,
 }
 
+impl jacquard_common::IntoStatic for ListViewerState<'_> {
+    type Output = ListViewerState<'static>;
+    fn into_static(self) -> Self::Output {
+        ListViewerState {
+            blocked: self.blocked.into_static(),
+            muted: self.muted.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 ///indicates that a handle or DID could not be resolved
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -197,6 +274,17 @@ pub struct NotFoundActor<'a> {
     #[serde(borrow)]
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
     pub not_found: bool,
+}
+
+impl jacquard_common::IntoStatic for NotFoundActor<'_> {
+    type Output = NotFoundActor<'static>;
+    fn into_static(self) -> Self::Output {
+        NotFoundActor {
+            actor: self.actor.into_static(),
+            not_found: self.not_found.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 ///lists the bi-directional graph relationships between one actor (not indicated in the object), and the target actors (the DID included in the object)
@@ -214,6 +302,18 @@ pub struct Relationship<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub following: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+}
+
+impl jacquard_common::IntoStatic for Relationship<'_> {
+    type Output = Relationship<'static>;
+    fn into_static(self) -> Self::Output {
+        Relationship {
+            did: self.did.into_static(),
+            followed_by: self.followed_by.into_static(),
+            following: self.following.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -249,6 +349,26 @@ pub struct StarterPackView<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+impl jacquard_common::IntoStatic for StarterPackView<'_> {
+    type Output = StarterPackView<'static>;
+    fn into_static(self) -> Self::Output {
+        StarterPackView {
+            cid: self.cid.into_static(),
+            creator: self.creator.into_static(),
+            feeds: self.feeds.into_static(),
+            indexed_at: self.indexed_at.into_static(),
+            joined_all_time_count: self.joined_all_time_count.into_static(),
+            joined_week_count: self.joined_week_count.into_static(),
+            labels: self.labels.into_static(),
+            list: self.list.into_static(),
+            list_items_sample: self.list_items_sample.into_static(),
+            record: self.record.into_static(),
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -271,4 +391,22 @@ pub struct StarterPackViewBasic<'a> {
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+impl jacquard_common::IntoStatic for StarterPackViewBasic<'_> {
+    type Output = StarterPackViewBasic<'static>;
+    fn into_static(self) -> Self::Output {
+        StarterPackViewBasic {
+            cid: self.cid.into_static(),
+            creator: self.creator.into_static(),
+            indexed_at: self.indexed_at.into_static(),
+            joined_all_time_count: self.joined_all_time_count.into_static(),
+            joined_week_count: self.joined_week_count.into_static(),
+            labels: self.labels.into_static(),
+            list_item_count: self.list_item_count.into_static(),
+            record: self.record.into_static(),
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

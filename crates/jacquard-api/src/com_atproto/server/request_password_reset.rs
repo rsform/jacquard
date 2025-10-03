@@ -13,6 +13,16 @@ pub struct RequestPasswordReset<'a> {
     pub email: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for RequestPasswordReset<'_> {
+    type Output = RequestPasswordReset<'static>;
+    fn into_static(self) -> Self::Output {
+        RequestPasswordReset {
+            email: self.email.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for RequestPasswordReset<'_> {
     const NSID: &'static str = "com.atproto.server.requestPasswordReset";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -20,5 +30,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for RequestPasswordReset<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

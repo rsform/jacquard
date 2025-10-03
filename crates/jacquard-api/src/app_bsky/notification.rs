@@ -25,6 +25,17 @@ pub struct ActivitySubscription<'a> {
     pub reply: bool,
 }
 
+impl jacquard_common::IntoStatic for ActivitySubscription<'_> {
+    type Output = ActivitySubscription<'static>;
+    fn into_static(self) -> Self::Output {
+        ActivitySubscription {
+            post: self.post.into_static(),
+            reply: self.reply.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -32,6 +43,17 @@ pub struct ChatPreference<'a> {
     #[serde(borrow)]
     pub include: jacquard_common::CowStr<'a>,
     pub push: bool,
+}
+
+impl jacquard_common::IntoStatic for ChatPreference<'_> {
+    type Output = ChatPreference<'static>;
+    fn into_static(self) -> Self::Output {
+        ChatPreference {
+            include: self.include.into_static(),
+            push: self.push.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -44,12 +66,35 @@ pub struct FilterablePreference<'a> {
     pub push: bool,
 }
 
+impl jacquard_common::IntoStatic for FilterablePreference<'_> {
+    type Output = FilterablePreference<'static>;
+    fn into_static(self) -> Self::Output {
+        FilterablePreference {
+            include: self.include.into_static(),
+            list: self.list.into_static(),
+            push: self.push.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct Preference<'a> {
     pub list: bool,
     pub push: bool,
+}
+
+impl jacquard_common::IntoStatic for Preference<'_> {
+    type Output = Preference<'static>;
+    fn into_static(self) -> Self::Output {
+        Preference {
+            list: self.list.into_static(),
+            push: self.push.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -84,10 +129,41 @@ pub struct Preferences<'a> {
     pub verified: crate::app_bsky::notification::Preference<'a>,
 }
 
+impl jacquard_common::IntoStatic for Preferences<'_> {
+    type Output = Preferences<'static>;
+    fn into_static(self) -> Self::Output {
+        Preferences {
+            chat: self.chat.into_static(),
+            follow: self.follow.into_static(),
+            like: self.like.into_static(),
+            like_via_repost: self.like_via_repost.into_static(),
+            mention: self.mention.into_static(),
+            quote: self.quote.into_static(),
+            reply: self.reply.into_static(),
+            repost: self.repost.into_static(),
+            repost_via_repost: self.repost_via_repost.into_static(),
+            starterpack_joined: self.starterpack_joined.into_static(),
+            subscribed_post: self.subscribed_post.into_static(),
+            unverified: self.unverified.into_static(),
+            verified: self.verified.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordDeleted<'a> {}
+impl jacquard_common::IntoStatic for RecordDeleted<'_> {
+    type Output = RecordDeleted<'static>;
+    fn into_static(self) -> Self::Output {
+        RecordDeleted {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 ///Object used to store activity subscription data in stash.
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -97,4 +173,15 @@ pub struct SubjectActivitySubscription<'a> {
     pub activity_subscription: crate::app_bsky::notification::ActivitySubscription<'a>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
+}
+
+impl jacquard_common::IntoStatic for SubjectActivitySubscription<'_> {
+    type Output = SubjectActivitySubscription<'static>;
+    fn into_static(self) -> Self::Output {
+        SubjectActivitySubscription {
+            activity_subscription: self.activity_subscription.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

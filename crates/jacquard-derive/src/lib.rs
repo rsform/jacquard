@@ -103,8 +103,8 @@ pub fn open_union(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
     match &mut input.data {
         Data::Enum(data_enum) => {
-            // Check if Other variant already exists
-            let has_other = data_enum.variants.iter().any(|v| v.ident == "Other");
+            // Check if Unknown variant already exists
+            let has_other = data_enum.variants.iter().any(|v| v.ident == "Unknown");
 
             if !has_other {
                 // Determine the lifetime parameter to use
@@ -114,7 +114,7 @@ pub fn open_union(_attr: TokenStream, item: TokenStream) -> TokenStream {
                     quote! { 'static }
                 };
 
-                // Add the Other variant
+                // Add the Unknown variant
                 let new_variant: syn::Variant = syn::parse_quote! {
                     #[serde(untagged)]
                     Unknown(::jacquard_common::types::value::Data<#lifetime>)

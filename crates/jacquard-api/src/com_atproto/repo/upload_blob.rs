@@ -9,12 +9,31 @@
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UploadBlob<'a> {}
+impl jacquard_common::IntoStatic for UploadBlob<'_> {
+    type Output = UploadBlob<'static>;
+    fn into_static(self) -> Self::Output {
+        UploadBlob {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UploadBlobOutput<'a> {
     #[serde(borrow)]
     pub blob: jacquard_common::types::blob::Blob<'a>,
+}
+
+impl jacquard_common::IntoStatic for UploadBlobOutput<'_> {
+    type Output = UploadBlobOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        UploadBlobOutput {
+            blob: self.blob.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 impl jacquard_common::types::xrpc::XrpcRequest for UploadBlob<'_> {
@@ -24,5 +43,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for UploadBlob<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = UploadBlobOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

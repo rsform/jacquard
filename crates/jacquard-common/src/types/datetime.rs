@@ -204,6 +204,14 @@ impl fmt::Display for Datetime {
     }
 }
 
+impl IntoStatic for Datetime {
+    type Output = Datetime;
+
+    fn into_static(self) -> Self::Output {
+        self
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

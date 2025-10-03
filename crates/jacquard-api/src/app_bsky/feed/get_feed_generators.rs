@@ -12,6 +12,15 @@ pub struct GetFeedGenerators<'a> {
     pub feeds: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetFeedGenerators<'_> {
+    type Output = GetFeedGenerators<'static>;
+    fn into_static(self) -> Self::Output {
+        GetFeedGenerators {
+            feeds: self.feeds.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -20,10 +29,20 @@ pub struct GetFeedGeneratorsOutput<'a> {
     pub feeds: Vec<crate::app_bsky::feed::GeneratorView<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetFeedGeneratorsOutput<'_> {
+    type Output = GetFeedGeneratorsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetFeedGeneratorsOutput {
+            feeds: self.feeds.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetFeedGenerators<'_> {
     const NSID: &'static str = "app.bsky.feed.getFeedGenerators";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetFeedGeneratorsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

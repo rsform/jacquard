@@ -12,6 +12,15 @@ pub struct GetStarterPacks<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetStarterPacks<'_> {
+    type Output = GetStarterPacks<'static>;
+    fn into_static(self) -> Self::Output {
+        GetStarterPacks {
+            uris: self.uris.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -20,10 +29,20 @@ pub struct GetStarterPacksOutput<'a> {
     pub starter_packs: Vec<crate::app_bsky::graph::StarterPackViewBasic<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetStarterPacksOutput<'_> {
+    type Output = GetStarterPacksOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetStarterPacksOutput {
+            starter_packs: self.starter_packs.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetStarterPacks<'_> {
     const NSID: &'static str = "app.bsky.graph.getStarterPacks";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetStarterPacksOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

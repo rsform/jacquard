@@ -19,3 +19,14 @@ pub struct Listblock<'a> {
 impl jacquard_common::types::collection::Collection for Listblock<'_> {
     const NSID: &'static str = "app.bsky.graph.listblock";
 }
+
+impl jacquard_common::IntoStatic for Listblock<'_> {
+    type Output = Listblock<'static>;
+    fn into_static(self) -> Self::Output {
+        Listblock {
+            created_at: self.created_at.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

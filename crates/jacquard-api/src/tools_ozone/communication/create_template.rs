@@ -27,6 +27,20 @@ pub struct CreateTemplate<'a> {
     pub subject: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for CreateTemplate<'_> {
+    type Output = CreateTemplate<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateTemplate {
+            content_markdown: self.content_markdown.into_static(),
+            created_by: self.created_by.into_static(),
+            lang: self.lang.into_static(),
+            name: self.name.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -34,6 +48,16 @@ pub struct CreateTemplateOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
     pub value: crate::tools_ozone::communication::TemplateView<'a>,
+}
+
+impl jacquard_common::IntoStatic for CreateTemplateOutput<'_> {
+    type Output = CreateTemplateOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateTemplateOutput {
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -65,6 +89,20 @@ impl std::fmt::Display for CreateTemplateError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for CreateTemplateError<'_> {
+    type Output = CreateTemplateError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CreateTemplateError::DuplicateTemplateName(v) => {
+                CreateTemplateError::DuplicateTemplateName(v.into_static())
+            }
+            CreateTemplateError::Unknown(v) => {
+                CreateTemplateError::Unknown(v.into_static())
+            }
         }
     }
 }

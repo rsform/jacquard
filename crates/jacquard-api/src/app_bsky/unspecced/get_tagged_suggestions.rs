@@ -8,6 +8,13 @@
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTaggedSuggestions {}
+impl jacquard_common::IntoStatic for GetTaggedSuggestions {
+    type Output = GetTaggedSuggestions;
+    fn into_static(self) -> Self::Output {
+        self
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -16,12 +23,22 @@ pub struct GetTaggedSuggestionsOutput<'a> {
     pub suggestions: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetTaggedSuggestionsOutput<'_> {
+    type Output = GetTaggedSuggestionsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetTaggedSuggestionsOutput {
+            suggestions: self.suggestions.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetTaggedSuggestions {
     const NSID: &'static str = "app.bsky.unspecced.getTaggedSuggestions";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetTaggedSuggestionsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]
@@ -34,4 +51,16 @@ pub struct Suggestion<'a> {
     pub subject_type: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub tag: jacquard_common::CowStr<'a>,
+}
+
+impl jacquard_common::IntoStatic for Suggestion<'_> {
+    type Output = Suggestion<'static>;
+    fn into_static(self) -> Self::Output {
+        Suggestion {
+            subject: self.subject.into_static(),
+            subject_type: self.subject_type.into_static(),
+            tag: self.tag.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

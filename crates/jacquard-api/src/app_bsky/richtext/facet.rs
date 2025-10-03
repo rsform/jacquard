@@ -14,6 +14,17 @@ pub struct ByteSlice<'a> {
     pub byte_start: i64,
 }
 
+impl jacquard_common::IntoStatic for ByteSlice<'_> {
+    type Output = ByteSlice<'static>;
+    fn into_static(self) -> Self::Output {
+        ByteSlice {
+            byte_end: self.byte_end.into_static(),
+            byte_start: self.byte_start.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 ///Facet feature for a URL. The text URL may have been simplified or truncated, but the facet reference should be a complete URL.
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -21,6 +32,16 @@ pub struct ByteSlice<'a> {
 pub struct Link<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
+}
+
+impl jacquard_common::IntoStatic for Link<'_> {
+    type Output = Link<'static>;
+    fn into_static(self) -> Self::Output {
+        Link {
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 ///Annotation of a sub-string within rich text.
@@ -34,6 +55,17 @@ pub struct Facet<'a> {
     pub index: crate::app_bsky::richtext::facet::ByteSlice<'a>,
 }
 
+impl jacquard_common::IntoStatic for Facet<'_> {
+    type Output = Facet<'static>;
+    fn into_static(self) -> Self::Output {
+        Facet {
+            features: self.features.into_static(),
+            index: self.index.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 ///Facet feature for mention of another account. The text is usually a handle, including a '@' prefix, but the facet reference is a DID.
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -43,6 +75,16 @@ pub struct Mention<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for Mention<'_> {
+    type Output = Mention<'static>;
+    fn into_static(self) -> Self::Output {
+        Mention {
+            did: self.did.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 ///Facet feature for a hashtag. The text usually includes a '#' prefix, but the facet reference should not (except in the case of 'double hash tags').
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -50,4 +92,14 @@ pub struct Mention<'a> {
 pub struct Tag<'a> {
     #[serde(borrow)]
     pub tag: jacquard_common::CowStr<'a>,
+}
+
+impl jacquard_common::IntoStatic for Tag<'_> {
+    type Output = Tag<'static>;
+    fn into_static(self) -> Self::Output {
+        Tag {
+            tag: self.tag.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

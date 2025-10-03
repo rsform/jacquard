@@ -14,3 +14,14 @@ pub struct StrongRef<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
+
+impl jacquard_common::IntoStatic for StrongRef<'_> {
+    type Output = StrongRef<'static>;
+    fn into_static(self) -> Self::Output {
+        StrongRef {
+            cid: self.cid.into_static(),
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

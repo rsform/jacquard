@@ -15,6 +15,16 @@ pub struct ReserveSigningKey<'a> {
     pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
+impl jacquard_common::IntoStatic for ReserveSigningKey<'_> {
+    type Output = ReserveSigningKey<'static>;
+    fn into_static(self) -> Self::Output {
+        ReserveSigningKey {
+            did: self.did.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -24,6 +34,16 @@ pub struct ReserveSigningKeyOutput<'a> {
     pub signing_key: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for ReserveSigningKeyOutput<'_> {
+    type Output = ReserveSigningKeyOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        ReserveSigningKeyOutput {
+            signing_key: self.signing_key.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for ReserveSigningKey<'_> {
     const NSID: &'static str = "com.atproto.server.reserveSigningKey";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -31,5 +51,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for ReserveSigningKey<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ReserveSigningKeyOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

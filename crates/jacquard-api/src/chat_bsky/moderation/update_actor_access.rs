@@ -17,6 +17,18 @@ pub struct UpdateActorAccess<'a> {
     pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for UpdateActorAccess<'_> {
+    type Output = UpdateActorAccess<'static>;
+    fn into_static(self) -> Self::Output {
+        UpdateActorAccess {
+            actor: self.actor.into_static(),
+            allow_access: self.allow_access.into_static(),
+            r#ref: self.r#ref.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for UpdateActorAccess<'_> {
     const NSID: &'static str = "chat.bsky.moderation.updateActorAccess";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -24,5 +36,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for UpdateActorAccess<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

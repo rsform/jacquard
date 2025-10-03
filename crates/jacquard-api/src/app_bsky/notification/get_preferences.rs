@@ -8,6 +8,13 @@
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPreferences {}
+impl jacquard_common::IntoStatic for GetPreferences {
+    type Output = GetPreferences;
+    fn into_static(self) -> Self::Output {
+        self
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -16,10 +23,20 @@ pub struct GetPreferencesOutput<'a> {
     pub preferences: crate::app_bsky::notification::Preferences<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetPreferencesOutput<'_> {
+    type Output = GetPreferencesOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetPreferencesOutput {
+            preferences: self.preferences.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetPreferences {
     const NSID: &'static str = "app.bsky.notification.getPreferences";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetPreferencesOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

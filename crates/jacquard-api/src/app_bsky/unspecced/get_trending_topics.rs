@@ -5,9 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTrendingTopics<'a> {
+    ///(default: 10, min: 1, max: 25)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -15,11 +16,12 @@ pub struct GetTrendingTopics<'a> {
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-impl Default for GetTrendingTopics<'_> {
-    fn default() -> Self {
-        Self {
-            limit: Some(10i64),
-            viewer: Default::default(),
+impl jacquard_common::IntoStatic for GetTrendingTopics<'_> {
+    type Output = GetTrendingTopics<'static>;
+    fn into_static(self) -> Self::Output {
+        GetTrendingTopics {
+            limit: self.limit.into_static(),
+            viewer: self.viewer.into_static(),
         }
     }
 }
@@ -34,10 +36,21 @@ pub struct GetTrendingTopicsOutput<'a> {
     pub topics: Vec<crate::app_bsky::unspecced::TrendingTopic<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetTrendingTopicsOutput<'_> {
+    type Output = GetTrendingTopicsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetTrendingTopicsOutput {
+            suggested: self.suggested.into_static(),
+            topics: self.topics.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetTrendingTopics<'_> {
     const NSID: &'static str = "app.bsky.unspecced.getTrendingTopics";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetTrendingTopicsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

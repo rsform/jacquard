@@ -13,6 +13,16 @@ pub struct PutPreferences<'a> {
     pub preferences: crate::app_bsky::actor::Preferences<'a>,
 }
 
+impl jacquard_common::IntoStatic for PutPreferences<'_> {
+    type Output = PutPreferences<'static>;
+    fn into_static(self) -> Self::Output {
+        PutPreferences {
+            preferences: self.preferences.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for PutPreferences<'_> {
     const NSID: &'static str = "app.bsky.actor.putPreferences";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -20,5 +30,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for PutPreferences<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -5,24 +5,26 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetValues<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 100, min: 1, max: 1000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
 
-impl Default for GetValues<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            limit: Some(100i64),
-            name: Default::default(),
+impl jacquard_common::IntoStatic for GetValues<'_> {
+    type Output = GetValues<'static>;
+    fn into_static(self) -> Self::Output {
+        GetValues {
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
+            name: self.name.into_static(),
         }
     }
 }
@@ -38,6 +40,18 @@ pub struct GetValuesOutput<'a> {
     pub set: crate::tools_ozone::set::SetView<'a>,
     #[serde(borrow)]
     pub values: Vec<jacquard_common::CowStr<'a>>,
+}
+
+impl jacquard_common::IntoStatic for GetValuesOutput<'_> {
+    type Output = GetValuesOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetValuesOutput {
+            cursor: self.cursor.into_static(),
+            set: self.set.into_static(),
+            values: self.values.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -70,6 +84,18 @@ impl std::fmt::Display for GetValuesError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetValuesError<'_> {
+    type Output = GetValuesError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetValuesError::SetNotFound(v) => {
+                GetValuesError::SetNotFound(v.into_static())
+            }
+            GetValuesError::Unknown(v) => GetValuesError::Unknown(v.into_static()),
         }
     }
 }

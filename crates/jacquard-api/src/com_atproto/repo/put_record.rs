@@ -36,6 +36,22 @@ pub struct PutRecord<'a> {
     pub validate: std::option::Option<bool>,
 }
 
+impl jacquard_common::IntoStatic for PutRecord<'_> {
+    type Output = PutRecord<'static>;
+    fn into_static(self) -> Self::Output {
+        PutRecord {
+            collection: self.collection.into_static(),
+            record: self.record.into_static(),
+            repo: self.repo.into_static(),
+            rkey: self.rkey.into_static(),
+            swap_commit: self.swap_commit.into_static(),
+            swap_record: self.swap_record.into_static(),
+            validate: self.validate.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -50,6 +66,19 @@ pub struct PutRecordOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub validation_status: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl jacquard_common::IntoStatic for PutRecordOutput<'_> {
+    type Output = PutRecordOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        PutRecordOutput {
+            cid: self.cid.into_static(),
+            commit: self.commit.into_static(),
+            uri: self.uri.into_static(),
+            validation_status: self.validation_status.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -81,6 +110,18 @@ impl std::fmt::Display for PutRecordError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for PutRecordError<'_> {
+    type Output = PutRecordError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            PutRecordError::InvalidSwap(v) => {
+                PutRecordError::InvalidSwap(v.into_static())
+            }
+            PutRecordError::Unknown(v) => PutRecordError::Unknown(v.into_static()),
         }
     }
 }

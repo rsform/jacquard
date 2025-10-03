@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorLikes<'a> {
     #[serde(borrow)]
@@ -13,16 +13,18 @@ pub struct GetActorLikes<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
-impl Default for GetActorLikes<'_> {
-    fn default() -> Self {
-        Self {
-            actor: Default::default(),
-            cursor: Default::default(),
-            limit: Some(50i64),
+impl jacquard_common::IntoStatic for GetActorLikes<'_> {
+    type Output = GetActorLikes<'static>;
+    fn into_static(self) -> Self::Output {
+        GetActorLikes {
+            actor: self.actor.into_static(),
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
         }
     }
 }
@@ -36,6 +38,17 @@ pub struct GetActorLikesOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub feed: Vec<crate::app_bsky::feed::FeedViewPost<'a>>,
+}
+
+impl jacquard_common::IntoStatic for GetActorLikesOutput<'_> {
+    type Output = GetActorLikesOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetActorLikesOutput {
+            cursor: self.cursor.into_static(),
+            feed: self.feed.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -76,6 +89,23 @@ impl std::fmt::Display for GetActorLikesError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetActorLikesError<'_> {
+    type Output = GetActorLikesError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetActorLikesError::BlockedActor(v) => {
+                GetActorLikesError::BlockedActor(v.into_static())
+            }
+            GetActorLikesError::BlockedByActor(v) => {
+                GetActorLikesError::BlockedByActor(v.into_static())
+            }
+            GetActorLikesError::Unknown(v) => {
+                GetActorLikesError::Unknown(v.into_static())
+            }
         }
     }
 }

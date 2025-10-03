@@ -26,6 +26,19 @@ pub struct GetRecommendedDidCredentialsOutput<'a> {
     >,
 }
 
+impl jacquard_common::IntoStatic for GetRecommendedDidCredentialsOutput<'_> {
+    type Output = GetRecommendedDidCredentialsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetRecommendedDidCredentialsOutput {
+            also_known_as: self.also_known_as.into_static(),
+            rotation_keys: self.rotation_keys.into_static(),
+            services: self.services.into_static(),
+            verification_methods: self.verification_methods.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct GetRecommendedDidCredentials;
@@ -34,5 +47,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for GetRecommendedDidCredentials 
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetRecommendedDidCredentialsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -5,33 +5,37 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct QuerySets<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub name_prefix: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: "name")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sort_by: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: "asc")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sort_direction: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl Default for QuerySets<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            limit: Some(50i64),
-            name_prefix: Default::default(),
-            sort_by: Some(jacquard_common::CowStr::from("name")),
-            sort_direction: Some(jacquard_common::CowStr::from("asc")),
+impl jacquard_common::IntoStatic for QuerySets<'_> {
+    type Output = QuerySets<'static>;
+    fn into_static(self) -> Self::Output {
+        QuerySets {
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
+            name_prefix: self.name_prefix.into_static(),
+            sort_by: self.sort_by.into_static(),
+            sort_direction: self.sort_direction.into_static(),
         }
     }
 }
@@ -47,10 +51,21 @@ pub struct QuerySetsOutput<'a> {
     pub sets: Vec<crate::tools_ozone::set::SetView<'a>>,
 }
 
+impl jacquard_common::IntoStatic for QuerySetsOutput<'_> {
+    type Output = QuerySetsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        QuerySetsOutput {
+            cursor: self.cursor.into_static(),
+            sets: self.sets.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for QuerySets<'_> {
     const NSID: &'static str = "tools.ozone.set.querySets";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = QuerySetsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

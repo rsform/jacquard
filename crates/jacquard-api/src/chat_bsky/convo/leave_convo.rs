@@ -13,6 +13,16 @@ pub struct LeaveConvo<'a> {
     pub convo_id: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for LeaveConvo<'_> {
+    type Output = LeaveConvo<'static>;
+    fn into_static(self) -> Self::Output {
+        LeaveConvo {
+            convo_id: self.convo_id.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -23,6 +33,17 @@ pub struct LeaveConvoOutput<'a> {
     pub rev: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for LeaveConvoOutput<'_> {
+    type Output = LeaveConvoOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        LeaveConvoOutput {
+            convo_id: self.convo_id.into_static(),
+            rev: self.rev.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for LeaveConvo<'_> {
     const NSID: &'static str = "chat.bsky.convo.leaveConvo";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -30,5 +51,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for LeaveConvo<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = LeaveConvoOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -98,3 +98,17 @@ where
         Ok(Self::from(s))
     }
 }
+
+impl jacquard_common::IntoStatic for HostStatus<'_> {
+    type Output = HostStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            HostStatus::Active => HostStatus::Active,
+            HostStatus::Idle => HostStatus::Idle,
+            HostStatus::Offline => HostStatus::Offline,
+            HostStatus::Throttled => HostStatus::Throttled,
+            HostStatus::Banned => HostStatus::Banned,
+            HostStatus::Other(v) => HostStatus::Other(v.into_static()),
+        }
+    }
+}

@@ -15,5 +15,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for ActivateAccount {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

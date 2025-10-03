@@ -34,6 +34,36 @@ pub enum CreateReportRecordSubject<'a> {
     StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
 }
 
+impl jacquard_common::IntoStatic for CreateReportRecordSubject<'_> {
+    type Output = CreateReportRecordSubject<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CreateReportRecordSubject::DefsRepoRef(v) => {
+                CreateReportRecordSubject::DefsRepoRef(v.into_static())
+            }
+            CreateReportRecordSubject::StrongRef(v) => {
+                CreateReportRecordSubject::StrongRef(v.into_static())
+            }
+            CreateReportRecordSubject::Unknown(v) => {
+                CreateReportRecordSubject::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for CreateReport<'_> {
+    type Output = CreateReport<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateReport {
+            mod_tool: self.mod_tool.into_static(),
+            reason: self.reason.into_static(),
+            reason_type: self.reason_type.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -62,6 +92,38 @@ pub enum CreateReportOutputRecordSubject<'a> {
     StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
 }
 
+impl jacquard_common::IntoStatic for CreateReportOutputRecordSubject<'_> {
+    type Output = CreateReportOutputRecordSubject<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CreateReportOutputRecordSubject::DefsRepoRef(v) => {
+                CreateReportOutputRecordSubject::DefsRepoRef(v.into_static())
+            }
+            CreateReportOutputRecordSubject::StrongRef(v) => {
+                CreateReportOutputRecordSubject::StrongRef(v.into_static())
+            }
+            CreateReportOutputRecordSubject::Unknown(v) => {
+                CreateReportOutputRecordSubject::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for CreateReportOutput<'_> {
+    type Output = CreateReportOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateReportOutput {
+            created_at: self.created_at.into_static(),
+            id: self.id.into_static(),
+            reason: self.reason.into_static(),
+            reason_type: self.reason_type.into_static(),
+            reported_by: self.reported_by.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for CreateReport<'_> {
     const NSID: &'static str = "com.atproto.moderation.createReport";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -69,7 +131,7 @@ impl jacquard_common::types::xrpc::XrpcRequest for CreateReport<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = CreateReportOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 ///Moderation tool information for tracing the source of the action
@@ -84,4 +146,15 @@ pub struct ModTool<'a> {
     ///Name/identifier of the source (e.g., 'bsky-app/android', 'bsky-web/chrome')
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
+}
+
+impl jacquard_common::IntoStatic for ModTool<'_> {
+    type Output = ModTool<'static>;
+    fn into_static(self) -> Self::Output {
+        ModTool {
+            meta: self.meta.into_static(),
+            name: self.name.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

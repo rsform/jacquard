@@ -19,6 +19,18 @@ pub struct Image<'a> {
     pub image: jacquard_common::types::blob::Blob<'a>,
 }
 
+impl jacquard_common::IntoStatic for Image<'_> {
+    type Output = Image<'static>;
+    fn into_static(self) -> Self::Output {
+        Image {
+            alt: self.alt.into_static(),
+            aspect_ratio: self.aspect_ratio.into_static(),
+            image: self.image.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -27,12 +39,32 @@ pub struct Images<'a> {
     pub images: Vec<crate::app_bsky::embed::images::Image<'a>>,
 }
 
+impl jacquard_common::IntoStatic for Images<'_> {
+    type Output = Images<'static>;
+    fn into_static(self) -> Self::Output {
+        Images {
+            images: self.images.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct View<'a> {
     #[serde(borrow)]
     pub images: Vec<crate::app_bsky::embed::images::ViewImage<'a>>,
+}
+
+impl jacquard_common::IntoStatic for View<'_> {
+    type Output = View<'static>;
+    fn into_static(self) -> Self::Output {
+        View {
+            images: self.images.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -51,4 +83,17 @@ pub struct ViewImage<'a> {
     ///Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.
     #[serde(borrow)]
     pub thumb: jacquard_common::types::string::Uri<'a>,
+}
+
+impl jacquard_common::IntoStatic for ViewImage<'_> {
+    type Output = ViewImage<'static>;
+    fn into_static(self) -> Self::Output {
+        ViewImage {
+            alt: self.alt.into_static(),
+            aspect_ratio: self.aspect_ratio.into_static(),
+            fullsize: self.fullsize.into_static(),
+            thumb: self.thumb.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

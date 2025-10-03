@@ -9,6 +9,15 @@
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ImportRepo<'a> {}
+impl jacquard_common::IntoStatic for ImportRepo<'_> {
+    type Output = ImportRepo<'static>;
+    fn into_static(self) -> Self::Output {
+        ImportRepo {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for ImportRepo<'_> {
     const NSID: &'static str = "com.atproto.repo.importRepo";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -16,5 +25,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for ImportRepo<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

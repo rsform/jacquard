@@ -28,6 +28,21 @@ pub struct AddRule<'a> {
     pub url: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for AddRule<'_> {
+    type Output = AddRule<'static>;
+    fn into_static(self) -> Self::Output {
+        AddRule {
+            action: self.action.into_static(),
+            comment: self.comment.into_static(),
+            created_by: self.created_by.into_static(),
+            pattern: self.pattern.into_static(),
+            reason: self.reason.into_static(),
+            url: self.url.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -35,6 +50,16 @@ pub struct AddRuleOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
     pub value: crate::tools_ozone::safelink::Event<'a>,
+}
+
+impl jacquard_common::IntoStatic for AddRuleOutput<'_> {
+    type Output = AddRuleOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        AddRuleOutput {
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -77,6 +102,19 @@ impl std::fmt::Display for AddRuleError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for AddRuleError<'_> {
+    type Output = AddRuleError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AddRuleError::InvalidUrl(v) => AddRuleError::InvalidUrl(v.into_static()),
+            AddRuleError::RuleAlreadyExists(v) => {
+                AddRuleError::RuleAlreadyExists(v.into_static())
+            }
+            AddRuleError::Unknown(v) => AddRuleError::Unknown(v.into_static()),
         }
     }
 }

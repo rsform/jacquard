@@ -17,7 +17,18 @@ pub struct ListWithMembership<'a> {
     pub list_item: std::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+impl jacquard_common::IntoStatic for ListWithMembership<'_> {
+    type Output = ListWithMembership<'static>;
+    fn into_static(self) -> Self::Output {
+        ListWithMembership {
+            list: self.list.into_static(),
+            list_item: self.list_item.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetListsWithMembership<'a> {
     #[serde(borrow)]
@@ -25,6 +36,7 @@ pub struct GetListsWithMembership<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -32,13 +44,14 @@ pub struct GetListsWithMembership<'a> {
     pub purposes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-impl Default for GetListsWithMembership<'_> {
-    fn default() -> Self {
-        Self {
-            actor: Default::default(),
-            cursor: Default::default(),
-            limit: Some(50i64),
-            purposes: Default::default(),
+impl jacquard_common::IntoStatic for GetListsWithMembership<'_> {
+    type Output = GetListsWithMembership<'static>;
+    fn into_static(self) -> Self::Output {
+        GetListsWithMembership {
+            actor: self.actor.into_static(),
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
+            purposes: self.purposes.into_static(),
         }
     }
 }
@@ -54,10 +67,21 @@ pub struct GetListsWithMembershipOutput<'a> {
     pub lists_with_membership: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetListsWithMembershipOutput<'_> {
+    type Output = GetListsWithMembershipOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetListsWithMembershipOutput {
+            cursor: self.cursor.into_static(),
+            lists_with_membership: self.lists_with_membership.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetListsWithMembership<'_> {
     const NSID: &'static str = "app.bsky.graph.getListsWithMembership";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetListsWithMembershipOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -5,33 +5,39 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThreadV2<'a> {
+    ///(default: true)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub above: std::option::Option<bool>,
     #[serde(borrow)]
     pub anchor: jacquard_common::types::string::AtUri<'a>,
+    ///(default: 6, min: 0, max: 20)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub below: std::option::Option<i64>,
+    ///(default: 10, min: 0, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub branching_factor: std::option::Option<i64>,
+    ///(default: false)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub prioritize_followed_users: std::option::Option<bool>,
+    ///(default: "oldest")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl Default for GetPostThreadV2<'_> {
-    fn default() -> Self {
-        Self {
-            above: Some(true),
-            anchor: Default::default(),
-            below: Some(6i64),
-            branching_factor: Some(10i64),
-            prioritize_followed_users: Some(false),
-            sort: Some(jacquard_common::CowStr::from("oldest")),
+impl jacquard_common::IntoStatic for GetPostThreadV2<'_> {
+    type Output = GetPostThreadV2<'static>;
+    fn into_static(self) -> Self::Output {
+        GetPostThreadV2 {
+            above: self.above.into_static(),
+            anchor: self.anchor.into_static(),
+            below: self.below.into_static(),
+            branching_factor: self.branching_factor.into_static(),
+            prioritize_followed_users: self.prioritize_followed_users.into_static(),
+            sort: self.sort.into_static(),
         }
     }
 }
@@ -50,12 +56,24 @@ pub struct GetPostThreadV2Output<'a> {
     pub threadgate: std::option::Option<crate::app_bsky::feed::ThreadgateView<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetPostThreadV2Output<'_> {
+    type Output = GetPostThreadV2Output<'static>;
+    fn into_static(self) -> Self::Output {
+        GetPostThreadV2Output {
+            has_other_replies: self.has_other_replies.into_static(),
+            thread: self.thread.into_static(),
+            threadgate: self.threadgate.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetPostThreadV2<'_> {
     const NSID: &'static str = "app.bsky.unspecced.getPostThreadV2";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetPostThreadV2Output<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]
@@ -85,4 +103,39 @@ pub enum ThreadItemRecordValue<'a> {
     DefsThreadItemNotFound(Box<crate::app_bsky::unspecced::ThreadItemNotFound<'a>>),
     #[serde(rename = "app.bsky.unspecced.defs#threadItemBlocked")]
     DefsThreadItemBlocked(Box<crate::app_bsky::unspecced::ThreadItemBlocked<'a>>),
+}
+
+impl jacquard_common::IntoStatic for ThreadItemRecordValue<'_> {
+    type Output = ThreadItemRecordValue<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThreadItemRecordValue::DefsThreadItemPost(v) => {
+                ThreadItemRecordValue::DefsThreadItemPost(v.into_static())
+            }
+            ThreadItemRecordValue::DefsThreadItemNoUnauthenticated(v) => {
+                ThreadItemRecordValue::DefsThreadItemNoUnauthenticated(v.into_static())
+            }
+            ThreadItemRecordValue::DefsThreadItemNotFound(v) => {
+                ThreadItemRecordValue::DefsThreadItemNotFound(v.into_static())
+            }
+            ThreadItemRecordValue::DefsThreadItemBlocked(v) => {
+                ThreadItemRecordValue::DefsThreadItemBlocked(v.into_static())
+            }
+            ThreadItemRecordValue::Unknown(v) => {
+                ThreadItemRecordValue::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for ThreadItem<'_> {
+    type Output = ThreadItem<'static>;
+    fn into_static(self) -> Self::Output {
+        ThreadItem {
+            depth: self.depth.into_static(),
+            uri: self.uri.into_static(),
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

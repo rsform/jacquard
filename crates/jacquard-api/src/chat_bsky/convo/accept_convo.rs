@@ -13,6 +13,16 @@ pub struct AcceptConvo<'a> {
     pub convo_id: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for AcceptConvo<'_> {
+    type Output = AcceptConvo<'static>;
+    fn into_static(self) -> Self::Output {
+        AcceptConvo {
+            convo_id: self.convo_id.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -23,6 +33,16 @@ pub struct AcceptConvoOutput<'a> {
     pub rev: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for AcceptConvoOutput<'_> {
+    type Output = AcceptConvoOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        AcceptConvoOutput {
+            rev: self.rev.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for AcceptConvo<'_> {
     const NSID: &'static str = "chat.bsky.convo.acceptConvo";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -30,5 +50,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for AcceptConvo<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = AcceptConvoOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

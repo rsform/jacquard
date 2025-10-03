@@ -26,3 +26,16 @@ pub struct Verification<'a> {
 impl jacquard_common::types::collection::Collection for Verification<'_> {
     const NSID: &'static str = "app.bsky.graph.verification";
 }
+
+impl jacquard_common::IntoStatic for Verification<'_> {
+    type Output = Verification<'static>;
+    fn into_static(self) -> Self::Output {
+        Verification {
+            created_at: self.created_at.into_static(),
+            display_name: self.display_name.into_static(),
+            handle: self.handle.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

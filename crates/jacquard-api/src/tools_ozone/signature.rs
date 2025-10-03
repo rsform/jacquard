@@ -18,3 +18,14 @@ pub struct SigDetail<'a> {
     #[serde(borrow)]
     pub value: jacquard_common::CowStr<'a>,
 }
+
+impl jacquard_common::IntoStatic for SigDetail<'_> {
+    type Output = SigDetail<'static>;
+    fn into_static(self) -> Self::Output {
+        SigDetail {
+            property: self.property.into_static(),
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

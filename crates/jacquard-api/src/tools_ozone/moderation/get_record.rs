@@ -15,6 +15,16 @@ pub struct GetRecord<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetRecord<'_> {
+    type Output = GetRecord<'static>;
+    fn into_static(self) -> Self::Output {
+        GetRecord {
+            cid: self.cid.into_static(),
+            uri: self.uri.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -22,6 +32,16 @@ pub struct GetRecordOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
     pub value: crate::tools_ozone::moderation::RecordViewDetail<'a>,
+}
+
+impl jacquard_common::IntoStatic for GetRecordOutput<'_> {
+    type Output = GetRecordOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetRecordOutput {
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -53,6 +73,18 @@ impl std::fmt::Display for GetRecordError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetRecordError<'_> {
+    type Output = GetRecordError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetRecordError::RecordNotFound(v) => {
+                GetRecordError::RecordNotFound(v.into_static())
+            }
+            GetRecordError::Unknown(v) => GetRecordError::Unknown(v.into_static()),
         }
     }
 }

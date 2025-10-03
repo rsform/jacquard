@@ -5,23 +5,26 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThread<'a> {
+    ///(default: 6, min: 0, max: 1000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub depth: std::option::Option<i64>,
+    ///(default: 80, min: 0, max: 1000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub parent_height: std::option::Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl Default for GetPostThread<'_> {
-    fn default() -> Self {
-        Self {
-            depth: Some(6i64),
-            parent_height: Some(80i64),
-            uri: Default::default(),
+impl jacquard_common::IntoStatic for GetPostThread<'_> {
+    type Output = GetPostThread<'static>;
+    fn into_static(self) -> Self::Output {
+        GetPostThread {
+            depth: self.depth.into_static(),
+            parent_height: self.parent_height.into_static(),
+            uri: self.uri.into_static(),
         }
     }
 }
@@ -48,6 +51,37 @@ pub enum GetPostThreadOutputRecordThread<'a> {
     DefsNotFoundPost(Box<crate::app_bsky::feed::NotFoundPost<'a>>),
     #[serde(rename = "app.bsky.feed.defs#blockedPost")]
     DefsBlockedPost(Box<crate::app_bsky::feed::BlockedPost<'a>>),
+}
+
+impl jacquard_common::IntoStatic for GetPostThreadOutputRecordThread<'_> {
+    type Output = GetPostThreadOutputRecordThread<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetPostThreadOutputRecordThread::DefsThreadViewPost(v) => {
+                GetPostThreadOutputRecordThread::DefsThreadViewPost(v.into_static())
+            }
+            GetPostThreadOutputRecordThread::DefsNotFoundPost(v) => {
+                GetPostThreadOutputRecordThread::DefsNotFoundPost(v.into_static())
+            }
+            GetPostThreadOutputRecordThread::DefsBlockedPost(v) => {
+                GetPostThreadOutputRecordThread::DefsBlockedPost(v.into_static())
+            }
+            GetPostThreadOutputRecordThread::Unknown(v) => {
+                GetPostThreadOutputRecordThread::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetPostThreadOutput<'_> {
+    type Output = GetPostThreadOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetPostThreadOutput {
+            thread: self.thread.into_static(),
+            threadgate: self.threadgate.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -79,6 +113,20 @@ impl std::fmt::Display for GetPostThreadError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetPostThreadError<'_> {
+    type Output = GetPostThreadError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetPostThreadError::NotFound(v) => {
+                GetPostThreadError::NotFound(v.into_static())
+            }
+            GetPostThreadError::Unknown(v) => {
+                GetPostThreadError::Unknown(v.into_static())
+            }
         }
     }
 }

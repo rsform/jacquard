@@ -15,6 +15,17 @@ pub struct AccountCodes<'a> {
     pub codes: Vec<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for AccountCodes<'_> {
+    type Output = AccountCodes<'static>;
+    fn into_static(self) -> Self::Output {
+        AccountCodes {
+            account: self.account.into_static(),
+            codes: self.codes.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -26,12 +37,34 @@ pub struct CreateInviteCodes<'a> {
     pub use_count: i64,
 }
 
+impl jacquard_common::IntoStatic for CreateInviteCodes<'_> {
+    type Output = CreateInviteCodes<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateInviteCodes {
+            code_count: self.code_count.into_static(),
+            for_accounts: self.for_accounts.into_static(),
+            use_count: self.use_count.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateInviteCodesOutput<'a> {
     #[serde(borrow)]
     pub codes: Vec<jacquard_common::types::value::Data<'a>>,
+}
+
+impl jacquard_common::IntoStatic for CreateInviteCodesOutput<'_> {
+    type Output = CreateInviteCodesOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateInviteCodesOutput {
+            codes: self.codes.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 impl jacquard_common::types::xrpc::XrpcRequest for CreateInviteCodes<'_> {
@@ -41,5 +74,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for CreateInviteCodes<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = CreateInviteCodesOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

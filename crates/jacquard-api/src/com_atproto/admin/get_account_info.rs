@@ -12,6 +12,15 @@ pub struct GetAccountInfo<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetAccountInfo<'_> {
+    type Output = GetAccountInfo<'static>;
+    fn into_static(self) -> Self::Output {
+        GetAccountInfo {
+            did: self.did.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -21,10 +30,20 @@ pub struct GetAccountInfoOutput<'a> {
     pub value: crate::com_atproto::admin::AccountView<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetAccountInfoOutput<'_> {
+    type Output = GetAccountInfoOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetAccountInfoOutput {
+            value: self.value.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetAccountInfo<'_> {
     const NSID: &'static str = "com.atproto.admin.getAccountInfo";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetAccountInfoOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

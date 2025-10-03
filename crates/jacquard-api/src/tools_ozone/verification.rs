@@ -61,6 +61,17 @@ pub struct VerificationView<'a> {
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum VerificationViewRecordIssuerProfile<'a> {}
+impl jacquard_common::IntoStatic for VerificationViewRecordIssuerProfile<'_> {
+    type Output = VerificationViewRecordIssuerProfile<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VerificationViewRecordIssuerProfile::Unknown(v) => {
+                VerificationViewRecordIssuerProfile::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(tag = "$type")]
@@ -72,11 +83,39 @@ pub enum VerificationViewRecordIssuerRepo<'a> {
     DefsRepoViewNotFound(Box<crate::tools_ozone::moderation::RepoViewNotFound<'a>>),
 }
 
+impl jacquard_common::IntoStatic for VerificationViewRecordIssuerRepo<'_> {
+    type Output = VerificationViewRecordIssuerRepo<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VerificationViewRecordIssuerRepo::DefsRepoViewDetail(v) => {
+                VerificationViewRecordIssuerRepo::DefsRepoViewDetail(v.into_static())
+            }
+            VerificationViewRecordIssuerRepo::DefsRepoViewNotFound(v) => {
+                VerificationViewRecordIssuerRepo::DefsRepoViewNotFound(v.into_static())
+            }
+            VerificationViewRecordIssuerRepo::Unknown(v) => {
+                VerificationViewRecordIssuerRepo::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum VerificationViewRecordSubjectProfile<'a> {}
+impl jacquard_common::IntoStatic for VerificationViewRecordSubjectProfile<'_> {
+    type Output = VerificationViewRecordSubjectProfile<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VerificationViewRecordSubjectProfile::Unknown(v) => {
+                VerificationViewRecordSubjectProfile::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(tag = "$type")]
@@ -86,4 +125,43 @@ pub enum VerificationViewRecordSubjectRepo<'a> {
     DefsRepoViewDetail(Box<crate::tools_ozone::moderation::RepoViewDetail<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#repoViewNotFound")]
     DefsRepoViewNotFound(Box<crate::tools_ozone::moderation::RepoViewNotFound<'a>>),
+}
+
+impl jacquard_common::IntoStatic for VerificationViewRecordSubjectRepo<'_> {
+    type Output = VerificationViewRecordSubjectRepo<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VerificationViewRecordSubjectRepo::DefsRepoViewDetail(v) => {
+                VerificationViewRecordSubjectRepo::DefsRepoViewDetail(v.into_static())
+            }
+            VerificationViewRecordSubjectRepo::DefsRepoViewNotFound(v) => {
+                VerificationViewRecordSubjectRepo::DefsRepoViewNotFound(v.into_static())
+            }
+            VerificationViewRecordSubjectRepo::Unknown(v) => {
+                VerificationViewRecordSubjectRepo::Unknown(v.into_static())
+            }
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for VerificationView<'_> {
+    type Output = VerificationView<'static>;
+    fn into_static(self) -> Self::Output {
+        VerificationView {
+            created_at: self.created_at.into_static(),
+            display_name: self.display_name.into_static(),
+            handle: self.handle.into_static(),
+            issuer: self.issuer.into_static(),
+            issuer_profile: self.issuer_profile.into_static(),
+            issuer_repo: self.issuer_repo.into_static(),
+            revoke_reason: self.revoke_reason.into_static(),
+            revoked_at: self.revoked_at.into_static(),
+            revoked_by: self.revoked_by.into_static(),
+            subject: self.subject.into_static(),
+            subject_profile: self.subject_profile.into_static(),
+            subject_repo: self.subject_repo.into_static(),
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

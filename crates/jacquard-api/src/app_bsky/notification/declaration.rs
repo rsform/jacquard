@@ -18,3 +18,13 @@ pub struct Declaration<'a> {
 impl jacquard_common::types::collection::Collection for Declaration<'_> {
     const NSID: &'static str = "app.bsky.notification.declaration";
 }
+
+impl jacquard_common::IntoStatic for Declaration<'_> {
+    type Output = Declaration<'static>;
+    fn into_static(self) -> Self::Output {
+        Declaration {
+            allow_subscriptions: self.allow_subscriptions.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryEvents<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -38,8 +38,10 @@ pub struct QueryEvents<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub has_comment: std::option::Option<bool>,
+    ///(default: false)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub include_all_user_records: std::option::Option<bool>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -57,6 +59,7 @@ pub struct QueryEvents<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub report_types: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ///(default: "desc")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub sort_direction: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -71,31 +74,32 @@ pub struct QueryEvents<'a> {
     pub types: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-impl Default for QueryEvents<'_> {
-    fn default() -> Self {
-        Self {
-            added_labels: Default::default(),
-            added_tags: Default::default(),
-            age_assurance_state: Default::default(),
-            batch_id: Default::default(),
-            collections: Default::default(),
-            comment: Default::default(),
-            created_after: Default::default(),
-            created_before: Default::default(),
-            created_by: Default::default(),
-            cursor: Default::default(),
-            has_comment: Default::default(),
-            include_all_user_records: Some(false),
-            limit: Some(50i64),
-            mod_tool: Default::default(),
-            policies: Default::default(),
-            removed_labels: Default::default(),
-            removed_tags: Default::default(),
-            report_types: Default::default(),
-            sort_direction: Some(jacquard_common::CowStr::from("desc")),
-            subject: Default::default(),
-            subject_type: Default::default(),
-            types: Default::default(),
+impl jacquard_common::IntoStatic for QueryEvents<'_> {
+    type Output = QueryEvents<'static>;
+    fn into_static(self) -> Self::Output {
+        QueryEvents {
+            added_labels: self.added_labels.into_static(),
+            added_tags: self.added_tags.into_static(),
+            age_assurance_state: self.age_assurance_state.into_static(),
+            batch_id: self.batch_id.into_static(),
+            collections: self.collections.into_static(),
+            comment: self.comment.into_static(),
+            created_after: self.created_after.into_static(),
+            created_before: self.created_before.into_static(),
+            created_by: self.created_by.into_static(),
+            cursor: self.cursor.into_static(),
+            has_comment: self.has_comment.into_static(),
+            include_all_user_records: self.include_all_user_records.into_static(),
+            limit: self.limit.into_static(),
+            mod_tool: self.mod_tool.into_static(),
+            policies: self.policies.into_static(),
+            removed_labels: self.removed_labels.into_static(),
+            removed_tags: self.removed_tags.into_static(),
+            report_types: self.report_types.into_static(),
+            sort_direction: self.sort_direction.into_static(),
+            subject: self.subject.into_static(),
+            subject_type: self.subject_type.into_static(),
+            types: self.types.into_static(),
         }
     }
 }
@@ -111,10 +115,21 @@ pub struct QueryEventsOutput<'a> {
     pub events: Vec<crate::tools_ozone::moderation::ModEventView<'a>>,
 }
 
+impl jacquard_common::IntoStatic for QueryEventsOutput<'_> {
+    type Output = QueryEventsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        QueryEventsOutput {
+            cursor: self.cursor.into_static(),
+            events: self.events.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for QueryEvents<'_> {
     const NSID: &'static str = "tools.ozone.moderation.queryEvents";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = QueryEventsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

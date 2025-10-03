@@ -39,3 +39,21 @@ pub struct ProfileViewBasic<'a> {
     #[serde(borrow)]
     pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
 }
+
+impl jacquard_common::IntoStatic for ProfileViewBasic<'_> {
+    type Output = ProfileViewBasic<'static>;
+    fn into_static(self) -> Self::Output {
+        ProfileViewBasic {
+            associated: self.associated.into_static(),
+            avatar: self.avatar.into_static(),
+            chat_disabled: self.chat_disabled.into_static(),
+            did: self.did.into_static(),
+            display_name: self.display_name.into_static(),
+            handle: self.handle.into_static(),
+            labels: self.labels.into_static(),
+            verification: self.verification.into_static(),
+            viewer: self.viewer.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

@@ -13,6 +13,16 @@ pub struct SubmitPlcOperation<'a> {
     pub operation: jacquard_common::types::value::Data<'a>,
 }
 
+impl jacquard_common::IntoStatic for SubmitPlcOperation<'_> {
+    type Output = SubmitPlcOperation<'static>;
+    fn into_static(self) -> Self::Output {
+        SubmitPlcOperation {
+            operation: self.operation.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for SubmitPlcOperation<'_> {
     const NSID: &'static str = "com.atproto.identity.submitPlcOperation";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -20,5 +30,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for SubmitPlcOperation<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

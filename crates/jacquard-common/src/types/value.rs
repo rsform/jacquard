@@ -1,4 +1,7 @@
-use crate::types::{DataModelType, LexiconStringType, UriType, blob::Blob, string::*};
+use crate::{
+    IntoStatic,
+    types::{DataModelType, LexiconStringType, UriType, blob::Blob, string::*},
+};
 use bytes::Bytes;
 use ipld_core::ipld::Ipld;
 use smol_str::{SmolStr, ToSmolStr};
@@ -101,8 +104,32 @@ impl<'s> Data<'s> {
     }
 }
 
+impl IntoStatic for Data<'_> {
+    type Output = Data<'static>;
+    fn into_static(self) -> Data<'static> {
+        match self {
+            Data::Null => Data::Null,
+            Data::Boolean(bool) => Data::Boolean(bool),
+            Data::Integer(int) => Data::Integer(int),
+            Data::String(string) => Data::String(string.into_static()),
+            Data::Bytes(bytes) => Data::Bytes(bytes),
+            Data::Array(array) => Data::Array(array.into_static()),
+            Data::Object(object) => Data::Object(object.into_static()),
+            Data::CidLink(cid) => Data::CidLink(cid.into_static()),
+            Data::Blob(blob) => Data::Blob(blob.into_static()),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Array<'s>(pub Vec<Data<'s>>);
+
+impl IntoStatic for Array<'_> {
+    type Output = Array<'static>;
+    fn into_static(self) -> Array<'static> {
+        Array(self.0.into_static())
+    }
+}
 
 impl<'s> Array<'s> {
     pub fn from_json(json: &'s Vec<serde_json::Value>) -> Result<Self, AtDataError> {
@@ -123,6 +150,13 @@ impl<'s> Array<'s> {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Object<'s>(pub BTreeMap<SmolStr, Data<'s>>);
+
+impl IntoStatic for Object<'_> {
+    type Output = Object<'static>;
+    fn into_static(self) -> Object<'static> {
+        Object(self.0.into_static())
+    }
+}
 
 impl<'s> Object<'s> {
     pub fn from_json(

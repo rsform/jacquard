@@ -12,6 +12,15 @@ pub struct DereferenceScope<'a> {
     pub scope: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for DereferenceScope<'_> {
+    type Output = DereferenceScope<'static>;
+    fn into_static(self) -> Self::Output {
+        DereferenceScope {
+            scope: self.scope.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -19,6 +28,16 @@ pub struct DereferenceScopeOutput<'a> {
     ///The full oauth permission scope
     #[serde(borrow)]
     pub scope: jacquard_common::CowStr<'a>,
+}
+
+impl jacquard_common::IntoStatic for DereferenceScopeOutput<'_> {
+    type Output = DereferenceScopeOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        DereferenceScopeOutput {
+            scope: self.scope.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -51,6 +70,20 @@ impl std::fmt::Display for DereferenceScopeError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for DereferenceScopeError<'_> {
+    type Output = DereferenceScopeError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            DereferenceScopeError::InvalidScopeReference(v) => {
+                DereferenceScopeError::InvalidScopeReference(v.into_static())
+            }
+            DereferenceScopeError::Unknown(v) => {
+                DereferenceScopeError::Unknown(v.into_static())
+            }
         }
     }
 }

@@ -13,6 +13,16 @@ pub struct RevokeAppPassword<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for RevokeAppPassword<'_> {
+    type Output = RevokeAppPassword<'static>;
+    fn into_static(self) -> Self::Output {
+        RevokeAppPassword {
+            name: self.name.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for RevokeAppPassword<'_> {
     const NSID: &'static str = "com.atproto.server.revokeAppPassword";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -20,5 +30,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for RevokeAppPassword<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

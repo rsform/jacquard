@@ -5,12 +5,13 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestionsSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -21,13 +22,14 @@ pub struct GetSuggestionsSkeleton<'a> {
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-impl Default for GetSuggestionsSkeleton<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            limit: Some(50i64),
-            relative_to_did: Default::default(),
-            viewer: Default::default(),
+impl jacquard_common::IntoStatic for GetSuggestionsSkeleton<'_> {
+    type Output = GetSuggestionsSkeleton<'static>;
+    fn into_static(self) -> Self::Output {
+        GetSuggestionsSkeleton {
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
+            relative_to_did: self.relative_to_did.into_static(),
+            viewer: self.viewer.into_static(),
         }
     }
 }
@@ -50,10 +52,23 @@ pub struct GetSuggestionsSkeletonOutput<'a> {
     pub relative_to_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetSuggestionsSkeletonOutput<'_> {
+    type Output = GetSuggestionsSkeletonOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetSuggestionsSkeletonOutput {
+            actors: self.actors.into_static(),
+            cursor: self.cursor.into_static(),
+            rec_id: self.rec_id.into_static(),
+            relative_to_did: self.relative_to_did.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetSuggestionsSkeleton<'_> {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestionsSkeleton";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetSuggestionsSkeletonOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

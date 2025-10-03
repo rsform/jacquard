@@ -42,6 +42,34 @@ pub enum ListRecordLabels<'a> {
     DefsSelfLabels(Box<crate::com_atproto::label::SelfLabels<'a>>),
 }
 
+impl jacquard_common::IntoStatic for ListRecordLabels<'_> {
+    type Output = ListRecordLabels<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListRecordLabels::DefsSelfLabels(v) => {
+                ListRecordLabels::DefsSelfLabels(v.into_static())
+            }
+            ListRecordLabels::Unknown(v) => ListRecordLabels::Unknown(v.into_static()),
+        }
+    }
+}
+
 impl jacquard_common::types::collection::Collection for List<'_> {
     const NSID: &'static str = "app.bsky.graph.list";
+}
+
+impl jacquard_common::IntoStatic for List<'_> {
+    type Output = List<'static>;
+    fn into_static(self) -> Self::Output {
+        List {
+            avatar: self.avatar.into_static(),
+            created_at: self.created_at.into_static(),
+            description: self.description.into_static(),
+            description_facets: self.description_facets.into_static(),
+            labels: self.labels.into_static(),
+            name: self.name.into_static(),
+            purpose: self.purpose.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

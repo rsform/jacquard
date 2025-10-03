@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStarterPacksWithMembership<'a> {
     #[serde(borrow)]
@@ -13,16 +13,18 @@ pub struct GetStarterPacksWithMembership<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
-impl Default for GetStarterPacksWithMembership<'_> {
-    fn default() -> Self {
-        Self {
-            actor: Default::default(),
-            cursor: Default::default(),
-            limit: Some(50i64),
+impl jacquard_common::IntoStatic for GetStarterPacksWithMembership<'_> {
+    type Output = GetStarterPacksWithMembership<'static>;
+    fn into_static(self) -> Self::Output {
+        GetStarterPacksWithMembership {
+            actor: self.actor.into_static(),
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
         }
     }
 }
@@ -38,12 +40,25 @@ pub struct GetStarterPacksWithMembershipOutput<'a> {
     pub starter_packs_with_membership: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetStarterPacksWithMembershipOutput<'_> {
+    type Output = GetStarterPacksWithMembershipOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetStarterPacksWithMembershipOutput {
+            cursor: self.cursor.into_static(),
+            starter_packs_with_membership: self
+                .starter_packs_with_membership
+                .into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetStarterPacksWithMembership<'_> {
     const NSID: &'static str = "app.bsky.graph.getStarterPacksWithMembership";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetStarterPacksWithMembershipOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 ///A starter pack and an optional list item indicating membership of a target user to that starter pack.
@@ -56,4 +71,15 @@ pub struct StarterPackWithMembership<'a> {
     pub list_item: std::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
     #[serde(borrow)]
     pub starter_pack: crate::app_bsky::graph::StarterPackView<'a>,
+}
+
+impl jacquard_common::IntoStatic for StarterPackWithMembership<'_> {
+    type Output = StarterPackWithMembership<'static>;
+    fn into_static(self) -> Self::Output {
+        StarterPackWithMembership {
+            list_item: self.list_item.into_static(),
+            starter_pack: self.starter_pack.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

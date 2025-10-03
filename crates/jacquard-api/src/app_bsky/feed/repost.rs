@@ -21,3 +21,15 @@ pub struct Repost<'a> {
 impl jacquard_common::types::collection::Collection for Repost<'_> {
     const NSID: &'static str = "app.bsky.feed.repost";
 }
+
+impl jacquard_common::IntoStatic for Repost<'_> {
+    type Output = Repost<'static>;
+    fn into_static(self) -> Self::Output {
+        Repost {
+            created_at: self.created_at.into_static(),
+            subject: self.subject.into_static(),
+            via: self.via.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

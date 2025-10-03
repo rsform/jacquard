@@ -18,3 +18,14 @@ pub struct Follow<'a> {
 impl jacquard_common::types::collection::Collection for Follow<'_> {
     const NSID: &'static str = "app.bsky.graph.follow";
 }
+
+impl jacquard_common::IntoStatic for Follow<'_> {
+    type Output = Follow<'static>;
+    fn into_static(self) -> Self::Output {
+        Follow {
+            created_at: self.created_at.into_static(),
+            subject: self.subject.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

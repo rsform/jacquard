@@ -17,6 +17,16 @@ pub struct GetRelationships<'a> {
     >,
 }
 
+impl jacquard_common::IntoStatic for GetRelationships<'_> {
+    type Output = GetRelationships<'static>;
+    fn into_static(self) -> Self::Output {
+        GetRelationships {
+            actor: self.actor.into_static(),
+            others: self.others.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -26,6 +36,17 @@ pub struct GetRelationshipsOutput<'a> {
     pub actor: std::option::Option<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
     pub relationships: Vec<jacquard_common::types::value::Data<'a>>,
+}
+
+impl jacquard_common::IntoStatic for GetRelationshipsOutput<'_> {
+    type Output = GetRelationshipsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetRelationshipsOutput {
+            actor: self.actor.into_static(),
+            relationships: self.relationships.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -58,6 +79,20 @@ impl std::fmt::Display for GetRelationshipsError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetRelationshipsError<'_> {
+    type Output = GetRelationshipsError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetRelationshipsError::ActorNotFound(v) => {
+                GetRelationshipsError::ActorNotFound(v.into_static())
+            }
+            GetRelationshipsError::Unknown(v) => {
+                GetRelationshipsError::Unknown(v.into_static())
+            }
         }
     }
 }

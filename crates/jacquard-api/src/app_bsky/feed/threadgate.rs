@@ -10,11 +10,29 @@
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct FollowerRule<'a> {}
+impl jacquard_common::IntoStatic for FollowerRule<'_> {
+    type Output = FollowerRule<'static>;
+    fn into_static(self) -> Self::Output {
+        FollowerRule {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 ///Allow replies from actors you follow.
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct FollowingRule<'a> {}
+impl jacquard_common::IntoStatic for FollowingRule<'_> {
+    type Output = FollowingRule<'static>;
+    fn into_static(self) -> Self::Output {
+        FollowingRule {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 ///Allow replies from actors on a list.
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -22,6 +40,16 @@ pub struct FollowingRule<'a> {}
 pub struct ListRule<'a> {
     #[serde(borrow)]
     pub list: jacquard_common::types::string::AtUri<'a>,
+}
+
+impl jacquard_common::IntoStatic for ListRule<'_> {
+    type Output = ListRule<'static>;
+    fn into_static(self) -> Self::Output {
+        ListRule {
+            list: self.list.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 ///Record defining interaction gating rules for a thread (aka, reply controls). The record key (rkey) of the threadgate record must match the record key of the thread's root post, and that record must be in the same repository.
@@ -49,8 +77,29 @@ impl jacquard_common::types::collection::Collection for Threadgate<'_> {
     const NSID: &'static str = "app.bsky.feed.threadgate";
 }
 
+impl jacquard_common::IntoStatic for Threadgate<'_> {
+    type Output = Threadgate<'static>;
+    fn into_static(self) -> Self::Output {
+        Threadgate {
+            allow: self.allow.into_static(),
+            created_at: self.created_at.into_static(),
+            hidden_replies: self.hidden_replies.into_static(),
+            post: self.post.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 ///Allow replies from actors mentioned in your post.
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct MentionRule<'a> {}
+impl jacquard_common::IntoStatic for MentionRule<'_> {
+    type Output = MentionRule<'static>;
+    fn into_static(self) -> Self::Output {
+        MentionRule {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}

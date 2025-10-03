@@ -12,6 +12,15 @@ pub struct GetRepoStatus<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
+impl jacquard_common::IntoStatic for GetRepoStatus<'_> {
+    type Output = GetRepoStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        GetRepoStatus {
+            did: self.did.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -26,6 +35,19 @@ pub struct GetRepoStatusOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+impl jacquard_common::IntoStatic for GetRepoStatusOutput<'_> {
+    type Output = GetRepoStatusOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetRepoStatusOutput {
+            active: self.active.into_static(),
+            did: self.did.into_static(),
+            rev: self.rev.into_static(),
+            status: self.status.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -57,6 +79,20 @@ impl std::fmt::Display for GetRepoStatusError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetRepoStatusError<'_> {
+    type Output = GetRepoStatusError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetRepoStatusError::RepoNotFound(v) => {
+                GetRepoStatusError::RepoNotFound(v.into_static())
+            }
+            GetRepoStatusError::Unknown(v) => {
+                GetRepoStatusError::Unknown(v.into_static())
+            }
         }
     }
 }

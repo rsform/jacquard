@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchAccounts<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -14,16 +14,18 @@ pub struct SearchAccounts<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
-impl Default for SearchAccounts<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            email: Default::default(),
-            limit: Some(50i64),
+impl jacquard_common::IntoStatic for SearchAccounts<'_> {
+    type Output = SearchAccounts<'static>;
+    fn into_static(self) -> Self::Output {
+        SearchAccounts {
+            cursor: self.cursor.into_static(),
+            email: self.email.into_static(),
+            limit: self.limit.into_static(),
         }
     }
 }
@@ -39,10 +41,21 @@ pub struct SearchAccountsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for SearchAccountsOutput<'_> {
+    type Output = SearchAccountsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        SearchAccountsOutput {
+            accounts: self.accounts.into_static(),
+            cursor: self.cursor.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for SearchAccounts<'_> {
     const NSID: &'static str = "com.atproto.admin.searchAccounts";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = SearchAccountsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

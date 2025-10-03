@@ -12,6 +12,15 @@ pub struct DescribeRepo<'a> {
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
+impl jacquard_common::IntoStatic for DescribeRepo<'_> {
+    type Output = DescribeRepo<'static>;
+    fn into_static(self) -> Self::Output {
+        DescribeRepo {
+            repo: self.repo.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -30,10 +39,24 @@ pub struct DescribeRepoOutput<'a> {
     pub handle_is_correct: bool,
 }
 
+impl jacquard_common::IntoStatic for DescribeRepoOutput<'_> {
+    type Output = DescribeRepoOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        DescribeRepoOutput {
+            collections: self.collections.into_static(),
+            did: self.did.into_static(),
+            did_doc: self.did_doc.into_static(),
+            handle: self.handle.into_static(),
+            handle_is_correct: self.handle_is_correct.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for DescribeRepo<'_> {
     const NSID: &'static str = "com.atproto.repo.describeRepo";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = DescribeRepoOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -12,6 +12,15 @@ pub struct GetPosts<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetPosts<'_> {
+    type Output = GetPosts<'static>;
+    fn into_static(self) -> Self::Output {
+        GetPosts {
+            uris: self.uris.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -20,10 +29,20 @@ pub struct GetPostsOutput<'a> {
     pub posts: Vec<crate::app_bsky::feed::PostView<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetPostsOutput<'_> {
+    type Output = GetPostsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetPostsOutput {
+            posts: self.posts.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetPosts<'_> {
     const NSID: &'static str = "app.bsky.feed.getPosts";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetPostsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -13,12 +13,32 @@ pub struct UnmuteConvo<'a> {
     pub convo_id: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for UnmuteConvo<'_> {
+    type Output = UnmuteConvo<'static>;
+    fn into_static(self) -> Self::Output {
+        UnmuteConvo {
+            convo_id: self.convo_id.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UnmuteConvoOutput<'a> {
     #[serde(borrow)]
     pub convo: crate::chat_bsky::convo::ConvoView<'a>,
+}
+
+impl jacquard_common::IntoStatic for UnmuteConvoOutput<'_> {
+    type Output = UnmuteConvoOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        UnmuteConvoOutput {
+            convo: self.convo.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 impl jacquard_common::types::xrpc::XrpcRequest for UnmuteConvo<'_> {
@@ -28,5 +48,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for UnmuteConvo<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = UnmuteConvoOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

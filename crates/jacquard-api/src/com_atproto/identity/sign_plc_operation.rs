@@ -29,6 +29,20 @@ pub struct SignPlcOperation<'a> {
     >,
 }
 
+impl jacquard_common::IntoStatic for SignPlcOperation<'_> {
+    type Output = SignPlcOperation<'static>;
+    fn into_static(self) -> Self::Output {
+        SignPlcOperation {
+            also_known_as: self.also_known_as.into_static(),
+            rotation_keys: self.rotation_keys.into_static(),
+            services: self.services.into_static(),
+            token: self.token.into_static(),
+            verification_methods: self.verification_methods.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -38,6 +52,16 @@ pub struct SignPlcOperationOutput<'a> {
     pub operation: jacquard_common::types::value::Data<'a>,
 }
 
+impl jacquard_common::IntoStatic for SignPlcOperationOutput<'_> {
+    type Output = SignPlcOperationOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        SignPlcOperationOutput {
+            operation: self.operation.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for SignPlcOperation<'_> {
     const NSID: &'static str = "com.atproto.identity.signPlcOperation";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -45,5 +69,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for SignPlcOperation<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = SignPlcOperationOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

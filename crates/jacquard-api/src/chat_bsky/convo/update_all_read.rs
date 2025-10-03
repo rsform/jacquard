@@ -14,12 +14,32 @@ pub struct UpdateAllRead<'a> {
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for UpdateAllRead<'_> {
+    type Output = UpdateAllRead<'static>;
+    fn into_static(self) -> Self::Output {
+        UpdateAllRead {
+            status: self.status.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAllReadOutput<'a> {
     ///The count of updated convos.
     pub updated_count: i64,
+}
+
+impl jacquard_common::IntoStatic for UpdateAllReadOutput<'_> {
+    type Output = UpdateAllReadOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        UpdateAllReadOutput {
+            updated_count: self.updated_count.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 impl jacquard_common::types::xrpc::XrpcRequest for UpdateAllRead<'_> {
@@ -29,5 +49,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for UpdateAllRead<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = UpdateAllReadOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

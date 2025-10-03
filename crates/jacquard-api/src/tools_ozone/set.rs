@@ -23,6 +23,17 @@ pub struct Set<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for Set<'_> {
+    type Output = Set<'static>;
+    fn into_static(self) -> Self::Output {
+        Set {
+            description: self.description.into_static(),
+            name: self.name.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -35,4 +46,18 @@ pub struct SetView<'a> {
     pub name: jacquard_common::CowStr<'a>,
     pub set_size: i64,
     pub updated_at: jacquard_common::types::string::Datetime,
+}
+
+impl jacquard_common::IntoStatic for SetView<'_> {
+    type Output = SetView<'static>;
+    fn into_static(self) -> Self::Output {
+        SetView {
+            created_at: self.created_at.into_static(),
+            description: self.description.into_static(),
+            name: self.name.into_static(),
+            set_size: self.set_size.into_static(),
+            updated_at: self.updated_at.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

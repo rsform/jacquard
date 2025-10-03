@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorFeeds<'a> {
     #[serde(borrow)]
@@ -13,16 +13,18 @@ pub struct GetActorFeeds<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
 }
 
-impl Default for GetActorFeeds<'_> {
-    fn default() -> Self {
-        Self {
-            actor: Default::default(),
-            cursor: Default::default(),
-            limit: Some(50i64),
+impl jacquard_common::IntoStatic for GetActorFeeds<'_> {
+    type Output = GetActorFeeds<'static>;
+    fn into_static(self) -> Self::Output {
+        GetActorFeeds {
+            actor: self.actor.into_static(),
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
         }
     }
 }
@@ -38,10 +40,21 @@ pub struct GetActorFeedsOutput<'a> {
     pub feeds: Vec<crate::app_bsky::feed::GeneratorView<'a>>,
 }
 
+impl jacquard_common::IntoStatic for GetActorFeedsOutput<'_> {
+    type Output = GetActorFeedsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetActorFeedsOutput {
+            cursor: self.cursor.into_static(),
+            feeds: self.feeds.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for GetActorFeeds<'_> {
     const NSID: &'static str = "app.bsky.feed.getActorFeeds";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetActorFeedsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

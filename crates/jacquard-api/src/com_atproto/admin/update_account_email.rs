@@ -16,6 +16,17 @@ pub struct UpdateAccountEmail<'a> {
     pub email: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for UpdateAccountEmail<'_> {
+    type Output = UpdateAccountEmail<'static>;
+    fn into_static(self) -> Self::Output {
+        UpdateAccountEmail {
+            account: self.account.into_static(),
+            email: self.email.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for UpdateAccountEmail<'_> {
     const NSID: &'static str = "com.atproto.admin.updateAccountEmail";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
@@ -23,5 +34,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for UpdateAccountEmail<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

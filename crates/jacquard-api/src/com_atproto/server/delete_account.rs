@@ -17,6 +17,18 @@ pub struct DeleteAccount<'a> {
     pub token: jacquard_common::CowStr<'a>,
 }
 
+impl jacquard_common::IntoStatic for DeleteAccount<'_> {
+    type Output = DeleteAccount<'static>;
+    fn into_static(self) -> Self::Output {
+        DeleteAccount {
+            did: self.did.into_static(),
+            password: self.password.into_static(),
+            token: self.token.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -55,6 +67,23 @@ impl std::fmt::Display for DeleteAccountError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for DeleteAccountError<'_> {
+    type Output = DeleteAccountError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            DeleteAccountError::ExpiredToken(v) => {
+                DeleteAccountError::ExpiredToken(v.into_static())
+            }
+            DeleteAccountError::InvalidToken(v) => {
+                DeleteAccountError::InvalidToken(v.into_static())
+            }
+            DeleteAccountError::Unknown(v) => {
+                DeleteAccountError::Unknown(v.into_static())
+            }
         }
     }
 }

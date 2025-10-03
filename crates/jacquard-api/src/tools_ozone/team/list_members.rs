@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ListMembers<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -13,6 +13,7 @@ pub struct ListMembers<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub disabled: std::option::Option<bool>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -23,14 +24,15 @@ pub struct ListMembers<'a> {
     pub roles: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-impl Default for ListMembers<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            disabled: Default::default(),
-            limit: Some(50i64),
-            q: Default::default(),
-            roles: Default::default(),
+impl jacquard_common::IntoStatic for ListMembers<'_> {
+    type Output = ListMembers<'static>;
+    fn into_static(self) -> Self::Output {
+        ListMembers {
+            cursor: self.cursor.into_static(),
+            disabled: self.disabled.into_static(),
+            limit: self.limit.into_static(),
+            q: self.q.into_static(),
+            roles: self.roles.into_static(),
         }
     }
 }
@@ -46,10 +48,21 @@ pub struct ListMembersOutput<'a> {
     pub members: Vec<crate::tools_ozone::team::Member<'a>>,
 }
 
+impl jacquard_common::IntoStatic for ListMembersOutput<'_> {
+    type Output = ListMembersOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        ListMembersOutput {
+            cursor: self.cursor.into_static(),
+            members: self.members.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for ListMembers<'_> {
     const NSID: &'static str = "tools.ozone.team.listMembers";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ListMembersOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

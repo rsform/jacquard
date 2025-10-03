@@ -5,12 +5,13 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ListNotifications<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -22,14 +23,15 @@ pub struct ListNotifications<'a> {
     pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
-impl Default for ListNotifications<'_> {
-    fn default() -> Self {
-        Self {
-            cursor: Default::default(),
-            limit: Some(50i64),
-            priority: Default::default(),
-            reasons: Default::default(),
-            seen_at: Default::default(),
+impl jacquard_common::IntoStatic for ListNotifications<'_> {
+    type Output = ListNotifications<'static>;
+    fn into_static(self) -> Self::Output {
+        ListNotifications {
+            cursor: self.cursor.into_static(),
+            limit: self.limit.into_static(),
+            priority: self.priority.into_static(),
+            reasons: self.reasons.into_static(),
+            seen_at: self.seen_at.into_static(),
         }
     }
 }
@@ -49,12 +51,25 @@ pub struct ListNotificationsOutput<'a> {
     pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+impl jacquard_common::IntoStatic for ListNotificationsOutput<'_> {
+    type Output = ListNotificationsOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        ListNotificationsOutput {
+            cursor: self.cursor.into_static(),
+            notifications: self.notifications.into_static(),
+            priority: self.priority.into_static(),
+            seen_at: self.seen_at.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 impl jacquard_common::types::xrpc::XrpcRequest for ListNotifications<'_> {
     const NSID: &'static str = "app.bsky.notification.listNotifications";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ListNotificationsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]
@@ -80,4 +95,22 @@ pub struct Notification<'a> {
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+impl jacquard_common::IntoStatic for Notification<'_> {
+    type Output = Notification<'static>;
+    fn into_static(self) -> Self::Output {
+        Notification {
+            author: self.author.into_static(),
+            cid: self.cid.into_static(),
+            indexed_at: self.indexed_at.into_static(),
+            is_read: self.is_read.into_static(),
+            labels: self.labels.into_static(),
+            reason: self.reason.into_static(),
+            reason_subject: self.reason_subject.into_static(),
+            record: self.record.into_static(),
+            uri: self.uri.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }

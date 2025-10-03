@@ -18,10 +18,30 @@ pub struct GetRecord<'a> {
     >,
 }
 
+impl jacquard_common::IntoStatic for GetRecord<'_> {
+    type Output = GetRecord<'static>;
+    fn into_static(self) -> Self::Output {
+        GetRecord {
+            collection: self.collection.into_static(),
+            did: self.did.into_static(),
+            rkey: self.rkey.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecordOutput<'a> {}
+impl jacquard_common::IntoStatic for GetRecordOutput<'_> {
+    type Output = GetRecordOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        GetRecordOutput {
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -87,6 +107,30 @@ impl std::fmt::Display for GetRecordError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
+impl jacquard_common::IntoStatic for GetRecordError<'_> {
+    type Output = GetRecordError<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetRecordError::RecordNotFound(v) => {
+                GetRecordError::RecordNotFound(v.into_static())
+            }
+            GetRecordError::RepoNotFound(v) => {
+                GetRecordError::RepoNotFound(v.into_static())
+            }
+            GetRecordError::RepoTakendown(v) => {
+                GetRecordError::RepoTakendown(v.into_static())
+            }
+            GetRecordError::RepoSuspended(v) => {
+                GetRecordError::RepoSuspended(v.into_static())
+            }
+            GetRecordError::RepoDeactivated(v) => {
+                GetRecordError::RepoDeactivated(v.into_static())
+            }
+            GetRecordError::Unknown(v) => GetRecordError::Unknown(v.into_static()),
         }
     }
 }

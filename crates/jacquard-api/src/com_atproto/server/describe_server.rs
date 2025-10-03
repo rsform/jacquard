@@ -14,6 +14,16 @@ pub struct Contact<'a> {
     pub email: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+impl jacquard_common::IntoStatic for Contact<'_> {
+    type Output = Contact<'static>;
+    fn into_static(self) -> Self::Output {
+        Contact {
+            email: self.email.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -24,6 +34,17 @@ pub struct Links<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub terms_of_service: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+}
+
+impl jacquard_common::IntoStatic for Links<'_> {
+    type Output = Links<'static>;
+    fn into_static(self) -> Self::Output {
+        Links {
+            privacy_policy: self.privacy_policy.into_static(),
+            terms_of_service: self.terms_of_service.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -51,6 +72,21 @@ pub struct DescribeServerOutput<'a> {
     pub phone_verification_required: std::option::Option<bool>,
 }
 
+impl jacquard_common::IntoStatic for DescribeServerOutput<'_> {
+    type Output = DescribeServerOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        DescribeServerOutput {
+            available_user_domains: self.available_user_domains.into_static(),
+            contact: self.contact.into_static(),
+            did: self.did.into_static(),
+            invite_code_required: self.invite_code_required.into_static(),
+            links: self.links.into_static(),
+            phone_verification_required: self.phone_verification_required.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct DescribeServer;
@@ -59,5 +95,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for DescribeServer {
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = DescribeServerOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -15,12 +15,33 @@ pub struct CreateInviteCode<'a> {
     pub use_count: i64,
 }
 
+impl jacquard_common::IntoStatic for CreateInviteCode<'_> {
+    type Output = CreateInviteCode<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateInviteCode {
+            for_account: self.for_account.into_static(),
+            use_count: self.use_count.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateInviteCodeOutput<'a> {
     #[serde(borrow)]
     pub code: jacquard_common::CowStr<'a>,
+}
+
+impl jacquard_common::IntoStatic for CreateInviteCodeOutput<'_> {
+    type Output = CreateInviteCodeOutput<'static>;
+    fn into_static(self) -> Self::Output {
+        CreateInviteCodeOutput {
+            code: self.code.into_static(),
+            extra_data: self.extra_data.into_static(),
+        }
+    }
 }
 
 impl jacquard_common::types::xrpc::XrpcRequest for CreateInviteCode<'_> {
@@ -30,5 +51,5 @@ impl jacquard_common::types::xrpc::XrpcRequest for CreateInviteCode<'_> {
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = CreateInviteCodeOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError;
+    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
 }
