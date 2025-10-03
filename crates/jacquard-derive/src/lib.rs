@@ -57,7 +57,7 @@ pub fn lexicon(_attr: TokenStream, item: TokenStream) -> TokenStream {
                             #[serde(default)]
                             pub extra_data: std::option::Option<::std::collections::BTreeMap<
                                 ::jacquard_common::smol_str::SmolStr,
-                                ::jacquard_common::types::value::Data<#lifetime>
+                                ::jacquard_common::types::value::Data<'static>
                             >>
                         }
                     };

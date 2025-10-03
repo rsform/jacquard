@@ -181,9 +181,17 @@ impl<'c> CodeGenerator<'c> {
                     }
                 }
 
+                // Generate Collection trait impl
+                let collection_impl = quote! {
+                    impl jacquard_common::types::collection::Collection for #ident<'_> {
+                        const NSID: &'static str = #nsid;
+                    }
+                };
+
                 Ok(quote! {
                     #struct_def
                     #(#unions)*
+                    #collection_impl
                 })
             }
         }
@@ -599,6 +607,15 @@ impl<'c> CodeGenerator<'c> {
         let type_base = self.def_to_type_name(nsid, def_name);
         let mut output = Vec::new();
 
+        let params_has_lifetime = query.parameters.as_ref()
+            .map(|p| match p {
+                crate::lexicon::LexXrpcQueryParameter::Params(params) => self.params_need_lifetime(params),
+            })
+            .unwrap_or(false);
+        let has_params = query.parameters.is_some();
+        let has_output = query.output.is_some();
+        let has_errors = query.errors.is_some();
+
         if let Some(params) = &query.parameters {
             let params_struct = self.generate_params_struct(&type_base, params)?;
             output.push(params_struct);
@@ -614,6 +631,22 @@ impl<'c> CodeGenerator<'c> {
             output.push(error_enum);
         }
 
+        // Generate XrpcRequest impl
+        let output_encoding = query.output.as_ref()
+            .map(|o| o.encoding.as_ref())
+            .unwrap_or("application/json");
+        let xrpc_impl = self.generate_xrpc_request_impl(
+            nsid,
+            &type_base,
+            quote! { jacquard_common::types::xrpc::XrpcMethod::Query },
+            output_encoding,
+            has_params,
+            params_has_lifetime,
+            has_output,
+            has_errors,
+        )?;
+        output.push(xrpc_impl);
+
         Ok(quote! {
             #(#output)*
         })
@@ -628,6 +661,12 @@ impl<'c> CodeGenerator<'c> {
     ) -> Result<TokenStream> {
         let type_base = self.def_to_type_name(nsid, def_name);
         let mut output = Vec::new();
+
+        // Input bodies always have lifetimes (they get #[lexicon] attribute)
+        let params_has_lifetime = proc.input.is_some();
+        let has_input = proc.input.is_some();
+        let has_output = proc.output.is_some();
+        let has_errors = proc.errors.is_some();
 
         if let Some(params) = &proc.parameters {
             let params_struct = self.generate_params_struct_proc(&type_base, params)?;
@@ -648,6 +687,25 @@ impl<'c> CodeGenerator<'c> {
             let error_enum = self.generate_error_enum(&type_base, errors)?;
             output.push(error_enum);
         }
+
+        // Generate XrpcRequest impl
+        let input_encoding = proc.input.as_ref()
+            .map(|i| i.encoding.as_ref())
+            .unwrap_or("application/json");
+        let output_encoding = proc.output.as_ref()
+            .map(|o| o.encoding.as_ref())
+            .unwrap_or("application/json");
+        let xrpc_impl = self.generate_xrpc_request_impl(
+            nsid,
+            &type_base,
+            quote! { jacquard_common::types::xrpc::XrpcMethod::Procedure(#input_encoding) },
+            output_encoding,
+            has_input,
+            params_has_lifetime,
+            has_output,
+            has_errors,
+        )?;
+        output.push(xrpc_impl);
 
         Ok(quote! {
             #(#output)*
@@ -1090,7 +1148,7 @@ impl<'c> CodeGenerator<'c> {
         }
     }
 
-    /// Generate params struct from XRPC procedure parameters
+    /// Generate params struct from XRPC procedure parameters (query string params)
     fn generate_params_struct_proc(
         &self,
         type_base: &str,
@@ -1098,7 +1156,12 @@ impl<'c> CodeGenerator<'c> {
     ) -> Result<TokenStream> {
         use crate::lexicon::LexXrpcProcedureParameter;
         match params {
-            LexXrpcProcedureParameter::Params(p) => self.generate_params_struct_inner(type_base, p),
+            // For procedures, query string params still get "Params" suffix since the main struct is the input
+            LexXrpcProcedureParameter::Params(p) => {
+                let struct_name = format!("{}Params", type_base);
+                let ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
+                self.generate_params_struct_inner_with_name(&ident, p)
+            }
         }
     }
 
@@ -1108,41 +1171,117 @@ impl<'c> CodeGenerator<'c> {
         type_base: &str,
         p: &crate::lexicon::LexXrpcParameters<'static>,
     ) -> Result<TokenStream> {
-        let struct_name = format!("{}Params", type_base);
-        let ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
+        let ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
+        self.generate_params_struct_inner_with_name(&ident, p)
+    }
+
+    /// Generate params struct with custom name
+    fn generate_params_struct_inner_with_name(
+        &self,
+        ident: &syn::Ident,
+        p: &crate::lexicon::LexXrpcParameters<'static>,
+    ) -> Result<TokenStream> {
 
         let required = p.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
         let mut fields = Vec::new();
+        let mut default_fields = Vec::new();
 
         for (field_name, field_type) in &p.properties {
             let is_required = required.contains(field_name);
             let field_tokens =
                 self.generate_param_field("", field_name, field_type, is_required)?;
             fields.push(field_tokens);
+
+            // Track field defaults
+            let field_ident = make_ident(&field_name.to_snake_case());
+            let default_value = self.get_param_default_value(field_type, is_required);
+            default_fields.push((field_ident, default_value));
         }
 
         let doc = self.generate_doc_comment(p.description.as_ref());
-
         let needs_lifetime = self.params_need_lifetime(p);
+
+        // Check if we should generate Default impl
+        let has_any_defaults = default_fields.iter().any(|(_, default)| default.is_some());
+
+        let derives = if has_any_defaults {
+            quote! { #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Default)] }
+        } else {
+            quote! { #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)] }
+        };
+
+        let default_impl = if has_any_defaults {
+            let field_inits: Vec<_> = default_fields.iter().map(|(field_ident, default_value)| {
+                if let Some(value) = default_value {
+                    quote! { #field_ident: #value }
+                } else {
+                    quote! { #field_ident: Default::default() }
+                }
+            }).collect();
+
+            if needs_lifetime {
+                quote! {
+                    impl Default for #ident<'_> {
+                        fn default() -> Self {
+                            Self {
+                                #(#field_inits,)*
+                            }
+                        }
+                    }
+                }
+            } else {
+                quote! {} // Default derive handles this
+            }
+        } else {
+            quote! {}
+        };
 
         if needs_lifetime {
             Ok(quote! {
                 #doc
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                #derives
                 #[serde(rename_all = "camelCase")]
                 pub struct #ident<'a> {
                     #(#fields)*
                 }
+
+                #default_impl
             })
         } else {
             Ok(quote! {
                 #doc
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                #derives
                 #[serde(rename_all = "camelCase")]
                 pub struct #ident {
                     #(#fields)*
                 }
             })
+        }
+    }
+
+    /// Get default value for a param field
+    fn get_param_default_value(
+        &self,
+        field_type: &crate::lexicon::LexXrpcParametersProperty<'static>,
+        is_required: bool,
+    ) -> Option<TokenStream> {
+        use crate::lexicon::LexXrpcParametersProperty;
+
+        let default_opt = match field_type {
+            LexXrpcParametersProperty::Boolean(b) => b.default.map(|v| quote! { #v }),
+            LexXrpcParametersProperty::Integer(i) => i.default.map(|v| quote! { #v }),
+            LexXrpcParametersProperty::String(s) => s.default.as_ref().map(|v| {
+                let s = v.as_ref();
+                quote! { jacquard_common::CowStr::from(#s) }
+            }),
+            LexXrpcParametersProperty::Unknown(_) | LexXrpcParametersProperty::Array(_) => None,
+        };
+
+        if is_required {
+            default_opt
+        } else {
+            // Optional fields: wrap in Some() if there's a default, otherwise None
+            default_opt.map(|v| quote! { Some(#v) })
         }
     }
 
@@ -1152,11 +1291,10 @@ impl<'c> CodeGenerator<'c> {
         type_base: &str,
         body: &LexXrpcBody<'static>,
     ) -> Result<TokenStream> {
-        let struct_name = format!("{}Input", type_base);
-        let ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
+        let ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
 
         let fields = if let Some(schema) = &body.schema {
-            self.generate_body_fields("", &struct_name, schema)?
+            self.generate_body_fields("", type_base, schema)?
         } else {
             quote! {}
         };
@@ -1181,7 +1319,7 @@ impl<'c> CodeGenerator<'c> {
             for (field_name, field_type) in &obj.properties {
                 if let LexObjectProperty::Union(union) = field_type {
                     let union_name =
-                        format!("{}Record{}", struct_name, field_name.to_pascal_case());
+                        format!("{}Record{}", type_base, field_name.to_pascal_case());
                     let refs: Vec<_> = union.refs.iter().cloned().collect();
                     let union_def = self.generate_union(&union_name, &refs, None, union.closed)?;
                     unions.push(union_def);
@@ -1579,6 +1717,72 @@ impl<'c> CodeGenerator<'c> {
                 }
             }
         })
+    }
+
+    /// Generate XrpcRequest trait impl for a query or procedure
+    fn generate_xrpc_request_impl(
+        &self,
+        nsid: &str,
+        type_base: &str,
+        method: TokenStream,
+        output_encoding: &str,
+        has_params: bool,
+        params_has_lifetime: bool,
+        has_output: bool,
+        has_errors: bool,
+    ) -> Result<TokenStream> {
+        let output_type = if has_output {
+            let output_ident = syn::Ident::new(&format!("{}Output", type_base), proc_macro2::Span::call_site());
+            quote! { #output_ident<'de> }
+        } else {
+            quote! { () }
+        };
+
+        let error_type = if has_errors {
+            let error_ident = syn::Ident::new(&format!("{}Error", type_base), proc_macro2::Span::call_site());
+            quote! { #error_ident<'de> }
+        } else {
+            quote! { jacquard_common::types::xrpc::GenericError }
+        };
+
+        if has_params {
+            // Implement on the params/input struct itself
+            let request_ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
+            let impl_target = if params_has_lifetime {
+                quote! { #request_ident<'_> }
+            } else {
+                quote! { #request_ident }
+            };
+
+            Ok(quote! {
+                impl jacquard_common::types::xrpc::XrpcRequest for #impl_target {
+                    const NSID: &'static str = #nsid;
+                    const METHOD: jacquard_common::types::xrpc::XrpcMethod = #method;
+                    const OUTPUT_ENCODING: &'static str = #output_encoding;
+
+                    type Output<'de> = #output_type;
+                    type Err<'de> = #error_type;
+                }
+            })
+        } else {
+            // No params - generate a marker struct
+            let request_ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
+
+            Ok(quote! {
+                /// XRPC request marker type
+                #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+                pub struct #request_ident;
+
+                impl jacquard_common::types::xrpc::XrpcRequest for #request_ident {
+                    const NSID: &'static str = #nsid;
+                    const METHOD: jacquard_common::types::xrpc::XrpcMethod = #method;
+                    const OUTPUT_ENCODING: &'static str = #output_encoding;
+
+                    type Output<'de> = #output_type;
+                    type Err<'de> = #error_type;
+                }
+            })
+        }
     }
 
     /// Generate a union enum

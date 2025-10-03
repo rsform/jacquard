@@ -17,8 +17,6 @@ proc-macro = true
 [dependencies]
 heck = "0.5.0"
 itertools = "0.14.0"
-jacquard-common = { version = "0.1.0", path = "../jacquard-common" }
-jacquard-lexicon = { version = "0.1.0", path = "../jacquard-lexicon" }
 prettyplease = "0.2.37"
 proc-macro2 = "1.0.101"
 quote = "1.0.41"
@@ -27,3 +25,7 @@ serde_json = "1.0.145"
 serde_repr = "0.1.20"
 serde_with = "3.14.1"
 syn = "2.0.106"
+
+
+[dev-dependencies]
+jacquard-common = { version = "0.1.0", path = "../jacquard-common" }

@@ -25,10 +25,7 @@ fn main() -> miette::Result<()> {
     println!("Loading lexicons from {:?}...", args.input);
     let corpus = LexiconCorpus::load_from_dir(&args.input)?;
 
-    println!(
-        "Loaded {} lexicon documents",
-        corpus.iter().count()
-    );
+    println!("Loaded {} lexicon documents", corpus.iter().count());
 
     println!("Generating code...");
     let codegen = CodeGenerator::new(&corpus, args.root_module);

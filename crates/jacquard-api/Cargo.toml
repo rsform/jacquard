@@ -11,6 +11,13 @@ documentation.workspace = true
 exclude.workspace = true
 description.workspace = true
 
+[features]
+default = ["app_bsky", "com_atproto", "tools_ozone", "chat_bsky"]
+app_bsky = []
+chat_bsky = []
+com_atproto = []
+tools_ozone = []
+
 [dependencies]
 bytes = { version = "1.10.1", features = ["serde"] }
 jacquard-common = { version = "0.1.0", path = "../jacquard-common" }

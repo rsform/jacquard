@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::error::Error;
+use std::fmt::{self, Debug};
+
+use crate::types::value::Data;
 
 /// XRPC method type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -7,15 +10,22 @@ pub enum XrpcMethod {
     /// Query (HTTP GET)
     Query,
     /// Procedure (HTTP POST)
-    Procedure,
+    Procedure(&'static str),
 }
 
 impl XrpcMethod {
     /// Get the HTTP method string
-    pub fn as_str(&self) -> &'static str {
+    pub const fn as_str(&self) -> &'static str {
         match self {
             Self::Query => "GET",
-            Self::Procedure => "POST",
+            Self::Procedure(_) => "POST",
+        }
+    }
+
+    pub const fn body_encoding(&self) -> Option<&'static str> {
+        match self {
+            Self::Query => None,
+            Self::Procedure(enc) => Some(enc),
         }
     }
 }
@@ -23,27 +33,34 @@ impl XrpcMethod {
 /// Trait for XRPC request types (queries and procedures)
 ///
 /// This trait provides metadata about XRPC endpoints including the NSID,
-/// HTTP method, encoding types, and associated parameter/output types.
-pub trait XrpcRequest {
+/// HTTP method, encoding types, and associated output types.
+///
+/// The trait is implemented on the request parameters/input type itself.
+pub trait XrpcRequest: Serialize {
     /// The NSID for this XRPC method
     const NSID: &'static str;
 
     /// XRPC method (query/GET or procedure/POST)
     const METHOD: XrpcMethod;
 
-    /// Input encoding (MIME type, e.g., "application/json")
-    /// None for queries (no body)
-    const INPUT_ENCODING: Option<&'static str>;
-
     /// Output encoding (MIME type)
     const OUTPUT_ENCODING: &'static str;
 
-    /// Request parameters type (query params for queries, body for procedures)
-    type Params: Serialize;
-
     /// Response output type
-    type Output: for<'de> Deserialize<'de>;
+    type Output<'de>: Deserialize<'de>;
 
     /// Error type for this request
-    type Err: Error;
+    type Err<'de>: Error;
 }
+
+/// Error type for XRPC endpoints that don't define any errors
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GenericError(Data<'static>);
+
+impl fmt::Display for GenericError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl Error for GenericError {}

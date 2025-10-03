@@ -1,6 +1,6 @@
 use core::fmt;
 
-use serde::{Serialize, de};
+use serde::Serialize;
 
 use crate::types::{
     aturi::UriPath,
@@ -11,12 +11,11 @@ use crate::types::{
 /// Trait for a collection of records that can be stored in a repository.
 ///
 /// The records all have the same Lexicon schema.
-pub trait Collection: fmt::Debug {
+///
+/// Implemented on the record type itself.
+pub trait Collection: fmt::Debug + Serialize {
     /// The NSID for the Lexicon that defines the schema of records in this collection.
     const NSID: &'static str;
-
-    /// This collection's record type.
-    type Record: fmt::Debug + de::DeserializeOwned + Serialize;
 
     /// Returns the [`Nsid`] for the Lexicon that defines the schema of records in this
     /// collection.

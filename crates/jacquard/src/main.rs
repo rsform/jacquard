@@ -1,4 +1,5 @@
 use clap::Parser;
+use jacquard_api::com_atproto::repo::create_record::*;
 
 #[derive(Parser, Debug)]
 #[command(author = "Orual", version, about)]
@@ -14,12 +15,5 @@ struct Args {
 }
 
 fn main() {
-    let args = Args::parse();
-    if args.verbose {
-        println!("DEBUG {args:?}");
-    }
-    println!(
-        "Hello {} (from jacquard)!",
-        args.name.unwrap_or("world".to_string())
-    );
+    let client = reqwest::Client::new();
 }
