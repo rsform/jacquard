@@ -1,5 +1,6 @@
 [package]
 name = "jacquard-api"
+description = "Generated AT Protocol API bindings for Jacquard"
 edition.workspace = true
 version.workspace = true
 authors.workspace = true
@@ -7,9 +8,8 @@ repository.workspace = true
 keywords.workspace = true
 categories.workspace = true
 readme.workspace = true
-documentation.workspace = true
+documentation = "https://docs.rs/jacquard-api"
 exclude.workspace = true
-description.workspace = true
 
 [features]
 default = [ "com_atproto"]
@@ -20,9 +20,9 @@ tools_ozone = []
 
 [dependencies]
 bon = "3"
-bytes = { version = "1.10.1", features = ["serde"] }
-jacquard-common = { version = "0.1.0", path = "../jacquard-common" }
-jacquard-derive = { version = "0.1.0", path = "../jacquard-derive" }
-miette = "7.6.0"
-serde = { version = "1.0.228", features = ["derive"] }
-thiserror = "2.0.17"
+bytes = { workspace = true, features = ["serde"] }
+jacquard-common = { path = "../jacquard-common" }
+jacquard-derive = { path = "../jacquard-derive" }
+miette.workspace = true
+serde.workspace = true
+thiserror.workspace = true
