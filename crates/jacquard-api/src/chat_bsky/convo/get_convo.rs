@@ -5,10 +5,20 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
+#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetConvo<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
 }
 

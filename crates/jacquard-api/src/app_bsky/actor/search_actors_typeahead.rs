@@ -5,7 +5,16 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
+#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchActorsTypeahead<'a> {
     ///(default: 10, min: 1, max: 100)
@@ -13,9 +22,11 @@ pub struct SearchActorsTypeahead<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub q: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub term: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 

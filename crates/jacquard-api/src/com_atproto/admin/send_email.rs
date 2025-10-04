@@ -6,14 +6,25 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
+#[builder(start_fn = new)]
 pub struct SendEmail<'a> {
     ///Additional comment by the sender that won't be used in the email itself but helpful to provide more context for moderators/reviewers
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub recipient_did: jacquard_common::types::string::Did<'a>,
@@ -21,7 +32,15 @@ pub struct SendEmail<'a> {
     pub sender_did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub subject: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(flatten)]
+    #[serde(borrow)]
+    #[builder(default)]
+    pub extra_data: ::std::collections::BTreeMap<
+        ::jacquard_common::smol_str::SmolStr,
+        ::jacquard_common::types::value::Data<'a>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for SendEmail<'_> {

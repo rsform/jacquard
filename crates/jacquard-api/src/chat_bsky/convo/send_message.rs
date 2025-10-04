@@ -6,13 +6,30 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
+#[builder(start_fn = new)]
 pub struct SendMessage<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub message: crate::chat_bsky::convo::MessageInput<'a>,
+    #[serde(flatten)]
+    #[serde(borrow)]
+    #[builder(default)]
+    pub extra_data: ::std::collections::BTreeMap<
+        ::jacquard_common::smol_str::SmolStr,
+        ::jacquard_common::types::value::Data<'a>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for SendMessage<'_> {

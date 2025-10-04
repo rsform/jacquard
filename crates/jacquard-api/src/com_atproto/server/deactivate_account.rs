@@ -6,12 +6,28 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
+#[builder(start_fn = new)]
 pub struct DeactivateAccount<'a> {
     ///A recommendation to server as to how long they should hold onto the deactivated account before deleting.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub delete_after: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(flatten)]
+    #[serde(borrow)]
+    #[builder(default)]
+    pub extra_data: ::std::collections::BTreeMap<
+        ::jacquard_common::smol_str::SmolStr,
+        ::jacquard_common::types::value::Data<'a>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for DeactivateAccount<'_> {

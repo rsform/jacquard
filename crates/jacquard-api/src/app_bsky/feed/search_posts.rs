@@ -5,7 +5,16 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
+#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchPosts<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -13,9 +22,11 @@ pub struct SearchPosts<'a> {
     pub author: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub domain: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub lang: std::option::Option<jacquard_common::types::string::Language>,
@@ -26,19 +37,23 @@ pub struct SearchPosts<'a> {
     #[serde(borrow)]
     pub mentions: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub q: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub since: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(default: "latest")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tag: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub until: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]

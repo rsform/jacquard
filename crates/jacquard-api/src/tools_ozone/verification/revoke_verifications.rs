@@ -6,16 +6,33 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
+#[builder(start_fn = new)]
 pub struct RevokeVerifications<'a> {
     ///Reason for revoking the verification. This is optional and can be omitted if not needed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub revoke_reason: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Array of verification record uris to revoke
     #[serde(borrow)]
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(flatten)]
+    #[serde(borrow)]
+    #[builder(default)]
+    pub extra_data: ::std::collections::BTreeMap<
+        ::jacquard_common::smol_str::SmolStr,
+        ::jacquard_common::types::value::Data<'a>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for RevokeVerifications<'_> {

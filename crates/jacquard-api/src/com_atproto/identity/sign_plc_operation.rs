@@ -6,8 +6,17 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
+#[builder(start_fn = new)]
 pub struct SignPlcOperation<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -21,11 +30,19 @@ pub struct SignPlcOperation<'a> {
     ///A token received through com.atproto.identity.requestPlcOperationSignature
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub token: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub verification_methods: std::option::Option<
         jacquard_common::types::value::Data<'a>,
+    >,
+    #[serde(flatten)]
+    #[serde(borrow)]
+    #[builder(default)]
+    pub extra_data: ::std::collections::BTreeMap<
+        ::jacquard_common::smol_str::SmolStr,
+        ::jacquard_common::types::value::Data<'a>,
     >,
 }
 

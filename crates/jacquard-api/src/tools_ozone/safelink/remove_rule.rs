@@ -6,12 +6,22 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
+#[builder(start_fn = new)]
 pub struct RemoveRule<'a> {
     ///Optional comment about why the rule is being removed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional DID of the user. Only respected when using admin auth.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -21,7 +31,15 @@ pub struct RemoveRule<'a> {
     pub pattern: crate::tools_ozone::safelink::PatternType<'a>,
     ///The URL or domain to remove the rule for
     #[serde(borrow)]
+    #[builder(into)]
     pub url: jacquard_common::CowStr<'a>,
+    #[serde(flatten)]
+    #[serde(borrow)]
+    #[builder(default)]
+    pub extra_data: ::std::collections::BTreeMap<
+        ::jacquard_common::smol_str::SmolStr,
+        ::jacquard_common::types::value::Data<'a>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for RemoveRule<'_> {

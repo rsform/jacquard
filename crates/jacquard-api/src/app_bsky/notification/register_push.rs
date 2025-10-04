@@ -6,20 +6,39 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
+#[builder(start_fn = new)]
 pub struct RegisterPush<'a> {
     ///Set to true when the actor is age restricted
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub age_restricted: std::option::Option<bool>,
     #[serde(borrow)]
+    #[builder(into)]
     pub app_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub platform: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub service_did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub token: jacquard_common::CowStr<'a>,
+    #[serde(flatten)]
+    #[serde(borrow)]
+    #[builder(default)]
+    pub extra_data: ::std::collections::BTreeMap<
+        ::jacquard_common::smol_str::SmolStr,
+        ::jacquard_common::types::value::Data<'a>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for RegisterPush<'_> {

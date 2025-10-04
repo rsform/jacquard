@@ -5,11 +5,21 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
+#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetInviteCodes<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(default: 100, min: 1, max: 500)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -17,6 +27,7 @@ pub struct GetInviteCodes<'a> {
     ///(default: "recent")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 

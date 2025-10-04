@@ -24,7 +24,7 @@ fn test_open_union_known_variant() {
 
 #[test]
 fn test_open_union_unknown_variant() {
-    use jacquard_common::types::value::{Data, Object};
+    use jacquard_common::types::value::Data;
 
     let json = r#"{"$type":"com.example.unknown","data":"something"}"#;
     let union: TestUnion = serde_json::from_str(json).unwrap();

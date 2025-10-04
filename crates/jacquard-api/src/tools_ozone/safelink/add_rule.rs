@@ -6,14 +6,24 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
+#[builder(start_fn = new)]
 pub struct AddRule<'a> {
     #[serde(borrow)]
     pub action: crate::tools_ozone::safelink::ActionType<'a>,
     ///Optional comment about the decision
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Author DID. Only respected when using admin auth
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -25,7 +35,15 @@ pub struct AddRule<'a> {
     pub reason: crate::tools_ozone::safelink::ReasonType<'a>,
     ///The URL or domain to apply the rule to
     #[serde(borrow)]
+    #[builder(into)]
     pub url: jacquard_common::CowStr<'a>,
+    #[serde(flatten)]
+    #[serde(borrow)]
+    #[builder(default)]
+    pub extra_data: ::std::collections::BTreeMap<
+        ::jacquard_common::smol_str::SmolStr,
+        ::jacquard_common::types::value::Data<'a>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for AddRule<'_> {

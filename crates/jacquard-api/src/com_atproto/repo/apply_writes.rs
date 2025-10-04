@@ -99,8 +99,17 @@ impl jacquard_common::IntoStatic for DeleteResult<'_> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
+#[builder(start_fn = new)]
 pub struct ApplyWrites<'a> {
     ///The handle or DID of the repo (aka, current account).
     #[serde(borrow)]
@@ -114,6 +123,13 @@ pub struct ApplyWrites<'a> {
     pub validate: std::option::Option<bool>,
     #[serde(borrow)]
     pub writes: Vec<jacquard_common::types::value::Data<'a>>,
+    #[serde(flatten)]
+    #[serde(borrow)]
+    #[builder(default)]
+    pub extra_data: ::std::collections::BTreeMap<
+        ::jacquard_common::smol_str::SmolStr,
+        ::jacquard_common::types::value::Data<'a>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for ApplyWrites<'_> {

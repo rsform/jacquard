@@ -152,7 +152,7 @@ impl<'c> CodeGenerator<'c> {
                 let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
 
                 // Generate main struct fields
-                let fields = self.generate_object_fields(nsid, &type_name, obj)?;
+                let fields = self.generate_object_fields(nsid, &type_name, obj, false)?;
                 let doc = self.generate_doc_comment(record.description.as_ref());
 
                 // Records always get a lifetime since they have the #[lexicon] attribute
@@ -213,7 +213,7 @@ impl<'c> CodeGenerator<'c> {
         let type_name = self.def_to_type_name(nsid, def_name);
         let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
 
-        let fields = self.generate_object_fields(nsid, &type_name, obj)?;
+        let fields = self.generate_object_fields(nsid, &type_name, obj, false)?;
         let doc = self.generate_doc_comment(obj.description.as_ref());
 
         // Objects always get a lifetime since they have the #[lexicon] attribute
@@ -257,6 +257,7 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         parent_type_name: &str,
         obj: &LexObject<'static>,
+        is_builder: bool,
     ) -> Result<TokenStream> {
         let required = obj.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
 
@@ -264,7 +265,7 @@ impl<'c> CodeGenerator<'c> {
         for (field_name, field_type) in &obj.properties {
             let is_required = required.contains(field_name);
             let field_tokens =
-                self.generate_field(nsid, parent_type_name, field_name, field_type, is_required)?;
+                self.generate_field(nsid, parent_type_name, field_name, field_type, is_required, is_builder)?;
             fields.push(field_tokens);
         }
 
@@ -279,12 +280,16 @@ impl<'c> CodeGenerator<'c> {
         field_name: &str,
         field_type: &LexObjectProperty<'static>,
         is_required: bool,
+        is_builder: bool,
     ) -> Result<TokenStream> {
         let field_ident = make_ident(&field_name.to_snake_case());
 
         let rust_type =
             self.property_to_rust_type(nsid, parent_type_name, field_name, field_type)?;
         let needs_lifetime = self.property_needs_lifetime(field_type);
+
+        // Check if this is a CowStr field for builder(into) attribute
+        let is_cowstr = matches!(field_type, LexObjectProperty::String(s) if s.format.is_none());
 
         let rust_type = if is_required {
             rust_type
@@ -316,6 +321,11 @@ impl<'c> CodeGenerator<'c> {
         // Add serde(borrow) to all fields with lifetimes
         if needs_lifetime {
             attrs.push(quote! { #[serde(borrow)] });
+        }
+
+        // Add builder(into) for CowStr fields to allow String, &str, etc., but only for builder structs
+        if is_builder && is_cowstr {
+            attrs.push(quote! { #[builder(into)] });
         }
 
         Ok(quote! {
@@ -865,7 +875,7 @@ impl<'c> CodeGenerator<'c> {
                 let struct_name = format!("{}Message", type_base);
                 let struct_ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
 
-                let fields = self.generate_object_fields("", &struct_name, obj)?;
+                let fields = self.generate_object_fields("", &struct_name, obj, false)?;
                 let doc = self.generate_doc_comment(obj.description.as_ref());
 
                 // Subscription message structs always get a lifetime since they have the #[lexicon] attribute
@@ -1263,8 +1273,10 @@ impl<'c> CodeGenerator<'c> {
         let doc = self.generate_doc_comment(p.description.as_ref());
         let needs_lifetime = self.params_need_lifetime(p);
 
-        let derives =
-            quote! { #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)] };
+        let derives = quote! {
+            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+            #[builder(start_fn = new)]
+        };
 
         // Generate IntoStatic impl
         let field_names: Vec<&str> = p.properties.keys().map(|k| k.as_str()).collect();
@@ -1438,7 +1450,7 @@ impl<'c> CodeGenerator<'c> {
         let is_binary_body = body.schema.is_none();
 
         let fields = if let Some(schema) = &body.schema {
-            self.generate_body_fields("", type_base, schema)?
+            self.generate_body_fields("", type_base, schema, true)?
         } else {
             // Binary body: just a bytes field
             quote! {
@@ -1452,22 +1464,31 @@ impl<'c> CodeGenerator<'c> {
         let struct_def = if is_binary_body {
             quote! {
                 #doc
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+                #[builder(start_fn = new)]
                 #[serde(rename_all = "camelCase")]
                 pub struct #ident {
                     #fields
                 }
             }
         } else {
-            // Input structs with schemas get a lifetime since they have the #[lexicon] attribute
-            // which adds extra_data: BTreeMap<..., Data<'a>>
+            // Input structs with schemas: manually add extra_data field with #[builder(default)]
+            // for bon compatibility. The #[lexicon] macro will see it exists and skip adding it.
             quote! {
                 #doc
                 #[jacquard_derive::lexicon]
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
                 #[serde(rename_all = "camelCase")]
+                #[builder(start_fn = new)]
                 pub struct #ident<'a> {
                     #fields
+                    #[serde(flatten)]
+                    #[serde(borrow)]
+                    #[builder(default)]
+                    pub extra_data: ::std::collections::BTreeMap<
+                        ::jacquard_common::smol_str::SmolStr,
+                        ::jacquard_common::types::value::Data<'a>
+                    >,
                 }
             }
         };
@@ -1530,7 +1551,7 @@ impl<'c> CodeGenerator<'c> {
         let ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
 
         let fields = if let Some(schema) = &body.schema {
-            self.generate_body_fields("", &struct_name, schema)?
+            self.generate_body_fields("", &struct_name, schema, false)?
         } else {
             quote! {}
         };
@@ -1593,12 +1614,13 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         parent_type_name: &str,
         schema: &LexXrpcBodySchema<'static>,
+        is_builder: bool,
     ) -> Result<TokenStream> {
         use crate::lexicon::LexXrpcBodySchema;
 
         match schema {
             LexXrpcBodySchema::Object(obj) => {
-                self.generate_object_fields(nsid, parent_type_name, obj)
+                self.generate_object_fields(nsid, parent_type_name, obj, is_builder)
             }
             LexXrpcBodySchema::Ref(ref_type) => {
                 let rust_type = self.ref_to_rust_type(&ref_type.r#ref)?;
@@ -1631,14 +1653,15 @@ impl<'c> CodeGenerator<'c> {
 
         let field_ident = make_ident(&field_name.to_snake_case());
 
-        let (rust_type, needs_lifetime) = match field_type {
-            LexXrpcParametersProperty::Boolean(_) => (quote! { bool }, false),
-            LexXrpcParametersProperty::Integer(_) => (quote! { i64 }, false),
+        let (rust_type, needs_lifetime, is_cowstr) = match field_type {
+            LexXrpcParametersProperty::Boolean(_) => (quote! { bool }, false, false),
+            LexXrpcParametersProperty::Integer(_) => (quote! { i64 }, false, false),
             LexXrpcParametersProperty::String(s) => {
-                (self.string_to_rust_type(s), self.string_needs_lifetime(s))
+                let is_cowstr = s.format.is_none(); // CowStr for plain strings
+                (self.string_to_rust_type(s), self.string_needs_lifetime(s), is_cowstr)
             }
             LexXrpcParametersProperty::Unknown(_) => {
-                (quote! { jacquard_common::types::value::Data<'a> }, true)
+                (quote! { jacquard_common::types::value::Data<'a> }, true, false)
             }
             LexXrpcParametersProperty::Array(arr) => {
                 let needs_lifetime = match &arr.items {
@@ -1657,7 +1680,7 @@ impl<'c> CodeGenerator<'c> {
                         quote! { jacquard_common::types::value::Data<'a> }
                     }
                 };
-                (quote! { Vec<#item_type> }, needs_lifetime)
+                (quote! { Vec<#item_type> }, needs_lifetime, false)
             }
         };
 
@@ -1676,6 +1699,11 @@ impl<'c> CodeGenerator<'c> {
         // Add serde(borrow) to all fields with lifetimes
         if needs_lifetime {
             attrs.push(quote! { #[serde(borrow)] });
+        }
+
+        // Add builder(into) for CowStr fields to allow String, &str, etc.
+        if is_cowstr {
+            attrs.push(quote! { #[builder(into)] });
         }
 
         Ok(quote! {

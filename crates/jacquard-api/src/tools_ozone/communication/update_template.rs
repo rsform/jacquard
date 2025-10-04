@@ -6,17 +6,28 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
+#[builder(start_fn = new)]
 pub struct UpdateTemplate<'a> {
     ///Content of the template, markdown supported, can contain variable placeholders.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub content_markdown: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub disabled: std::option::Option<bool>,
     ///ID of the template to be updated.
     #[serde(borrow)]
+    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
     ///Message language.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -24,15 +35,24 @@ pub struct UpdateTemplate<'a> {
     ///Name of the template.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub name: std::option::Option<jacquard_common::CowStr<'a>>,
     ///Subject of the message, used in emails.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    #[builder(into)]
     pub subject: std::option::Option<jacquard_common::CowStr<'a>>,
     ///DID of the user who is updating the template.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub updated_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(flatten)]
+    #[serde(borrow)]
+    #[builder(default)]
+    pub extra_data: ::std::collections::BTreeMap<
+        ::jacquard_common::smol_str::SmolStr,
+        ::jacquard_common::types::value::Data<'a>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for UpdateTemplate<'_> {

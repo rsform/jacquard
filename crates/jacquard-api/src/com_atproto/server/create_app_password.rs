@@ -32,15 +32,32 @@ impl jacquard_common::IntoStatic for AppPassword<'_> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
+#[builder(start_fn = new)]
 pub struct CreateAppPassword<'a> {
     ///A short name for the App Password, to help distinguish them.
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     ///If an app password has 'privileged' access to possibly sensitive account state. Meant for use with trusted clients.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub privileged: std::option::Option<bool>,
+    #[serde(flatten)]
+    #[serde(borrow)]
+    #[builder(default)]
+    pub extra_data: ::std::collections::BTreeMap<
+        ::jacquard_common::smol_str::SmolStr,
+        ::jacquard_common::types::value::Data<'a>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for CreateAppPassword<'_> {
