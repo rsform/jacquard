@@ -249,12 +249,15 @@ pub trait IdentityResolver {
 
     /// Resolve DID document
     async fn resolve_did_doc(&self, did: &Did<'_>) -> Result<DidDocResponse, IdentityError>;
+
+    /// Resolve the DID document and return an owned version
     async fn resolve_did_doc_owned(
         &self,
         did: &Did<'_>,
     ) -> Result<DidDocument<'static>, IdentityError> {
         self.resolve_did_doc(did).await?.into_owned()
     }
+    /// reutrn the PDS url for a DID
     async fn pds_for_did(&self, did: &Did<'_>) -> Result<Url, IdentityError> {
         let resp = self.resolve_did_doc(did).await?;
         let doc = resp.parse()?;
@@ -269,6 +272,7 @@ pub trait IdentityResolver {
         }
         doc.pds_endpoint().ok_or(IdentityError::MissingPdsEndpoint)
     }
+    /// Return the DIS and PDS url for a handle
     async fn pds_for_handle(
         &self,
         handle: &Handle<'_>,
@@ -292,14 +296,14 @@ pub trait IdentityResolver {
 ///
 /// Example
 /// ```ignore
-/// use jacquard::identity::resolver::{DefaultResolver, ResolverOptions};
-/// use jacquard::client::{AuthenticatedClient, XrpcClient};
-/// use jacquard::types::string::Handle;
-/// use jacquard::CowStr;
+/// # use jacquard::identity::resolver::{DefaultResolver, ResolverOptions};
+/// # use jacquard::client::{AuthenticatedClient, XrpcClient};
+/// # use jacquard::types::string::Handle;
+/// # use jacquard::CowStr;
 ///
 /// // Build an auth-capable XRPC client (without a session it behaves like public/unauth)
 /// let http = reqwest::Client::new();
-/// let xrpc = AuthenticatedClient::new(http.clone(), CowStr::from("https://bsky.social"));
+/// let xrpc = AuthenticatedClient::new(http.clone(), CowStr::new_static("https://bsky.social"));
 /// let resolver = DefaultResolver::new(http, xrpc, ResolverOptions::default());
 ///
 /// // Resolve a handle to a DID
@@ -314,6 +318,7 @@ pub struct DefaultResolver<C: crate::client::XrpcClient + Send + Sync> {
 }
 
 impl<C: crate::client::XrpcClient + Send + Sync> DefaultResolver<C> {
+    /// Create a new instance of the default resolver with all options (except DNS) up front
     pub fn new(http: reqwest::Client, xrpc: C, opts: ResolverOptions) -> Self {
         Self {
             http,
@@ -325,6 +330,7 @@ impl<C: crate::client::XrpcClient + Send + Sync> DefaultResolver<C> {
     }
 
     #[cfg(feature = "dns")]
+    /// Add default DNS resolution to the resolver
     pub fn with_system_dns(mut self) -> Self {
         self.dns = Some(TokioAsyncResolver::tokio(
             ResolverConfig::default(),
@@ -334,45 +340,18 @@ impl<C: crate::client::XrpcClient + Send + Sync> DefaultResolver<C> {
     }
 
     /// Set PLC source (PLC directory or Slingshot)
-    ///
-    /// Example
-    /// ```ignore
-    /// use jacquard::identity::resolver::{DefaultResolver, ResolverOptions, PlcSource};
-    /// let http = reqwest::Client::new();
-    /// let xrpc = jacquard::client::AuthenticatedClient::new(http.clone(), jacquard::CowStr::from("https://public.api.bsky.app"));
-    /// let resolver = DefaultResolver::new(http, xrpc, ResolverOptions::default())
-    ///     .with_plc_source(PlcSource::slingshot_default());
-    /// ```
     pub fn with_plc_source(mut self, source: PlcSource) -> Self {
         self.opts.plc_source = source;
         self
     }
 
     /// Enable/disable public unauthenticated fallback for resolveHandle
-    ///
-    /// Example
-    /// ```ignore
-    /// # use jacquard::identity::resolver::{DefaultResolver, ResolverOptions};
-    /// # let http = reqwest::Client::new();
-    /// # let xrpc = jacquard::client::AuthenticatedClient::new(http.clone(), jacquard::CowStr::from("https://public.api.bsky.app"));
-    /// let resolver = DefaultResolver::new(http, xrpc, ResolverOptions::default())
-    ///     .with_public_fallback_for_handle(true);
-    /// ```
     pub fn with_public_fallback_for_handle(mut self, enable: bool) -> Self {
         self.opts.public_fallback_for_handle = enable;
         self
     }
 
     /// Enable/disable doc id validation
-    ///
-    /// Example
-    /// ```ignore
-    /// # use jacquard::identity::resolver::{DefaultResolver, ResolverOptions};
-    /// # let http = reqwest::Client::new();
-    /// # let xrpc = jacquard::client::AuthenticatedClient::new(http.clone(), jacquard::CowStr::from("https://public.api.bsky.app"));
-    /// let resolver = DefaultResolver::new(http, xrpc, ResolverOptions::default())
-    ///     .with_validate_doc_id(true);
-    /// ```
     pub fn with_validate_doc_id(mut self, enable: bool) -> Self {
         self.opts.validate_doc_id = enable;
         self
@@ -682,7 +661,10 @@ impl<C: crate::client::XrpcClient + Send + Sync> IdentityResolver for DefaultRes
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum IdentityWarning {
     /// The DID doc did not contain the expected handle alias under alsoKnownAs
-    HandleAliasMismatch { expected: Handle<'static> },
+    HandleAliasMismatch {
+        #[allow(missing_docs)]
+        expected: Handle<'static>,
+    },
 }
 
 impl<C: crate::client::XrpcClient + Send + Sync> DefaultResolver<C> {
@@ -772,6 +754,7 @@ impl MiniDocResponse {
 /// Slingshot mini-doc data (subset of DID doc info)
 #[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[allow(missing_docs)]
 pub struct MiniDoc<'a> {
     #[serde(borrow)]
     pub did: Did<'a>,
