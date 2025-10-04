@@ -19,7 +19,7 @@
 //!
 //! Dead simple api client. Logs in, prints the latest 5 posts from your timeline.
 //!
-//! ```rust
+//! ```no_run
 //! # use clap::Parser;
 //! # use jacquard::CowStr;
 //! use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
@@ -100,3 +100,6 @@ pub use jacquard_common::*;
 #[cfg(feature = "derive")]
 /// if enabled, reexport the attribute macros
 pub use jacquard_derive::*;
+
+/// Identity resolution helpers (DIDs, handles, PDS endpoints)
+pub mod identity;

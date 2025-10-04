@@ -9,10 +9,11 @@ keywords.workspace = true
 categories.workspace = true
 readme.workspace = true
 exclude.workspace = true
-license-file.workspace = true
+license.workspace = true
 
 
 [dependencies]
+bon = "3"
 base64 = "0.22.1"
 bytes.workspace = true
 chrono = "0.4.42"
@@ -34,3 +35,28 @@ serde_with.workspace = true
 smol_str.workspace = true
 thiserror.workspace = true
 url.workspace = true
+
+[features]
+default = []
+crypto = []
+crypto-ed25519 = ["crypto", "dep:ed25519-dalek"]
+crypto-k256 = ["crypto", "dep:k256"]
+crypto-p256 = ["crypto", "dep:p256"]
+
+[dependencies.ed25519-dalek]
+version = "2"
+optional = true
+default-features = false
+features = ["pkcs8"]
+
+[dependencies.k256]
+version = "0.13"
+optional = true
+default-features = false
+features = ["arithmetic"]
+
+[dependencies.p256]
+version = "0.13"
+optional = true
+default-features = false
+features = ["arithmetic"]

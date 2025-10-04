@@ -69,10 +69,10 @@ pub trait HttpClient {
     fn send_http(
         &self,
         request: Request<Vec<u8>>,
-    ) -> impl Future<Output = core::result::Result<http::Response<Vec<u8>>, Self::Error>>;
+    ) -> impl Future<Output = core::result::Result<http::Response<Vec<u8>>, Self::Error>> + Send;
 }
 /// XRPC client trait for AT Protocol RPC calls
-pub trait XrpcClient: HttpClient {
+pub trait XrpcClient: HttpClient + Sync {
     /// Get the base URI for XRPC requests (e.g., "https://bsky.social")
     fn base_uri(&self) -> CowStr<'_>;
     /// Get the authorization token for XRPC requests
@@ -80,21 +80,21 @@ pub trait XrpcClient: HttpClient {
     fn authorization_token(
         &self,
         is_refresh: bool,
-    ) -> impl Future<Output = Option<AuthorizationToken<'_>>> {
+    ) -> impl Future<Output = Option<AuthorizationToken<'_>>> + Send {
         async { None }
     }
     /// Get the `atproto-proxy` header.
-    fn atproto_proxy_header(&self) -> impl Future<Output = Option<String>> {
+    fn atproto_proxy_header(&self) -> impl Future<Output = Option<String>> + Send {
         async { None }
     }
     /// Get the `atproto-accept-labelers` header.
-    fn atproto_accept_labelers_header(&self) -> impl Future<Output = Option<Vec<String>>> {
+    fn atproto_accept_labelers_header(&self) -> impl Future<Output = Option<Vec<String>>> + Send {
         async { None }
     }
     /// Send an XRPC request and get back a response
-    fn send<R: XrpcRequest>(&self, request: R) -> impl Future<Output = Result<Response<R>>>
+    fn send<R: XrpcRequest + Send>(&self, request: R) -> impl Future<Output = Result<Response<R>>> + Send
     where
-        Self: Sized,
+        Self: Sized + Sync,
     {
         send_xrpc(self, request)
     }
@@ -149,8 +149,8 @@ impl From<Header> for HeaderName {
 /// Generic XRPC send implementation that uses HttpClient
 async fn send_xrpc<R, C>(client: &C, request: R) -> Result<Response<R>>
 where
-    R: XrpcRequest,
-    C: XrpcClient + ?Sized,
+    R: XrpcRequest + Send,
+    C: XrpcClient + ?Sized + Sync,
 {
     // Build URI: base_uri + /xrpc/ + NSID
     let mut uri = format!("{}/xrpc/{}", client.base_uri(), R::NSID);
@@ -314,7 +314,7 @@ impl<C: HttpClient> HttpClient for AuthenticatedClient<C> {
     }
 }
 
-impl<C: HttpClient> XrpcClient for AuthenticatedClient<C> {
+impl<C: HttpClient + Sync> XrpcClient for AuthenticatedClient<C> {
     fn base_uri(&self) -> CowStr<'_> {
         self.base_uri.clone()
     }

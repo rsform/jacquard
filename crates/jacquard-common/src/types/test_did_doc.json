@@ -1,0 +1,24 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/multikey/v1",
+    "https://w3id.org/security/suites/secp256k1-2019/v1"
+  ],
+  "alsoKnownAs": ["at://nonbinary.computer"],
+  "id": "did:plc:yfvwmnlztr4dwkb7hwz55r2g",
+  "service": [
+    {
+      "id": "#atproto_pds",
+      "serviceEndpoint": "https://atproto.systems",
+      "type": "AtprotoPersonalDataServer"
+    }
+  ],
+  "verificationMethod": [
+    {
+      "controller": "did:plc:yfvwmnlztr4dwkb7hwz55r2g",
+      "id": "did:plc:yfvwmnlztr4dwkb7hwz55r2g#atproto",
+      "publicKeyMultibase": "zQ3shtTHyn59SehkrApkRCXMbE7UZyrrkeCdQTuDW9oRF3R9U",
+      "type": "Multikey"
+    }
+  ]
+}

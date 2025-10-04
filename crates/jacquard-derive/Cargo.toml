@@ -9,7 +9,7 @@ keywords.workspace = true
 categories.workspace = true
 readme.workspace = true
 exclude.workspace = true
-license-file.workspace = true
+license.workspace = true
 
 [lib]
 proc-macro = true

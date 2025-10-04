@@ -9,13 +9,14 @@ keywords.workspace = true
 categories.workspace = true
 readme.workspace = true
 exclude.workspace = true
-license-file.workspace = true
+license.workspace = true
 
 [features]
 default = ["api_all"]
 derive = ["dep:jacquard-derive"]
 api = ["jacquard-api/com_atproto"]
 api_all = ["api", "jacquard-api/app_bsky", "jacquard-api/chat_bsky", "jacquard-api/tools_ozone"]
+dns = ["dep:hickory-resolver"]
 
 [lib]
 name = "jacquard"
@@ -26,6 +27,8 @@ name = "jacquard"
 path = "src/main.rs"
 
 [dependencies]
+bon = "3"
+async-trait = "0.1"
 bytes.workspace = true
 clap.workspace = true
 http.workspace = true
@@ -40,3 +43,8 @@ serde_ipld_dagcbor.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+hickory-resolver = { version = "0.24", default-features = false, features = ["system-config", "tokio-runtime"], optional = true }
+url.workspace = true
+smol_str.workspace = true
+percent-encoding = "2"
+urlencoding = "2"

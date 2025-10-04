@@ -1,0 +1,12 @@
+{
+  "uri": "at://did:plc:5me6kvratkf2f5lgvezbqrk7/app.bsky.feed.post/3lxzkque3272s",
+  "cid": "bafyreibllccqp445znzudb6q635aghmtqy3v4dexdzrzb4s4x3zuhejy2i",
+  "value": {
+    "text": "RT @kickitout: Four goals. One mission. Football United.\n\n⚽ Inclusive culture\n👥 More representation on the pitch\n💼 More coaches and leaders��",
+    "$type": "app.bsky.feed.post",
+    "embed": {
+      "$type": ""
+    },
+    "createdAt": "2025-09-04T11:26:06-05:00"
+  }
+}

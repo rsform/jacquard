@@ -12,6 +12,10 @@ pub mod collection;
 pub mod datetime;
 /// Decentralized Identifier (DID) types and validation
 pub mod did;
+/// DID Document types and helpers
+pub mod did_doc;
+/// Crypto helpers for keys (Multikey decoding, conversions)
+pub mod crypto;
 /// AT Protocol handle types and validation
 pub mod handle;
 /// AT Protocol identifier types (handle or DID)
