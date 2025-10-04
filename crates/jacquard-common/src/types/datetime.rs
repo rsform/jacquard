@@ -9,16 +9,27 @@ use std::{cmp, str::FromStr};
 use crate::{CowStr, IntoStatic};
 use regex::Regex;
 
+/// Regex for ISO 8601 datetime validation per AT Protocol spec
 pub static ISO8601_REGEX: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|(\+[0-9]{2}|\-[0-9][1-9]):[0-9]{2})$").unwrap()
 });
 
-/// A Lexicon timestamp.
+/// AT Protocol datetime (ISO 8601 with specific requirements)
+///
+/// Lexicon datetimes use ISO 8601 format with these requirements:
+/// - Must include timezone (strongly prefer UTC with 'Z')
+/// - Requires whole seconds precision minimum
+/// - Supports millisecond and microsecond precision
+/// - Uses uppercase 'T' to separate date and time
+///
+/// Examples: `"1985-04-12T23:20:50.123Z"`, `"2023-01-01T00:00:00+00:00"`
+///
+/// The serialized form is preserved during parsing to ensure exact round-trip serialization.
 #[derive(Clone, Debug, Eq, Hash)]
 pub struct Datetime {
-    /// Serialized form. Preserved during parsing to ensure round-trip re-serialization.
+    /// Serialized form preserved from parsing for round-trip consistency
     serialized: CowStr<'static>,
-    /// Parsed form.
+    /// Parsed datetime value for comparisons and operations
     dt: chrono::DateTime<chrono::FixedOffset>,
 }
 

@@ -1,6 +1,9 @@
+//! XRPC response parsing and error handling
+
 use bytes::Bytes;
 use http::StatusCode;
 use jacquard_common::IntoStatic;
+use jacquard_common::smol_str::SmolStr;
 use jacquard_common::types::xrpc::XrpcRequest;
 use serde::Deserialize;
 use std::marker::PhantomData;
@@ -10,6 +13,7 @@ use super::error::AuthError;
 /// XRPC response wrapper that owns the response buffer
 ///
 /// Allows borrowing from the buffer when parsing to avoid unnecessary allocations.
+/// Supports both borrowed parsing (with `parse()`) and owned parsing (with `into_output()`).
 pub struct Response<R: XrpcRequest> {
     buffer: Bytes,
     status: StatusCode,
@@ -74,13 +78,11 @@ impl<R: XrpcRequest> Response<R> {
         // 401: always auth error
         } else {
             match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
-                Ok(generic) => {
-                    match generic.error.as_str() {
-                        "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
-                        "InvalidToken" => Err(XrpcError::Auth(AuthError::InvalidToken)),
-                        _ => Err(XrpcError::Auth(AuthError::NotAuthenticated)),
-                    }
-                }
+                Ok(generic) => match generic.error.as_str() {
+                    "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
+                    "InvalidToken" => Err(XrpcError::Auth(AuthError::InvalidToken)),
+                    _ => Err(XrpcError::Auth(AuthError::NotAuthenticated)),
+                },
                 Err(e) => Err(XrpcError::Decode(e)),
             }
         }
@@ -120,7 +122,7 @@ impl<R: XrpcRequest> Response<R> {
                     match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
                         Ok(generic) => {
                             // Map auth-related errors to AuthError
-                            match generic.error.as_str() {
+                            match generic.error.as_ref() {
                                 "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
                                 "InvalidToken" => Err(XrpcError::Auth(AuthError::InvalidToken)),
                                 _ => Err(XrpcError::Generic(generic)),
@@ -133,13 +135,11 @@ impl<R: XrpcRequest> Response<R> {
         // 401: always auth error
         } else {
             match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
-                Ok(generic) => {
-                    match generic.error.as_str() {
-                        "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
-                        "InvalidToken" => Err(XrpcError::Auth(AuthError::InvalidToken)),
-                        _ => Err(XrpcError::Auth(AuthError::NotAuthenticated)),
-                    }
-                }
+                Ok(generic) => match generic.error.as_ref() {
+                    "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
+                    "InvalidToken" => Err(XrpcError::Auth(AuthError::InvalidToken)),
+                    _ => Err(XrpcError::Auth(AuthError::NotAuthenticated)),
+                },
                 Err(e) => Err(XrpcError::Decode(e)),
             }
         }
@@ -151,11 +151,15 @@ impl<R: XrpcRequest> Response<R> {
     }
 }
 
-/// Generic XRPC error format (for InvalidRequest, etc.)
+/// Generic XRPC error format for untyped errors like InvalidRequest
+///
+/// Used when the error doesn't match the endpoint's specific error enum
 #[derive(Debug, Clone, Deserialize)]
 pub struct GenericXrpcError {
-    pub error: String,
-    pub message: Option<String>,
+    /// Error code (e.g., "InvalidRequest")
+    pub error: SmolStr,
+    /// Optional error message with details
+    pub message: Option<SmolStr>,
 }
 
 impl std::fmt::Display for GenericXrpcError {
@@ -170,9 +174,13 @@ impl std::fmt::Display for GenericXrpcError {
 
 impl std::error::Error for GenericXrpcError {}
 
+/// XRPC-specific errors returned from endpoints
+///
+/// Represents errors returned in the response body
+/// Type parameter `E` is the endpoint's specific error enum type.
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub enum XrpcError<E: std::error::Error + IntoStatic> {
-    /// Typed XRPC error from the endpoint's error enum
+    /// Typed XRPC error from the endpoint's specific error enum
     #[error("XRPC error: {0}")]
     Xrpc(E),
 
@@ -180,11 +188,11 @@ pub enum XrpcError<E: std::error::Error + IntoStatic> {
     #[error("Authentication error: {0}")]
     Auth(#[from] AuthError),
 
-    /// Generic XRPC error (InvalidRequest, etc.)
+    /// Generic XRPC error not in the endpoint's error enum (e.g., InvalidRequest)
     #[error("XRPC error: {0}")]
     Generic(GenericXrpcError),
 
-    /// Failed to decode response
+    /// Failed to decode the response body
     #[error("Failed to decode response: {0}")]
     Decode(#[from] serde_json::Error),
 }

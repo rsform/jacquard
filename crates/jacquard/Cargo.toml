@@ -1,10 +1,15 @@
 [package]
-authors.workspace = true
-# If you change the name here, you must also do it in flake.nix (and run `cargo generate-lockfile` afterwards)
 name = "jacquard"
-description = "A simple Rust project using Nix"
-version.workspace = true
+description = "Simple and powerful AT Procotol implementation"
 edition.workspace = true
+version.workspace = true
+authors.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme.workspace = true
+documentation.workspace = true
+exclude.workspace = true
 
 [features]
 default = ["api_all"]

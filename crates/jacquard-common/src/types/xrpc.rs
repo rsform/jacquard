@@ -45,6 +45,7 @@ impl XrpcMethod {
         }
     }
 
+    /// Get the body encoding type for this method (procedures only)
     pub const fn body_encoding(&self) -> Option<&'static str> {
         match self {
             Self::Query => None,

@@ -12,12 +12,23 @@ use std::{
     str::FromStr,
 };
 
+/// Blob reference for binary data in AT Protocol
+///
+/// Blobs represent uploaded binary data (images, videos, etc.) stored separately from records.
+/// They include a CID reference, MIME type, and size information.
+///
+/// Serialization differs between formats:
+/// - JSON: `ref` is serialized as `{"$link": "cid_string"}`
+/// - CBOR: `ref` is the raw CID
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
 pub struct Blob<'b> {
+    /// CID (Content Identifier) reference to the blob data
     pub r#ref: Cid<'b>,
+    /// MIME type of the blob (e.g., "image/png", "video/mp4")
     #[serde(borrow)]
     pub mime_type: MimeType<'b>,
+    /// Size of the blob in bytes
     pub size: usize,
 }
 
@@ -65,18 +76,20 @@ impl IntoStatic for Blob<'_> {
     }
 }
 
-/// Current, typed blob reference.
-/// Quite dislike this nesting, but it serves the same purpose as it did in Atrium
-/// Couple of helper methods and conversions to make it less annoying.
-/// TODO: revisit nesting and maybe hand-roll a serde impl that supports this sans nesting
+/// Tagged blob reference with `$type` field for serde
+///
+/// This enum provides the `{"$type": "blob"}` wrapper expected by AT Protocol's JSON format.
+/// Currently only contains the `Blob` variant, but the enum structure supports future extensions.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(tag = "$type", rename_all = "lowercase")]
 pub enum BlobRef<'r> {
+    /// Blob variant with embedded blob data
     #[serde(borrow)]
     Blob(Blob<'r>),
 }
 
 impl<'r> BlobRef<'r> {
+    /// Get the inner blob reference
     pub fn blob(&self) -> &Blob<'r> {
         match self {
             BlobRef::Blob(blob) => blob,
@@ -108,7 +121,9 @@ impl IntoStatic for BlobRef<'_> {
     }
 }
 
-/// Wrapper for file type
+/// MIME type identifier for blob data
+///
+/// Used to specify the content type of blobs. Supports patterns like "image/*" and "*/*".
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 #[serde(transparent)]
 #[repr(transparent)]
@@ -120,24 +135,27 @@ impl<'m> MimeType<'m> {
         Ok(Self(CowStr::Borrowed(mime_type)))
     }
 
+    /// Fallible constructor, validates, takes ownership
     pub fn new_owned(mime_type: impl AsRef<str>) -> Self {
         Self(CowStr::Owned(mime_type.as_ref().to_smolstr()))
     }
 
+    /// Fallible constructor, validates, doesn't allocate
     pub fn new_static(mime_type: &'static str) -> Self {
         Self(CowStr::new_static(mime_type))
     }
 
-    /// Fallible constructor from an existing CowStr, borrows
+    /// Fallible constructor from an existing CowStr
     pub fn from_cowstr(mime_type: CowStr<'m>) -> Result<MimeType<'m>, &'static str> {
         Ok(Self(mime_type))
     }
 
-    /// Infallible constructor
+    /// Infallible constructor for trusted MIME type strings
     pub fn raw(mime_type: &'m str) -> Self {
         Self(CowStr::Borrowed(mime_type))
     }
 
+    /// Get the MIME type as a string slice
     pub fn as_str(&self) -> &str {
         {
             let this = &self.0;

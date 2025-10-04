@@ -1,6 +1,8 @@
+//! Error types for XRPC client operations
+
 use bytes::Bytes;
 
-/// Client error type
+/// Client error type wrapping all possible error conditions
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub enum ClientError {
     /// HTTP transport error
@@ -44,17 +46,22 @@ pub enum ClientError {
     ),
 }
 
+/// Transport-level errors that occur during HTTP communication
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub enum TransportError {
+    /// Failed to establish connection to server
     #[error("Connection error: {0}")]
     Connect(String),
 
+    /// Request timed out
     #[error("Request timeout")]
     Timeout,
 
+    /// Request construction failed (malformed URI, headers, etc.)
     #[error("Invalid request: {0}")]
     InvalidRequest(String),
 
+    /// Other transport error
     #[error("Transport error: {0}")]
     Other(Box<dyn std::error::Error + Send + Sync>),
 }
@@ -62,20 +69,24 @@ pub enum TransportError {
 // Re-export EncodeError from common
 pub use jacquard_common::types::xrpc::EncodeError;
 
+/// Response deserialization errors
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub enum DecodeError {
+    /// JSON deserialization failed
     #[error("Failed to deserialize JSON: {0}")]
     Json(
         #[from]
         #[source]
         serde_json::Error,
     ),
+    /// CBOR deserialization failed (local I/O)
     #[error("Failed to deserialize CBOR: {0}")]
     CborLocal(
         #[from]
         #[source]
         serde_ipld_dagcbor::DecodeError<std::io::Error>,
     ),
+    /// CBOR deserialization failed (remote/reqwest)
     #[error("Failed to deserialize CBOR: {0}")]
     CborRemote(
         #[from]
@@ -84,9 +95,12 @@ pub enum DecodeError {
     ),
 }
 
+/// HTTP error response (non-200 status codes outside of XRPC error handling)
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub struct HttpError {
+    /// HTTP status code
     pub status: http::StatusCode,
+    /// Response body if available
     pub body: Option<Bytes>,
 }
 
@@ -102,23 +116,31 @@ impl std::fmt::Display for HttpError {
     }
 }
 
+/// Authentication and authorization errors
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub enum AuthError {
+    /// Access token has expired (use refresh token to get a new one)
     #[error("Access token expired")]
     TokenExpired,
 
+    /// Access token is invalid or malformed
     #[error("Invalid access token")]
     InvalidToken,
 
+    /// Token refresh request failed
     #[error("Token refresh failed")]
     RefreshFailed,
 
+    /// Request requires authentication but none was provided
     #[error("No authentication provided")]
     NotAuthenticated,
+
+    /// Other authentication error
     #[error("Authentication error: {0:?}")]
     Other(http::HeaderValue),
 }
 
+/// Result type for client operations
 pub type Result<T> = std::result::Result<T, ClientError>;
 
 impl From<reqwest::Error> for TransportError {

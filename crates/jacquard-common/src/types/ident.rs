@@ -8,12 +8,20 @@ use serde::{Deserialize, Serialize};
 
 use crate::CowStr;
 
-/// An AT Protocol identifier.
+/// AT Protocol identifier (either a DID or handle)
+///
+/// Represents the union of DIDs and handles, which can both be used to identify
+/// accounts in AT Protocol. DIDs are permanent identifiers, while handles are
+/// human-friendly and can change.
+///
+/// Automatically determines whether a string is a DID or a handle during parsing.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
 #[serde(untagged)]
 pub enum AtIdentifier<'i> {
+    /// DID variant
     #[serde(borrow)]
     Did(Did<'i>),
+    /// Handle variant
     Handle(Handle<'i>),
 }
 
@@ -73,6 +81,7 @@ impl<'i> AtIdentifier<'i> {
         }
     }
 
+    /// Get the identifier as a string slice
     pub fn as_str(&self) -> &str {
         match self {
             AtIdentifier::Did(did) => did.as_str(),

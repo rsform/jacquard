@@ -21,20 +21,39 @@ pub use crate::{
     },
 };
 
-/// ATProto string value
+/// Polymorphic AT Protocol string value
+///
+/// Represents any AT Protocol string type, automatically detecting and parsing
+/// into the appropriate variant. Used internally for generic value handling.
+///
+/// Variants are checked in order from most specific to least specific. Note that
+/// record keys are intentionally NOT parsed from bare strings as the validation
+/// is too permissive and would catch too many values.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AtprotoStr<'s> {
+    /// ISO 8601 datetime
     Datetime(Datetime),
+    /// BCP 47 language tag
     Language(Language),
+    /// Timestamp identifier
     Tid(Tid),
+    /// Namespaced identifier
     Nsid(Nsid<'s>),
+    /// Decentralized identifier
     Did(Did<'s>),
+    /// Account handle
     Handle(Handle<'s>),
+    /// Identifier (DID or handle)
     AtIdentifier(AtIdentifier<'s>),
+    /// AT URI
     AtUri(AtUri<'s>),
+    /// Generic URI
     Uri(Uri<'s>),
+    /// Content identifier
     Cid(Cid<'s>),
+    /// Record key
     RecordKey(RecordKey<Rkey<'s>>),
+    /// Plain string (fallback)
     String(CowStr<'s>),
 }
 
@@ -77,6 +96,7 @@ impl<'s> AtprotoStr<'s> {
         }
     }
 
+    /// Get the string value regardless of variant
     pub fn as_str(&self) -> &str {
         match self {
             Self::Datetime(datetime) => datetime.as_str(),
@@ -238,15 +258,19 @@ impl From<AtprotoStr<'_>> for String {
     help("if something doesn't match the spec, contact the crate author")
 )]
 pub struct AtStrError {
+    /// AT Protocol spec name this error relates to
     pub spec: SmolStr,
+    /// The source string that failed to parse
     #[source_code]
     pub source: String,
+    /// The specific kind of parsing error
     #[source]
     #[diagnostic_source]
     pub kind: StrParseKind,
 }
 
 impl AtStrError {
+    /// Create a new AT string parsing error
     pub fn new(spec: &'static str, source: String, kind: StrParseKind) -> Self {
         Self {
             spec: SmolStr::new_static(spec),
@@ -255,6 +279,7 @@ impl AtStrError {
         }
     }
 
+    /// Wrap an existing error with a new spec context
     pub fn wrap(spec: &'static str, source: String, error: AtStrError) -> Self {
         if let Some(span) = match &error.kind {
             StrParseKind::Disallowed { problem, .. } => problem,
@@ -309,6 +334,7 @@ impl AtStrError {
         }
     }
 
+    /// Create an error for a string that exceeds the maximum length
     pub fn too_long(spec: &'static str, source: &str, max: usize, actual: usize) -> Self {
         Self {
             spec: SmolStr::new_static(spec),
@@ -317,6 +343,7 @@ impl AtStrError {
         }
     }
 
+    /// Create an error for a string below the minimum length
     pub fn too_short(spec: &'static str, source: &str, min: usize, actual: usize) -> Self {
         Self {
             spec: SmolStr::new_static(spec),
@@ -348,6 +375,7 @@ impl AtStrError {
     }
 
     /// missing component, with the span where it was expected to be founf
+    /// Create an error for a missing component at a specific span
     pub fn missing_from(
         spec: &'static str,
         source: &str,
@@ -364,6 +392,7 @@ impl AtStrError {
         }
     }
 
+    /// Create an error for a regex validation failure
     pub fn regex(spec: &'static str, source: &str, message: SmolStr) -> Self {
         Self {
             spec: SmolStr::new_static(spec),
@@ -376,44 +405,69 @@ impl AtStrError {
     }
 }
 
+/// Kinds of parsing errors for AT Protocol string types
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub enum StrParseKind {
+    /// Regex pattern validation failed
     #[error("regex failure - {message}")]
     #[diagnostic(code(jacquard::types::string::regex_fail))]
     RegexFail {
+        /// Optional span highlighting the problem area
         #[label]
         span: Option<SourceSpan>,
+        /// Help message explaining the failure
         #[help]
         message: SmolStr,
     },
+    /// String exceeds maximum allowed length
     #[error("string too long (allowed: {max}, actual: {actual})")]
     #[diagnostic(code(jacquard::types::string::wrong_length))]
-    TooLong { max: usize, actual: usize },
+    TooLong {
+        /// Maximum allowed length
+        max: usize,
+        /// Actual string length
+        actual: usize,
+    },
 
+    /// String is below minimum required length
     #[error("string too short (allowed: {min}, actual: {actual})")]
     #[diagnostic(code(jacquard::types::string::wrong_length))]
-    TooShort { min: usize, actual: usize },
+    TooShort {
+        /// Minimum required length
+        min: usize,
+        /// Actual string length
+        actual: usize,
+    },
+    /// String contains disallowed values
     #[error("disallowed - {message}")]
     #[diagnostic(code(jacquard::types::string::disallowed))]
     Disallowed {
+        /// Optional span highlighting the disallowed content
         #[label]
         problem: Option<SourceSpan>,
+        /// Help message about what's disallowed
         #[help]
         message: SmolStr,
     },
+    /// Required component is missing
     #[error("missing - {message}")]
     #[diagnostic(code(jacquard::atstr::missing_component))]
     MissingComponent {
+        /// Optional span where the component should be
         #[label]
         span: Option<SourceSpan>,
+        /// Help message about what's missing
         #[help]
         message: SmolStr,
     },
+    /// Wraps another error with additional context
     #[error("{err:?}")]
     #[diagnostic(code(jacquard::atstr::inner))]
     Wrap {
+        /// Optional span in the outer context
         #[label]
         span: Option<SourceSpan>,
+        /// The wrapped inner error
         #[source]
         err: Arc<AtStrError>,
     },

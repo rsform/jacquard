@@ -9,18 +9,24 @@ use std::marker::PhantomData;
 use std::sync::LazyLock;
 use std::{ops::Deref, str::FromStr};
 
-/// Trait for generic typed record keys
+/// Trait for typed record key implementations
 ///
-/// This is deliberately public (so that consumers can develop specialized record key types),
-/// but is marked as unsafe, because the implementer is expected to uphold the invariants
-/// required by this trait, namely compliance with the [spec](https://atproto.com/specs/record-key)
-/// as described by [`RKEY_REGEX`].
+/// Allows different record key types (TID, NSID, literals, generic strings) while
+/// maintaining validation guarantees. Implementers must ensure compliance with the
+/// AT Protocol [record key specification](https://atproto.com/specs/record-key).
 ///
-/// This crate provides implementations for TID, NSID, literals, and generic strings
+/// # Safety
+/// Implementations must ensure the string representation matches [`RKEY_REGEX`] and
+/// is not "." or "..". Built-in implementations: `Tid`, `Nsid`, `Literal<T>`, `Rkey<'_>`.
 pub unsafe trait RecordKeyType: Clone + Serialize {
+    /// Get the record key as a string slice
     fn as_str(&self) -> &str;
 }
 
+/// Wrapper for typed record keys
+///
+/// Provides a generic container for different record key types while preserving their
+/// specific validation guarantees through the `RecordKeyType` trait.
 #[derive(Clone, PartialEq, Eq, Serialize, Deserialize, Hash, Debug)]
 #[serde(transparent)]
 #[repr(transparent)]
@@ -56,8 +62,19 @@ where
     }
 }
 
-/// ATProto Record Key (type `any`)
-/// Catch-all for any string meeting the overall Record Key requirements detailed [](https://atproto.com/specs/record-key)
+/// AT Protocol record key (generic "any" type)
+///
+/// Record keys uniquely identify records within a collection. This is the catch-all
+/// type for any valid record key string (1-512 characters of alphanumerics, dots,
+/// hyphens, underscores, colons, tildes).
+///
+/// Common record key types:
+/// - TID: timestamp-based (most common)
+/// - Literal: fixed keys like "self"
+/// - NSID: namespaced identifiers
+/// - Any: flexible strings matching the validation rules
+///
+/// See: <https://atproto.com/specs/record-key>
 #[derive(Clone, PartialEq, Eq, Serialize, Hash)]
 #[serde(transparent)]
 #[repr(transparent)]
@@ -69,10 +86,10 @@ unsafe impl<'r> RecordKeyType for Rkey<'r> {
     }
 }
 
+/// Regex for record key validation per AT Protocol spec
 pub static RKEY_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^[a-zA-Z0-9.\-_:~]{1,512}$").unwrap());
 
-/// AT Protocol rkey
 impl<'r> Rkey<'r> {
     /// Fallible constructor, validates, borrows from input
     pub fn new(rkey: &'r str) -> Result<Self, AtStrError> {
@@ -89,7 +106,7 @@ impl<'r> Rkey<'r> {
         }
     }
 
-    /// Fallible constructor, validates, borrows from input
+    /// Fallible constructor, validates, takes ownership
     pub fn new_owned(rkey: impl AsRef<str>) -> Result<Self, AtStrError> {
         let rkey = rkey.as_ref();
         if [".", ".."].contains(&rkey) {
@@ -140,6 +157,7 @@ impl<'r> Rkey<'r> {
         Self(CowStr::Borrowed(rkey))
     }
 
+    /// Get the record key as a string slice
     pub fn as_str(&self) -> &str {
         {
             let this = &self.0;
@@ -265,6 +283,7 @@ pub struct LiteralKey<T: Literal = SelfRecord> {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
+/// Key for a record where only one of an NSID is supposed to exist
 pub struct SelfRecord;
 
 impl Literal for SelfRecord {
@@ -326,6 +345,7 @@ impl<T: Literal> LiteralKey<T> {
         }
     }
 
+    /// Get the literal record key as a string slice
     pub fn as_str(&self) -> &str {
         T::LITERAL
     }

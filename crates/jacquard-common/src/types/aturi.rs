@@ -12,11 +12,22 @@ use std::hash::{Hash, Hasher};
 use std::sync::LazyLock;
 use std::{ops::Deref, str::FromStr};
 
-/// at:// URI type
+/// AT Protocol URI (`at://`) for referencing records in repositories
 ///
-/// based on the regex here: [](https://github.com/bluesky-social/atproto/blob/main/packages/syntax/src/aturi_validation.ts)
+/// AT URIs provide a way to reference records using either a DID or handle as the authority.
+/// They're not content-addressed, so the record's contents can change over time.
 ///
-/// Doesn't support the query segment, but then neither does the Typescript SDK.
+/// Format: `at://AUTHORITY[/COLLECTION[/RKEY]][#FRAGMENT]`
+/// - Authority: DID or handle identifying the repository (required)
+/// - Collection: NSID of the record type (optional)
+/// - Record key (rkey): specific record identifier (optional)
+/// - Fragment: sub-resource identifier (optional, limited support)
+///
+/// Examples:
+/// - `at://alice.bsky.social`
+/// - `at://did:plc:abc123/app.bsky.feed.post/3jk5`
+///
+/// See: <https://atproto.com/specs/at-uri-scheme>
 #[derive(PartialEq, Eq, Debug)]
 pub struct AtUri<'u> {
     inner: Inner<'u>,
@@ -81,10 +92,14 @@ impl Hash for AtUri<'_> {
     }
 }
 
-/// at:// URI path component (current subset)
+/// Path component of an AT URI (collection and optional record key)
+///
+/// Represents the `/COLLECTION[/RKEY]` portion of an AT URI.
 #[derive(Clone, PartialEq, Eq, Hash, Debug)]
 pub struct RepoPath<'u> {
+    /// Collection NSID (e.g., `app.bsky.feed.post`)
     pub collection: Nsid<'u>,
+    /// Optional record key identifying a specific record
     pub rkey: Option<RecordKey<Rkey<'u>>>,
 }
 
@@ -99,8 +114,10 @@ impl IntoStatic for RepoPath<'_> {
     }
 }
 
+/// Owned (static lifetime) version of `RepoPath`
 pub type UriPathBuf = RepoPath<'static>;
 
+/// Regex for AT URI validation per AT Protocol spec
 pub static ATURI_REGEX: LazyLock<Regex> = LazyLock::new(|| {
     // Fragment allows: / and \ and other special chars. In raw string, backslashes are literal.
     Regex::new(r##"^at://(?<authority>[a-zA-Z0-9._:%-]+)(/(?<collection>[a-zA-Z0-9-.]+)(/(?<rkey>[a-zA-Z0-9._~:@!$&%')(*+,;=-]+))?)?(#(?<fragment>/[a-zA-Z0-9._~:@!$&%')(*+,;=\-\[\]/\\]*))?$"##).unwrap()
@@ -154,6 +171,9 @@ impl<'u> AtUri<'u> {
         }
     }
 
+    /// Infallible constructor for when you know the URI is valid
+    ///
+    /// Panics on invalid URIs. Use this when manually constructing URIs from trusted sources.
     pub fn raw(uri: &'u str) -> Self {
         if let Some(parts) = ATURI_REGEX.captures(uri) {
             if let Some(authority) = parts.name("authority") {
@@ -275,6 +295,7 @@ impl<'u> AtUri<'u> {
         })
     }
 
+    /// Get the full URI as a string slice
     pub fn as_str(&self) -> &str {
         {
             let this = &self.inner.borrow_uri();
@@ -282,22 +303,27 @@ impl<'u> AtUri<'u> {
         }
     }
 
+    /// Get the authority component (DID or handle)
     pub fn authority(&self) -> &AtIdentifier<'_> {
         self.inner.borrow_authority()
     }
 
+    /// Get the path component (collection and optional rkey)
     pub fn path(&self) -> &Option<RepoPath<'_>> {
         self.inner.borrow_path()
     }
 
+    /// Get the fragment component if present
     pub fn fragment(&self) -> &Option<CowStr<'_>> {
         self.inner.borrow_fragment()
     }
 
+    /// Get the collection NSID from the path, if present
     pub fn collection(&self) -> Option<&Nsid<'_>> {
         self.inner.borrow_path().as_ref().map(|p| &p.collection)
     }
 
+    /// Get the record key from the path, if present
     pub fn rkey(&self) -> Option<&RecordKey<Rkey<'_>>> {
         self.inner
             .borrow_path()
@@ -400,6 +426,7 @@ impl AtUri<'static> {
         }
     }
 
+    /// Fallible constructor, validates, doesn't allocate (static lifetime)
     pub fn new_static(uri: &'static str) -> Result<Self, AtStrError> {
         let uri = uri.as_ref();
         if let Some(parts) = ATURI_REGEX.captures(uri) {

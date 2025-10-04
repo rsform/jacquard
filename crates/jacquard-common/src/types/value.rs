@@ -7,33 +7,55 @@ use ipld_core::ipld::Ipld;
 use smol_str::{SmolStr, ToSmolStr};
 use std::collections::BTreeMap;
 
+/// Conversion utilities for Data types
 pub mod convert;
+/// String parsing for AT Protocol types
 pub mod parsing;
+/// Serde implementations for Data types
 pub mod serde_impl;
 
 #[cfg(test)]
 mod tests;
 
+/// AT Protocol data model value
+///
+/// Represents any valid value in the AT Protocol data model, which supports JSON and CBOR
+/// serialization with specific constraints (no floats, CID links, blobs with metadata).
+///
+/// This is the generic "unknown data" type used for lexicon values, extra fields captured
+/// by `#[lexicon]`, and IPLD data structures.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Data<'s> {
+    /// Null value
     Null,
+    /// Boolean value
     Boolean(bool),
+    /// Integer value (no floats in AT Protocol)
     Integer(i64),
+    /// String value (parsed into specific AT Protocol types when possible)
     String(AtprotoStr<'s>),
+    /// Raw bytes
     Bytes(Bytes),
+    /// CID link reference
     CidLink(Cid<'s>),
+    /// Array of values
     Array(Array<'s>),
+    /// Object/map of values
     Object(Object<'s>),
+    /// Blob reference with metadata
     Blob(Blob<'s>),
 }
 
+/// Errors that can occur when working with AT Protocol data
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic)]
 pub enum AtDataError {
+    /// Floating point numbers are not allowed in AT Protocol
     #[error("floating point numbers not allowed in AT protocol data")]
     FloatNotAllowed,
 }
 
 impl<'s> Data<'s> {
+    /// Get the data model type of this value
     pub fn data_type(&self) -> DataModelType {
         match self {
             Data::Null => DataModelType::Null,
@@ -69,6 +91,7 @@ impl<'s> Data<'s> {
             Data::Blob(_) => DataModelType::Blob,
         }
     }
+    /// Parse a Data value from a JSON value
     pub fn from_json(json: &'s serde_json::Value) -> Result<Self, AtDataError> {
         Ok(if let Some(value) = json.as_bool() {
             Self::Boolean(value)
@@ -87,6 +110,7 @@ impl<'s> Data<'s> {
         })
     }
 
+    /// Parse a Data value from an IPLD value (CBOR)
     pub fn from_cbor(cbor: &'s Ipld) -> Result<Self, AtDataError> {
         Ok(match cbor {
             Ipld::Null => Data::Null,
@@ -121,6 +145,7 @@ impl IntoStatic for Data<'_> {
     }
 }
 
+/// Array of AT Protocol data values
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Array<'s>(pub Vec<Data<'s>>);
 
@@ -132,6 +157,7 @@ impl IntoStatic for Array<'_> {
 }
 
 impl<'s> Array<'s> {
+    /// Parse an array from JSON values
     pub fn from_json(json: &'s Vec<serde_json::Value>) -> Result<Self, AtDataError> {
         let mut array = Vec::with_capacity(json.len());
         for item in json {
@@ -139,6 +165,7 @@ impl<'s> Array<'s> {
         }
         Ok(Self(array))
     }
+    /// Parse an array from IPLD values (CBOR)
     pub fn from_cbor(cbor: &'s Vec<Ipld>) -> Result<Self, AtDataError> {
         let mut array = Vec::with_capacity(cbor.len());
         for item in cbor {
@@ -148,6 +175,7 @@ impl<'s> Array<'s> {
     }
 }
 
+/// Object/map of AT Protocol data values
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Object<'s>(pub BTreeMap<SmolStr, Data<'s>>);
 
@@ -159,6 +187,9 @@ impl IntoStatic for Object<'_> {
 }
 
 impl<'s> Object<'s> {
+    /// Parse an object from a JSON map with type inference
+    ///
+    /// Uses key names to infer the appropriate AT Protocol types for values.
     pub fn from_json(
         json: &'s serde_json::Map<String, serde_json::Value>,
     ) -> Result<Data<'s>, AtDataError> {
@@ -232,6 +263,9 @@ impl<'s> Object<'s> {
         Ok(Data::Object(Object(map)))
     }
 
+    /// Parse an object from IPLD (CBOR) with type inference
+    ///
+    /// Uses key names to infer the appropriate AT Protocol types for values.
     pub fn from_cbor(cbor: &'s BTreeMap<String, Ipld>) -> Result<Data<'s>, AtDataError> {
         if let Some(Ipld::String(type_field)) = cbor.get("$type") {
             if parsing::infer_from_type(type_field) == DataModelType::Blob {
@@ -288,17 +322,30 @@ impl<'s> Object<'s> {
 /// E.g. lower-level services, PDS implementations, firehose indexers, relay implementations.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RawData<'s> {
+    /// Null value
     Null,
+    /// Boolean value
     Boolean(bool),
+    /// Signed integer
     SignedInt(i64),
+    /// Unsigned integer
     UnsignedInt(u64),
+    /// String value (no type inference)
     String(CowStr<'s>),
+    /// Raw bytes
     Bytes(Bytes),
+    /// CID link reference
     CidLink(Cid<'s>),
+    /// Array of raw values
     Array(Vec<RawData<'s>>),
+    /// Object/map of raw values
     Object(BTreeMap<SmolStr, RawData<'s>>),
+    /// Valid blob reference
     Blob(Blob<'s>),
+    /// Invalid blob structure (captured for debugging)
     InvalidBlob(Box<RawData<'s>>),
+    /// Invalid number format, generally a floating point number (captured as bytes)
     InvalidNumber(Bytes),
+    /// Invalid/unknown data (captured as bytes)
     InvalidData(Bytes),
 }

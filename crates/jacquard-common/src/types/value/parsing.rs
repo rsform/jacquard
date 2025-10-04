@@ -17,6 +17,7 @@ use smol_str::{SmolStr, ToSmolStr};
 use std::{collections::BTreeMap, str::FromStr};
 use url::Url;
 
+/// Insert a string into an at:// `Data<'_>` map, inferring its type.
 pub fn insert_string<'s>(
     map: &mut BTreeMap<SmolStr, Data<'s>>,
     key: &'s str,
@@ -231,6 +232,7 @@ pub fn string_key_type_guess(key: &str) -> DataModelType {
     }
 }
 
+/// Convert an ipld map to a atproto data model blob if it matches the format
 pub fn cbor_to_blob<'b>(blob: &'b BTreeMap<String, Ipld>) -> Option<Blob<'b>> {
     let mime_type = blob.get("mimeType").and_then(|o| {
         if let Ipld::String(string) = o {
@@ -267,6 +269,7 @@ pub fn cbor_to_blob<'b>(blob: &'b BTreeMap<String, Ipld>) -> Option<Blob<'b>> {
     None
 }
 
+/// convert a JSON object to an atproto data model blob if it matches the format
 pub fn json_to_blob<'b>(blob: &'b serde_json::Map<String, serde_json::Value>) -> Option<Blob<'b>> {
     let mime_type = blob.get("mimeType").and_then(|v| v.as_str());
     if let Some(value) = blob.get("ref") {
@@ -297,6 +300,7 @@ pub fn json_to_blob<'b>(blob: &'b serde_json::Map<String, serde_json::Value>) ->
     None
 }
 
+/// Infer if something with a "$type" field is a blob or an object
 pub fn infer_from_type(type_field: &str) -> DataModelType {
     match type_field {
         "blob" => DataModelType::Blob,
@@ -304,6 +308,7 @@ pub fn infer_from_type(type_field: &str) -> DataModelType {
     }
 }
 
+/// decode a base64 byte string into atproto data
 pub fn decode_bytes<'s>(bytes: &str) -> Data<'s> {
     // First one should just work. rest are insurance.
     if let Ok(bytes) = BASE64_STANDARD.decode(bytes) {
@@ -319,6 +324,7 @@ pub fn decode_bytes<'s>(bytes: &str) -> Data<'s> {
     }
 }
 
+/// decode a base64 byte string into atproto raw unvalidated data
 pub fn decode_raw_bytes<'s>(bytes: &str) -> RawData<'s> {
     // First one should just work. rest are insurance.
     if let Ok(bytes) = BASE64_STANDARD.decode(bytes) {

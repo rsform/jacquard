@@ -8,16 +8,32 @@ use std::fmt;
 use std::sync::LazyLock;
 use std::{ops::Deref, str::FromStr};
 
+/// AT Protocol handle (human-readable account identifier)
+///
+/// Handles are user-friendly account identifiers that must resolve to a DID through DNS
+/// or HTTPS. Unlike DIDs, handles can change over time, though they remain an important
+/// part of user identity.
+///
+/// Format rules:
+/// - Maximum 253 characters
+/// - At least two segments separated by dots (e.g., "alice.bsky.social")
+/// - Each segment is 1-63 characters of ASCII letters, numbers, and hyphens
+/// - Segments cannot start or end with a hyphen
+/// - Final segment (TLD) cannot start with a digit
+/// - Case-insensitive (normalized to lowercase)
+///
+/// Certain TLDs are disallowed (.local, .localhost, .arpa, .invalid, .internal, .example, .alt, .onion).
+///
+/// See: <https://atproto.com/specs/handle>
 #[derive(Clone, PartialEq, Eq, Serialize, Hash)]
 #[serde(transparent)]
 #[repr(transparent)]
 pub struct Handle<'h>(CowStr<'h>);
 
+/// Regex for handle validation per AT Protocol spec
 pub static HANDLE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$").unwrap()
 });
-
-/// AT Protocol handle
 impl<'h> Handle<'h> {
     /// Fallible constructor, validates, borrows from input
     ///
@@ -127,6 +143,7 @@ impl<'h> Handle<'h> {
         Self(CowStr::Borrowed(stripped))
     }
 
+    /// Get the handle as a string slice
     pub fn as_str(&self) -> &str {
         {
             let this = &self.0;

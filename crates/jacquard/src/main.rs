@@ -27,7 +27,7 @@ async fn main() -> miette::Result<()> {
 
     // Create HTTP client
     let http = reqwest::Client::new();
-    let mut client = AuthenticatedClient::new(http, CowStr::from(args.pds));
+    let mut client = AuthenticatedClient::new(http, args.pds);
 
     // Create session
     println!("logging in as {}...", args.username);

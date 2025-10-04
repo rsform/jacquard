@@ -17,18 +17,20 @@ use crate::IntoStatic;
 /// `<str as ToOwned>::Owned` is `String`, and not `SmolStr`.
 #[derive(Clone)]
 pub enum CowStr<'s> {
+    /// &str varaiant
     Borrowed(&'s str),
+    /// Smolstr variant
     Owned(SmolStr),
 }
 
 impl CowStr<'static> {
     /// Create a new `CowStr` by copying from a `&str` — this might allocate
-    /// if the `compact_str` feature is disabled, or if the string is longer
-    /// than `MAX_INLINE_SIZE`.
+    /// if the string is longer than `MAX_INLINE_SIZE`.
     pub fn copy_from_str(s: &str) -> Self {
         Self::Owned(SmolStr::from(s))
     }
 
+    /// Create a new owned `CowStr` from a static &str without allocating
     pub fn new_static(s: &'static str) -> Self {
         Self::Owned(SmolStr::new_static(s))
     }
@@ -36,16 +38,20 @@ impl CowStr<'static> {
 
 impl<'s> CowStr<'s> {
     #[inline]
+    /// Borrow and decode a byte slice as utf8 into a CowStr
     pub fn from_utf8(s: &'s [u8]) -> Result<Self, std::str::Utf8Error> {
         Ok(Self::Borrowed(std::str::from_utf8(s)?))
     }
 
     #[inline]
-    pub fn from_utf8_owned(s: Vec<u8>) -> Result<Self, std::str::Utf8Error> {
-        Ok(Self::Owned(SmolStr::new(std::str::from_utf8(&s)?)))
+    /// Take bytes and decode them as utf8 into an owned CowStr. Might allocate.
+    pub fn from_utf8_owned(s: impl AsRef<[u8]>) -> Result<Self, std::str::Utf8Error> {
+        Ok(Self::Owned(SmolStr::new(std::str::from_utf8(&s.as_ref())?)))
     }
 
     #[inline]
+    /// Take bytes and decode them as utf8, skipping invalid characters, taking ownership.
+    /// Will allocate, uses String::from_utf8_lossy() internally for now.
     pub fn from_utf8_lossy(s: &'s [u8]) -> Self {
         Self::Owned(String::from_utf8_lossy(&s).into())
     }

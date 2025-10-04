@@ -4,34 +4,48 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Visitor};
 use smol_str::ToSmolStr;
 use std::{convert::Infallible, fmt, marker::PhantomData, ops::Deref, str::FromStr};
 
-/// raw
+/// CID codec for AT Protocol (raw)
 pub const ATP_CID_CODEC: u64 = 0x55;
 
-/// SHA-256
+/// CID hash function for AT Protocol (SHA-256)
 pub const ATP_CID_HASH: u64 = 0x12;
 
-/// base 32
+/// CID encoding base for AT Protocol (base32 lowercase)
 pub const ATP_CID_BASE: multibase::Base = multibase::Base::Base32Lower;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-/// Either the string form of a cid or the ipld form
-/// For the IPLD form we also cache the string representation for later use.
+/// Content Identifier (CID) for IPLD data in AT Protocol
 ///
-/// Default on deserialization matches the format (if we get bytes, we try to decode)
+/// CIDs are self-describing content addresses used to reference IPLD data.
+/// This type supports both string and parsed IPLD forms, with string caching
+/// for the parsed form to optimize serialization.
+///
+/// Deserialization automatically detects the format (bytes trigger IPLD parsing).
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Cid<'c> {
-    Ipld { cid: IpldCid, s: CowStr<'c> },
+    /// Parsed IPLD CID with cached string representation
+    Ipld {
+        /// Parsed CID structure
+        cid: IpldCid,
+        /// Cached base32 string form
+        s: CowStr<'c>,
+    },
+    /// String-only form (not yet parsed)
     Str(CowStr<'c>),
 }
 
+/// Errors that can occur when working with CIDs
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub enum Error {
+    /// Invalid IPLD CID structure
     #[error("Invalid IPLD CID {:?}", 0)]
     Ipld(#[from] cid::Error),
+    /// Invalid UTF-8 in CID string
     #[error("{:?}", 0)]
     Utf8(#[from] std::str::Utf8Error),
 }
 
 impl<'c> Cid<'c> {
+    /// Parse a CID from bytes (tries IPLD first, falls back to UTF-8 string)
     pub fn new(cid: &'c [u8]) -> Result<Self, Error> {
         if let Ok(cid) = IpldCid::try_from(cid.as_ref()) {
             Ok(Self::ipld(cid))
@@ -41,6 +55,7 @@ impl<'c> Cid<'c> {
         }
     }
 
+    /// Parse a CID from bytes into an owned (static lifetime) value
     pub fn new_owned(cid: &[u8]) -> Result<Cid<'static>, Error> {
         if let Ok(cid) = IpldCid::try_from(cid.as_ref()) {
             Ok(Self::ipld(cid))
@@ -50,6 +65,7 @@ impl<'c> Cid<'c> {
         }
     }
 
+    /// Construct a CID from a parsed IPLD CID
     pub fn ipld(cid: IpldCid) -> Cid<'static> {
         let s = CowStr::Owned(
             cid.to_string_of_base(ATP_CID_BASE)
@@ -59,14 +75,17 @@ impl<'c> Cid<'c> {
         Cid::Ipld { cid, s }
     }
 
+    /// Construct a CID from a string slice (borrows)
     pub fn str(cid: &'c str) -> Self {
         Self::Str(CowStr::Borrowed(cid))
     }
 
+    /// Construct a CID from a CowStr
     pub fn cow_str(cid: CowStr<'c>) -> Self {
         Self::Str(cid)
     }
 
+    /// Convert to a parsed IPLD CID (parses if needed)
     pub fn to_ipld(&self) -> Result<IpldCid, cid::Error> {
         match self {
             Cid::Ipld { cid, s: _ } => Ok(cid.clone()),
@@ -74,6 +93,7 @@ impl<'c> Cid<'c> {
         }
     }
 
+    /// Get the CID as a string slice
     pub fn as_str(&self) -> &str {
         match self {
             Cid::Ipld { cid: _, s } => s.as_ref(),
@@ -218,45 +238,59 @@ impl Deref for Cid<'_> {
     }
 }
 
-/// CID link wrapper that serializes as {"$link": "cid"} in JSON
-/// and as raw CID in CBOR
+/// CID link wrapper for JSON `{"$link": "cid"}` serialization
+///
+/// Wraps a `Cid` and handles format-specific serialization:
+/// - JSON: `{"$link": "cid_string"}`
+/// - CBOR: raw CID bytes
+///
+/// Used in the AT Protocol data model to represent IPLD links in JSON.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[repr(transparent)]
 pub struct CidLink<'c>(pub Cid<'c>);
 
 impl<'c> CidLink<'c> {
+    /// Parse a CID link from bytes
     pub fn new(cid: &'c [u8]) -> Result<Self, Error> {
         Ok(Self(Cid::new(cid)?))
     }
 
+    /// Parse a CID link from bytes into an owned value
     pub fn new_owned(cid: &[u8]) -> Result<CidLink<'static>, Error> {
         Ok(CidLink(Cid::new_owned(cid)?))
     }
 
+    /// Construct a CID link from a static string
     pub fn new_static(cid: &'static str) -> Self {
         Self(Cid::str(cid))
     }
 
+    /// Construct a CID link from a parsed IPLD CID
     pub fn ipld(cid: IpldCid) -> CidLink<'static> {
         CidLink(Cid::ipld(cid))
     }
 
+    /// Construct a CID link from a string slice
     pub fn str(cid: &'c str) -> Self {
         Self(Cid::str(cid))
     }
 
+    /// Construct a CID link from a CowStr
     pub fn cow_str(cid: CowStr<'c>) -> Self {
         Self(Cid::cow_str(cid))
     }
 
+    /// Get the CID as a string slice
     pub fn as_str(&self) -> &str {
         self.0.as_str()
     }
 
+    /// Convert to a parsed IPLD CID
     pub fn to_ipld(&self) -> Result<IpldCid, cid::Error> {
         self.0.to_ipld()
     }
 
+    /// Unwrap into the inner Cid
     pub fn into_inner(self) -> Cid<'c> {
         self.0
     }

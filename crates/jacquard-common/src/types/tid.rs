@@ -28,13 +28,26 @@ fn s32_encode(mut i: u64) -> SmolStr {
     builder.finish()
 }
 
+/// Regex for TID validation per AT Protocol spec
 static TID_REGEX: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^[234567abcdefghij][234567abcdefghijklmnopqrstuvwxyz]{12}$").unwrap()
 });
 
-/// A [Timestamp Identifier].
+/// Timestamp Identifier (TID) for record keys and commit revisions
 ///
-/// [Timestamp Identifier]: https://atproto.com/specs/tid
+/// TIDs are compact, sortable identifiers based on timestamps. They're used as record keys
+/// and repository commit revision numbers in AT Protocol.
+///
+/// Format:
+/// - Always 13 ASCII characters
+/// - Base32-sortable encoding (`234567abcdefghijklmnopqrstuvwxyz`)
+/// - First 53 bits: microseconds since UNIX epoch
+/// - Final 10 bits: random clock identifier for collision resistance
+///
+/// TIDs are sortable by timestamp and suitable for use in URLs. Generate new TIDs with
+/// `Tid::now()` or `Tid::now_with_clock_id()`.
+///
+/// See: <https://atproto.com/specs/tid>
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Hash)]
 #[serde(transparent)]
 #[repr(transparent)]
@@ -105,6 +118,7 @@ impl Tid {
         Self(s32_encode(tid))
     }
 
+    /// Construct a TID from a timestamp (in microseconds) and clock ID
     pub fn from_time(timestamp: usize, clkid: u32) -> Self {
         let str = smol_str::format_smolstr!(
             "{0}{1:2>2}",
@@ -114,11 +128,14 @@ impl Tid {
         Self(str)
     }
 
+    /// Extract the timestamp component (microseconds since UNIX epoch)
     pub fn timestamp(&self) -> usize {
         s32decode(self.0[0..11].to_owned())
     }
 
-    // newer > older
+    /// Compare two TIDs chronologically (newer > older)
+    ///
+    /// Returns 1 if self is newer, -1 if older, 0 if equal
     pub fn compare_to(&self, other: &Tid) -> i8 {
         if self.0 > other.0 {
             return 1;
@@ -129,14 +146,17 @@ impl Tid {
         0
     }
 
+    /// Check if this TID is newer than another
     pub fn newer_than(&self, other: &Tid) -> bool {
         self.compare_to(other) > 0
     }
 
+    /// Check if this TID is older than another
     pub fn older_than(&self, other: &Tid) -> bool {
         self.compare_to(other) < 0
     }
 
+    /// Generate the next TID in sequence after the given TID
     pub fn next_str(prev: Option<Tid>) -> Result<Self, AtStrError> {
         let prev = match prev {
             None => None,
@@ -173,6 +193,7 @@ impl Tid {
     }
 }
 
+/// Decode a base32-sortable string into a usize
 pub fn s32decode(s: String) -> usize {
     let mut i: usize = 0;
     for c in s.chars() {
@@ -273,6 +294,7 @@ pub struct Ticker {
 }
 
 impl Ticker {
+    /// Create a new TID generator with random clock ID
     pub fn new() -> Self {
         let mut ticker = Self {
             last_timestamp: 0,
@@ -284,6 +306,7 @@ impl Ticker {
         ticker
     }
 
+    /// Generate the next TID, optionally ensuring it's after the given TID
     pub fn next(&mut self, prev: Option<Tid>) -> Tid {
         let now = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)

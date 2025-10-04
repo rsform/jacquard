@@ -5,10 +5,15 @@ use std::{ops::Deref, str::FromStr};
 
 use crate::CowStr;
 
-/// An IETF language tag.
+/// IETF BCP 47 language tag for AT Protocol
 ///
-/// Uses langtag crate for validation, but is stored as a SmolStr for size/avoiding allocations
+/// Language tags identify natural languages following the BCP 47 standard. They consist of
+/// a 2-3 character language code (e.g., "en", "ja") with optional regional subtags (e.g., "pt-BR").
 ///
+/// Examples: `"ja"` (Japanese), `"pt-BR"` (Brazilian Portuguese), `"en-US"` (US English)
+///
+/// Language tags require semantic parsing rather than simple string comparison.
+/// Uses the `langtag` crate for validation but stores as `SmolStr` for efficiency.
 /// TODO: Implement langtag-style semantic matching for this type, delegating to langtag
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Hash)]
 #[serde(transparent)]

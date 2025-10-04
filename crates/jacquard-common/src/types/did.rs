@@ -7,6 +7,20 @@ use std::fmt;
 use std::sync::LazyLock;
 use std::{ops::Deref, str::FromStr};
 
+/// Decentralized Identifier (DID) for AT Protocol accounts
+///
+/// DIDs are the persistent, long-term account identifiers in AT Protocol. Unlike handles,
+/// which can change, a DID permanently identifies an account across the network.
+///
+/// Supported DID methods:
+/// - `did:plc` - Bluesky's novel DID method
+/// - `did:web` - Based on HTTPS and DNS
+///
+/// Validation enforces a maximum length of 2048 characters and uses the pattern:
+/// `did:[method]:[method-specific-id]` where the method is lowercase ASCII and the
+/// method-specific-id allows alphanumerics, dots, colons, hyphens, underscores, and percent signs.
+///
+/// See: <https://atproto.com/specs/did>
 #[derive(Clone, PartialEq, Eq, Serialize, Hash)]
 #[serde(transparent)]
 #[repr(transparent)]
@@ -94,6 +108,7 @@ impl<'d> Did<'d> {
         Self(CowStr::Borrowed(did))
     }
 
+    /// Get the DID as a string slice
     pub fn as_str(&self) -> &str {
         {
             let this = &self.0;

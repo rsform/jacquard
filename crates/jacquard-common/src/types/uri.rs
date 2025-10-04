@@ -7,29 +7,44 @@ use crate::{
     types::{aturi::AtUri, cid::Cid, did::Did, string::AtStrError},
 };
 
-/// URI with best-available contextual type
-/// TODO: figure out wtf a DNS uri should look like
+/// Generic URI with type-specific parsing
+///
+/// Automatically detects and parses URIs into the appropriate variant based on
+/// the scheme prefix. Used in lexicon where URIs can be of various types.
+///
+/// Variants are checked by prefix: `did:`, `at://`, `https://`, `wss://`, `ipld://`
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Uri<'u> {
+    /// DID URI (did:)
     Did(Did<'u>),
+    /// AT Protocol URI (at://)
     At(AtUri<'u>),
+    /// HTTPS URL
     Https(Url),
+    /// WebSocket Secure URL
     Wss(Url),
+    /// IPLD CID URI
     Cid(Cid<'u>),
+    /// Unrecognized URI scheme (catch-all)
     Any(CowStr<'u>),
 }
 
+/// Errors that can occur when parsing URIs
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub enum UriParseError {
+    /// AT Protocol string parsing error
     #[error("Invalid atproto string: {0}")]
     At(#[from] AtStrError),
+    /// Generic URL parsing error
     #[error(transparent)]
     Url(#[from] url::ParseError),
+    /// CID parsing error
     #[error(transparent)]
     Cid(#[from] crate::types::cid::Error),
 }
 
 impl<'u> Uri<'u> {
+    /// Parse a URI from a string slice, borrowing
     pub fn new(uri: &'u str) -> Result<Self, UriParseError> {
         if uri.starts_with("did:") {
             Ok(Uri::Did(Did::new(uri)?))
@@ -46,6 +61,7 @@ impl<'u> Uri<'u> {
         }
     }
 
+    /// Parse a URI from a string, taking ownership
     pub fn new_owned(uri: impl AsRef<str>) -> Result<Uri<'static>, UriParseError> {
         let uri = uri.as_ref();
         if uri.starts_with("did:") {
@@ -63,6 +79,7 @@ impl<'u> Uri<'u> {
         }
     }
 
+    /// Get the URI as a string slice
     pub fn as_str(&self) -> &str {
         match self {
             Uri::Did(did) => did.as_str(),

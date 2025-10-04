@@ -8,15 +8,28 @@ use std::fmt;
 use std::sync::LazyLock;
 use std::{ops::Deref, str::FromStr};
 
-/// Namespaced Identifier (NSID)
+/// Namespaced Identifier (NSID) for Lexicon schemas and XRPC endpoints
 ///
-/// Stored as SmolStr to ease lifetime issues and because, despite the fact that NSIDs *can* be 317 characters, most are quite short
-/// TODO: consider if this should go back to CowStr, or be broken up into segments
+/// NSIDs provide globally unique identifiers for Lexicon schemas, record types, and XRPC methods.
+/// They're structured as reversed domain names with a camelCase name segment.
+///
+/// Format: `domain.authority.name` (e.g., `com.example.fooBar`)
+/// - Domain authority: reversed domain name (≤253 chars, lowercase, dots separate segments)
+/// - Name: camelCase identifier (letters and numbers only, cannot start with a digit)
+///
+/// Validation rules:
+/// - Minimum 3 segments
+/// - Maximum 317 characters total
+/// - Each domain segment is 1-63 characters
+/// - Case-sensitive
+///
+/// See: <https://atproto.com/specs/nsid>
 #[derive(Clone, PartialEq, Eq, Serialize, Hash)]
 #[serde(transparent)]
 #[repr(transparent)]
 pub struct Nsid<'n>(CowStr<'n>);
 
+/// Regex for NSID validation per AT Protocol spec
 pub static NSID_REGEX: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\.[a-zA-Z][a-zA-Z0-9]{0,62})$").unwrap()
 });
@@ -100,6 +113,7 @@ impl<'n> Nsid<'n> {
         &self.0[split + 1..]
     }
 
+    /// Get the NSID as a string slice
     pub fn as_str(&self) -> &str {
         {
             let this = &self.0;

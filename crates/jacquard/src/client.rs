@@ -1,3 +1,8 @@
+//! XRPC client implementation for AT Protocol
+//!
+//! This module provides HTTP and XRPC client traits along with an authenticated
+//! client implementation that manages session tokens.
+
 mod error;
 mod response;
 
@@ -56,7 +61,9 @@ impl HttpClient for reqwest::Client {
     }
 }
 
+/// HTTP client trait for sending raw HTTP requests
 pub trait HttpClient {
+    /// Error type returned by the HTTP client
     type Error: std::error::Error + Display + Send + Sync + 'static;
     /// Send an HTTP request and return the response.
     fn send_http(
@@ -64,9 +71,11 @@ pub trait HttpClient {
         request: Request<Vec<u8>>,
     ) -> impl Future<Output = core::result::Result<http::Response<Vec<u8>>, Self::Error>>;
 }
-/// XRPC client trait
+/// XRPC client trait for AT Protocol RPC calls
 pub trait XrpcClient: HttpClient {
+    /// Get the base URI for XRPC requests (e.g., "https://bsky.social")
     fn base_uri(&self) -> CowStr<'_>;
+    /// Get the authorization token for XRPC requests
     #[allow(unused_variables)]
     fn authorization_token(
         &self,
@@ -93,8 +102,11 @@ pub trait XrpcClient: HttpClient {
 
 pub(crate) const NSID_REFRESH_SESSION: &str = "com.atproto.server.refreshSession";
 
+/// Authorization token types for XRPC requests
 pub enum AuthorizationToken<'s> {
+    /// Bearer token (access JWT, refresh JWT to refresh the session)
     Bearer(CowStr<'s>),
+    /// DPoP token (proof-of-possession) for OAuth
     Dpop(CowStr<'s>),
 }
 
@@ -109,11 +121,17 @@ impl TryFrom<AuthorizationToken<'_>> for HeaderValue {
     }
 }
 
-/// HTTP headers which can be used in XPRC requests.
+/// HTTP headers commonly used in XRPC requests
 pub enum Header {
+    /// Content-Type header
     ContentType,
+    /// Authorization header
     Authorization,
+    /// `atproto-proxy` header - specifies which service (app server or other atproto service) the user's PDS should forward requests to as appropriate.
+    ///
+    /// See: <https://atproto.com/specs/xrpc#service-proxying>
     AtprotoProxy,
+    /// `atproto-accept-labelers` header used by clients to request labels from specific labelers to be included and applied in the response. See [label](https://atproto.com/specs/label) specification for details.
     AtprotoAcceptLabelers,
 }
 
@@ -210,12 +228,18 @@ where
     Ok(Response::new(buffer, status))
 }
 
-/// Session information from createSession
+/// Session information from `com.atproto.server.createSession`
+///
+/// Contains the access and refresh tokens along with user identity information.
 #[derive(Debug, Clone)]
 pub struct Session {
+    /// Access token (JWT) used for authenticated requests
     pub access_jwt: CowStr<'static>,
+    /// Refresh token (JWT) used to obtain new access tokens
     pub refresh_jwt: CowStr<'static>,
+    /// User's DID (Decentralized Identifier)
     pub did: Did<'static>,
+    /// User's handle (e.g., "alice.bsky.social")
     pub handle: Handle<'static>,
 }
 
@@ -232,7 +256,10 @@ impl From<jacquard_api::com_atproto::server::create_session::CreateSessionOutput
     }
 }
 
-/// Authenticated XRPC client that includes session tokens
+/// Authenticated XRPC client wrapper that manages session tokens
+///
+/// Wraps an HTTP client and adds automatic Bearer token authentication for XRPC requests.
+/// Handles both access tokens for regular requests and refresh tokens for session refresh.
 pub struct AuthenticatedClient<C> {
     client: C,
     base_uri: CowStr<'static>,
@@ -241,6 +268,14 @@ pub struct AuthenticatedClient<C> {
 
 impl<C> AuthenticatedClient<C> {
     /// Create a new authenticated client with a base URI
+    ///
+    /// # Example
+    /// ```ignore
+    /// let client = AuthenticatedClient::new(
+    ///     reqwest::Client::new(),
+    ///     CowStr::from("https://bsky.social")
+    /// );
+    /// ```
     pub fn new(client: C, base_uri: CowStr<'static>) -> Self {
         Self {
             client,
@@ -249,17 +284,20 @@ impl<C> AuthenticatedClient<C> {
         }
     }
 
-    /// Set the session
+    /// Set the session obtained from `createSession` or `refreshSession`
     pub fn set_session(&mut self, session: Session) {
         self.session = Some(session);
     }
 
-    /// Get the current session
+    /// Get the current session if one exists
     pub fn session(&self) -> Option<&Session> {
         self.session.as_ref()
     }
 
-    /// Clear the session
+    /// Clear the current session locally
+    ///
+    /// Note: This only clears the local session state. To properly revoke the session
+    /// server-side, use `com.atproto.server.deleteSession` before calling this.
     pub fn clear_session(&mut self) {
         self.session = None;
     }
