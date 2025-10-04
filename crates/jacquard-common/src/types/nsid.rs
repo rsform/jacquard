@@ -71,7 +71,7 @@ impl<'n> Nsid<'n> {
     /// Infallible constructor for when you *know* the string is a valid NSID.
     /// Will panic on invalid NSIDs. If you're manually decoding atproto records
     /// or API values you know are valid (rather than using serde), this is the one to use.
-    /// The From<String> and From<CowStr> impls use the same logic.
+    /// The `From<String>` and `From<CowStr>` impls use the same logic.
     pub fn raw(nsid: &'n str) -> Self {
         if nsid.len() > 317 {
             panic!("NSID too long")

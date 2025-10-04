@@ -7,7 +7,7 @@ use std::hash::BuildHasher;
 use std::hash::Hash;
 use std::sync::Arc;
 
-/// Shamelessly copied from https://github.com/bearcove/merde
+/// Shamelessly copied from [](https://github.com/bearcove/merde)
 /// Allow turning a value into an "owned" variant, which can then be
 /// returned, moved, etc.
 ///

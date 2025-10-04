@@ -9,7 +9,7 @@ use std::{
 
 use crate::IntoStatic;
 
-/// Shamelessly copied from https://github.com/bearcove/merde
+/// Shamelessly copied from [](https://github.com/bearcove/merde)
 /// A copy-on-write immutable string type that uses [`SmolStr`] for
 /// the "owned" variant.
 ///

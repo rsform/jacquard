@@ -1089,11 +1089,20 @@ impl<'c> CodeGenerator<'c> {
                 path
             };
 
+            let is_root = dir.components().count() == 0;
             let mods: Vec<_> = module_names
                 .iter()
                 .map(|name| {
                     let ident = syn::Ident::new(name, proc_macro2::Span::call_site());
-                    quote! { pub mod #ident; }
+                    if is_root {
+                        // Top-level modules get feature gates
+                        quote! {
+                            #[cfg(feature = #name)]
+                            pub mod #ident;
+                        }
+                    } else {
+                        quote! { pub mod #ident; }
+                    }
                 })
                 .collect();
 

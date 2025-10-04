@@ -26,7 +26,7 @@ pub trait Collection: fmt::Debug + Serialize {
     ///
     /// Panics if [`Self::NSID`] is not a valid NSID.
     ///
-    /// [`Nsid`]: string::Nsid
+    /// [`Nsid`]: crate::types::string::Nsid
     fn nsid() -> crate::types::nsid::Nsid<'static> {
         Nsid::new_static(Self::NSID).expect("should be valid NSID")
     }
@@ -39,7 +39,7 @@ pub trait Collection: fmt::Debug + Serialize {
     /// > [`RecordKey`].
     ///
     /// [Repo Data Structure v3]: https://atproto.com/specs/repository#repo-data-structure-v3
-    /// [`Nsid`]: string::Nsid
+    /// [`Nsid`]: crate::types::string::Nsid
     fn repo_path<'u, T: RecordKeyType>(
         rkey: &'u crate::types::recordkey::RecordKey<T>,
     ) -> UriPath<'u> {

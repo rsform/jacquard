@@ -34,7 +34,7 @@ impl Language {
     /// Infallible constructor for when you *know* the string is a valid IETF language tag.
     /// Will panic on invalid tag. If you're manually decoding atproto records
     /// or API values you know are valid (rather than using serde), this is the one to use.
-    /// The From<String> and From<CowStr> impls use the same logic.
+    /// The `From<String>` and `From<CowStr>` impls use the same logic.
     pub fn raw(lang: impl AsRef<str>) -> Self {
         let lang = lang.as_ref();
         let tag = langtag::LangTag::new(lang).expect("valid IETF language tag");

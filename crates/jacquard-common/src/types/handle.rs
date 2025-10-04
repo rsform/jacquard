@@ -95,7 +95,7 @@ impl<'h> Handle<'h> {
     /// Infallible constructor for when you *know* the string is a valid handle.
     /// Will panic on invalid handles. If you're manually decoding atproto records
     /// or API values you know are valid (rather than using serde), this is the one to use.
-    /// The From<String> and From<CowStr> impls use the same logic.
+    /// The `From<String>` and `From<CowStr>` impls use the same logic.
     ///
     /// Accepts (and strips) preceding '@' or 'at://' if present
     pub fn raw(handle: &'h str) -> Self {

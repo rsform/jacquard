@@ -76,7 +76,7 @@ impl<'d> Did<'d> {
     /// Infallible constructor for when you *know* the string is a valid DID.
     /// Will panic on invalid DIDs. If you're manually decoding atproto records
     /// or API values you know are valid (rather than using serde), this is the one to use.
-    /// The From<String> and From<CowStr> impls use the same logic.
+    /// The `From<String>` and `From<CowStr>` impls use the same logic.
     pub fn raw(did: &'d str) -> Self {
         let did = did.strip_prefix("at://").unwrap_or(did);
         if did.len() > 2048 {

@@ -14,7 +14,7 @@ use std::{ops::Deref, str::FromStr};
 
 /// at:// URI type
 ///
-/// based on the regex here: https://github.com/bluesky-social/atproto/blob/main/packages/syntax/src/aturi_validation.ts
+/// based on the regex here: [](https://github.com/bluesky-social/atproto/blob/main/packages/syntax/src/aturi_validation.ts)
 ///
 /// Doesn't support the query segment, but then neither does the Typescript SDK.
 #[derive(PartialEq, Eq, Debug)]

@@ -14,7 +14,7 @@ use std::{ops::Deref, str::FromStr};
 /// This is deliberately public (so that consumers can develop specialized record key types),
 /// but is marked as unsafe, because the implementer is expected to uphold the invariants
 /// required by this trait, namely compliance with the [spec](https://atproto.com/specs/record-key)
-/// as described by [`RKEY_REGEX`](RKEY_REGEX).
+/// as described by [`RKEY_REGEX`].
 ///
 /// This crate provides implementations for TID, NSID, literals, and generic strings
 pub unsafe trait RecordKeyType: Clone + Serialize {
@@ -57,7 +57,7 @@ where
 }
 
 /// ATProto Record Key (type `any`)
-/// Catch-all for any string meeting the overall Record Key requirements detailed https://atproto.com/specs/record-key
+/// Catch-all for any string meeting the overall Record Key requirements detailed [](https://atproto.com/specs/record-key)
 #[derive(Clone, PartialEq, Eq, Serialize, Hash)]
 #[serde(transparent)]
 #[repr(transparent)]
@@ -298,7 +298,7 @@ impl<T: Literal> LiteralKey<T> {
     /// Infallible constructor for when you *know* the string is a valid rkey.
     /// Will panic on invalid rkeys. If you're manually decoding atproto records
     /// or API values you know are valid (rather than using serde), this is the one to use.
-    /// The From<String> and From<CowStr> impls use the same logic.
+    /// The `From<String>` and `From<CowStr>` impls use the same logic.
     pub fn raw(rkey: &str) -> Self {
         if !rkey.eq_ignore_ascii_case(T::LITERAL) {
             panic!(

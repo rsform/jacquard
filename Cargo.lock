@@ -1140,6 +1140,7 @@ dependencies = [
  "http",
  "jacquard-api",
  "jacquard-common",
+ "jacquard-derive",
  "miette",
  "reqwest",
  "serde",

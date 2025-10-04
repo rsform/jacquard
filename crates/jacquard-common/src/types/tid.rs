@@ -71,7 +71,7 @@ impl Tid {
     /// Infallible constructor for when you *know* the string is a valid TID.
     /// Will panic on invalid TID. If you're manually decoding atproto records
     /// or API values you know are valid (rather than using serde), this is the one to use.
-    /// The From<String> and From<CowStr> impls use the same logic.
+    /// The `From<String>` and `From<CowStr>` impls use the same logic.
     pub fn raw(tid: impl AsRef<str>) -> Self {
         let tid = tid.as_ref();
         if tid.len() != 13 {
