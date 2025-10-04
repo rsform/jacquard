@@ -5,20 +5,20 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
-pub struct ImportRepo<'a> {}
-impl jacquard_common::IntoStatic for ImportRepo<'_> {
-    type Output = ImportRepo<'static>;
+pub struct ImportRepo {
+    pub body: bytes::Bytes,
+}
+
+impl jacquard_common::IntoStatic for ImportRepo {
+    type Output = ImportRepo;
     fn into_static(self) -> Self::Output {
-        ImportRepo {
-            extra_data: self.extra_data.into_static(),
-        }
+        self
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for ImportRepo<'_> {
+impl jacquard_common::types::xrpc::XrpcRequest for ImportRepo {
     const NSID: &'static str = "com.atproto.repo.importRepo";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/vnd.ipld.car",
@@ -26,4 +26,7 @@ impl jacquard_common::types::xrpc::XrpcRequest for ImportRepo<'_> {
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = ();
     type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::types::xrpc::EncodeError> {
+        Ok(self.body.to_vec())
+    }
 }

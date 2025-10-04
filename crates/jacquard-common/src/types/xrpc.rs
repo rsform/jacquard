@@ -1,10 +1,31 @@
-use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt::{self, Debug};
 
 use crate::IntoStatic;
 use crate::types::value::Data;
+
+/// Error type for encoding XRPC requests
+#[derive(Debug, thiserror::Error, miette::Diagnostic)]
+pub enum EncodeError {
+    /// Failed to serialize query parameters
+    #[error("Failed to serialize query: {0}")]
+    Query(
+        #[from]
+        #[source]
+        serde_html_form::ser::Error,
+    ),
+    /// Failed to serialize JSON body
+    #[error("Failed to serialize JSON: {0}")]
+    Json(
+        #[from]
+        #[source]
+        serde_json::Error,
+    ),
+    /// Other encoding error
+    #[error("Encoding error: {0}")]
+    Other(String),
+}
 
 /// XRPC method type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -53,6 +74,13 @@ pub trait XrpcRequest: Serialize {
 
     /// Error type for this request
     type Err<'de>: Error + Deserialize<'de> + IntoStatic;
+
+    /// Encode the request body for procedures.
+    ///
+    /// Default implementation serializes to JSON. Override for non-JSON encodings.
+    fn encode_body(&self) -> Result<Vec<u8>, EncodeError> {
+        Ok(serde_json::to_vec(self)?)
+    }
 }
 
 /// Error type for XRPC endpoints that don't define any errors

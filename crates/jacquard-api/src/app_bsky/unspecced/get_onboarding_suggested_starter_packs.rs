@@ -40,8 +40,7 @@ impl jacquard_common::IntoStatic for GetOnboardingSuggestedStarterPacksOutput<'_
 
 impl jacquard_common::types::xrpc::XrpcRequest for GetOnboardingSuggestedStarterPacks {
     const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedStarterPacks";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = GetOnboardingSuggestedStarterPacksOutput<'de>;
     type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;

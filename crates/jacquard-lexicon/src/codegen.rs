@@ -662,6 +662,7 @@ impl<'c> CodeGenerator<'c> {
             params_has_lifetime,
             has_output,
             has_errors,
+            false, // queries never have binary inputs
         )?;
         output.push(xrpc_impl);
 
@@ -680,8 +681,16 @@ impl<'c> CodeGenerator<'c> {
         let type_base = self.def_to_type_name(nsid, def_name);
         let mut output = Vec::new();
 
-        // Input bodies always have lifetimes (they get #[lexicon] attribute)
-        let params_has_lifetime = proc.input.is_some();
+        // Check if input is a binary body (no schema)
+        let is_binary_input = proc
+            .input
+            .as_ref()
+            .map(|i| i.schema.is_none())
+            .unwrap_or(false);
+
+        // Input bodies with schemas have lifetimes (they get #[lexicon] attribute)
+        // Binary inputs don't have lifetimes
+        let params_has_lifetime = proc.input.is_some() && !is_binary_input;
         let has_input = proc.input.is_some();
         let has_output = proc.output.is_some();
         let has_errors = proc.errors.is_some();
@@ -726,6 +735,7 @@ impl<'c> CodeGenerator<'c> {
             params_has_lifetime,
             has_output,
             has_errors,
+            is_binary_input,
         )?;
         output.push(xrpc_impl);
 
@@ -1424,23 +1434,41 @@ impl<'c> CodeGenerator<'c> {
     ) -> Result<TokenStream> {
         let ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
 
+        // Check if this is a binary body (no schema, just raw bytes)
+        let is_binary_body = body.schema.is_none();
+
         let fields = if let Some(schema) = &body.schema {
             self.generate_body_fields("", type_base, schema)?
         } else {
-            quote! {}
+            // Binary body: just a bytes field
+            quote! {
+                pub body: bytes::Bytes,
+            }
         };
 
         let doc = self.generate_doc_comment(body.description.as_ref());
 
-        // Input structs always get a lifetime since they have the #[lexicon] attribute
-        // which adds extra_data: BTreeMap<..., Data<'a>>
-        let struct_def = quote! {
-            #doc
-            #[jacquard_derive::lexicon]
-            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
-            #[serde(rename_all = "camelCase")]
-            pub struct #ident<'a> {
-                #fields
+        // Binary bodies don't need #[lexicon] attribute or lifetime
+        let struct_def = if is_binary_body {
+            quote! {
+                #doc
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                #[serde(rename_all = "camelCase")]
+                pub struct #ident {
+                    #fields
+                }
+            }
+        } else {
+            // Input structs with schemas get a lifetime since they have the #[lexicon] attribute
+            // which adds extra_data: BTreeMap<..., Data<'a>>
+            quote! {
+                #doc
+                #[jacquard_derive::lexicon]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                #[serde(rename_all = "camelCase")]
+                pub struct #ident<'a> {
+                    #fields
+                }
             }
         };
 
@@ -1458,21 +1486,32 @@ impl<'c> CodeGenerator<'c> {
         }
 
         // Generate IntoStatic impl
-        let field_names: Vec<&str> = match &body.schema {
-            Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) => {
-                obj.properties.keys().map(|k| k.as_str()).collect()
+        let into_static_impl = if is_binary_body {
+            // Binary bodies: simple clone of the Bytes field
+            quote! {
+                impl jacquard_common::IntoStatic for #ident {
+                    type Output = #ident;
+                    fn into_static(self) -> Self::Output {
+                        self
+                    }
+                }
             }
-            Some(_) => {
-                // For Ref or Union schemas, there's just a single flattened field
-                vec!["value"]
-            }
-            None => {
-                // No schema means no fields, just extra_data
-                vec![]
-            }
+        } else {
+            let field_names: Vec<&str> = match &body.schema {
+                Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) => {
+                    obj.properties.keys().map(|k| k.as_str()).collect()
+                }
+                Some(_) => {
+                    // For Ref or Union schemas, there's just a single flattened field
+                    vec!["value"]
+                }
+                None => {
+                    // No schema means no fields, just extra_data
+                    vec![]
+                }
+            };
+            self.generate_into_static_for_struct(type_base, &field_names, true, true)
         };
-        let into_static_impl =
-            self.generate_into_static_for_struct(type_base, &field_names, true, true);
 
         Ok(quote! {
             #struct_def
@@ -1923,6 +1962,7 @@ impl<'c> CodeGenerator<'c> {
         params_has_lifetime: bool,
         has_output: bool,
         has_errors: bool,
+        is_binary_input: bool,
     ) -> Result<TokenStream> {
         let output_type = if has_output {
             let output_ident = syn::Ident::new(
@@ -1944,6 +1984,17 @@ impl<'c> CodeGenerator<'c> {
             quote! { jacquard_common::types::xrpc::GenericError<'de> }
         };
 
+        // Generate encode_body() method for binary inputs
+        let encode_body_method = if is_binary_input {
+            quote! {
+                fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::types::xrpc::EncodeError> {
+                    Ok(self.body.to_vec())
+                }
+            }
+        } else {
+            quote! {}
+        };
+
         if has_params {
             // Implement on the params/input struct itself
             let request_ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
@@ -1961,6 +2012,8 @@ impl<'c> CodeGenerator<'c> {
 
                     type Output<'de> = #output_type;
                     type Err<'de> = #error_type;
+
+                    #encode_body_method
                 }
             })
         } else {
@@ -2311,7 +2364,7 @@ mod tests {
         println!("\n{}\n", formatted);
 
         // Check structure
-        assert!(formatted.contains("struct GetAuthorFeedParams"));
+        assert!(formatted.contains("struct GetAuthorFeed"));
         assert!(formatted.contains("struct GetAuthorFeedOutput"));
         assert!(formatted.contains("enum GetAuthorFeedError"));
         assert!(formatted.contains("pub actor"));

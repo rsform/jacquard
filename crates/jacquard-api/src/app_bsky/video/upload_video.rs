@@ -5,16 +5,16 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
-pub struct UploadVideo<'a> {}
-impl jacquard_common::IntoStatic for UploadVideo<'_> {
-    type Output = UploadVideo<'static>;
+pub struct UploadVideo {
+    pub body: bytes::Bytes,
+}
+
+impl jacquard_common::IntoStatic for UploadVideo {
+    type Output = UploadVideo;
     fn into_static(self) -> Self::Output {
-        UploadVideo {
-            extra_data: self.extra_data.into_static(),
-        }
+        self
     }
 }
 
@@ -36,7 +36,7 @@ impl jacquard_common::IntoStatic for UploadVideoOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for UploadVideo<'_> {
+impl jacquard_common::types::xrpc::XrpcRequest for UploadVideo {
     const NSID: &'static str = "app.bsky.video.uploadVideo";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "video/mp4",
@@ -44,4 +44,7 @@ impl jacquard_common::types::xrpc::XrpcRequest for UploadVideo<'_> {
     const OUTPUT_ENCODING: &'static str = "application/json";
     type Output<'de> = UploadVideoOutput<'de>;
     type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::types::xrpc::EncodeError> {
+        Ok(self.body.to_vec())
+    }
 }

@@ -59,21 +59,8 @@ pub enum TransportError {
     Other(Box<dyn std::error::Error + Send + Sync>),
 }
 
-#[derive(Debug, thiserror::Error, miette::Diagnostic)]
-pub enum EncodeError {
-    #[error("Failed to serialize query: {0}")]
-    Query(
-        #[from]
-        #[source]
-        serde_html_form::ser::Error,
-    ),
-    #[error("Failed to serialize JSON: {0}")]
-    Json(
-        #[from]
-        #[source]
-        serde_json::Error,
-    ),
-}
+// Re-export EncodeError from common
+pub use jacquard_common::types::xrpc::EncodeError;
 
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub enum DecodeError {
