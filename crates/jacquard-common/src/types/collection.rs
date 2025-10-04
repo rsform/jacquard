@@ -3,7 +3,7 @@ use core::fmt;
 use serde::Serialize;
 
 use crate::types::{
-    aturi::UriPath,
+    aturi::RepoPath,
     nsid::Nsid,
     recordkey::{RecordKey, RecordKeyType, Rkey},
 };
@@ -42,8 +42,8 @@ pub trait Collection: fmt::Debug + Serialize {
     /// [`Nsid`]: crate::types::string::Nsid
     fn repo_path<'u, T: RecordKeyType>(
         rkey: &'u crate::types::recordkey::RecordKey<T>,
-    ) -> UriPath<'u> {
-        UriPath {
+    ) -> RepoPath<'u> {
+        RepoPath {
             collection: Self::nsid(),
             rkey: Some(RecordKey::from(Rkey::raw(rkey.as_ref()))),
         }

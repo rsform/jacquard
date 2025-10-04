@@ -31,7 +31,7 @@ struct Inner<'u> {
     pub authority: AtIdentifier<'this>,
     #[borrows(uri)]
     #[covariant]
-    pub path: Option<UriPath<'this>>,
+    pub path: Option<RepoPath<'this>>,
     #[borrows(uri)]
     #[covariant]
     pub fragment: Option<CowStr<'this>>,
@@ -58,7 +58,7 @@ impl Clone for AtUri<'_> {
                         } else {
                             None
                         };
-                        Some(UriPath { collection, rkey })
+                        Some(RepoPath { collection, rkey })
                     } else {
                         None
                     }
@@ -83,23 +83,23 @@ impl Hash for AtUri<'_> {
 
 /// at:// URI path component (current subset)
 #[derive(Clone, PartialEq, Eq, Hash, Debug)]
-pub struct UriPath<'u> {
+pub struct RepoPath<'u> {
     pub collection: Nsid<'u>,
     pub rkey: Option<RecordKey<Rkey<'u>>>,
 }
 
-impl IntoStatic for UriPath<'_> {
-    type Output = UriPath<'static>;
+impl IntoStatic for RepoPath<'_> {
+    type Output = RepoPath<'static>;
 
     fn into_static(self) -> Self::Output {
-        UriPath {
+        RepoPath {
             collection: self.collection.into_static(),
             rkey: self.rkey.map(|rkey| rkey.into_static()),
         }
     }
 }
 
-pub type UriPathBuf = UriPath<'static>;
+pub type UriPathBuf = RepoPath<'static>;
 
 pub static ATURI_REGEX: LazyLock<Regex> = LazyLock::new(|| {
     // Fragment allows: / and \ and other special chars. In raw string, backslashes are literal.
@@ -125,7 +125,7 @@ impl<'u> AtUri<'u> {
                     } else {
                         None
                     };
-                    Some(UriPath { collection, rkey })
+                    Some(RepoPath { collection, rkey })
                 } else {
                     None
                 };
@@ -166,7 +166,7 @@ impl<'u> AtUri<'u> {
                     } else {
                         None
                     };
-                    Some(UriPath { collection, rkey })
+                    Some(RepoPath { collection, rkey })
                 } else {
                     None
                 };
@@ -207,7 +207,7 @@ impl<'u> AtUri<'u> {
                     } else {
                         None
                     };
-                    Some(UriPath { collection, rkey })
+                    Some(RepoPath { collection, rkey })
                 } else {
                     None
                 };
@@ -286,7 +286,7 @@ impl<'u> AtUri<'u> {
         self.inner.borrow_authority()
     }
 
-    pub fn path(&self) -> &Option<UriPath<'_>> {
+    pub fn path(&self) -> &Option<RepoPath<'_>> {
         self.inner.borrow_path()
     }
 
@@ -339,7 +339,7 @@ impl AtUri<'static> {
                     } else {
                         None
                     };
-                    Some(UriPath { collection, rkey })
+                    Some(RepoPath { collection, rkey })
                 } else {
                     None
                 };
@@ -367,7 +367,7 @@ impl AtUri<'static> {
                                     } else {
                                         None
                                     };
-                                    Some(UriPath { collection, rkey })
+                                    Some(RepoPath { collection, rkey })
                                 } else {
                                     None
                                 }
@@ -418,7 +418,7 @@ impl AtUri<'static> {
                     } else {
                         None
                     };
-                    Some(UriPath { collection, rkey })
+                    Some(RepoPath { collection, rkey })
                 } else {
                     None
                 };
@@ -470,7 +470,7 @@ impl FromStr for AtUri<'_> {
                     } else {
                         None
                     };
-                    Some(UriPath { collection, rkey })
+                    Some(RepoPath { collection, rkey })
                 } else {
                     None
                 };
@@ -498,7 +498,7 @@ impl FromStr for AtUri<'_> {
                                     } else {
                                         None
                                     };
-                                    Some(UriPath { collection, rkey })
+                                    Some(RepoPath { collection, rkey })
                                 } else {
                                     None
                                 }
@@ -555,7 +555,7 @@ impl IntoStatic for AtUri<'_> {
                             } else {
                                 None
                             };
-                            Some(UriPath { collection, rkey })
+                            Some(RepoPath { collection, rkey })
                         } else {
                             None
                         }
@@ -646,7 +646,7 @@ impl<'d> TryFrom<CowStr<'d>> for AtUri<'d> {
                     } else {
                         None
                     };
-                    Some(UriPath { collection, rkey })
+                    Some(RepoPath { collection, rkey })
                 } else {
                     None
                 };
@@ -672,7 +672,7 @@ impl<'d> TryFrom<CowStr<'d>> for AtUri<'d> {
                                 } else {
                                     None
                                 };
-                                Some(UriPath { collection, rkey })
+                                Some(RepoPath { collection, rkey })
                             } else {
                                 None
                             }
