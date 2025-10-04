@@ -2,6 +2,7 @@
 
 A suite of Rust crates for the AT Protocol.
 
+[![Crates.io](https://img.shields.io/crates/v/jacquard.svg)](https://crates.io/crates/jacquard) [![Documentation](https://docs.rs/jacquard/badge.svg)](https://docs.rs/jacquard) [![License](https://img.shields.io/crates/l/jacquard.svg)](./LICENSE)
 
 ## Goals
 
