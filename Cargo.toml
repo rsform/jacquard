@@ -11,9 +11,9 @@ repository = "https://tangled.org/@nonbinary.computer/jacquard"
 keywords = ["atproto", "at protocol", "bluesky", "api", "client"]
 categories = ["api-bindings", "web-programming::http-client"]
 readme = "README.md"
-documentation = "https://docs.rs/jacquard"
 exclude = [".direnv"]
-
+homepage = "https://tangled.org/@nonbinary.computer/jacquard"
+license-file = "LICENSE"
 
 description = "Simple and powerful AT Protocol client library for Rust"
 

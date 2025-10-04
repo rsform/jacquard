@@ -8,8 +8,8 @@ repository.workspace = true
 keywords.workspace = true
 categories.workspace = true
 readme.workspace = true
-documentation.workspace = true
 exclude.workspace = true
+license-file.workspace = true
 
 [features]
 default = ["api_all"]
@@ -29,9 +29,9 @@ path = "src/main.rs"
 bytes.workspace = true
 clap.workspace = true
 http.workspace = true
-jacquard-api = { path = "../jacquard-api" }
-jacquard-common = { path = "../jacquard-common" }
-jacquard-derive = { path = "../jacquard-derive", optional = true }
+jacquard-api = { version = "0.1.0", path = "../jacquard-api" }
+jacquard-common = { version = "0.1.0", path = "../jacquard-common" }
+jacquard-derive = { version = "0.1.0", path = "../jacquard-derive", optional = true }
 miette.workspace = true
 reqwest = { workspace = true, features = ["charset", "http2", "json", "system-proxy", "gzip", "rustls-tls"] }
 serde.workspace = true

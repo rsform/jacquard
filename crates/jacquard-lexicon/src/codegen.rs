@@ -264,8 +264,14 @@ impl<'c> CodeGenerator<'c> {
         let mut fields = Vec::new();
         for (field_name, field_type) in &obj.properties {
             let is_required = required.contains(field_name);
-            let field_tokens =
-                self.generate_field(nsid, parent_type_name, field_name, field_type, is_required, is_builder)?;
+            let field_tokens = self.generate_field(
+                nsid,
+                parent_type_name,
+                field_name,
+                field_type,
+                is_required,
+                is_builder,
+            )?;
             fields.push(field_tokens);
         }
 
@@ -1667,11 +1673,17 @@ impl<'c> CodeGenerator<'c> {
             LexXrpcParametersProperty::Integer(_) => (quote! { i64 }, false, false),
             LexXrpcParametersProperty::String(s) => {
                 let is_cowstr = s.format.is_none(); // CowStr for plain strings
-                (self.string_to_rust_type(s), self.string_needs_lifetime(s), is_cowstr)
+                (
+                    self.string_to_rust_type(s),
+                    self.string_needs_lifetime(s),
+                    is_cowstr,
+                )
             }
-            LexXrpcParametersProperty::Unknown(_) => {
-                (quote! { jacquard_common::types::value::Data<'a> }, true, false)
-            }
+            LexXrpcParametersProperty::Unknown(_) => (
+                quote! { jacquard_common::types::value::Data<'a> },
+                true,
+                false,
+            ),
             LexXrpcParametersProperty::Array(arr) => {
                 let needs_lifetime = match &arr.items {
                     crate::lexicon::LexPrimitiveArrayItem::Boolean(_)
@@ -2472,7 +2484,9 @@ mod tests {
             LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
         let codegen = CodeGenerator::new(&corpus, "test_generated");
 
-        let output_dir = std::path::PathBuf::from("target/test_codegen_output");
+        let tmp_dir =
+            tempfile::tempdir().expect("should be able to create temp directory for output");
+        let output_dir = std::path::PathBuf::from(tmp_dir.path());
 
         // Clean up any previous test output
         let _ = std::fs::remove_dir_all(&output_dir);
@@ -2494,33 +2508,5 @@ mod tests {
             .expect("read post.rs");
         assert!(post_content.contains("pub struct Post"));
         assert!(post_content.contains("jacquard_common"));
-    }
-
-    #[test]
-    #[ignore] // run manually: cargo test test_generate_full_atproto -- --ignored
-    fn test_generate_full_atproto() {
-        let corpus = LexiconCorpus::load_from_dir("tests/fixtures/lexicons/atproto/lexicons")
-            .expect("load atproto corpus");
-        let codegen = CodeGenerator::new(&corpus, "crate");
-
-        let output_dir = std::path::PathBuf::from("../jacquard-api/src");
-
-        // Clean up existing generated code
-        if output_dir.exists() {
-            for entry in std::fs::read_dir(&output_dir).expect("read output dir") {
-                let entry = entry.expect("dir entry");
-                let path = entry.path();
-                if path.is_dir() {
-                    std::fs::remove_dir_all(&path).ok();
-                } else if path.extension().map_or(false, |e| e == "rs") {
-                    std::fs::remove_file(&path).ok();
-                }
-            }
-        }
-
-        // Generate and write
-        codegen.write_to_disk(&output_dir).expect("write to disk");
-
-        println!("\n✨ Generated full atproto API to {:?}", output_dir);
     }
 }

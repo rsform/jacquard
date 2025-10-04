@@ -17,6 +17,7 @@
         nixd # Nix language server
         bacon
         rust-analyzer
+        cargo-release
       ];
     };
   };

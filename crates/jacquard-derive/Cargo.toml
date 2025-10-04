@@ -8,8 +8,8 @@ repository.workspace = true
 keywords.workspace = true
 categories.workspace = true
 readme.workspace = true
-documentation = "https://docs.rs/jacquard-derive"
 exclude.workspace = true
+license-file.workspace = true
 
 [lib]
 proc-macro = true
@@ -28,4 +28,4 @@ syn.workspace = true
 
 
 [dev-dependencies]
-jacquard-common = { path = "../jacquard-common" }
+jacquard-common = { version = "0.1.0", path = "../jacquard-common" }

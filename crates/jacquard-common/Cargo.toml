@@ -8,9 +8,8 @@ repository.workspace = true
 keywords.workspace = true
 categories.workspace = true
 readme.workspace = true
-documentation = "https://docs.rs/jacquard-common"
 exclude.workspace = true
-
+license-file.workspace = true
 
 
 [dependencies]

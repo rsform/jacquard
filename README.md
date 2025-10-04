@@ -2,6 +2,19 @@
 
 A suite of Rust crates for the AT Protocol.
 
+
+## Goals
+
+- Validated, spec-compliant, easy to work with, and performant baseline types (including typed at:// uris)
+- Batteries-included, but easily replaceable batteries.
+  - Easy to extend with custom lexicons
+- lexicon Value type for working with unknown atproto data (dag-cbor or json)
+- order of magnitude less boilerplate than some existing crates
+  - either the codegen produces code that's easy to work with, or there are good handwritten wrappers
+- didDoc type with helper methods for getting handles, multikey, and PDS endpoint
+- use as much or as little from the crates as you need
+
+
 ## Example
 
 Dead simple api client. Logs in, prints the latest 5 posts from your timeline.
@@ -72,17 +85,6 @@ async fn main() -> miette::Result<()> {
     Ok(())
 }
 ```
-
-## Goals
-
-- Validated, spec-compliant, easy to work with, and performant baseline types (including typed at:// uris)
-- Batteries-included, but easily replaceable batteries.
-  - Easy to extend with custom lexicons
-- lexicon Value type for working with unknown atproto data (dag-cbor or json)
-- order of magnitude less boilerplate than some existing crates
-  - either the codegen produces code that's easy to work with, or there are good handwritten wrappers
-- didDoc type with helper methods for getting handles, multikey, and PDS endpoint
-- use as much or as little from the crates as you need
 
 ## Development
 

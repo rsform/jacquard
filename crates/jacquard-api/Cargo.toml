@@ -8,8 +8,8 @@ repository.workspace = true
 keywords.workspace = true
 categories.workspace = true
 readme.workspace = true
-documentation = "https://docs.rs/jacquard-api"
 exclude.workspace = true
+license-file.workspace = true
 
 [features]
 default = [ "com_atproto"]
@@ -21,8 +21,8 @@ tools_ozone = []
 [dependencies]
 bon = "3"
 bytes = { workspace = true, features = ["serde"] }
-jacquard-common = { path = "../jacquard-common" }
-jacquard-derive = { path = "../jacquard-derive" }
+jacquard-common = { version = "0.1.0", path = "../jacquard-common" }
+jacquard-derive = { version = "0.1.0", path = "../jacquard-derive" }
 miette.workspace = true
 serde.workspace = true
 thiserror.workspace = true

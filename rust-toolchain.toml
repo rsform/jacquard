@@ -1,3 +1,3 @@
 [toolchain]
 channel = "stable"
-profile = "complete"
+profile = "default"
