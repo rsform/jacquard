@@ -46,11 +46,9 @@
 //! #[tokio::main]
 //! async fn main() -> miette::Result<()> {
 //!     let args = Args::parse();
-//!
 //!     // Create HTTP client
 //!     let url = url::Url::parse(&args.pds).unwrap();
 //!     let client = BasicClient::new(url);
-//!
 //!     // Create session
 //!     let session = Session::from(
 //!         client
@@ -63,17 +61,13 @@
 //!             .await?
 //!             .into_output()?,
 //!     );
-//!
-//!     println!("logged in as {} ({})", session.handle, session.did);
 //!     client.set_session(session).await.unwrap();
-//!
 //!     // Fetch timeline
 //!     println!("\nfetching timeline...");
 //!     let timeline = client
 //!         .send(GetTimeline::new().limit(5).build())
 //!         .await?
 //!         .into_output()?;
-//!
 //!     println!("\ntimeline ({} posts):", timeline.feed.len());
 //!     for (i, post) in timeline.feed.iter().enumerate() {
 //!         println!("\n{}. by {}", i + 1, post.post.author.handle);
@@ -82,23 +76,21 @@
 //!             serde_json::to_string_pretty(&post.post.record).into_diagnostic()?
 //!        );
 //!     }
-//!
 //!     Ok(())
 //! }
 //! ```
 //!
-//! ## Clients
+//! ## Client options:
 //!
 //! - Stateless XRPC: any `HttpClient` (e.g., `reqwest::Client`) implements `XrpcExt`,
 //!   which provides `xrpc(base: Url) -> XrpcCall` for per-request calls with
 //!   optional `CallOptions` (auth, proxy, labelers, headers). Useful when you
 //!   want to pass auth on each call or build advanced flows.
-//!   Example
-//!   ```ignore
-//!   use jacquard::client::XrpcExt;
-//!   use jacquard::api::app_bsky::feed::get_author_feed::GetAuthorFeed;
-//!   use jacquard::types::ident::AtIdentifier;
-//!
+//!  ```no_run
+//!   #  use jacquard::client::XrpcExt;
+//!   #  use jacquard::api::app_bsky::feed::get_author_feed::GetAuthorFeed;
+//!   #  use jacquard::types::ident::AtIdentifier;
+//!   #
 //!   #[tokio::main]
 //!   async fn main() -> anyhow::Result<()> {
 //!       let http = reqwest::Client::new();
@@ -124,13 +116,13 @@
 //!   `AtClient<reqwest::Client, MemoryTokenStore>` with a `new(Url)` constructor.
 //!
 //! Per-request overrides (stateless)
-//! ```ignore
-//! use jacquard::client::{XrpcExt, AuthorizationToken};
-//! use jacquard::api::app_bsky::feed::get_author_feed::GetAuthorFeed;
-//! use jacquard::types::ident::AtIdentifier;
-//! use jacquard::CowStr;
-//! use miette::IntoDiagnostic;
-//!
+//! ```no_run
+//! # use jacquard::client::{XrpcExt, AuthorizationToken};
+//! # use jacquard::api::app_bsky::feed::get_author_feed::GetAuthorFeed;
+//! # use jacquard::types::ident::AtIdentifier;
+//! # use jacquard::CowStr;
+//! # use miette::IntoDiagnostic;
+//! #
 //! #[tokio::main]
 //! async fn main() -> miette::Result<()> {
 //!     let http = reqwest::Client::new();
@@ -157,8 +149,7 @@
 //! - Use `MemoryTokenStore` for ephemeral sessions, tests, and CLIs.
 //! - For persistence, `FileTokenStore` stores session tokens as JSON on disk.
 //!   See `client::token::FileTokenStore` docs for details.
-//!   Example
-//!   ```ignore
+//!   ```no_run
 //!   use jacquard::client::{AtClient, FileTokenStore};
 //!   let base = url::Url::parse("https://bsky.social").unwrap();
 //!   let store = FileTokenStore::new("/tmp/jacquard-session.json");

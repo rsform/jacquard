@@ -161,9 +161,9 @@ impl DidDocResponse {
 /// Handle → DID fallback step.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HandleStep {
-    /// DNS TXT _atproto.<handle>
+    /// DNS TXT _atproto.\<handle\>
     DnsTxt,
-    /// HTTPS GET https://<handle>/.well-known/atproto-did
+    /// HTTPS GET https://\<handle\>/.well-known/atproto-did
     HttpsWellKnown,
     /// XRPC com.atproto.identity.resolveHandle against a provided PDS base
     PdsResolveHandle,

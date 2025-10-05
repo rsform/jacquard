@@ -35,7 +35,7 @@ pub struct DidDocument<'a> {
     #[serde(borrow)]
     pub id: Did<'a>,
 
-    /// Alternate identifiers for the subject, such as at://<handle>
+    /// Alternate identifiers for the subject, such as at://\<handle\>
     #[serde(borrow)]
     pub also_known_as: Option<Vec<CowStr<'a>>>,
 
@@ -66,7 +66,7 @@ impl crate::IntoStatic for DidDocument<'_> {
 }
 
 impl<'a> DidDocument<'a> {
-    /// Extract validated handles from `alsoKnownAs` entries like `at://<handle>`.
+    /// Extract validated handles from `alsoKnownAs` entries like `at://\<handle\>`.
     pub fn handles(&self) -> Vec<Handle<'static>> {
         self.also_known_as
             .as_ref()

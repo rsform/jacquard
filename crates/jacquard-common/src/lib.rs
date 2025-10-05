@@ -6,7 +6,7 @@ pub use into_static::IntoStatic;
 pub use smol_str;
 pub use url;
 
-/// A copy-on-write immutable string type that uses [`SmolStr`] for
+/// A copy-on-write immutable string type that uses [`smol_str::SmolStr`] for
 /// the "owned" variant.
 #[macro_use]
 pub mod cowstr;

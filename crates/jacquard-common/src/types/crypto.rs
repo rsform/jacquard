@@ -22,8 +22,6 @@ use std::borrow::Cow;
 
 /// Known multicodec key codecs for Multikey public keys
 ///
-
-/// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KeyCodec {
     /// Ed25519
