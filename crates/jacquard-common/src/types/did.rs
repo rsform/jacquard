@@ -21,7 +21,7 @@ use std::{ops::Deref, str::FromStr};
 /// method-specific-id allows alphanumerics, dots, colons, hyphens, underscores, and percent signs.
 ///
 /// See: <https://atproto.com/specs/did>
-#[derive(Clone, PartialEq, Eq, Serialize, Hash)]
+#[derive(Clone, PartialEq, Eq, Serialize, Hash, PartialOrd, Ord)]
 #[serde(transparent)]
 #[repr(transparent)]
 pub struct Did<'d>(CowStr<'d>);

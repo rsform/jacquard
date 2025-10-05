@@ -1,3 +1,5 @@
+//! Identity resolution utilities: DID and handle resolution, DID document fetch,
+//! and helpers for PDS endpoint discovery. See `identity::resolver` for details.
 //! Identity resolution: handle → DID and DID → document, with smart fallbacks.
 //!
 //! Fallback order (default):
@@ -9,323 +11,28 @@
 //! Parsing returns a `DidDocResponse` so callers can borrow from the response buffer
 //! and optionally validate the document `id` against the requested DID.
 
-use std::collections::BTreeMap;
-use std::str::FromStr;
-
 // use crate::CowStr; // not currently needed directly here
-use crate::client::XrpcExt;
-use bon::Builder;
+
 use bytes::Bytes;
-use jacquard_common::types::did_doc::Service;
-use jacquard_common::types::string::AtprotoStr;
-use jacquard_common::types::uri::Uri;
-use jacquard_common::types::value::Data;
-use jacquard_common::{CowStr, IntoStatic};
-use miette::Diagnostic;
+use jacquard_common::IntoStatic;
+use jacquard_common::error::TransportError;
+use jacquard_common::http_client::HttpClient;
+use jacquard_common::ident_resolver::{
+    DidDocResponse, DidStep, HandleStep, IdentityError, IdentityResolver, MiniDoc, PlcSource,
+    ResolverOptions,
+};
+use jacquard_common::types::xrpc::XrpcExt;
 use percent_encoding::percent_decode_str;
 use reqwest::StatusCode;
-use thiserror::Error;
 use url::{ParseError, Url};
 
 use crate::api::com_atproto::identity::{resolve_did, resolve_handle::ResolveHandle};
 use crate::types::did_doc::DidDocument;
 use crate::types::ident::AtIdentifier;
 use crate::types::string::{Did, Handle};
-use crate::types::value::AtDataError;
 
 #[cfg(feature = "dns")]
 use hickory_resolver::{TokioAsyncResolver, config::ResolverConfig};
-
-/// Errors that can occur during identity resolution.
-///
-/// Note: when validating a fetched DID document against a requested DID, a
-/// `DocIdMismatch` error is returned that includes the owned document so callers
-/// can inspect it and decide how to proceed.
-#[derive(Debug, Error, Diagnostic)]
-#[allow(missing_docs)]
-pub enum IdentityError {
-    #[error("unsupported DID method: {0}")]
-    UnsupportedDidMethod(String),
-    #[error("invalid well-known atproto-did content")]
-    InvalidWellKnown,
-    #[error("missing PDS endpoint in DID document")]
-    MissingPdsEndpoint,
-    #[error("HTTP error: {0}")]
-    Http(#[from] reqwest::Error),
-    #[error("HTTP status {0}")]
-    HttpStatus(StatusCode),
-    #[error("XRPC error: {0}")]
-    Xrpc(String),
-    #[error("URL parse error: {0}")]
-    Url(#[from] url::ParseError),
-    #[error("DNS error: {0}")]
-    #[cfg(feature = "dns")]
-    Dns(#[from] hickory_resolver::error::ResolveError),
-    #[error("serialize/deserialize error: {0}")]
-    Serde(#[from] serde_json::Error),
-    #[error("invalid DID document: {0}")]
-    InvalidDoc(String),
-    #[error(transparent)]
-    Data(#[from] AtDataError),
-    /// DID document id did not match requested DID; includes the fetched document
-    #[error("DID doc id mismatch")]
-    DocIdMismatch {
-        expected: Did<'static>,
-        doc: DidDocument<'static>,
-    },
-}
-
-/// Source to fetch PLC (did:plc) documents from.
-///
-/// - `PlcDirectory`: uses the public PLC directory (default `https://plc.directory/`).
-/// - `Slingshot`: uses Slingshot which also exposes convenience endpoints such as
-///   `com.atproto.identity.resolveHandle` and a "mini-doc"
-///   endpoint (`com.bad-example.identity.resolveMiniDoc`).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PlcSource {
-    /// Use the public PLC directory
-    PlcDirectory {
-        /// Base URL for the PLC directory
-        base: Url,
-    },
-    /// Use the slingshot mini-docs service
-    Slingshot {
-        /// Base URL for the Slingshot service
-        base: Url,
-    },
-}
-
-impl Default for PlcSource {
-    fn default() -> Self {
-        Self::PlcDirectory {
-            base: Url::parse("https://plc.directory/").expect("valid url"),
-        }
-    }
-}
-
-impl PlcSource {
-    /// Default Slingshot source (`https://slingshot.microcosm.blue`)
-    pub fn slingshot_default() -> Self {
-        PlcSource::Slingshot {
-            base: Url::parse("https://slingshot.microcosm.blue").expect("valid url"),
-        }
-    }
-}
-
-/// DID Document fetch response for borrowed/owned parsing.
-///
-/// Carries the raw response bytes and the HTTP status, plus the requested DID
-/// (if supplied) to enable validation. Use `parse()` to borrow from the buffer
-/// or `parse_validated()` to also enforce that the doc `id` matches the
-/// requested DID (returns a `DocIdMismatch` containing the fetched doc on
-/// mismatch). Use `into_owned()` to parse into an owned document.
-#[derive(Clone)]
-pub struct DidDocResponse {
-    buffer: Bytes,
-    status: StatusCode,
-    /// Optional DID we intended to resolve; used for validation helpers
-    requested: Option<Did<'static>>,
-}
-
-impl DidDocResponse {
-    /// Parse as borrowed DidDocument<'_>
-    pub fn parse<'b>(&'b self) -> Result<DidDocument<'b>, IdentityError> {
-        if self.status.is_success() {
-            if let Ok(doc) = serde_json::from_slice::<DidDocument<'b>>(&self.buffer) {
-                Ok(doc)
-            } else if let Ok(mini_doc) = serde_json::from_slice::<MiniDoc<'b>>(&self.buffer) {
-                Ok(DidDocument {
-                    id: mini_doc.did,
-                    also_known_as: Some(vec![CowStr::from(mini_doc.handle)]),
-                    verification_method: None,
-                    service: Some(vec![Service {
-                        id: CowStr::new_static("#atproto_pds"),
-                        r#type: CowStr::new_static("AtprotoPersonalDataServer"),
-                        service_endpoint: Some(Data::String(AtprotoStr::Uri(Uri::Https(
-                            Url::from_str(&mini_doc.pds).unwrap(),
-                        )))),
-                        extra_data: BTreeMap::new(),
-                    }]),
-                    extra_data: BTreeMap::new(),
-                })
-            } else {
-                Err(IdentityError::MissingPdsEndpoint)
-            }
-        } else {
-            Err(IdentityError::HttpStatus(self.status))
-        }
-    }
-
-    /// Parse and validate that the DID in the document matches the requested DID if present.
-    ///
-    /// On mismatch, returns an error that contains the owned document for inspection.
-    pub fn parse_validated<'b>(&'b self) -> Result<DidDocument<'b>, IdentityError> {
-        let doc = self.parse()?;
-        if let Some(expected) = &self.requested {
-            if doc.id.as_str() != expected.as_str() {
-                return Err(IdentityError::DocIdMismatch {
-                    expected: expected.clone(),
-                    doc: doc.clone().into_static(),
-                });
-            }
-        }
-        Ok(doc)
-    }
-
-    /// Parse as owned DidDocument<'static>
-    pub fn into_owned(self) -> Result<DidDocument<'static>, IdentityError> {
-        if self.status.is_success() {
-            if let Ok(doc) = serde_json::from_slice::<DidDocument<'_>>(&self.buffer) {
-                Ok(doc.into_static())
-            } else if let Ok(mini_doc) = serde_json::from_slice::<MiniDoc<'_>>(&self.buffer) {
-                Ok(DidDocument {
-                    id: mini_doc.did,
-                    also_known_as: Some(vec![CowStr::from(mini_doc.handle)]),
-                    verification_method: None,
-                    service: Some(vec![Service {
-                        id: CowStr::new_static("#atproto_pds"),
-                        r#type: CowStr::new_static("AtprotoPersonalDataServer"),
-                        service_endpoint: Some(Data::String(AtprotoStr::Uri(Uri::Https(
-                            Url::from_str(&mini_doc.pds).unwrap(),
-                        )))),
-                        extra_data: BTreeMap::new(),
-                    }]),
-                    extra_data: BTreeMap::new(),
-                }
-                .into_static())
-            } else {
-                Err(IdentityError::MissingPdsEndpoint)
-            }
-        } else {
-            Err(IdentityError::HttpStatus(self.status))
-        }
-    }
-}
-
-/// Handle → DID fallback step.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HandleStep {
-    /// DNS TXT _atproto.\<handle\>
-    DnsTxt,
-    /// HTTPS GET https://\<handle\>/.well-known/atproto-did
-    HttpsWellKnown,
-    /// XRPC com.atproto.identity.resolveHandle against a provided PDS base
-    PdsResolveHandle,
-}
-
-/// DID → Doc fallback step.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DidStep {
-    /// For did:web: fetch from the well-known location
-    DidWebHttps,
-    /// For did:plc: fetch from PLC source
-    PlcHttp,
-    /// If a PDS base is known, ask it for the DID doc
-    PdsResolveDid,
-}
-
-/// Configurable resolver options.
-///
-/// - `plc_source`: where to fetch did:plc documents (PLC Directory or Slingshot).
-/// - `pds_fallback`: optional base URL of a PDS for XRPC fallbacks (stateless
-///   XRPC over reqwest; authentication can be layered as needed).
-/// - `handle_order`/`did_order`: ordered strategies for resolution.
-/// - `validate_doc_id`: if true (default), convenience helpers validate doc `id` against the requested DID,
-///   returning `DocIdMismatch` with the fetched document on mismatch.
-/// - `public_fallback_for_handle`: if true (default), attempt
-///   `https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle` as an unauth fallback.
-///   There is no public fallback for DID documents; when `PdsResolveDid` is chosen and the PDS XRPC
-///   client fails, the resolver falls back to Slingshot mini-doc (partial) if `PlcSource::Slingshot` is configured.
-#[derive(Debug, Clone, Builder)]
-#[builder(start_fn = new)]
-pub struct ResolverOptions {
-    /// PLC data source (directory or slingshot)
-    pub plc_source: PlcSource,
-    /// Optional PDS base to use for fallbacks
-    pub pds_fallback: Option<Url>,
-    /// Order of attempts for handle → DID resolution
-    pub handle_order: Vec<HandleStep>,
-    /// Order of attempts for DID → Doc resolution
-    pub did_order: Vec<DidStep>,
-    /// Validate that fetched DID document id matches the requested DID
-    pub validate_doc_id: bool,
-    /// Allow public unauthenticated fallback for resolveHandle via public.api.bsky.app
-    pub public_fallback_for_handle: bool,
-}
-
-impl Default for ResolverOptions {
-    fn default() -> Self {
-        // By default, prefer DNS then HTTPS for handles, then PDS fallback
-        // For DID documents, prefer method-native sources, then PDS fallback
-        Self::new()
-            .plc_source(PlcSource::default())
-            .handle_order(vec![
-                HandleStep::DnsTxt,
-                HandleStep::HttpsWellKnown,
-                HandleStep::PdsResolveHandle,
-            ])
-            .did_order(vec![
-                DidStep::DidWebHttps,
-                DidStep::PlcHttp,
-                DidStep::PdsResolveDid,
-            ])
-            .validate_doc_id(true)
-            .public_fallback_for_handle(true)
-            .build()
-    }
-}
-
-/// Trait for identity resolution, for pluggable implementations.
-///
-/// The provided `DefaultResolver` supports:
-/// - DNS TXT (`_atproto.<handle>`) when compiled with the `dns` feature
-/// - HTTPS well-known for handles and `did:web`
-/// - PLC directory or Slingshot for `did:plc`
-/// - Slingshot `resolveHandle` (unauthenticated) when configured as the PLC source
-/// - PDS fallbacks via helpers that use stateless XRPC on top of reqwest
-#[async_trait::async_trait]
-pub trait IdentityResolver {
-    /// Access options for validation decisions in default methods
-    fn options(&self) -> &ResolverOptions;
-
-    /// Resolve handle
-    async fn resolve_handle(&self, handle: &Handle<'_>) -> Result<Did<'static>, IdentityError>;
-
-    /// Resolve DID document
-    async fn resolve_did_doc(&self, did: &Did<'_>) -> Result<DidDocResponse, IdentityError>;
-
-    /// Resolve the DID document and return an owned version
-    async fn resolve_did_doc_owned(
-        &self,
-        did: &Did<'_>,
-    ) -> Result<DidDocument<'static>, IdentityError> {
-        self.resolve_did_doc(did).await?.into_owned()
-    }
-    /// reutrn the PDS url for a DID
-    async fn pds_for_did(&self, did: &Did<'_>) -> Result<Url, IdentityError> {
-        let resp = self.resolve_did_doc(did).await?;
-        let doc = resp.parse()?;
-        // Default-on doc id equality check
-        if self.options().validate_doc_id {
-            if doc.id.as_str() != did.as_str() {
-                return Err(IdentityError::DocIdMismatch {
-                    expected: did.clone().into_static(),
-                    doc: doc.clone().into_static(),
-                });
-            }
-        }
-        doc.pds_endpoint().ok_or(IdentityError::MissingPdsEndpoint)
-    }
-    /// Return the DIS and PDS url for a handle
-    async fn pds_for_handle(
-        &self,
-        handle: &Handle<'_>,
-    ) -> Result<(Did<'static>, Url), IdentityError> {
-        let did = self.resolve_handle(handle).await?;
-        let pds = self.pds_for_did(&did).await?;
-        Ok((did, pds))
-    }
-}
 
 /// Default resolver implementation with configurable fallback order.
 pub struct DefaultResolver {
@@ -343,6 +50,19 @@ impl DefaultResolver {
             opts,
             #[cfg(feature = "dns")]
             dns: None,
+        }
+    }
+
+    #[cfg(feature = "dns")]
+    /// Create a new instance of the default resolver with all options, plus default DNS, up front
+    pub fn new_dns(http: reqwest::Client, opts: ResolverOptions) -> Self {
+        Self {
+            http,
+            opts,
+            dns: Some(TokioAsyncResolver::tokio(
+                ResolverConfig::default(),
+                Default::default(),
+            )),
         }
     }
 
@@ -415,18 +135,30 @@ impl DefaultResolver {
     }
 
     async fn get_json_bytes(&self, url: Url) -> Result<(Bytes, StatusCode), IdentityError> {
-        let resp = self.http.get(url).send().await?;
+        let resp = self
+            .http
+            .get(url)
+            .send()
+            .await
+            .map_err(TransportError::from)?;
         let status = resp.status();
-        let buf = resp.bytes().await?;
+        let buf = resp.bytes().await.map_err(TransportError::from)?;
         Ok((buf, status))
     }
 
     async fn get_text(&self, url: Url) -> Result<String, IdentityError> {
-        let resp = self.http.get(url).send().await?;
+        let resp = self
+            .http
+            .get(url)
+            .send()
+            .await
+            .map_err(TransportError::from)?;
         if resp.status() == StatusCode::OK {
-            Ok(resp.text().await?)
+            Ok(resp.text().await.map_err(TransportError::from)?)
         } else {
-            Err(IdentityError::Http(resp.error_for_status().unwrap_err()))
+            Err(IdentityError::Http(
+                resp.error_for_status().unwrap_err().into(),
+            ))
         }
     }
 
@@ -684,6 +416,17 @@ impl IdentityResolver for DefaultResolver {
     }
 }
 
+impl HttpClient for DefaultResolver {
+    async fn send_http(
+        &self,
+        request: http::Request<Vec<u8>>,
+    ) -> core::result::Result<http::Response<Vec<u8>>, Self::Error> {
+        self.http.send_http(request).await
+    }
+
+    type Error = reqwest::Error;
+}
+
 /// Warnings produced during identity checks that are not fatal
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum IdentityWarning {
@@ -778,19 +521,40 @@ impl MiniDocResponse {
     }
 }
 
-/// Slingshot mini-doc data (subset of DID doc info)
-#[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-#[allow(missing_docs)]
-pub struct MiniDoc<'a> {
-    #[serde(borrow)]
-    pub did: Did<'a>,
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
-    #[serde(borrow)]
-    pub pds: crate::CowStr<'a>,
-    #[serde(borrow, rename = "signingKey", alias = "signing_key")]
-    pub signing_key: crate::CowStr<'a>,
+/// Resolver specialized for unauthenticated/public flows using reqwest and stateless XRPC
+pub type PublicResolver = DefaultResolver;
+
+impl Default for PublicResolver {
+    /// Build a resolver with:
+    /// - reqwest HTTP client
+    /// - Public fallbacks enabled for handle resolution
+    /// - default options (DNS enabled if compiled, public fallback for handles enabled)
+    ///
+    /// Example
+    /// ```ignore
+    /// use jacquard::identity::resolver::PublicResolver;
+    /// let resolver = PublicResolver::default();
+    /// ```
+    fn default() -> Self {
+        let http = reqwest::Client::new();
+        let opts = ResolverOptions::default();
+        let resolver = DefaultResolver::new(http, opts);
+        #[cfg(feature = "dns")]
+        let resolver = resolver.with_system_dns();
+        resolver
+    }
+}
+
+/// Build a resolver configured to use Slingshot (`https://slingshot.microcosm.blue`) for PLC and
+/// mini-doc fallbacks, unauthenticated by default.
+pub fn slingshot_resolver_default() -> PublicResolver {
+    let http = reqwest::Client::new();
+    let mut opts = ResolverOptions::default();
+    opts.plc_source = PlcSource::slingshot_default();
+    let resolver = DefaultResolver::new(http, opts);
+    #[cfg(feature = "dns")]
+    let resolver = resolver.with_system_dns();
+    resolver
 }
 
 #[cfg(test)]
@@ -808,36 +572,6 @@ mod tests {
             r.test_did_web_url_raw("did:web:example.com:user:alice"),
             "https://example.com/user/alice/did.json"
         );
-    }
-
-    #[test]
-    fn parse_validated_ok() {
-        let buf = Bytes::from_static(br#"{"id":"did:plc:alice"}"#);
-        let requested = Did::new_owned("did:plc:alice").unwrap();
-        let resp = DidDocResponse {
-            buffer: buf,
-            status: StatusCode::OK,
-            requested: Some(requested),
-        };
-        let _doc = resp.parse_validated().expect("valid");
-    }
-
-    #[test]
-    fn parse_validated_mismatch() {
-        let buf = Bytes::from_static(br#"{"id":"did:plc:bob"}"#);
-        let requested = Did::new_owned("did:plc:alice").unwrap();
-        let resp = DidDocResponse {
-            buffer: buf,
-            status: StatusCode::OK,
-            requested: Some(requested),
-        };
-        match resp.parse_validated() {
-            Err(IdentityError::DocIdMismatch { expected, doc }) => {
-                assert_eq!(expected.as_str(), "did:plc:alice");
-                assert_eq!(doc.id.as_str(), "did:plc:bob");
-            }
-            other => panic!("unexpected result: {:?}", other),
-        }
     }
 
     #[test]
@@ -892,40 +626,4 @@ mod tests {
             other => panic!("unexpected: {:?}", other),
         }
     }
-}
-
-/// Resolver specialized for unauthenticated/public flows using reqwest and stateless XRPC
-pub type PublicResolver = DefaultResolver;
-
-impl Default for PublicResolver {
-    /// Build a resolver with:
-    /// - reqwest HTTP client
-    /// - Public fallbacks enabled for handle resolution
-    /// - default options (DNS enabled if compiled, public fallback for handles enabled)
-    ///
-    /// Example
-    /// ```ignore
-    /// use jacquard::identity::resolver::PublicResolver;
-    /// let resolver = PublicResolver::default();
-    /// ```
-    fn default() -> Self {
-        let http = reqwest::Client::new();
-        let opts = ResolverOptions::default();
-        let resolver = DefaultResolver::new(http, opts);
-        #[cfg(feature = "dns")]
-        let resolver = resolver.with_system_dns();
-        resolver
-    }
-}
-
-/// Build a resolver configured to use Slingshot (`https://slingshot.microcosm.blue`) for PLC and
-/// mini-doc fallbacks, unauthenticated by default.
-pub fn slingshot_resolver_default() -> PublicResolver {
-    let http = reqwest::Client::new();
-    let mut opts = ResolverOptions::default();
-    opts.plc_source = PlcSource::slingshot_default();
-    let resolver = DefaultResolver::new(http, opts);
-    #[cfg(feature = "dns")]
-    let resolver = resolver.with_system_dns();
-    resolver
 }

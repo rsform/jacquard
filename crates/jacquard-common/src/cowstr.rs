@@ -105,6 +105,13 @@ impl<'s> From<&'s str> for CowStr<'s> {
     }
 }
 
+impl Default for CowStr<'_> {
+    #[inline]
+    fn default() -> Self {
+        CowStr::new_static("")
+    }
+}
+
 impl From<String> for CowStr<'_> {
     #[inline]
     fn from(s: String) -> Self {

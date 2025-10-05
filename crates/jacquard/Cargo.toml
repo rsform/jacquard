@@ -12,12 +12,13 @@ exclude.workspace = true
 license.workspace = true
 
 [features]
-default = ["api_all", "dns", "fancy"]
+default = ["api_all", "dns", "fancy", "loopback"]
 derive = ["dep:jacquard-derive"]
 api = ["jacquard-api/com_atproto"]
 api_all = ["api", "jacquard-api/app_bsky", "jacquard-api/chat_bsky", "jacquard-api/tools_ozone"]
-dns = ["dep:hickory-resolver"]
+dns = ["dep:hickory-resolver", "jacquard-common/dns"]
 fancy = ["miette/fancy"]
+loopback = ["dep:rouille"]
 
 [lib]
 name = "jacquard"
@@ -35,7 +36,8 @@ bytes.workspace = true
 clap.workspace = true
 http.workspace = true
 jacquard-api = { version = "0.2.0", path = "../jacquard-api" }
-jacquard-common = { version = "0.2.0", path = "../jacquard-common" }
+jacquard-common = { version = "0.2.0", path = "../jacquard-common", features = ["reqwest-client"] }
+jacquard-oauth = { version = "0.1.0", path = "../jacquard-oauth" }
 jacquard-derive = { version = "0.2.0", path = "../jacquard-derive", optional = true }
 miette = { workspace = true }
 reqwest = { workspace = true, features = ["charset", "http2", "json", "system-proxy", "gzip", "rustls-tls"] }
@@ -50,3 +52,7 @@ url.workspace = true
 smol_str.workspace = true
 percent-encoding = "2"
 urlencoding = "2"
+jose-jwk = { version = "0.1", features = ["p256"] }
+p256 = { version = "0.13", features = ["ecdsa"] }
+rand_core = "0.6"
+rouille = { version = "3.6.2", optional = true }

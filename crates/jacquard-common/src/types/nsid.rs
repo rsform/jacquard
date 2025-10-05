@@ -24,7 +24,7 @@ use std::{ops::Deref, str::FromStr};
 /// - Case-sensitive
 ///
 /// See: <https://atproto.com/specs/nsid>
-#[derive(Clone, PartialEq, Eq, Serialize, Hash)]
+#[derive(Clone, PartialEq, Eq, Serialize, Hash, PartialOrd, Ord)]
 #[serde(transparent)]
 #[repr(transparent)]
 pub struct Nsid<'n>(CowStr<'n>);

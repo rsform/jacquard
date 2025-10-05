@@ -13,6 +13,21 @@ pub mod cowstr;
 #[macro_use]
 /// Trait for taking ownership of most borrowed types in jacquard.
 pub mod into_static;
+pub mod error;
+/// HTTP client abstraction used by jacquard crates.
+pub mod http_client;
+pub mod ident_resolver;
 pub mod macros;
+/// Generic session storage traits and utilities.
+pub mod session;
 /// Baseline fundamental AT Protocol data types.
 pub mod types;
+
+/// Authorization token types for XRPC requests.
+#[derive(Debug, Clone)]
+pub enum AuthorizationToken<'s> {
+    /// Bearer token (access JWT, refresh JWT to refresh the session)
+    Bearer(CowStr<'s>),
+    /// DPoP token (proof-of-possession) for OAuth
+    Dpop(CowStr<'s>),
+}

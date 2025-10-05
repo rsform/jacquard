@@ -35,13 +35,21 @@ serde_with.workspace = true
 smol_str.workspace = true
 thiserror.workspace = true
 url.workspace = true
+http.workspace = true
+async-trait = "0.1"
+tokio = { version = "1", features = ["sync"] }
+reqwest = { workspace = true, optional = true, features = ["charset", "http2", "json", "system-proxy", "gzip", "rustls-tls"] }
+hickory-resolver = { version = "0.24", default-features = false, features = ["system-config", "tokio-runtime"], optional = true }
+serde_ipld_dagcbor.workspace = true
 
 [features]
 default = []
+dns = ["dep:hickory-resolver"]
 crypto = []
 crypto-ed25519 = ["crypto", "dep:ed25519-dalek"]
 crypto-k256 = ["crypto", "dep:k256"]
 crypto-p256 = ["crypto", "dep:p256"]
+reqwest-client = ["dep:reqwest"]
 
 [dependencies.ed25519-dalek]
 version = "2"

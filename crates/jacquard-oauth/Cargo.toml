@@ -1,0 +1,29 @@
+[package]
+name = "jacquard-oauth"
+version = "0.1.0"
+edition = "2024"
+description = "AT Protocol OAuth 2.1 core types and helpers for Jacquard"
+license = "MPL-2.0"
+
+[dependencies]
+jacquard-common = { version = "0.2.0", path = "../jacquard-common" }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+url = { workspace = true }
+smol_str = { workspace = true }
+base64 = { version = "0.22" }
+sha2 = { version = "0.10" }
+thiserror = { workspace = true }
+serde_html_form = { workspace = true }
+miette = { workspace = true }
+uuid = { version = "1", features = ["v4","std"] }
+p256 = { version = "0.13", features = ["ecdsa"] }
+signature = "2"
+rand_core = "0.6"
+jose-jwa = "0.1"
+jose-jwk = { version = "0.1", features = ["p256"] }
+chrono = "0.4"
+elliptic-curve = "0.13.8"
+http.workspace = true
+rand = { version = "0.8.5", features = ["small_rng"] }
+async-trait = "0.1.89"

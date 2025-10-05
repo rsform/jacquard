@@ -2,6 +2,8 @@
 
 use bytes::Bytes;
 
+use crate::types::xrpc::EncodeError;
+
 /// Client error type wrapping all possible error conditions
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub enum ClientError {
@@ -66,9 +68,6 @@ pub enum TransportError {
     Other(Box<dyn std::error::Error + Send + Sync>),
 }
 
-// Re-export EncodeError from common
-pub use jacquard_common::types::xrpc::EncodeError;
-
 /// Response deserialization errors
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub enum DecodeError {
@@ -91,7 +90,7 @@ pub enum DecodeError {
     CborRemote(
         #[from]
         #[source]
-        serde_ipld_dagcbor::DecodeError<reqwest::Error>,
+        serde_ipld_dagcbor::DecodeError<HttpError>,
     ),
 }
 
@@ -113,6 +112,24 @@ impl std::fmt::Display for HttpError {
             }
         }
         Ok(())
+    }
+}
+
+/// Result type for client operations
+pub type XrpcResult<T> = std::result::Result<T, ClientError>;
+
+#[cfg(feature = "reqwest-client")]
+impl From<reqwest::Error> for TransportError {
+    fn from(e: reqwest::Error) -> Self {
+        if e.is_timeout() {
+            Self::Timeout
+        } else if e.is_connect() {
+            Self::Connect(e.to_string())
+        } else if e.is_builder() || e.is_request() {
+            Self::InvalidRequest(e.to_string())
+        } else {
+            Self::Other(Box::new(e))
+        }
     }
 }
 
@@ -138,21 +155,4 @@ pub enum AuthError {
     /// Other authentication error
     #[error("Authentication error: {0:?}")]
     Other(http::HeaderValue),
-}
-
-/// Result type for client operations
-pub type Result<T> = std::result::Result<T, ClientError>;
-
-impl From<reqwest::Error> for TransportError {
-    fn from(e: reqwest::Error) -> Self {
-        if e.is_timeout() {
-            Self::Timeout
-        } else if e.is_connect() {
-            Self::Connect(e.to_string())
-        } else if e.is_builder() || e.is_request() {
-            Self::InvalidRequest(e.to_string())
-        } else {
-            Self::Other(Box::new(e))
-        }
-    }
 }

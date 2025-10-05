@@ -2,8 +2,9 @@ use clap::Parser;
 use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
 use jacquard::api::com_atproto::server::create_session::CreateSession;
-use jacquard::client::{BasicClient, Session};
-use jacquard::identity::resolver::{IdentityResolver, slingshot_resolver_default};
+use jacquard::client::{AtpSession, AuthSession, BasicClient};
+use jacquard::ident_resolver::IdentityResolver;
+use jacquard::identity::slingshot_resolver_default;
 use jacquard::types::string::Handle;
 use miette::IntoDiagnostic;
 
@@ -33,7 +34,7 @@ async fn main() -> miette::Result<()> {
     let client = BasicClient::new(pds_url);
 
     // Create session
-    let session = Session::from(
+    let session = AtpSession::from(
         client
             .send(
                 CreateSession::new()
@@ -46,7 +47,7 @@ async fn main() -> miette::Result<()> {
     );
 
     println!("logged in as {} ({})", session.handle, session.did);
-    client.set_session(session).await.into_diagnostic()?;
+    client.set_session(session.into()).await.into_diagnostic()?;
 
     // Fetch timeline
     println!("\nfetching timeline...");

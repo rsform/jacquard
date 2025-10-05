@@ -251,7 +251,7 @@ impl From<AtprotoStr<'_>> for String {
 /// detailing the specification for the type
 /// `source` is the source string, or part of it
 /// `kind` is the type of parsing error: `[StrParseKind]`
-#[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[derive(Debug, thiserror::Error, miette::Diagnostic, PartialEq, Eq, Clone)]
 #[error("error in `{source}`: {kind}")]
 #[diagnostic(
     url("https://atproto.com/specs/{spec}"),
@@ -406,7 +406,7 @@ impl AtStrError {
 }
 
 /// Kinds of parsing errors for AT Protocol string types
-#[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[derive(Debug, thiserror::Error, miette::Diagnostic, PartialEq, Eq, Clone)]
 pub enum StrParseKind {
     /// Regex pattern validation failed
     #[error("regex failure - {message}")]
