@@ -19,7 +19,7 @@ path = "src/bin/codegen.rs"
 clap.workspace = true
 heck.workspace = true
 itertools.workspace = true
-jacquard-common = { version = "0.1.0", path = "../jacquard-common" }
+jacquard-common = { version = "0.2.0", path = "../jacquard-common" }
 miette = { workspace = true, features = ["fancy"] }
 prettyplease.workspace = true
 proc-macro2.workspace = true

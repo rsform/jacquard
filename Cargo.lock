@@ -1353,7 +1353,7 @@ checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 
 [[package]]
 name = "jacquard"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "bon",
@@ -1380,7 +1380,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-api"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "bon",
  "bytes",
@@ -1393,7 +1393,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-common"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "base64",
  "bon",
@@ -1424,7 +1424,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-derive"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "heck 0.5.0",
  "itertools",
@@ -1441,7 +1441,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-lexicon"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "clap",
  "heck 0.5.0",

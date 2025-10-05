@@ -32,9 +32,9 @@ async-trait = "0.1"
 bytes.workspace = true
 clap.workspace = true
 http.workspace = true
-jacquard-api = { version = "0.1.0", path = "../jacquard-api" }
-jacquard-common = { version = "0.1.0", path = "../jacquard-common" }
-jacquard-derive = { version = "0.1.0", path = "../jacquard-derive", optional = true }
+jacquard-api = { version = "0.2.0", path = "../jacquard-api" }
+jacquard-common = { version = "0.2.0", path = "../jacquard-common" }
+jacquard-derive = { version = "0.2.0", path = "../jacquard-derive", optional = true }
 miette.workspace = true
 reqwest = { workspace = true, features = ["charset", "http2", "json", "system-proxy", "gzip", "rustls-tls"] }
 serde.workspace = true

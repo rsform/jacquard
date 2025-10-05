@@ -24,8 +24,8 @@ tools_ozone = []
 [dependencies]
 bon = "3"
 bytes = { workspace = true, features = ["serde"] }
-jacquard-common = { version = "0.1.0", path = "../jacquard-common" }
-jacquard-derive = { version = "0.1.0", path = "../jacquard-derive" }
+jacquard-common = { version = "0.2.0", path = "../jacquard-common" }
+jacquard-derive = { version = "0.2.0", path = "../jacquard-derive" }
 miette.workspace = true
 serde.workspace = true
 thiserror.workspace = true
