@@ -3,7 +3,7 @@ use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
 use jacquard::api::com_atproto::server::create_session::CreateSession;
 use jacquard::client::{BasicClient, Session};
-use jacquard::identity::resolver::{slingshot_resolver_default, IdentityResolver};
+use jacquard::identity::resolver::{IdentityResolver, slingshot_resolver_default};
 use jacquard::types::string::Handle;
 use miette::IntoDiagnostic;
 

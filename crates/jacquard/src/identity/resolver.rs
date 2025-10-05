@@ -9,11 +9,18 @@
 //! Parsing returns a `DidDocResponse` so callers can borrow from the response buffer
 //! and optionally validate the document `id` against the requested DID.
 
+use std::collections::BTreeMap;
+use std::str::FromStr;
+
 // use crate::CowStr; // not currently needed directly here
 use crate::client::XrpcExt;
 use bon::Builder;
 use bytes::Bytes;
-use jacquard_common::IntoStatic;
+use jacquard_common::types::did_doc::Service;
+use jacquard_common::types::string::AtprotoStr;
+use jacquard_common::types::uri::Uri;
+use jacquard_common::types::value::Data;
+use jacquard_common::{CowStr, IntoStatic};
 use miette::Diagnostic;
 use percent_encoding::percent_decode_str;
 use reqwest::StatusCode;
@@ -124,7 +131,26 @@ impl DidDocResponse {
     /// Parse as borrowed DidDocument<'_>
     pub fn parse<'b>(&'b self) -> Result<DidDocument<'b>, IdentityError> {
         if self.status.is_success() {
-            serde_json::from_slice::<DidDocument<'b>>(&self.buffer).map_err(IdentityError::from)
+            if let Ok(doc) = serde_json::from_slice::<DidDocument<'b>>(&self.buffer) {
+                Ok(doc)
+            } else if let Ok(mini_doc) = serde_json::from_slice::<MiniDoc<'b>>(&self.buffer) {
+                Ok(DidDocument {
+                    id: mini_doc.did,
+                    also_known_as: Some(vec![CowStr::from(mini_doc.handle)]),
+                    verification_method: None,
+                    service: Some(vec![Service {
+                        id: CowStr::new_static("#atproto_pds"),
+                        r#type: CowStr::new_static("AtprotoPersonalDataServer"),
+                        service_endpoint: Some(Data::String(AtprotoStr::Uri(Uri::Https(
+                            Url::from_str(&mini_doc.pds).unwrap(),
+                        )))),
+                        extra_data: BTreeMap::new(),
+                    }]),
+                    extra_data: BTreeMap::new(),
+                })
+            } else {
+                Err(IdentityError::MissingPdsEndpoint)
+            }
         } else {
             Err(IdentityError::HttpStatus(self.status))
         }
@@ -149,9 +175,27 @@ impl DidDocResponse {
     /// Parse as owned DidDocument<'static>
     pub fn into_owned(self) -> Result<DidDocument<'static>, IdentityError> {
         if self.status.is_success() {
-            serde_json::from_slice::<DidDocument<'_>>(&self.buffer)
-                .map(|d| d.into_static())
-                .map_err(IdentityError::from)
+            if let Ok(doc) = serde_json::from_slice::<DidDocument<'_>>(&self.buffer) {
+                Ok(doc.into_static())
+            } else if let Ok(mini_doc) = serde_json::from_slice::<MiniDoc<'_>>(&self.buffer) {
+                Ok(DidDocument {
+                    id: mini_doc.did,
+                    also_known_as: Some(vec![CowStr::from(mini_doc.handle)]),
+                    verification_method: None,
+                    service: Some(vec![Service {
+                        id: CowStr::new_static("#atproto_pds"),
+                        r#type: CowStr::new_static("AtprotoPersonalDataServer"),
+                        service_endpoint: Some(Data::String(AtprotoStr::Uri(Uri::Https(
+                            Url::from_str(&mini_doc.pds).unwrap(),
+                        )))),
+                        extra_data: BTreeMap::new(),
+                    }]),
+                    extra_data: BTreeMap::new(),
+                }
+                .into_static())
+            } else {
+                Err(IdentityError::MissingPdsEndpoint)
+            }
         } else {
             Err(IdentityError::HttpStatus(self.status))
         }

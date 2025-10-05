@@ -2,7 +2,7 @@
 name = "jacquard"
 description.workspace = true
 edition.workspace = true
-version.workspace = true
+version = "0.2.1"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -12,11 +12,12 @@ exclude.workspace = true
 license.workspace = true
 
 [features]
-default = ["api_all", "dns"]
+default = ["api_all", "dns", "fancy"]
 derive = ["dep:jacquard-derive"]
 api = ["jacquard-api/com_atproto"]
 api_all = ["api", "jacquard-api/app_bsky", "jacquard-api/chat_bsky", "jacquard-api/tools_ozone"]
 dns = ["dep:hickory-resolver"]
+fancy = ["miette/fancy"]
 
 [lib]
 name = "jacquard"
@@ -25,6 +26,7 @@ path = "src/lib.rs"
 [[bin]]
 name = "jacquard"
 path = "src/main.rs"
+
 
 [dependencies]
 bon = "3"
@@ -35,7 +37,7 @@ http.workspace = true
 jacquard-api = { version = "0.2.0", path = "../jacquard-api" }
 jacquard-common = { version = "0.2.0", path = "../jacquard-common" }
 jacquard-derive = { version = "0.2.0", path = "../jacquard-derive", optional = true }
-miette.workspace = true
+miette = { workspace = true }
 reqwest = { workspace = true, features = ["charset", "http2", "json", "system-proxy", "gzip", "rustls-tls"] }
 serde.workspace = true
 serde_html_form.workspace = true
