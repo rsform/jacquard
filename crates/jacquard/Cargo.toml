@@ -12,7 +12,7 @@ exclude.workspace = true
 license.workspace = true
 
 [features]
-default = ["api_all"]
+default = ["api_all", "dns"]
 derive = ["dep:jacquard-derive"]
 api = ["jacquard-api/com_atproto"]
 api_all = ["api", "jacquard-api/app_bsky", "jacquard-api/chat_bsky", "jacquard-api/tools_ozone"]
@@ -42,7 +42,7 @@ serde_html_form.workspace = true
 serde_ipld_dagcbor.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "fs"] }
 hickory-resolver = { version = "0.24", default-features = false, features = ["system-config", "tokio-runtime"], optional = true }
 url.workspace = true
 smol_str.workspace = true

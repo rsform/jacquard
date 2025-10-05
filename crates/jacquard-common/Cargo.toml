@@ -60,3 +60,6 @@ version = "0.13"
 optional = true
 default-features = false
 features = ["arithmetic"]
+
+[package.metadata.docs.rs]
+features = [ "crypto-k256", "crypto-k256", "crypto-p256"]

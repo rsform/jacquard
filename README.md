@@ -25,7 +25,7 @@ use clap::Parser;
 use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
 use jacquard::api::com_atproto::server::create_session::CreateSession;
-use jacquard::client::{AuthenticatedClient, Session, XrpcClient};
+use jacquard::client::{BasicClient, Session};
 use miette::IntoDiagnostic;
 
 #[derive(Parser, Debug)]
@@ -49,7 +49,8 @@ async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
     // Create HTTP client
-    let mut client = AuthenticatedClient::new(reqwest::Client::new(), args.pds);
+    let base = url::Url::parse(&args.pds).into_diagnostic()?;
+    let client = BasicClient::new(base);
 
     // Create session
     let session = Session::from(
@@ -65,7 +66,7 @@ async fn main() -> miette::Result<()> {
     );
 
     println!("logged in as {} ({})", session.handle, session.did);
-    client.set_session(session);
+    client.set_session(session).await.into_diagnostic()?;
 
     // Fetch timeline
     println!("\nfetching timeline...");

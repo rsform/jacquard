@@ -2,7 +2,9 @@ use clap::Parser;
 use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
 use jacquard::api::com_atproto::server::create_session::CreateSession;
-use jacquard::client::{AuthenticatedClient, Session, XrpcClient};
+use jacquard::client::{BasicClient, Session};
+use jacquard::identity::resolver::{slingshot_resolver_default, IdentityResolver};
+use jacquard::types::string::Handle;
 use miette::IntoDiagnostic;
 
 #[derive(Parser, Debug)]
@@ -24,8 +26,11 @@ struct Args {
 async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
-    // Create HTTP client
-    let mut client = AuthenticatedClient::new(reqwest::Client::new(), args.pds);
+    // Resolve PDS for the handle using the Slingshot-enabled resolver
+    let resolver = slingshot_resolver_default();
+    let handle = Handle::new(args.username.as_ref()).into_diagnostic()?;
+    let (_did, pds_url) = resolver.pds_for_handle(&handle).await.into_diagnostic()?;
+    let client = BasicClient::new(pds_url);
 
     // Create session
     let session = Session::from(
@@ -41,7 +46,7 @@ async fn main() -> miette::Result<()> {
     );
 
     println!("logged in as {} ({})", session.handle, session.did);
-    client.set_session(session);
+    client.set_session(session).await.into_diagnostic()?;
 
     // Fetch timeline
     println!("\nfetching timeline...");

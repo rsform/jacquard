@@ -1,16 +1,16 @@
 //! Identity resolution: handle → DID and DID → document, with smart fallbacks.
 //!
 //! Fallback order (default):
-//! - Handle → DID: DNS TXT (if `dns` feature) → HTTPS well-known → embedded XRPC
-//!   `resolveHandle` → public API fallback → Slingshot `resolveHandle` (if configured).
-//! - DID → Doc: did:web well-known → PLC/slingshot HTTP → embedded XRPC `resolveDid`,
+//! - Handle → DID: DNS TXT (if `dns` feature) → HTTPS well-known → PDS XRPC
+//!   `resolveHandle` (when `pds_fallback` is configured) → public API fallback → Slingshot `resolveHandle` (if configured).
+//! - DID → Doc: did:web well-known → PLC/Slingshot HTTP → PDS XRPC `resolveDid` (when configured),
 //!   then Slingshot mini‑doc (partial) if configured.
 //!
 //! Parsing returns a `DidDocResponse` so callers can borrow from the response buffer
 //! and optionally validate the document `id` against the requested DID.
 
-use crate::CowStr;
-use crate::client::AuthenticatedClient;
+// use crate::CowStr; // not currently needed directly here
+use crate::client::XrpcExt;
 use bon::Builder;
 use bytes::Bytes;
 use jacquard_common::IntoStatic;
@@ -183,14 +183,14 @@ pub enum DidStep {
 /// Configurable resolver options.
 ///
 /// - `plc_source`: where to fetch did:plc documents (PLC Directory or Slingshot).
-/// - `pds_fallback`: optional base URL of a PDS for XRPC fallbacks (auth-aware
-///   paths available via helpers that take an `XrpcClient`).
+/// - `pds_fallback`: optional base URL of a PDS for XRPC fallbacks (stateless
+///   XRPC over reqwest; authentication can be layered as needed).
 /// - `handle_order`/`did_order`: ordered strategies for resolution.
 /// - `validate_doc_id`: if true (default), convenience helpers validate doc `id` against the requested DID,
 ///   returning `DocIdMismatch` with the fetched document on mismatch.
 /// - `public_fallback_for_handle`: if true (default), attempt
 ///   `https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle` as an unauth fallback.
-///   There is no public fallback for DID documents; when `PdsResolveDid` is chosen and the embedded XRPC
+///   There is no public fallback for DID documents; when `PdsResolveDid` is chosen and the PDS XRPC
 ///   client fails, the resolver falls back to Slingshot mini-doc (partial) if `PlcSource::Slingshot` is configured.
 #[derive(Debug, Clone, Builder)]
 #[builder(start_fn = new)]
@@ -238,7 +238,7 @@ impl Default for ResolverOptions {
 /// - HTTPS well-known for handles and `did:web`
 /// - PLC directory or Slingshot for `did:plc`
 /// - Slingshot `resolveHandle` (unauthenticated) when configured as the PLC source
-/// - Auth-aware PDS fallbacks via helpers that accept an `XrpcClient`
+/// - PDS fallbacks via helpers that use stateless XRPC on top of reqwest
 #[async_trait::async_trait]
 pub trait IdentityResolver {
     /// Access options for validation decisions in default methods
@@ -284,45 +284,18 @@ pub trait IdentityResolver {
 }
 
 /// Default resolver implementation with configurable fallback order.
-///
-/// Behavior highlights:
-/// - Handle resolution tries DNS TXT (if enabled via `dns` feature), then HTTPS
-///   well-known, then Slingshot's unauthenticated `resolveHandle` when
-///   `PlcSource::Slingshot` is configured.
-/// - DID resolution tries did:web well-known for `did:web`, and the configured
-///   PLC base (PLC directory or Slingshot) for `did:plc`.
-/// - PDS-authenticated fallbacks (e.g., `resolveHandle`, `resolveDid` on a PDS)
-///   are available via helper methods that accept a user-provided `XrpcClient`.
-///
-/// Example
-/// ```ignore
-/// # use jacquard::identity::resolver::{DefaultResolver, ResolverOptions};
-/// # use jacquard::client::{AuthenticatedClient, XrpcClient};
-/// # use jacquard::types::string::Handle;
-/// # use jacquard::CowStr;
-///
-/// // Build an auth-capable XRPC client (without a session it behaves like public/unauth)
-/// let http = reqwest::Client::new();
-/// let xrpc = AuthenticatedClient::new(http.clone(), CowStr::new_static("https://bsky.social"));
-/// let resolver = DefaultResolver::new(http, xrpc, ResolverOptions::default());
-///
-/// // Resolve a handle to a DID
-/// let did = tokio_test::block_on(async { resolver.resolve_handle(&Handle::new("bad-example.com").unwrap()).await }).unwrap();
-/// ```
-pub struct DefaultResolver<C: crate::client::XrpcClient + Send + Sync> {
+pub struct DefaultResolver {
     http: reqwest::Client,
-    xrpc: C,
     opts: ResolverOptions,
     #[cfg(feature = "dns")]
     dns: Option<TokioAsyncResolver>,
 }
 
-impl<C: crate::client::XrpcClient + Send + Sync> DefaultResolver<C> {
+impl DefaultResolver {
     /// Create a new instance of the default resolver with all options (except DNS) up front
-    pub fn new(http: reqwest::Client, xrpc: C, opts: ResolverOptions) -> Self {
+    pub fn new(http: reqwest::Client, opts: ResolverOptions) -> Self {
         Self {
             http,
-            xrpc,
             opts,
             #[cfg(feature = "dns")]
             dns: None,
@@ -439,15 +412,20 @@ impl<C: crate::client::XrpcClient + Send + Sync> DefaultResolver<C> {
     }
 }
 
-impl<C: crate::client::XrpcClient + Send + Sync> DefaultResolver<C> {
-    /// Resolve handle to DID via a PDS XRPC client (auth-aware path)
+impl DefaultResolver {
+    /// Resolve handle to DID via a PDS XRPC call (stateless, unauth by default)
     pub async fn resolve_handle_via_pds(
         &self,
         handle: &Handle<'_>,
     ) -> Result<Did<'static>, IdentityError> {
+        let pds = match &self.opts.pds_fallback {
+            Some(u) => u.clone(),
+            None => return Err(IdentityError::InvalidWellKnown),
+        };
         let req = ResolveHandle::new().handle((*handle).clone()).build();
         let resp = self
-            .xrpc
+            .http
+            .xrpc(pds)
             .send(req)
             .await
             .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
@@ -464,9 +442,14 @@ impl<C: crate::client::XrpcClient + Send + Sync> DefaultResolver<C> {
         &self,
         did: &Did<'_>,
     ) -> Result<DidDocument<'static>, IdentityError> {
+        let pds = match &self.opts.pds_fallback {
+            Some(u) => u.clone(),
+            None => return Err(IdentityError::InvalidWellKnown),
+        };
         let req = resolve_did::ResolveDid::new().did(did.clone()).build();
         let resp = self
-            .xrpc
+            .http
+            .xrpc(pds)
             .send(req)
             .await
             .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
@@ -510,7 +493,7 @@ impl<C: crate::client::XrpcClient + Send + Sync> DefaultResolver<C> {
 }
 
 #[async_trait::async_trait]
-impl<C: crate::client::XrpcClient + Send + Sync> IdentityResolver for DefaultResolver<C> {
+impl IdentityResolver for DefaultResolver {
     fn options(&self) -> &ResolverOptions {
         &self.opts
     }
@@ -541,7 +524,7 @@ impl<C: crate::client::XrpcClient + Send + Sync> IdentityResolver for DefaultRes
                     }
                 }
                 HandleStep::PdsResolveHandle => {
-                    // Prefer embedded XRPC client
+                    // Prefer PDS XRPC via stateless client
                     if let Ok(did) = self.resolve_handle_via_pds(handle).await {
                         return Ok(did);
                     }
@@ -630,7 +613,7 @@ impl<C: crate::client::XrpcClient + Send + Sync> IdentityResolver for DefaultRes
                     }
                 }
                 DidStep::PdsResolveDid => {
-                    // Try embedded XRPC client for full DID doc
+                    // Try PDS XRPC for full DID doc
                     if let Ok(doc) = self.fetch_did_doc_via_pds_owned(did).await {
                         let buf = serde_json::to_vec(&doc).unwrap_or_default();
                         return Ok(DidDocResponse {
@@ -667,7 +650,7 @@ pub enum IdentityWarning {
     },
 }
 
-impl<C: crate::client::XrpcClient + Send + Sync> DefaultResolver<C> {
+impl DefaultResolver {
     /// Resolve a handle to its DID, fetch the DID document, and return doc plus any warnings.
     /// This applies the default equality check on the document id (error with doc if mismatch).
     pub async fn resolve_handle_and_doc(
@@ -772,11 +755,7 @@ mod tests {
 
     #[test]
     fn did_web_urls() {
-        let r = DefaultResolver::new(
-            reqwest::Client::new(),
-            TestXrpc::new(),
-            ResolverOptions::default(),
-        );
+        let r = DefaultResolver::new(reqwest::Client::new(), ResolverOptions::default());
         assert_eq!(
             r.test_did_web_url_raw("did:web:example.com"),
             "https://example.com/.well-known/did.json"
@@ -819,11 +798,7 @@ mod tests {
 
     #[test]
     fn slingshot_mini_doc_url_build() {
-        let r = DefaultResolver::new(
-            reqwest::Client::new(),
-            TestXrpc::new(),
-            ResolverOptions::default(),
-        );
+        let r = DefaultResolver::new(reqwest::Client::new(), ResolverOptions::default());
         let base = Url::parse("https://slingshot.microcosm.blue").unwrap();
         let url = r.slingshot_mini_doc_url(&base, "bad-example.com").unwrap();
         assert_eq!(
@@ -873,43 +848,15 @@ mod tests {
             other => panic!("unexpected: {:?}", other),
         }
     }
-    use crate::client::{HttpClient, XrpcClient};
-    use http::Request;
-    use jacquard_common::CowStr;
-
-    struct TestXrpc {
-        client: reqwest::Client,
-    }
-    impl TestXrpc {
-        fn new() -> Self {
-            Self {
-                client: reqwest::Client::new(),
-            }
-        }
-    }
-    impl HttpClient for TestXrpc {
-        type Error = reqwest::Error;
-        async fn send_http(
-            &self,
-            request: Request<Vec<u8>>,
-        ) -> Result<http::Response<Vec<u8>>, Self::Error> {
-            self.client.send_http(request).await
-        }
-    }
-    impl XrpcClient for TestXrpc {
-        fn base_uri(&self) -> CowStr<'_> {
-            CowStr::from("https://public.api.bsky.app")
-        }
-    }
 }
 
-/// Resolver specialized for unauthenticated/public flows using reqwest + AuthenticatedClient
-pub type PublicResolver = DefaultResolver<AuthenticatedClient<reqwest::Client>>;
+/// Resolver specialized for unauthenticated/public flows using reqwest and stateless XRPC
+pub type PublicResolver = DefaultResolver;
 
 impl Default for PublicResolver {
     /// Build a resolver with:
     /// - reqwest HTTP client
-    /// - XRPC base https://public.api.bsky.app (unauthenticated)
+    /// - Public fallbacks enabled for handle resolution
     /// - default options (DNS enabled if compiled, public fallback for handles enabled)
     ///
     /// Example
@@ -919,10 +866,8 @@ impl Default for PublicResolver {
     /// ```
     fn default() -> Self {
         let http = reqwest::Client::new();
-        let xrpc =
-            AuthenticatedClient::new(http.clone(), CowStr::from("https://public.api.bsky.app"));
         let opts = ResolverOptions::default();
-        let resolver = DefaultResolver::new(http, xrpc, opts);
+        let resolver = DefaultResolver::new(http, opts);
         #[cfg(feature = "dns")]
         let resolver = resolver.with_system_dns();
         resolver
@@ -933,10 +878,9 @@ impl Default for PublicResolver {
 /// mini-doc fallbacks, unauthenticated by default.
 pub fn slingshot_resolver_default() -> PublicResolver {
     let http = reqwest::Client::new();
-    let xrpc = AuthenticatedClient::new(http.clone(), CowStr::from("https://public.api.bsky.app"));
     let mut opts = ResolverOptions::default();
     opts.plc_source = PlcSource::slingshot_default();
-    let resolver = DefaultResolver::new(http, xrpc, opts);
+    let resolver = DefaultResolver::new(http, opts);
     #[cfg(feature = "dns")]
     let resolver = resolver.with_system_dns();
     resolver

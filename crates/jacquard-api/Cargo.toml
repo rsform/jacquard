@@ -11,6 +11,9 @@ readme.workspace = true
 exclude.workspace = true
 license.workspace = true
 
+[package.metadata.docs.rs]
+features = [ "com_atproto", "app_bsky", "chat_bsky", "tools_ozone" ]
+
 [features]
 default = [ "com_atproto"]
 app_bsky = []

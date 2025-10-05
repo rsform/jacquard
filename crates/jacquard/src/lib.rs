@@ -24,7 +24,7 @@
 //! # use jacquard::CowStr;
 //! use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
 //! use jacquard::api::com_atproto::server::create_session::CreateSession;
-//! use jacquard::client::{AuthenticatedClient, Session, XrpcClient};
+//! use jacquard::client::{BasicClient, Session};
 //! # use miette::IntoDiagnostic;
 //!
 //! # #[derive(Parser, Debug)]
@@ -48,7 +48,8 @@
 //!     let args = Args::parse();
 //!
 //!     // Create HTTP client
-//!     let mut client = AuthenticatedClient::new(reqwest::Client::new(), args.pds);
+//!     let url = url::Url::parse(&args.pds).unwrap();
+//!     let client = BasicClient::new(url);
 //!
 //!     // Create session
 //!     let session = Session::from(
@@ -64,7 +65,7 @@
 //!     );
 //!
 //!     println!("logged in as {} ({})", session.handle, session.did);
-//!     client.set_session(session);
+//!     client.set_session(session).await.unwrap();
 //!
 //!     // Fetch timeline
 //!     println!("\nfetching timeline...");
@@ -85,6 +86,84 @@
 //!     Ok(())
 //! }
 //! ```
+//!
+//! ## Clients
+//!
+//! - Stateless XRPC: any `HttpClient` (e.g., `reqwest::Client`) implements `XrpcExt`,
+//!   which provides `xrpc(base: Url) -> XrpcCall` for per-request calls with
+//!   optional `CallOptions` (auth, proxy, labelers, headers). Useful when you
+//!   want to pass auth on each call or build advanced flows.
+//!   Example
+//!   ```ignore
+//!   use jacquard::client::XrpcExt;
+//!   use jacquard::api::app_bsky::feed::get_author_feed::GetAuthorFeed;
+//!   use jacquard::types::ident::AtIdentifier;
+//!
+//!   #[tokio::main]
+//!   async fn main() -> anyhow::Result<()> {
+//!       let http = reqwest::Client::new();
+//!       let base = url::Url::parse("https://public.api.bsky.app")?;
+//!       let resp = http
+//!           .xrpc(base)
+//!           .send(
+//!               GetAuthorFeed::new()
+//!                   .actor(AtIdentifier::new_static("pattern.atproto.systems").unwrap())
+//!                   .limit(5)
+//!                   .build(),
+//!           )
+//!           .await?;
+//!       let out = resp.into_output()?;
+//!       println!("{}", serde_json::to_string_pretty(&out).into_diagnostic()?);
+//!       Ok(())
+//!   }
+//!   ```
+//! - Stateful client: `AtClient<C, S>` holds a base `Url`, a transport, and a
+//!   `TokenStore` implementation. It automatically sets Authorization and can
+//!   auto-refresh a session when expired, retrying once.
+//! - Convenience wrapper: `BasicClient` is an ergonomic newtype over
+//!   `AtClient<reqwest::Client, MemoryTokenStore>` with a `new(Url)` constructor.
+//!
+//! Per-request overrides (stateless)
+//! ```ignore
+//! use jacquard::client::{XrpcExt, AuthorizationToken};
+//! use jacquard::api::app_bsky::feed::get_author_feed::GetAuthorFeed;
+//! use jacquard::types::ident::AtIdentifier;
+//! use jacquard::CowStr;
+//! use miette::IntoDiagnostic;
+//!
+//! #[tokio::main]
+//! async fn main() -> miette::Result<()> {
+//!     let http = reqwest::Client::new();
+//!     let base = url::Url::parse("https://public.api.bsky.app")?;
+//!     let resp = http
+//!         .xrpc(base)
+//!         .auth(AuthorizationToken::Bearer(CowStr::from("ACCESS_JWT")))
+//!         .accept_labelers(vec![CowStr::from("did:plc:labelerid")])
+//!         .header(http::header::USER_AGENT, http::HeaderValue::from_static("jacquard-example"))
+//!         .send(
+//!             GetAuthorFeed::new()
+//!                 .actor(AtIdentifier::new_static("pattern.atproto.systems").unwrap())
+//!                 .limit(5)
+//!                 .build(),
+//!         )
+//!         .await?;
+//!     let out = resp.into_output()?;
+//!     println!("{}", serde_json::to_string_pretty(&out).into_diagnostic()?);
+//!     Ok(())
+//! }
+//! ```
+//!
+//! Token storage:
+//! - Use `MemoryTokenStore` for ephemeral sessions, tests, and CLIs.
+//! - For persistence, `FileTokenStore` stores session tokens as JSON on disk.
+//!   See `client::token::FileTokenStore` docs for details.
+//!   Example
+//!   ```ignore
+//!   use jacquard::client::{AtClient, FileTokenStore};
+//!   let base = url::Url::parse("https://bsky.social").unwrap();
+//!   let store = FileTokenStore::new("/tmp/jacquard-session.json");
+//!   let client = AtClient::new(reqwest::Client::new(), base, store);
+//!   ```
 //!
 
 #![warn(missing_docs)]
