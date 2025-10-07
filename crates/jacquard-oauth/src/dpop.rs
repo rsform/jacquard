@@ -63,19 +63,6 @@ pub trait DpopExt: HttpClient {
     {
         DpopCall::client(self, data_source)
     }
-
-    async fn wrap_with_dpop<'r, D>(
-        &'r self,
-        is_to_auth_server: bool,
-        data_source: &'r mut D,
-        request: Request<Vec<u8>>,
-    ) -> Result<Response<Vec<u8>>>
-    where
-        Self: Sized,
-        D: DpopDataSource,
-    {
-        wrap_request_with_dpop(self, data_source, is_to_auth_server, request).await
-    }
 }
 
 pub struct DpopCall<'r, C: HttpClient, D: DpopDataSource> {

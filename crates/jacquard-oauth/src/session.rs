@@ -308,7 +308,8 @@ where
                 return Ok(session);
             }
         }
-        let metadata = OAuthMetadata::new(&self.client, &self.client_data, &session).await?;
+        let metadata =
+            OAuthMetadata::new(self.client.as_ref(), &self.client_data, &session).await?;
         session = refresh(self.client.as_ref(), session, &metadata).await?;
         self.store.upsert_session(session.clone()).await?;
 

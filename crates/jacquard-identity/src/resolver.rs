@@ -12,23 +12,21 @@
 use std::collections::BTreeMap;
 use std::str::FromStr;
 
-use crate::error::TransportError;
-use crate::types::did_doc::Service;
-use crate::types::ident::AtIdentifier;
-use crate::types::string::AtprotoStr;
-use crate::types::uri::Uri;
-use crate::types::value::Data;
-use crate::{CowStr, IntoStatic};
 use bon::Builder;
 use bytes::Bytes;
 use http::StatusCode;
+use jacquard_common::error::TransportError;
+use jacquard_common::types::did::Did;
+use jacquard_common::types::did_doc::{DidDocument, Service};
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_common::types::string::{AtprotoStr, Handle};
+use jacquard_common::types::uri::Uri;
+use jacquard_common::types::value::{AtDataError, Data};
+use jacquard_common::{CowStr, IntoStatic};
 use miette::Diagnostic;
 use thiserror::Error;
 use url::Url;
 
-use crate::types::did_doc::DidDocument;
-use crate::types::string::{Did, Handle};
-use crate::types::value::AtDataError;
 /// Errors that can occur during identity resolution.
 ///
 /// Note: when validating a fetched DID document against a requested DID, a
@@ -114,7 +112,9 @@ impl PlcSource {
 /// mismatch). Use `into_owned()` to parse into an owned document.
 #[derive(Clone)]
 pub struct DidDocResponse {
+    #[allow(missing_docs)]
     pub buffer: Bytes,
+    #[allow(missing_docs)]
     pub status: StatusCode,
     /// Optional DID we intended to resolve; used for validation helpers
     pub requested: Option<Did<'static>>,
@@ -205,9 +205,9 @@ pub struct MiniDoc<'a> {
     #[serde(borrow)]
     pub handle: Handle<'a>,
     #[serde(borrow)]
-    pub pds: crate::CowStr<'a>,
+    pub pds: CowStr<'a>,
     #[serde(borrow, rename = "signingKey", alias = "signing_key")]
-    pub signing_key: crate::CowStr<'a>,
+    pub signing_key: CowStr<'a>,
 }
 
 /// Handle → DID fallback step.

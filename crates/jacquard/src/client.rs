@@ -21,8 +21,6 @@ use jacquard_common::{
 pub use token::FileTokenStore;
 use url::Url;
 
-use p256::SecretKey;
-
 // Note: Stateless and stateful XRPC clients are implemented in xrpc_call.rs and at_client.rs
 
 pub(crate) const NSID_REFRESH_SESSION: &str = "com.atproto.server.refreshSession";
@@ -133,7 +131,7 @@ impl From<jacquard_api::com_atproto::server::refresh_session::RefreshSessionOutp
 #[derive(Debug, Clone)]
 pub enum AuthSession {
     AppPassword(AtpSession),
-    OAuth(jacquard_oauth::session::OauthSession<'static>),
+    OAuth(jacquard_oauth::session::ClientSessionData<'static>),
 }
 
 impl AuthSession {
@@ -187,8 +185,8 @@ impl From<AtpSession> for AuthSession {
     }
 }
 
-impl From<jacquard_oauth::session::OauthSession<'static>> for AuthSession {
-    fn from(session: jacquard_oauth::session::OauthSession<'static>) -> Self {
+impl From<jacquard_oauth::session::ClientSessionData<'static>> for AuthSession {
+    fn from(session: jacquard_oauth::session::ClientSessionData<'static>) -> Self {
         AuthSession::OAuth(session)
     }
 }

@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize, de::DeserializeOwned};
-use smol_str::{SmolStr, ToSmolStr};
+use serde::{Deserialize, Serialize};
+use smol_str::SmolStr;
 use std::{
     borrow::Cow,
     fmt,

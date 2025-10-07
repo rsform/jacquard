@@ -1,0 +1,35 @@
+[package]
+name = "jacquard-identity"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme.workspace = true
+exclude.workspace = true
+homepage.workspace = true
+license.workspace = true
+description.workspace = true
+
+[features]
+dns = ["dep:hickory-resolver"]
+
+[dependencies]
+async-trait = "0.1.89"
+bon.workspace = true
+bytes.workspace = true
+jacquard-common = { version = "0.2", path = "../jacquard-common" }
+percent-encoding = "2.3.2"
+reqwest.workspace = true
+url.workspace = true
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "fs"] }
+hickory-resolver = { optional = true, version = "0.24", default-features = false, features = ["system-config", "tokio-runtime"]}
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+miette.workspace = true
+http.workspace = true
+jacquard-api = { version = "0.2.0", path = "../jacquard-api" }
+serde_html_form.workspace = true
+urlencoding = "2.1.3"

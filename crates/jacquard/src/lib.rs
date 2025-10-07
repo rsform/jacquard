@@ -174,5 +174,4 @@ pub use jacquard_common::*;
 /// if enabled, reexport the attribute macros
 pub use jacquard_derive::*;
 
-/// Identity resolution helpers (DIDs, handles, PDS endpoints)
-pub mod identity;
+pub use jacquard_identity as identity;

@@ -29,5 +29,7 @@ rand = { version = "0.8.5", features = ["small_rng"] }
 async-trait = "0.1.89"
 dashmap = "6.1.0"
 tokio = { version = "1.47.1", features = ["sync"] }
-bon = "3.8.0"
+
 reqwest.workspace = true
+trait-variant.workspace = true
+jacquard-identity = { version = "0.2.0", path = "../jacquard-identity" }

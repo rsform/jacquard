@@ -16,7 +16,6 @@ pub mod into_static;
 pub mod error;
 /// HTTP client abstraction used by jacquard crates.
 pub mod http_client;
-pub mod ident_resolver;
 pub mod macros;
 /// Generic session storage traits and utilities.
 pub mod session;

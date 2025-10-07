@@ -35,6 +35,12 @@ serde_repr = "0.1"
 miette = "7.6"
 thiserror = "2.0"
 
+# trait stuff
+trait-variant = "0.1.2"
+
+
+bon = "3.8.0"
+
 # Data types
 bytes = "1.10"
 smol_str = { version = "0.3", features = ["serde"] }

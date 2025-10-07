@@ -13,7 +13,7 @@ use url::Url;
 
 use jacquard_common::types::xrpc::{XrpcRequest, build_http_request};
 
-use crate::client::{AtpSession, AuthSession, FileTokenStore, NSID_REFRESH_SESSION};
+use crate::client::{AtpSession, AuthSession, NSID_REFRESH_SESSION};
 
 /// Per-call overrides when sending via `AtClient`.
 #[derive(Debug, Default, Clone)]

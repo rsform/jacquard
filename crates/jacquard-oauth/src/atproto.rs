@@ -5,7 +5,7 @@ use crate::{keyset::Keyset, scopes::Scope};
 use jacquard_common::CowStr;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
-use url::{Host, Url};
+use url::Url;
 
 #[derive(Error, Debug)]
 pub enum Error {

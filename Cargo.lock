@@ -1539,11 +1539,11 @@ dependencies = [
  "bon",
  "bytes",
  "clap",
- "hickory-resolver",
  "http",
  "jacquard-api",
  "jacquard-common",
  "jacquard-derive",
+ "jacquard-identity",
  "jacquard-oauth",
  "jose-jwk",
  "miette",
@@ -1588,7 +1588,6 @@ dependencies = [
  "cid",
  "ed25519-dalek",
  "enum_dispatch",
- "hickory-resolver",
  "http",
  "ipld-core",
  "k256",
@@ -1610,6 +1609,7 @@ dependencies = [
  "smol_str",
  "thiserror 2.0.17",
  "tokio",
+ "trait-variant",
  "url",
 ]
 
@@ -1628,6 +1628,29 @@ dependencies = [
  "serde_repr",
  "serde_with",
  "syn 2.0.106",
+]
+
+[[package]]
+name = "jacquard-identity"
+version = "0.2.0"
+dependencies = [
+ "async-trait",
+ "bon",
+ "bytes",
+ "hickory-resolver",
+ "http",
+ "jacquard-api",
+ "jacquard-common",
+ "miette",
+ "percent-encoding",
+ "reqwest",
+ "serde",
+ "serde_html_form",
+ "serde_json",
+ "thiserror 2.0.17",
+ "tokio",
+ "url",
+ "urlencoding",
 ]
 
 [[package]]
@@ -1657,12 +1680,12 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
- "bon",
  "chrono",
  "dashmap",
  "elliptic-curve",
  "http",
  "jacquard-common",
+ "jacquard-identity",
  "jose-jwa",
  "jose-jwk",
  "miette",
@@ -1678,6 +1701,7 @@ dependencies = [
  "smol_str",
  "thiserror 2.0.17",
  "tokio",
+ "trait-variant",
  "url",
  "uuid",
 ]
@@ -3344,6 +3368,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b9d12581f227e93f094d3af2ae690a574abb8a2b9b7a96e7cfe9647b2b617678"
 dependencies = [
  "once_cell",
+]
+
+[[package]]
+name = "trait-variant"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70977707304198400eb4835a78f6a9f928bf41bba420deb8fdb175cd965d77a7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.106",
 ]
 
 [[package]]

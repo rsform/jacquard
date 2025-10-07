@@ -1,28 +1,25 @@
-use chrono::{DateTime, FixedOffset, TimeDelta, Utc};
+use chrono::{TimeDelta, Utc};
 use http::{Method, Request, StatusCode};
 use jacquard_common::{
     CowStr, IntoStatic,
     cowstr::ToCowStr,
     http_client::HttpClient,
-    ident_resolver::{IdentityError, IdentityResolver},
     session::SessionStoreError,
     types::{
         did::Did,
         string::{AtStrError, Datetime},
     },
 };
-use jose_jwk::Key;
-use serde::{Serialize, de::DeserializeOwned};
+use jacquard_identity::resolver::IdentityError;
+use serde::Serialize;
 use serde_json::Value;
 use smol_str::ToSmolStr;
-use std::sync::Arc;
 use thiserror::Error;
-use url::Url;
 
 use crate::{
     FALLBACK_ALG,
-    atproto::{AtprotoClientMetadata, atproto_client_metadata},
-    dpop::{DpopClient, DpopExt},
+    atproto::atproto_client_metadata,
+    dpop::DpopExt,
     jose::jwt::{RegisteredClaims, RegisteredClaimsAud},
     keyset::Keyset,
     resolver::OAuthResolver,
@@ -424,6 +421,7 @@ where
     }
 }
 
+#[inline]
 fn endpoint_for_req<'a, 'r>(
     server_metadata: &'r OAuthAuthorizationServerMetadata<'a>,
     request: &'r OAuthRequest,
@@ -438,10 +436,8 @@ fn endpoint_for_req<'a, 'r>(
     }
 }
 
-fn build_oauth_req_body<'a, S>(
-    client_assertions: ClientAssertions<'a>,
-    parameters: S,
-) -> Result<String>
+#[inline]
+fn build_oauth_req_body<'a, S>(client_assertions: ClientAuth<'a>, parameters: S) -> Result<String>
 where
     S: Serialize,
 {
@@ -454,13 +450,13 @@ where
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct ClientAssertions<'a> {
+pub struct ClientAuth<'a> {
     client_id: CowStr<'a>,
     assertion_type: Option<CowStr<'a>>, // either none or `CLIENT_ASSERTION_TYPE_JWT_BEARER`
     assertion: Option<CowStr<'a>>,
 }
 
-impl<'s> ClientAssertions<'s> {
+impl<'s> ClientAuth<'s> {
     pub fn new_id(client_id: CowStr<'s>) -> Self {
         Self {
             client_id,
@@ -474,7 +470,7 @@ fn build_auth<'a>(
     keyset: Option<&Keyset>,
     server_metadata: &OAuthAuthorizationServerMetadata<'a>,
     client_metadata: &OAuthClientMetadata<'a>,
-) -> Result<ClientAssertions<'a>> {
+) -> Result<ClientAuth<'a>> {
     let method_supported = server_metadata
         .token_endpoint_auth_methods_supported
         .as_ref();
@@ -494,7 +490,7 @@ fn build_auth<'a>(
                         .unwrap_or(vec![FALLBACK_ALG.into()]);
                     algs.sort_by(compare_algos);
                     let iat = Utc::now().timestamp();
-                    return Ok(ClientAssertions {
+                    return Ok(ClientAuth {
                         client_id: client_id.clone(),
                         assertion_type: Some(CowStr::new_static(CLIENT_ASSERTION_TYPE_JWT_BEARER)),
                         assertion: Some(
@@ -526,7 +522,7 @@ fn build_auth<'a>(
                     .as_ref()
                     .is_some_and(|v| v.contains(&CowStr::new_static("none"))) =>
             {
-                return Ok(ClientAssertions::new_id(client_id));
+                return Ok(ClientAuth::new_id(client_id));
             }
             _ => {}
         }

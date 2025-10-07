@@ -16,7 +16,7 @@ default = ["api_all", "dns", "fancy", "loopback"]
 derive = ["dep:jacquard-derive"]
 api = ["jacquard-api/com_atproto"]
 api_all = ["api", "jacquard-api/app_bsky", "jacquard-api/chat_bsky", "jacquard-api/tools_ozone"]
-dns = ["dep:hickory-resolver", "jacquard-common/dns"]
+dns = ["jacquard-identity/dns"]
 fancy = ["miette/fancy"]
 loopback = ["dep:rouille"]
 
@@ -47,7 +47,6 @@ serde_ipld_dagcbor.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "fs"] }
-hickory-resolver = { version = "0.24", default-features = false, features = ["system-config", "tokio-runtime"], optional = true }
 url.workspace = true
 smol_str.workspace = true
 percent-encoding = "2"
@@ -56,3 +55,4 @@ jose-jwk = { version = "0.1", features = ["p256"] }
 p256 = { version = "0.13", features = ["ecdsa"] }
 rand_core = "0.6"
 rouille = { version = "3.6.2", optional = true }
+jacquard-identity = { version = "0.2.0", path = "../jacquard-identity" }

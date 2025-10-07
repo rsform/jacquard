@@ -12,24 +12,25 @@
 //! and optionally validate the document `id` against the requested DID.
 
 // use crate::CowStr; // not currently needed directly here
+pub mod resolver;
 
-use bytes::Bytes;
-use jacquard_common::IntoStatic;
-use jacquard_common::error::TransportError;
-use jacquard_common::http_client::HttpClient;
-use jacquard_common::ident_resolver::{
+use crate::resolver::{
     DidDocResponse, DidStep, HandleStep, IdentityError, IdentityResolver, MiniDoc, PlcSource,
     ResolverOptions,
 };
+use bytes::Bytes;
+use jacquard_api::com_atproto::identity::resolve_did;
+use jacquard_api::com_atproto::identity::resolve_handle::ResolveHandle;
+use jacquard_common::error::TransportError;
+use jacquard_common::http_client::HttpClient;
+use jacquard_common::types::did::Did;
+use jacquard_common::types::did_doc::DidDocument;
+use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::xrpc::XrpcExt;
+use jacquard_common::{IntoStatic, types::string::Handle};
 use percent_encoding::percent_decode_str;
 use reqwest::StatusCode;
 use url::{ParseError, Url};
-
-use crate::api::com_atproto::identity::{resolve_did, resolve_handle::ResolveHandle};
-use crate::types::did_doc::DidDocument;
-use crate::types::ident::AtIdentifier;
-use crate::types::string::{Did, Handle};
 
 #[cfg(feature = "dns")]
 use hickory_resolver::{TokioAsyncResolver, config::ResolverConfig};

@@ -1,11 +1,10 @@
 use crate::types::{OAuthAuthorizationServerMetadata, OAuthProtectedResourceMetadata};
 use http::{Request, StatusCode};
 use jacquard_common::IntoStatic;
-use jacquard_common::ident_resolver::{IdentityError, IdentityResolver};
 use jacquard_common::types::did_doc::DidDocument;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::{http_client::HttpClient, types::did::Did};
-use sha2::digest::const_oid::Arc;
+use jacquard_identity::resolver::{IdentityError, IdentityResolver};
 use url::Url;
 
 #[derive(thiserror::Error, Debug, miette::Diagnostic)]
@@ -160,9 +159,6 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         Ok(as_metadata)
     }
 }
-
-#[async_trait::async_trait]
-impl<T: OAuthResolver + Sync + Send> OAuthResolver for std::sync::Arc<T> {}
 
 pub async fn resolve_authorization_server<T: HttpClient + ?Sized>(
     client: &T,

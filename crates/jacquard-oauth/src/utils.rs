@@ -1,11 +1,10 @@
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use elliptic_curve::SecretKey;
-use jacquard_common::{CowStr, IntoStatic, cowstr::ToCowStr};
+use jacquard_common::CowStr;
 use jose_jwk::{Key, crypto};
 use rand::{CryptoRng, RngCore, rngs::ThreadRng};
 use sha2::{Digest, Sha256};
-use smol_str::ToSmolStr;
 use std::cmp::Ordering;
 
 use crate::{FALLBACK_ALG, types::OAuthAuthorizationServerMetadata};
