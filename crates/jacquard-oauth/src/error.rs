@@ -1,8 +1,10 @@
+use jacquard_common::session::SessionStoreError;
 use miette::Diagnostic;
-use thiserror::Error;
+
+use crate::resolver::ResolverError;
 
 /// Errors emitted by OAuth helpers.
-#[derive(Debug, Error, Diagnostic)]
+#[derive(Debug, thiserror::Error, Diagnostic)]
 pub enum OAuthError {
     /// Invalid or unsupported JWK
     #[error("invalid JWK: {0}")]
@@ -37,6 +39,20 @@ pub enum OAuthError {
         help("PKCE must use S256; ensure verifier/challenge generated")
     )]
     Pkce(String),
+    #[error("authorize error: {0}")]
+    Authorize(String),
+    #[error(transparent)]
+    Atproto(#[from] crate::atproto::Error),
+    #[error("callback error: {0}")]
+    Callback(String),
+    #[error(transparent)]
+    Storage(#[from] SessionStoreError),
+    #[error(transparent)]
+    Session(#[from] crate::session::Error),
+    #[error(transparent)]
+    Request(#[from] crate::request::Error),
+    #[error(transparent)]
+    Client(#[from] ResolverError),
 }
 
 pub type Result<T> = core::result::Result<T, OAuthError>;

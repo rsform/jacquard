@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
-use smol_str::SmolStr;
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
+use smol_str::{SmolStr, ToSmolStr};
 use std::{
     borrow::Cow,
     fmt,
@@ -62,6 +62,15 @@ impl<'s> CowStr<'s> {
     #[inline]
     pub unsafe fn from_utf8_unchecked(s: &'s [u8]) -> Self {
         unsafe { Self::Owned(SmolStr::new(std::str::from_utf8_unchecked(s))) }
+    }
+
+    /// Returns a reference to the underlying string slice.
+    #[inline]
+    pub fn as_str(&self) -> &str {
+        match self {
+            CowStr::Borrowed(s) => s,
+            CowStr::Owned(s) => s.as_str(),
+        }
     }
 }
 
@@ -142,6 +151,23 @@ impl From<CowStr<'_>> for String {
             #[allow(clippy::useless_conversion)]
             CowStr::Owned(s) => s.into(),
         }
+    }
+}
+
+impl From<CowStr<'_>> for SmolStr {
+    #[inline]
+    fn from(s: CowStr<'_>) -> Self {
+        match s {
+            CowStr::Borrowed(s) => SmolStr::new(s),
+            CowStr::Owned(s) => SmolStr::new(s),
+        }
+    }
+}
+
+impl From<SmolStr> for CowStr<'_> {
+    #[inline]
+    fn from(s: SmolStr) -> Self {
+        CowStr::Owned(s)
     }
 }
 
@@ -257,7 +283,47 @@ impl Serialize for CowStr<'_> {
     }
 }
 
-impl<'de: 'a, 'a> Deserialize<'de> for CowStr<'a> {
+// impl<'de> Deserialize<'de> for CowStr<'_> {
+//     #[inline]
+//     fn deserialize<D>(deserializer: D) -> Result<CowStr<'static>, D::Error>
+//     where
+//         D: serde::Deserializer<'de>,
+//     {
+//         struct CowStrVisitor;
+
+//         impl<'de> serde::de::Visitor<'de> for CowStrVisitor {
+//             type Value = CowStr<'static>;
+
+//             #[inline]
+//             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+//                 write!(formatter, "a string")
+//             }
+
+//             #[inline]
+//             fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+//             where
+//                 E: serde::de::Error,
+//             {
+//                 Ok(CowStr::copy_from_str(v))
+//             }
+
+//             #[inline]
+//             fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
+//             where
+//                 E: serde::de::Error,
+//             {
+//                 Ok(v.into())
+//             }
+//         }
+
+//         deserializer.deserialize_str(CowStrVisitor)
+//     }
+// }
+
+impl<'de, 'a, 'b> Deserialize<'de> for CowStr<'a>
+where
+    'de: 'a,
+{
     #[inline]
     fn deserialize<D>(deserializer: D) -> Result<CowStr<'a>, D::Error>
     where
@@ -299,6 +365,21 @@ impl<'de: 'a, 'a> Deserialize<'de> for CowStr<'a> {
         }
 
         deserializer.deserialize_str(CowStrVisitor)
+    }
+}
+
+/// Convert to a CowStr.
+pub trait ToCowStr {
+    /// Convert to a CowStr.
+    fn to_cowstr(&self) -> CowStr<'_>;
+}
+
+impl<T> ToCowStr for T
+where
+    T: fmt::Display + ?Sized,
+{
+    fn to_cowstr(&self) -> CowStr<'_> {
+        CowStr::Owned(smol_str::format_smolstr!("{}", self))
     }
 }
 

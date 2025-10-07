@@ -203,12 +203,6 @@ impl From<Datetime> for CowStr<'static> {
     }
 }
 
-impl AsRef<str> for Datetime {
-    fn as_ref(&self) -> &str {
-        self.as_str()
-    }
-}
-
 impl fmt::Display for Datetime {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(self.as_str())

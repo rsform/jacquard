@@ -13,8 +13,9 @@ pub use self::response::*;
 pub use self::token::*;
 use jacquard_common::CowStr;
 use serde::Deserialize;
+use url::Url;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Copy)]
 pub enum AuthorizeOptionPrompt {
     Login,
     None,
@@ -35,7 +36,7 @@ impl From<AuthorizeOptionPrompt> for CowStr<'static> {
 
 #[derive(Debug)]
 pub struct AuthorizeOptions<'s> {
-    pub redirect_uri: Option<CowStr<'s>>,
+    pub redirect_uri: Option<Url>,
     pub scopes: Vec<Scope<'s>>,
     pub prompt: Option<AuthorizeOptionPrompt>,
     pub state: Option<CowStr<'s>>,

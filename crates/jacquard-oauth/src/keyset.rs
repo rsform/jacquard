@@ -1,11 +1,10 @@
 use crate::jose::create_signed_jwt;
 use crate::jose::jws::RegisteredHeader;
 use crate::jose::jwt::Claims;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, IntoStatic};
 use jose_jwa::{Algorithm, Signing};
 use jose_jwk::{Class, EcCurves, crypto};
 use jose_jwk::{Jwk, JwkSet, Key};
-use smol_str::{SmolStr, ToSmolStr};
 use std::collections::HashSet;
 use thiserror::Error;
 
@@ -18,7 +17,7 @@ pub enum Error {
     #[error("key must have a `kid`")]
     EmptyKid,
     #[error("no signing key found for algorithms: {0:?}")]
-    NotFound(Vec<SmolStr>),
+    NotFound(Vec<CowStr<'static>>),
     #[error("key for signing must be a secret key")]
     PublicKey,
     #[error("crypto error: {0:?}")]
@@ -49,13 +48,13 @@ impl Keyset {
         }
         JwkSet { keys }
     }
-    pub fn create_jwt(&self, algs: &[SmolStr], claims: Claims) -> Result<CowStr<'static>> {
+    pub fn create_jwt(&self, algs: &[CowStr], claims: Claims) -> Result<CowStr<'static>> {
         let Some(jwk) = self.find_key(algs, Class::Signing) else {
-            return Err(Error::NotFound(algs.to_vec()));
+            return Err(Error::NotFound(algs.to_vec().into_static()));
         };
         self.create_jwt_with_key(jwk, claims)
     }
-    fn find_key(&self, algs: &[SmolStr], cls: Class) -> Option<&Jwk> {
+    fn find_key(&self, algs: &[CowStr], cls: Class) -> Option<&Jwk> {
         let candidates = self
             .0
             .iter()
@@ -70,7 +69,7 @@ impl Keyset {
                     },
                     _ => unimplemented!(),
                 };
-                Some((alg, key)).filter(|(alg, _)| algs.contains(&alg.to_smolstr()))
+                Some((alg, key)).filter(|(alg, _)| algs.contains(&CowStr::Borrowed(&alg)))
             })
             .collect::<Vec<_>>();
         for pref_alg in Self::PREFERRED_SIGNING_ALGORITHMS {

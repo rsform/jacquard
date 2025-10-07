@@ -291,7 +291,7 @@ impl Default for ResolverOptions {
 /// - PLC directory or Slingshot for `did:plc`
 /// - Slingshot `resolveHandle` (unauthenticated) when configured as the PLC source
 /// - PDS fallbacks via helpers that use stateless XRPC on top of reqwest
-#[async_trait::async_trait]
+#[async_trait::async_trait()]
 pub trait IdentityResolver {
     /// Access options for validation decisions in default methods
     fn options(&self) -> &ResolverOptions;
@@ -360,6 +360,23 @@ pub trait IdentityResolver {
         let did = self.resolve_handle(handle).await?;
         let pds = self.pds_for_did(&did).await?;
         Ok((did, pds))
+    }
+}
+
+#[async_trait::async_trait]
+impl<T: IdentityResolver + Sync + Send> IdentityResolver for std::sync::Arc<T> {
+    fn options(&self) -> &ResolverOptions {
+        self.as_ref().options()
+    }
+
+    /// Resolve handle
+    async fn resolve_handle(&self, handle: &Handle<'_>) -> Result<Did<'static>, IdentityError> {
+        self.as_ref().resolve_handle(handle).await
+    }
+
+    /// Resolve DID document
+    async fn resolve_did_doc(&self, did: &Did<'_>) -> Result<DidDocResponse, IdentityError> {
+        self.as_ref().resolve_did_doc(did).await
     }
 }
 

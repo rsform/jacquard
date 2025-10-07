@@ -5,6 +5,7 @@ use jacquard_common::ident_resolver::{IdentityError, IdentityResolver};
 use jacquard_common::types::did_doc::DidDocument;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::{http_client::HttpClient, types::did::Did};
+use sha2::digest::const_oid::Arc;
 use url::Url;
 
 #[derive(thiserror::Error, Debug, miette::Diagnostic)]
@@ -41,6 +42,19 @@ pub enum ResolverError {
 
 #[async_trait::async_trait]
 pub trait OAuthResolver: IdentityResolver + HttpClient {
+    async fn verify_issuer(
+        &self,
+        server_metadata: &OAuthAuthorizationServerMetadata<'_>,
+        sub: &Did<'_>,
+    ) -> Result<Url, ResolverError> {
+        let (metadata, identity) = self.resolve_from_identity(sub).await?;
+        if metadata.issuer != server_metadata.issuer {
+            return Err(ResolverError::Did(format!("DIDs did not match")));
+        }
+        Ok(identity
+            .pds_endpoint()
+            .ok_or(ResolverError::DidDocument(format!("{:?}", identity).into()))?)
+    }
     async fn resolve_oauth(
         &self,
         input: &str,
@@ -146,6 +160,9 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         Ok(as_metadata)
     }
 }
+
+#[async_trait::async_trait]
+impl<T: OAuthResolver + Sync + Send> OAuthResolver for std::sync::Arc<T> {}
 
 pub async fn resolve_authorization_server<T: HttpClient + ?Sized>(
     client: &T,

@@ -27,7 +27,7 @@ pub enum AuthorizationCodeChallengeMethod {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct PushedAuthorizationRequestParameters<'a> {
+pub struct ParParameters<'a> {
     // https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1
     pub response_type: AuthorizationResponseType,
     #[serde(borrow)]
@@ -115,8 +115,8 @@ impl IntoStatic for RefreshRequestParameters<'_> {
     }
 }
 
-impl IntoStatic for PushedAuthorizationRequestParameters<'_> {
-    type Output = PushedAuthorizationRequestParameters<'static>;
+impl IntoStatic for ParParameters<'_> {
+    type Output = ParParameters<'static>;
 
     fn into_static(self) -> Self::Output {
         Self::Output {

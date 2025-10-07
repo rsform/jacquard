@@ -124,6 +124,7 @@ impl<C: HttpClient, S: SessionStore<Did<'static>, AuthSession>> AtClient<C, S> {
     pub async fn set_session(&self, session: AuthSession) -> Result<(), SessionStoreError> {
         let s = session.clone();
         let did = s.did().clone().into_static();
+        self.refresh_lock.lock().await.replace(did.clone());
         self.tokens.set(did, session).await
     }
 

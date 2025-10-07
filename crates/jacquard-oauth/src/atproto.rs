@@ -76,77 +76,78 @@ impl From<GrantType> for CowStr<'static> {
     }
 }
 
-pub fn localhost_client_metadata<'s>(
-    redirect_uris: Option<Vec<Url>>,
-    scopes: Option<&'s [Scope<'s>]>,
-) -> Result<OAuthClientMetadata<'s>> {
-    // validate redirect_uris
-    if let Some(redirect_uris) = &redirect_uris {
-        for redirect_uri in redirect_uris {
-            if redirect_uri.scheme() != "http" {
-                return Err(Error::LocalhostClient(LocalhostClientError::NotHttpScheme));
-            }
-            if redirect_uri.host().map(|h| h.to_owned()) == Some(Host::parse("localhost").unwrap())
-            {
-                return Err(Error::LocalhostClient(LocalhostClientError::Localhost));
-            }
-            if redirect_uri
-                .host()
-                .map(|h| h.to_owned())
-                .map_or(true, |host| {
-                    host != Host::parse("127.0.0.1").unwrap()
-                        && host != Host::parse("[::1]").unwrap()
-                })
-            {
-                return Err(Error::LocalhostClient(
-                    LocalhostClientError::NotLoopbackHost,
-                ));
-            }
-        }
-    }
-    // determine client_id
-    #[derive(serde::Serialize)]
-    struct Parameters<'a> {
-        #[serde(skip_serializing_if = "Option::is_none")]
-        redirect_uri: Option<Vec<Url>>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        scope: Option<CowStr<'a>>,
-    }
-    let query = serde_html_form::to_string(Parameters {
-        redirect_uri: redirect_uris.clone(),
-        scope: scopes.map(|s| Scope::serialize_multiple(s)),
-    })?;
-    let mut client_id = String::from("http://localhost");
-    if !query.is_empty() {
-        client_id.push_str(&format!("?{query}"));
-    }
-    Ok(OAuthClientMetadata {
-        client_id: Url::parse(&client_id).unwrap(),
-        client_uri: None,
-        redirect_uris: redirect_uris.unwrap_or(vec![
-            Url::from_str("http://127.0.0.1/").unwrap(),
-            Url::from_str("http://[::1]/").unwrap(),
-        ]),
-        scope: None,
-        grant_types: None, // will be set to `authorization_code` and `refresh_token`
-        token_endpoint_auth_method: Some(CowStr::new_static("none")),
-        dpop_bound_access_tokens: None, // will be set to `true`
-        jwks_uri: None,
-        jwks: None,
-        token_endpoint_auth_signing_alg: None,
-    })
-}
-
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AtprotoClientMetadata<'m> {
     pub client_id: Url,
     pub client_uri: Option<Url>,
     pub redirect_uris: Vec<Url>,
-    pub token_endpoint_auth_method: AuthMethod,
     pub grant_types: Vec<GrantType>,
     pub scopes: Vec<Scope<'m>>,
     pub jwks_uri: Option<Url>,
-    pub token_endpoint_auth_signing_alg: Option<CowStr<'m>>,
+}
+
+impl<'m> AtprotoClientMetadata<'m> {
+    pub fn new(
+        client_id: Url,
+        client_uri: Option<Url>,
+        redirect_uris: Vec<Url>,
+        grant_types: Vec<GrantType>,
+        scopes: Vec<Scope<'m>>,
+        jwks_uri: Option<Url>,
+    ) -> Self {
+        Self {
+            client_id,
+            client_uri,
+            redirect_uris,
+            grant_types,
+            scopes,
+            jwks_uri,
+        }
+    }
+
+    pub fn new_localhost(
+        mut redirect_uris: Option<Vec<Url>>,
+        scopes: Option<Vec<Scope<'m>>>,
+    ) -> Self {
+        // coerce redirect uris to localhost
+        if let Some(redirect_uris) = &mut redirect_uris {
+            for redirect_uri in redirect_uris {
+                redirect_uri.set_host(Some("http://localhost")).unwrap();
+            }
+        }
+        // determine client_id
+        #[derive(serde::Serialize)]
+        struct Parameters<'a> {
+            #[serde(skip_serializing_if = "Option::is_none")]
+            redirect_uri: Option<Vec<Url>>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            scope: Option<CowStr<'a>>,
+        }
+        let query = serde_html_form::to_string(Parameters {
+            redirect_uri: redirect_uris.clone(),
+            scope: scopes
+                .as_ref()
+                .map(|s| Scope::serialize_multiple(s.as_slice())),
+        })
+        .ok();
+        let mut client_id = String::from("http://localhost");
+        if let Some(query) = query
+            && !query.is_empty()
+        {
+            client_id.push_str(&format!("?{query}"));
+        }
+        Self {
+            client_id: Url::parse(&client_id).unwrap(),
+            client_uri: None,
+            redirect_uris: redirect_uris.unwrap_or(vec![
+                Url::from_str("http://127.0.0.1/").unwrap(),
+                Url::from_str("http://[::1]/").unwrap(),
+            ]),
+            grant_types: vec![GrantType::AuthorizationCode, GrantType::RefreshToken],
+            scopes: scopes.unwrap_or(vec![Scope::Atproto]),
+            jwks_uri: None,
+        }
+    }
 }
 
 pub fn atproto_client_metadata<'m>(
@@ -162,37 +163,32 @@ pub fn atproto_client_metadata<'m>(
     if !metadata.scopes.contains(&Scope::Atproto) {
         return Err(Error::InvalidScope);
     }
-    let (jwks_uri, mut jwks) = (metadata.jwks_uri, None);
-    match metadata.token_endpoint_auth_method {
-        AuthMethod::None => {
-            if metadata.token_endpoint_auth_signing_alg.is_some() {
-                return Err(Error::AuthSigningAlg);
-            }
-        }
-        AuthMethod::PrivateKeyJwt => {
-            if let Some(keyset) = keyset {
-                if metadata.token_endpoint_auth_signing_alg.is_none() {
-                    return Err(Error::AuthSigningAlg);
-                }
-                if jwks_uri.is_none() {
-                    jwks = Some(keyset.public_jwks());
-                }
-            } else {
-                return Err(Error::EmptyJwks);
-            }
-        }
-    }
+    let (auth_method, jwks_uri, jwks) = if let Some(keyset) = keyset {
+        let jwks = if metadata.jwks_uri.is_none() {
+            Some(keyset.public_jwks())
+        } else {
+            None
+        };
+        (AuthMethod::PrivateKeyJwt, metadata.jwks_uri, jwks)
+    } else {
+        (AuthMethod::None, None, None)
+    };
+
     Ok(OAuthClientMetadata {
         client_id: metadata.client_id,
         client_uri: metadata.client_uri,
         redirect_uris: metadata.redirect_uris,
-        token_endpoint_auth_method: Some(metadata.token_endpoint_auth_method.into()),
+        token_endpoint_auth_method: Some(auth_method.into()),
         grant_types: Some(metadata.grant_types.into_iter().map(|v| v.into()).collect()),
         scope: Some(Scope::serialize_multiple(metadata.scopes.as_slice())),
         dpop_bound_access_tokens: Some(true),
         jwks_uri,
         jwks,
-        token_endpoint_auth_signing_alg: metadata.token_endpoint_auth_signing_alg,
+        token_endpoint_auth_signing_alg: if keyset.is_some() {
+            Some(CowStr::new_static("ES256"))
+        } else {
+            None
+        },
     })
 }
 
@@ -216,7 +212,8 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
     #[test]
     fn test_localhost_client_metadata_default() {
         assert_eq!(
-            localhost_client_metadata(None, None).expect("failed to convert metadata"),
+            atproto_client_metadata(AtprotoClientMetadata::new_localhost(None, None), &None)
+                .unwrap(),
             OAuthClientMetadata {
                 client_id: Url::from_str("http://localhost").unwrap(),
                 client_uri: None,
@@ -238,7 +235,7 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
     #[test]
     fn test_localhost_client_metadata_custom() {
         assert_eq!(
-            localhost_client_metadata(
+            atproto_client_metadata(AtprotoClientMetadata::new_localhost(
                 Some(vec![
                      Url::from_str("http://127.0.0.1/callback").unwrap(),
                      Url::from_str("http://[::1]/callback").unwrap(),
@@ -249,9 +246,8 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                         Scope::Transition(TransitionScope::Generic),
                         Scope::parse("account:email").unwrap()
                     ]
-                    .as_slice()
                 )
-            )
+            ), &None)
             .expect("failed to convert metadata"),
             OAuthClientMetadata {
                 client_id: Url::from_str(
@@ -276,9 +272,12 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
     #[test]
     fn test_localhost_client_metadata_invalid() {
         {
-            let err = localhost_client_metadata(
-                Some(vec![Url::from_str("https://127.0.0.1/").unwrap()]),
-                None,
+            let err = atproto_client_metadata(
+                AtprotoClientMetadata::new_localhost(
+                    Some(vec![Url::from_str("https://127.0.0.1/").unwrap()]),
+                    None,
+                ),
+                &None,
             )
             .expect_err("expected to fail");
             assert!(matches!(
@@ -287,9 +286,12 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             ));
         }
         {
-            let err = localhost_client_metadata(
-                Some(vec![Url::from_str("http://localhost:8000/").unwrap()]),
-                None,
+            let err = atproto_client_metadata(
+                AtprotoClientMetadata::new_localhost(
+                    Some(vec![Url::from_str("http://localhost:8000/").unwrap()]),
+                    None,
+                ),
+                &None,
             )
             .expect_err("expected to fail");
             assert!(matches!(
@@ -298,9 +300,12 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             ));
         }
         {
-            let err = localhost_client_metadata(
-                Some(vec![Url::from_str("http://192.168.0.0/").unwrap()]),
-                None,
+            let err = atproto_client_metadata(
+                AtprotoClientMetadata::new_localhost(
+                    Some(vec![Url::from_str("http://192.168.0.0/").unwrap()]),
+                    None,
+                ),
+                &None,
             )
             .expect_err("expected to fail");
             assert!(matches!(
@@ -316,11 +321,9 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             client_id: Url::from_str("https://example.com/client_metadata.json").unwrap(),
             client_uri: Some(Url::from_str("https://example.com").unwrap()),
             redirect_uris: vec![Url::from_str("https://example.com/callback").unwrap()],
-            token_endpoint_auth_method: AuthMethod::PrivateKeyJwt,
             grant_types: vec![GrantType::AuthorizationCode],
             scopes: vec![Scope::Atproto],
             jwks_uri: None,
-            token_endpoint_auth_signing_alg: Some(CowStr::new_static("ES256")),
         };
         {
             let metadata = metadata.clone();

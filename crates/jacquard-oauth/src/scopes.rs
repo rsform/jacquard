@@ -26,6 +26,8 @@ use jacquard_common::types::did::Did;
 use jacquard_common::types::nsid::Nsid;
 use jacquard_common::types::string::AtStrError;
 use jacquard_common::{CowStr, IntoStatic};
+use serde::de::Visitor;
+use serde::{Deserialize, Serialize};
 use smol_str::{SmolStr, ToSmolStr};
 
 /// Represents an AT Protocol OAuth scope
@@ -51,6 +53,41 @@ pub enum Scope<'s> {
     Profile,
     /// Email scope - access to user email address
     Email,
+}
+
+impl Serialize for Scope<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.to_string_normalized())
+    }
+}
+
+impl<'de> Deserialize<'de> for Scope<'_> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct ScopeVisitor;
+
+        impl Visitor<'_> for ScopeVisitor {
+            type Value = Scope<'static>;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                write!(formatter, "a scope string")
+            }
+            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                Scope::parse(v)
+                    .map(|s| s.into_static())
+                    .map_err(|e| serde::de::Error::custom(format!("{:?}", e)))
+            }
+        }
+        deserializer.deserialize_str(ScopeVisitor)
+    }
 }
 
 impl IntoStatic for Scope<'_> {
@@ -370,7 +407,10 @@ impl<'s> Scope<'s> {
             return CowStr::default();
         }
 
-        let mut serialized: Vec<String> = scopes.iter().map(|scope| scope.to_string()).collect();
+        let mut serialized: Vec<String> = scopes
+            .iter()
+            .map(|scope| scope.to_string_normalized())
+            .collect();
 
         serialized.sort();
         serialized.join(" ").into()
