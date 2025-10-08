@@ -2,7 +2,7 @@ use crate::{
     atproto::atproto_client_metadata,
     authstore::ClientAuthStore,
     dpop::DpopExt,
-    error::{OAuthError, Result},
+    error::{CallbackError, Result},
     request::{OAuthMetadata, exchange_code, par},
     resolver::OAuthResolver,
     scopes::Scope,
@@ -105,13 +105,11 @@ where
 
     pub async fn callback(&self, params: CallbackParams<'_>) -> Result<OAuthSession<T, S>> {
         let Some(state_key) = params.state else {
-            return Err(OAuthError::Callback("missing state parameter".into()));
+            return Err(CallbackError::MissingState.into());
         };
 
         let Some(auth_req_info) = self.registry.store.get_auth_req_info(&state_key).await? else {
-            return Err(OAuthError::Callback(format!(
-                "unknown authorization state: {state_key}"
-            )));
+            return Err(CallbackError::MissingState.into());
         };
 
         self.registry.store.delete_auth_req_info(&state_key).await?;
@@ -122,14 +120,11 @@ where
             .await?;
 
         if let Some(iss) = params.iss {
-            if iss != metadata.issuer {
-                return Err(OAuthError::Callback(format!(
-                    "issuer mismatch: expected {}, got {iss}",
-                    metadata.issuer
-                )));
+            if !crate::resolver::issuer_equivalent(&iss, &metadata.issuer) {
+                return Err(CallbackError::IssuerMismatch { expected: metadata.issuer.to_string(), got: iss.to_string() }.into());
             }
         } else if metadata.authorization_response_iss_parameter_supported == Some(true) {
-            return Err(OAuthError::Callback("missing `iss` parameter".into()));
+            return Err(CallbackError::MissingIssuer.into());
         }
         let metadata = OAuthMetadata {
             server_metadata: metadata,
@@ -257,13 +252,7 @@ where
     }
 
     pub async fn refresh_token(&self) -> Option<AuthorizationToken<'_>> {
-        self.data
-            .read()
-            .await
-            .token_set
-            .refresh_token
-            .as_ref()
-            .map(|token| AuthorizationToken::Dpop(token.clone()))
+        self.data.read().await.token_set.refresh_token.as_ref().map(|t| AuthorizationToken::Dpop(t.clone()))
     }
 }
 impl<T, S> OAuthSession<T, S>
@@ -272,14 +261,19 @@ where
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
 {
     pub async fn refresh(&self) -> Result<AuthorizationToken<'_>> {
-        let mut data = self.data.write().await;
+        // Read identifiers without holding the lock across await
+        let (did, sid) = {
+            let data = self.data.read().await;
+            (data.account_did.clone(), data.session_id.clone())
+        };
         let refreshed = self
             .registry
             .as_ref()
-            .get(&data.account_did, &data.session_id, true)
+            .get(&did, &sid, true)
             .await?;
         let token = AuthorizationToken::Dpop(refreshed.token_set.access_token.clone());
-        *data = refreshed.into_static();
+        // Write back updated session
+        *self.data.write().await = refreshed.into_static();
         Ok(token)
     }
 }
@@ -305,7 +299,13 @@ where
     T: OAuthResolver + DpopExt + XrpcExt + Send + Sync + 'static,
 {
     fn base_uri(&self) -> Url {
-        self.data.blocking_read().host_url.clone()
+        // base_uri is a synchronous trait method; we must avoid async `.read().await`.
+        // Use `block_in_place` under Tokio to perform a blocking RwLock read safely.
+        if tokio::runtime::Handle::try_current().is_ok() {
+            tokio::task::block_in_place(|| self.data.blocking_read().host_url.clone())
+        } else {
+            self.data.blocking_read().host_url.clone()
+        }
     }
 
     async fn opts(&self) -> CallOptions<'_> {
@@ -349,6 +349,10 @@ fn is_invalid_token_response<R: XrpcRequest>(response: &XrpcResult<Response<R>>)
         Err(ClientError::Auth(AuthError::Other(value))) => value
             .to_str()
             .is_ok_and(|s| s.starts_with("DPoP ") && s.contains("error=\"invalid_token\"")),
+        Ok(resp) => match resp.parse() {
+            Err(jacquard_common::types::xrpc::XrpcError::Auth(AuthError::InvalidToken)) => true,
+            _ => false,
+        },
         _ => false,
     }
 }

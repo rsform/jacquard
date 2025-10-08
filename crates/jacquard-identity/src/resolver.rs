@@ -36,30 +36,42 @@ use url::Url;
 #[allow(missing_docs)]
 pub enum IdentityError {
     #[error("unsupported DID method: {0}")]
+    #[diagnostic(code(jacquard_identity::unsupported_did_method), help("supported DID methods: did:web, did:plc"))]
     UnsupportedDidMethod(String),
     #[error("invalid well-known atproto-did content")]
+    #[diagnostic(code(jacquard_identity::invalid_well_known), help("expected first non-empty line to be a DID"))]
     InvalidWellKnown,
     #[error("missing PDS endpoint in DID document")]
+    #[diagnostic(code(jacquard_identity::missing_pds_endpoint))]
     MissingPdsEndpoint,
     #[error("HTTP error: {0}")]
+    #[diagnostic(code(jacquard_identity::http), help("check network connectivity and TLS configuration"))]
     Http(#[from] TransportError),
     #[error("HTTP status {0}")]
+    #[diagnostic(code(jacquard_identity::http_status), help("verify well-known paths or PDS XRPC endpoints"))]
     HttpStatus(StatusCode),
     #[error("XRPC error: {0}")]
+    #[diagnostic(code(jacquard_identity::xrpc), help("enable PDS fallback or public resolver if needed"))]
     Xrpc(String),
     #[error("URL parse error: {0}")]
+    #[diagnostic(code(jacquard_identity::url))]
     Url(#[from] url::ParseError),
     #[error("DNS error: {0}")]
     #[cfg(feature = "dns")]
+    #[diagnostic(code(jacquard_identity::dns))]
     Dns(#[from] hickory_resolver::error::ResolveError),
     #[error("serialize/deserialize error: {0}")]
+    #[diagnostic(code(jacquard_identity::serde))]
     Serde(#[from] serde_json::Error),
     #[error("invalid DID document: {0}")]
+    #[diagnostic(code(jacquard_identity::invalid_doc), help("validate keys and services; ensure AtprotoPersonalDataServer service exists"))]
     InvalidDoc(String),
     #[error(transparent)]
+    #[diagnostic(code(jacquard_identity::data))]
     Data(#[from] AtDataError),
     /// DID document id did not match requested DID; includes the fetched document
     #[error("DID doc id mismatch")]
+    #[diagnostic(code(jacquard_identity::doc_id_mismatch), help("document id differs from requested DID; do not trust this document"))]
     DocIdMismatch {
         expected: Did<'static>,
         doc: DidDocument<'static>,

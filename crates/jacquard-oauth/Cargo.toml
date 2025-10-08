@@ -25,6 +25,7 @@ jose-jwk = { version = "0.1", features = ["p256"] }
 chrono = "0.4"
 elliptic-curve = "0.13.8"
 http.workspace = true
+bytes.workspace = true
 rand = { version = "0.8.5", features = ["small_rng"] }
 async-trait = "0.1.89"
 dashmap = "6.1.0"

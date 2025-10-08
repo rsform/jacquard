@@ -109,10 +109,12 @@ impl<'m> AtprotoClientMetadata<'m> {
         mut redirect_uris: Option<Vec<Url>>,
         scopes: Option<Vec<Scope<'m>>>,
     ) -> Self {
-        // coerce redirect uris to localhost
+        // Coerce provided redirect URIs to http://localhost while preserving path
         if let Some(redirect_uris) = &mut redirect_uris {
             for redirect_uri in redirect_uris {
-                redirect_uri.set_host(Some("http://localhost")).unwrap();
+                let _ = redirect_uri.set_scheme("http");
+                redirect_uri.set_host(Some("localhost")).unwrap();
+                let _ = redirect_uri.set_port(None);
             }
         }
         // determine client_id
@@ -154,6 +156,12 @@ pub fn atproto_client_metadata<'m>(
     metadata: AtprotoClientMetadata<'m>,
     keyset: &Option<Keyset>,
 ) -> Result<OAuthClientMetadata<'m>> {
+    // For non-loopback clients, require a keyset/JWKs.
+    let is_loopback = metadata.client_id.scheme() == "http"
+        && metadata.client_id.host_str() == Some("localhost");
+    if !is_loopback && keyset.is_none() {
+        return Err(Error::EmptyJwks);
+    }
     if metadata.redirect_uris.is_empty() {
         return Err(Error::EmptyRedirectUris);
     }
@@ -179,9 +187,17 @@ pub fn atproto_client_metadata<'m>(
         client_uri: metadata.client_uri,
         redirect_uris: metadata.redirect_uris,
         token_endpoint_auth_method: Some(auth_method.into()),
-        grant_types: Some(metadata.grant_types.into_iter().map(|v| v.into()).collect()),
-        scope: Some(Scope::serialize_multiple(metadata.scopes.as_slice())),
-        dpop_bound_access_tokens: Some(true),
+        grant_types: if keyset.is_some() {
+            Some(metadata.grant_types.into_iter().map(|v| v.into()).collect())
+        } else {
+            None
+        },
+        scope: if keyset.is_some() {
+            Some(Scope::serialize_multiple(metadata.scopes.as_slice()))
+        } else {
+            None
+        },
+        dpop_bound_access_tokens: if keyset.is_some() { Some(true) } else { None },
         jwks_uri,
         jwks,
         token_endpoint_auth_signing_alg: if keyset.is_some() {
@@ -251,12 +267,12 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             .expect("failed to convert metadata"),
             OAuthClientMetadata {
                 client_id: Url::from_str(
-                    "http://localhost?redirect_uri=http%3A%2F%2F127.0.0.1%2Fcallback&redirect_uri=http%3A%2F%2F%5B%3A%3A1%5D%2Fcallback&scope=account%3Aemail+atproto+transition%3Ageneric"
+                    "http://localhost?redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=account%3Aemail+atproto+transition%3Ageneric"
                 ).unwrap(),
                 client_uri: None,
                 redirect_uris: vec![
-                    Url::from_str("http://127.0.0.1/callback").unwrap(),
-                    Url::from_str("http://[::1]/callback").unwrap(),
+                    Url::from_str("http://localhost/callback").unwrap(),
+                    Url::from_str("http://localhost/callback").unwrap(),
                 ],
                 scope: None,
                 grant_types: None,
@@ -271,47 +287,81 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
 
     #[test]
     fn test_localhost_client_metadata_invalid() {
+        // Invalid inputs are coerced to http://localhost rather than failing
         {
-            let err = atproto_client_metadata(
+            let out = atproto_client_metadata(
                 AtprotoClientMetadata::new_localhost(
                     Some(vec![Url::from_str("https://127.0.0.1/").unwrap()]),
                     None,
                 ),
                 &None,
             )
-            .expect_err("expected to fail");
-            assert!(matches!(
-                err,
-                Error::LocalhostClient(LocalhostClientError::NotHttpScheme)
-            ));
+            .expect("should coerce to localhost");
+            assert_eq!(
+                out,
+                OAuthClientMetadata {
+                    client_id: Url::from_str("http://localhost?redirect_uri=http%3A%2F%2Flocalhost%2F").unwrap(),
+                    client_uri: None,
+                    redirect_uris: vec![Url::from_str("http://localhost/").unwrap()],
+                    scope: None,
+                    grant_types: None,
+                    token_endpoint_auth_method: Some(AuthMethod::None.into()),
+                    dpop_bound_access_tokens: None,
+                    jwks_uri: None,
+                    jwks: None,
+                    token_endpoint_auth_signing_alg: None,
+                }
+            );
         }
         {
-            let err = atproto_client_metadata(
+            let out = atproto_client_metadata(
                 AtprotoClientMetadata::new_localhost(
                     Some(vec![Url::from_str("http://localhost:8000/").unwrap()]),
                     None,
                 ),
                 &None,
             )
-            .expect_err("expected to fail");
-            assert!(matches!(
-                err,
-                Error::LocalhostClient(LocalhostClientError::Localhost)
-            ));
+            .expect("should coerce to localhost");
+            assert_eq!(
+                out,
+                OAuthClientMetadata {
+                    client_id: Url::from_str("http://localhost?redirect_uri=http%3A%2F%2Flocalhost%2F").unwrap(),
+                    client_uri: None,
+                    redirect_uris: vec![Url::from_str("http://localhost/").unwrap()],
+                    scope: None,
+                    grant_types: None,
+                    token_endpoint_auth_method: Some(AuthMethod::None.into()),
+                    dpop_bound_access_tokens: None,
+                    jwks_uri: None,
+                    jwks: None,
+                    token_endpoint_auth_signing_alg: None,
+                }
+            );
         }
         {
-            let err = atproto_client_metadata(
+            let out = atproto_client_metadata(
                 AtprotoClientMetadata::new_localhost(
                     Some(vec![Url::from_str("http://192.168.0.0/").unwrap()]),
                     None,
                 ),
                 &None,
             )
-            .expect_err("expected to fail");
-            assert!(matches!(
-                err,
-                Error::LocalhostClient(LocalhostClientError::NotLoopbackHost)
-            ));
+            .expect("should coerce to localhost");
+            assert_eq!(
+                out,
+                OAuthClientMetadata {
+                    client_id: Url::from_str("http://localhost?redirect_uri=http%3A%2F%2Flocalhost%2F").unwrap(),
+                    client_uri: None,
+                    redirect_uris: vec![Url::from_str("http://localhost/").unwrap()],
+                    scope: None,
+                    grant_types: None,
+                    token_endpoint_auth_method: Some(AuthMethod::None.into()),
+                    dpop_bound_access_tokens: None,
+                    jwks_uri: None,
+                    jwks: None,
+                    token_endpoint_auth_signing_alg: None,
+                }
+            );
         }
     }
 
@@ -326,6 +376,7 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             jwks_uri: None,
         };
         {
+            // Non-loopback clients without a keyset should fail (must provide JWKS)
             let metadata = metadata.clone();
             let err = atproto_client_metadata(metadata, &None).expect_err("expected to fail");
             assert!(matches!(err, Error::EmptyJwks));

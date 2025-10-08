@@ -18,16 +18,25 @@ use crate::client::AtpSession;
 use jacquard_identity::resolver::IdentityResolver;
 use std::any::Any;
 
+/// Storage key for app‑password sessions: `(account DID, session id)`.
 pub type SessionKey = (Did<'static>, CowStr<'static>);
 
+/// Stateful client for app‑password based sessions.
+///
+/// - Persists sessions via a pluggable `SessionStore`.
+/// - Automatically refreshes on token expiry.
+/// - Tracks a base endpoint, defaulting to the public appview until login/restore.
 pub struct CredentialSession<S, T>
 where
     S: SessionStore<SessionKey, AtpSession>,
 {
     store: Arc<S>,
     client: Arc<T>,
+    /// Default call options applied to each request (auth/headers/labelers).
     pub options: RwLock<CallOptions<'static>>,
+    /// Active session key, if any.
     pub key: RwLock<Option<SessionKey>>,
+    /// Current base endpoint (PDS); defaults to public appview when unset.
     pub endpoint: RwLock<Option<Url>>,
 }
 
@@ -35,6 +44,7 @@ impl<S, T> CredentialSession<S, T>
 where
     S: SessionStore<SessionKey, AtpSession>,
 {
+    /// Create a new credential session using the given store and client.
     pub fn new(store: Arc<S>, client: Arc<T>) -> Self {
         Self {
             store,
@@ -50,6 +60,7 @@ impl<S, T> CredentialSession<S, T>
 where
     S: SessionStore<SessionKey, AtpSession>,
 {
+    /// Return a copy configured with the provided default call options.
     pub fn with_options(self, options: CallOptions<'_>) -> Self {
         Self {
             client: self.client,
@@ -60,30 +71,36 @@ where
         }
     }
 
+    /// Replace default call options.
     pub async fn set_options(&self, options: CallOptions<'_>) {
         *self.options.write().await = options.into_static();
     }
 
+    /// Get the active session key (account DID and session id), if any.
     pub async fn session_info(&self) -> Option<SessionKey> {
         self.key.read().await.clone()
     }
 
+    /// Current base endpoint. Defaults to the public appview when unset.
     pub async fn endpoint(&self) -> Url {
         self.endpoint.read().await.clone().unwrap_or(
             Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
         )
     }
 
+    /// Override the current base endpoint.
     pub async fn set_endpoint(&self, endpoint: Url) {
         *self.endpoint.write().await = Some(endpoint);
     }
 
+    /// Current access token (Bearer), if logged in.
     pub async fn access_token(&self) -> Option<AuthorizationToken<'_>> {
         let key = self.key.read().await.clone()?;
         let session = self.store.get(&key).await;
         session.map(|session| AuthorizationToken::Bearer(session.access_jwt))
     }
 
+    /// Current refresh token (Bearer), if logged in.
     pub async fn refresh_token(&self) -> Option<AuthorizationToken<'_>> {
         let key = self.key.read().await.clone()?;
         let session = self.store.get(&key).await;
@@ -96,6 +113,7 @@ where
     S: SessionStore<SessionKey, AtpSession>,
     T: HttpClient,
 {
+    /// Refresh the active session by calling `com.atproto.server.refreshSession`.
     pub async fn refresh(&self) -> Result<AuthorizationToken<'_>, ClientError> {
         let key = self.key.read().await.clone().ok_or(ClientError::Auth(
             jacquard_common::error::AuthError::NotAuthenticated,
@@ -134,6 +152,7 @@ where
     ///
     /// - `identifier`: handle (preferred), DID, or `https://` PDS base URL.
     /// - `session_id`: optional session label; defaults to "session".
+    /// - Persists and activates the session, and updates the base endpoint to the user's PDS.
     pub async fn login(
         &self,
         identifier: CowStr<'_>,
@@ -298,7 +317,7 @@ where
         Ok(())
     }
 
-    /// Switch to a different stored session (and refresh endpoint from DID).
+    /// Switch to a different stored session (and refresh endpoint/PDS).
     pub async fn switch_session(
         &self,
         did: Did<'_>,
@@ -380,9 +399,27 @@ where
     T: HttpClient + XrpcExt + Send + Sync + 'static,
 {
     fn base_uri(&self) -> Url {
-        self.endpoint.blocking_read().clone().unwrap_or(
-            Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
-        )
+        // base_uri is a synchronous trait method; avoid `.await` here.
+        // Under Tokio, use `block_in_place` to make a blocking RwLock read safe.
+        if tokio::runtime::Handle::try_current().is_ok() {
+            tokio::task::block_in_place(|| {
+                self.endpoint
+                    .blocking_read()
+                    .clone()
+                    .unwrap_or(
+                        Url::parse("https://public.bsky.app")
+                            .expect("public appview should be valid url"),
+                    )
+            })
+        } else {
+            self.endpoint
+                .blocking_read()
+                .clone()
+                .unwrap_or(
+                    Url::parse("https://public.bsky.app")
+                        .expect("public appview should be valid url"),
+                )
+        }
     }
     async fn send<R: jacquard_common::types::xrpc::XrpcRequest + Send>(
         self,

@@ -1,3 +1,15 @@
+//! Stateless XRPC utilities and request/response mapping
+//!
+//! Mapping overview:
+//! - Success (2xx): parse body into the endpoint's typed output.
+//! - 400: try typed error; on failure, fall back to a generic XRPC error (with
+//!   `nsid`, `method`, and `http_status`) and map common auth errors.
+//! - 401: if `WWW-Authenticate` is present, return
+//!   `ClientError::Auth(AuthError::Other(header))` so higher layers (OAuth/DPoP)
+//!   can inspect `error="invalid_token"` or `error="use_dpop_nonce"` and refresh/retry.
+//!   If the header is absent, parse the body and map auth errors to
+//!   `AuthError::TokenExpired`/`InvalidToken`.
+//!
 use bytes::Bytes;
 use http::{
     HeaderName, HeaderValue, Request, StatusCode,
@@ -251,6 +263,13 @@ impl<'a, C: HttpClient> XrpcCall<'a, C> {
     }
 
     /// Send the given typed XRPC request and return a response wrapper.
+    ///
+    /// Note on 401 handling:
+    /// - When the server returns 401 with a `WWW-Authenticate` header, this surfaces as
+    ///   `ClientError::Auth(AuthError::Other(header))` so higher layers (e.g., OAuth/DPoP) can
+    ///   inspect the header for `error="invalid_token"` or `error="use_dpop_nonce"` and react
+    ///   (refresh/retry). If the header is absent, the 401 body flows through to `Response` and
+    ///   can be parsed/mapped to `AuthError` as appropriate.
     pub async fn send<R: XrpcRequest + Send>(self, request: &R) -> XrpcResult<Response<R>> {
         let http_request = build_http_request(&self.base, request, &self.opts)
             .map_err(crate::error::TransportError::from)?;
@@ -262,6 +281,15 @@ impl<'a, C: HttpClient> XrpcCall<'a, C> {
             .map_err(|e| crate::error::TransportError::Other(Box::new(e)))?;
 
         let status = http_response.status();
+        // If the server returned 401 with a WWW-Authenticate header, expose it so higher layers
+        // (e.g., DPoP handling) can detect `error="invalid_token"` and trigger refresh.
+        if status.as_u16() == 401 {
+            if let Some(hv) = http_response.headers().get(http::header::WWW_AUTHENTICATE) {
+                return Err(crate::error::ClientError::Auth(
+                    crate::error::AuthError::Other(hv.clone()),
+                ));
+            }
+        }
         let buffer = Bytes::from(http_response.into_body());
 
         if !status.is_success() && !matches!(status.as_u16(), 400 | 401) {
@@ -430,7 +458,10 @@ impl<R: XrpcRequest> Response<R> {
                 Err(_) => {
                     // Fallback to generic error (InvalidRequest, ExpiredToken, etc.)
                     match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
-                        Ok(generic) => {
+                        Ok(mut generic) => {
+                            generic.nsid = R::NSID;
+                            generic.method = R::METHOD.as_str();
+                            generic.http_status = self.status;
                             // Map auth-related errors to AuthError
                             match generic.error.as_str() {
                                 "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
@@ -445,11 +476,16 @@ impl<R: XrpcRequest> Response<R> {
         // 401: always auth error
         } else {
             match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
-                Ok(generic) => match generic.error.as_str() {
-                    "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
-                    "InvalidToken" => Err(XrpcError::Auth(AuthError::InvalidToken)),
-                    _ => Err(XrpcError::Auth(AuthError::NotAuthenticated)),
-                },
+                Ok(mut generic) => {
+                    generic.nsid = R::NSID;
+                    generic.method = R::METHOD.as_str();
+                    generic.http_status = self.status;
+                    match generic.error.as_str() {
+                        "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
+                        "InvalidToken" => Err(XrpcError::Auth(AuthError::InvalidToken)),
+                        _ => Err(XrpcError::Auth(AuthError::NotAuthenticated)),
+                    }
+                }
                 Err(e) => Err(XrpcError::Decode(e)),
             }
         }
@@ -487,7 +523,10 @@ impl<R: XrpcRequest> Response<R> {
                 Err(_) => {
                     // Fallback to generic error (InvalidRequest, ExpiredToken, etc.)
                     match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
-                        Ok(generic) => {
+                        Ok(mut generic) => {
+                            generic.nsid = R::NSID;
+                            generic.method = R::METHOD.as_str();
+                            generic.http_status = self.status;
                             // Map auth-related errors to AuthError
                             match generic.error.as_ref() {
                                 "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
@@ -502,11 +541,17 @@ impl<R: XrpcRequest> Response<R> {
         // 401: always auth error
         } else {
             match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
-                Ok(generic) => match generic.error.as_ref() {
-                    "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
-                    "InvalidToken" => Err(XrpcError::Auth(AuthError::InvalidToken)),
-                    _ => Err(XrpcError::Auth(AuthError::NotAuthenticated)),
-                },
+                Ok(mut generic) => {
+                    let status = self.status;
+                    generic.nsid = R::NSID;
+                    generic.method = R::METHOD.as_str();
+                    generic.http_status = status;
+                    match generic.error.as_ref() {
+                        "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
+                        "InvalidToken" => Err(XrpcError::Auth(AuthError::InvalidToken)),
+                        _ => Err(XrpcError::Auth(AuthError::NotAuthenticated)),
+                    }
+                }
                 Err(e) => Err(XrpcError::Decode(e)),
             }
         }
@@ -527,14 +572,31 @@ pub struct GenericXrpcError {
     pub error: SmolStr,
     /// Optional error message with details
     pub message: Option<SmolStr>,
+    /// XRPC method NSID that produced this error (context only; not serialized)
+    #[serde(skip)]
+    pub nsid: &'static str,
+    /// HTTP method used (GET/POST) (context only; not serialized)
+    #[serde(skip)]
+    pub method: &'static str,
+    /// HTTP status code (context only; not serialized)
+    #[serde(skip)]
+    pub http_status: StatusCode,
 }
 
 impl std::fmt::Display for GenericXrpcError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Some(msg) = &self.message {
-            write!(f, "{}: {}", self.error, msg)
+            write!(
+                f,
+                "{}: {} (nsid={}, method={}, status={})",
+                self.error, msg, self.nsid, self.method, self.http_status
+            )
         } else {
-            write!(f, "{}", self.error)
+            write!(
+                f,
+                "{} (nsid={}, method={}, status={})",
+                self.error, self.nsid, self.method, self.http_status
+            )
         }
     }
 }
@@ -549,19 +611,120 @@ impl std::error::Error for GenericXrpcError {}
 pub enum XrpcError<E: std::error::Error + IntoStatic> {
     /// Typed XRPC error from the endpoint's specific error enum
     #[error("XRPC error: {0}")]
+    #[diagnostic(code(jacquard_common::xrpc::typed))]
     Xrpc(E),
 
     /// Authentication error (ExpiredToken, InvalidToken, etc.)
     #[error("Authentication error: {0}")]
+    #[diagnostic(code(jacquard_common::xrpc::auth))]
     Auth(#[from] AuthError),
 
     /// Generic XRPC error not in the endpoint's error enum (e.g., InvalidRequest)
     #[error("XRPC error: {0}")]
+    #[diagnostic(code(jacquard_common::xrpc::generic))]
     Generic(GenericXrpcError),
 
     /// Failed to decode the response body
     #[error("Failed to decode response: {0}")]
+    #[diagnostic(code(jacquard_common::xrpc::decode))]
     Decode(#[from] serde_json::Error),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Serialize)]
+    struct DummyReq;
+
+    #[derive(Deserialize, Debug, thiserror::Error)]
+    #[error("{0}")]
+    struct DummyErr<'a>(#[serde(borrow)] CowStr<'a>);
+
+    impl IntoStatic for DummyErr<'_> {
+        type Output = DummyErr<'static>;
+        fn into_static(self) -> Self::Output {
+            DummyErr(self.0.into_static())
+        }
+    }
+
+    impl XrpcRequest for DummyReq {
+        const NSID: &'static str = "test.dummy";
+        const METHOD: XrpcMethod = XrpcMethod::Procedure("application/json");
+        const OUTPUT_ENCODING: &'static str = "application/json";
+        type Output<'de> = ();
+        type Err<'de> = DummyErr<'de>;
+    }
+
+    #[test]
+    fn generic_error_carries_context() {
+        let body = serde_json::json!({"error":"InvalidRequest","message":"missing"});
+        let buf = Bytes::from(serde_json::to_vec(&body).unwrap());
+        let resp: Response<DummyReq> = Response::new(buf, StatusCode::BAD_REQUEST);
+        match resp.parse().unwrap_err() {
+            XrpcError::Generic(g) => {
+                assert_eq!(g.error.as_str(), "InvalidRequest");
+                assert_eq!(g.message.as_deref(), Some("missing"));
+                assert_eq!(g.nsid, DummyReq::NSID);
+                assert_eq!(g.method, DummyReq::METHOD.as_str());
+                assert_eq!(g.http_status, StatusCode::BAD_REQUEST);
+            }
+            other => panic!("unexpected: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn auth_error_mapping() {
+        for (code, expect) in [
+            ("ExpiredToken", AuthError::TokenExpired),
+            ("InvalidToken", AuthError::InvalidToken),
+        ] {
+            let body = serde_json::json!({"error": code});
+            let buf = Bytes::from(serde_json::to_vec(&body).unwrap());
+            let resp: Response<DummyReq> = Response::new(buf, StatusCode::UNAUTHORIZED);
+            match resp.parse().unwrap_err() {
+                XrpcError::Auth(e) => match (e, expect) {
+                    (AuthError::TokenExpired, AuthError::TokenExpired) => {}
+                    (AuthError::InvalidToken, AuthError::InvalidToken) => {}
+                    other => panic!("mismatch: {other:?}"),
+                },
+                other => panic!("unexpected: {other:?}"),
+            }
+        }
+    }
+
+    #[test]
+    fn no_double_slash_in_path() {
+        #[derive(Serialize)]
+        struct Req;
+        #[derive(Deserialize, Debug, thiserror::Error)]
+        #[error("{0}")]
+        struct Err<'a>(#[serde(borrow)] CowStr<'a>);
+        impl IntoStatic for Err<'_> {
+            type Output = Err<'static>;
+            fn into_static(self) -> Self::Output { Err(self.0.into_static()) }
+        }
+        impl XrpcRequest for Req {
+            const NSID: &'static str = "com.example.test";
+            const METHOD: XrpcMethod = XrpcMethod::Query;
+            const OUTPUT_ENCODING: &'static str = "application/json";
+            type Output<'de> = ();
+            type Err<'de> = Err<'de>;
+        }
+
+        let opts = CallOptions::default();
+        for base in [
+            Url::parse("https://pds").unwrap(),
+            Url::parse("https://pds/").unwrap(),
+            Url::parse("https://pds/base/").unwrap(),
+        ] {
+            let req = build_http_request(&base, &Req, &opts).unwrap();
+            let uri = req.uri().to_string();
+            assert!(uri.contains("/xrpc/com.example.test"));
+            assert!(!uri.contains("//xrpc"));
+        }
+    }
 }
 
 /// Stateful XRPC call trait

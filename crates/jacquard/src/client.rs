@@ -3,7 +3,9 @@
 //! This module provides HTTP and XRPC client traits along with an authenticated
 //! client implementation that manages session tokens.
 
+/// Stateful session client for app‑password auth with auto‑refresh.
 pub mod credential_session;
+/// Token storage and on‑disk formats shared across app‑password and OAuth.
 pub mod token;
 
 use core::future::Future;
@@ -72,7 +74,7 @@ impl From<jacquard_api::com_atproto::server::refresh_session::RefreshSessionOutp
     }
 }
 
-/// A unified indicator for the type of authenticated session.
+/// Identifies the active authentication mode for an agent/session.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentKind {
     /// App password (Bearer) session
@@ -82,6 +84,8 @@ pub enum AgentKind {
 }
 
 /// Common interface for stateful sessions used by the Agent wrapper.
+///
+/// Implemented by `CredentialSession` (app‑password) and `OAuthSession` (DPoP).
 pub trait AgentSession: XrpcClient + HttpClient + Send + Sync {
     /// Identify the kind of session.
     fn session_kind(&self) -> AgentKind;
@@ -188,7 +192,7 @@ where
     }
 }
 
-/// Thin wrapper that erases the concrete session type while preserving type-safety.
+/// Thin wrapper over a stateful session providing a uniform `XrpcClient`.
 pub struct Agent<A: AgentSession> {
     inner: A,
 }
@@ -214,7 +218,7 @@ impl<A: AgentSession> Agent<A> {
         self.inner.endpoint().await
     }
 
-    /// Override call options.
+    /// Override call options for subsequent requests.
     pub async fn set_options(&self, opts: CallOptions<'_>) {
         self.inner.set_options(opts).await
     }

@@ -40,48 +40,65 @@ use crate::{
 const CLIENT_ASSERTION_TYPE_JWT_BEARER: &str =
     "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
 
-#[derive(Error, Debug)]
-pub enum Error {
+#[derive(Error, Debug, miette::Diagnostic)]
+pub enum RequestError {
     #[error("no {0} endpoint available")]
+    #[diagnostic(code(jacquard_oauth::request::no_endpoint), help("server does not advertise this endpoint"))]
     NoEndpoint(CowStr<'static>),
     #[error("token response verification failed")]
-    Token(CowStr<'static>),
+    #[diagnostic(code(jacquard_oauth::request::token_verification))]
+    TokenVerification,
     #[error("unsupported authentication method")]
+    #[diagnostic(
+        code(jacquard_oauth::request::unsupported_auth_method),
+        help("server must support `private_key_jwt` or `none`; configure client metadata accordingly")
+    )]
     UnsupportedAuthMethod,
     #[error("no refresh token available")]
-    TokenRefresh,
+    #[diagnostic(code(jacquard_oauth::request::no_refresh_token))]
+    NoRefreshToken,
     #[error("failed to parse DID: {0}")]
+    #[diagnostic(code(jacquard_oauth::request::invalid_did))]
     InvalidDid(#[from] AtStrError),
     #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::request::dpop))]
     DpopClient(#[from] crate::dpop::Error),
     #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::request::storage))]
     Storage(#[from] SessionStoreError),
 
     #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::request::resolver))]
     ResolverError(#[from] crate::resolver::ResolverError),
     // #[error(transparent)]
     // OAuthSession(#[from] crate::oauth_session::Error),
     #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::request::http_build))]
     Http(#[from] http::Error),
-    #[error("http client error: {0}")]
-    HttpClient(Box<dyn std::error::Error + Send + Sync + 'static>),
     #[error("http status: {0}")]
+    #[diagnostic(code(jacquard_oauth::request::http_status), help("see server response for details"))]
     HttpStatus(StatusCode),
     #[error("http status: {0}, body: {1:?}")]
+    #[diagnostic(code(jacquard_oauth::request::http_status_body), help("server returned error JSON; inspect fields like `error`, `error_description`"))]
     HttpStatusWithBody(StatusCode, Value),
     #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::request::identity))]
     Identity(#[from] IdentityError),
     #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::request::keyset))]
     Keyset(#[from] crate::keyset::Error),
     #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::request::serde_form))]
     SerdeHtmlForm(#[from] serde_html_form::ser::Error),
     #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::request::serde_json))]
     SerdeJson(#[from] serde_json::Error),
     #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::request::atproto))]
     Atproto(#[from] crate::atproto::Error),
 }
 
-pub type Result<T> = core::result::Result<T, Error>;
+pub type Result<T> = core::result::Result<T, RequestError>;
 
 #[allow(dead_code)]
 pub enum OAuthRequest<'a> {
@@ -110,6 +127,179 @@ impl OAuthRequest<'_> {
             Self::Revocation(_) => StatusCode::NO_CONTENT,
             _ => unimplemented!(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::types::{OAuthAuthorizationServerMetadata, OAuthClientMetadata};
+    use http::{Response as HttpResponse, StatusCode};
+    use bytes::Bytes;
+    use jacquard_common::http_client::HttpClient;
+    use jacquard_identity::resolver::IdentityResolver;
+    use std::sync::Arc;
+    use tokio::sync::Mutex;
+
+    #[derive(Clone, Default)]
+    struct MockClient {
+        resp: Arc<Mutex<Option<HttpResponse<Vec<u8>>>>>,
+    }
+
+    impl HttpClient for MockClient {
+        type Error = std::convert::Infallible;
+        fn send_http(
+            &self,
+            _request: http::Request<Vec<u8>>,
+        ) -> impl core::future::Future<
+            Output = core::result::Result<http::Response<Vec<u8>>, Self::Error>,
+        > + Send {
+            let resp = self.resp.clone();
+            async move { Ok(resp.lock().await.take().unwrap()) }
+        }
+    }
+
+    // IdentityResolver methods won't be called in these tests; provide stubs.
+    #[async_trait::async_trait]
+    impl IdentityResolver for MockClient {
+        fn options(&self) -> &jacquard_identity::resolver::ResolverOptions {
+            use std::sync::LazyLock;
+            static OPTS: LazyLock<jacquard_identity::resolver::ResolverOptions> =
+                LazyLock::new(|| jacquard_identity::resolver::ResolverOptions::default());
+            &OPTS
+        }
+        async fn resolve_handle(
+            &self,
+            _handle: &jacquard_common::types::string::Handle<'_>,
+        ) -> std::result::Result<
+            jacquard_common::types::string::Did<'static>,
+            jacquard_identity::resolver::IdentityError,
+        > {
+            Ok(jacquard_common::types::string::Did::new_static("did:plc:alice").unwrap())
+        }
+        async fn resolve_did_doc(
+            &self,
+            _did: &jacquard_common::types::string::Did<'_>,
+        ) -> std::result::Result<
+            jacquard_identity::resolver::DidDocResponse,
+            jacquard_identity::resolver::IdentityError,
+        > {
+            let doc = serde_json::json!({
+                "id": "did:plc:alice",
+                "service": [{
+                    "id": "#pds",
+                    "type": "AtprotoPersonalDataServer",
+                    "serviceEndpoint": "https://pds"
+                }]
+            });
+            let buf = Bytes::from(serde_json::to_vec(&doc).unwrap());
+            Ok(jacquard_identity::resolver::DidDocResponse {
+                buffer: buf,
+                status: StatusCode::OK,
+                requested: None,
+            })
+        }
+    }
+
+    // Allow using DPoP helpers on MockClient
+    impl crate::dpop::DpopExt for MockClient {}
+    impl crate::resolver::OAuthResolver for MockClient {}
+
+    fn base_metadata() -> OAuthMetadata {
+        let mut server = OAuthAuthorizationServerMetadata::default();
+        server.issuer = CowStr::from("https://issuer");
+        server.authorization_endpoint = CowStr::from("https://issuer/authorize");
+        server.token_endpoint = CowStr::from("https://issuer/token");
+        OAuthMetadata {
+            server_metadata: server,
+            client_metadata: OAuthClientMetadata {
+                client_id: url::Url::parse("https://client").unwrap(),
+                client_uri: None,
+                redirect_uris: vec![url::Url::parse("https://client/cb").unwrap()],
+                scope: Some(CowStr::from("atproto")),
+                grant_types: None,
+                token_endpoint_auth_method: Some(CowStr::from("none")),
+                dpop_bound_access_tokens: None,
+                jwks_uri: None,
+                jwks: None,
+                token_endpoint_auth_signing_alg: None,
+            },
+            keyset: None,
+        }
+    }
+
+    #[tokio::test]
+    async fn par_missing_endpoint() {
+        let mut meta = base_metadata();
+        meta.server_metadata.require_pushed_authorization_requests = Some(true);
+        meta.server_metadata.pushed_authorization_request_endpoint = None;
+        // require_pushed_authorization_requests is true and no endpoint
+        let err = super::par(&MockClient::default(), None, None, &meta)
+            .await
+            .unwrap_err();
+        match err {
+            RequestError::NoEndpoint(name) => {
+                assert_eq!(name.as_ref(), "pushed_authorization_request");
+            }
+            other => panic!("unexpected: {other:?}"),
+        }
+    }
+
+    #[tokio::test]
+    async fn refresh_no_refresh_token() {
+        let client = MockClient::default();
+        let meta = base_metadata();
+        let mut session = ClientSessionData {
+            account_did: jacquard_common::types::string::Did::new_static("did:plc:alice").unwrap(),
+            session_id: CowStr::from("state"),
+            host_url: url::Url::parse("https://pds").unwrap(),
+            authserver_url: url::Url::parse("https://issuer").unwrap(),
+            authserver_token_endpoint: CowStr::from("https://issuer/token"),
+            authserver_revocation_endpoint: None,
+            scopes: vec![],
+            dpop_data: DpopClientData {
+                dpop_key: crate::utils::generate_key(&[CowStr::from("ES256")]).unwrap(),
+                dpop_authserver_nonce: CowStr::from(""),
+                dpop_host_nonce: CowStr::from(""),
+            },
+            token_set: crate::types::TokenSet {
+                iss: CowStr::from("https://issuer"),
+                sub: jacquard_common::types::string::Did::new_static("did:plc:alice").unwrap(),
+                aud: CowStr::from("https://pds"),
+                scope: None,
+                refresh_token: None,
+                access_token: CowStr::from("abc"),
+                token_type: crate::types::OAuthTokenType::DPoP,
+                expires_at: None,
+            },
+        };
+        let err = super::refresh(&client, session, &meta).await.unwrap_err();
+        matches!(err, RequestError::NoRefreshToken);
+    }
+
+    #[tokio::test]
+    async fn exchange_code_missing_sub() {
+        let client = MockClient::default();
+        // set mock HTTP response body: token response without `sub`
+        *client.resp.lock().await = Some(
+            HttpResponse::builder()
+                .status(StatusCode::OK)
+                .body(serde_json::to_vec(&serde_json::json!({
+                    "access_token":"tok",
+                    "token_type":"DPoP",
+                    "expires_in": 3600
+                })).unwrap())
+                .unwrap(),
+        );
+        let meta = base_metadata();
+        let mut dpop = DpopReqData {
+            dpop_key: crate::utils::generate_key(&[CowStr::from("ES256")]).unwrap(),
+            dpop_authserver_nonce: None,
+        };
+        let err = super::exchange_code(&client, &mut dpop, "abc", "verifier", &meta)
+            .await
+            .unwrap_err();
+        matches!(err, RequestError::TokenVerification);
     }
 }
 
@@ -162,7 +352,7 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
     let (code_challenge, verifier) = generate_pkce();
 
     let Some(dpop_key) = generate_dpop_key(&metadata.server_metadata) else {
-        return Err(Error::Token("none of the algorithms worked".into()));
+        return Err(RequestError::TokenVerification);
     };
     let mut dpop_data = DpopReqData {
         dpop_key,
@@ -218,8 +408,8 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
         .require_pushed_authorization_requests
         == Some(true)
     {
-        Err(Error::NoEndpoint(CowStr::new_static(
-            "server requires PAR but no endpoint is available",
+        Err(RequestError::NoEndpoint(CowStr::new_static(
+            "pushed_authorization_request",
         )))
     } else {
         todo!("use of PAR is mandatory")
@@ -235,7 +425,7 @@ where
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
 {
     let Some(refresh_token) = session_data.token_set.refresh_token.as_ref() else {
-        return Err(Error::TokenRefresh);
+        return Err(RequestError::NoRefreshToken);
     };
 
     // /!\ IMPORTANT /!\
@@ -312,7 +502,7 @@ where
     )
     .await?;
     let Some(sub) = token_response.sub else {
-        return Err(Error::Token("missing `sub` in token response".into()));
+        return Err(RequestError::TokenVerification);
     };
     let sub = Did::new_owned(sub)?;
     let iss = metadata.server_metadata.issuer.clone();
@@ -376,7 +566,7 @@ where
     D: DpopDataSource,
 {
     let Some(url) = endpoint_for_req(&metadata.server_metadata, &request) else {
-        return Err(Error::NoEndpoint(request.name()));
+        return Err(RequestError::NoEndpoint(request.name()));
     };
     let client_assertions = build_auth(
         metadata.keyset.as_ref(),
@@ -401,7 +591,7 @@ where
         .dpop_server_call(data_source)
         .send(req)
         .await
-        .map_err(Error::DpopClient)?;
+        .map_err(RequestError::DpopClient)?;
     if res.status() == request.expected_status() {
         let body = res.body();
         if body.is_empty() {
@@ -412,12 +602,12 @@ where
             Ok(output)
         }
     } else if res.status().is_client_error() {
-        Err(Error::HttpStatusWithBody(
+        Err(RequestError::HttpStatusWithBody(
             res.status(),
             serde_json::from_slice(res.body())?,
         ))
     } else {
-        Err(Error::HttpStatus(res.status()))
+        Err(RequestError::HttpStatus(res.status()))
     }
 }
 
@@ -528,5 +718,5 @@ fn build_auth<'a>(
         }
     }
 
-    Err(Error::UnsupportedAuthMethod)
+    Err(RequestError::UnsupportedAuthMethod)
 }

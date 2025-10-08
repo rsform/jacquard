@@ -263,7 +263,7 @@ impl<'s> ClientSession<'s> {
             server_metadata: client
                 .get_authorization_server_metadata(&self.session_data.authserver_url)
                 .await
-                .map_err(|e| Error::ServerAgent(crate::request::Error::ResolverError(e)))?,
+                .map_err(|e| Error::ServerAgent(crate::request::RequestError::ResolverError(e)))?,
             client_metadata: atproto_client_metadata(self.config.clone(), &self.keyset)
                 .unwrap()
                 .into_static(),
@@ -272,13 +272,16 @@ impl<'s> ClientSession<'s> {
     }
 }
 
-#[derive(thiserror::Error, Debug)]
+#[derive(thiserror::Error, Debug, miette::Diagnostic)]
 pub enum Error {
     #[error(transparent)]
-    ServerAgent(#[from] crate::request::Error),
+    #[diagnostic(code(jacquard_oauth::session::request))]
+    ServerAgent(#[from] crate::request::RequestError),
     #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::session::storage))]
     Store(#[from] SessionStoreError),
     #[error("session does not exist")]
+    #[diagnostic(code(jacquard_oauth::session::not_found))]
     SessionNotFound,
 }
 

@@ -1,58 +1,69 @@
 use jacquard_common::session::SessionStoreError;
 use miette::Diagnostic;
 
+use crate::request::RequestError;
 use crate::resolver::ResolverError;
 
-/// Errors emitted by OAuth helpers.
+/// High-level errors emitted by OAuth helpers.
 #[derive(Debug, thiserror::Error, Diagnostic)]
 pub enum OAuthError {
-    /// Invalid or unsupported JWK
-    #[error("invalid JWK: {0}")]
-    #[diagnostic(
-        code(jacquard_oauth::jwk),
-        help("Ensure EC P-256 JWK with base64url x,y,d values")
-    )]
-    Jwk(String),
-    /// Signing error
-    #[error("signing error: {0}")]
-    #[diagnostic(
-        code(jacquard_oauth::signing),
-        help("Check ES256 key material and input payloads")
-    )]
-    Signing(String),
-    /// Serialization error
     #[error(transparent)]
-    #[diagnostic(code(jacquard_oauth::serde))]
-    Serde(#[from] serde_json::Error),
-    /// URL error
+    #[diagnostic(code(jacquard_oauth::resolver))]
+    Resolver(#[from] ResolverError),
+
+    #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::request))]
+    Request(#[from] RequestError),
+
+    #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::storage))]
+    Storage(#[from] SessionStoreError),
+
+    #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::dpop))]
+    Dpop(#[from] crate::dpop::Error),
+
+    #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::keyset))]
+    Keyset(#[from] crate::keyset::Error),
+
+    #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::atproto))]
+    Atproto(#[from] crate::atproto::Error),
+
+    #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::session))]
+    Session(#[from] crate::session::Error),
+
+    #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::serde_json))]
+    SerdeJson(#[from] serde_json::Error),
+
     #[error(transparent)]
     #[diagnostic(code(jacquard_oauth::url))]
     Url(#[from] url::ParseError),
-    /// URL error
+
     #[error(transparent)]
-    #[diagnostic(code(jacquard_oauth::url))]
-    UrlEncoding(#[from] serde_html_form::ser::Error),
-    /// PKCE error
-    #[error("pkce error: {0}")]
-    #[diagnostic(
-        code(jacquard_oauth::pkce),
-        help("PKCE must use S256; ensure verifier/challenge generated")
-    )]
-    Pkce(String),
-    #[error("authorize error: {0}")]
-    Authorize(String),
+    #[diagnostic(code(jacquard_oauth::form))]
+    Form(#[from] serde_html_form::ser::Error),
+
     #[error(transparent)]
-    Atproto(#[from] crate::atproto::Error),
-    #[error("callback error: {0}")]
-    Callback(String),
-    #[error(transparent)]
-    Storage(#[from] SessionStoreError),
-    #[error(transparent)]
-    Session(#[from] crate::session::Error),
-    #[error(transparent)]
-    Request(#[from] crate::request::Error),
-    #[error(transparent)]
-    Client(#[from] ResolverError),
+    #[diagnostic(code(jacquard_oauth::callback))]
+    Callback(#[from] CallbackError),
+}
+
+/// Typed callback validation errors (redirect handling).
+#[derive(Debug, thiserror::Error, Diagnostic)]
+pub enum CallbackError {
+    #[error("missing state parameter in callback")] 
+    #[diagnostic(code(jacquard_oauth::callback::missing_state))]
+    MissingState,
+    #[error("missing `iss` parameter")] 
+    #[diagnostic(code(jacquard_oauth::callback::missing_iss))]
+    MissingIssuer,
+    #[error("issuer mismatch: expected {expected}, got {got}")]
+    #[diagnostic(code(jacquard_oauth::callback::issuer_mismatch))]
+    IssuerMismatch { expected: String, got: String },
 }
 
 pub type Result<T> = core::result::Result<T, OAuthError>;

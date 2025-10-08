@@ -1,41 +1,92 @@
 use crate::types::{OAuthAuthorizationServerMetadata, OAuthProtectedResourceMetadata};
 use http::{Request, StatusCode};
-use jacquard_common::IntoStatic;
+use jacquard_common::{IntoStatic, error::TransportError};
 use jacquard_common::types::did_doc::DidDocument;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::{http_client::HttpClient, types::did::Did};
 use jacquard_identity::resolver::{IdentityError, IdentityResolver};
 use url::Url;
 
+/// Compare two issuer strings strictly but without spuriously failing on trivial differences.
+///
+/// Rules:
+/// - Schemes must match exactly.
+/// - Hostnames and effective ports must match (treat missing port the same as default port).
+/// - Path must match, except that an empty path and `/` are equivalent.
+/// - Query/fragment are not considered; if present on either side, the comparison fails.
+pub(crate) fn issuer_equivalent(a: &str, b: &str) -> bool {
+    fn normalize(url: &Url) -> Option<(String, String, u16, String)> {
+        if url.query().is_some() || url.fragment().is_some() {
+            return None;
+        }
+        let scheme = url.scheme().to_string();
+        let host = url.host_str()?.to_string();
+        let port = url.port_or_known_default()?;
+        let path = match url.path() {
+            "" => "/".to_string(),
+            "/" => "/".to_string(),
+            other => other.to_string(),
+        };
+        Some((scheme, host, port, path))
+    }
+
+    match (Url::parse(a), Url::parse(b)) {
+        (Ok(ua), Ok(ub)) => match (normalize(&ua), normalize(&ub)) {
+            (Some((sa, ha, pa, pa_path)), Some((sb, hb, pb, pb_path))) => {
+                if sa != sb || ha != hb || pa != pb {
+                    return false;
+                }
+                if pa_path == "/" && pb_path == "/" {
+                    return true;
+                }
+                pa_path == pb_path
+            }
+            _ => false,
+        },
+        _ => a == b,
+    }
+}
+
 #[derive(thiserror::Error, Debug, miette::Diagnostic)]
 pub enum ResolverError {
     #[error("resource not found")]
+    #[diagnostic(code(jacquard_oauth::resolver::not_found), help("check the base URL or identifier"))]
     NotFound,
     #[error("invalid at identifier: {0}")]
+    #[diagnostic(code(jacquard_oauth::resolver::at_identifier), help("ensure a valid handle or DID was provided"))]
     AtIdentifier(String),
     #[error("invalid did: {0}")]
+    #[diagnostic(code(jacquard_oauth::resolver::did), help("ensure DID is correctly formed (did:plc or did:web)"))]
     Did(String),
     #[error("invalid did document: {0}")]
+    #[diagnostic(code(jacquard_oauth::resolver::did_document), help("verify the DID document structure and service entries"))]
     DidDocument(String),
     #[error("protected resource metadata is invalid: {0}")]
+    #[diagnostic(code(jacquard_oauth::resolver::protected_resource_metadata), help("PDS must advertise an authorization server in its protected resource metadata"))]
     ProtectedResourceMetadata(String),
     #[error("authorization server metadata is invalid: {0}")]
+    #[diagnostic(code(jacquard_oauth::resolver::authorization_server_metadata), help("issuer must match and include the PDS resource"))]
     AuthorizationServerMetadata(String),
     #[error("error resolving identity: {0}")]
+    #[diagnostic(code(jacquard_oauth::resolver::identity))]
     IdentityResolverError(#[from] IdentityError),
     #[error("unsupported did method: {0:?}")]
+    #[diagnostic(code(jacquard_oauth::resolver::unsupported_did_method), help("supported DID methods: did:web, did:plc"))]
     UnsupportedDidMethod(Did<'static>),
     #[error(transparent)]
-    Http(#[from] http::Error),
-    #[error("http client error: {0}")]
-    HttpClient(Box<dyn std::error::Error + Send + Sync + 'static>),
+    #[diagnostic(code(jacquard_oauth::resolver::transport))]
+    Transport(#[from] TransportError),
     #[error("http status: {0:?}")]
+    #[diagnostic(code(jacquard_oauth::resolver::http_status), help("check well-known paths and server configuration"))]
     HttpStatus(StatusCode),
     #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::resolver::serde_json))]
     SerdeJson(#[from] serde_json::Error),
     #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::resolver::serde_form))]
     SerdeHtmlForm(#[from] serde_html_form::ser::Error),
     #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::resolver::url))]
     Uri(#[from] url::ParseError),
 }
 
@@ -47,8 +98,10 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         sub: &Did<'_>,
     ) -> Result<Url, ResolverError> {
         let (metadata, identity) = self.resolve_from_identity(sub).await?;
-        if metadata.issuer != server_metadata.issuer {
-            return Err(ResolverError::Did(format!("DIDs did not match")));
+        if !issuer_equivalent(&metadata.issuer, &server_metadata.issuer) {
+            return Err(ResolverError::AuthorizationServerMetadata(
+                "issuer mismatch".to_string(),
+            ));
         }
         Ok(identity
             .pds_endpoint()
@@ -110,7 +163,10 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         &self,
         issuer: &Url,
     ) -> Result<OAuthAuthorizationServerMetadata<'static>, ResolverError> {
-        Ok(resolve_authorization_server(self, issuer).await?)
+        let mut md = resolve_authorization_server(self, issuer).await?;
+        // Normalize issuer string to the input URL representation to avoid slash quirks
+        md.issuer = jacquard_common::CowStr::from(issuer.as_str()).into_static();
+        Ok(md)
     }
     async fn get_resource_server_metadata(
         &self,
@@ -166,21 +222,23 @@ pub async fn resolve_authorization_server<T: HttpClient + ?Sized>(
 ) -> Result<OAuthAuthorizationServerMetadata<'static>, ResolverError> {
     let url = server
         .join("/.well-known/oauth-authorization-server")
-        .map_err(|e| ResolverError::HttpClient(e.into()))?;
+        .map_err(|e| ResolverError::Transport(TransportError::Other(Box::new(e))))?;
 
     let req = Request::builder()
         .uri(url.to_string())
         .body(Vec::new())
-        .map_err(|e| ResolverError::HttpClient(e.into()))?;
+        .map_err(|e| ResolverError::Transport(TransportError::InvalidRequest(e.to_string())))?;
     let res = client
         .send_http(req)
         .await
-        .map_err(|e| ResolverError::HttpClient(e.into()))?;
+        .map_err(|e| ResolverError::Transport(TransportError::Other(Box::new(e))))?;
     if res.status() == StatusCode::OK {
-        let metadata = serde_json::from_slice::<OAuthAuthorizationServerMetadata>(res.body())
+        let mut metadata = serde_json::from_slice::<OAuthAuthorizationServerMetadata>(res.body())
             .map_err(ResolverError::SerdeJson)?;
         // https://datatracker.ietf.org/doc/html/rfc8414#section-3.3
-        if metadata.issuer == server.as_str() {
+        // Accept semantically equivalent issuer (normalize to the requested URL form)
+        if issuer_equivalent(&metadata.issuer, server.as_str()) {
+            metadata.issuer = server.as_str().into();
             Ok(metadata.into_static())
         } else {
             Err(ResolverError::AuthorizationServerMetadata(format!(
@@ -199,21 +257,23 @@ pub async fn resolve_protected_resource_info<T: HttpClient + ?Sized>(
 ) -> Result<OAuthProtectedResourceMetadata<'static>, ResolverError> {
     let url = server
         .join("/.well-known/oauth-protected-resource")
-        .map_err(|e| ResolverError::HttpClient(e.into()))?;
+        .map_err(|e| ResolverError::Transport(TransportError::Other(Box::new(e))))?;
 
     let req = Request::builder()
         .uri(url.to_string())
         .body(Vec::new())
-        .map_err(|e| ResolverError::HttpClient(e.into()))?;
+        .map_err(|e| ResolverError::Transport(TransportError::InvalidRequest(e.to_string())))?;
     let res = client
         .send_http(req)
         .await
-        .map_err(|e| ResolverError::HttpClient(e.into()))?;
+        .map_err(|e| ResolverError::Transport(TransportError::Other(Box::new(e))))?;
     if res.status() == StatusCode::OK {
-        let metadata = serde_json::from_slice::<OAuthProtectedResourceMetadata>(res.body())
+        let mut metadata = serde_json::from_slice::<OAuthProtectedResourceMetadata>(res.body())
             .map_err(ResolverError::SerdeJson)?;
         // https://datatracker.ietf.org/doc/html/rfc8414#section-3.3
-        if metadata.resource == server.as_str() {
+        // Accept semantically equivalent resource URL (normalize to the requested URL form)
+        if issuer_equivalent(&metadata.resource, server.as_str()) {
+            metadata.resource = server.as_str().into();
             Ok(metadata.into_static())
         } else {
             Err(ResolverError::AuthorizationServerMetadata(format!(
@@ -228,3 +288,55 @@ pub async fn resolve_protected_resource_info<T: HttpClient + ?Sized>(
 
 #[async_trait::async_trait]
 impl OAuthResolver for jacquard_identity::JacquardResolver {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use http::{Request as HttpRequest, Response as HttpResponse, StatusCode};
+    use jacquard_common::http_client::HttpClient;
+
+    #[derive(Default, Clone)]
+    struct MockHttp {
+        next: std::sync::Arc<tokio::sync::Mutex<Option<HttpResponse<Vec<u8>>>>>,
+    }
+
+    impl HttpClient for MockHttp {
+        type Error = std::convert::Infallible;
+        fn send_http(
+            &self,
+            _request: HttpRequest<Vec<u8>>,
+        ) -> impl core::future::Future<
+            Output = core::result::Result<HttpResponse<Vec<u8>>, Self::Error>,
+        > + Send {
+            let next = self.next.clone();
+            async move { Ok(next.lock().await.take().unwrap()) }
+        }
+    }
+
+    #[tokio::test]
+    async fn authorization_server_http_status() {
+        let client = MockHttp::default();
+        *client.next.lock().await = Some(HttpResponse::builder().status(StatusCode::NOT_FOUND).body(Vec::new()).unwrap());
+        let issuer = url::Url::parse("https://issuer").unwrap();
+        let err = super::resolve_authorization_server(&client, &issuer).await.unwrap_err();
+        matches!(err, ResolverError::HttpStatus(StatusCode::NOT_FOUND));
+    }
+
+    #[tokio::test]
+    async fn authorization_server_bad_json() {
+        let client = MockHttp::default();
+        *client.next.lock().await = Some(HttpResponse::builder().status(StatusCode::OK).body(b"{not json}".to_vec()).unwrap());
+        let issuer = url::Url::parse("https://issuer").unwrap();
+        let err = super::resolve_authorization_server(&client, &issuer).await.unwrap_err();
+        matches!(err, ResolverError::SerdeJson(_));
+    }
+
+    #[test]
+    fn issuer_equivalence_rules() {
+        assert!(super::issuer_equivalent("https://issuer", "https://issuer/"));
+        assert!(super::issuer_equivalent("https://issuer:443/", "https://issuer/"));
+        assert!(!super::issuer_equivalent("http://issuer/", "https://issuer/"));
+        assert!(!super::issuer_equivalent("https://issuer/foo", "https://issuer/"));
+        assert!(!super::issuer_equivalent("https://issuer/?q=1", "https://issuer/"));
+    }
+}

@@ -27,6 +27,7 @@
 //! use jacquard::client::credential_session::{CredentialSession, SessionKey};
 //! use jacquard::client::{AtpSession, FileAuthStore, MemorySessionStore};
 //! use jacquard::identity::PublicResolver as JacquardResolver;
+//! use jacquard::types::xrpc::XrpcClient;
 //! # use miette::IntoDiagnostic;
 //!
 //! # #[derive(Parser, Debug)]
@@ -57,8 +58,7 @@
 //!         .into_diagnostic()?;
 //!     // Fetch timeline
 //!     let timeline = session
-//!         .clone()
-//!         .send(GetTimeline::new().limit(5).build())
+//!         .send(&GetTimeline::new().limit(5).build())
 //!         .await
 //!         .into_diagnostic()?
 //!         .into_output()
@@ -90,7 +90,7 @@
 //!       let resp = http
 //!           .xrpc(base)
 //!           .send(
-//!               GetAuthorFeed::new()
+//!               &GetAuthorFeed::new()
 //!                   .actor(AtIdentifier::new_static("pattern.atproto.systems").unwrap())
 //!                   .limit(5)
 //!                   .build(),
@@ -124,7 +124,7 @@
 //!         .accept_labelers(vec![CowStr::from("did:plc:labelerid")])
 //!         .header(http::header::USER_AGENT, http::HeaderValue::from_static("jacquard-example"))
 //!         .send(
-//!             GetAuthorFeed::new()
+//!             &GetAuthorFeed::new()
 //!                 .actor(AtIdentifier::new_static("pattern.atproto.systems").unwrap())
 //!                 .limit(5)
 //!                 .build(),
