@@ -10,13 +10,10 @@ use crate::{
     scopes::Scope,
     types::{AuthorizeOptions, CallbackParams},
 };
-use jacquard_common::{CowStr, IntoStatic, cowstr::ToCowStr};
+use jacquard_common::{IntoStatic, cowstr::ToCowStr};
 use rouille::Server;
-use std::{net::SocketAddr, sync::Arc};
-use tokio::{
-    net::TcpListener,
-    sync::{Mutex, mpsc, oneshot},
-};
+use std::net::SocketAddr;
+use tokio::sync::mpsc;
 use url::Url;
 
 #[derive(Clone, Debug)]
@@ -108,19 +105,17 @@ where
         opts: AuthorizeOptions<'_>,
         cfg: LoopbackConfig,
     ) -> crate::error::Result<super::client::OAuthSession<T, S>> {
-        // 1) Bind server first to learn effective port
         let port = match cfg.port {
             LoopbackPort::Fixed(p) => p,
             LoopbackPort::Ephemeral => 0,
         };
-        // TODO: fix this to it also accepts ipv6
+        // TODO: fix this to it also accepts ipv6 and properly finds a free port
         let bind_addr: SocketAddr = format!("0.0.0.0:{}", port)
             .parse()
             .expect("invalid loopback host/port");
         let (local_addr, handle) = one_shot_server(bind_addr);
         println!("Listening on {}", local_addr);
-
-        // 2) Build per-flow metadata with the actual redirect URI
+        // build redirect uri
         let redirect = Url::parse(&format!(
             "http://{}:{}/oauth/callback",
             cfg.host,
@@ -138,23 +133,23 @@ where
             ),
         };
 
-        // Build a per-flow client using shared store and resolver
+        // Build client using store and resolver
         let flow_client = OAuthClient::new_with_shared(
             self.registry.store.clone(),
             self.client.clone(),
             client_data.clone(),
         );
 
-        // 3) Start auth (persists state) and get authorization URL
+        // Start auth and get authorization URL
         let auth_url = flow_client.start_auth(input.as_ref(), opts).await?;
         // Print URL for copy/paste
-        println!("Open this URL to authorize:\n{}\n", auth_url);
+        println!("To authenticate with your PDS, visit:\n{}\n", auth_url);
         // Optionally open browser
         if cfg.open_browser {
             let _ = try_open_in_browser(&auth_url);
         }
 
-        // 4) Await callback or timeout
+        // Await callback or timeout
         let mut callback_rx = handle.callback_rx;
         let cb = tokio::time::timeout(
             std::time::Duration::from_millis(cfg.timeout_ms),
@@ -163,14 +158,9 @@ where
         .await;
         // trigger shutdown
         let _ = handle.server_stop.send(());
-        if let Err(_) = cb {
-            return Err(OAuthError::Callback(CallbackError::Timeout));
-        }
-
         if let Ok(Some(cb)) = cb {
-            // 5) Continue with callback flow
-            let session = flow_client.callback(cb).await?;
-            Ok(session)
+            // Handle callback and create a session
+            Ok(flow_client.callback(cb).await?)
         } else {
             Err(OAuthError::Callback(CallbackError::Timeout))
         }

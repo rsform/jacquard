@@ -232,7 +232,7 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     Url::from_str("http://127.0.0.1/").unwrap(),
                     Url::from_str("http://[::1]/").unwrap(),
                 ],
-                scope: None,
+                scope: Some(CowStr::new_static("atproto")),
                 grant_types: None,
                 token_endpoint_auth_method: Some(AuthMethod::None.into()),
                 dpop_bound_access_tokens: None,
@@ -262,14 +262,15 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             .expect("failed to convert metadata"),
             OAuthClientMetadata {
                 client_id: Url::from_str(
-                    "http://localhost?redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=account%3Aemail+atproto+transition%3Ageneric"
+                    "http://localhost?redirect_uri=http%3A%2F%2F127.0.0.1%2Fcallback&redirect_uri=http%3A%2F%2F127.0.0.1%2Fcallback&scope=account%3Aemail+atproto+transition%3Ageneric"
                 ).unwrap(),
                 client_uri: None,
                 redirect_uris: vec![
-                    Url::from_str("http://localhost/callback").unwrap(),
-                    Url::from_str("http://localhost/callback").unwrap(),
+                    Url::from_str("http://127.0.0.1/callback").unwrap(),
+                    // TODO: fix this so that it respects IPv6
+                    Url::from_str("http://127.0.0.1/callback").unwrap(),
                 ],
-                scope: None,
+                scope: Some(CowStr::new_static("account:email atproto transition:generic")),
                 grant_types: None,
                 token_endpoint_auth_method: Some(AuthMethod::None.into()),
                 dpop_bound_access_tokens: None,
@@ -291,17 +292,17 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                 ),
                 &None,
             )
-            .expect("should coerce to localhost");
+            .expect("should coerce to 127.0.0.1");
             assert_eq!(
                 out,
                 OAuthClientMetadata {
                     client_id: Url::from_str(
-                        "http://localhost?redirect_uri=http%3A%2F%2Flocalhost%2F"
+                        "http://localhost?redirect_uri=http%3A%2F%2F127.0.0.1%2F"
                     )
                     .unwrap(),
                     client_uri: None,
-                    redirect_uris: vec![Url::from_str("http://localhost/").unwrap()],
-                    scope: None,
+                    redirect_uris: vec![Url::from_str("http://127.0.0.1/").unwrap()],
+                    scope: Some(CowStr::new_static("atproto")),
                     grant_types: None,
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),
                     dpop_bound_access_tokens: None,
@@ -319,17 +320,17 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                 ),
                 &None,
             )
-            .expect("should coerce to localhost");
+            .expect("should coerce to 127.0.0.1");
             assert_eq!(
                 out,
                 OAuthClientMetadata {
                     client_id: Url::from_str(
-                        "http://localhost?redirect_uri=http%3A%2F%2Flocalhost%2F"
+                        "http://localhost?redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2F"
                     )
                     .unwrap(),
                     client_uri: None,
-                    redirect_uris: vec![Url::from_str("http://localhost/").unwrap()],
-                    scope: None,
+                    redirect_uris: vec![Url::from_str("http://127.0.0.1:8000/").unwrap()],
+                    scope: Some(CowStr::new_static("atproto")),
                     grant_types: None,
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),
                     dpop_bound_access_tokens: None,
@@ -347,17 +348,17 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                 ),
                 &None,
             )
-            .expect("should coerce to localhost");
+            .expect("should coerce to 127.0.0.1");
             assert_eq!(
                 out,
                 OAuthClientMetadata {
                     client_id: Url::from_str(
-                        "http://localhost?redirect_uri=http%3A%2F%2Flocalhost%2F"
+                        "http://localhost?redirect_uri=http%3A%2F%2F127.0.0.1%2F"
                     )
                     .unwrap(),
                     client_uri: None,
-                    redirect_uris: vec![Url::from_str("http://localhost/").unwrap()],
-                    scope: None,
+                    redirect_uris: vec![Url::from_str("http://127.0.0.1/").unwrap()],
+                    scope: Some(CowStr::new_static("atproto")),
                     grant_types: None,
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),
                     dpop_bound_access_tokens: None,

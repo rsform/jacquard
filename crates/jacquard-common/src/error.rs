@@ -149,7 +149,7 @@ pub enum AuthError {
     RefreshFailed,
 
     /// Request requires authentication but none was provided
-    #[error("No authentication provided")]
+    #[error("No authentication provided, but endpoint requires auth")]
     NotAuthenticated,
 
     /// Other authentication error
