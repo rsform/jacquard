@@ -2,7 +2,7 @@
 name = "jacquard"
 description.workspace = true
 edition.workspace = true
-version = "0.2.1"
+version = "0.3.0"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -30,14 +30,14 @@ path = "src/main.rs"
 
 
 [dependencies]
-bon = "3"
-async-trait = "0.1"
+bon.workspace = true
+async-trait.workspace = true
 bytes.workspace = true
 clap.workspace = true
 http.workspace = true
-jacquard-api = { version = "0.2.0", path = "../jacquard-api" }
-jacquard-common = { version = "0.2.0", path = "../jacquard-common", features = ["reqwest-client"] }
-jacquard-oauth = { version = "0.1.0", path = "../jacquard-oauth" }
+jacquard-api = { version = "0.3.0", path = "../jacquard-api" }
+jacquard-common = { version = "0.3.0", path = "../jacquard-common", features = ["reqwest-client"] }
+jacquard-oauth = { version = "0.3.0", path = "../jacquard-oauth" }
 jacquard-derive = { version = "0.2.0", path = "../jacquard-derive", optional = true }
 miette = { workspace = true }
 reqwest = { workspace = true, features = ["charset", "http2", "json", "system-proxy", "gzip", "rustls-tls"] }
@@ -46,13 +46,13 @@ serde_html_form.workspace = true
 serde_ipld_dagcbor.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
-tokio = { version = "1", features = ["macros", "rt-multi-thread", "fs"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "fs"] }
 url.workspace = true
 smol_str.workspace = true
-percent-encoding = "2"
-urlencoding = "2"
-jose-jwk = { version = "0.1", features = ["p256"] }
-p256 = { version = "0.13", features = ["ecdsa"] }
-rand_core = "0.6"
+percent-encoding.workspace = true
+urlencoding.workspace = true
+jose-jwk = { workspace = true, features = ["p256"] }
+p256 = { workspace = true, features = ["ecdsa"] }
+rand_core.workspace = true
 rouille = { version = "3.6.2", optional = true }
 jacquard-identity = { version = "0.2.0", path = "../jacquard-identity" }

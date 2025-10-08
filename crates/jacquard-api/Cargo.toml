@@ -22,7 +22,7 @@ com_atproto = []
 tools_ozone = []
 
 [dependencies]
-bon = "3"
+bon.workspace = true
 bytes = { workspace = true, features = ["serde"] }
 jacquard-common = { version = "0.2.0", path = "../jacquard-common" }
 jacquard-derive = { version = "0.2.0", path = "../jacquard-derive" }

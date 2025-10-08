@@ -16,14 +16,14 @@ description.workspace = true
 dns = ["dep:hickory-resolver"]
 
 [dependencies]
-async-trait = "0.1.89"
+async-trait.workspace = true
 bon.workspace = true
 bytes.workspace = true
 jacquard-common = { version = "0.2", path = "../jacquard-common" }
-percent-encoding = "2.3.2"
+percent-encoding.workspace = true
 reqwest.workspace = true
 url.workspace = true
-tokio = { version = "1", features = ["macros", "rt-multi-thread", "fs"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "fs"] }
 hickory-resolver = { optional = true, version = "0.24", default-features = false, features = ["system-config", "tokio-runtime"]}
 serde.workspace = true
 serde_json.workspace = true
@@ -32,4 +32,4 @@ miette.workspace = true
 http.workspace = true
 jacquard-api = { version = "0.2.0", path = "../jacquard-api" }
 serde_html_form.workspace = true
-urlencoding = "2.1.3"
+urlencoding.workspace = true

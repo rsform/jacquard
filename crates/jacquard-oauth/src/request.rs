@@ -43,7 +43,10 @@ const CLIENT_ASSERTION_TYPE_JWT_BEARER: &str =
 #[derive(Error, Debug, miette::Diagnostic)]
 pub enum RequestError {
     #[error("no {0} endpoint available")]
-    #[diagnostic(code(jacquard_oauth::request::no_endpoint), help("server does not advertise this endpoint"))]
+    #[diagnostic(
+        code(jacquard_oauth::request::no_endpoint),
+        help("server does not advertise this endpoint")
+    )]
     NoEndpoint(CowStr<'static>),
     #[error("token response verification failed")]
     #[diagnostic(code(jacquard_oauth::request::token_verification))]
@@ -51,7 +54,9 @@ pub enum RequestError {
     #[error("unsupported authentication method")]
     #[diagnostic(
         code(jacquard_oauth::request::unsupported_auth_method),
-        help("server must support `private_key_jwt` or `none`; configure client metadata accordingly")
+        help(
+            "server must support `private_key_jwt` or `none`; configure client metadata accordingly"
+        )
     )]
     UnsupportedAuthMethod,
     #[error("no refresh token available")]
@@ -76,10 +81,16 @@ pub enum RequestError {
     #[diagnostic(code(jacquard_oauth::request::http_build))]
     Http(#[from] http::Error),
     #[error("http status: {0}")]
-    #[diagnostic(code(jacquard_oauth::request::http_status), help("see server response for details"))]
+    #[diagnostic(
+        code(jacquard_oauth::request::http_status),
+        help("see server response for details")
+    )]
     HttpStatus(StatusCode),
     #[error("http status: {0}, body: {1:?}")]
-    #[diagnostic(code(jacquard_oauth::request::http_status_body), help("server returned error JSON; inspect fields like `error`, `error_description`"))]
+    #[diagnostic(
+        code(jacquard_oauth::request::http_status_body),
+        help("server returned error JSON; inspect fields like `error`, `error_description`")
+    )]
     HttpStatusWithBody(StatusCode, Value),
     #[error(transparent)]
     #[diagnostic(code(jacquard_oauth::request::identity))]
@@ -134,8 +145,8 @@ impl OAuthRequest<'_> {
 mod tests {
     use super::*;
     use crate::types::{OAuthAuthorizationServerMetadata, OAuthClientMetadata};
-    use http::{Response as HttpResponse, StatusCode};
     use bytes::Bytes;
+    use http::{Response as HttpResponse, StatusCode};
     use jacquard_common::http_client::HttpClient;
     use jacquard_identity::resolver::IdentityResolver;
     use std::sync::Arc;
@@ -249,7 +260,7 @@ mod tests {
     async fn refresh_no_refresh_token() {
         let client = MockClient::default();
         let meta = base_metadata();
-        let mut session = ClientSessionData {
+        let session = ClientSessionData {
             account_did: jacquard_common::types::string::Did::new_static("did:plc:alice").unwrap(),
             session_id: CowStr::from("state"),
             host_url: url::Url::parse("https://pds").unwrap(),
@@ -284,11 +295,14 @@ mod tests {
         *client.resp.lock().await = Some(
             HttpResponse::builder()
                 .status(StatusCode::OK)
-                .body(serde_json::to_vec(&serde_json::json!({
-                    "access_token":"tok",
-                    "token_type":"DPoP",
-                    "expires_in": 3600
-                })).unwrap())
+                .body(
+                    serde_json::to_vec(&serde_json::json!({
+                        "access_token":"tok",
+                        "token_type":"DPoP",
+                        "expires_in": 3600
+                    }))
+                    .unwrap(),
+                )
                 .unwrap(),
         );
         let meta = base_metadata();

@@ -239,7 +239,7 @@ async fn oauth_end_to_end_mock_flow() {
         keyset: None,
     };
     let login_hint = identity.map(|_| jacquard::CowStr::from("alice.bsky.social"));
-    let mut auth_req = jacquard_oauth::request::par(client.as_ref(), login_hint, None, &metadata)
+    let auth_req = jacquard_oauth::request::par(client.as_ref(), login_hint, None, &metadata)
         .await
         .unwrap();
     // Construct authorization URL as OAuthClient::start_auth would do
