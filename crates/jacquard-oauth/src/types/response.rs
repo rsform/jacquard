@@ -13,6 +13,15 @@ pub enum OAuthTokenType {
     Bearer,
 }
 
+impl OAuthTokenType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            OAuthTokenType::DPoP => "DPoP",
+            OAuthTokenType::Bearer => "Bearer",
+        }
+    }
+}
+
 // https://datatracker.ietf.org/doc/html/rfc6749#section-5.1
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct OAuthTokenResponse {

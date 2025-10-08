@@ -6,18 +6,17 @@ use jacquard_common::{
     session::{SessionStore, SessionStoreError},
     types::{
         did::Did,
-        xrpc::{CallOptions, Response, XrpcExt},
+        xrpc::{CallOptions, Response, XrpcExt, XrpcRequest, build_http_request},
     },
 };
 use url::Url;
 
-use jacquard_common::types::xrpc::{XrpcRequest, build_http_request};
-
 use crate::client::{AtpSession, AuthSession, NSID_REFRESH_SESSION};
 
 /// Per-call overrides when sending via `AtClient`.
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct SendOverrides<'a> {
+    /// Optional DID override for this call.
     pub did: Option<Did<'a>>,
     /// Optional base URI override for this call.
     pub base_uri: Option<Url>,
@@ -25,6 +24,17 @@ pub struct SendOverrides<'a> {
     pub options: CallOptions<'a>,
     /// Whether to auto-refresh on expired/invalid token and retry once.
     pub auto_refresh: bool,
+}
+
+impl Default for SendOverrides<'_> {
+    fn default() -> Self {
+        Self {
+            did: None,
+            base_uri: None,
+            options: CallOptions::default(),
+            auto_refresh: true,
+        }
+    }
 }
 
 impl<'a> SendOverrides<'a> {
@@ -126,11 +136,6 @@ impl<C: HttpClient, S: SessionStore<Did<'static>, AuthSession>> AtClient<C, S> {
         let did = s.did().clone().into_static();
         self.refresh_lock.lock().await.replace(did.clone());
         self.tokens.set(did, session).await
-    }
-
-    /// Clear the current session from the token store.
-    pub async fn clear_session(&self) -> Result<(), SessionStoreError> {
-        self.tokens.clear().await
     }
 
     /// Send an XRPC request using the client's base URL and default behavior.
@@ -237,7 +242,7 @@ impl<C: HttpClient, S: SessionStore<Did<'static>, AuthSession>> AtClient<C, S> {
                         .auth(AuthorizationToken::Bearer(
                             refresh_tok.clone().into_static(),
                         ))
-                        .send(jacquard_api::com_atproto::server::refresh_session::RefreshSession)
+                        .send(&jacquard_api::com_atproto::server::refresh_session::RefreshSession)
                         .await?;
                     let refreshed = match refresh_resp.into_output() {
                         Ok(o) => AtpSession::from(o),

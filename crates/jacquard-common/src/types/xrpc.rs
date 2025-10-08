@@ -128,6 +128,21 @@ pub struct CallOptions<'a> {
     pub extra_headers: Vec<(HeaderName, HeaderValue)>,
 }
 
+impl IntoStatic for CallOptions<'_> {
+    type Output = CallOptions<'static>;
+
+    fn into_static(self) -> Self::Output {
+        CallOptions {
+            auth: self.auth.map(|auth| auth.into_static()),
+            atproto_proxy: self.atproto_proxy.map(|proxy| proxy.into_static()),
+            atproto_accept_labelers: self
+                .atproto_accept_labelers
+                .map(|labelers| labelers.into_static()),
+            extra_headers: self.extra_headers,
+        }
+    }
+}
+
 /// Extension for stateless XRPC calls on any `HttpClient`.
 ///
 /// Example
@@ -236,8 +251,8 @@ impl<'a, C: HttpClient> XrpcCall<'a, C> {
     }
 
     /// Send the given typed XRPC request and return a response wrapper.
-    pub async fn send<R: XrpcRequest + Send>(self, request: R) -> XrpcResult<Response<R>> {
-        let http_request = build_http_request(&self.base, &request, &self.opts)
+    pub async fn send<R: XrpcRequest + Send>(self, request: &R) -> XrpcResult<Response<R>> {
+        let http_request = build_http_request(&self.base, request, &self.opts)
             .map_err(crate::error::TransportError::from)?;
 
         let http_response = self
@@ -547,4 +562,20 @@ pub enum XrpcError<E: std::error::Error + IntoStatic> {
     /// Failed to decode the response body
     #[error("Failed to decode response: {0}")]
     Decode(#[from] serde_json::Error),
+}
+
+/// Stateful XRPC call trait
+pub trait XrpcClient: HttpClient {
+    /// Get the base URI for the client.
+    fn base_uri(&self) -> Url;
+
+    /// Get the call options for the client.
+    fn opts(&self) -> impl Future<Output = CallOptions<'_>> {
+        async { CallOptions::default() }
+    }
+    /// Send an XRPC request and parse the response
+    fn send<R: XrpcRequest + Send>(
+        self,
+        request: &R,
+    ) -> impl Future<Output = XrpcResult<Response<R>>>;
 }

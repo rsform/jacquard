@@ -1,7 +1,16 @@
-use std::sync::Arc;
-
-use jacquard_common::{CowStr, IntoStatic, types::did::Did};
+use jacquard_common::{
+    AuthorizationToken, CowStr, IntoStatic,
+    error::{AuthError, ClientError, TransportError, XrpcResult},
+    http_client::HttpClient,
+    types::{
+        did::Did,
+        xrpc::{CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest},
+    },
+};
 use jose_jwk::JwkSet;
+use smol_str::SmolStr;
+use std::sync::Arc;
+use tokio::sync::RwLock;
 use url::Url;
 
 use crate::{
@@ -88,7 +97,7 @@ where
             .unwrap())
     }
 
-    pub async fn callback(&self, params: CallbackParams<'_>) -> Result<ClientSessionData<'static>> {
+    pub async fn callback(&self, params: CallbackParams<'_>) -> Result<OAuthSession<T, S>> {
         let Some(state_key) = params.state else {
             return Err(OAuthError::Callback("missing state parameter".into()));
         };
@@ -162,25 +171,178 @@ where
                     token_set,
                 };
 
-                Ok(client_data.into_static())
+                self.create_session(client_data).await
             }
             Err(e) => Err(e.into()),
         }
     }
 
-    pub async fn restore(
-        &self,
-        did: &Did<'_>,
-        session_id: &str,
-    ) -> Result<ClientSessionData<'static>> {
-        Ok(self
-            .registry
-            .get(did, session_id, false)
-            .await?
-            .into_static())
+    async fn create_session(&self, data: ClientSessionData<'_>) -> Result<OAuthSession<T, S>> {
+        Ok(OAuthSession::new(
+            self.registry.clone(),
+            self.client.clone(),
+            data.into_static(),
+        ))
+    }
+
+    pub async fn restore(&self, did: &Did<'_>, session_id: &str) -> Result<OAuthSession<T, S>> {
+        self.create_session(self.registry.get(did, session_id, false).await?)
+            .await
     }
 
     pub async fn revoke(&self, did: &Did<'_>, session_id: &str) -> Result<()> {
         Ok(self.registry.del(did, session_id).await?)
+    }
+}
+
+pub struct OAuthSession<T, S>
+where
+    T: OAuthResolver,
+    S: ClientAuthStore,
+{
+    pub registry: Arc<SessionRegistry<T, S>>,
+    pub client: Arc<T>,
+    pub data: RwLock<ClientSessionData<'static>>,
+    pub options: RwLock<CallOptions<'static>>,
+}
+
+impl<T, S> OAuthSession<T, S>
+where
+    T: OAuthResolver,
+    S: ClientAuthStore,
+{
+    pub fn new(
+        registry: Arc<SessionRegistry<T, S>>,
+        client: Arc<T>,
+        data: ClientSessionData<'static>,
+    ) -> Self {
+        Self {
+            registry,
+            client,
+            data: RwLock::new(data),
+            options: RwLock::new(CallOptions::default()),
+        }
+    }
+
+    pub fn with_options(self, options: CallOptions<'_>) -> Self {
+        Self {
+            registry: self.registry,
+            client: self.client,
+            data: self.data,
+            options: RwLock::new(options.into_static()),
+        }
+    }
+
+    pub async fn set_options(&self, options: CallOptions<'_>) {
+        *self.options.write().await = options.into_static();
+    }
+
+    pub async fn session_info(&self) -> (Did<'_>, CowStr<'_>) {
+        let data = self.data.read().await;
+        (data.account_did.clone(), data.session_id.clone())
+    }
+
+    pub async fn pds(&self) -> Url {
+        self.data.read().await.host_url.clone()
+    }
+
+    pub async fn access_token(&self) -> AuthorizationToken<'_> {
+        AuthorizationToken::Dpop(self.data.read().await.token_set.access_token.clone())
+    }
+
+    pub async fn refresh_token(&self) -> Option<AuthorizationToken<'_>> {
+        self.data
+            .read()
+            .await
+            .token_set
+            .refresh_token
+            .as_ref()
+            .map(|token| AuthorizationToken::Dpop(token.clone()))
+    }
+}
+impl<T, S> OAuthSession<T, S>
+where
+    S: ClientAuthStore + Send + Sync + 'static,
+    T: OAuthResolver + DpopExt + Send + Sync + 'static,
+{
+    pub async fn refresh(&self) -> Result<AuthorizationToken<'_>> {
+        let mut data = self.data.write().await;
+        let refreshed = self
+            .registry
+            .as_ref()
+            .get(&data.account_did, &data.session_id, true)
+            .await?;
+        let token = AuthorizationToken::Dpop(refreshed.token_set.access_token.clone());
+        *data = refreshed.into_static();
+        Ok(token)
+    }
+}
+
+impl<T, S> HttpClient for OAuthSession<T, S>
+where
+    S: ClientAuthStore + Send + Sync + 'static,
+    T: OAuthResolver + DpopExt + Send + Sync + 'static,
+{
+    type Error = T::Error;
+
+    async fn send_http(
+        &self,
+        request: http::Request<Vec<u8>>,
+    ) -> core::result::Result<http::Response<Vec<u8>>, Self::Error> {
+        self.client.send_http(request).await
+    }
+}
+
+impl<T, S> XrpcClient for OAuthSession<T, S>
+where
+    S: ClientAuthStore + Send + Sync + 'static,
+    T: OAuthResolver + DpopExt + XrpcExt + Send + Sync + 'static,
+{
+    fn base_uri(&self) -> Url {
+        self.data.blocking_read().host_url.clone()
+    }
+
+    async fn opts(&self) -> CallOptions<'_> {
+        self.options.read().await.clone()
+    }
+
+    async fn send<R: jacquard_common::types::xrpc::XrpcRequest + Send>(
+        self,
+        request: &R,
+    ) -> XrpcResult<Response<R>> {
+        let base_uri = self.base_uri();
+        let auth = self.access_token().await;
+        let mut opts = self.options.read().await.clone();
+        opts.auth = Some(auth);
+        let res = self
+            .client
+            .xrpc(base_uri.clone())
+            .with_options(opts.clone())
+            .send(request)
+            .await;
+        if is_invalid_token_response(&res) {
+            opts.auth = Some(
+                self.refresh()
+                    .await
+                    .map_err(|e| ClientError::Transport(TransportError::Other(e.into())))?,
+            );
+            self.client
+                .xrpc(base_uri)
+                .with_options(opts)
+                .send(request)
+                .await
+        } else {
+            res
+        }
+    }
+}
+
+fn is_invalid_token_response<R: XrpcRequest>(response: &XrpcResult<Response<R>>) -> bool {
+    match response {
+        Err(ClientError::Auth(AuthError::InvalidToken)) => true,
+        Err(ClientError::Auth(AuthError::Other(value))) => value
+            .to_str()
+            .is_ok_and(|s| s.starts_with("DPoP ") && s.contains("error=\"invalid_token\"")),
+        _ => false,
     }
 }

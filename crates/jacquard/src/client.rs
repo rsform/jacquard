@@ -18,7 +18,7 @@ use jacquard_common::{
         xrpc::{Response, XrpcRequest},
     },
 };
-pub use token::FileTokenStore;
+pub use token::FileAuthStore;
 use url::Url;
 
 // Note: Stateless and stateful XRPC clients are implemented in xrpc_call.rs and at_client.rs
@@ -70,11 +70,6 @@ impl BasicClient {
         session: AuthSession,
     ) -> core::result::Result<(), SessionStoreError> {
         self.0.set_session(session).await
-    }
-
-    /// Clear session.
-    pub async fn clear_session(&self) -> core::result::Result<(), SessionStoreError> {
-        self.0.clear_session().await
     }
 
     /// Base URL of this client.

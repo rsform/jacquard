@@ -203,7 +203,7 @@ impl DefaultResolver {
         let resp = self
             .http
             .xrpc(pds)
-            .send(req)
+            .send(&req)
             .await
             .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
         let out = resp
@@ -227,7 +227,7 @@ impl DefaultResolver {
         let resp = self
             .http
             .xrpc(pds)
-            .send(req)
+            .send(&req)
             .await
             .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
         let out = resp

@@ -2,7 +2,7 @@ use clap::Parser;
 use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
 use jacquard::api::com_atproto::server::create_session::CreateSession;
-use jacquard::client::{AtpSession, AuthSession, BasicClient};
+use jacquard::client::{AtpSession, BasicClient};
 use jacquard::identity::resolver::IdentityResolver;
 use jacquard::identity::slingshot_resolver_default;
 use jacquard::types::string::Handle;

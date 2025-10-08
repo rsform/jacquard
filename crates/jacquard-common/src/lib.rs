@@ -30,3 +30,13 @@ pub enum AuthorizationToken<'s> {
     /// DPoP token (proof-of-possession) for OAuth
     Dpop(CowStr<'s>),
 }
+
+impl<'s> IntoStatic for AuthorizationToken<'s> {
+    type Output = AuthorizationToken<'static>;
+    fn into_static(self) -> AuthorizationToken<'static> {
+        match self {
+            AuthorizationToken::Bearer(token) => AuthorizationToken::Bearer(token.into_static()),
+            AuthorizationToken::Dpop(token) => AuthorizationToken::Dpop(token.into_static()),
+        }
+    }
+}
