@@ -403,22 +403,15 @@ where
         // Under Tokio, use `block_in_place` to make a blocking RwLock read safe.
         if tokio::runtime::Handle::try_current().is_ok() {
             tokio::task::block_in_place(|| {
-                self.endpoint
-                    .blocking_read()
-                    .clone()
-                    .unwrap_or(
-                        Url::parse("https://public.bsky.app")
-                            .expect("public appview should be valid url"),
-                    )
-            })
-        } else {
-            self.endpoint
-                .blocking_read()
-                .clone()
-                .unwrap_or(
+                self.endpoint.blocking_read().clone().unwrap_or(
                     Url::parse("https://public.bsky.app")
                         .expect("public appview should be valid url"),
                 )
+            })
+        } else {
+            self.endpoint.blocking_read().clone().unwrap_or(
+                Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
+            )
         }
     }
     async fn send<R: jacquard_common::types::xrpc::XrpcRequest + Send>(

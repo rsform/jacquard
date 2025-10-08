@@ -1,12 +1,12 @@
-use std::sync::Arc;
 use clap::Parser;
 use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
 use jacquard::client::credential_session::{CredentialSession, SessionKey};
 use jacquard::client::{AtpSession, MemorySessionStore};
-use jacquard::identity::PublicResolver as JacquardResolver;
 use jacquard::types::xrpc::XrpcClient;
+use jacquard_identity::slingshot_resolver_default;
 use miette::IntoDiagnostic;
+use std::sync::Arc;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Jacquard - AT Protocol client demo")]
@@ -24,14 +24,19 @@ async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
     // Resolver + in-memory store
-    let resolver = Arc::new(JacquardResolver::default());
+    let resolver = Arc::new(slingshot_resolver_default());
     let store: Arc<MemorySessionStore<SessionKey, AtpSession>> = Arc::new(Default::default());
     let client = Arc::new(resolver.clone());
     let session = CredentialSession::new(store, client);
 
-    // Login; resolves PDS from handle/DID automatically. Persisted under (did, "session").
     let _ = session
-        .login(args.username.clone(), args.password.clone(), None, None, None)
+        .login(
+            args.username.clone(),
+            args.password.clone(),
+            None,
+            None,
+            None,
+        )
         .await
         .into_diagnostic()?;
 

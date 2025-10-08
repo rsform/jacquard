@@ -378,9 +378,13 @@ impl IdentityResolver for JacquardResolver {
                 }
                 DidStep::PlcHttp if s.starts_with("did:plc:") => {
                     let url = match &self.opts.plc_source {
-                        PlcSource::PlcDirectory { base } => base.join(did.as_str())?,
+                        PlcSource::PlcDirectory { base } => {
+                            // this is odd, the join screws up with the plc directory but NOT slingshot
+                            Url::parse(&format!("{}{}", base, did.as_str())).expect("Invalid URL")
+                        }
                         PlcSource::Slingshot { base } => base.join(did.as_str())?,
                     };
+                    println!("Fetching DID document from {}", url);
                     if let Ok((buf, status)) = self.get_json_bytes(url).await {
                         return Ok(DidDocResponse {
                             buffer: buf,
