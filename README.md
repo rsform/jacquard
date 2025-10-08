@@ -1,6 +1,6 @@
-[# Jacquard](https://docs.rs/jacquard/latest/jacquard/)
+# Jacquard
 
-A suite of Rust crates for the AT Protocol.
+A suite of Rust crates for the AT Protocol. [Docs](https://docs.rs/jacquard/latest/jacquard/)
 
 ## Goals and Features
 
