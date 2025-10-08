@@ -36,14 +36,14 @@ use url::{ParseError, Url};
 use hickory_resolver::{TokioAsyncResolver, config::ResolverConfig};
 
 /// Default resolver implementation with configurable fallback order.
-pub struct DefaultResolver {
+pub struct JacquardResolver {
     http: reqwest::Client,
     opts: ResolverOptions,
     #[cfg(feature = "dns")]
     dns: Option<TokioAsyncResolver>,
 }
 
-impl DefaultResolver {
+impl JacquardResolver {
     /// Create a new instance of the default resolver with all options (except DNS) up front
     pub fn new(http: reqwest::Client, opts: ResolverOptions) -> Self {
         Self {
@@ -189,7 +189,7 @@ impl DefaultResolver {
     }
 }
 
-impl DefaultResolver {
+impl JacquardResolver {
     /// Resolve handle to DID via a PDS XRPC call (stateless, unauth by default)
     pub async fn resolve_handle_via_pds(
         &self,
@@ -270,7 +270,7 @@ impl DefaultResolver {
 }
 
 #[async_trait::async_trait]
-impl IdentityResolver for DefaultResolver {
+impl IdentityResolver for JacquardResolver {
     fn options(&self) -> &ResolverOptions {
         &self.opts
     }
@@ -417,7 +417,7 @@ impl IdentityResolver for DefaultResolver {
     }
 }
 
-impl HttpClient for DefaultResolver {
+impl HttpClient for JacquardResolver {
     async fn send_http(
         &self,
         request: http::Request<Vec<u8>>,
@@ -438,7 +438,7 @@ pub enum IdentityWarning {
     },
 }
 
-impl DefaultResolver {
+impl JacquardResolver {
     /// Resolve a handle to its DID, fetch the DID document, and return doc plus any warnings.
     /// This applies the default equality check on the document id (error with doc if mismatch).
     pub async fn resolve_handle_and_doc(
@@ -523,7 +523,7 @@ impl MiniDocResponse {
 }
 
 /// Resolver specialized for unauthenticated/public flows using reqwest and stateless XRPC
-pub type PublicResolver = DefaultResolver;
+pub type PublicResolver = JacquardResolver;
 
 impl Default for PublicResolver {
     /// Build a resolver with:
@@ -539,7 +539,7 @@ impl Default for PublicResolver {
     fn default() -> Self {
         let http = reqwest::Client::new();
         let opts = ResolverOptions::default();
-        let resolver = DefaultResolver::new(http, opts);
+        let resolver = JacquardResolver::new(http, opts);
         #[cfg(feature = "dns")]
         let resolver = resolver.with_system_dns();
         resolver
@@ -552,7 +552,7 @@ pub fn slingshot_resolver_default() -> PublicResolver {
     let http = reqwest::Client::new();
     let mut opts = ResolverOptions::default();
     opts.plc_source = PlcSource::slingshot_default();
-    let resolver = DefaultResolver::new(http, opts);
+    let resolver = JacquardResolver::new(http, opts);
     #[cfg(feature = "dns")]
     let resolver = resolver.with_system_dns();
     resolver
@@ -564,7 +564,7 @@ mod tests {
 
     #[test]
     fn did_web_urls() {
-        let r = DefaultResolver::new(reqwest::Client::new(), ResolverOptions::default());
+        let r = JacquardResolver::new(reqwest::Client::new(), ResolverOptions::default());
         assert_eq!(
             r.test_did_web_url_raw("did:web:example.com"),
             "https://example.com/.well-known/did.json"
@@ -577,7 +577,7 @@ mod tests {
 
     #[test]
     fn slingshot_mini_doc_url_build() {
-        let r = DefaultResolver::new(reqwest::Client::new(), ResolverOptions::default());
+        let r = JacquardResolver::new(reqwest::Client::new(), ResolverOptions::default());
         let base = Url::parse("https://slingshot.microcosm.blue").unwrap();
         let url = r.slingshot_mini_doc_url(&base, "bad-example.com").unwrap();
         assert_eq!(

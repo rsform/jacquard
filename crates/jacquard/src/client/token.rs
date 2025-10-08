@@ -15,7 +15,7 @@ use std::path::{Path, PathBuf};
 use url::Url;
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-enum StoredSession {
+pub enum StoredSession {
     Atp(StoredAtSession),
     OAuth(OAuthSession),
     OAuthState(OAuthState),

@@ -4,7 +4,7 @@
 //! client implementation that manages session tokens.
 
 mod at_client;
-
+pub mod credential_session;
 mod token;
 
 pub use at_client::{AtClient, SendOverrides};
@@ -20,8 +20,6 @@ use jacquard_common::{
 };
 pub use token::FileAuthStore;
 use url::Url;
-
-// Note: Stateless and stateful XRPC clients are implemented in xrpc_call.rs and at_client.rs
 
 pub(crate) const NSID_REFRESH_SESSION: &str = "com.atproto.server.refreshSession";
 

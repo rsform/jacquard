@@ -1,18 +1,3 @@
-use jacquard_common::{
-    AuthorizationToken, CowStr, IntoStatic,
-    error::{AuthError, ClientError, TransportError, XrpcResult},
-    http_client::HttpClient,
-    types::{
-        did::Did,
-        xrpc::{CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest},
-    },
-};
-use jose_jwk::JwkSet;
-use smol_str::SmolStr;
-use std::sync::Arc;
-use tokio::sync::RwLock;
-use url::Url;
-
 use crate::{
     atproto::atproto_client_metadata,
     authstore::ClientAuthStore,
@@ -24,6 +9,19 @@ use crate::{
     session::{ClientData, ClientSessionData, DpopClientData, SessionRegistry},
     types::{AuthorizeOptions, CallbackParams},
 };
+use jacquard_common::{
+    AuthorizationToken, CowStr, IntoStatic,
+    error::{AuthError, ClientError, TransportError, XrpcResult},
+    http_client::HttpClient,
+    types::{
+        did::Did,
+        xrpc::{CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest},
+    },
+};
+use jose_jwk::JwkSet;
+use std::sync::Arc;
+use tokio::sync::RwLock;
+use url::Url;
 
 pub struct OAuthClient<T, S>
 where
@@ -242,7 +240,7 @@ where
         (data.account_did.clone(), data.session_id.clone())
     }
 
-    pub async fn pds(&self) -> Url {
+    pub async fn endpoint(&self) -> Url {
         self.data.read().await.host_url.clone()
     }
 

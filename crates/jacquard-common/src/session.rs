@@ -25,7 +25,7 @@ pub trait Session {
 
     async fn access_token(&self) -> Result<AuthorizationToken, SessionStoreError>;
 
-    async fn refresh(&self) -> Result<(), SessionStoreError>;
+    async fn refresh(&self) -> Result<AuthorizationToken, SessionStoreError>;
 }
 
 /// Errors emitted by session stores.
