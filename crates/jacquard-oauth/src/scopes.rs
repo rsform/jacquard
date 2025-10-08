@@ -1,5 +1,5 @@
-//! AT Protocol OAuth scopes module
-//! Derived from https://tangled.org/@smokesignal.events/atproto-identity-rs/raw/main/crates/atproto-oauth/src/scopes.rs
+//! AT Protocol OAuth scopes
+//! Derived from <https://tangled.org/@smokesignal.events/atproto-identity-rs/raw/main/crates/atproto-oauth/src/scopes.rs>
 //!
 //! This module provides comprehensive support for AT Protocol OAuth scopes,
 //! including parsing, serialization, normalization, and permission checking.

@@ -1,13 +1,14 @@
 use clap::Parser;
 use jacquard::CowStr;
+use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
 use jacquard::client::{Agent, FileAuthStore};
-use jacquard::types::xrpc::XrpcClient;
-use jacquard_api::app_bsky::feed::get_timeline::GetTimeline;
-use jacquard_oauth::atproto::AtprotoClientMetadata;
-use jacquard_oauth::client::OAuthClient;
+use jacquard::oauth::atproto::AtprotoClientMetadata;
+use jacquard::oauth::client::OAuthClient;
 #[cfg(feature = "loopback")]
-use jacquard_oauth::loopback::LoopbackConfig;
-use jacquard_oauth::scopes::Scope;
+use jacquard::oauth::loopback::LoopbackConfig;
+use jacquard::types::xrpc::XrpcClient;
+#[cfg(not(feature = "loopback"))]
+use jacquard_oauth::types::AuthorizeOptions;
 use miette::IntoDiagnostic;
 
 #[derive(Parser, Debug)]
@@ -25,38 +26,56 @@ struct Args {
 async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
-    // File-backed auth store shared by OAuthClient and session registry
+    // File-backed auth store for testing
     let store = FileAuthStore::new(&args.store);
 
     // Minimal localhost client metadata (redirect_uris get set by loopback helper)
     let client_data = jacquard_oauth::session::ClientData {
         keyset: None,
-        // scopes: include atproto; redirect_uris will be populated by the loopback helper
-        config: AtprotoClientMetadata::new_localhost(None, Some(vec![Scope::Atproto])),
+        // Default sets normal localhost redirect URIs and "atproto transition:generic" scopes.
+        // The localhost helper will ensure you have at least "atproto" and will fix urls
+        config: AtprotoClientMetadata::default_localhost(),
     };
 
-    // Build an OAuth client and run loopback flow
+    // Build an OAuth client
     let oauth = OAuthClient::new(store, client_data);
 
     #[cfg(feature = "loopback")]
+    // Authenticate with a PDS, using a loopback server to handle the callback flow
     let session = oauth
         .login_with_local_server(
             args.input.clone(),
             Default::default(),
             LoopbackConfig::default(),
         )
-        .await
-        .into_diagnostic()?;
+        .await?;
 
     #[cfg(not(feature = "loopback"))]
-    compile_error!("loopback feature must be enabled to run this example");
+    let session = {
+        use std::io::{BufRead, Write, stdin, stdout};
 
-    // Wrap in Agent and call a simple resource endpoint
+        let auth_url = oauth
+            .start_auth(args.input, AuthorizeOptions::default())
+            .await?;
+
+        println!("To authenticate with your PDS, visit:\n{}\n", auth_url);
+        print!("\nPaste the callback url here:");
+        stdout().lock().flush().into_diagnostic()?;
+        let mut url = String::new();
+        stdin().lock().read_line(&mut url).into_diagnostic()?;
+
+        let uri = url.trim().parse::<http::Uri>().into_diagnostic()?;
+        let params =
+            serde_html_form::from_str(uri.query().ok_or(miette::miette!("invalid callback url"))?)
+                .into_diagnostic()?;
+        oauth.callback(params).await?
+    };
+
+    // Wrap in Agent and fetch the timeline
     let agent: Agent<_> = Agent::from(session);
     let timeline = agent
         .send(&GetTimeline::new().limit(5).build())
-        .await
-        .into_diagnostic()?
+        .await?
         .into_output()?;
     for (i, post) in timeline.feed.iter().enumerate() {
         println!("\n{}. by {}", i + 1, post.post.author.handle);

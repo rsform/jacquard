@@ -141,182 +141,6 @@ impl OAuthRequest<'_> {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::types::{OAuthAuthorizationServerMetadata, OAuthClientMetadata};
-    use bytes::Bytes;
-    use http::{Response as HttpResponse, StatusCode};
-    use jacquard_common::http_client::HttpClient;
-    use jacquard_identity::resolver::IdentityResolver;
-    use std::sync::Arc;
-    use tokio::sync::Mutex;
-
-    #[derive(Clone, Default)]
-    struct MockClient {
-        resp: Arc<Mutex<Option<HttpResponse<Vec<u8>>>>>,
-    }
-
-    impl HttpClient for MockClient {
-        type Error = std::convert::Infallible;
-        fn send_http(
-            &self,
-            _request: http::Request<Vec<u8>>,
-        ) -> impl core::future::Future<
-            Output = core::result::Result<http::Response<Vec<u8>>, Self::Error>,
-        > + Send {
-            let resp = self.resp.clone();
-            async move { Ok(resp.lock().await.take().unwrap()) }
-        }
-    }
-
-    // IdentityResolver methods won't be called in these tests; provide stubs.
-    #[async_trait::async_trait]
-    impl IdentityResolver for MockClient {
-        fn options(&self) -> &jacquard_identity::resolver::ResolverOptions {
-            use std::sync::LazyLock;
-            static OPTS: LazyLock<jacquard_identity::resolver::ResolverOptions> =
-                LazyLock::new(|| jacquard_identity::resolver::ResolverOptions::default());
-            &OPTS
-        }
-        async fn resolve_handle(
-            &self,
-            _handle: &jacquard_common::types::string::Handle<'_>,
-        ) -> std::result::Result<
-            jacquard_common::types::string::Did<'static>,
-            jacquard_identity::resolver::IdentityError,
-        > {
-            Ok(jacquard_common::types::string::Did::new_static("did:plc:alice").unwrap())
-        }
-        async fn resolve_did_doc(
-            &self,
-            _did: &jacquard_common::types::string::Did<'_>,
-        ) -> std::result::Result<
-            jacquard_identity::resolver::DidDocResponse,
-            jacquard_identity::resolver::IdentityError,
-        > {
-            let doc = serde_json::json!({
-                "id": "did:plc:alice",
-                "service": [{
-                    "id": "#pds",
-                    "type": "AtprotoPersonalDataServer",
-                    "serviceEndpoint": "https://pds"
-                }]
-            });
-            let buf = Bytes::from(serde_json::to_vec(&doc).unwrap());
-            Ok(jacquard_identity::resolver::DidDocResponse {
-                buffer: buf,
-                status: StatusCode::OK,
-                requested: None,
-            })
-        }
-    }
-
-    // Allow using DPoP helpers on MockClient
-    impl crate::dpop::DpopExt for MockClient {}
-    impl crate::resolver::OAuthResolver for MockClient {}
-
-    fn base_metadata() -> OAuthMetadata {
-        let mut server = OAuthAuthorizationServerMetadata::default();
-        server.issuer = CowStr::from("https://issuer");
-        server.authorization_endpoint = CowStr::from("https://issuer/authorize");
-        server.token_endpoint = CowStr::from("https://issuer/token");
-        OAuthMetadata {
-            server_metadata: server,
-            client_metadata: OAuthClientMetadata {
-                client_id: url::Url::parse("https://client").unwrap(),
-                client_uri: None,
-                redirect_uris: vec![url::Url::parse("https://client/cb").unwrap()],
-                scope: Some(CowStr::from("atproto")),
-                grant_types: None,
-                token_endpoint_auth_method: Some(CowStr::from("none")),
-                dpop_bound_access_tokens: None,
-                jwks_uri: None,
-                jwks: None,
-                token_endpoint_auth_signing_alg: None,
-            },
-            keyset: None,
-        }
-    }
-
-    #[tokio::test]
-    async fn par_missing_endpoint() {
-        let mut meta = base_metadata();
-        meta.server_metadata.require_pushed_authorization_requests = Some(true);
-        meta.server_metadata.pushed_authorization_request_endpoint = None;
-        // require_pushed_authorization_requests is true and no endpoint
-        let err = super::par(&MockClient::default(), None, None, &meta)
-            .await
-            .unwrap_err();
-        match err {
-            RequestError::NoEndpoint(name) => {
-                assert_eq!(name.as_ref(), "pushed_authorization_request");
-            }
-            other => panic!("unexpected: {other:?}"),
-        }
-    }
-
-    #[tokio::test]
-    async fn refresh_no_refresh_token() {
-        let client = MockClient::default();
-        let meta = base_metadata();
-        let session = ClientSessionData {
-            account_did: jacquard_common::types::string::Did::new_static("did:plc:alice").unwrap(),
-            session_id: CowStr::from("state"),
-            host_url: url::Url::parse("https://pds").unwrap(),
-            authserver_url: url::Url::parse("https://issuer").unwrap(),
-            authserver_token_endpoint: CowStr::from("https://issuer/token"),
-            authserver_revocation_endpoint: None,
-            scopes: vec![],
-            dpop_data: DpopClientData {
-                dpop_key: crate::utils::generate_key(&[CowStr::from("ES256")]).unwrap(),
-                dpop_authserver_nonce: CowStr::from(""),
-                dpop_host_nonce: CowStr::from(""),
-            },
-            token_set: crate::types::TokenSet {
-                iss: CowStr::from("https://issuer"),
-                sub: jacquard_common::types::string::Did::new_static("did:plc:alice").unwrap(),
-                aud: CowStr::from("https://pds"),
-                scope: None,
-                refresh_token: None,
-                access_token: CowStr::from("abc"),
-                token_type: crate::types::OAuthTokenType::DPoP,
-                expires_at: None,
-            },
-        };
-        let err = super::refresh(&client, session, &meta).await.unwrap_err();
-        matches!(err, RequestError::NoRefreshToken);
-    }
-
-    #[tokio::test]
-    async fn exchange_code_missing_sub() {
-        let client = MockClient::default();
-        // set mock HTTP response body: token response without `sub`
-        *client.resp.lock().await = Some(
-            HttpResponse::builder()
-                .status(StatusCode::OK)
-                .body(
-                    serde_json::to_vec(&serde_json::json!({
-                        "access_token":"tok",
-                        "token_type":"DPoP",
-                        "expires_in": 3600
-                    }))
-                    .unwrap(),
-                )
-                .unwrap(),
-        );
-        let meta = base_metadata();
-        let mut dpop = DpopReqData {
-            dpop_key: crate::utils::generate_key(&[CowStr::from("ES256")]).unwrap(),
-            dpop_authserver_nonce: None,
-        };
-        let err = super::exchange_code(&client, &mut dpop, "abc", "verifier", &meta)
-            .await
-            .unwrap_err();
-        matches!(err, RequestError::TokenVerification);
-    }
-}
-
 #[derive(Debug, Serialize)]
 pub struct RequestPayload<'a, T>
 where
@@ -734,4 +558,180 @@ fn build_auth<'a>(
     }
 
     Err(RequestError::UnsupportedAuthMethod)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::types::{OAuthAuthorizationServerMetadata, OAuthClientMetadata};
+    use bytes::Bytes;
+    use http::{Response as HttpResponse, StatusCode};
+    use jacquard_common::http_client::HttpClient;
+    use jacquard_identity::resolver::IdentityResolver;
+    use std::sync::Arc;
+    use tokio::sync::Mutex;
+
+    #[derive(Clone, Default)]
+    struct MockClient {
+        resp: Arc<Mutex<Option<HttpResponse<Vec<u8>>>>>,
+    }
+
+    impl HttpClient for MockClient {
+        type Error = std::convert::Infallible;
+        fn send_http(
+            &self,
+            _request: http::Request<Vec<u8>>,
+        ) -> impl core::future::Future<
+            Output = core::result::Result<http::Response<Vec<u8>>, Self::Error>,
+        > + Send {
+            let resp = self.resp.clone();
+            async move { Ok(resp.lock().await.take().unwrap()) }
+        }
+    }
+
+    // IdentityResolver methods won't be called in these tests; provide stubs.
+    #[async_trait::async_trait]
+    impl IdentityResolver for MockClient {
+        fn options(&self) -> &jacquard_identity::resolver::ResolverOptions {
+            use std::sync::LazyLock;
+            static OPTS: LazyLock<jacquard_identity::resolver::ResolverOptions> =
+                LazyLock::new(|| jacquard_identity::resolver::ResolverOptions::default());
+            &OPTS
+        }
+        async fn resolve_handle(
+            &self,
+            _handle: &jacquard_common::types::string::Handle<'_>,
+        ) -> std::result::Result<
+            jacquard_common::types::string::Did<'static>,
+            jacquard_identity::resolver::IdentityError,
+        > {
+            Ok(jacquard_common::types::string::Did::new_static("did:plc:alice").unwrap())
+        }
+        async fn resolve_did_doc(
+            &self,
+            _did: &jacquard_common::types::string::Did<'_>,
+        ) -> std::result::Result<
+            jacquard_identity::resolver::DidDocResponse,
+            jacquard_identity::resolver::IdentityError,
+        > {
+            let doc = serde_json::json!({
+                "id": "did:plc:alice",
+                "service": [{
+                    "id": "#pds",
+                    "type": "AtprotoPersonalDataServer",
+                    "serviceEndpoint": "https://pds"
+                }]
+            });
+            let buf = Bytes::from(serde_json::to_vec(&doc).unwrap());
+            Ok(jacquard_identity::resolver::DidDocResponse {
+                buffer: buf,
+                status: StatusCode::OK,
+                requested: None,
+            })
+        }
+    }
+
+    // Allow using DPoP helpers on MockClient
+    impl crate::dpop::DpopExt for MockClient {}
+    impl crate::resolver::OAuthResolver for MockClient {}
+
+    fn base_metadata() -> OAuthMetadata {
+        let mut server = OAuthAuthorizationServerMetadata::default();
+        server.issuer = CowStr::from("https://issuer");
+        server.authorization_endpoint = CowStr::from("https://issuer/authorize");
+        server.token_endpoint = CowStr::from("https://issuer/token");
+        OAuthMetadata {
+            server_metadata: server,
+            client_metadata: OAuthClientMetadata {
+                client_id: url::Url::parse("https://client").unwrap(),
+                client_uri: None,
+                redirect_uris: vec![url::Url::parse("https://client/cb").unwrap()],
+                scope: Some(CowStr::from("atproto")),
+                grant_types: None,
+                token_endpoint_auth_method: Some(CowStr::from("none")),
+                dpop_bound_access_tokens: None,
+                jwks_uri: None,
+                jwks: None,
+                token_endpoint_auth_signing_alg: None,
+            },
+            keyset: None,
+        }
+    }
+
+    #[tokio::test]
+    async fn par_missing_endpoint() {
+        let mut meta = base_metadata();
+        meta.server_metadata.require_pushed_authorization_requests = Some(true);
+        meta.server_metadata.pushed_authorization_request_endpoint = None;
+        // require_pushed_authorization_requests is true and no endpoint
+        let err = super::par(&MockClient::default(), None, None, &meta)
+            .await
+            .unwrap_err();
+        match err {
+            RequestError::NoEndpoint(name) => {
+                assert_eq!(name.as_ref(), "pushed_authorization_request");
+            }
+            other => panic!("unexpected: {other:?}"),
+        }
+    }
+
+    #[tokio::test]
+    async fn refresh_no_refresh_token() {
+        let client = MockClient::default();
+        let meta = base_metadata();
+        let session = ClientSessionData {
+            account_did: jacquard_common::types::string::Did::new_static("did:plc:alice").unwrap(),
+            session_id: CowStr::from("state"),
+            host_url: url::Url::parse("https://pds").unwrap(),
+            authserver_url: url::Url::parse("https://issuer").unwrap(),
+            authserver_token_endpoint: CowStr::from("https://issuer/token"),
+            authserver_revocation_endpoint: None,
+            scopes: vec![],
+            dpop_data: DpopClientData {
+                dpop_key: crate::utils::generate_key(&[CowStr::from("ES256")]).unwrap(),
+                dpop_authserver_nonce: CowStr::from(""),
+                dpop_host_nonce: CowStr::from(""),
+            },
+            token_set: crate::types::TokenSet {
+                iss: CowStr::from("https://issuer"),
+                sub: jacquard_common::types::string::Did::new_static("did:plc:alice").unwrap(),
+                aud: CowStr::from("https://pds"),
+                scope: None,
+                refresh_token: None,
+                access_token: CowStr::from("abc"),
+                token_type: crate::types::OAuthTokenType::DPoP,
+                expires_at: None,
+            },
+        };
+        let err = super::refresh(&client, session, &meta).await.unwrap_err();
+        matches!(err, RequestError::NoRefreshToken);
+    }
+
+    #[tokio::test]
+    async fn exchange_code_missing_sub() {
+        let client = MockClient::default();
+        // set mock HTTP response body: token response without `sub`
+        *client.resp.lock().await = Some(
+            HttpResponse::builder()
+                .status(StatusCode::OK)
+                .body(
+                    serde_json::to_vec(&serde_json::json!({
+                        "access_token":"tok",
+                        "token_type":"DPoP",
+                        "expires_in": 3600
+                    }))
+                    .unwrap(),
+                )
+                .unwrap(),
+        );
+        let meta = base_metadata();
+        let mut dpop = DpopReqData {
+            dpop_key: crate::utils::generate_key(&[CowStr::from("ES256")]).unwrap(),
+            dpop_authserver_nonce: None,
+        };
+        let err = super::exchange_code(&client, &mut dpop, "abc", "verifier", &meta)
+            .await
+            .unwrap_err();
+        matches!(err, RequestError::TokenVerification);
+    }
 }

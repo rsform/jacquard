@@ -2,71 +2,75 @@
 
 A suite of Rust crates for the AT Protocol.
 
-[![Crates.io](https://img.shields.io/crates/v/jacquard.svg)](https://crates.io/crates/jacquard) [![Documentation](https://docs.rs/jacquard/badge.svg)](https://docs.rs/jacquard) [![License](https://img.shields.io/crates/l/jacquard.svg)](./LICENSE)
+## Goals and Features
 
-## Goals
-
-- Validated, spec-compliant, easy to work with, and performant baseline types (including typed at:// uris)
+- Validated, spec-compliant, easy to work with, and performant baseline types
 - Batteries-included, but easily replaceable batteries.
-  - Easy to extend with custom lexicons
+   - Easy to extend with custom lexicons
+   - Straightforward OAuth
+   - stateless options (or options where you handle the state) for rolling your own
+   - all the building blocks of the convenient abstractions are available
 - lexicon Value type for working with unknown atproto data (dag-cbor or json)
 - order of magnitude less boilerplate than some existing crates
-  - either the codegen produces code that's easy to work with, or there are good handwritten wrappers
-- didDoc type with helper methods for getting handles, multikey, and PDS endpoint
 - use as much or as little from the crates as you need
-
 
 ## Example
 
-Dead simple API client. Logs in with an app password and prints the latest 5 posts from your timeline.
+Dead simple API client. Logs in with OAuth and prints the latest 5 posts from your timeline.
 
 ```rust
-use std::sync::Arc;
+// Note: this requires the `loopback` feature enabled (it is currently by default)
 use clap::Parser;
 use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
-use jacquard::client::credential_session::{CredentialSession, SessionKey};
-use jacquard::client::{AtpSession, FileAuthStore, MemorySessionStore};
-use jacquard::identity::PublicResolver as JacquardResolver;
+use jacquard::client::{Agent, FileAuthStore};
+use jacquard::oauth::atproto::AtprotoClientMetadata;
+use jacquard::oauth::client::OAuthClient;
+use jacquard::oauth::loopback::LoopbackConfig;
+use jacquard::oauth::scopes::Scope;
+use jacquard::types::xrpc::XrpcClient;
 use miette::IntoDiagnostic;
 
 #[derive(Parser, Debug)]
-#[command(author, version, about = "Jacquard - AT Protocol client demo")]
+#[command(author, version, about = "Jacquard - OAuth (DPoP) loopback demo")]
 struct Args {
-    /// Username/handle (e.g., alice.bsky.social) or DID
-    #[arg(short, long)]
-    username: CowStr<'static>,
-    /// App password
-    #[arg(short, long)]
-    password: CowStr<'static>,
+    /// Handle (e.g., alice.bsky.social), DID, or PDS URL
+    input: CowStr<'static>,
+
+    /// Path to auth store file (will be created if missing)
+    #[arg(long, default_value = "/tmp/jacquard-oauth-session.json")]
+    store: String,
 }
 
 #[tokio::main]
 async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
-    // Resolver + storage
-    let resolver = Arc::new(JacquardResolver::default());
-    let store: Arc<MemorySessionStore<SessionKey, AtpSession>> = Arc::new(Default::default());
-    let client = Arc::new(resolver.clone());
-    let session = CredentialSession::new(store, client);
+    // File-backed auth store for testing
+    let store = FileAuthStore::new(&args.store);
+    let client_data = jacquard_oauth::session::ClientData {
+        keyset: None,
+        // Default sets normal localhost redirect URIs and "atproto transition:generic" scopes.
+        // The localhost helper will ensure you have at least "atproto" and will fix urls
+        config: AtprotoClientMetadata::default_localhost()
+    };
 
-    // Login (resolves PDS automatically) and persist as (did, "session")
-    session
-        .login(args.username.clone(), args.password.clone(), None, None, None)
-        .await
-        .into_diagnostic()?;
-
-    // Fetch timeline
-    let timeline = session
-        .clone()
-        .send(GetTimeline::new().limit(5).build())
-        .await
-        .into_diagnostic()?
-        .into_output()
-        .into_diagnostic()?;
-
-    println!("\ntimeline ({} posts):", timeline.feed.len());
+    // Build an OAuth client
+    let oauth = OAuthClient::new(store, client_data);
+    // Authenticate with a PDS, using a loopback server to handle the callback flow
+    let session = oauth
+        .login_with_local_server(
+            args.input.clone(),
+            Default::default(),
+            LoopbackConfig::default(),
+        )
+        .await?;
+    // Wrap in Agent and fetch the timeline
+    let agent: Agent<_> = Agent::from(session);
+    let timeline = agent
+        .send(&GetTimeline::new().limit(5).build())
+        .await?
+        .into_output()?;
     for (i, post) in timeline.feed.iter().enumerate() {
         println!("\n{}. by {}", i + 1, post.post.author.handle);
         println!(
@@ -77,7 +81,18 @@ async fn main() -> miette::Result<()> {
 
     Ok(())
 }
+
 ```
+
+## Component crates
+
+Jacquard is broken up into several crates for modularity. The correct one to use is generally `jacquard` itself, as it re-exports the others.
+- `jacquard`: Main crate [![Crates.io](https://img.shields.io/crates/v/jacquard.svg)](https://crates.io/crates/jacquard) [![Documentation](https://docs.rs/jacquard/badge.svg)](https://docs.rs/jacquard)
+- `jacquard-api`: Autogenerated API bindings [![Crates.io](https://img.shields.io/crates/v/jacquard-api.svg)](https://crates.io/crates/jacquard-api) [![Documentation](https://docs.rs/jacquard-api/badge.svg)](https://docs.rs/jacquard-api)
+- `jacquard-oauth`: atproto OAuth implementation [![Crates.io](https://img.shields.io/crates/v/jacquard-oauth.svg)](https://crates.io/crates/jacquard-oauth) [![Documentation](https://docs.rs/jacquard-oauth/badge.svg)](https://docs.rs/jacquard-oauth)
+- `jacquard-identity`: Identity resolution [![Crates.io](https://img.shields.io/crates/v/jacquard-identity.svg)](https://crates.io/crates/jacquard-identity) [![Documentation](https://docs.rs/jacquard-identity/badge.svg)](https://docs.rs/jacquard-identity)
+- `jacquard-lexicon`: Lexicon parsing and code generation [![Crates.io](https://img.shields.io/crates/v/jacquard-lexicon.svg)](https://crates.io/crates/jacquard-lexicon) [![Documentation](https://docs.rs/jacquard-lexicon/badge.svg)](https://docs.rs/jacquard-lexicon)
+- `jacquard-derive`: Derive macros for lexicon types [![Crates.io](https://img.shields.io/crates/v/jacquard-derive.svg)](https://crates.io/crates/jacquard-derive) [![Documentation](https://docs.rs/jacquard-derive/badge.svg)](https://docs.rs/jacquard-derive)
 
 ## Development
 
@@ -95,3 +110,5 @@ nix build
 ```
 
 There's also a [`justfile`](https://just.systems/) for Makefile-esque commands to be run inside of the devShell, and you can generally `cargo ...` or `just ...` whatever just fine if you don't want to use Nix and have the prerequisites installed.
+
+[![License](https://img.shields.io/crates/l/jacquard.svg)](./LICENSE)

@@ -105,6 +105,13 @@ impl<'m> AtprotoClientMetadata<'m> {
         }
     }
 
+    pub fn default_localhost() -> Self {
+        Self::new_localhost(
+            None,
+            Some(Scope::parse_multiple("atproto transition:generic").unwrap()),
+        )
+    }
+
     pub fn new_localhost(
         mut redirect_uris: Option<Vec<Url>>,
         scopes: Option<Vec<Scope<'m>>>,
