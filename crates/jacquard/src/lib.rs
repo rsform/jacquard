@@ -17,26 +17,24 @@
 //!
 //! ## Example
 //!
-//! Dead simple api client. Logs in, prints the latest 5 posts from your timeline.
+//! Dead simple API client: login with an app password, then fetch the latest 5 posts.
 //!
 //! ```no_run
 //! # use clap::Parser;
 //! # use jacquard::CowStr;
+//! use std::sync::Arc;
 //! use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
-//! use jacquard::api::com_atproto::server::create_session::CreateSession;
-//! use jacquard::client::{BasicClient, AuthSession, AtpSession};
+//! use jacquard::client::credential_session::{CredentialSession, SessionKey};
+//! use jacquard::client::{AtpSession, FileAuthStore, MemorySessionStore};
+//! use jacquard::identity::PublicResolver as JacquardResolver;
 //! # use miette::IntoDiagnostic;
 //!
 //! # #[derive(Parser, Debug)]
 //! # #[command(author, version, about = "Jacquard - AT Protocol client demo")]
 //! # struct Args {
-//! #     /// Username/handle (e.g., alice.mosphere.at)
+//! #     /// Username/handle (e.g., alice.bsky.social) or DID
 //! #     #[arg(short, long)]
 //! #     username: CowStr<'static>,
-//! #
-//! #     /// PDS URL (e.g., https://bsky.social)
-//! #     #[arg(long, default_value = "https://bsky.social")]
-//! #     pds: CowStr<'static>,
 //! #
 //! #     /// App password
 //! #     #[arg(short, long)]
@@ -46,35 +44,28 @@
 //! #[tokio::main]
 //! async fn main() -> miette::Result<()> {
 //!     let args = Args::parse();
-//!     // Create HTTP client
-//!     let url = url::Url::parse(&args.pds).unwrap();
-//!     let client = BasicClient::new(url);
-//!     // Create session
-//!     let session = AtpSession::from(
-//!         client
-//!             .send(
-//!                 CreateSession::new()
-//!                     .identifier(args.username)
-//!                     .password(args.password)
-//!                     .build(),
-//!             )
-//!             .await?
-//!             .into_output()?,
-//!     );
-//!     client.set_session(session).await.unwrap();
+//!     // Resolver + storage
+//!     let resolver = Arc::new(JacquardResolver::default());
+//!     let store: Arc<MemorySessionStore<SessionKey, AtpSession>> = Arc::new(Default::default());
+//!     let client = Arc::new(resolver.clone());
+//!     // Create session object with implicit public appview endpoint until login/restore
+//!     let session = CredentialSession::new(store, client);
+//!     // Log in (resolves PDS automatically) and persist as (did, "session")
+//!     session
+//!         .login(args.username.clone(), args.password.clone(), None, None, None)
+//!         .await
+//!         .into_diagnostic()?;
 //!     // Fetch timeline
-//!     println!("\nfetching timeline...");
-//!     let timeline = client
+//!     let timeline = session
+//!         .clone()
 //!         .send(GetTimeline::new().limit(5).build())
-//!         .await?
-//!         .into_output()?;
-//!     println!("\ntimeline ({} posts):", timeline.feed.len());
+//!         .await
+//!         .into_diagnostic()?
+//!         .into_output()
+//!         .into_diagnostic()?;
+//!     println!("timeline ({} posts):", timeline.feed.len());
 //!     for (i, post) in timeline.feed.iter().enumerate() {
-//!         println!("\n{}. by {}", i + 1, post.post.author.handle);
-//!         println!(
-//!             "   {}",
-//!             serde_json::to_string_pretty(&post.post.record).into_diagnostic()?
-//!        );
+//!         println!("{}. by {}", i + 1, post.post.author.handle);
 //!     }
 //!     Ok(())
 //! }
@@ -110,11 +101,9 @@
 //!       Ok(())
 //!   }
 //!   ```
-//! - Stateful client: `AtClient<C, S>` holds a base `Url`, a transport, and a
-//!   `SessionStore<AuthSession>` implementation. It automatically sets Authorization and can
-//!   auto-refresh a session when expired, retrying once.
-//! - Convenience wrapper: `BasicClient` is an ergonomic newtype over
-//!   `AtClient<reqwest::Client, MemorySessionStore<AuthSession>>` with a `new(Url)` constructor.
+//! - Stateful client (app-password): `CredentialSession<S, T>` where `S: SessionStore<(Did, CowStr), AtpSession>` and
+//!   `T: IdentityResolver + HttpClient + XrpcExt`. It auto-attaches Authorization, refreshes on expiry, and updates the
+//!   base endpoint to the user's PDS on login/restore.
 //!
 //! Per-request overrides (stateless)
 //! ```no_run
@@ -148,14 +137,17 @@
 //! ```
 //!
 //! Token storage:
-//! - Use `MemorySessionStore<AuthSession>` for ephemeral sessions, tests, and CLIs.
-//! - For persistence, `FileTokenStore` stores app-password sessions as JSON on disk.
-//!   See `client::token::FileTokenStore` docs for details.
+//! - Use `MemorySessionStore<SessionKey, AtpSession>` for ephemeral sessions and tests.
+//! - For persistence, wrap the file store: `FileAuthStore::new(path)` implements SessionStore for app-password sessions
+//!   and OAuth `ClientAuthStore` (unified on-disk map).
 //!   ```no_run
-//!   use jacquard::client::{AtClient, FileTokenStore};
-//!   let base = url::Url::parse("https://bsky.social").unwrap();
-//!   let store = FileTokenStore::new("/tmp/jacquard-session.json");
-//!   let client = AtClient::new(reqwest::Client::new(), base, store);
+//!   use std::sync::Arc;
+//!   use jacquard::client::credential_session::{CredentialSession, SessionKey};
+//!   use jacquard::client::{AtpSession, FileAuthStore};
+//!   use jacquard::identity::PublicResolver;
+//!   let store = Arc::new(FileAuthStore::new("/tmp/jacquard-session.json"));
+//!   let client = Arc::new(PublicResolver::default());
+//!   let session = CredentialSession::new(store, client);
 //!   ```
 //!
 

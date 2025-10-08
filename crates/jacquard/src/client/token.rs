@@ -22,7 +22,8 @@ pub struct StoredAtSession {
     access_jwt: String,
     refresh_jwt: String,
     did: String,
-    pds: String,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pds: Option<String>,
     session_id: String,
     handle: String,
 }
@@ -212,6 +213,13 @@ impl From<OAuthState> for AuthRequestData<'_> {
 
 pub struct FileAuthStore(FileTokenStore);
 
+impl FileAuthStore {
+    /// Create a new file-backed auth store wrapping `FileTokenStore`.
+    pub fn new(path: impl AsRef<std::path::Path>) -> Self {
+        Self(FileTokenStore::new(path))
+    }
+}
+
 #[async_trait::async_trait]
 impl jacquard_oauth::authstore::ClientAuthStore for FileAuthStore {
     async fn get_session(
@@ -302,6 +310,111 @@ impl jacquard_oauth::authstore::ClientAuthStore for FileAuthStore {
             Ok(())
         } else {
             Err(SessionStoreError::Other("invalid store".into()))
+        }
+    }
+}
+
+impl FileAuthStore {
+    /// Update the persisted PDS endpoint for an app-password session (best-effort).
+    pub fn set_atp_pds(
+        &self,
+        key: &crate::client::credential_session::SessionKey,
+        pds: &Url,
+    ) -> Result<(), SessionStoreError> {
+        let key_str = format!("{}_{}", key.0, key.1);
+        let file = std::fs::read_to_string(&self.0.path)?;
+        let mut store: Value = serde_json::from_str(&file)?;
+        if let Some(map) = store.as_object_mut() {
+            if let Some(value) = map.get_mut(&key_str) {
+                if let Some(obj) = value.as_object_mut() {
+                    obj.insert(
+                        "pds".to_string(),
+                        serde_json::Value::String(pds.to_string()),
+                    );
+                    std::fs::write(&self.0.path, serde_json::to_string_pretty(&store)?)?;
+                    return Ok(());
+                }
+            }
+        }
+        Err(SessionStoreError::Other("invalid store".into()))
+    }
+
+    /// Read the persisted PDS endpoint for an app-password session, if present.
+    pub fn get_atp_pds(
+        &self,
+        key: &crate::client::credential_session::SessionKey,
+    ) -> Result<Option<Url>, SessionStoreError> {
+        let key_str = format!("{}_{}", key.0, key.1);
+        let file = std::fs::read_to_string(&self.0.path)?;
+        let store: Value = serde_json::from_str(&file)?;
+        if let Some(value) = store.get(&key_str) {
+            if let Some(obj) = value.as_object() {
+                if let Some(serde_json::Value::String(pds)) = obj.get("pds") {
+                    return Ok(Url::parse(pds).ok());
+                }
+            }
+        }
+        Ok(None)
+    }
+}
+
+#[async_trait::async_trait]
+impl jacquard_common::session::SessionStore<
+        crate::client::credential_session::SessionKey,
+        crate::client::AtpSession,
+    > for FileAuthStore
+{
+    async fn get(
+        &self,
+        key: &crate::client::credential_session::SessionKey,
+    ) -> Option<crate::client::AtpSession> {
+        let key_str = format!("{}_{}", key.0, key.1);
+        if let Some(StoredSession::Atp(stored)) = self.0.get(&key_str).await {
+            Some(crate::client::AtpSession {
+                access_jwt: stored.access_jwt.into(),
+                refresh_jwt: stored.refresh_jwt.into(),
+                did: stored.did.into(),
+                handle: stored.handle.into(),
+            })
+        } else {
+            None
+        }
+    }
+
+    async fn set(
+        &self,
+        key: crate::client::credential_session::SessionKey,
+        session: crate::client::AtpSession,
+    ) -> Result<(), jacquard_common::session::SessionStoreError> {
+        let key_str = format!("{}_{}", key.0, key.1);
+        let stored = StoredAtSession {
+            access_jwt: session.access_jwt.to_string(),
+            refresh_jwt: session.refresh_jwt.to_string(),
+            did: session.did.to_string(),
+            // pds endpoint is resolved on restore; do not persist
+            pds: None,
+            session_id: key.1.to_string(),
+            handle: session.handle.to_string(),
+        };
+        self.0.set(key_str, StoredSession::Atp(stored)).await
+    }
+
+    async fn del(
+        &self,
+        key: &crate::client::credential_session::SessionKey,
+    ) -> Result<(), jacquard_common::session::SessionStoreError> {
+        let key_str = format!("{}_{}", key.0, key.1);
+        // Manual removal to mirror existing pattern
+        let file = std::fs::read_to_string(&self.0.path)?;
+        let mut store: serde_json::Value = serde_json::from_str(&file)?;
+        if let Some(map) = store.as_object_mut() {
+            map.remove(&key_str);
+            std::fs::write(&self.0.path, serde_json::to_string_pretty(&store)?)?;
+            Ok(())
+        } else {
+            Err(jacquard_common::session::SessionStoreError::Other(
+                "invalid store".into(),
+            ))
         }
     }
 }

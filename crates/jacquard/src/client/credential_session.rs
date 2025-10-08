@@ -14,7 +14,9 @@ use jacquard_common::{
 use tokio::sync::RwLock;
 use url::Url;
 
-use crate::client::{AtpSession, token::StoredSession};
+use crate::client::AtpSession;
+use jacquard_identity::resolver::IdentityResolver;
+use std::any::Any;
 
 pub type SessionKey = (Did<'static>, CowStr<'static>);
 
@@ -120,6 +122,240 @@ where
             .map_err(|_| ClientError::Auth(jacquard_common::error::AuthError::RefreshFailed))?;
 
         Ok(token)
+    }
+}
+
+impl<S, T> CredentialSession<S, T>
+where
+    S: SessionStore<SessionKey, AtpSession>,
+    T: HttpClient + IdentityResolver + XrpcExt,
+{
+    /// Resolve the user's PDS and create an app-password session.
+    ///
+    /// - `identifier`: handle (preferred), DID, or `https://` PDS base URL.
+    /// - `session_id`: optional session label; defaults to "session".
+    pub async fn login(
+        &self,
+        identifier: CowStr<'_>,
+        password: CowStr<'_>,
+        session_id: Option<CowStr<'_>>,
+        allow_takendown: Option<bool>,
+        auth_factor_token: Option<CowStr<'_>>,
+    ) -> Result<AtpSession, ClientError>
+    where
+        S: Any + 'static,
+    {
+        // Resolve PDS base
+        let pds = if identifier.as_ref().starts_with("http://")
+            || identifier.as_ref().starts_with("https://")
+        {
+            Url::parse(identifier.as_ref()).map_err(|e| {
+                ClientError::Transport(jacquard_common::error::TransportError::InvalidRequest(
+                    e.to_string(),
+                ))
+            })?
+        } else if identifier.as_ref().starts_with("did:") {
+            let did = Did::new(identifier.as_ref()).map_err(|e| {
+                ClientError::Transport(jacquard_common::error::TransportError::InvalidRequest(
+                    format!("invalid did: {:?}", e),
+                ))
+            })?;
+            let resp = self.client.resolve_did_doc(&did).await.map_err(|e| {
+                ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
+            })?;
+            resp.into_owned()
+                .map_err(|e| {
+                    ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(
+                        e,
+                    )))
+                })?
+                .pds_endpoint()
+                .ok_or_else(|| {
+                    ClientError::Transport(jacquard_common::error::TransportError::InvalidRequest(
+                        "missing PDS endpoint".into(),
+                    ))
+                })?
+        } else {
+            // treat as handle
+            let handle =
+                jacquard_common::types::string::Handle::new(identifier.as_ref()).map_err(|e| {
+                    ClientError::Transport(jacquard_common::error::TransportError::InvalidRequest(
+                        format!("invalid handle: {:?}", e),
+                    ))
+                })?;
+            let did = self.client.resolve_handle(&handle).await.map_err(|e| {
+                ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
+            })?;
+            let resp = self.client.resolve_did_doc(&did).await.map_err(|e| {
+                ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
+            })?;
+            resp.into_owned()
+                .map_err(|e| {
+                    ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(
+                        e,
+                    )))
+                })?
+                .pds_endpoint()
+                .ok_or_else(|| {
+                    ClientError::Transport(jacquard_common::error::TransportError::InvalidRequest(
+                        "missing PDS endpoint".into(),
+                    ))
+                })?
+        };
+
+        // Build and send createSession
+        use std::collections::BTreeMap;
+        let req = jacquard_api::com_atproto::server::create_session::CreateSession {
+            allow_takendown,
+            auth_factor_token,
+            identifier: identifier.clone().into_static(),
+            password: password.into_static(),
+            extra_data: BTreeMap::new(),
+        };
+
+        let resp = self
+            .client
+            .xrpc(pds.clone())
+            .with_options(self.options.read().await.clone())
+            .send(&req)
+            .await?;
+        let out = resp
+            .into_output()
+            .map_err(|_| ClientError::Auth(AuthError::NotAuthenticated))?;
+        let session = AtpSession::from(out);
+
+        let sid = session_id.unwrap_or_else(|| CowStr::new_static("session"));
+        let key = (session.did.clone(), sid.into_static());
+        self.store
+            .set(key.clone(), session.clone())
+            .await
+            .map_err(|e| {
+                ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
+            })?;
+        // If using FileAuthStore, persist PDS for faster resume
+        if let Some(file_store) =
+            (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
+        {
+            let _ = file_store.set_atp_pds(&key, &pds);
+        }
+        // Activate
+        *self.key.write().await = Some(key);
+        *self.endpoint.write().await = Some(pds);
+
+        Ok(session)
+    }
+
+    /// Restore a previously persisted app-password session and set base endpoint.
+    pub async fn restore(&self, did: Did<'_>, session_id: CowStr<'_>) -> Result<(), ClientError>
+    where
+        S: Any + 'static,
+    {
+        let key = (did.clone().into_static(), session_id.clone().into_static());
+        let Some(sess) = self.store.get(&key).await else {
+            return Err(ClientError::Auth(AuthError::NotAuthenticated));
+        };
+        // Try to read cached PDS; otherwise resolve via DID
+        let pds = if let Some(file_store) =
+            (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
+        {
+            file_store.get_atp_pds(&key).ok().flatten().or_else(|| None)
+        } else {
+            None
+        }
+        .unwrap_or({
+            let resp = self.client.resolve_did_doc(&did).await.map_err(|e| {
+                ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
+            })?;
+            resp.into_owned()
+                .map_err(|e| {
+                    ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(
+                        e,
+                    )))
+                })?
+                .pds_endpoint()
+                .ok_or_else(|| {
+                    ClientError::Transport(jacquard_common::error::TransportError::InvalidRequest(
+                        "missing PDS endpoint".into(),
+                    ))
+                })?
+        });
+
+        // Activate
+        *self.key.write().await = Some(key.clone());
+        *self.endpoint.write().await = Some(pds);
+        // ensure store has the session (no-op if it existed)
+        self.store
+            .set((sess.did.clone(), session_id.into_static()), sess)
+            .await
+            .map_err(|e| {
+                ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
+            })?;
+        if let Some(file_store) =
+            (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
+        {
+            let _ = file_store.set_atp_pds(&key, &self.endpoint().await);
+        }
+        Ok(())
+    }
+
+    /// Switch to a different stored session (and refresh endpoint from DID).
+    pub async fn switch_session(
+        &self,
+        did: Did<'_>,
+        session_id: CowStr<'_>,
+    ) -> Result<(), ClientError>
+    where
+        S: Any + 'static,
+    {
+        let key = (did.clone().into_static(), session_id.into_static());
+        if self.store.get(&key).await.is_none() {
+            return Err(ClientError::Auth(AuthError::NotAuthenticated));
+        }
+        // Endpoint from store if cached, else resolve
+        let pds = if let Some(file_store) =
+            (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
+        {
+            file_store.get_atp_pds(&key).ok().flatten().or_else(|| None)
+        } else {
+            None
+        }
+        .unwrap_or({
+            let resp = self.client.resolve_did_doc(&did).await.map_err(|e| {
+                ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
+            })?;
+            resp.into_owned()
+                .map_err(|e| {
+                    ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(
+                        e,
+                    )))
+                })?
+                .pds_endpoint()
+                .ok_or_else(|| {
+                    ClientError::Transport(jacquard_common::error::TransportError::InvalidRequest(
+                        "missing PDS endpoint".into(),
+                    ))
+                })?
+        });
+        *self.key.write().await = Some(key.clone());
+        *self.endpoint.write().await = Some(pds);
+        if let Some(file_store) =
+            (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
+        {
+            let _ = file_store.set_atp_pds(&key, &self.endpoint().await);
+        }
+        Ok(())
+    }
+
+    /// Clear and delete the current session from the store.
+    pub async fn logout(&self) -> Result<(), ClientError> {
+        let Some(key) = self.key.read().await.clone() else {
+            return Ok(());
+        };
+        self.store.del(&key).await.map_err(|e| {
+            ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
+        })?;
+        *self.key.write().await = None;
+        Ok(())
     }
 }
 

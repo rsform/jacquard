@@ -18,27 +18,24 @@ A suite of Rust crates for the AT Protocol.
 
 ## Example
 
-Dead simple api client. Logs in, prints the latest 5 posts from your timeline.
+Dead simple API client. Logs in with an app password and prints the latest 5 posts from your timeline.
 
 ```rust
+use std::sync::Arc;
 use clap::Parser;
 use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
-use jacquard::api::com_atproto::server::create_session::CreateSession;
-use jacquard::client::{BasicClient, Session};
+use jacquard::client::credential_session::{CredentialSession, SessionKey};
+use jacquard::client::{AtpSession, FileAuthStore, MemorySessionStore};
+use jacquard::identity::PublicResolver as JacquardResolver;
 use miette::IntoDiagnostic;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Jacquard - AT Protocol client demo")]
 struct Args {
-    /// Username/handle (e.g., alice.mosphere.at)
+    /// Username/handle (e.g., alice.bsky.social) or DID
     #[arg(short, long)]
     username: CowStr<'static>,
-
-    /// PDS URL (e.g., https://bsky.social)
-    #[arg(long, default_value = "https://bsky.social")]
-    pds: CowStr<'static>,
-
     /// App password
     #[arg(short, long)]
     password: CowStr<'static>,
@@ -48,32 +45,26 @@ struct Args {
 async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
-    // Create HTTP client
-    let base = url::Url::parse(&args.pds).into_diagnostic()?;
-    let client = BasicClient::new(base);
+    // Resolver + storage
+    let resolver = Arc::new(JacquardResolver::default());
+    let store: Arc<MemorySessionStore<SessionKey, AtpSession>> = Arc::new(Default::default());
+    let client = Arc::new(resolver.clone());
+    let session = CredentialSession::new(store, client);
 
-    // Create session
-    let session = Session::from(
-        client
-            .send(
-                CreateSession::new()
-                    .identifier(args.username)
-                    .password(args.password)
-                    .build(),
-            )
-            .await?
-            .into_output()?,
-    );
-
-    println!("logged in as {} ({})", session.handle, session.did);
-    client.set_session(session).await.into_diagnostic()?;
+    // Login (resolves PDS automatically) and persist as (did, "session")
+    session
+        .login(args.username.clone(), args.password.clone(), None, None, None)
+        .await
+        .into_diagnostic()?;
 
     // Fetch timeline
-    println!("\nfetching timeline...");
-    let timeline = client
+    let timeline = session
+        .clone()
         .send(GetTimeline::new().limit(5).build())
-        .await?
-        .into_output()?;
+        .await
+        .into_diagnostic()?
+        .into_output()
+        .into_diagnostic()?;
 
     println!("\ntimeline ({} posts):", timeline.feed.len());
     for (i, post) in timeline.feed.iter().enumerate() {
