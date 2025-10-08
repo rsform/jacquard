@@ -91,12 +91,12 @@ impl jacquard_common::IntoStatic for DeleteValuesError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for DeleteValues<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DeleteValues<'de> {
     const NSID: &'static str = "tools.ozone.set.deleteValues";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = DeleteValuesError<'de>;
+    type Output = ();
+    type Err = DeleteValuesError<'de>;
 }

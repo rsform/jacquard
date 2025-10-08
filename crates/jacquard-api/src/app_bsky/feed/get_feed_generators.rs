@@ -48,10 +48,10 @@ impl jacquard_common::IntoStatic for GetFeedGeneratorsOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetFeedGenerators<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetFeedGenerators<'de> {
     const NSID: &'static str = "app.bsky.feed.getFeedGenerators";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFeedGeneratorsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetFeedGeneratorsOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

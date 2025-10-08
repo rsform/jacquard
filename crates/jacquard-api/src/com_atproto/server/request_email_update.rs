@@ -23,14 +23,14 @@ impl jacquard_common::IntoStatic for RequestEmailUpdateOutput<'_> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct RequestEmailUpdate;
-impl jacquard_common::types::xrpc::XrpcRequest for RequestEmailUpdate {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RequestEmailUpdate {
     const NSID: &'static str = "com.atproto.server.requestEmailUpdate";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = RequestEmailUpdateOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = RequestEmailUpdateOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

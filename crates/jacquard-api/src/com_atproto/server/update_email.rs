@@ -118,12 +118,12 @@ impl jacquard_common::IntoStatic for UpdateEmailError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for UpdateEmail<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpdateEmail<'de> {
     const NSID: &'static str = "com.atproto.server.updateEmail";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = UpdateEmailError<'de>;
+    type Output = ();
+    type Err = UpdateEmailError<'de>;
 }

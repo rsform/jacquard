@@ -141,10 +141,10 @@ impl jacquard_common::IntoStatic for QueryEventsOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for QueryEvents<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for QueryEvents<'de> {
     const NSID: &'static str = "tools.ozone.moderation.queryEvents";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = QueryEventsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = QueryEventsOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

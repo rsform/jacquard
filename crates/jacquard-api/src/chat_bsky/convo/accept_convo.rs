@@ -60,12 +60,12 @@ impl jacquard_common::IntoStatic for AcceptConvoOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for AcceptConvo<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for AcceptConvo<'de> {
     const NSID: &'static str = "chat.bsky.convo.acceptConvo";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = AcceptConvoOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = AcceptConvoOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

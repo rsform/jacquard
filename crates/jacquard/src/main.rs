@@ -76,7 +76,8 @@ async fn main() -> miette::Result<()> {
     let timeline = agent
         .send(&GetTimeline::new().limit(5).build())
         .await?
-        .into_output()?;
+        .owned::<GetTimeline>()
+        .output()?;
     for (i, post) in timeline.feed.iter().enumerate() {
         println!("\n{}. by {}", i + 1, post.post.author.handle);
         println!(

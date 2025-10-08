@@ -139,10 +139,10 @@ impl jacquard_common::IntoStatic for GetBlocksError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetBlocks<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetBlocks<'de> {
     const NSID: &'static str = "com.atproto.sync.getBlocks";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<'de> = GetBlocksOutput<'de>;
-    type Err<'de> = GetBlocksError<'de>;
+    type Output = GetBlocksOutput<'de>;
+    type Err = GetBlocksError<'de>;
 }

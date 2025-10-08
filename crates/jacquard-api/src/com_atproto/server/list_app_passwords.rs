@@ -94,12 +94,12 @@ impl jacquard_common::IntoStatic for ListAppPasswordsError<'_> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ListAppPasswords;
-impl jacquard_common::types::xrpc::XrpcRequest for ListAppPasswords {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ListAppPasswords {
     const NSID: &'static str = "com.atproto.server.listAppPasswords";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ListAppPasswordsOutput<'de>;
-    type Err<'de> = ListAppPasswordsError<'de>;
+    type Output = ListAppPasswordsOutput<'de>;
+    type Err = ListAppPasswordsError<'de>;
 }

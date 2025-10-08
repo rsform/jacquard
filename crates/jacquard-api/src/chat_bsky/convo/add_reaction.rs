@@ -138,12 +138,12 @@ impl jacquard_common::IntoStatic for AddReactionError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for AddReaction<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for AddReaction<'de> {
     const NSID: &'static str = "chat.bsky.convo.addReaction";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = AddReactionOutput<'de>;
-    type Err<'de> = AddReactionError<'de>;
+    type Output = AddReactionOutput<'de>;
+    type Err = AddReactionError<'de>;
 }

@@ -214,14 +214,14 @@ impl jacquard_common::IntoStatic for ApplyWritesError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for ApplyWrites<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ApplyWrites<'de> {
     const NSID: &'static str = "com.atproto.repo.applyWrites";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ApplyWritesOutput<'de>;
-    type Err<'de> = ApplyWritesError<'de>;
+    type Output = ApplyWritesOutput<'de>;
+    type Err = ApplyWritesError<'de>;
 }
 
 ///Operation which updates an existing record.

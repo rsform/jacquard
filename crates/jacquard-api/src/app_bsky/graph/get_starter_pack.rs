@@ -48,10 +48,10 @@ impl jacquard_common::IntoStatic for GetStarterPackOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetStarterPack<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetStarterPack<'de> {
     const NSID: &'static str = "app.bsky.graph.getStarterPack";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetStarterPackOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetStarterPackOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

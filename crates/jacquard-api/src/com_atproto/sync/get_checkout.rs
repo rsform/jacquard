@@ -43,10 +43,10 @@ impl jacquard_common::IntoStatic for GetCheckoutOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetCheckout<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetCheckout<'de> {
     const NSID: &'static str = "com.atproto.sync.getCheckout";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<'de> = GetCheckoutOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetCheckoutOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

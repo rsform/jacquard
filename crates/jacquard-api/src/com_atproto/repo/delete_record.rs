@@ -124,12 +124,12 @@ impl jacquard_common::IntoStatic for DeleteRecordError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for DeleteRecord<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DeleteRecord<'de> {
     const NSID: &'static str = "com.atproto.repo.deleteRecord";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = DeleteRecordOutput<'de>;
-    type Err<'de> = DeleteRecordError<'de>;
+    type Output = DeleteRecordOutput<'de>;
+    type Err = DeleteRecordError<'de>;
 }

@@ -75,10 +75,10 @@ impl jacquard_common::IntoStatic for QuerySetsOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for QuerySets<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for QuerySets<'de> {
     const NSID: &'static str = "tools.ozone.set.querySets";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = QuerySetsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = QuerySetsOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

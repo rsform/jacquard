@@ -103,12 +103,12 @@ impl jacquard_common::IntoStatic for ResetPasswordError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for ResetPassword<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ResetPassword<'de> {
     const NSID: &'static str = "com.atproto.server.resetPassword";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = ResetPasswordError<'de>;
+    type Output = ();
+    type Err = ResetPasswordError<'de>;
 }

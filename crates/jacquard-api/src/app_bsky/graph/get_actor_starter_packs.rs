@@ -61,10 +61,10 @@ impl jacquard_common::IntoStatic for GetActorStarterPacksOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetActorStarterPacks<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetActorStarterPacks<'de> {
     const NSID: &'static str = "app.bsky.graph.getActorStarterPacks";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorStarterPacksOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetActorStarterPacksOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

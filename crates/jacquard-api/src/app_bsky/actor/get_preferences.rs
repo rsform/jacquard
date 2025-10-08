@@ -42,10 +42,10 @@ impl jacquard_common::IntoStatic for GetPreferencesOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetPreferences {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetPreferences {
     const NSID: &'static str = "app.bsky.actor.getPreferences";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPreferencesOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetPreferencesOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

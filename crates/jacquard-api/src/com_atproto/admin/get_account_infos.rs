@@ -48,10 +48,10 @@ impl jacquard_common::IntoStatic for GetAccountInfosOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetAccountInfos<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetAccountInfos<'de> {
     const NSID: &'static str = "com.atproto.admin.getAccountInfos";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetAccountInfosOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetAccountInfosOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

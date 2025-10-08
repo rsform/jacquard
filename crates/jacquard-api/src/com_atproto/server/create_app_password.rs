@@ -137,12 +137,12 @@ impl jacquard_common::IntoStatic for CreateAppPasswordError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for CreateAppPassword<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CreateAppPassword<'de> {
     const NSID: &'static str = "com.atproto.server.createAppPassword";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateAppPasswordOutput<'de>;
-    type Err<'de> = CreateAppPasswordError<'de>;
+    type Output = CreateAppPasswordOutput<'de>;
+    type Err = CreateAppPasswordError<'de>;
 }

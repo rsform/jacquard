@@ -6,14 +6,14 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ActivateAccount;
-impl jacquard_common::types::xrpc::XrpcRequest for ActivateAccount {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ActivateAccount {
     const NSID: &'static str = "com.atproto.server.activateAccount";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = ();
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

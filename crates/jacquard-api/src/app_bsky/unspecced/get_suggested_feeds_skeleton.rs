@@ -53,10 +53,11 @@ impl jacquard_common::IntoStatic for GetSuggestedFeedsSkeletonOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetSuggestedFeedsSkeleton<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de>
+for GetSuggestedFeedsSkeleton<'de> {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedFeedsSkeleton";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSuggestedFeedsSkeletonOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetSuggestedFeedsSkeletonOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

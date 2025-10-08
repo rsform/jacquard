@@ -19,14 +19,14 @@ use crate::resolver::{
     ResolverOptions,
 };
 use bytes::Bytes;
-use jacquard_api::com_atproto::identity::resolve_did;
+use jacquard_api::com_atproto::identity::resolve_did::{self, ResolveDid};
 use jacquard_api::com_atproto::identity::resolve_handle::ResolveHandle;
 use jacquard_common::error::TransportError;
 use jacquard_common::http_client::HttpClient;
 use jacquard_common::types::did::Did;
 use jacquard_common::types::did_doc::DidDocument;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_common::types::xrpc::XrpcExt;
+use jacquard_common::types::xrpc::{OwnedResponse, XrpcExt};
 use jacquard_common::{IntoStatic, types::string::Handle};
 use percent_encoding::percent_decode_str;
 use reqwest::StatusCode;
@@ -199,15 +199,18 @@ impl JacquardResolver {
             Some(u) => u.clone(),
             None => return Err(IdentityError::InvalidWellKnown),
         };
-        let req = ResolveHandle::new().handle((*handle).clone()).build();
+        let req = ResolveHandle::new()
+            .handle(handle.clone().into_static())
+            .build();
         let resp = self
             .http
             .xrpc(pds)
             .send(&req)
             .await
             .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
-        let out = resp
-            .into_output()
+        let owned: OwnedResponse<ResolveHandle<'static>> = resp.owned();
+        let out = owned
+            .output()
             .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
         Did::new_owned(out.did.as_str())
             .map(|d| d.into_static())
@@ -230,8 +233,9 @@ impl JacquardResolver {
             .send(&req)
             .await
             .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
-        let out = resp
-            .into_output()
+        let owned: OwnedResponse<ResolveDid<'static>> = resp.owned();
+        let out = owned
+            .output()
             .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
         let doc_json = serde_json::to_value(&out.did_doc)?;
         let s = serde_json::to_string(&doc_json)?;
@@ -255,9 +259,11 @@ impl JacquardResolver {
         };
         let mut url = base;
         url.set_path("/xrpc/com.bad-example.identity.resolveMiniDoc");
-        if let Ok(qs) =
-            serde_html_form::to_string(&resolve_did::ResolveDid::new().did(did.clone()).build())
-        {
+        if let Ok(qs) = serde_html_form::to_string(
+            &resolve_did::ResolveDid::new()
+                .did(did.clone().into_static())
+                .build(),
+        ) {
             url.set_query(Some(&qs));
         }
         let (buf, status) = self.get_json_bytes(url).await?;

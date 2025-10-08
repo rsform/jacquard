@@ -61,12 +61,12 @@ impl jacquard_common::IntoStatic for ListReposByCollectionOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for ListReposByCollection<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ListReposByCollection<'de> {
     const NSID: &'static str = "com.atproto.sync.listReposByCollection";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ListReposByCollectionOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = ListReposByCollectionOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]

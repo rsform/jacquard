@@ -74,12 +74,12 @@ impl jacquard_common::IntoStatic for SendEmailOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for SendEmail<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for SendEmail<'de> {
     const NSID: &'static str = "com.atproto.admin.sendEmail";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = SendEmailOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = SendEmailOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

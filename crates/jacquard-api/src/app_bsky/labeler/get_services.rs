@@ -52,10 +52,10 @@ impl jacquard_common::IntoStatic for GetServicesOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetServices<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetServices<'de> {
     const NSID: &'static str = "app.bsky.labeler.getServices";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetServicesOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetServicesOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -92,14 +92,14 @@ impl jacquard_common::IntoStatic for RefreshSessionError<'_> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct RefreshSession;
-impl jacquard_common::types::xrpc::XrpcRequest for RefreshSession {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RefreshSession {
     const NSID: &'static str = "com.atproto.server.refreshSession";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = RefreshSessionOutput<'de>;
-    type Err<'de> = RefreshSessionError<'de>;
+    type Output = RefreshSessionOutput<'de>;
+    type Err = RefreshSessionError<'de>;
 }

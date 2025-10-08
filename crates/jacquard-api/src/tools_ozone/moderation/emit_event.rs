@@ -310,12 +310,12 @@ impl jacquard_common::IntoStatic for EmitEventError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for EmitEvent<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for EmitEvent<'de> {
     const NSID: &'static str = "tools.ozone.moderation.emitEvent";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = EmitEventOutput<'de>;
-    type Err<'de> = EmitEventError<'de>;
+    type Output = EmitEventOutput<'de>;
+    type Err = EmitEventError<'de>;
 }

@@ -141,14 +141,14 @@ impl jacquard_common::IntoStatic for CreateReportOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for CreateReport<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CreateReport<'de> {
     const NSID: &'static str = "com.atproto.moderation.createReport";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateReportOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = CreateReportOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 ///Moderation tool information for tracing the source of the action

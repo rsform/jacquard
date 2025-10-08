@@ -74,12 +74,12 @@ impl jacquard_common::IntoStatic for ListNotificationsOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for ListNotifications<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ListNotifications<'de> {
     const NSID: &'static str = "app.bsky.notification.listNotifications";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ListNotificationsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = ListNotificationsOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]

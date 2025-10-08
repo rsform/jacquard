@@ -112,12 +112,12 @@ impl jacquard_common::IntoStatic for UpdateMemberError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for UpdateMember<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpdateMember<'de> {
     const NSID: &'static str = "tools.ozone.team.updateMember";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateMemberOutput<'de>;
-    type Err<'de> = UpdateMemberError<'de>;
+    type Output = UpdateMemberOutput<'de>;
+    type Err = UpdateMemberError<'de>;
 }

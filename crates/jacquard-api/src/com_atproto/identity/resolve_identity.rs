@@ -123,10 +123,10 @@ impl jacquard_common::IntoStatic for ResolveIdentityError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for ResolveIdentity<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ResolveIdentity<'de> {
     const NSID: &'static str = "com.atproto.identity.resolveIdentity";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveIdentityOutput<'de>;
-    type Err<'de> = ResolveIdentityError<'de>;
+    type Output = ResolveIdentityOutput<'de>;
+    type Err = ResolveIdentityError<'de>;
 }

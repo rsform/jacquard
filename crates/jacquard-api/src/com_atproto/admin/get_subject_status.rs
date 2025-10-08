@@ -98,10 +98,10 @@ impl jacquard_common::IntoStatic for GetSubjectStatusOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetSubjectStatus<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetSubjectStatus<'de> {
     const NSID: &'static str = "com.atproto.admin.getSubjectStatus";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSubjectStatusOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetSubjectStatusOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

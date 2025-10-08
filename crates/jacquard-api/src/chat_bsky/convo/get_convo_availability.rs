@@ -51,10 +51,10 @@ impl jacquard_common::IntoStatic for GetConvoAvailabilityOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetConvoAvailability<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetConvoAvailability<'de> {
     const NSID: &'static str = "chat.bsky.convo.getConvoAvailability";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetConvoAvailabilityOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetConvoAvailabilityOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -95,12 +95,12 @@ impl jacquard_common::IntoStatic for GetAccountTimelineError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetAccountTimeline<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetAccountTimeline<'de> {
     const NSID: &'static str = "tools.ozone.moderation.getAccountTimeline";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetAccountTimelineOutput<'de>;
-    type Err<'de> = GetAccountTimelineError<'de>;
+    type Output = GetAccountTimelineOutput<'de>;
+    type Err = GetAccountTimelineError<'de>;
 }
 
 #[jacquard_derive::lexicon]

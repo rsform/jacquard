@@ -48,10 +48,10 @@ impl jacquard_common::IntoStatic for GetProfilesOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetProfiles<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetProfiles<'de> {
     const NSID: &'static str = "app.bsky.actor.getProfiles";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetProfilesOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetProfilesOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

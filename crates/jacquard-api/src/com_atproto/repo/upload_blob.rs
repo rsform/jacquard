@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct UploadBlob {
@@ -45,15 +37,22 @@ impl jacquard_common::IntoStatic for UploadBlobOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for UploadBlob {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UploadBlob {
     const NSID: &'static str = "com.atproto.repo.uploadBlob";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "*/*",
-    );
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("*/*");
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = UploadBlobOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = UploadBlobOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
     fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::types::xrpc::EncodeError> {
         Ok(self.body.to_vec())
+    }
+    fn decode_body(
+        &self,
+        body: &'de [u8],
+    ) -> Result<Box<Self>, jacquard_common::error::DecodeError> {
+        Ok(Box::new(Self {
+            body: bytes::Bytes::copy_from_slice(body),
+        }))
     }
 }

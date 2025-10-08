@@ -49,10 +49,10 @@ impl jacquard_common::IntoStatic for GetJobStatusOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetJobStatus<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetJobStatus<'de> {
     const NSID: &'static str = "app.bsky.video.getJobStatus";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetJobStatusOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetJobStatusOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

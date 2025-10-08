@@ -83,12 +83,12 @@ impl jacquard_common::IntoStatic for CreateInviteCodesOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for CreateInviteCodes<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CreateInviteCodes<'de> {
     const NSID: &'static str = "com.atproto.server.createInviteCodes";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateInviteCodesOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = CreateInviteCodesOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

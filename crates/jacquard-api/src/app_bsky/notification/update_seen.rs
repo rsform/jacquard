@@ -38,12 +38,12 @@ impl jacquard_common::IntoStatic for UpdateSeen<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for UpdateSeen<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpdateSeen<'de> {
     const NSID: &'static str = "app.bsky.notification.updateSeen";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = ();
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -1,0 +1,29 @@
+[package]
+name = "jacquard-axum"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme.workspace = true
+exclude.workspace = true
+homepage.workspace = true
+license.workspace = true
+description = "Axum server helpers for Jacquard"
+
+[dependencies]
+axum = "0.8.6"
+bytes.workspace = true
+jacquard = { version = "0.3.0", path = "../jacquard" }
+jacquard-common = { version = "0.3.0", path = "../jacquard-common", features = ["reqwest-client"] }
+miette.workspace = true
+serde.workspace = true
+serde_ipld_dagcbor.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+axum-test = "18.1.0"
+tokio-test = "0.4.4"

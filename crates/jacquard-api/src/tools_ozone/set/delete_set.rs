@@ -100,12 +100,12 @@ impl jacquard_common::IntoStatic for DeleteSetError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for DeleteSet<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DeleteSet<'de> {
     const NSID: &'static str = "tools.ozone.set.deleteSet";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = DeleteSetOutput<'de>;
-    type Err<'de> = DeleteSetError<'de>;
+    type Output = DeleteSetOutput<'de>;
+    type Err = DeleteSetError<'de>;
 }

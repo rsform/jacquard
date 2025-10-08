@@ -64,10 +64,10 @@ impl jacquard_common::IntoStatic for GetFollowsOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetFollows<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetFollows<'de> {
     const NSID: &'static str = "app.bsky.graph.getFollows";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFollowsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetFollowsOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

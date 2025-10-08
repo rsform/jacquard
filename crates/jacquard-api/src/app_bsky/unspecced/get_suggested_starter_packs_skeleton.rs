@@ -53,10 +53,11 @@ impl jacquard_common::IntoStatic for GetSuggestedStarterPacksSkeletonOutput<'_> 
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetSuggestedStarterPacksSkeleton<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de>
+for GetSuggestedStarterPacksSkeleton<'de> {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedStarterPacksSkeleton";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSuggestedStarterPacksSkeletonOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetSuggestedStarterPacksSkeletonOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

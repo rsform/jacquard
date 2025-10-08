@@ -25,12 +25,12 @@ impl jacquard_common::IntoStatic for GetAgeAssuranceStateOutput<'_> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct GetAgeAssuranceState;
-impl jacquard_common::types::xrpc::XrpcRequest for GetAgeAssuranceState {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetAgeAssuranceState {
     const NSID: &'static str = "app.bsky.unspecced.getAgeAssuranceState";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetAgeAssuranceStateOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetAgeAssuranceStateOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

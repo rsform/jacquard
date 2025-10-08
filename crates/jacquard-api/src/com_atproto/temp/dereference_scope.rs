@@ -98,10 +98,10 @@ impl jacquard_common::IntoStatic for DereferenceScopeError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for DereferenceScope<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DereferenceScope<'de> {
     const NSID: &'static str = "com.atproto.temp.dereferenceScope";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = DereferenceScopeOutput<'de>;
-    type Err<'de> = DereferenceScopeError<'de>;
+    type Output = DereferenceScopeOutput<'de>;
+    type Err = DereferenceScopeError<'de>;
 }

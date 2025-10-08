@@ -140,10 +140,10 @@ impl jacquard_common::IntoStatic for GetPostThreadError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetPostThread<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetPostThread<'de> {
     const NSID: &'static str = "app.bsky.feed.getPostThread";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPostThreadOutput<'de>;
-    type Err<'de> = GetPostThreadError<'de>;
+    type Output = GetPostThreadOutput<'de>;
+    type Err = GetPostThreadError<'de>;
 }

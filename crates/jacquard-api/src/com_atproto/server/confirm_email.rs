@@ -125,12 +125,12 @@ impl jacquard_common::IntoStatic for ConfirmEmailError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for ConfirmEmail<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ConfirmEmail<'de> {
     const NSID: &'static str = "com.atproto.server.confirmEmail";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = ConfirmEmailError<'de>;
+    type Output = ();
+    type Err = ConfirmEmailError<'de>;
 }

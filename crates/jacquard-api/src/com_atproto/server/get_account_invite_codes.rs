@@ -97,10 +97,10 @@ impl jacquard_common::IntoStatic for GetAccountInviteCodesError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetAccountInviteCodes {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetAccountInviteCodes {
     const NSID: &'static str = "com.atproto.server.getAccountInviteCodes";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetAccountInviteCodesOutput<'de>;
-    type Err<'de> = GetAccountInviteCodesError<'de>;
+    type Output = GetAccountInviteCodesOutput<'de>;
+    type Err = GetAccountInviteCodesError<'de>;
 }

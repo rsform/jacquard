@@ -92,10 +92,10 @@ impl jacquard_common::IntoStatic for GetRepoError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetRepo<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetRepo<'de> {
     const NSID: &'static str = "tools.ozone.moderation.getRepo";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRepoOutput<'de>;
-    type Err<'de> = GetRepoError<'de>;
+    type Output = GetRepoOutput<'de>;
+    type Err = GetRepoError<'de>;
 }

@@ -66,12 +66,13 @@ impl jacquard_common::IntoStatic for PutActivitySubscriptionOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for PutActivitySubscription<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de>
+for PutActivitySubscription<'de> {
     const NSID: &'static str = "app.bsky.notification.putActivitySubscription";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = PutActivitySubscriptionOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = PutActivitySubscriptionOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

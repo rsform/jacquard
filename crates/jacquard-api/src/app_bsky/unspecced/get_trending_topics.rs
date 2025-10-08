@@ -56,10 +56,10 @@ impl jacquard_common::IntoStatic for GetTrendingTopicsOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetTrendingTopics<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetTrendingTopics<'de> {
     const NSID: &'static str = "app.bsky.unspecced.getTrendingTopics";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTrendingTopicsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetTrendingTopicsOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

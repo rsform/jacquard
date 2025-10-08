@@ -49,10 +49,10 @@ impl jacquard_common::IntoStatic for FetchLabelsOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for FetchLabels {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for FetchLabels {
     const NSID: &'static str = "com.atproto.temp.fetchLabels";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = FetchLabelsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = FetchLabelsOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

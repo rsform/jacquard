@@ -43,12 +43,13 @@ impl jacquard_common::IntoStatic for UpdateAccountSigningKey<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for UpdateAccountSigningKey<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de>
+for UpdateAccountSigningKey<'de> {
     const NSID: &'static str = "com.atproto.admin.updateAccountSigningKey";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = ();
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

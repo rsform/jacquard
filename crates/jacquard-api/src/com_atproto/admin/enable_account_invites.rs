@@ -45,12 +45,12 @@ impl jacquard_common::IntoStatic for EnableAccountInvites<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for EnableAccountInvites<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for EnableAccountInvites<'de> {
     const NSID: &'static str = "com.atproto.admin.enableAccountInvites";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = ();
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

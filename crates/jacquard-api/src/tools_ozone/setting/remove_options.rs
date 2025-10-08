@@ -56,12 +56,12 @@ impl jacquard_common::IntoStatic for RemoveOptionsOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for RemoveOptions<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RemoveOptions<'de> {
     const NSID: &'static str = "tools.ozone.setting.removeOptions";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = RemoveOptionsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = RemoveOptionsOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

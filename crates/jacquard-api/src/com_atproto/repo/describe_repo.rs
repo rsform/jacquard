@@ -62,10 +62,10 @@ impl jacquard_common::IntoStatic for DescribeRepoOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for DescribeRepo<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DescribeRepo<'de> {
     const NSID: &'static str = "com.atproto.repo.describeRepo";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = DescribeRepoOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = DescribeRepoOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

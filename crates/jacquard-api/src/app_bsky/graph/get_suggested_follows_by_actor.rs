@@ -56,10 +56,11 @@ impl jacquard_common::IntoStatic for GetSuggestedFollowsByActorOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetSuggestedFollowsByActor<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de>
+for GetSuggestedFollowsByActor<'de> {
     const NSID: &'static str = "app.bsky.graph.getSuggestedFollowsByActor";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSuggestedFollowsByActorOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetSuggestedFollowsByActorOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

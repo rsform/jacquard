@@ -132,12 +132,12 @@ impl jacquard_common::IntoStatic for RefreshIdentityError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for RefreshIdentity<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RefreshIdentity<'de> {
     const NSID: &'static str = "com.atproto.identity.refreshIdentity";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = RefreshIdentityOutput<'de>;
-    type Err<'de> = RefreshIdentityError<'de>;
+    type Output = RefreshIdentityOutput<'de>;
+    type Err = RefreshIdentityError<'de>;
 }

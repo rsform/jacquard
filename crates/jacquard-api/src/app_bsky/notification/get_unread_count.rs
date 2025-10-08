@@ -47,10 +47,10 @@ impl jacquard_common::IntoStatic for GetUnreadCountOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetUnreadCount {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetUnreadCount {
     const NSID: &'static str = "app.bsky.notification.getUnreadCount";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetUnreadCountOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetUnreadCountOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

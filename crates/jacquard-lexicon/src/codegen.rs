@@ -2044,25 +2044,42 @@ impl<'c> CodeGenerator<'c> {
             quote! {}
         };
 
+        // Generate decode_body() method for binary inputs
+        let decode_body_method = if is_binary_input {
+            quote! {
+                fn decode_body(
+                    &self,
+                    body: &'de [u8],
+                ) -> Result<Box<Self>, jacquard_common::error::DecodeError> {
+                    Ok(Box::new(Self {
+                        body: bytes::Bytes::copy_from_slice(body),
+                    }))
+                }
+            }
+        } else {
+            quote! {}
+        };
+
         if has_params {
             // Implement on the params/input struct itself
             let request_ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
             let impl_target = if params_has_lifetime {
-                quote! { #request_ident<'_> }
+                quote! { #request_ident<'de> }
             } else {
                 quote! { #request_ident }
             };
 
             Ok(quote! {
-                impl jacquard_common::types::xrpc::XrpcRequest for #impl_target {
+                impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for #impl_target {
                     const NSID: &'static str = #nsid;
                     const METHOD: jacquard_common::types::xrpc::XrpcMethod = #method;
                     const OUTPUT_ENCODING: &'static str = #output_encoding;
 
-                    type Output<'de> = #output_type;
-                    type Err<'de> = #error_type;
+                    type Output = #output_type;
+                    type Err = #error_type;
 
                     #encode_body_method
+                    #decode_body_method
                 }
             })
         } else {
@@ -2071,16 +2088,16 @@ impl<'c> CodeGenerator<'c> {
 
             Ok(quote! {
                 /// XRPC request marker type
-                #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+                #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
                 pub struct #request_ident;
 
-                impl jacquard_common::types::xrpc::XrpcRequest for #request_ident {
+                impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for #request_ident {
                     const NSID: &'static str = #nsid;
                     const METHOD: jacquard_common::types::xrpc::XrpcMethod = #method;
                     const OUTPUT_ENCODING: &'static str = #output_encoding;
 
-                    type Output<'de> = #output_type;
-                    type Err<'de> = #error_type;
+                    type Output = #output_type;
+                    type Err = #error_type;
                 }
             })
         }

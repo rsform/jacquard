@@ -70,10 +70,10 @@ impl jacquard_common::IntoStatic for ListMembersOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for ListMembers<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ListMembers<'de> {
     const NSID: &'static str = "tools.ozone.team.listMembers";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ListMembersOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = ListMembersOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

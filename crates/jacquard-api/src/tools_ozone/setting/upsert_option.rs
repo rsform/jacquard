@@ -74,12 +74,12 @@ impl jacquard_common::IntoStatic for UpsertOptionOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for UpsertOption<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpsertOption<'de> {
     const NSID: &'static str = "tools.ozone.setting.upsertOption";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = UpsertOptionOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = UpsertOptionOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

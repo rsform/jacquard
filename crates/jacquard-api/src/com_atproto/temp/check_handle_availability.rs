@@ -124,12 +124,13 @@ impl jacquard_common::IntoStatic for CheckHandleAvailabilityError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for CheckHandleAvailability<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de>
+for CheckHandleAvailability<'de> {
     const NSID: &'static str = "com.atproto.temp.checkHandleAvailability";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = CheckHandleAvailabilityOutput<'de>;
-    type Err<'de> = CheckHandleAvailabilityError<'de>;
+    type Output = CheckHandleAvailabilityOutput<'de>;
+    type Err = CheckHandleAvailabilityError<'de>;
 }
 
 ///Indicates the provided handle is available.

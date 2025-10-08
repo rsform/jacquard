@@ -58,12 +58,12 @@ impl jacquard_common::IntoStatic for MuteConvoOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for MuteConvo<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for MuteConvo<'de> {
     const NSID: &'static str = "chat.bsky.convo.muteConvo";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = MuteConvoOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = MuteConvoOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -72,12 +72,12 @@ impl jacquard_common::IntoStatic for DescribeFeedGeneratorOutput<'_> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct DescribeFeedGenerator;
-impl jacquard_common::types::xrpc::XrpcRequest for DescribeFeedGenerator {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DescribeFeedGenerator {
     const NSID: &'static str = "app.bsky.feed.describeFeedGenerator";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = DescribeFeedGeneratorOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = DescribeFeedGeneratorOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

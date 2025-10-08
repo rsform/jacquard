@@ -111,10 +111,10 @@ impl jacquard_common::IntoStatic for GetValuesError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetValues<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetValues<'de> {
     const NSID: &'static str = "tools.ozone.set.getValues";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetValuesOutput<'de>;
-    type Err<'de> = GetValuesError<'de>;
+    type Output = GetValuesOutput<'de>;
+    type Err = GetValuesError<'de>;
 }

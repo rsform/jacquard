@@ -73,10 +73,10 @@ impl jacquard_common::IntoStatic for ListOptionsOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for ListOptions<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ListOptions<'de> {
     const NSID: &'static str = "tools.ozone.setting.listOptions";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ListOptionsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = ListOptionsOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

@@ -144,10 +144,10 @@ impl jacquard_common::IntoStatic for GetRecordError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetRecord<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetRecord<'de> {
     const NSID: &'static str = "com.atproto.sync.getRecord";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<'de> = GetRecordOutput<'de>;
-    type Err<'de> = GetRecordError<'de>;
+    type Output = GetRecordOutput<'de>;
+    type Err = GetRecordError<'de>;
 }

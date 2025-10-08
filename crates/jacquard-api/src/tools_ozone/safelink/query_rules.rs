@@ -102,12 +102,12 @@ impl jacquard_common::IntoStatic for QueryRulesOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for QueryRules<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for QueryRules<'de> {
     const NSID: &'static str = "tools.ozone.safelink.queryRules";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = QueryRulesOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = QueryRulesOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

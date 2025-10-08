@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
-use jacquard_api::com_atproto::server::refresh_session::RefreshSession;
+use jacquard_api::com_atproto::server::{
+    create_session::{CreateSession, CreateSessionOutput},
+    refresh_session::RefreshSession,
+};
 use jacquard_common::{
     AuthorizationToken, CowStr, IntoStatic,
     error::{AuthError, ClientError, XrpcResult},
@@ -8,7 +11,7 @@ use jacquard_common::{
     session::SessionStore,
     types::{
         did::Did,
-        xrpc::{CallOptions, Response, XrpcClient, XrpcError, XrpcExt, XrpcRequest},
+        xrpc::{CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest},
     },
 };
 use tokio::sync::RwLock;
@@ -129,7 +132,8 @@ where
             .send(&RefreshSession)
             .await?;
         let refresh = response
-            .into_output()
+            .owned::<RefreshSession>()
+            .output()
             .map_err(|_| ClientError::Auth(jacquard_common::error::AuthError::RefreshFailed))?;
 
         let new_session: AtpSession = refresh.into();
@@ -238,8 +242,9 @@ where
             .with_options(self.options.read().await.clone())
             .send(&req)
             .await?;
-        let out = resp
-            .into_output()
+        let out: CreateSessionOutput<'_> = resp
+            .owned::<CreateSession<'_>>()
+            .output()
             .map_err(|_| ClientError::Auth(AuthError::NotAuthenticated))?;
         let session = AtpSession::from(out);
 
@@ -414,10 +419,10 @@ where
             )
         }
     }
-    async fn send<R: jacquard_common::types::xrpc::XrpcRequest + Send>(
-        self,
-        request: &R,
-    ) -> XrpcResult<Response<R>> {
+    async fn send<'de, R: jacquard_common::types::xrpc::XrpcRequest<'de> + Send>(
+        &self,
+        request: &'de R,
+    ) -> XrpcResult<Response<'de, R>> {
         let base_uri = self.base_uri();
         let auth = self.access_token().await;
         let mut opts = self.options.read().await.clone();
@@ -443,13 +448,10 @@ where
     }
 }
 
-fn is_expired<R: XrpcRequest>(response: &XrpcResult<Response<R>>) -> bool {
+fn is_expired<'de, R: XrpcRequest<'de>>(response: &XrpcResult<Response<'de, R>>) -> bool {
     match response {
         Err(ClientError::Auth(AuthError::TokenExpired)) => true,
-        Ok(resp) => match resp.parse() {
-            Err(XrpcError::Auth(AuthError::TokenExpired)) => true,
-            _ => false,
-        },
+
         _ => false,
     }
 }

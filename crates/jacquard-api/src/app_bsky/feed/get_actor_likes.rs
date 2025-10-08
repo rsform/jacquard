@@ -120,10 +120,10 @@ impl jacquard_common::IntoStatic for GetActorLikesError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetActorLikes<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetActorLikes<'de> {
     const NSID: &'static str = "app.bsky.feed.getActorLikes";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorLikesOutput<'de>;
-    type Err<'de> = GetActorLikesError<'de>;
+    type Output = GetActorLikesOutput<'de>;
+    type Err = GetActorLikesError<'de>;
 }

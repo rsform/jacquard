@@ -85,14 +85,14 @@ impl jacquard_common::IntoStatic for GrantVerificationsOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GrantVerifications<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GrantVerifications<'de> {
     const NSID: &'static str = "tools.ozone.verification.grantVerifications";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GrantVerificationsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GrantVerificationsOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]

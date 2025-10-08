@@ -62,10 +62,10 @@ impl jacquard_common::IntoStatic for SearchStarterPacksOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for SearchStarterPacks<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for SearchStarterPacks<'de> {
     const NSID: &'static str = "app.bsky.graph.searchStarterPacks";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchStarterPacksOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = SearchStarterPacksOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

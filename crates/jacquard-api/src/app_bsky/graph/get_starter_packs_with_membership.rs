@@ -63,12 +63,13 @@ impl jacquard_common::IntoStatic for GetStarterPacksWithMembershipOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetStarterPacksWithMembership<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de>
+for GetStarterPacksWithMembership<'de> {
     const NSID: &'static str = "app.bsky.graph.getStarterPacksWithMembership";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetStarterPacksWithMembershipOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetStarterPacksWithMembershipOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 ///A starter pack and an optional list item indicating membership of a target user to that starter pack.

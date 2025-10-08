@@ -46,14 +46,14 @@ impl jacquard_common::IntoStatic for GetConfigOutput<'_> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct GetConfig;
-impl jacquard_common::types::xrpc::XrpcRequest for GetConfig {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetConfig {
     const NSID: &'static str = "tools.ozone.server.getConfig";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetConfigOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetConfigOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]

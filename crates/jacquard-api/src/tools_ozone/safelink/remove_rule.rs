@@ -120,12 +120,12 @@ impl jacquard_common::IntoStatic for RemoveRuleError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for RemoveRule<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RemoveRule<'de> {
     const NSID: &'static str = "tools.ozone.safelink.removeRule";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = RemoveRuleOutput<'de>;
-    type Err<'de> = RemoveRuleError<'de>;
+    type Output = RemoveRuleOutput<'de>;
+    type Err = RemoveRuleError<'de>;
 }

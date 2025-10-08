@@ -59,12 +59,12 @@ impl jacquard_common::IntoStatic for UpdateAllReadOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for UpdateAllRead<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpdateAllRead<'de> {
     const NSID: &'static str = "chat.bsky.convo.updateAllRead";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateAllReadOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = UpdateAllReadOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

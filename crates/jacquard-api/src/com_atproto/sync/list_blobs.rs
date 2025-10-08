@@ -145,10 +145,10 @@ impl jacquard_common::IntoStatic for ListBlobsError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for ListBlobs<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ListBlobs<'de> {
     const NSID: &'static str = "com.atproto.sync.listBlobs";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ListBlobsOutput<'de>;
-    type Err<'de> = ListBlobsError<'de>;
+    type Output = ListBlobsOutput<'de>;
+    type Err = ListBlobsError<'de>;
 }

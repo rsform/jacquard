@@ -11,14 +11,11 @@ use crate::{
 };
 use jacquard_common::{
     AuthorizationToken, CowStr, IntoStatic,
-    error::{AuthError, ClientError, TransportError, XrpcResult},
+    error::{ClientError, TransportError, XrpcResult},
     http_client::HttpClient,
     types::{
         did::Did,
-        xrpc::{
-            CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest, build_http_request,
-            process_response,
-        },
+        xrpc::{CallOptions, Response, XrpcClient, XrpcExt, build_http_request, process_response},
     },
 };
 use jacquard_identity::JacquardResolver;
@@ -378,10 +375,10 @@ where
         self.options.read().await.clone()
     }
 
-    async fn send<R: jacquard_common::types::xrpc::XrpcRequest + Send>(
-        self,
-        request: &R,
-    ) -> XrpcResult<Response<R>> {
+    async fn send<'de, R: jacquard_common::types::xrpc::XrpcRequest<'de> + Send>(
+        &self,
+        request: &'de R,
+    ) -> XrpcResult<Response<'de, R>> {
         let base_uri = self.base_uri();
         let mut opts = self.options.read().await.clone();
         opts.auth = Some(self.access_token().await);
@@ -394,8 +391,7 @@ where
             .await
             .map_err(|e| TransportError::Other(Box::new(e)))?;
         drop(guard);
-        let res = process_response(http_response);
-        if is_invalid_token_response(&res) {
+        if is_invalid_token_response(&http_response) {
             opts.auth = Some(
                 self.refresh()
                     .await
@@ -411,21 +407,21 @@ where
                 .map_err(|e| TransportError::Other(Box::new(e)))?;
             process_response(http_response)
         } else {
-            res
+            process_response(http_response)
         }
     }
 }
 
-fn is_invalid_token_response<R: XrpcRequest>(response: &XrpcResult<Response<R>>) -> bool {
-    match response {
-        Err(ClientError::Auth(AuthError::InvalidToken)) => true,
-        Err(ClientError::Auth(AuthError::Other(value))) => value
-            .to_str()
-            .is_ok_and(|s| s.starts_with("DPoP ") && s.contains("error=\"invalid_token\"")),
-        Ok(resp) => match resp.parse() {
-            Err(jacquard_common::types::xrpc::XrpcError::Auth(AuthError::InvalidToken)) => true,
-            _ => false,
-        },
-        _ => false,
+fn is_invalid_token_response(response: &http::Response<Vec<u8>>) -> bool {
+    let status = response.status();
+    if status.as_u16() == 401 {
+        if let Some(www_auth) = response
+            .headers()
+            .get("WWW-Authenticate")
+            .and_then(|v| v.to_str().ok())
+        {
+            return www_auth.starts_with("DPoP") && www_auth.contains(r#"error="invalid_token""#);
+        }
     }
+    false
 }

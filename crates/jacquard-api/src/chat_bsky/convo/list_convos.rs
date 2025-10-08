@@ -68,10 +68,10 @@ impl jacquard_common::IntoStatic for ListConvosOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for ListConvos<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ListConvos<'de> {
     const NSID: &'static str = "chat.bsky.convo.listConvos";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ListConvosOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = ListConvosOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

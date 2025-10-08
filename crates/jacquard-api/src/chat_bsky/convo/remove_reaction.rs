@@ -127,12 +127,12 @@ impl jacquard_common::IntoStatic for RemoveReactionError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for RemoveReaction<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RemoveReaction<'de> {
     const NSID: &'static str = "chat.bsky.convo.removeReaction";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = RemoveReactionOutput<'de>;
-    type Err<'de> = RemoveReactionError<'de>;
+    type Output = RemoveReactionOutput<'de>;
+    type Err = RemoveReactionError<'de>;
 }

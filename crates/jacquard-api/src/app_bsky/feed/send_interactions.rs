@@ -52,12 +52,12 @@ impl jacquard_common::IntoStatic for SendInteractionsOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for SendInteractions<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for SendInteractions<'de> {
     const NSID: &'static str = "app.bsky.feed.sendInteractions";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = SendInteractionsOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = SendInteractionsOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

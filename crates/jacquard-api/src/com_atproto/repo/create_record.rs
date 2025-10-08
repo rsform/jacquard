@@ -141,12 +141,12 @@ impl jacquard_common::IntoStatic for CreateRecordError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for CreateRecord<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CreateRecord<'de> {
     const NSID: &'static str = "com.atproto.repo.createRecord";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateRecordOutput<'de>;
-    type Err<'de> = CreateRecordError<'de>;
+    type Output = CreateRecordOutput<'de>;
+    type Err = CreateRecordError<'de>;
 }

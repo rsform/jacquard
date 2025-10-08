@@ -88,10 +88,11 @@ impl jacquard_common::IntoStatic for GetListsWithMembershipOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetListsWithMembership<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de>
+for GetListsWithMembership<'de> {
     const NSID: &'static str = "app.bsky.graph.getListsWithMembership";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetListsWithMembershipOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetListsWithMembershipOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

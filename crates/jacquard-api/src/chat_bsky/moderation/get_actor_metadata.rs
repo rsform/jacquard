@@ -54,12 +54,12 @@ impl jacquard_common::IntoStatic for GetActorMetadataOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetActorMetadata<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetActorMetadata<'de> {
     const NSID: &'static str = "chat.bsky.moderation.getActorMetadata";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorMetadataOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetActorMetadataOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }
 
 #[jacquard_derive::lexicon]

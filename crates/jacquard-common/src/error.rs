@@ -1,6 +1,7 @@
 //! Error types for XRPC client operations
 
 use bytes::Bytes;
+use serde::{Deserialize, Serialize};
 
 use crate::types::xrpc::EncodeError;
 
@@ -155,4 +156,18 @@ pub enum AuthError {
     /// Other authentication error
     #[error("Authentication error: {0:?}")]
     Other(http::HeaderValue),
+}
+
+impl crate::IntoStatic for AuthError {
+    type Output = AuthError;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            AuthError::TokenExpired => AuthError::TokenExpired,
+            AuthError::InvalidToken => AuthError::InvalidToken,
+            AuthError::RefreshFailed => AuthError::RefreshFailed,
+            AuthError::NotAuthenticated => AuthError::NotAuthenticated,
+            AuthError::Other(header) => AuthError::Other(header),
+        }
+    }
 }

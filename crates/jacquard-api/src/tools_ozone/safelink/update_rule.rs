@@ -126,12 +126,12 @@ impl jacquard_common::IntoStatic for UpdateRuleError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for UpdateRule<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpdateRule<'de> {
     const NSID: &'static str = "tools.ozone.safelink.updateRule";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateRuleOutput<'de>;
-    type Err<'de> = UpdateRuleError<'de>;
+    type Output = UpdateRuleOutput<'de>;
+    type Err = UpdateRuleError<'de>;
 }

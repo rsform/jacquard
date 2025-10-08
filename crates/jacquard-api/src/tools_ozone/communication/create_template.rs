@@ -126,12 +126,12 @@ impl jacquard_common::IntoStatic for CreateTemplateError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for CreateTemplate<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CreateTemplate<'de> {
     const NSID: &'static str = "tools.ozone.communication.createTemplate";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateTemplateOutput<'de>;
-    type Err<'de> = CreateTemplateError<'de>;
+    type Output = CreateTemplateOutput<'de>;
+    type Err = CreateTemplateError<'de>;
 }

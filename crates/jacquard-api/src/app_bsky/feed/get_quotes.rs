@@ -72,10 +72,10 @@ impl jacquard_common::IntoStatic for GetQuotesOutput<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetQuotes<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetQuotes<'de> {
     const NSID: &'static str = "app.bsky.feed.getQuotes";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetQuotesOutput<'de>;
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = GetQuotesOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
 }

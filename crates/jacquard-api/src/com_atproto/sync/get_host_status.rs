@@ -108,10 +108,10 @@ impl jacquard_common::IntoStatic for GetHostStatusError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for GetHostStatus<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetHostStatus<'de> {
     const NSID: &'static str = "com.atproto.sync.getHostStatus";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = GetHostStatusOutput<'de>;
-    type Err<'de> = GetHostStatusError<'de>;
+    type Output = GetHostStatusOutput<'de>;
+    type Err = GetHostStatusError<'de>;
 }

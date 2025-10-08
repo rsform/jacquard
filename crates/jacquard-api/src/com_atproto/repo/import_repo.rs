@@ -27,15 +27,25 @@ impl jacquard_common::IntoStatic for ImportRepo {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for ImportRepo {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ImportRepo {
     const NSID: &'static str = "com.atproto.repo.importRepo";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
         "application/vnd.ipld.car",
     );
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output = ();
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
     fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::types::xrpc::EncodeError> {
         Ok(self.body.to_vec())
+    }
+    fn decode_body(
+        &self,
+        body: &'de [u8],
+    ) -> Result<Box<Self>, jacquard_common::error::DecodeError> {
+        Ok(
+            Box::new(Self {
+                body: bytes::Bytes::copy_from_slice(body),
+            }),
+        )
     }
 }

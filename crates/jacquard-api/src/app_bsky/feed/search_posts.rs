@@ -151,10 +151,10 @@ impl jacquard_common::IntoStatic for SearchPostsError<'_> {
     }
 }
 
-impl jacquard_common::types::xrpc::XrpcRequest for SearchPosts<'_> {
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for SearchPosts<'de> {
     const NSID: &'static str = "app.bsky.feed.searchPosts";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
     const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchPostsOutput<'de>;
-    type Err<'de> = SearchPostsError<'de>;
+    type Output = SearchPostsOutput<'de>;
+    type Err = SearchPostsError<'de>;
 }
