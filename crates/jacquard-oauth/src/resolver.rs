@@ -225,3 +225,6 @@ pub async fn resolve_protected_resource_info<T: HttpClient + ?Sized>(
         Err(ResolverError::HttpStatus(res.status()))
     }
 }
+
+#[async_trait::async_trait]
+impl OAuthResolver for jacquard_identity::JacquardResolver {}

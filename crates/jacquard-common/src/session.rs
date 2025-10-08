@@ -12,21 +12,6 @@ use std::hash::Hash;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use url::Url;
-
-use crate::AuthorizationToken;
-use crate::types::did::Did;
-
-#[async_trait::async_trait]
-pub trait Session {
-    async fn did(&self) -> Did<'_>;
-
-    async fn endpoint(&self) -> Url;
-
-    async fn access_token(&self) -> Result<AuthorizationToken, SessionStoreError>;
-
-    async fn refresh(&self) -> Result<AuthorizationToken, SessionStoreError>;
-}
 
 /// Errors emitted by session stores.
 #[derive(Debug, thiserror::Error, Diagnostic)]

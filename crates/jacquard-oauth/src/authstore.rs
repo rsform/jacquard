@@ -1,11 +1,12 @@
 use std::sync::Arc;
 
+use dashmap::DashMap;
 use jacquard_common::{
     IntoStatic,
-    session::{FileTokenStore, SessionStore, SessionStoreError},
+    session::{SessionStore, SessionStoreError},
     types::did::Did,
 };
-use smol_str::SmolStr;
+use smol_str::{SmolStr, ToSmolStr, format_smolstr};
 
 use crate::session::{AuthRequestData, ClientSessionData};
 
@@ -37,6 +38,74 @@ pub trait ClientAuthStore {
     ) -> Result<(), SessionStoreError>;
 
     async fn delete_auth_req_info(&self, state: &str) -> Result<(), SessionStoreError>;
+}
+
+pub struct MemoryAuthStore {
+    sessions: DashMap<SmolStr, ClientSessionData<'static>>,
+    auth_reqs: DashMap<SmolStr, AuthRequestData<'static>>,
+}
+
+impl MemoryAuthStore {
+    pub fn new() -> Self {
+        Self {
+            sessions: DashMap::new(),
+            auth_reqs: DashMap::new(),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl ClientAuthStore for MemoryAuthStore {
+    async fn get_session(
+        &self,
+        did: &Did<'_>,
+        session_id: &str,
+    ) -> Result<Option<ClientSessionData<'_>>, SessionStoreError> {
+        let key = format_smolstr!("{}_{}", did, session_id);
+        Ok(self.sessions.get(&key).map(|v| v.clone()))
+    }
+
+    async fn upsert_session(
+        &self,
+        session: ClientSessionData<'_>,
+    ) -> Result<(), SessionStoreError> {
+        let key = format_smolstr!("{}_{}", session.account_did, session.session_id);
+        self.sessions.insert(key, session.into_static());
+        Ok(())
+    }
+
+    async fn delete_session(
+        &self,
+        did: &Did<'_>,
+        session_id: &str,
+    ) -> Result<(), SessionStoreError> {
+        let key = format_smolstr!("{}_{}", did, session_id);
+        self.sessions.remove(&key);
+        Ok(())
+    }
+
+    async fn get_auth_req_info(
+        &self,
+        state: &str,
+    ) -> Result<Option<AuthRequestData<'_>>, SessionStoreError> {
+        Ok(self.auth_reqs.get(state).map(|v| v.clone()))
+    }
+
+    async fn save_auth_req_info(
+        &self,
+        auth_req_info: &AuthRequestData<'_>,
+    ) -> Result<(), SessionStoreError> {
+        self.auth_reqs.insert(
+            auth_req_info.state.clone().to_smolstr(),
+            auth_req_info.clone().into_static(),
+        );
+        Ok(())
+    }
+
+    async fn delete_auth_req_info(&self, state: &str) -> Result<(), SessionStoreError> {
+        self.auth_reqs.remove(state);
+        Ok(())
+    }
 }
 
 #[async_trait::async_trait]

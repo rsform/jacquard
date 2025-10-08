@@ -18,6 +18,7 @@ use jacquard_common::{
         xrpc::{CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest},
     },
 };
+use jacquard_identity::JacquardResolver;
 use jose_jwk::JwkSet;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -30,6 +31,13 @@ where
 {
     pub registry: Arc<SessionRegistry<T, S>>,
     pub client: Arc<T>,
+}
+
+impl<S: ClientAuthStore> OAuthClient<JacquardResolver, S> {
+    pub fn new(store: S, client_data: ClientData<'static>) -> Self {
+        let client = JacquardResolver::default();
+        Self::new_from_resolver(store, client, client_data)
+    }
 }
 
 impl<T, S> OAuthClient<T, S>

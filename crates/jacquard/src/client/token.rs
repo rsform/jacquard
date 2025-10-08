@@ -1,17 +1,13 @@
 use jacquard_common::IntoStatic;
 use jacquard_common::cowstr::ToCowStr;
 use jacquard_common::session::{FileTokenStore, SessionStore, SessionStoreError};
-use jacquard_common::types::string::{Datetime, Did, Handle};
+use jacquard_common::types::string::{Datetime, Did};
 use jacquard_oauth::scopes::Scope;
 use jacquard_oauth::session::{AuthRequestData, ClientSessionData, DpopClientData, DpopReqData};
 use jacquard_oauth::types::OAuthTokenType;
 use jose_jwk::Key;
-use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::fmt::Display;
-use std::hash::Hash;
-use std::path::{Path, PathBuf};
 use url::Url;
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -22,7 +18,7 @@ pub enum StoredSession {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-struct StoredAtSession {
+pub struct StoredAtSession {
     access_jwt: String,
     refresh_jwt: String,
     did: String,
@@ -32,7 +28,7 @@ struct StoredAtSession {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-struct OAuthSession {
+pub struct OAuthSession {
     account_did: String,
     session_id: String,
 

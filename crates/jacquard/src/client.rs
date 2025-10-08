@@ -3,78 +3,21 @@
 //! This module provides HTTP and XRPC client traits along with an authenticated
 //! client implementation that manages session tokens.
 
-mod at_client;
 pub mod credential_session;
-mod token;
-
-pub use at_client::{AtClient, SendOverrides};
+pub mod token;
 
 pub use jacquard_common::error::{ClientError, XrpcResult};
 pub use jacquard_common::session::{MemorySessionStore, SessionStore, SessionStoreError};
 use jacquard_common::{
     CowStr, IntoStatic,
-    types::{
-        string::{Did, Handle},
-        xrpc::{Response, XrpcRequest},
-    },
+    types::string::{Did, Handle},
 };
 pub use token::FileAuthStore;
-use url::Url;
 
 pub(crate) const NSID_REFRESH_SESSION: &str = "com.atproto.server.refreshSession";
 
 /// Basic client wrapper: reqwest transport + in-memory session store.
-pub struct BasicClient(AtClient<reqwest::Client, MemorySessionStore<Did<'static>, AuthSession>>);
-
-impl BasicClient {
-    /// Construct a basic client with minimal inputs.
-    pub fn new(base: Url) -> Self {
-        Self(AtClient::new(
-            reqwest::Client::new(),
-            base,
-            MemorySessionStore::default(),
-        ))
-    }
-
-    /// Access the inner stateful client.
-    pub fn inner(
-        &self,
-    ) -> &AtClient<reqwest::Client, MemorySessionStore<Did<'static>, AuthSession>> {
-        &self.0
-    }
-
-    /// Send an XRPC request.
-    pub async fn send<R: XrpcRequest + Send>(&self, req: R) -> XrpcResult<Response<R>> {
-        self.0.send(req).await
-    }
-
-    /// Send with per-call overrides.
-    pub async fn send_with<R: XrpcRequest + Send>(
-        &self,
-        req: R,
-        overrides: SendOverrides<'_>,
-    ) -> XrpcResult<Response<R>> {
-        self.0.send_with(req, overrides).await
-    }
-
-    /// Get current session.
-    pub async fn session(&self, did: &Did<'static>) -> Option<AuthSession> {
-        self.0.session(did).await
-    }
-
-    /// Set the session.
-    pub async fn set_session(
-        &self,
-        session: AuthSession,
-    ) -> core::result::Result<(), SessionStoreError> {
-        self.0.set_session(session).await
-    }
-
-    /// Base URL of this client.
-    pub fn base(&self) -> &Url {
-        self.0.base()
-    }
-}
+pub struct BasicClient(); //AtClient<reqwest::Client, MemorySessionStore<Did<'static>, AuthSession>>);
 
 /// App password session information from `com.atproto.server.createSession`
 ///
