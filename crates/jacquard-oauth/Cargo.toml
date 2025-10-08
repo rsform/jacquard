@@ -6,7 +6,7 @@ description = "AT Protocol OAuth 2.1 core types and helpers for Jacquard"
 license = "MPL-2.0"
 
 [dependencies]
-jacquard-common = { version = "0.3.0", path = "../jacquard-common" }
+jacquard-common = { version = "0.3.0", path = "../jacquard-common", features = ["reqwest-client"] }
 jacquard-identity = { version = "0.3.0", path = "../jacquard-identity" }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
