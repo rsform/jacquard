@@ -30,15 +30,17 @@ path = "src/main.rs"
 
 
 [dependencies]
+jacquard-api = { version = "0.3.0", path = "../jacquard-api" }
+jacquard-common = { version = "0.3.0", path = "../jacquard-common", features = ["reqwest-client"] }
+jacquard-oauth = { version = "0.3.0", path = "../jacquard-oauth" }
+jacquard-derive = { version = "0.3.0", path = "../jacquard-derive", optional = true }
+jacquard-identity = { version = "0.3.0", path = "../jacquard-identity" }
+
 bon.workspace = true
 async-trait.workspace = true
 bytes.workspace = true
 clap.workspace = true
 http.workspace = true
-jacquard-api = { version = "0.3.0", path = "../jacquard-api" }
-jacquard-common = { version = "0.3.0", path = "../jacquard-common", features = ["reqwest-client"] }
-jacquard-oauth = { version = "0.3.0", path = "../jacquard-oauth" }
-jacquard-derive = { version = "0.2.0", path = "../jacquard-derive", optional = true }
 miette = { workspace = true }
 reqwest = { workspace = true, features = ["charset", "http2", "json", "system-proxy", "gzip", "rustls-tls"] }
 serde.workspace = true
@@ -55,4 +57,3 @@ jose-jwk = { workspace = true, features = ["p256"] }
 p256 = { workspace = true, features = ["ecdsa"] }
 rand_core.workspace = true
 rouille = { version = "3.6.2", optional = true }
-jacquard-identity = { version = "0.2.0", path = "../jacquard-identity" }

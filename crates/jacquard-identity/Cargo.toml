@@ -19,7 +19,7 @@ dns = ["dep:hickory-resolver"]
 async-trait.workspace = true
 bon.workspace = true
 bytes.workspace = true
-jacquard-common = { version = "0.2", path = "../jacquard-common" }
+jacquard-common = { version = "0.3", path = "../jacquard-common" }
 percent-encoding.workspace = true
 reqwest.workspace = true
 url.workspace = true
@@ -30,6 +30,6 @@ serde_json.workspace = true
 thiserror.workspace = true
 miette.workspace = true
 http.workspace = true
-jacquard-api = { version = "0.2.0", path = "../jacquard-api" }
+jacquard-api = { version = "0.3.0", path = "../jacquard-api" }
 serde_html_form.workspace = true
 urlencoding.workspace = true

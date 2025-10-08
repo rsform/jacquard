@@ -7,6 +7,7 @@ license = "MPL-2.0"
 
 [dependencies]
 jacquard-common = { version = "0.3.0", path = "../jacquard-common" }
+jacquard-identity = { version = "0.3.0", path = "../jacquard-identity" }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 url = { workspace = true }
@@ -30,7 +31,5 @@ rand = { version = "0.8.5", features = ["small_rng"] }
 async-trait.workspace = true
 dashmap = "6.1.0"
 tokio = { workspace = true, features = ["sync"] }
-
 reqwest.workspace = true
 trait-variant.workspace = true
-jacquard-identity = { version = "0.2.0", path = "../jacquard-identity" }
