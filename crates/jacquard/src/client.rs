@@ -27,11 +27,6 @@ pub use token::FileAuthStore;
 
 use crate::client::credential_session::{CredentialSession, SessionKey};
 
-pub(crate) const NSID_REFRESH_SESSION: &str = "com.atproto.server.refreshSession";
-
-/// Basic client wrapper: reqwest transport + in-memory session store.
-pub struct BasicClient(); //AtClient<reqwest::Client, MemorySessionStore<Did<'static>, AuthSession>>);
-
 /// App password session information from `com.atproto.server.createSession`
 ///
 /// Contains the access and refresh tokens along with user identity information.
@@ -256,3 +251,22 @@ impl<A: AgentSession> XrpcClient for Agent<A> {
         async move { self.inner.send(request).await }
     }
 }
+
+impl<A: AgentSession> From<A> for Agent<A> {
+    fn from(inner: A) -> Self {
+        Self::new(inner)
+    }
+}
+
+/// Alias for an agent over a credential (app‑password) session.
+pub type CredentialAgent<S, T> = Agent<CredentialSession<S, T>>;
+/// Alias for an agent over an OAuth (DPoP) session.
+pub type OAuthAgent<T, S> = Agent<OAuthSession<T, S>>;
+
+/// BasicClient: in-memory store + public resolver over a credential session.
+pub type BasicClient = Agent<
+    CredentialSession<
+        MemorySessionStore<SessionKey, AtpSession>,
+        jacquard_identity::PublicResolver,
+    >,
+>;
