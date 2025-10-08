@@ -204,6 +204,7 @@ where
     }
 
     async fn create_session(&self, data: ClientSessionData<'_>) -> Result<OAuthSession<T, S>> {
+        self.registry.set(data.clone()).await?;
         Ok(OAuthSession::new(
             self.registry.clone(),
             self.client.clone(),
@@ -336,7 +337,9 @@ where
         let refreshed = self.registry.as_ref().get(&did, &sid, true).await?;
         let token = AuthorizationToken::Dpop(refreshed.token_set.access_token.clone());
         // Write back updated session
-        *self.data.write().await = refreshed.into_static();
+        *self.data.write().await = refreshed.clone().into_static();
+        // Store in the registry
+        self.registry.set(refreshed).await?;
         Ok(token)
     }
 }
@@ -390,6 +393,7 @@ where
             .send(build_http_request(&base_uri, request, &opts)?)
             .await
             .map_err(|e| TransportError::Other(Box::new(e)))?;
+        drop(guard);
         let res = process_response(http_response);
         if is_invalid_token_response(&res) {
             opts.auth = Some(
@@ -397,6 +401,8 @@ where
                     .await
                     .map_err(|e| ClientError::Transport(TransportError::Other(e.into())))?,
             );
+            let guard = self.data.read().await;
+            let mut dpop = guard.dpop_data.clone();
             let http_response = self
                 .client
                 .dpop_call(&mut dpop)
