@@ -3,7 +3,13 @@ name = "jacquard-oauth"
 version = "0.3.0"
 edition = "2024"
 description = "AT Protocol OAuth 2.1 core types and helpers for Jacquard"
-license = "MPL-2.0"
+authors.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme.workspace = true
+exclude.workspace = true
+license.workspace = true
 
 [dependencies]
 jacquard-common = { version = "0.3.0", path = "../jacquard-common", features = ["reqwest-client"] }
