@@ -1,4 +1,4 @@
-# Jacquard
+[# Jacquard](https://docs.rs/jacquard/latest/jacquard/)
 
 A suite of Rust crates for the AT Protocol.
 
@@ -6,7 +6,7 @@ A suite of Rust crates for the AT Protocol.
 
 - Validated, spec-compliant, easy to work with, and performant baseline types
 - Batteries-included, but easily replaceable batteries.
-   - Easy to extend with custom lexicons
+   - Easy to extend with custom lexicons using code generation or handwritten api types
    - Straightforward OAuth
    - stateless options (or options where you handle the state) for rolling your own
    - all the building blocks of the convenient abstractions are available
