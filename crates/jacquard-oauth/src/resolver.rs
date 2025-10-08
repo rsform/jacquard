@@ -1,8 +1,9 @@
 use crate::types::{OAuthAuthorizationServerMetadata, OAuthProtectedResourceMetadata};
 use http::{Request, StatusCode};
-use jacquard_common::{IntoStatic, error::TransportError};
+use jacquard_common::CowStr;
 use jacquard_common::types::did_doc::DidDocument;
 use jacquard_common::types::ident::AtIdentifier;
+use jacquard_common::{IntoStatic, error::TransportError};
 use jacquard_common::{http_client::HttpClient, types::did::Did};
 use jacquard_identity::resolver::{IdentityError, IdentityResolver};
 use url::Url;
@@ -50,34 +51,58 @@ pub(crate) fn issuer_equivalent(a: &str, b: &str) -> bool {
 #[derive(thiserror::Error, Debug, miette::Diagnostic)]
 pub enum ResolverError {
     #[error("resource not found")]
-    #[diagnostic(code(jacquard_oauth::resolver::not_found), help("check the base URL or identifier"))]
+    #[diagnostic(
+        code(jacquard_oauth::resolver::not_found),
+        help("check the base URL or identifier")
+    )]
     NotFound,
     #[error("invalid at identifier: {0}")]
-    #[diagnostic(code(jacquard_oauth::resolver::at_identifier), help("ensure a valid handle or DID was provided"))]
+    #[diagnostic(
+        code(jacquard_oauth::resolver::at_identifier),
+        help("ensure a valid handle or DID was provided")
+    )]
     AtIdentifier(String),
     #[error("invalid did: {0}")]
-    #[diagnostic(code(jacquard_oauth::resolver::did), help("ensure DID is correctly formed (did:plc or did:web)"))]
+    #[diagnostic(
+        code(jacquard_oauth::resolver::did),
+        help("ensure DID is correctly formed (did:plc or did:web)")
+    )]
     Did(String),
     #[error("invalid did document: {0}")]
-    #[diagnostic(code(jacquard_oauth::resolver::did_document), help("verify the DID document structure and service entries"))]
+    #[diagnostic(
+        code(jacquard_oauth::resolver::did_document),
+        help("verify the DID document structure and service entries")
+    )]
     DidDocument(String),
     #[error("protected resource metadata is invalid: {0}")]
-    #[diagnostic(code(jacquard_oauth::resolver::protected_resource_metadata), help("PDS must advertise an authorization server in its protected resource metadata"))]
+    #[diagnostic(
+        code(jacquard_oauth::resolver::protected_resource_metadata),
+        help("PDS must advertise an authorization server in its protected resource metadata")
+    )]
     ProtectedResourceMetadata(String),
     #[error("authorization server metadata is invalid: {0}")]
-    #[diagnostic(code(jacquard_oauth::resolver::authorization_server_metadata), help("issuer must match and include the PDS resource"))]
+    #[diagnostic(
+        code(jacquard_oauth::resolver::authorization_server_metadata),
+        help("issuer must match and include the PDS resource")
+    )]
     AuthorizationServerMetadata(String),
     #[error("error resolving identity: {0}")]
     #[diagnostic(code(jacquard_oauth::resolver::identity))]
     IdentityResolverError(#[from] IdentityError),
     #[error("unsupported did method: {0:?}")]
-    #[diagnostic(code(jacquard_oauth::resolver::unsupported_did_method), help("supported DID methods: did:web, did:plc"))]
+    #[diagnostic(
+        code(jacquard_oauth::resolver::unsupported_did_method),
+        help("supported DID methods: did:web, did:plc")
+    )]
     UnsupportedDidMethod(Did<'static>),
     #[error(transparent)]
     #[diagnostic(code(jacquard_oauth::resolver::transport))]
     Transport(#[from] TransportError),
     #[error("http status: {0:?}")]
-    #[diagnostic(code(jacquard_oauth::resolver::http_status), help("check well-known paths and server configuration"))]
+    #[diagnostic(
+        code(jacquard_oauth::resolver::http_status),
+        help("check well-known paths and server configuration")
+    )]
     HttpStatus(StatusCode),
     #[error(transparent)]
     #[diagnostic(code(jacquard_oauth::resolver::serde_json))]
@@ -194,9 +219,14 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         let as_metadata = self.get_authorization_server_metadata(issuer).await?;
         // https://datatracker.ietf.org/doc/html/draft-ietf-oauth-resource-metadata-08#name-authorization-server-metada
         if let Some(protected_resources) = &as_metadata.protected_resources {
-            if !protected_resources.contains(&rs_metadata.resource) {
+            let resource_url = rs_metadata
+                .resource
+                .strip_suffix('/')
+                .unwrap_or(rs_metadata.resource.as_str());
+            if !protected_resources.contains(&CowStr::Borrowed(resource_url)) {
                 return Err(ResolverError::AuthorizationServerMetadata(format!(
-                    "pds {pds} does not protected by issuer: {issuer}",
+                    "pds {pds}, resource {0} not protected by issuer: {issuer}, protected resources: {1:?}",
+                    rs_metadata.resource, protected_resources
                 )));
             }
         }
@@ -316,27 +346,56 @@ mod tests {
     #[tokio::test]
     async fn authorization_server_http_status() {
         let client = MockHttp::default();
-        *client.next.lock().await = Some(HttpResponse::builder().status(StatusCode::NOT_FOUND).body(Vec::new()).unwrap());
+        *client.next.lock().await = Some(
+            HttpResponse::builder()
+                .status(StatusCode::NOT_FOUND)
+                .body(Vec::new())
+                .unwrap(),
+        );
         let issuer = url::Url::parse("https://issuer").unwrap();
-        let err = super::resolve_authorization_server(&client, &issuer).await.unwrap_err();
+        let err = super::resolve_authorization_server(&client, &issuer)
+            .await
+            .unwrap_err();
         matches!(err, ResolverError::HttpStatus(StatusCode::NOT_FOUND));
     }
 
     #[tokio::test]
     async fn authorization_server_bad_json() {
         let client = MockHttp::default();
-        *client.next.lock().await = Some(HttpResponse::builder().status(StatusCode::OK).body(b"{not json}".to_vec()).unwrap());
+        *client.next.lock().await = Some(
+            HttpResponse::builder()
+                .status(StatusCode::OK)
+                .body(b"{not json}".to_vec())
+                .unwrap(),
+        );
         let issuer = url::Url::parse("https://issuer").unwrap();
-        let err = super::resolve_authorization_server(&client, &issuer).await.unwrap_err();
+        let err = super::resolve_authorization_server(&client, &issuer)
+            .await
+            .unwrap_err();
         matches!(err, ResolverError::SerdeJson(_));
     }
 
     #[test]
     fn issuer_equivalence_rules() {
-        assert!(super::issuer_equivalent("https://issuer", "https://issuer/"));
-        assert!(super::issuer_equivalent("https://issuer:443/", "https://issuer/"));
-        assert!(!super::issuer_equivalent("http://issuer/", "https://issuer/"));
-        assert!(!super::issuer_equivalent("https://issuer/foo", "https://issuer/"));
-        assert!(!super::issuer_equivalent("https://issuer/?q=1", "https://issuer/"));
+        assert!(super::issuer_equivalent(
+            "https://issuer",
+            "https://issuer/"
+        ));
+        assert!(super::issuer_equivalent(
+            "https://issuer:443/",
+            "https://issuer/"
+        ));
+        assert!(!super::issuer_equivalent(
+            "http://issuer/",
+            "https://issuer/"
+        ));
+        assert!(!super::issuer_equivalent(
+            "https://issuer/foo",
+            "https://issuer/"
+        ));
+        assert!(!super::issuer_equivalent(
+            "https://issuer/?q=1",
+            "https://issuer/"
+        ));
     }
 }

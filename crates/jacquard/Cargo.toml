@@ -18,7 +18,8 @@ api = ["jacquard-api/com_atproto"]
 api_all = ["api", "jacquard-api/app_bsky", "jacquard-api/chat_bsky", "jacquard-api/tools_ozone"]
 dns = ["jacquard-identity/dns"]
 fancy = ["miette/fancy"]
-loopback = ["dep:rouille"]
+# Propagate loopback to oauth (server + browser helper)
+loopback = ["jacquard-oauth/loopback", "jacquard-oauth/browser-open"]
 
 [lib]
 name = "jacquard"
@@ -56,4 +57,3 @@ urlencoding.workspace = true
 jose-jwk = { workspace = true, features = ["p256"] }
 p256 = { workspace = true, features = ["ecdsa"] }
 rand_core.workspace = true
-rouille = { version = "3.6.2", optional = true }

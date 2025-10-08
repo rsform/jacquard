@@ -16,3 +16,6 @@ pub mod types;
 pub mod utils;
 
 pub const FALLBACK_ALG: &str = "ES256";
+
+#[cfg(feature = "loopback")]
+pub mod loopback;

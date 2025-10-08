@@ -113,8 +113,7 @@ impl<'m> AtprotoClientMetadata<'m> {
         if let Some(redirect_uris) = &mut redirect_uris {
             for redirect_uri in redirect_uris {
                 let _ = redirect_uri.set_scheme("http");
-                redirect_uri.set_host(Some("localhost")).unwrap();
-                let _ = redirect_uri.set_port(None);
+                redirect_uri.set_host(Some("127.0.0.1")).unwrap();
             }
         }
         // determine client_id
@@ -157,8 +156,8 @@ pub fn atproto_client_metadata<'m>(
     keyset: &Option<Keyset>,
 ) -> Result<OAuthClientMetadata<'m>> {
     // For non-loopback clients, require a keyset/JWKs.
-    let is_loopback = metadata.client_id.scheme() == "http"
-        && metadata.client_id.host_str() == Some("localhost");
+    let is_loopback =
+        metadata.client_id.scheme() == "http" && metadata.client_id.host_str() == Some("localhost");
     if !is_loopback && keyset.is_none() {
         return Err(Error::EmptyJwks);
     }
@@ -192,11 +191,7 @@ pub fn atproto_client_metadata<'m>(
         } else {
             None
         },
-        scope: if keyset.is_some() {
-            Some(Scope::serialize_multiple(metadata.scopes.as_slice()))
-        } else {
-            None
-        },
+        scope: Some(Scope::serialize_multiple(metadata.scopes.as_slice())),
         dpop_bound_access_tokens: if keyset.is_some() { Some(true) } else { None },
         jwks_uri,
         jwks,
@@ -300,7 +295,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             assert_eq!(
                 out,
                 OAuthClientMetadata {
-                    client_id: Url::from_str("http://localhost?redirect_uri=http%3A%2F%2Flocalhost%2F").unwrap(),
+                    client_id: Url::from_str(
+                        "http://localhost?redirect_uri=http%3A%2F%2Flocalhost%2F"
+                    )
+                    .unwrap(),
                     client_uri: None,
                     redirect_uris: vec![Url::from_str("http://localhost/").unwrap()],
                     scope: None,
@@ -325,7 +323,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             assert_eq!(
                 out,
                 OAuthClientMetadata {
-                    client_id: Url::from_str("http://localhost?redirect_uri=http%3A%2F%2Flocalhost%2F").unwrap(),
+                    client_id: Url::from_str(
+                        "http://localhost?redirect_uri=http%3A%2F%2Flocalhost%2F"
+                    )
+                    .unwrap(),
                     client_uri: None,
                     redirect_uris: vec![Url::from_str("http://localhost/").unwrap()],
                     scope: None,
@@ -350,7 +351,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             assert_eq!(
                 out,
                 OAuthClientMetadata {
-                    client_id: Url::from_str("http://localhost?redirect_uri=http%3A%2F%2Flocalhost%2F").unwrap(),
+                    client_id: Url::from_str(
+                        "http://localhost?redirect_uri=http%3A%2F%2Flocalhost%2F"
+                    )
+                    .unwrap(),
                     client_uri: None,
                     redirect_uris: vec![Url::from_str("http://localhost/").unwrap()],
                     scope: None,

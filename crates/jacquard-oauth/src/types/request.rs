@@ -1,7 +1,7 @@
 use jacquard_common::{CowStr, IntoStatic};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum AuthorizationResponseType {
     Code,
@@ -10,7 +10,7 @@ pub enum AuthorizationResponseType {
     IdToken,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum AuthorizationResponseMode {
     Query,
@@ -19,14 +19,14 @@ pub enum AuthorizationResponseMode {
     FormPost,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub enum AuthorizationCodeChallengeMethod {
     S256,
     #[serde(rename = "plain")]
     Plain,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ParParameters<'a> {
     // https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1
     pub response_type: AuthorizationResponseType,

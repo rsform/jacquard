@@ -2,6 +2,7 @@ use base64::{Engine as _, engine::general_purpose::URL_SAFE_NO_PAD};
 use chrono::Utc;
 use http::{Request, Response, header::InvalidHeaderValue};
 use jacquard_common::{CowStr, IntoStatic, cowstr::ToCowStr, http_client::HttpClient};
+use jacquard_identity::JacquardResolver;
 use jose_jwa::{Algorithm, Signing};
 use jose_jwk::{Jwk, Key, crypto};
 use p256::ecdsa::SigningKey;
@@ -245,3 +246,5 @@ pub fn build_dpop_proof<'s>(
         claims,
     )?)
 }
+
+impl DpopExt for JacquardResolver {}

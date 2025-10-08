@@ -94,6 +94,9 @@ pub struct FileTokenStore {
 impl FileTokenStore {
     /// Create a new file token store at the given path.
     pub fn new(path: impl AsRef<Path>) -> Self {
+        std::fs::create_dir_all(path.as_ref().parent().unwrap()).unwrap();
+        std::fs::write(path.as_ref(), b"{}").unwrap();
+
         Self {
             path: path.as_ref().to_path_buf(),
         }

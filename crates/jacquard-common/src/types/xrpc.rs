@@ -280,28 +280,38 @@ impl<'a, C: HttpClient> XrpcCall<'a, C> {
             .await
             .map_err(|e| crate::error::TransportError::Other(Box::new(e)))?;
 
-        let status = http_response.status();
-        // If the server returned 401 with a WWW-Authenticate header, expose it so higher layers
-        // (e.g., DPoP handling) can detect `error="invalid_token"` and trigger refresh.
-        if status.as_u16() == 401 {
-            if let Some(hv) = http_response.headers().get(http::header::WWW_AUTHENTICATE) {
-                return Err(crate::error::ClientError::Auth(
-                    crate::error::AuthError::Other(hv.clone()),
-                ));
-            }
-        }
-        let buffer = Bytes::from(http_response.into_body());
-
-        if !status.is_success() && !matches!(status.as_u16(), 400 | 401) {
-            return Err(crate::error::HttpError {
-                status,
-                body: Some(buffer),
-            }
-            .into());
-        }
-
-        Ok(Response::new(buffer, status))
+        process_response(http_response)
     }
+}
+
+/// Process the HTTP response from the server into a proper xrpc response statelessly.
+///
+/// Exposed to make things more easily pluggable
+#[inline]
+pub fn process_response<R: XrpcRequest + Send>(
+    http_response: http::Response<Vec<u8>>,
+) -> XrpcResult<Response<R>> {
+    let status = http_response.status();
+    // If the server returned 401 with a WWW-Authenticate header, expose it so higher layers
+    // (e.g., DPoP handling) can detect `error="invalid_token"` and trigger refresh.
+    if status.as_u16() == 401 {
+        if let Some(hv) = http_response.headers().get(http::header::WWW_AUTHENTICATE) {
+            return Err(crate::error::ClientError::Auth(
+                crate::error::AuthError::Other(hv.clone()),
+            ));
+        }
+    }
+    let buffer = Bytes::from(http_response.into_body());
+
+    if !status.is_success() && !matches!(status.as_u16(), 400 | 401) {
+        return Err(crate::error::HttpError {
+            status,
+            body: Some(buffer),
+        }
+        .into());
+    }
+
+    Ok(Response::new(buffer, status))
 }
 
 /// HTTP headers commonly used in XRPC requests
@@ -703,7 +713,9 @@ mod tests {
         struct Err<'a>(#[serde(borrow)] CowStr<'a>);
         impl IntoStatic for Err<'_> {
             type Output = Err<'static>;
-            fn into_static(self) -> Self::Output { Err(self.0.into_static()) }
+            fn into_static(self) -> Self::Output {
+                Err(self.0.into_static())
+            }
         }
         impl XrpcRequest for Req {
             const NSID: &'static str = "com.example.test";

@@ -383,6 +383,7 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
         login_hint: login_hint,
         prompt: prompt.map(CowStr::from),
     };
+    println!("Parameters: {:?}", parameters);
     if metadata
         .server_metadata
         .pushed_authorization_request_endpoint
@@ -509,7 +510,7 @@ where
                 metadata.client_metadata.redirect_uris[0]
                     .clone()
                     .to_smolstr(),
-            ), // ?
+            ),
             code_verifier: verifier.into(),
         }),
         metadata,

@@ -30,6 +30,13 @@ bytes.workspace = true
 rand = { version = "0.8.5", features = ["small_rng"] }
 async-trait.workspace = true
 dashmap = "6.1.0"
-tokio = { workspace = true, features = ["sync"] }
+tokio = { workspace = true, features = ["sync", "net", "time"] }
 reqwest.workspace = true
 trait-variant.workspace = true
+webbrowser = { version = "0.8", optional = true }
+rouille  = { version =  "3.6.2", optional = true }
+
+[features]
+default = []
+loopback = ["dep:rouille"]
+browser-open = ["dep:webbrowser"]

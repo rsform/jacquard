@@ -310,6 +310,15 @@ where
             pending: DashMap::new(),
         }
     }
+
+    pub fn new_shared(store: Arc<S>, client: Arc<T>, client_data: ClientData<'static>) -> Self {
+        Self {
+            store,
+            client,
+            client_data,
+            pending: DashMap::new(),
+        }
+    }
 }
 
 impl<T, S> SessionRegistry<T, S>

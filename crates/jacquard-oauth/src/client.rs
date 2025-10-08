@@ -15,7 +15,10 @@ use jacquard_common::{
     http_client::HttpClient,
     types::{
         did::Did,
-        xrpc::{CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest},
+        xrpc::{
+            CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest, build_http_request,
+            process_response,
+        },
     },
 };
 use jacquard_identity::JacquardResolver;
@@ -48,6 +51,19 @@ where
     pub fn new_from_resolver(store: S, client: T, client_data: ClientData<'static>) -> Self {
         let client = Arc::new(client);
         let registry = Arc::new(SessionRegistry::new(store, client.clone(), client_data));
+        Self { registry, client }
+    }
+
+    pub fn new_with_shared(
+        store: Arc<S>,
+        client: Arc<T>,
+        client_data: ClientData<'static>,
+    ) -> Self {
+        let registry = Arc::new(SessionRegistry::new_shared(
+            store,
+            client.clone(),
+            client_data,
+        ));
         Self { registry, client }
     }
 }
@@ -88,6 +104,11 @@ where
         };
         let auth_req_info =
             par(self.client.as_ref(), login_hint, options.prompt, &metadata).await?;
+        // Persist state for callback handling
+        self.registry
+            .store
+            .save_auth_req_info(&auth_req_info)
+            .await?;
 
         #[derive(serde::Serialize)]
         struct Parameters<'s> {
@@ -121,7 +142,11 @@ where
 
         if let Some(iss) = params.iss {
             if !crate::resolver::issuer_equivalent(&iss, &metadata.issuer) {
-                return Err(CallbackError::IssuerMismatch { expected: metadata.issuer.to_string(), got: iss.to_string() }.into());
+                return Err(CallbackError::IssuerMismatch {
+                    expected: metadata.issuer.to_string(),
+                    got: iss.to_string(),
+                }
+                .into());
             }
         } else if metadata.authorization_response_iss_parameter_supported == Some(true) {
             return Err(CallbackError::MissingIssuer.into());
@@ -252,7 +277,49 @@ where
     }
 
     pub async fn refresh_token(&self) -> Option<AuthorizationToken<'_>> {
-        self.data.read().await.token_set.refresh_token.as_ref().map(|t| AuthorizationToken::Dpop(t.clone()))
+        self.data
+            .read()
+            .await
+            .token_set
+            .refresh_token
+            .as_ref()
+            .map(|t| AuthorizationToken::Dpop(t.clone()))
+    }
+}
+impl<T, S> OAuthSession<T, S>
+where
+    S: ClientAuthStore + Send + Sync + 'static,
+    T: OAuthResolver + DpopExt + Send + Sync + 'static,
+{
+    pub async fn logout(&self) -> Result<()> {
+        use crate::request::{OAuthMetadata, revoke};
+        let mut data = self.data.write().await;
+        let meta =
+            OAuthMetadata::new(self.client.as_ref(), &self.registry.client_data, &data).await?;
+        if meta.server_metadata.revocation_endpoint.is_some() {
+            let token = data.token_set.access_token.clone();
+            revoke(self.client.as_ref(), &mut data.dpop_data, &token, &meta)
+                .await
+                .ok();
+        }
+        // Remove from store
+        self.registry
+            .del(&data.account_did, &data.session_id)
+            .await?;
+        Ok(())
+    }
+}
+
+impl<T, S> OAuthClient<T, S>
+where
+    T: OAuthResolver,
+    S: ClientAuthStore,
+{
+    pub fn from_session(session: &OAuthSession<T, S>) -> Self {
+        Self {
+            registry: session.registry.clone(),
+            client: session.client.clone(),
+        }
     }
 }
 impl<T, S> OAuthSession<T, S>
@@ -266,11 +333,7 @@ where
             let data = self.data.read().await;
             (data.account_did.clone(), data.session_id.clone())
         };
-        let refreshed = self
-            .registry
-            .as_ref()
-            .get(&did, &sid, true)
-            .await?;
+        let refreshed = self.registry.as_ref().get(&did, &sid, true).await?;
         let token = AuthorizationToken::Dpop(refreshed.token_set.access_token.clone());
         // Write back updated session
         *self.data.write().await = refreshed.into_static();
@@ -317,26 +380,30 @@ where
         request: &R,
     ) -> XrpcResult<Response<R>> {
         let base_uri = self.base_uri();
-        let auth = self.access_token().await;
         let mut opts = self.options.read().await.clone();
-        opts.auth = Some(auth);
-        let res = self
+        opts.auth = Some(self.access_token().await);
+        let guard = self.data.read().await;
+        let mut dpop = guard.dpop_data.clone();
+        let http_response = self
             .client
-            .xrpc(base_uri.clone())
-            .with_options(opts.clone())
-            .send(request)
-            .await;
+            .dpop_call(&mut dpop)
+            .send(build_http_request(&base_uri, request, &opts)?)
+            .await
+            .map_err(|e| TransportError::Other(Box::new(e)))?;
+        let res = process_response(http_response);
         if is_invalid_token_response(&res) {
             opts.auth = Some(
                 self.refresh()
                     .await
                     .map_err(|e| ClientError::Transport(TransportError::Other(e.into())))?,
             );
-            self.client
-                .xrpc(base_uri)
-                .with_options(opts)
-                .send(request)
+            let http_response = self
+                .client
+                .dpop_call(&mut dpop)
+                .send(build_http_request(&base_uri, request, &opts)?)
                 .await
+                .map_err(|e| TransportError::Other(Box::new(e)))?;
+            process_response(http_response)
         } else {
             res
         }

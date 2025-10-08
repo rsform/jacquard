@@ -55,15 +55,18 @@ pub enum OAuthError {
 /// Typed callback validation errors (redirect handling).
 #[derive(Debug, thiserror::Error, Diagnostic)]
 pub enum CallbackError {
-    #[error("missing state parameter in callback")] 
+    #[error("missing state parameter in callback")]
     #[diagnostic(code(jacquard_oauth::callback::missing_state))]
     MissingState,
-    #[error("missing `iss` parameter")] 
+    #[error("missing `iss` parameter")]
     #[diagnostic(code(jacquard_oauth::callback::missing_iss))]
     MissingIssuer,
     #[error("issuer mismatch: expected {expected}, got {got}")]
     #[diagnostic(code(jacquard_oauth::callback::issuer_mismatch))]
     IssuerMismatch { expected: String, got: String },
+    #[error("timeout")]
+    #[diagnostic(code(jacquard_oauth::callback::timeout))]
+    Timeout,
 }
 
 pub type Result<T> = core::result::Result<T, OAuthError>;
