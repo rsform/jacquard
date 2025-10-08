@@ -19,7 +19,7 @@ dns = ["dep:hickory-resolver"]
 async-trait.workspace = true
 bon.workspace = true
 bytes.workspace = true
-jacquard-common = { version = "0.3", path = "../jacquard-common" }
+jacquard-common = { version = "0.3", path = "../jacquard-common", features = ["reqwest-client"] }
 percent-encoding.workspace = true
 reqwest.workspace = true
 url.workspace = true
