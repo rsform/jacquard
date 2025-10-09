@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct UpdateHandle<'a> {
@@ -35,15 +43,17 @@ impl jacquard_common::IntoStatic for UpdateHandle<'_> {
 ///Response type for
 ///com.atproto.identity.updateHandle
 pub struct UpdateHandleResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for UpdateHandleResponse {
+impl jacquard_common::xrpc::XrpcResp for UpdateHandleResponse {
+    const NSID: &'static str = "com.atproto.identity.updateHandle";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpdateHandle<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateHandle<'de> {
     const NSID: &'static str = "com.atproto.identity.updateHandle";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = UpdateHandleResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateHandleResponse;
 }

@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct RemoveReaction<'a> {
@@ -67,7 +75,7 @@ impl jacquard_common::IntoStatic for RemoveReactionOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -112,7 +120,9 @@ impl jacquard_common::IntoStatic for RemoveReactionError<'_> {
             RemoveReactionError::ReactionInvalidValue(v) => {
                 RemoveReactionError::ReactionInvalidValue(v.into_static())
             }
-            RemoveReactionError::Unknown(v) => RemoveReactionError::Unknown(v.into_static()),
+            RemoveReactionError::Unknown(v) => {
+                RemoveReactionError::Unknown(v.into_static())
+            }
         }
     }
 }
@@ -120,15 +130,17 @@ impl jacquard_common::IntoStatic for RemoveReactionError<'_> {
 ///Response type for
 ///chat.bsky.convo.removeReaction
 pub struct RemoveReactionResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for RemoveReactionResponse {
+impl jacquard_common::xrpc::XrpcResp for RemoveReactionResponse {
+    const NSID: &'static str = "chat.bsky.convo.removeReaction";
     const ENCODING: &'static str = "application/json";
-    type Output = RemoveReactionOutput<'de>;
-    type Err = RemoveReactionError<'de>;
+    type Output<'de> = RemoveReactionOutput<'de>;
+    type Err<'de> = RemoveReactionError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RemoveReaction<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RemoveReaction<'de> {
     const NSID: &'static str = "chat.bsky.convo.removeReaction";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = RemoveReactionResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = RemoveReactionResponse;
 }

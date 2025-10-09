@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct UpdateAccountSigningKey<'a> {
@@ -38,15 +46,17 @@ impl jacquard_common::IntoStatic for UpdateAccountSigningKey<'_> {
 ///Response type for
 ///com.atproto.admin.updateAccountSigningKey
 pub struct UpdateAccountSigningKeyResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for UpdateAccountSigningKeyResponse {
+impl jacquard_common::xrpc::XrpcResp for UpdateAccountSigningKeyResponse {
+    const NSID: &'static str = "com.atproto.admin.updateAccountSigningKey";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpdateAccountSigningKey<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateAccountSigningKey<'de> {
     const NSID: &'static str = "com.atproto.admin.updateAccountSigningKey";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = UpdateAccountSigningKeyResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateAccountSigningKeyResponse;
 }

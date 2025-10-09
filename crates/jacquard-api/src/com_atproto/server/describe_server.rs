@@ -93,15 +93,15 @@ pub struct DescribeServer;
 ///Response type for
 ///com.atproto.server.describeServer
 pub struct DescribeServerResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for DescribeServerResponse {
+impl jacquard_common::xrpc::XrpcResp for DescribeServerResponse {
+    const NSID: &'static str = "com.atproto.server.describeServer";
     const ENCODING: &'static str = "application/json";
-    type Output = DescribeServerOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = DescribeServerOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DescribeServer {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DescribeServer {
     const NSID: &'static str = "com.atproto.server.describeServer";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = DescribeServerResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = DescribeServerResponse;
 }

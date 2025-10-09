@@ -10,7 +10,7 @@ use axum::{
     response::{ErrorResponse, IntoResponse, Response},
     routing::get,
 };
-use jacquard::types::xrpc::{XrpcError, XrpcMethod, XrpcRequest};
+use jacquard::xrpc::{XrpcError, XrpcMethod, XrpcRequest};
 use serde::Serialize;
 use serde_json::json;
 

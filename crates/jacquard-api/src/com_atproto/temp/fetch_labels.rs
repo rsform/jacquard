@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct FetchLabels {
@@ -44,15 +52,15 @@ impl jacquard_common::IntoStatic for FetchLabelsOutput<'_> {
 ///Response type for
 ///com.atproto.temp.fetchLabels
 pub struct FetchLabelsResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for FetchLabelsResponse {
+impl jacquard_common::xrpc::XrpcResp for FetchLabelsResponse {
+    const NSID: &'static str = "com.atproto.temp.fetchLabels";
     const ENCODING: &'static str = "application/json";
-    type Output = FetchLabelsOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = FetchLabelsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for FetchLabels {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for FetchLabels {
     const NSID: &'static str = "com.atproto.temp.fetchLabels";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = FetchLabelsResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = FetchLabelsResponse;
 }

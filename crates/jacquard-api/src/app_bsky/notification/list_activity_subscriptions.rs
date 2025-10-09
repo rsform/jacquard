@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct ListActivitySubscriptions<'a> {
@@ -53,15 +61,15 @@ impl jacquard_common::IntoStatic for ListActivitySubscriptionsOutput<'_> {
 ///Response type for
 ///app.bsky.notification.listActivitySubscriptions
 pub struct ListActivitySubscriptionsResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for ListActivitySubscriptionsResponse {
+impl jacquard_common::xrpc::XrpcResp for ListActivitySubscriptionsResponse {
+    const NSID: &'static str = "app.bsky.notification.listActivitySubscriptions";
     const ENCODING: &'static str = "application/json";
-    type Output = ListActivitySubscriptionsOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ListActivitySubscriptionsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ListActivitySubscriptions<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListActivitySubscriptions<'de> {
     const NSID: &'static str = "app.bsky.notification.listActivitySubscriptions";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = ListActivitySubscriptionsResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListActivitySubscriptionsResponse;
 }

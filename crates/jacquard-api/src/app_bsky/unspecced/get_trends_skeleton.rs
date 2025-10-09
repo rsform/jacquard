@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTrendsSkeleton<'a> {
@@ -48,15 +56,15 @@ impl jacquard_common::IntoStatic for GetTrendsSkeletonOutput<'_> {
 ///Response type for
 ///app.bsky.unspecced.getTrendsSkeleton
 pub struct GetTrendsSkeletonResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetTrendsSkeletonResponse {
+impl jacquard_common::xrpc::XrpcResp for GetTrendsSkeletonResponse {
+    const NSID: &'static str = "app.bsky.unspecced.getTrendsSkeleton";
     const ENCODING: &'static str = "application/json";
-    type Output = GetTrendsSkeletonOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetTrendsSkeletonOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetTrendsSkeleton<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetTrendsSkeleton<'de> {
     const NSID: &'static str = "app.bsky.unspecced.getTrendsSkeleton";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetTrendsSkeletonResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetTrendsSkeletonResponse;
 }

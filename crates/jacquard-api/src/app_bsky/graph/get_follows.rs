@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFollows<'a> {
@@ -59,15 +67,15 @@ impl jacquard_common::IntoStatic for GetFollowsOutput<'_> {
 ///Response type for
 ///app.bsky.graph.getFollows
 pub struct GetFollowsResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetFollowsResponse {
+impl jacquard_common::xrpc::XrpcResp for GetFollowsResponse {
+    const NSID: &'static str = "app.bsky.graph.getFollows";
     const ENCODING: &'static str = "application/json";
-    type Output = GetFollowsOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetFollowsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetFollows<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetFollows<'de> {
     const NSID: &'static str = "app.bsky.graph.getFollows";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetFollowsResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetFollowsResponse;
 }

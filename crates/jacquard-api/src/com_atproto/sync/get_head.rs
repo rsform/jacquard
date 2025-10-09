@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHead<'a> {
@@ -49,7 +57,7 @@ impl jacquard_common::IntoStatic for GetHeadOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -86,15 +94,15 @@ impl jacquard_common::IntoStatic for GetHeadError<'_> {
 ///Response type for
 ///com.atproto.sync.getHead
 pub struct GetHeadResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetHeadResponse {
+impl jacquard_common::xrpc::XrpcResp for GetHeadResponse {
+    const NSID: &'static str = "com.atproto.sync.getHead";
     const ENCODING: &'static str = "application/json";
-    type Output = GetHeadOutput<'de>;
-    type Err = GetHeadError<'de>;
+    type Output<'de> = GetHeadOutput<'de>;
+    type Err<'de> = GetHeadError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetHead<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetHead<'de> {
     const NSID: &'static str = "com.atproto.sync.getHead";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetHeadResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetHeadResponse;
 }

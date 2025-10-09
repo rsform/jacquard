@@ -10,7 +10,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct ListTemplatesOutput<'a> {
     #[serde(borrow)]
-    pub communication_templates: Vec<crate::tools_ozone::communication::TemplateView<'a>>,
+    pub communication_templates: Vec<
+        crate::tools_ozone::communication::TemplateView<'a>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for ListTemplatesOutput<'_> {
@@ -29,15 +31,15 @@ pub struct ListTemplates;
 ///Response type for
 ///tools.ozone.communication.listTemplates
 pub struct ListTemplatesResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for ListTemplatesResponse {
+impl jacquard_common::xrpc::XrpcResp for ListTemplatesResponse {
+    const NSID: &'static str = "tools.ozone.communication.listTemplates";
     const ENCODING: &'static str = "application/json";
-    type Output = ListTemplatesOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ListTemplatesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ListTemplates {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListTemplates {
     const NSID: &'static str = "tools.ozone.communication.listTemplates";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = ListTemplatesResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListTemplatesResponse;
 }

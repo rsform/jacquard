@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRelationships<'a> {
@@ -13,7 +21,9 @@ pub struct GetRelationships<'a> {
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub others: std::option::Option<Vec<jacquard_common::types::ident::AtIdentifier<'a>>>,
+    pub others: std::option::Option<
+        Vec<jacquard_common::types::ident::AtIdentifier<'a>>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for GetRelationships<'_> {
@@ -57,7 +67,7 @@ impl jacquard_common::IntoStatic for GetRelationshipsOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -89,7 +99,9 @@ impl jacquard_common::IntoStatic for GetRelationshipsError<'_> {
             GetRelationshipsError::ActorNotFound(v) => {
                 GetRelationshipsError::ActorNotFound(v.into_static())
             }
-            GetRelationshipsError::Unknown(v) => GetRelationshipsError::Unknown(v.into_static()),
+            GetRelationshipsError::Unknown(v) => {
+                GetRelationshipsError::Unknown(v.into_static())
+            }
         }
     }
 }
@@ -97,15 +109,15 @@ impl jacquard_common::IntoStatic for GetRelationshipsError<'_> {
 ///Response type for
 ///app.bsky.graph.getRelationships
 pub struct GetRelationshipsResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetRelationshipsResponse {
+impl jacquard_common::xrpc::XrpcResp for GetRelationshipsResponse {
+    const NSID: &'static str = "app.bsky.graph.getRelationships";
     const ENCODING: &'static str = "application/json";
-    type Output = GetRelationshipsOutput<'de>;
-    type Err = GetRelationshipsError<'de>;
+    type Output<'de> = GetRelationshipsOutput<'de>;
+    type Err<'de> = GetRelationshipsError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetRelationships<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRelationships<'de> {
     const NSID: &'static str = "app.bsky.graph.getRelationships";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetRelationshipsResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetRelationshipsResponse;
 }

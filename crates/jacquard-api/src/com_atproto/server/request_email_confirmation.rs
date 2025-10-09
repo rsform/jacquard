@@ -11,15 +11,17 @@ pub struct RequestEmailConfirmation;
 ///Response type for
 ///com.atproto.server.requestEmailConfirmation
 pub struct RequestEmailConfirmationResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for RequestEmailConfirmationResponse {
+impl jacquard_common::xrpc::XrpcResp for RequestEmailConfirmationResponse {
+    const NSID: &'static str = "com.atproto.server.requestEmailConfirmation";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RequestEmailConfirmation {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RequestEmailConfirmation {
     const NSID: &'static str = "com.atproto.server.requestEmailConfirmation";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = RequestEmailConfirmationResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = RequestEmailConfirmationResponse;
 }

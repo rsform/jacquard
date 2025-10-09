@@ -28,15 +28,17 @@ pub struct RequestEmailUpdate;
 ///Response type for
 ///com.atproto.server.requestEmailUpdate
 pub struct RequestEmailUpdateResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for RequestEmailUpdateResponse {
+impl jacquard_common::xrpc::XrpcResp for RequestEmailUpdateResponse {
+    const NSID: &'static str = "com.atproto.server.requestEmailUpdate";
     const ENCODING: &'static str = "application/json";
-    type Output = RequestEmailUpdateOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = RequestEmailUpdateOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RequestEmailUpdate {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RequestEmailUpdate {
     const NSID: &'static str = "com.atproto.server.requestEmailUpdate";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = RequestEmailUpdateResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = RequestEmailUpdateResponse;
 }

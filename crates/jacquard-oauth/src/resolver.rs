@@ -115,134 +115,152 @@ pub enum ResolverError {
     Uri(#[from] url::ParseError),
 }
 
-#[async_trait::async_trait]
 pub trait OAuthResolver: IdentityResolver + HttpClient {
-    async fn verify_issuer(
+    fn verify_issuer(
         &self,
         server_metadata: &OAuthAuthorizationServerMetadata<'_>,
         sub: &Did<'_>,
-    ) -> Result<Url, ResolverError> {
-        let (metadata, identity) = self.resolve_from_identity(sub).await?;
-        if !issuer_equivalent(&metadata.issuer, &server_metadata.issuer) {
-            return Err(ResolverError::AuthorizationServerMetadata(
-                "issuer mismatch".to_string(),
-            ));
+    ) -> impl std::future::Future<Output = Result<Url, ResolverError>> {
+        async {
+            let (metadata, identity) = self.resolve_from_identity(sub).await?;
+            if !issuer_equivalent(&metadata.issuer, &server_metadata.issuer) {
+                return Err(ResolverError::AuthorizationServerMetadata(
+                    "issuer mismatch".to_string(),
+                ));
+            }
+            Ok(identity
+                .pds_endpoint()
+                .ok_or(ResolverError::DidDocument(format!("{:?}", identity).into()))?)
         }
-        Ok(identity
-            .pds_endpoint()
-            .ok_or(ResolverError::DidDocument(format!("{:?}", identity).into()))?)
     }
-    async fn resolve_oauth(
+    fn resolve_oauth(
         &self,
         input: &str,
-    ) -> Result<
-        (
-            OAuthAuthorizationServerMetadata<'static>,
-            Option<DidDocument<'static>>,
-        ),
-        ResolverError,
+    ) -> impl Future<
+        Output = Result<
+            (
+                OAuthAuthorizationServerMetadata<'static>,
+                Option<DidDocument<'static>>,
+            ),
+            ResolverError,
+        >,
     > {
         // Allow using an entryway, or PDS url, directly as login input (e.g.
         // when the user forgot their handle, or when the handle does not
         // resolve to a DID)
-        Ok(if input.starts_with("https://") {
-            let url = Url::parse(input).map_err(|_| ResolverError::NotFound)?;
-            (self.resolve_from_service(&url).await?, None)
-        } else {
-            let (metadata, identity) = self.resolve_from_identity(input).await?;
-            (metadata, Some(identity))
-        })
+        async {
+            Ok(if input.starts_with("https://") {
+                let url = Url::parse(input).map_err(|_| ResolverError::NotFound)?;
+                (self.resolve_from_service(&url).await?, None)
+            } else {
+                let (metadata, identity) = self.resolve_from_identity(input).await?;
+                (metadata, Some(identity))
+            })
+        }
     }
-    async fn resolve_from_service(
+    fn resolve_from_service(
         &self,
         input: &Url,
-    ) -> Result<OAuthAuthorizationServerMetadata<'static>, ResolverError> {
-        // Assume first that input is a PDS URL (as required by ATPROTO)
-        if let Ok(metadata) = self.get_resource_server_metadata(input).await {
-            return Ok(metadata);
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>>
+    {
+        async {
+            // Assume first that input is a PDS URL (as required by ATPROTO)
+            if let Ok(metadata) = self.get_resource_server_metadata(input).await {
+                return Ok(metadata);
+            }
+            // Fallback to trying to fetch as an issuer (Entryway)
+            self.get_authorization_server_metadata(input).await
         }
-        // Fallback to trying to fetch as an issuer (Entryway)
-        self.get_authorization_server_metadata(input).await
     }
-    async fn resolve_from_identity(
+    fn resolve_from_identity(
         &self,
         input: &str,
-    ) -> Result<
-        (
-            OAuthAuthorizationServerMetadata<'static>,
-            DidDocument<'static>,
-        ),
-        ResolverError,
+    ) -> impl Future<
+        Output = Result<
+            (
+                OAuthAuthorizationServerMetadata<'static>,
+                DidDocument<'static>,
+            ),
+            ResolverError,
+        >,
     > {
-        let actor = AtIdentifier::new(input)
-            .map_err(|e| ResolverError::AtIdentifier(format!("{:?}", e)))?;
-        let identity = self.resolve_ident_owned(&actor).await?;
-        if let Some(pds) = &identity.pds_endpoint() {
-            let metadata = self.get_resource_server_metadata(pds).await?;
-            Ok((metadata, identity))
-        } else {
-            Err(ResolverError::DidDocument(format!("Did doc lacking pds")))
+        async {
+            let actor = AtIdentifier::new(input)
+                .map_err(|e| ResolverError::AtIdentifier(format!("{:?}", e)))?;
+            let identity = self.resolve_ident_owned(&actor).await?;
+            if let Some(pds) = &identity.pds_endpoint() {
+                let metadata = self.get_resource_server_metadata(pds).await?;
+                Ok((metadata, identity))
+            } else {
+                Err(ResolverError::DidDocument(format!("Did doc lacking pds")))
+            }
         }
     }
-    async fn get_authorization_server_metadata(
+    fn get_authorization_server_metadata(
         &self,
         issuer: &Url,
-    ) -> Result<OAuthAuthorizationServerMetadata<'static>, ResolverError> {
-        let mut md = resolve_authorization_server(self, issuer).await?;
-        // Normalize issuer string to the input URL representation to avoid slash quirks
-        md.issuer = jacquard_common::CowStr::from(issuer.as_str()).into_static();
-        Ok(md)
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>>
+    {
+        async {
+            let mut md = resolve_authorization_server(self, issuer).await?;
+            // Normalize issuer string to the input URL representation to avoid slash quirks
+            md.issuer = jacquard_common::CowStr::from(issuer.as_str()).into_static();
+            Ok(md)
+        }
     }
-    async fn get_resource_server_metadata(
+    fn get_resource_server_metadata(
         &self,
         pds: &Url,
-    ) -> Result<OAuthAuthorizationServerMetadata<'static>, ResolverError> {
-        let rs_metadata = resolve_protected_resource_info(self, pds).await?;
-        // ATPROTO requires one, and only one, authorization server entry
-        // > That document MUST contain a single item in the authorization_servers array.
-        // https://github.com/bluesky-social/proposals/tree/main/0004-oauth#server-metadata
-        let issuer = match &rs_metadata.authorization_servers {
-            Some(servers) if !servers.is_empty() => {
-                if servers.len() > 1 {
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>>
+    {
+        async move {
+            let rs_metadata = resolve_protected_resource_info(self, pds).await?;
+            // ATPROTO requires one, and only one, authorization server entry
+            // > That document MUST contain a single item in the authorization_servers array.
+            // https://github.com/bluesky-social/proposals/tree/main/0004-oauth#server-metadata
+            let issuer = match &rs_metadata.authorization_servers {
+                Some(servers) if !servers.is_empty() => {
+                    if servers.len() > 1 {
+                        return Err(ResolverError::ProtectedResourceMetadata(format!(
+                            "unable to determine authorization server for PDS: {pds}"
+                        )));
+                    }
+                    &servers[0]
+                }
+                _ => {
                     return Err(ResolverError::ProtectedResourceMetadata(format!(
-                        "unable to determine authorization server for PDS: {pds}"
+                        "no authorization server found for PDS: {pds}"
                     )));
                 }
-                &servers[0]
+            };
+            let as_metadata = self.get_authorization_server_metadata(issuer).await?;
+            // https://datatracker.ietf.org/doc/html/draft-ietf-oauth-resource-metadata-08#name-authorization-server-metada
+            if let Some(protected_resources) = &as_metadata.protected_resources {
+                let resource_url = rs_metadata
+                    .resource
+                    .strip_suffix('/')
+                    .unwrap_or(rs_metadata.resource.as_str());
+                if !protected_resources.contains(&CowStr::Borrowed(resource_url)) {
+                    return Err(ResolverError::AuthorizationServerMetadata(format!(
+                        "pds {pds}, resource {0} not protected by issuer: {issuer}, protected resources: {1:?}",
+                        rs_metadata.resource, protected_resources
+                    )));
+                }
             }
-            _ => {
-                return Err(ResolverError::ProtectedResourceMetadata(format!(
-                    "no authorization server found for PDS: {pds}"
-                )));
-            }
-        };
-        let as_metadata = self.get_authorization_server_metadata(issuer).await?;
-        // https://datatracker.ietf.org/doc/html/draft-ietf-oauth-resource-metadata-08#name-authorization-server-metada
-        if let Some(protected_resources) = &as_metadata.protected_resources {
-            let resource_url = rs_metadata
-                .resource
-                .strip_suffix('/')
-                .unwrap_or(rs_metadata.resource.as_str());
-            if !protected_resources.contains(&CowStr::Borrowed(resource_url)) {
-                return Err(ResolverError::AuthorizationServerMetadata(format!(
-                    "pds {pds}, resource {0} not protected by issuer: {issuer}, protected resources: {1:?}",
-                    rs_metadata.resource, protected_resources
-                )));
-            }
+
+            // TODO: atproot specific validation?
+            // https://github.com/bluesky-social/proposals/tree/main/0004-oauth#server-metadata
+            //
+            // eg.
+            // https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html
+            // if as_metadata.client_id_metadata_document_supported != Some(true) {
+            //     return Err(Error::AuthorizationServerMetadata(format!(
+            //         "authorization server does not support client_id_metadata_document: {issuer}"
+            //     )));
+            // }
+
+            Ok(as_metadata)
         }
-
-        // TODO: atproot specific validation?
-        // https://github.com/bluesky-social/proposals/tree/main/0004-oauth#server-metadata
-        //
-        // eg.
-        // https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html
-        // if as_metadata.client_id_metadata_document_supported != Some(true) {
-        //     return Err(Error::AuthorizationServerMetadata(format!(
-        //         "authorization server does not support client_id_metadata_document: {issuer}"
-        //     )));
-        // }
-
-        Ok(as_metadata)
     }
 }
 
@@ -316,7 +334,6 @@ pub async fn resolve_protected_resource_info<T: HttpClient + ?Sized>(
     }
 }
 
-#[async_trait::async_trait]
 impl OAuthResolver for jacquard_identity::JacquardResolver {}
 
 #[cfg(test)]

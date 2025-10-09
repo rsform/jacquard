@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecord<'a> {
@@ -14,7 +22,9 @@ pub struct GetRecord<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
-    pub rkey: jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+    pub rkey: jacquard_common::types::string::RecordKey<
+        jacquard_common::types::string::Rkey<'a>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for GetRecord<'_> {
@@ -50,7 +60,7 @@ impl jacquard_common::IntoStatic for GetRecordOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -114,11 +124,21 @@ impl jacquard_common::IntoStatic for GetRecordError<'_> {
     type Output = GetRecordError<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            GetRecordError::RecordNotFound(v) => GetRecordError::RecordNotFound(v.into_static()),
-            GetRecordError::RepoNotFound(v) => GetRecordError::RepoNotFound(v.into_static()),
-            GetRecordError::RepoTakendown(v) => GetRecordError::RepoTakendown(v.into_static()),
-            GetRecordError::RepoSuspended(v) => GetRecordError::RepoSuspended(v.into_static()),
-            GetRecordError::RepoDeactivated(v) => GetRecordError::RepoDeactivated(v.into_static()),
+            GetRecordError::RecordNotFound(v) => {
+                GetRecordError::RecordNotFound(v.into_static())
+            }
+            GetRecordError::RepoNotFound(v) => {
+                GetRecordError::RepoNotFound(v.into_static())
+            }
+            GetRecordError::RepoTakendown(v) => {
+                GetRecordError::RepoTakendown(v.into_static())
+            }
+            GetRecordError::RepoSuspended(v) => {
+                GetRecordError::RepoSuspended(v.into_static())
+            }
+            GetRecordError::RepoDeactivated(v) => {
+                GetRecordError::RepoDeactivated(v.into_static())
+            }
             GetRecordError::Unknown(v) => GetRecordError::Unknown(v.into_static()),
         }
     }
@@ -127,15 +147,15 @@ impl jacquard_common::IntoStatic for GetRecordError<'_> {
 ///Response type for
 ///com.atproto.sync.getRecord
 pub struct GetRecordResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetRecordResponse {
+impl jacquard_common::xrpc::XrpcResp for GetRecordResponse {
+    const NSID: &'static str = "com.atproto.sync.getRecord";
     const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output = GetRecordOutput<'de>;
-    type Err = GetRecordError<'de>;
+    type Output<'de> = GetRecordOutput<'de>;
+    type Err<'de> = GetRecordError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetRecord<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRecord<'de> {
     const NSID: &'static str = "com.atproto.sync.getRecord";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetRecordResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetRecordResponse;
 }

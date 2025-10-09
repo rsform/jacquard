@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct UpdateSubjectStatus<'a> {
@@ -130,15 +138,17 @@ impl jacquard_common::IntoStatic for UpdateSubjectStatusOutput<'_> {
 ///Response type for
 ///com.atproto.admin.updateSubjectStatus
 pub struct UpdateSubjectStatusResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for UpdateSubjectStatusResponse {
+impl jacquard_common::xrpc::XrpcResp for UpdateSubjectStatusResponse {
+    const NSID: &'static str = "com.atproto.admin.updateSubjectStatus";
     const ENCODING: &'static str = "application/json";
-    type Output = UpdateSubjectStatusOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = UpdateSubjectStatusOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpdateSubjectStatus<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateSubjectStatus<'de> {
     const NSID: &'static str = "com.atproto.admin.updateSubjectStatus";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = UpdateSubjectStatusResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateSubjectStatusResponse;
 }

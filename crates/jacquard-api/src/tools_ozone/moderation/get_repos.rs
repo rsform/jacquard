@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepos<'a> {
@@ -43,15 +51,15 @@ impl jacquard_common::IntoStatic for GetReposOutput<'_> {
 ///Response type for
 ///tools.ozone.moderation.getRepos
 pub struct GetReposResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetReposResponse {
+impl jacquard_common::xrpc::XrpcResp for GetReposResponse {
+    const NSID: &'static str = "tools.ozone.moderation.getRepos";
     const ENCODING: &'static str = "application/json";
-    type Output = GetReposOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetReposOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetRepos<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRepos<'de> {
     const NSID: &'static str = "tools.ozone.moderation.getRepos";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetReposResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetReposResponse;
 }

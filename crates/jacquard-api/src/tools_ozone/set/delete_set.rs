@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct DeleteSet<'a> {
@@ -55,7 +63,7 @@ impl jacquard_common::IntoStatic for DeleteSetOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -84,7 +92,9 @@ impl jacquard_common::IntoStatic for DeleteSetError<'_> {
     type Output = DeleteSetError<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            DeleteSetError::SetNotFound(v) => DeleteSetError::SetNotFound(v.into_static()),
+            DeleteSetError::SetNotFound(v) => {
+                DeleteSetError::SetNotFound(v.into_static())
+            }
             DeleteSetError::Unknown(v) => DeleteSetError::Unknown(v.into_static()),
         }
     }
@@ -93,15 +103,17 @@ impl jacquard_common::IntoStatic for DeleteSetError<'_> {
 ///Response type for
 ///tools.ozone.set.deleteSet
 pub struct DeleteSetResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for DeleteSetResponse {
+impl jacquard_common::xrpc::XrpcResp for DeleteSetResponse {
+    const NSID: &'static str = "tools.ozone.set.deleteSet";
     const ENCODING: &'static str = "application/json";
-    type Output = DeleteSetOutput<'de>;
-    type Err = DeleteSetError<'de>;
+    type Output<'de> = DeleteSetOutput<'de>;
+    type Err<'de> = DeleteSetError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DeleteSet<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteSet<'de> {
     const NSID: &'static str = "tools.ozone.set.deleteSet";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = DeleteSetResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteSetResponse;
 }

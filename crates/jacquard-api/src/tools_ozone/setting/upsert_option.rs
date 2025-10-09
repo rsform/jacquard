@@ -69,15 +69,16 @@ impl jacquard_common::IntoStatic for UpsertOptionOutput<'_> {
 ///Response type for
 ///tools.ozone.setting.upsertOption
 pub struct UpsertOptionResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for UpsertOptionResponse {
+impl jacquard_common::xrpc::XrpcResp for UpsertOptionResponse {
+    const NSID: &'static str = "tools.ozone.setting.upsertOption";
     const ENCODING: &'static str = "application/json";
-    type Output = UpsertOptionOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = UpsertOptionOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpsertOption<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpsertOption<'de> {
     const NSID: &'static str = "tools.ozone.setting.upsertOption";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = UpsertOptionResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    type Response = UpsertOptionResponse;
 }

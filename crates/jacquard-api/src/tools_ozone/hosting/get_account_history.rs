@@ -84,7 +84,9 @@ impl jacquard_common::IntoStatic for EventRecordDetails<'_> {
     type Output = EventRecordDetails<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            EventRecordDetails::Unknown(v) => EventRecordDetails::Unknown(v.into_static()),
+            EventRecordDetails::Unknown(v) => {
+                EventRecordDetails::Unknown(v.into_static())
+            }
         }
     }
 }
@@ -119,7 +121,15 @@ impl jacquard_common::IntoStatic for HandleUpdated<'_> {
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountHistory<'a> {
@@ -174,17 +184,17 @@ impl jacquard_common::IntoStatic for GetAccountHistoryOutput<'_> {
 ///Response type for
 ///tools.ozone.hosting.getAccountHistory
 pub struct GetAccountHistoryResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetAccountHistoryResponse {
+impl jacquard_common::xrpc::XrpcResp for GetAccountHistoryResponse {
+    const NSID: &'static str = "tools.ozone.hosting.getAccountHistory";
     const ENCODING: &'static str = "application/json";
-    type Output = GetAccountHistoryOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetAccountHistoryOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetAccountHistory<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAccountHistory<'de> {
     const NSID: &'static str = "tools.ozone.hosting.getAccountHistory";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetAccountHistoryResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetAccountHistoryResponse;
 }
 
 #[jacquard_derive::lexicon]

@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThreadOtherV2<'a> {
@@ -48,17 +56,17 @@ impl jacquard_common::IntoStatic for GetPostThreadOtherV2Output<'_> {
 ///Response type for
 ///app.bsky.unspecced.getPostThreadOtherV2
 pub struct GetPostThreadOtherV2Response;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetPostThreadOtherV2Response {
+impl jacquard_common::xrpc::XrpcResp for GetPostThreadOtherV2Response {
+    const NSID: &'static str = "app.bsky.unspecced.getPostThreadOtherV2";
     const ENCODING: &'static str = "application/json";
-    type Output = GetPostThreadOtherV2Output<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetPostThreadOtherV2Output<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetPostThreadOtherV2<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetPostThreadOtherV2<'de> {
     const NSID: &'static str = "app.bsky.unspecced.getPostThreadOtherV2";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetPostThreadOtherV2Response;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetPostThreadOtherV2Response;
 }
 
 #[jacquard_derive::lexicon]
@@ -89,7 +97,9 @@ impl jacquard_common::IntoStatic for ThreadItemRecordValue<'_> {
             ThreadItemRecordValue::DefsThreadItemPost(v) => {
                 ThreadItemRecordValue::DefsThreadItemPost(v.into_static())
             }
-            ThreadItemRecordValue::Unknown(v) => ThreadItemRecordValue::Unknown(v.into_static()),
+            ThreadItemRecordValue::Unknown(v) => {
+                ThreadItemRecordValue::Unknown(v.into_static())
+            }
         }
     }
 }

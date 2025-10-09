@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct FindRelatedAccounts<'a> {
@@ -56,17 +64,17 @@ impl jacquard_common::IntoStatic for FindRelatedAccountsOutput<'_> {
 ///Response type for
 ///tools.ozone.signature.findRelatedAccounts
 pub struct FindRelatedAccountsResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for FindRelatedAccountsResponse {
+impl jacquard_common::xrpc::XrpcResp for FindRelatedAccountsResponse {
+    const NSID: &'static str = "tools.ozone.signature.findRelatedAccounts";
     const ENCODING: &'static str = "application/json";
-    type Output = FindRelatedAccountsOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = FindRelatedAccountsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for FindRelatedAccounts<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for FindRelatedAccounts<'de> {
     const NSID: &'static str = "tools.ozone.signature.findRelatedAccounts";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = FindRelatedAccountsResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = FindRelatedAccountsResponse;
 }
 
 #[jacquard_derive::lexicon]
@@ -77,7 +85,9 @@ pub struct RelatedAccount<'a> {
     pub account: crate::com_atproto::admin::AccountView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub similarities: std::option::Option<Vec<crate::tools_ozone::signature::SigDetail<'a>>>,
+    pub similarities: std::option::Option<
+        Vec<crate::tools_ozone::signature::SigDetail<'a>>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for RelatedAccount<'_> {

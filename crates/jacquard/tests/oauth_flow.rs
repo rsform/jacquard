@@ -5,7 +5,7 @@ use bytes::Bytes;
 use http::{Response as HttpResponse, StatusCode};
 use jacquard::IntoStatic;
 use jacquard::client::Agent;
-use jacquard::types::xrpc::XrpcClient;
+use jacquard::xrpc::XrpcClient;
 use jacquard_common::http_client::HttpClient;
 use jacquard_oauth::atproto::AtprotoClientMetadata;
 use jacquard_oauth::authstore::ClientAuthStore;
@@ -38,7 +38,6 @@ impl HttpClient for MockClient {
     }
 }
 
-#[async_trait::async_trait]
 impl jacquard::identity::resolver::IdentityResolver for MockClient {
     fn options(&self) -> &jacquard::identity::resolver::ResolverOptions {
         use std::sync::LazyLock;
@@ -78,7 +77,6 @@ impl jacquard::identity::resolver::IdentityResolver for MockClient {
     }
 }
 
-#[async_trait::async_trait]
 impl OAuthResolver for MockClient {
     async fn resolve_oauth(
         &self,
@@ -284,7 +282,7 @@ async fn oauth_end_to_end_mock_flow() {
     // Wrap in Agent and send a resource XRPC call to verify Authorization works
     let agent: Agent<_> = Agent::from(session);
     let resp = agent
-        .send(&jacquard::api::com_atproto::server::get_session::GetSession)
+        .send(jacquard::api::com_atproto::server::get_session::GetSession)
         .await
         .unwrap();
     assert_eq!(resp.status(), StatusCode::OK);

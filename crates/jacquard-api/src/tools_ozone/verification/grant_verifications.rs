@@ -30,7 +30,15 @@ impl jacquard_common::IntoStatic for GrantError<'_> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct GrantVerifications<'a> {
@@ -80,17 +88,19 @@ impl jacquard_common::IntoStatic for GrantVerificationsOutput<'_> {
 ///Response type for
 ///tools.ozone.verification.grantVerifications
 pub struct GrantVerificationsResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GrantVerificationsResponse {
+impl jacquard_common::xrpc::XrpcResp for GrantVerificationsResponse {
+    const NSID: &'static str = "tools.ozone.verification.grantVerifications";
     const ENCODING: &'static str = "application/json";
-    type Output = GrantVerificationsOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GrantVerificationsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GrantVerifications<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GrantVerifications<'de> {
     const NSID: &'static str = "tools.ozone.verification.grantVerifications";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = GrantVerificationsResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = GrantVerificationsResponse;
 }
 
 #[jacquard_derive::lexicon]

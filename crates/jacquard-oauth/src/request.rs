@@ -590,7 +590,6 @@ mod tests {
     }
 
     // IdentityResolver methods won't be called in these tests; provide stubs.
-    #[async_trait::async_trait]
     impl IdentityResolver for MockClient {
         fn options(&self) -> &jacquard_identity::resolver::ResolverOptions {
             use std::sync::LazyLock;

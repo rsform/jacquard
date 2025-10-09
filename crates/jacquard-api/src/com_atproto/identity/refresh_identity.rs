@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct RefreshIdentity<'a> {
@@ -59,7 +67,7 @@ impl jacquard_common::IntoStatic for RefreshIdentityOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -117,7 +125,9 @@ impl jacquard_common::IntoStatic for RefreshIdentityError<'_> {
             RefreshIdentityError::DidDeactivated(v) => {
                 RefreshIdentityError::DidDeactivated(v.into_static())
             }
-            RefreshIdentityError::Unknown(v) => RefreshIdentityError::Unknown(v.into_static()),
+            RefreshIdentityError::Unknown(v) => {
+                RefreshIdentityError::Unknown(v.into_static())
+            }
         }
     }
 }
@@ -125,15 +135,17 @@ impl jacquard_common::IntoStatic for RefreshIdentityError<'_> {
 ///Response type for
 ///com.atproto.identity.refreshIdentity
 pub struct RefreshIdentityResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for RefreshIdentityResponse {
+impl jacquard_common::xrpc::XrpcResp for RefreshIdentityResponse {
+    const NSID: &'static str = "com.atproto.identity.refreshIdentity";
     const ENCODING: &'static str = "application/json";
-    type Output = RefreshIdentityOutput<'de>;
-    type Err = RefreshIdentityError<'de>;
+    type Output<'de> = RefreshIdentityOutput<'de>;
+    type Err<'de> = RefreshIdentityError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RefreshIdentity<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RefreshIdentity<'de> {
     const NSID: &'static str = "com.atproto.identity.refreshIdentity";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = RefreshIdentityResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = RefreshIdentityResponse;
 }

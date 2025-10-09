@@ -6,8 +6,7 @@ use jacquard::oauth::atproto::AtprotoClientMetadata;
 use jacquard::oauth::client::OAuthClient;
 #[cfg(feature = "loopback")]
 use jacquard::oauth::loopback::LoopbackConfig;
-use jacquard::types::xrpc::XrpcClient;
-use jacquard_api::app_bsky::feed::get_timeline::GetTimelineOutput;
+use jacquard::xrpc::XrpcClient;
 #[cfg(not(feature = "loopback"))]
 use jacquard_oauth::types::AuthorizeOptions;
 use miette::IntoDiagnostic;
@@ -74,10 +73,8 @@ async fn main() -> miette::Result<()> {
 
     // Wrap in Agent and fetch the timeline
     let agent: Agent<_> = Agent::from(session);
-    let timeline = agent
-        .send(&GetTimeline::new().limit(5).build())
-        .await?
-        .output::<GetTimeline>()?;
+    let output = agent.send(GetTimeline::new().limit(5).build()).await?;
+    let timeline = output.into_output()?;
     for (i, post) in timeline.feed.iter().enumerate() {
         println!("\n{}. by {}", i + 1, post.post.author.handle);
         println!(

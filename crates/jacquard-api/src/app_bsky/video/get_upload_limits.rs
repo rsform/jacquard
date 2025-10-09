@@ -42,15 +42,15 @@ pub struct GetUploadLimits;
 ///Response type for
 ///app.bsky.video.getUploadLimits
 pub struct GetUploadLimitsResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetUploadLimitsResponse {
+impl jacquard_common::xrpc::XrpcResp for GetUploadLimitsResponse {
+    const NSID: &'static str = "app.bsky.video.getUploadLimits";
     const ENCODING: &'static str = "application/json";
-    type Output = GetUploadLimitsOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetUploadLimitsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetUploadLimits {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetUploadLimits {
     const NSID: &'static str = "app.bsky.video.getUploadLimits";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetUploadLimitsResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetUploadLimitsResponse;
 }

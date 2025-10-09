@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct AddMember<'a> {
@@ -63,7 +71,7 @@ impl jacquard_common::IntoStatic for AddMemberOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -103,15 +111,17 @@ impl jacquard_common::IntoStatic for AddMemberError<'_> {
 ///Response type for
 ///tools.ozone.team.addMember
 pub struct AddMemberResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for AddMemberResponse {
+impl jacquard_common::xrpc::XrpcResp for AddMemberResponse {
+    const NSID: &'static str = "tools.ozone.team.addMember";
     const ENCODING: &'static str = "application/json";
-    type Output = AddMemberOutput<'de>;
-    type Err = AddMemberError<'de>;
+    type Output<'de> = AddMemberOutput<'de>;
+    type Err<'de> = AddMemberError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for AddMember<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AddMember<'de> {
     const NSID: &'static str = "tools.ozone.team.addMember";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = AddMemberResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = AddMemberResponse;
 }

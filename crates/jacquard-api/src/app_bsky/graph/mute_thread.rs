@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct MuteThread<'a> {
@@ -34,15 +42,17 @@ impl jacquard_common::IntoStatic for MuteThread<'_> {
 ///Response type for
 ///app.bsky.graph.muteThread
 pub struct MuteThreadResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for MuteThreadResponse {
+impl jacquard_common::xrpc::XrpcResp for MuteThreadResponse {
+    const NSID: &'static str = "app.bsky.graph.muteThread";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for MuteThread<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for MuteThread<'de> {
     const NSID: &'static str = "app.bsky.graph.muteThread";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = MuteThreadResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = MuteThreadResponse;
 }

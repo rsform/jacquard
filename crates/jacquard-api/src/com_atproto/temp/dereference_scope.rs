@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct DereferenceScope<'a> {
@@ -51,7 +59,7 @@ impl jacquard_common::IntoStatic for DereferenceScopeOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -83,7 +91,9 @@ impl jacquard_common::IntoStatic for DereferenceScopeError<'_> {
             DereferenceScopeError::InvalidScopeReference(v) => {
                 DereferenceScopeError::InvalidScopeReference(v.into_static())
             }
-            DereferenceScopeError::Unknown(v) => DereferenceScopeError::Unknown(v.into_static()),
+            DereferenceScopeError::Unknown(v) => {
+                DereferenceScopeError::Unknown(v.into_static())
+            }
         }
     }
 }
@@ -91,15 +101,15 @@ impl jacquard_common::IntoStatic for DereferenceScopeError<'_> {
 ///Response type for
 ///com.atproto.temp.dereferenceScope
 pub struct DereferenceScopeResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for DereferenceScopeResponse {
+impl jacquard_common::xrpc::XrpcResp for DereferenceScopeResponse {
+    const NSID: &'static str = "com.atproto.temp.dereferenceScope";
     const ENCODING: &'static str = "application/json";
-    type Output = DereferenceScopeOutput<'de>;
-    type Err = DereferenceScopeError<'de>;
+    type Output<'de> = DereferenceScopeOutput<'de>;
+    type Err<'de> = DereferenceScopeError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DereferenceScope<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DereferenceScope<'de> {
     const NSID: &'static str = "com.atproto.temp.dereferenceScope";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = DereferenceScopeResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = DereferenceScopeResponse;
 }

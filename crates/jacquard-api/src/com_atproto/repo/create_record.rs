@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct CreateRecord<'a> {
@@ -23,7 +31,9 @@ pub struct CreateRecord<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rkey: std::option::Option<
-        jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+        jacquard_common::types::string::RecordKey<
+            jacquard_common::types::string::Rkey<'a>,
+        >,
     >,
     ///Compare and swap with the previous commit by CID.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -94,7 +104,7 @@ impl jacquard_common::IntoStatic for CreateRecordOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -123,7 +133,9 @@ impl jacquard_common::IntoStatic for CreateRecordError<'_> {
     type Output = CreateRecordError<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            CreateRecordError::InvalidSwap(v) => CreateRecordError::InvalidSwap(v.into_static()),
+            CreateRecordError::InvalidSwap(v) => {
+                CreateRecordError::InvalidSwap(v.into_static())
+            }
             CreateRecordError::Unknown(v) => CreateRecordError::Unknown(v.into_static()),
         }
     }
@@ -132,15 +144,17 @@ impl jacquard_common::IntoStatic for CreateRecordError<'_> {
 ///Response type for
 ///com.atproto.repo.createRecord
 pub struct CreateRecordResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for CreateRecordResponse {
+impl jacquard_common::xrpc::XrpcResp for CreateRecordResponse {
+    const NSID: &'static str = "com.atproto.repo.createRecord";
     const ENCODING: &'static str = "application/json";
-    type Output = CreateRecordOutput<'de>;
-    type Err = CreateRecordError<'de>;
+    type Output<'de> = CreateRecordOutput<'de>;
+    type Err<'de> = CreateRecordError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CreateRecord<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateRecord<'de> {
     const NSID: &'static str = "com.atproto.repo.createRecord";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = CreateRecordResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreateRecordResponse;
 }

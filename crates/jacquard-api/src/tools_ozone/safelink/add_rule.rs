@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct AddRule<'a> {
@@ -81,7 +89,7 @@ impl jacquard_common::IntoStatic for AddRuleOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -121,7 +129,9 @@ impl jacquard_common::IntoStatic for AddRuleError<'_> {
     fn into_static(self) -> Self::Output {
         match self {
             AddRuleError::InvalidUrl(v) => AddRuleError::InvalidUrl(v.into_static()),
-            AddRuleError::RuleAlreadyExists(v) => AddRuleError::RuleAlreadyExists(v.into_static()),
+            AddRuleError::RuleAlreadyExists(v) => {
+                AddRuleError::RuleAlreadyExists(v.into_static())
+            }
             AddRuleError::Unknown(v) => AddRuleError::Unknown(v.into_static()),
         }
     }
@@ -130,15 +140,17 @@ impl jacquard_common::IntoStatic for AddRuleError<'_> {
 ///Response type for
 ///tools.ozone.safelink.addRule
 pub struct AddRuleResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for AddRuleResponse {
+impl jacquard_common::xrpc::XrpcResp for AddRuleResponse {
+    const NSID: &'static str = "tools.ozone.safelink.addRule";
     const ENCODING: &'static str = "application/json";
-    type Output = AddRuleOutput<'de>;
-    type Err = AddRuleError<'de>;
+    type Output<'de> = AddRuleOutput<'de>;
+    type Err<'de> = AddRuleError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for AddRule<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AddRule<'de> {
     const NSID: &'static str = "tools.ozone.safelink.addRule";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = AddRuleResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = AddRuleResponse;
 }

@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct FindCorrelation<'a> {
@@ -43,15 +51,15 @@ impl jacquard_common::IntoStatic for FindCorrelationOutput<'_> {
 ///Response type for
 ///tools.ozone.signature.findCorrelation
 pub struct FindCorrelationResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for FindCorrelationResponse {
+impl jacquard_common::xrpc::XrpcResp for FindCorrelationResponse {
+    const NSID: &'static str = "tools.ozone.signature.findCorrelation";
     const ENCODING: &'static str = "application/json";
-    type Output = FindCorrelationOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = FindCorrelationOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for FindCorrelation<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for FindCorrelation<'de> {
     const NSID: &'static str = "tools.ozone.signature.findCorrelation";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = FindCorrelationResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = FindCorrelationResponse;
 }

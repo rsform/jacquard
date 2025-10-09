@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchPosts<'a> {
@@ -107,7 +115,7 @@ impl jacquard_common::IntoStatic for SearchPostsOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -146,15 +154,15 @@ impl jacquard_common::IntoStatic for SearchPostsError<'_> {
 ///Response type for
 ///app.bsky.feed.searchPosts
 pub struct SearchPostsResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for SearchPostsResponse {
+impl jacquard_common::xrpc::XrpcResp for SearchPostsResponse {
+    const NSID: &'static str = "app.bsky.feed.searchPosts";
     const ENCODING: &'static str = "application/json";
-    type Output = SearchPostsOutput<'de>;
-    type Err = SearchPostsError<'de>;
+    type Output<'de> = SearchPostsOutput<'de>;
+    type Err<'de> = SearchPostsError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for SearchPosts<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SearchPosts<'de> {
     const NSID: &'static str = "app.bsky.feed.searchPosts";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = SearchPostsResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = SearchPostsResponse;
 }

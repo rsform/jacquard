@@ -324,80 +324,93 @@ impl Default for ResolverOptions {
 /// - PLC directory or Slingshot for `did:plc`
 /// - Slingshot `resolveHandle` (unauthenticated) when configured as the PLC source
 /// - PDS fallbacks via helpers that use stateless XRPC on top of reqwest
-#[async_trait::async_trait()]
+
 pub trait IdentityResolver {
     /// Access options for validation decisions in default methods
     fn options(&self) -> &ResolverOptions;
 
     /// Resolve handle
-    async fn resolve_handle(&self, handle: &Handle<'_>) -> Result<Did<'static>, IdentityError>;
+    fn resolve_handle(
+        &self,
+        handle: &Handle<'_>,
+    ) -> impl Future<Output = Result<Did<'static>, IdentityError>>;
 
     /// Resolve DID document
-    async fn resolve_did_doc(&self, did: &Did<'_>) -> Result<DidDocResponse, IdentityError>;
+    fn resolve_did_doc(
+        &self,
+        did: &Did<'_>,
+    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>>;
 
     /// Resolve DID doc from an identifier
-    async fn resolve_ident(
+    fn resolve_ident(
         &self,
         actor: &AtIdentifier<'_>,
-    ) -> Result<DidDocResponse, IdentityError> {
-        match actor {
-            AtIdentifier::Did(did) => self.resolve_did_doc(&did).await,
-            AtIdentifier::Handle(handle) => {
-                let did = self.resolve_handle(&handle).await?;
-                self.resolve_did_doc(&did).await
+    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>> {
+        async move {
+            match actor {
+                AtIdentifier::Did(did) => self.resolve_did_doc(&did).await,
+                AtIdentifier::Handle(handle) => {
+                    let did = self.resolve_handle(&handle).await?;
+                    self.resolve_did_doc(&did).await
+                }
             }
         }
     }
 
     /// Resolve DID doc from an identifier
-    async fn resolve_ident_owned(
+    fn resolve_ident_owned(
         &self,
         actor: &AtIdentifier<'_>,
-    ) -> Result<DidDocument<'static>, IdentityError> {
-        match actor {
-            AtIdentifier::Did(did) => self.resolve_did_doc_owned(&did).await,
-            AtIdentifier::Handle(handle) => {
-                let did = self.resolve_handle(&handle).await?;
-                self.resolve_did_doc_owned(&did).await
+    ) -> impl Future<Output = Result<DidDocument<'static>, IdentityError>> {
+        async move {
+            match actor {
+                AtIdentifier::Did(did) => self.resolve_did_doc_owned(&did).await,
+                AtIdentifier::Handle(handle) => {
+                    let did = self.resolve_handle(&handle).await?;
+                    self.resolve_did_doc_owned(&did).await
+                }
             }
         }
     }
 
     /// Resolve the DID document and return an owned version
-    async fn resolve_did_doc_owned(
+    fn resolve_did_doc_owned(
         &self,
         did: &Did<'_>,
-    ) -> Result<DidDocument<'static>, IdentityError> {
-        self.resolve_did_doc(did).await?.into_owned()
+    ) -> impl Future<Output = Result<DidDocument<'static>, IdentityError>> {
+        async { self.resolve_did_doc(did).await?.into_owned() }
     }
     /// Return the PDS url for a DID
-    async fn pds_for_did(&self, did: &Did<'_>) -> Result<Url, IdentityError> {
-        let resp = self.resolve_did_doc(did).await?;
-        let doc = resp.parse()?;
-        // Default-on doc id equality check
-        if self.options().validate_doc_id {
-            if doc.id.as_str() != did.as_str() {
-                return Err(IdentityError::DocIdMismatch {
-                    expected: did.clone().into_static(),
-                    doc: doc.clone().into_static(),
-                });
+    fn pds_for_did(&self, did: &Did<'_>) -> impl Future<Output = Result<Url, IdentityError>> {
+        async {
+            let resp = self.resolve_did_doc(did).await?;
+            let doc = resp.parse()?;
+            // Default-on doc id equality check
+            if self.options().validate_doc_id {
+                if doc.id.as_str() != did.as_str() {
+                    return Err(IdentityError::DocIdMismatch {
+                        expected: did.clone().into_static(),
+                        doc: doc.clone().into_static(),
+                    });
+                }
             }
+            doc.pds_endpoint().ok_or(IdentityError::MissingPdsEndpoint)
         }
-        doc.pds_endpoint().ok_or(IdentityError::MissingPdsEndpoint)
     }
     /// Return the DIS and PDS url for a handle
-    async fn pds_for_handle(
+    fn pds_for_handle(
         &self,
         handle: &Handle<'_>,
-    ) -> Result<(Did<'static>, Url), IdentityError> {
-        let did = self.resolve_handle(handle).await?;
-        let pds = self.pds_for_did(&did).await?;
-        Ok((did, pds))
+    ) -> impl Future<Output = Result<(Did<'static>, Url), IdentityError>> {
+        async {
+            let did = self.resolve_handle(handle).await?;
+            let pds = self.pds_for_did(&did).await?;
+            Ok((did, pds))
+        }
     }
 }
 
-#[async_trait::async_trait]
-impl<T: IdentityResolver + Sync + Send> IdentityResolver for std::sync::Arc<T> {
+impl<T: IdentityResolver> IdentityResolver for std::sync::Arc<T> {
     fn options(&self) -> &ResolverOptions {
         self.as_ref().options()
     }

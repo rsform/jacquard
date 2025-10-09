@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct AddReservedHandle<'a> {
@@ -48,15 +56,17 @@ impl jacquard_common::IntoStatic for AddReservedHandleOutput<'_> {
 ///Response type for
 ///com.atproto.temp.addReservedHandle
 pub struct AddReservedHandleResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for AddReservedHandleResponse {
+impl jacquard_common::xrpc::XrpcResp for AddReservedHandleResponse {
+    const NSID: &'static str = "com.atproto.temp.addReservedHandle";
     const ENCODING: &'static str = "application/json";
-    type Output = AddReservedHandleOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = AddReservedHandleOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for AddReservedHandle<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AddReservedHandle<'de> {
     const NSID: &'static str = "com.atproto.temp.addReservedHandle";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = AddReservedHandleResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = AddReservedHandleResponse;
 }

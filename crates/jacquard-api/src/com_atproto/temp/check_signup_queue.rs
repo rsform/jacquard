@@ -34,15 +34,15 @@ pub struct CheckSignupQueue;
 ///Response type for
 ///com.atproto.temp.checkSignupQueue
 pub struct CheckSignupQueueResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for CheckSignupQueueResponse {
+impl jacquard_common::xrpc::XrpcResp for CheckSignupQueueResponse {
+    const NSID: &'static str = "com.atproto.temp.checkSignupQueue";
     const ENCODING: &'static str = "application/json";
-    type Output = CheckSignupQueueOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = CheckSignupQueueOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CheckSignupQueue {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CheckSignupQueue {
     const NSID: &'static str = "com.atproto.temp.checkSignupQueue";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = CheckSignupQueueResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = CheckSignupQueueResponse;
 }

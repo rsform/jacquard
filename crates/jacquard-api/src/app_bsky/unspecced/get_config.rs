@@ -54,15 +54,15 @@ pub struct GetConfig;
 ///Response type for
 ///app.bsky.unspecced.getConfig
 pub struct GetConfigResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetConfigResponse {
+impl jacquard_common::xrpc::XrpcResp for GetConfigResponse {
+    const NSID: &'static str = "app.bsky.unspecced.getConfig";
     const ENCODING: &'static str = "application/json";
-    type Output = GetConfigOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetConfigOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetConfig {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetConfig {
     const NSID: &'static str = "app.bsky.unspecced.getConfig";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetConfigResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetConfigResponse;
 }

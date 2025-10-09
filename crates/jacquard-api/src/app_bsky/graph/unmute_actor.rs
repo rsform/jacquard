@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct UnmuteActor<'a> {
@@ -34,15 +42,17 @@ impl jacquard_common::IntoStatic for UnmuteActor<'_> {
 ///Response type for
 ///app.bsky.graph.unmuteActor
 pub struct UnmuteActorResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for UnmuteActorResponse {
+impl jacquard_common::xrpc::XrpcResp for UnmuteActorResponse {
+    const NSID: &'static str = "app.bsky.graph.unmuteActor";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UnmuteActor<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UnmuteActor<'de> {
     const NSID: &'static str = "app.bsky.graph.unmuteActor";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = UnmuteActorResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UnmuteActorResponse;
 }

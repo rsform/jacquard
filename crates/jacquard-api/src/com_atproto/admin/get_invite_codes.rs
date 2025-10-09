@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetInviteCodes<'a> {
@@ -59,15 +67,15 @@ impl jacquard_common::IntoStatic for GetInviteCodesOutput<'_> {
 ///Response type for
 ///com.atproto.admin.getInviteCodes
 pub struct GetInviteCodesResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetInviteCodesResponse {
+impl jacquard_common::xrpc::XrpcResp for GetInviteCodesResponse {
+    const NSID: &'static str = "com.atproto.admin.getInviteCodes";
     const ENCODING: &'static str = "application/json";
-    type Output = GetInviteCodesOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetInviteCodesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetInviteCodes<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetInviteCodes<'de> {
     const NSID: &'static str = "com.atproto.admin.getInviteCodes";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetInviteCodesResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetInviteCodesResponse;
 }

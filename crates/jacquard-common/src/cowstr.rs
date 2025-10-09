@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 use std::{
-    borrow::{Borrow, Cow},
+    borrow::Cow,
     fmt,
     hash::{Hash, Hasher},
     ops::Deref,

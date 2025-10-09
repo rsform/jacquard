@@ -11,15 +11,17 @@ pub struct RequestAccountDelete;
 ///Response type for
 ///com.atproto.server.requestAccountDelete
 pub struct RequestAccountDeleteResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for RequestAccountDeleteResponse {
+impl jacquard_common::xrpc::XrpcResp for RequestAccountDeleteResponse {
+    const NSID: &'static str = "com.atproto.server.requestAccountDelete";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RequestAccountDelete {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RequestAccountDelete {
     const NSID: &'static str = "com.atproto.server.requestAccountDelete";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = RequestAccountDeleteResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = RequestAccountDeleteResponse;
 }

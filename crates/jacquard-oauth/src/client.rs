@@ -13,9 +13,10 @@ use jacquard_common::{
     AuthorizationToken, CowStr, IntoStatic,
     error::{ClientError, TransportError, XrpcResult},
     http_client::HttpClient,
-    types::{
-        did::Did,
-        xrpc::{CallOptions, Response, XrpcClient, XrpcExt, build_http_request, process_response},
+    types::did::Did,
+    xrpc::{
+        CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest, build_http_request,
+        process_response,
     },
 };
 use jacquard_identity::JacquardResolver;
@@ -375,13 +376,13 @@ where
         self.options.read().await.clone()
     }
 
-    async fn send<
-        'de,
-        R: jacquard_common::types::xrpc::XrpcRequest<'de> + Clone + Send + Sync + 'de,
-    >(
+    async fn send<'s, R>(
         &self,
-        request: &R,
-    ) -> XrpcResult<Response<'de, R>> {
+        request: R,
+    ) -> XrpcResult<Response<<R as XrpcRequest<'s>>::Response>>
+    where
+        R: XrpcRequest<'s>,
+    {
         let base_uri = self.base_uri();
         let mut opts = self.options.read().await.clone();
         opts.auth = Some(self.access_token().await);
@@ -390,7 +391,7 @@ where
         let http_response = self
             .client
             .dpop_call(&mut dpop)
-            .send(build_http_request(&base_uri, request, &opts)?)
+            .send(build_http_request(&base_uri, &request, &opts)?)
             .await
             .map_err(|e| TransportError::Other(Box::new(e)))?;
         drop(guard);
@@ -405,7 +406,7 @@ where
             let http_response = self
                 .client
                 .dpop_call(&mut dpop)
-                .send(build_http_request(&base_uri, request, &opts)?)
+                .send(build_http_request(&base_uri, &request, &opts)?)
                 .await
                 .map_err(|e| TransportError::Other(Box::new(e)))?;
             process_response(http_response)

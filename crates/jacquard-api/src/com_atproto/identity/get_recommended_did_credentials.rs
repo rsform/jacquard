@@ -21,7 +21,9 @@ pub struct GetRecommendedDidCredentialsOutput<'a> {
     pub services: std::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub verification_methods: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub verification_methods: std::option::Option<
+        jacquard_common::types::value::Data<'a>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for GetRecommendedDidCredentialsOutput<'_> {
@@ -43,15 +45,15 @@ pub struct GetRecommendedDidCredentials;
 ///Response type for
 ///com.atproto.identity.getRecommendedDidCredentials
 pub struct GetRecommendedDidCredentialsResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetRecommendedDidCredentialsResponse {
+impl jacquard_common::xrpc::XrpcResp for GetRecommendedDidCredentialsResponse {
+    const NSID: &'static str = "com.atproto.identity.getRecommendedDidCredentials";
     const ENCODING: &'static str = "application/json";
-    type Output = GetRecommendedDidCredentialsOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetRecommendedDidCredentialsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetRecommendedDidCredentials {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRecommendedDidCredentials {
     const NSID: &'static str = "com.atproto.identity.getRecommendedDidCredentials";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetRecommendedDidCredentialsResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetRecommendedDidCredentialsResponse;
 }

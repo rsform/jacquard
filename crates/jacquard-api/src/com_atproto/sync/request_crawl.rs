@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct RequestCrawl<'a> {
@@ -42,7 +50,7 @@ impl jacquard_common::IntoStatic for RequestCrawl<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -70,7 +78,9 @@ impl jacquard_common::IntoStatic for RequestCrawlError<'_> {
     type Output = RequestCrawlError<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            RequestCrawlError::HostBanned(v) => RequestCrawlError::HostBanned(v.into_static()),
+            RequestCrawlError::HostBanned(v) => {
+                RequestCrawlError::HostBanned(v.into_static())
+            }
             RequestCrawlError::Unknown(v) => RequestCrawlError::Unknown(v.into_static()),
         }
     }
@@ -79,15 +89,17 @@ impl jacquard_common::IntoStatic for RequestCrawlError<'_> {
 ///Response type for
 ///com.atproto.sync.requestCrawl
 pub struct RequestCrawlResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for RequestCrawlResponse {
+impl jacquard_common::xrpc::XrpcResp for RequestCrawlResponse {
+    const NSID: &'static str = "com.atproto.sync.requestCrawl";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = RequestCrawlError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = RequestCrawlError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RequestCrawl<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RequestCrawl<'de> {
     const NSID: &'static str = "com.atproto.sync.requestCrawl";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = RequestCrawlResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = RequestCrawlResponse;
 }

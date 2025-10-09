@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct UpdateEmail<'a> {
@@ -50,7 +58,7 @@ impl jacquard_common::IntoStatic for UpdateEmail<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -96,9 +104,15 @@ impl jacquard_common::IntoStatic for UpdateEmailError<'_> {
     type Output = UpdateEmailError<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            UpdateEmailError::ExpiredToken(v) => UpdateEmailError::ExpiredToken(v.into_static()),
-            UpdateEmailError::InvalidToken(v) => UpdateEmailError::InvalidToken(v.into_static()),
-            UpdateEmailError::TokenRequired(v) => UpdateEmailError::TokenRequired(v.into_static()),
+            UpdateEmailError::ExpiredToken(v) => {
+                UpdateEmailError::ExpiredToken(v.into_static())
+            }
+            UpdateEmailError::InvalidToken(v) => {
+                UpdateEmailError::InvalidToken(v.into_static())
+            }
+            UpdateEmailError::TokenRequired(v) => {
+                UpdateEmailError::TokenRequired(v.into_static())
+            }
             UpdateEmailError::Unknown(v) => UpdateEmailError::Unknown(v.into_static()),
         }
     }
@@ -107,15 +121,17 @@ impl jacquard_common::IntoStatic for UpdateEmailError<'_> {
 ///Response type for
 ///com.atproto.server.updateEmail
 pub struct UpdateEmailResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for UpdateEmailResponse {
+impl jacquard_common::xrpc::XrpcResp for UpdateEmailResponse {
+    const NSID: &'static str = "com.atproto.server.updateEmail";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = UpdateEmailError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = UpdateEmailError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpdateEmail<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateEmail<'de> {
     const NSID: &'static str = "com.atproto.server.updateEmail";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = UpdateEmailResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateEmailResponse;
 }

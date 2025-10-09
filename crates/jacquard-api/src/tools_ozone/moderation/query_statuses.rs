@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryStatuses<'a> {
@@ -30,19 +38,29 @@ pub struct QueryStatuses<'a> {
     #[serde(borrow)]
     pub exclude_tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hosting_deleted_after: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub hosting_deleted_after: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hosting_deleted_before: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub hosting_deleted_before: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub hosting_statuses: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hosting_updated_after: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub hosting_updated_after: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hosting_updated_before: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub hosting_updated_before: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub ignore_subjects: std::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+    pub ignore_subjects: std::option::Option<
+        Vec<jacquard_common::types::string::Uri<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub include_all_user_records: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -176,15 +194,15 @@ impl jacquard_common::IntoStatic for QueryStatusesOutput<'_> {
 ///Response type for
 ///tools.ozone.moderation.queryStatuses
 pub struct QueryStatusesResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for QueryStatusesResponse {
+impl jacquard_common::xrpc::XrpcResp for QueryStatusesResponse {
+    const NSID: &'static str = "tools.ozone.moderation.queryStatuses";
     const ENCODING: &'static str = "application/json";
-    type Output = QueryStatusesOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = QueryStatusesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for QueryStatuses<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for QueryStatuses<'de> {
     const NSID: &'static str = "tools.ozone.moderation.queryStatuses";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = QueryStatusesResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = QueryStatusesResponse;
 }

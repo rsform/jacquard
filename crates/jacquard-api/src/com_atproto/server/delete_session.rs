@@ -11,15 +11,17 @@ pub struct DeleteSession;
 ///Response type for
 ///com.atproto.server.deleteSession
 pub struct DeleteSessionResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for DeleteSessionResponse {
+impl jacquard_common::xrpc::XrpcResp for DeleteSessionResponse {
+    const NSID: &'static str = "com.atproto.server.deleteSession";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DeleteSession {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteSession {
     const NSID: &'static str = "com.atproto.server.deleteSession";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = DeleteSessionResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = DeleteSessionResponse;
 }

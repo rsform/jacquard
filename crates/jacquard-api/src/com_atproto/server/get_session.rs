@@ -54,15 +54,15 @@ pub struct GetSession;
 ///Response type for
 ///com.atproto.server.getSession
 pub struct GetSessionResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetSessionResponse {
+impl jacquard_common::xrpc::XrpcResp for GetSessionResponse {
+    const NSID: &'static str = "com.atproto.server.getSession";
     const ENCODING: &'static str = "application/json";
-    type Output = GetSessionOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetSessionOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetSession {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSession {
     const NSID: &'static str = "com.atproto.server.getSession";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetSessionResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSessionResponse;
 }

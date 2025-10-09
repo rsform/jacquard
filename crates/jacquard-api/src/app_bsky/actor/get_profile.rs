@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfile<'a> {
@@ -44,15 +52,15 @@ impl jacquard_common::IntoStatic for GetProfileOutput<'_> {
 ///Response type for
 ///app.bsky.actor.getProfile
 pub struct GetProfileResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetProfileResponse {
+impl jacquard_common::xrpc::XrpcResp for GetProfileResponse {
+    const NSID: &'static str = "app.bsky.actor.getProfile";
     const ENCODING: &'static str = "application/json";
-    type Output = GetProfileOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetProfileOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetProfile<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetProfile<'de> {
     const NSID: &'static str = "app.bsky.actor.getProfile";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetProfileResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetProfileResponse;
 }

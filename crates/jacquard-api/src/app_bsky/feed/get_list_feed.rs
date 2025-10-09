@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetListFeed<'a> {
@@ -62,7 +70,7 @@ impl jacquard_common::IntoStatic for GetListFeedOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -90,7 +98,9 @@ impl jacquard_common::IntoStatic for GetListFeedError<'_> {
     type Output = GetListFeedError<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            GetListFeedError::UnknownList(v) => GetListFeedError::UnknownList(v.into_static()),
+            GetListFeedError::UnknownList(v) => {
+                GetListFeedError::UnknownList(v.into_static())
+            }
             GetListFeedError::Unknown(v) => GetListFeedError::Unknown(v.into_static()),
         }
     }
@@ -99,15 +109,15 @@ impl jacquard_common::IntoStatic for GetListFeedError<'_> {
 ///Response type for
 ///app.bsky.feed.getListFeed
 pub struct GetListFeedResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetListFeedResponse {
+impl jacquard_common::xrpc::XrpcResp for GetListFeedResponse {
+    const NSID: &'static str = "app.bsky.feed.getListFeed";
     const ENCODING: &'static str = "application/json";
-    type Output = GetListFeedOutput<'de>;
-    type Err = GetListFeedError<'de>;
+    type Output<'de> = GetListFeedOutput<'de>;
+    type Err<'de> = GetListFeedError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetListFeed<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetListFeed<'de> {
     const NSID: &'static str = "app.bsky.feed.getListFeed";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetListFeedResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetListFeedResponse;
 }

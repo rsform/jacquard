@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct UnmuteConvo<'a> {
@@ -53,15 +61,17 @@ impl jacquard_common::IntoStatic for UnmuteConvoOutput<'_> {
 ///Response type for
 ///chat.bsky.convo.unmuteConvo
 pub struct UnmuteConvoResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for UnmuteConvoResponse {
+impl jacquard_common::xrpc::XrpcResp for UnmuteConvoResponse {
+    const NSID: &'static str = "chat.bsky.convo.unmuteConvo";
     const ENCODING: &'static str = "application/json";
-    type Output = UnmuteConvoOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = UnmuteConvoOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UnmuteConvo<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UnmuteConvo<'de> {
     const NSID: &'static str = "chat.bsky.convo.unmuteConvo";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = UnmuteConvoResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UnmuteConvoResponse;
 }

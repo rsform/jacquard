@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct UpdateTemplate<'a> {
@@ -91,7 +99,7 @@ impl jacquard_common::IntoStatic for UpdateTemplateOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -122,7 +130,9 @@ impl jacquard_common::IntoStatic for UpdateTemplateError<'_> {
             UpdateTemplateError::DuplicateTemplateName(v) => {
                 UpdateTemplateError::DuplicateTemplateName(v.into_static())
             }
-            UpdateTemplateError::Unknown(v) => UpdateTemplateError::Unknown(v.into_static()),
+            UpdateTemplateError::Unknown(v) => {
+                UpdateTemplateError::Unknown(v.into_static())
+            }
         }
     }
 }
@@ -130,15 +140,17 @@ impl jacquard_common::IntoStatic for UpdateTemplateError<'_> {
 ///Response type for
 ///tools.ozone.communication.updateTemplate
 pub struct UpdateTemplateResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for UpdateTemplateResponse {
+impl jacquard_common::xrpc::XrpcResp for UpdateTemplateResponse {
+    const NSID: &'static str = "tools.ozone.communication.updateTemplate";
     const ENCODING: &'static str = "application/json";
-    type Output = UpdateTemplateOutput<'de>;
-    type Err = UpdateTemplateError<'de>;
+    type Output<'de> = UpdateTemplateOutput<'de>;
+    type Err<'de> = UpdateTemplateError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpdateTemplate<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateTemplate<'de> {
     const NSID: &'static str = "tools.ozone.communication.updateTemplate";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = UpdateTemplateResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateTemplateResponse;
 }

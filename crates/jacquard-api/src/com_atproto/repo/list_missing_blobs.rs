@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct ListMissingBlobs<'a> {
@@ -53,17 +61,17 @@ impl jacquard_common::IntoStatic for ListMissingBlobsOutput<'_> {
 ///Response type for
 ///com.atproto.repo.listMissingBlobs
 pub struct ListMissingBlobsResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for ListMissingBlobsResponse {
+impl jacquard_common::xrpc::XrpcResp for ListMissingBlobsResponse {
+    const NSID: &'static str = "com.atproto.repo.listMissingBlobs";
     const ENCODING: &'static str = "application/json";
-    type Output = ListMissingBlobsOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ListMissingBlobsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ListMissingBlobs<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListMissingBlobs<'de> {
     const NSID: &'static str = "com.atproto.repo.listMissingBlobs";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = ListMissingBlobsResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListMissingBlobsResponse;
 }
 
 #[jacquard_derive::lexicon]

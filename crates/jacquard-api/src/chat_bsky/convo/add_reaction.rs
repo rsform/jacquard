@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct AddReaction<'a> {
@@ -67,7 +75,7 @@ impl jacquard_common::IntoStatic for AddReactionOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -133,15 +141,17 @@ impl jacquard_common::IntoStatic for AddReactionError<'_> {
 ///Response type for
 ///chat.bsky.convo.addReaction
 pub struct AddReactionResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for AddReactionResponse {
+impl jacquard_common::xrpc::XrpcResp for AddReactionResponse {
+    const NSID: &'static str = "chat.bsky.convo.addReaction";
     const ENCODING: &'static str = "application/json";
-    type Output = AddReactionOutput<'de>;
-    type Err = AddReactionError<'de>;
+    type Output<'de> = AddReactionOutput<'de>;
+    type Err<'de> = AddReactionError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for AddReaction<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AddReaction<'de> {
     const NSID: &'static str = "chat.bsky.convo.addReaction";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = AddReactionResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = AddReactionResponse;
 }

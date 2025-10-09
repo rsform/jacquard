@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestions<'a> {
@@ -57,15 +65,15 @@ impl jacquard_common::IntoStatic for GetSuggestionsOutput<'_> {
 ///Response type for
 ///app.bsky.actor.getSuggestions
 pub struct GetSuggestionsResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetSuggestionsResponse {
+impl jacquard_common::xrpc::XrpcResp for GetSuggestionsResponse {
+    const NSID: &'static str = "app.bsky.actor.getSuggestions";
     const ENCODING: &'static str = "application/json";
-    type Output = GetSuggestionsOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetSuggestionsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetSuggestions<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSuggestions<'de> {
     const NSID: &'static str = "app.bsky.actor.getSuggestions";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetSuggestionsResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSuggestionsResponse;
 }

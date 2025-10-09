@@ -11,15 +11,17 @@ pub struct RequestPlcOperationSignature;
 ///Response type for
 ///com.atproto.identity.requestPlcOperationSignature
 pub struct RequestPlcOperationSignatureResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for RequestPlcOperationSignatureResponse {
+impl jacquard_common::xrpc::XrpcResp for RequestPlcOperationSignatureResponse {
+    const NSID: &'static str = "com.atproto.identity.requestPlcOperationSignature";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RequestPlcOperationSignature {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RequestPlcOperationSignature {
     const NSID: &'static str = "com.atproto.identity.requestPlcOperationSignature";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = RequestPlcOperationSignatureResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = RequestPlcOperationSignatureResponse;
 }

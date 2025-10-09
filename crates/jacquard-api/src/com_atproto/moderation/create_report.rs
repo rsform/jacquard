@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct CreateReport<'a> {
@@ -136,17 +144,19 @@ impl jacquard_common::IntoStatic for CreateReportOutput<'_> {
 ///Response type for
 ///com.atproto.moderation.createReport
 pub struct CreateReportResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for CreateReportResponse {
+impl jacquard_common::xrpc::XrpcResp for CreateReportResponse {
+    const NSID: &'static str = "com.atproto.moderation.createReport";
     const ENCODING: &'static str = "application/json";
-    type Output = CreateReportOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = CreateReportOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CreateReport<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateReport<'de> {
     const NSID: &'static str = "com.atproto.moderation.createReport";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = CreateReportResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreateReportResponse;
 }
 
 ///Moderation tool information for tracing the source of the action

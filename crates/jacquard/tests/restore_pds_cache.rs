@@ -38,7 +38,6 @@ impl HttpClient for MockResolver {
     }
 }
 
-#[async_trait::async_trait]
 impl IdentityResolver for MockResolver {
     fn options(&self) -> &ResolverOptions {
         use std::sync::LazyLock;

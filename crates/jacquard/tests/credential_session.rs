@@ -8,7 +8,7 @@ use jacquard::client::credential_session::{CredentialSession, SessionKey};
 use jacquard::identity::resolver::{DidDocResponse, IdentityResolver, ResolverOptions};
 use jacquard::types::did::Did;
 use jacquard::types::string::Handle;
-use jacquard::types::xrpc::XrpcClient;
+use jacquard::xrpc::XrpcClient;
 use jacquard_common::http_client::HttpClient;
 use jacquard_common::session::{MemorySessionStore, SessionStore};
 use tokio::sync::{Mutex, RwLock};
@@ -53,7 +53,6 @@ impl HttpClient for MockClient {
     }
 }
 
-#[async_trait::async_trait]
 impl IdentityResolver for MockClient {
     fn options(&self) -> &ResolverOptions {
         use std::sync::LazyLock;
@@ -192,7 +191,7 @@ async fn credential_login_and_auto_refresh() {
 
     // Send a request that will first 401 (ExpiredToken), then refresh, then succeed
     let resp = session
-        .send(&jacquard::api::com_atproto::server::get_session::GetSession)
+        .send(jacquard::api::com_atproto::server::get_session::GetSession)
         .await
         .expect("xrpc send ok");
     assert_eq!(resp.status(), StatusCode::OK);

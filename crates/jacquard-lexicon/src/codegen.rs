@@ -672,7 +672,7 @@ impl<'c> CodeGenerator<'c> {
         let xrpc_impl = self.generate_xrpc_request_impl(
             nsid,
             &type_base,
-            quote! { jacquard_common::types::xrpc::XrpcMethod::Query },
+            quote! { jacquard_common::xrpc::XrpcMethod::Query },
             output_encoding,
             has_params,
             params_has_lifetime,
@@ -745,7 +745,7 @@ impl<'c> CodeGenerator<'c> {
         let xrpc_impl = self.generate_xrpc_request_impl(
             nsid,
             &type_base,
-            quote! { jacquard_common::types::xrpc::XrpcMethod::Procedure(#input_encoding) },
+            quote! { jacquard_common::xrpc::XrpcMethod::Procedure(#input_encoding) },
             output_encoding,
             has_input,
             params_has_lifetime,
@@ -2030,7 +2030,7 @@ impl<'c> CodeGenerator<'c> {
             );
             quote! { #error_ident<'de> }
         } else {
-            quote! { jacquard_common::types::xrpc::GenericError<'de> }
+            quote! { jacquard_common::xrpc::GenericError<'de> }
         };
 
         // Generate the response type that implements XrpcResp
@@ -2044,17 +2044,18 @@ impl<'c> CodeGenerator<'c> {
             #[doc = #nsid]
             pub struct #response_ident;
 
-            impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for #response_ident {
+            impl jacquard_common::xrpc::XrpcResp for #response_ident {
+                const NSID: &'static str = #nsid;
                 const ENCODING: &'static str = #output_encoding;
-                type Output = #output_type;
-                type Err = #error_type;
+                type Output<'de> = #output_type;
+                type Err<'de> = #error_type;
             }
         };
 
         // Generate encode_body() method for binary inputs
         let encode_body_method = if is_binary_input {
             quote! {
-                fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::types::xrpc::EncodeError> {
+                fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
                     Ok(self.body.to_vec())
                 }
             }
@@ -2089,11 +2090,11 @@ impl<'c> CodeGenerator<'c> {
             Ok(quote! {
                 #response_type
 
-                impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for #impl_target {
+                impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for #impl_target {
                     const NSID: &'static str = #nsid;
-                    const METHOD: jacquard_common::types::xrpc::XrpcMethod = #method;
+                    const METHOD: jacquard_common::xrpc::XrpcMethod = #method;
 
-                    type Response<'de1> = #response_ident;
+                    type Response = #response_ident;
 
                     #encode_body_method
                     #decode_body_method
@@ -2110,11 +2111,11 @@ impl<'c> CodeGenerator<'c> {
 
                 #response_type
 
-                impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for #request_ident {
+                impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for #request_ident {
                     const NSID: &'static str = #nsid;
-                    const METHOD: jacquard_common::types::xrpc::XrpcMethod = #method;
+                    const METHOD: jacquard_common::xrpc::XrpcMethod = #method;
 
-                    type Response<'de1> = #response_ident;
+                    type Response = #response_ident;
                 }
             })
         }

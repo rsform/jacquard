@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct ResetPassword<'a> {
@@ -45,7 +53,7 @@ impl jacquard_common::IntoStatic for ResetPassword<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -88,7 +96,9 @@ impl jacquard_common::IntoStatic for ResetPasswordError<'_> {
             ResetPasswordError::InvalidToken(v) => {
                 ResetPasswordError::InvalidToken(v.into_static())
             }
-            ResetPasswordError::Unknown(v) => ResetPasswordError::Unknown(v.into_static()),
+            ResetPasswordError::Unknown(v) => {
+                ResetPasswordError::Unknown(v.into_static())
+            }
         }
     }
 }
@@ -96,15 +106,17 @@ impl jacquard_common::IntoStatic for ResetPasswordError<'_> {
 ///Response type for
 ///com.atproto.server.resetPassword
 pub struct ResetPasswordResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for ResetPasswordResponse {
+impl jacquard_common::xrpc::XrpcResp for ResetPasswordResponse {
+    const NSID: &'static str = "com.atproto.server.resetPassword";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = ResetPasswordError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = ResetPasswordError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ResetPassword<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ResetPassword<'de> {
     const NSID: &'static str = "com.atproto.server.resetPassword";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = ResetPasswordResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = ResetPasswordResponse;
 }

@@ -8,14 +8,14 @@ pub mod blob;
 pub mod cid;
 /// Repository collection trait for records
 pub mod collection;
+/// Crypto helpers for keys (Multikey decoding, conversions)
+pub mod crypto;
 /// AT Protocol datetime string type
 pub mod datetime;
 /// Decentralized Identifier (DID) types and validation
 pub mod did;
 /// DID Document types and helpers
 pub mod did_doc;
-/// Crypto helpers for keys (Multikey decoding, conversions)
-pub mod crypto;
 /// AT Protocol handle types and validation
 pub mod handle;
 /// AT Protocol identifier types (handle or DID)
@@ -38,8 +38,6 @@ pub mod tid;
 pub mod uri;
 /// Generic data value types for lexicon data model
 pub mod value;
-/// XRPC protocol types and traits
-pub mod xrpc;
 
 /// Trait for a constant string literal type
 pub trait Literal: Clone + Copy + PartialEq + Eq + Send + Sync + 'static {

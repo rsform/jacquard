@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlob<'a> {
@@ -47,7 +55,7 @@ impl jacquard_common::IntoStatic for GetBlobOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -113,9 +121,15 @@ impl jacquard_common::IntoStatic for GetBlobError<'_> {
         match self {
             GetBlobError::BlobNotFound(v) => GetBlobError::BlobNotFound(v.into_static()),
             GetBlobError::RepoNotFound(v) => GetBlobError::RepoNotFound(v.into_static()),
-            GetBlobError::RepoTakendown(v) => GetBlobError::RepoTakendown(v.into_static()),
-            GetBlobError::RepoSuspended(v) => GetBlobError::RepoSuspended(v.into_static()),
-            GetBlobError::RepoDeactivated(v) => GetBlobError::RepoDeactivated(v.into_static()),
+            GetBlobError::RepoTakendown(v) => {
+                GetBlobError::RepoTakendown(v.into_static())
+            }
+            GetBlobError::RepoSuspended(v) => {
+                GetBlobError::RepoSuspended(v.into_static())
+            }
+            GetBlobError::RepoDeactivated(v) => {
+                GetBlobError::RepoDeactivated(v.into_static())
+            }
             GetBlobError::Unknown(v) => GetBlobError::Unknown(v.into_static()),
         }
     }
@@ -124,15 +138,15 @@ impl jacquard_common::IntoStatic for GetBlobError<'_> {
 ///Response type for
 ///com.atproto.sync.getBlob
 pub struct GetBlobResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetBlobResponse {
+impl jacquard_common::xrpc::XrpcResp for GetBlobResponse {
+    const NSID: &'static str = "com.atproto.sync.getBlob";
     const ENCODING: &'static str = "*/*";
-    type Output = GetBlobOutput<'de>;
-    type Err = GetBlobError<'de>;
+    type Output<'de> = GetBlobOutput<'de>;
+    type Err<'de> = GetBlobError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetBlob<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetBlob<'de> {
     const NSID: &'static str = "com.atproto.sync.getBlob";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetBlobResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetBlobResponse;
 }

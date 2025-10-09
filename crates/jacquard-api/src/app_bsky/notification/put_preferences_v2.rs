@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct PutPreferencesV2<'a> {
@@ -15,36 +23,54 @@ pub struct PutPreferencesV2<'a> {
     pub chat: std::option::Option<crate::app_bsky::notification::ChatPreference<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub follow: std::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+    pub follow: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub like: std::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+    pub like: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub like_via_repost:
-        std::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+    pub like_via_repost: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub mention: std::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+    pub mention: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub quote: std::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+    pub quote: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reply: std::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+    pub reply: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub repost: std::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+    pub repost: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub repost_via_repost:
-        std::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+    pub repost_via_repost: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub starterpack_joined: std::option::Option<crate::app_bsky::notification::Preference<'a>>,
+    pub starterpack_joined: std::option::Option<
+        crate::app_bsky::notification::Preference<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subscribed_post: std::option::Option<crate::app_bsky::notification::Preference<'a>>,
+    pub subscribed_post: std::option::Option<
+        crate::app_bsky::notification::Preference<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub unverified: std::option::Option<crate::app_bsky::notification::Preference<'a>>,
@@ -103,15 +129,17 @@ impl jacquard_common::IntoStatic for PutPreferencesV2Output<'_> {
 ///Response type for
 ///app.bsky.notification.putPreferencesV2
 pub struct PutPreferencesV2Response;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for PutPreferencesV2Response {
+impl jacquard_common::xrpc::XrpcResp for PutPreferencesV2Response {
+    const NSID: &'static str = "app.bsky.notification.putPreferencesV2";
     const ENCODING: &'static str = "application/json";
-    type Output = PutPreferencesV2Output<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = PutPreferencesV2Output<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for PutPreferencesV2<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for PutPreferencesV2<'de> {
     const NSID: &'static str = "app.bsky.notification.putPreferencesV2";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = PutPreferencesV2Response;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = PutPreferencesV2Response;
 }

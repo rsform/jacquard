@@ -3,16 +3,16 @@ use std::sync::Arc;
 
 use bytes::Bytes;
 use http::{HeaderValue, Method, Response as HttpResponse, StatusCode};
-use jacquard::client::Agent;
 use jacquard::IntoStatic;
+use jacquard::client::Agent;
 use jacquard::types::did::Did;
-use jacquard::types::xrpc::XrpcClient;
+use jacquard::xrpc::XrpcClient;
 use jacquard_common::http_client::HttpClient;
 use jacquard_oauth::atproto::AtprotoClientMetadata;
 use jacquard_oauth::client::OAuthSession;
-use jacquard_oauth::session::SessionRegistry;
 use jacquard_oauth::resolver::OAuthResolver;
 use jacquard_oauth::scopes::Scope;
+use jacquard_oauth::session::SessionRegistry;
 use jacquard_oauth::session::{ClientData, ClientSessionData, DpopClientData};
 use jacquard_oauth::types::{OAuthAuthorizationServerMetadata, OAuthTokenType, TokenSet};
 use tokio::sync::Mutex;
@@ -41,16 +41,10 @@ impl HttpClient for MockClient {
         let queue = self.queue.clone();
         async move {
             log.lock().await.push(request);
-            Ok(queue
-                .lock()
-                .await
-                .pop_front()
-                .expect("no queued response"))
+            Ok(queue.lock().await.pop_front().expect("no queued response"))
         }
     }
 }
-
-#[async_trait::async_trait]
 impl jacquard::identity::resolver::IdentityResolver for MockClient {
     fn options(&self) -> &jacquard::identity::resolver::ResolverOptions {
         use std::sync::LazyLock;
@@ -67,7 +61,10 @@ impl jacquard::identity::resolver::IdentityResolver for MockClient {
     async fn resolve_did_doc(
         &self,
         _did: &Did<'_>,
-    ) -> std::result::Result<jacquard::identity::resolver::DidDocResponse, jacquard::identity::resolver::IdentityError> {
+    ) -> std::result::Result<
+        jacquard::identity::resolver::DidDocResponse,
+        jacquard::identity::resolver::IdentityError,
+    > {
         let doc = serde_json::json!({
             "id": "did:plc:alice",
             "service": [{
@@ -84,12 +81,12 @@ impl jacquard::identity::resolver::IdentityResolver for MockClient {
     }
 }
 
-#[async_trait::async_trait]
 impl OAuthResolver for MockClient {
     async fn get_authorization_server_metadata(
         &self,
         issuer: &url::Url,
-    ) -> Result<OAuthAuthorizationServerMetadata<'static>, jacquard_oauth::resolver::ResolverError> {
+    ) -> Result<OAuthAuthorizationServerMetadata<'static>, jacquard_oauth::resolver::ResolverError>
+    {
         // Return minimal metadata with supported auth method "none" and DPoP support
         let mut md = OAuthAuthorizationServerMetadata::default();
         md.issuer = jacquard::CowStr::from(issuer.as_str());
@@ -107,14 +104,16 @@ impl OAuthResolver for MockClient {
     async fn get_resource_server_metadata(
         &self,
         _pds: &url::Url,
-    ) -> Result<OAuthAuthorizationServerMetadata<'static>, jacquard_oauth::resolver::ResolverError> {
+    ) -> Result<OAuthAuthorizationServerMetadata<'static>, jacquard_oauth::resolver::ResolverError>
+    {
         // Return metadata pointing to the same issuer as above
         let mut md = OAuthAuthorizationServerMetadata::default();
         md.issuer = jacquard::CowStr::from("https://issuer");
         md.token_endpoint = jacquard::CowStr::from("https://issuer/token");
         md.authorization_endpoint = jacquard::CowStr::from("https://issuer/authorize");
         md.require_pushed_authorization_requests = Some(true);
-        md.pushed_authorization_request_endpoint = Some(jacquard::CowStr::from("https://issuer/par"));
+        md.pushed_authorization_request_endpoint =
+            Some(jacquard::CowStr::from("https://issuer/par"));
         md.token_endpoint_auth_methods_supported = Some(vec![jacquard::CowStr::from("none")]);
         md.dpop_signing_alg_values_supported = Some(vec![jacquard::CowStr::from("ES256")]);
         Ok(md.into_static())
@@ -275,7 +274,7 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
 
     let agent: Agent<_> = Agent::from(session);
     let resp = agent
-        .send(&jacquard::api::com_atproto::server::get_session::GetSession)
+        .send(jacquard::api::com_atproto::server::get_session::GetSession)
         .await
         .expect("xrpc send ok after auto-refresh");
     assert_eq!(resp.status(), StatusCode::OK);
@@ -285,11 +284,21 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
     assert_eq!(log.len(), 4, "expected 4 HTTP calls");
     // 0: getSession with old token
     assert_eq!(log[0].method(), Method::GET);
-    assert!(log[0].headers().get(http::header::AUTHORIZATION).unwrap().to_str().unwrap().starts_with("DPoP "));
-    assert!(log[0]
-        .uri()
-        .to_string()
-        .ends_with("/xrpc/com.atproto.server.getSession"));
+    assert!(
+        log[0]
+            .headers()
+            .get(http::header::AUTHORIZATION)
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .starts_with("DPoP ")
+    );
+    assert!(
+        log[0]
+            .uri()
+            .to_string()
+            .ends_with("/xrpc/com.atproto.server.getSession")
+    );
     // 1 and 2: token refresh attempts
     assert_eq!(log[1].method(), Method::POST);
     assert!(log[1].uri().to_string().ends_with("/token"));
@@ -299,13 +308,15 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
     assert!(log[2].headers().contains_key("DPoP"));
     // 3: retried getSession with new access token
     assert_eq!(log[3].method(), Method::GET);
-    assert!(log[3]
-        .headers()
-        .get(http::header::AUTHORIZATION)
-        .unwrap()
-        .to_str()
-        .unwrap()
-        .starts_with("DPoP newacc"));
+    assert!(
+        log[3]
+            .headers()
+            .get(http::header::AUTHORIZATION)
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .starts_with("DPoP newacc")
+    );
 
     // Cleanup temp file
     let _ = std::fs::remove_file(&path);
@@ -322,7 +333,10 @@ async fn oauth_xrpc_invalid_token_body_triggers_refresh_and_retries() {
     client.push(get_session_ok()).await;
 
     let mut path = std::env::temp_dir();
-    path.push(format!("jacquard-oauth-test-body-{}.json", std::process::id()));
+    path.push(format!(
+        "jacquard-oauth-test-body-{}.json",
+        std::process::id()
+    ));
     std::fs::write(&path, "{}").unwrap();
     let store = jacquard::client::FileAuthStore::new(&path);
 
@@ -364,7 +378,7 @@ async fn oauth_xrpc_invalid_token_body_triggers_refresh_and_retries() {
 
     let agent: Agent<_> = Agent::from(session);
     let resp = agent
-        .send(&jacquard::api::com_atproto::server::get_session::GetSession)
+        .send(jacquard::api::com_atproto::server::get_session::GetSession)
         .await
         .expect("xrpc send ok after auto-refresh");
     assert_eq!(resp.status(), StatusCode::OK);

@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct EmitEvent<'a> {
@@ -26,7 +34,9 @@ pub struct EmitEvent<'a> {
     pub subject: EmitEventRecordSubject<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_blob_cids: std::option::Option<Vec<jacquard_common::types::string::Cid<'a>>>,
+    pub subject_blob_cids: std::option::Option<
+        Vec<jacquard_common::types::string::Cid<'a>>,
+    >,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
@@ -44,7 +54,9 @@ pub enum EmitEventRecordEvent<'a> {
     #[serde(rename = "tools.ozone.moderation.defs#modEventTakedown")]
     DefsModEventTakedown(Box<crate::tools_ozone::moderation::ModEventTakedown<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventAcknowledge")]
-    DefsModEventAcknowledge(Box<crate::tools_ozone::moderation::ModEventAcknowledge<'a>>),
+    DefsModEventAcknowledge(
+        Box<crate::tools_ozone::moderation::ModEventAcknowledge<'a>>,
+    ),
     #[serde(rename = "tools.ozone.moderation.defs#modEventEscalate")]
     DefsModEventEscalate(Box<crate::tools_ozone::moderation::ModEventEscalate<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventComment")]
@@ -58,13 +70,21 @@ pub enum EmitEventRecordEvent<'a> {
     #[serde(rename = "tools.ozone.moderation.defs#modEventUnmute")]
     DefsModEventUnmute(Box<crate::tools_ozone::moderation::ModEventUnmute<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventMuteReporter")]
-    DefsModEventMuteReporter(Box<crate::tools_ozone::moderation::ModEventMuteReporter<'a>>),
+    DefsModEventMuteReporter(
+        Box<crate::tools_ozone::moderation::ModEventMuteReporter<'a>>,
+    ),
     #[serde(rename = "tools.ozone.moderation.defs#modEventUnmuteReporter")]
-    DefsModEventUnmuteReporter(Box<crate::tools_ozone::moderation::ModEventUnmuteReporter<'a>>),
+    DefsModEventUnmuteReporter(
+        Box<crate::tools_ozone::moderation::ModEventUnmuteReporter<'a>>,
+    ),
     #[serde(rename = "tools.ozone.moderation.defs#modEventReverseTakedown")]
-    DefsModEventReverseTakedown(Box<crate::tools_ozone::moderation::ModEventReverseTakedown<'a>>),
+    DefsModEventReverseTakedown(
+        Box<crate::tools_ozone::moderation::ModEventReverseTakedown<'a>>,
+    ),
     #[serde(rename = "tools.ozone.moderation.defs#modEventResolveAppeal")]
-    DefsModEventResolveAppeal(Box<crate::tools_ozone::moderation::ModEventResolveAppeal<'a>>),
+    DefsModEventResolveAppeal(
+        Box<crate::tools_ozone::moderation::ModEventResolveAppeal<'a>>,
+    ),
     #[serde(rename = "tools.ozone.moderation.defs#modEventEmail")]
     DefsModEventEmail(Box<crate::tools_ozone::moderation::ModEventEmail<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventDivert")]
@@ -78,7 +98,9 @@ pub enum EmitEventRecordEvent<'a> {
     #[serde(rename = "tools.ozone.moderation.defs#recordEvent")]
     DefsRecordEvent(Box<crate::tools_ozone::moderation::RecordEvent<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventPriorityScore")]
-    DefsModEventPriorityScore(Box<crate::tools_ozone::moderation::ModEventPriorityScore<'a>>),
+    DefsModEventPriorityScore(
+        Box<crate::tools_ozone::moderation::ModEventPriorityScore<'a>>,
+    ),
     #[serde(rename = "tools.ozone.moderation.defs#ageAssuranceEvent")]
     DefsAgeAssuranceEvent(Box<crate::tools_ozone::moderation::AgeAssuranceEvent<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#ageAssuranceOverrideEvent")]
@@ -161,7 +183,9 @@ impl jacquard_common::IntoStatic for EmitEventRecordEvent<'_> {
             EmitEventRecordEvent::DefsRevokeAccountCredentialsEvent(v) => {
                 EmitEventRecordEvent::DefsRevokeAccountCredentialsEvent(v.into_static())
             }
-            EmitEventRecordEvent::Unknown(v) => EmitEventRecordEvent::Unknown(v.into_static()),
+            EmitEventRecordEvent::Unknown(v) => {
+                EmitEventRecordEvent::Unknown(v.into_static())
+            }
         }
     }
 }
@@ -187,7 +211,9 @@ impl jacquard_common::IntoStatic for EmitEventRecordSubject<'_> {
             EmitEventRecordSubject::StrongRef(v) => {
                 EmitEventRecordSubject::StrongRef(v.into_static())
             }
-            EmitEventRecordSubject::Unknown(v) => EmitEventRecordSubject::Unknown(v.into_static()),
+            EmitEventRecordSubject::Unknown(v) => {
+                EmitEventRecordSubject::Unknown(v.into_static())
+            }
         }
     }
 }
@@ -235,7 +261,7 @@ impl jacquard_common::IntoStatic for EmitEventOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -287,15 +313,17 @@ impl jacquard_common::IntoStatic for EmitEventError<'_> {
 ///Response type for
 ///tools.ozone.moderation.emitEvent
 pub struct EmitEventResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for EmitEventResponse {
+impl jacquard_common::xrpc::XrpcResp for EmitEventResponse {
+    const NSID: &'static str = "tools.ozone.moderation.emitEvent";
     const ENCODING: &'static str = "application/json";
-    type Output = EmitEventOutput<'de>;
-    type Err = EmitEventError<'de>;
+    type Output<'de> = EmitEventOutput<'de>;
+    type Err<'de> = EmitEventError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for EmitEvent<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for EmitEvent<'de> {
     const NSID: &'static str = "tools.ozone.moderation.emitEvent";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = EmitEventResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = EmitEventResponse;
 }

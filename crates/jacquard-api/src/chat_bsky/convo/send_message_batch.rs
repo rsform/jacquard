@@ -27,7 +27,15 @@ impl jacquard_common::IntoStatic for BatchItem<'_> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct SendMessageBatch<'a> {
@@ -73,15 +81,17 @@ impl jacquard_common::IntoStatic for SendMessageBatchOutput<'_> {
 ///Response type for
 ///chat.bsky.convo.sendMessageBatch
 pub struct SendMessageBatchResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for SendMessageBatchResponse {
+impl jacquard_common::xrpc::XrpcResp for SendMessageBatchResponse {
+    const NSID: &'static str = "chat.bsky.convo.sendMessageBatch";
     const ENCODING: &'static str = "application/json";
-    type Output = SendMessageBatchOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = SendMessageBatchOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for SendMessageBatch<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SendMessageBatch<'de> {
     const NSID: &'static str = "chat.bsky.convo.sendMessageBatch";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = SendMessageBatchResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = SendMessageBatchResponse;
 }

@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetMessages<'a> {
@@ -57,15 +65,15 @@ impl jacquard_common::IntoStatic for GetMessagesOutput<'_> {
 ///Response type for
 ///chat.bsky.convo.getMessages
 pub struct GetMessagesResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetMessagesResponse {
+impl jacquard_common::xrpc::XrpcResp for GetMessagesResponse {
+    const NSID: &'static str = "chat.bsky.convo.getMessages";
     const ENCODING: &'static str = "application/json";
-    type Output = GetMessagesOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetMessagesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetMessages<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetMessages<'de> {
     const NSID: &'static str = "chat.bsky.convo.getMessages";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetMessagesResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetMessagesResponse;
 }

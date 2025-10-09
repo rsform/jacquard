@@ -13,18 +13,19 @@ use core::future::Future;
 use jacquard_common::AuthorizationToken;
 use jacquard_common::error::TransportError;
 pub use jacquard_common::error::{ClientError, XrpcResult};
+use jacquard_common::http_client::HttpClient;
 pub use jacquard_common::session::{MemorySessionStore, SessionStore, SessionStoreError};
-use jacquard_common::types::xrpc::{CallOptions, Response, XrpcClient, XrpcRequest};
+use jacquard_common::xrpc::{CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest};
 use jacquard_common::{
     CowStr, IntoStatic,
     types::string::{Did, Handle},
 };
-use jacquard_common::{http_client::HttpClient, types::xrpc::XrpcExt};
 use jacquard_identity::resolver::IdentityResolver;
 use jacquard_oauth::authstore::ClientAuthStore;
 use jacquard_oauth::client::OAuthSession;
 use jacquard_oauth::dpop::DpopExt;
 use jacquard_oauth::resolver::OAuthResolver;
+
 pub use token::FileAuthStore;
 
 use crate::client::credential_session::{CredentialSession, SessionKey};
@@ -90,24 +91,14 @@ pub trait AgentSession: XrpcClient + HttpClient + Send + Sync {
     /// Identify the kind of session.
     fn session_kind(&self) -> AgentKind;
     /// Return current DID and an optional session id (always Some for OAuth).
-    fn session_info(
-        &self,
-    ) -> core::pin::Pin<
-        Box<dyn Future<Output = Option<(Did<'static>, Option<CowStr<'static>>)>> + Send + '_>,
-    >;
+    fn session_info(&self)
+    -> impl Future<Output = Option<(Did<'static>, Option<CowStr<'static>>)>>;
     /// Current base endpoint.
-    fn endpoint(&self) -> core::pin::Pin<Box<dyn Future<Output = url::Url> + Send + '_>>;
+    fn endpoint(&self) -> impl Future<Output = url::Url>;
     /// Override per-session call options.
-    fn set_options<'a>(
-        &'a self,
-        opts: CallOptions<'a>,
-    ) -> core::pin::Pin<Box<dyn Future<Output = ()> + Send + 'a>>;
+    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()>;
     /// Refresh the session and return a fresh AuthorizationToken.
-    fn refresh(
-        &self,
-    ) -> core::pin::Pin<
-        Box<dyn Future<Output = Result<AuthorizationToken<'static>, ClientError>> + Send + '_>,
-    >;
+    fn refresh(&self) -> impl Future<Output = Result<AuthorizationToken<'static>, ClientError>>;
 }
 
 impl<S, T> AgentSession for CredentialSession<S, T>
@@ -120,34 +111,30 @@ where
     }
     fn session_info(
         &self,
-    ) -> core::pin::Pin<
-        Box<dyn Future<Output = Option<(Did<'static>, Option<CowStr<'static>>)>> + Send + '_>,
+    ) -> impl Future<
+        Output = std::option::Option<(
+            jacquard_common::types::did::Did<'static>,
+            std::option::Option<CowStr<'static>>,
+        )>,
     > {
-        Box::pin(async move {
+        async move {
             CredentialSession::<S, T>::session_info(self)
                 .await
                 .map(|(did, sid)| (did, Some(sid)))
-        })
+        }
     }
-    fn endpoint(&self) -> core::pin::Pin<Box<dyn Future<Output = url::Url> + Send + '_>> {
-        Box::pin(async move { CredentialSession::<S, T>::endpoint(self).await })
+    fn endpoint(&self) -> impl Future<Output = url::Url> {
+        async move { CredentialSession::<S, T>::endpoint(self).await }
     }
-    fn set_options<'a>(
-        &'a self,
-        opts: CallOptions<'a>,
-    ) -> core::pin::Pin<Box<dyn Future<Output = ()> + Send + 'a>> {
-        Box::pin(async move { CredentialSession::<S, T>::set_options(self, opts).await })
+    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
+        async move { CredentialSession::<S, T>::set_options(self, opts).await }
     }
-    fn refresh(
-        &self,
-    ) -> core::pin::Pin<
-        Box<dyn Future<Output = Result<AuthorizationToken<'static>, ClientError>> + Send + '_>,
-    > {
-        Box::pin(async move {
+    fn refresh(&self) -> impl Future<Output = Result<AuthorizationToken<'static>, ClientError>> {
+        async move {
             Ok(CredentialSession::<S, T>::refresh(self)
                 .await?
                 .into_static())
-        })
+        }
     }
 }
 
@@ -161,34 +148,30 @@ where
     }
     fn session_info(
         &self,
-    ) -> core::pin::Pin<
-        Box<dyn Future<Output = Option<(Did<'static>, Option<CowStr<'static>>)>> + Send + '_>,
+    ) -> impl Future<
+        Output = std::option::Option<(
+            jacquard_common::types::did::Did<'static>,
+            std::option::Option<CowStr<'static>>,
+        )>,
     > {
-        Box::pin(async move {
+        async {
             let (did, sid) = OAuthSession::<T, S>::session_info(self).await;
             Some((did.into_static(), Some(sid.into_static())))
-        })
+        }
     }
-    fn endpoint(&self) -> core::pin::Pin<Box<dyn Future<Output = url::Url> + Send + '_>> {
-        Box::pin(async move { self.endpoint().await })
+    fn endpoint(&self) -> impl Future<Output = url::Url> {
+        async { self.endpoint().await }
     }
-    fn set_options<'a>(
-        &'a self,
-        opts: CallOptions<'a>,
-    ) -> core::pin::Pin<Box<dyn Future<Output = ()> + Send + 'a>> {
-        Box::pin(async move { self.set_options(opts).await })
+    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
+        async { self.set_options(opts).await }
     }
-    fn refresh(
-        &self,
-    ) -> core::pin::Pin<
-        Box<dyn Future<Output = Result<AuthorizationToken<'static>, ClientError>> + Send + '_>,
-    > {
-        Box::pin(async move {
+    fn refresh(&self) -> impl Future<Output = Result<AuthorizationToken<'static>, ClientError>> {
+        async {
             self.refresh()
                 .await
                 .map(|t| t.into_static())
                 .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))
-        })
+        }
     }
 }
 
@@ -248,10 +231,13 @@ impl<A: AgentSession> XrpcClient for Agent<A> {
     fn opts(&self) -> impl Future<Output = CallOptions<'_>> {
         self.inner.opts()
     }
-    fn send<'de, R: XrpcRequest<'de> + Clone + Send + Sync + 'de>(
+    fn send<'s, R>(
         &self,
-        request: &R,
-    ) -> impl Future<Output = XrpcResult<Response<'de, R>>> {
+        request: R,
+    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest<'s>>::Response>>>
+    where
+        R: XrpcRequest<'s>,
+    {
         async move { self.inner.send(request).await }
     }
 }

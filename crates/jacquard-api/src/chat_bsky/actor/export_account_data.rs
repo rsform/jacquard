@@ -24,15 +24,15 @@ pub struct ExportAccountData;
 ///Response type for
 ///chat.bsky.actor.exportAccountData
 pub struct ExportAccountDataResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for ExportAccountDataResponse {
+impl jacquard_common::xrpc::XrpcResp for ExportAccountDataResponse {
+    const NSID: &'static str = "chat.bsky.actor.exportAccountData";
     const ENCODING: &'static str = "application/jsonl";
-    type Output = ExportAccountDataOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ExportAccountDataOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ExportAccountData {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ExportAccountData {
     const NSID: &'static str = "chat.bsky.actor.exportAccountData";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = ExportAccountDataResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ExportAccountDataResponse;
 }

@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAuthorFeed<'a> {
@@ -72,7 +80,7 @@ impl jacquard_common::IntoStatic for GetAuthorFeedOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -115,7 +123,9 @@ impl jacquard_common::IntoStatic for GetAuthorFeedError<'_> {
             GetAuthorFeedError::BlockedByActor(v) => {
                 GetAuthorFeedError::BlockedByActor(v.into_static())
             }
-            GetAuthorFeedError::Unknown(v) => GetAuthorFeedError::Unknown(v.into_static()),
+            GetAuthorFeedError::Unknown(v) => {
+                GetAuthorFeedError::Unknown(v.into_static())
+            }
         }
     }
 }
@@ -123,15 +133,15 @@ impl jacquard_common::IntoStatic for GetAuthorFeedError<'_> {
 ///Response type for
 ///app.bsky.feed.getAuthorFeed
 pub struct GetAuthorFeedResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetAuthorFeedResponse {
+impl jacquard_common::xrpc::XrpcResp for GetAuthorFeedResponse {
+    const NSID: &'static str = "app.bsky.feed.getAuthorFeed";
     const ENCODING: &'static str = "application/json";
-    type Output = GetAuthorFeedOutput<'de>;
-    type Err = GetAuthorFeedError<'de>;
+    type Output<'de> = GetAuthorFeedOutput<'de>;
+    type Err<'de> = GetAuthorFeedError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetAuthorFeed<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAuthorFeed<'de> {
     const NSID: &'static str = "app.bsky.feed.getAuthorFeed";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetAuthorFeedResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetAuthorFeedResponse;
 }

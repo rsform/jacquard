@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetOnboardingSuggestedStarterPacksSkeleton<'a> {
@@ -35,7 +43,8 @@ pub struct GetOnboardingSuggestedStarterPacksSkeletonOutput<'a> {
     pub starter_packs: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GetOnboardingSuggestedStarterPacksSkeletonOutput<'_> {
+impl jacquard_common::IntoStatic
+for GetOnboardingSuggestedStarterPacksSkeletonOutput<'_> {
     type Output = GetOnboardingSuggestedStarterPacksSkeletonOutput<'static>;
     fn into_static(self) -> Self::Output {
         GetOnboardingSuggestedStarterPacksSkeletonOutput {
@@ -48,19 +57,17 @@ impl jacquard_common::IntoStatic for GetOnboardingSuggestedStarterPacksSkeletonO
 ///Response type for
 ///app.bsky.unspecced.getOnboardingSuggestedStarterPacksSkeleton
 pub struct GetOnboardingSuggestedStarterPacksSkeletonResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de>
-    for GetOnboardingSuggestedStarterPacksSkeletonResponse
-{
+impl jacquard_common::xrpc::XrpcResp
+for GetOnboardingSuggestedStarterPacksSkeletonResponse {
+    const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedStarterPacksSkeleton";
     const ENCODING: &'static str = "application/json";
-    type Output = GetOnboardingSuggestedStarterPacksSkeletonOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetOnboardingSuggestedStarterPacksSkeletonOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de>
-    for GetOnboardingSuggestedStarterPacksSkeleton<'de>
-{
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de>
+for GetOnboardingSuggestedStarterPacksSkeleton<'de> {
     const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedStarterPacksSkeleton";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetOnboardingSuggestedStarterPacksSkeletonResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetOnboardingSuggestedStarterPacksSkeletonResponse;
 }

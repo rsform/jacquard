@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountTimeline<'a> {
@@ -49,7 +57,7 @@ impl jacquard_common::IntoStatic for GetAccountTimelineOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -90,17 +98,17 @@ impl jacquard_common::IntoStatic for GetAccountTimelineError<'_> {
 ///Response type for
 ///tools.ozone.moderation.getAccountTimeline
 pub struct GetAccountTimelineResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetAccountTimelineResponse {
+impl jacquard_common::xrpc::XrpcResp for GetAccountTimelineResponse {
+    const NSID: &'static str = "tools.ozone.moderation.getAccountTimeline";
     const ENCODING: &'static str = "application/json";
-    type Output = GetAccountTimelineOutput<'de>;
-    type Err = GetAccountTimelineError<'de>;
+    type Output<'de> = GetAccountTimelineOutput<'de>;
+    type Err<'de> = GetAccountTimelineError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetAccountTimeline<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAccountTimeline<'de> {
     const NSID: &'static str = "tools.ozone.moderation.getAccountTimeline";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetAccountTimelineResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetAccountTimelineResponse;
 }
 
 #[jacquard_derive::lexicon]
@@ -110,7 +118,9 @@ pub struct TimelineItem<'a> {
     #[serde(borrow)]
     pub day: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    pub summary: Vec<crate::tools_ozone::moderation::get_account_timeline::TimelineItemSummary<'a>>,
+    pub summary: Vec<
+        crate::tools_ozone::moderation::get_account_timeline::TimelineItemSummary<'a>,
+    >,
 }
 
 impl jacquard_common::IntoStatic for TimelineItem<'_> {

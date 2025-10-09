@@ -27,7 +27,15 @@ impl jacquard_common::IntoStatic for AccountCodes<'_> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct CreateInviteCodes<'a> {
@@ -78,15 +86,17 @@ impl jacquard_common::IntoStatic for CreateInviteCodesOutput<'_> {
 ///Response type for
 ///com.atproto.server.createInviteCodes
 pub struct CreateInviteCodesResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for CreateInviteCodesResponse {
+impl jacquard_common::xrpc::XrpcResp for CreateInviteCodesResponse {
+    const NSID: &'static str = "com.atproto.server.createInviteCodes";
     const ENCODING: &'static str = "application/json";
-    type Output = CreateInviteCodesOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = CreateInviteCodesOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CreateInviteCodes<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateInviteCodes<'de> {
     const NSID: &'static str = "com.atproto.server.createInviteCodes";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = CreateInviteCodesResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreateInviteCodesResponse;
 }

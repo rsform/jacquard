@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountInfo<'a> {
@@ -44,15 +52,15 @@ impl jacquard_common::IntoStatic for GetAccountInfoOutput<'_> {
 ///Response type for
 ///com.atproto.admin.getAccountInfo
 pub struct GetAccountInfoResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetAccountInfoResponse {
+impl jacquard_common::xrpc::XrpcResp for GetAccountInfoResponse {
+    const NSID: &'static str = "com.atproto.admin.getAccountInfo";
     const ENCODING: &'static str = "application/json";
-    type Output = GetAccountInfoOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetAccountInfoOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetAccountInfo<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAccountInfo<'de> {
     const NSID: &'static str = "com.atproto.admin.getAccountInfo";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetAccountInfoResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetAccountInfoResponse;
 }

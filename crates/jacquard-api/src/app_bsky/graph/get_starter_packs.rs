@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStarterPacks<'a> {
@@ -43,15 +51,15 @@ impl jacquard_common::IntoStatic for GetStarterPacksOutput<'_> {
 ///Response type for
 ///app.bsky.graph.getStarterPacks
 pub struct GetStarterPacksResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetStarterPacksResponse {
+impl jacquard_common::xrpc::XrpcResp for GetStarterPacksResponse {
+    const NSID: &'static str = "app.bsky.graph.getStarterPacks";
     const ENCODING: &'static str = "application/json";
-    type Output = GetStarterPacksOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetStarterPacksOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetStarterPacks<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetStarterPacks<'de> {
     const NSID: &'static str = "app.bsky.graph.getStarterPacks";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetStarterPacksResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetStarterPacksResponse;
 }

@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlocks<'a> {
@@ -47,7 +55,7 @@ impl jacquard_common::IntoStatic for GetBlocksOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -111,11 +119,21 @@ impl jacquard_common::IntoStatic for GetBlocksError<'_> {
     type Output = GetBlocksError<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            GetBlocksError::BlockNotFound(v) => GetBlocksError::BlockNotFound(v.into_static()),
-            GetBlocksError::RepoNotFound(v) => GetBlocksError::RepoNotFound(v.into_static()),
-            GetBlocksError::RepoTakendown(v) => GetBlocksError::RepoTakendown(v.into_static()),
-            GetBlocksError::RepoSuspended(v) => GetBlocksError::RepoSuspended(v.into_static()),
-            GetBlocksError::RepoDeactivated(v) => GetBlocksError::RepoDeactivated(v.into_static()),
+            GetBlocksError::BlockNotFound(v) => {
+                GetBlocksError::BlockNotFound(v.into_static())
+            }
+            GetBlocksError::RepoNotFound(v) => {
+                GetBlocksError::RepoNotFound(v.into_static())
+            }
+            GetBlocksError::RepoTakendown(v) => {
+                GetBlocksError::RepoTakendown(v.into_static())
+            }
+            GetBlocksError::RepoSuspended(v) => {
+                GetBlocksError::RepoSuspended(v.into_static())
+            }
+            GetBlocksError::RepoDeactivated(v) => {
+                GetBlocksError::RepoDeactivated(v.into_static())
+            }
             GetBlocksError::Unknown(v) => GetBlocksError::Unknown(v.into_static()),
         }
     }
@@ -124,15 +142,15 @@ impl jacquard_common::IntoStatic for GetBlocksError<'_> {
 ///Response type for
 ///com.atproto.sync.getBlocks
 pub struct GetBlocksResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetBlocksResponse {
+impl jacquard_common::xrpc::XrpcResp for GetBlocksResponse {
+    const NSID: &'static str = "com.atproto.sync.getBlocks";
     const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output = GetBlocksOutput<'de>;
-    type Err = GetBlocksError<'de>;
+    type Output<'de> = GetBlocksOutput<'de>;
+    type Err<'de> = GetBlocksError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetBlocks<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetBlocks<'de> {
     const NSID: &'static str = "com.atproto.sync.getBlocks";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetBlocksResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetBlocksResponse;
 }

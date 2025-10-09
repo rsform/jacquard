@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct PutRecord<'a> {
@@ -21,7 +29,9 @@ pub struct PutRecord<'a> {
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
     ///The Record Key.
     #[serde(borrow)]
-    pub rkey: jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
+    pub rkey: jacquard_common::types::string::RecordKey<
+        jacquard_common::types::string::Rkey<'a>,
+    >,
     ///Compare and swap with the previous commit by CID.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -96,7 +106,7 @@ impl jacquard_common::IntoStatic for PutRecordOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -124,7 +134,9 @@ impl jacquard_common::IntoStatic for PutRecordError<'_> {
     type Output = PutRecordError<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            PutRecordError::InvalidSwap(v) => PutRecordError::InvalidSwap(v.into_static()),
+            PutRecordError::InvalidSwap(v) => {
+                PutRecordError::InvalidSwap(v.into_static())
+            }
             PutRecordError::Unknown(v) => PutRecordError::Unknown(v.into_static()),
         }
     }
@@ -133,15 +145,17 @@ impl jacquard_common::IntoStatic for PutRecordError<'_> {
 ///Response type for
 ///com.atproto.repo.putRecord
 pub struct PutRecordResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for PutRecordResponse {
+impl jacquard_common::xrpc::XrpcResp for PutRecordResponse {
+    const NSID: &'static str = "com.atproto.repo.putRecord";
     const ENCODING: &'static str = "application/json";
-    type Output = PutRecordOutput<'de>;
-    type Err = PutRecordError<'de>;
+    type Output<'de> = PutRecordOutput<'de>;
+    type Err<'de> = PutRecordError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for PutRecord<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for PutRecord<'de> {
     const NSID: &'static str = "com.atproto.repo.putRecord";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = PutRecordResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = PutRecordResponse;
 }

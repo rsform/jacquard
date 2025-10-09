@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct CreateBookmark<'a> {
@@ -43,7 +51,7 @@ impl jacquard_common::IntoStatic for CreateBookmark<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -75,7 +83,9 @@ impl jacquard_common::IntoStatic for CreateBookmarkError<'_> {
             CreateBookmarkError::UnsupportedCollection(v) => {
                 CreateBookmarkError::UnsupportedCollection(v.into_static())
             }
-            CreateBookmarkError::Unknown(v) => CreateBookmarkError::Unknown(v.into_static()),
+            CreateBookmarkError::Unknown(v) => {
+                CreateBookmarkError::Unknown(v.into_static())
+            }
         }
     }
 }
@@ -83,15 +93,17 @@ impl jacquard_common::IntoStatic for CreateBookmarkError<'_> {
 ///Response type for
 ///app.bsky.bookmark.createBookmark
 pub struct CreateBookmarkResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for CreateBookmarkResponse {
+impl jacquard_common::xrpc::XrpcResp for CreateBookmarkResponse {
+    const NSID: &'static str = "app.bsky.bookmark.createBookmark";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = CreateBookmarkError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = CreateBookmarkError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CreateBookmark<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateBookmark<'de> {
     const NSID: &'static str = "app.bsky.bookmark.createBookmark";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = CreateBookmarkResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreateBookmarkResponse;
 }

@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct UpdateRule<'a> {
@@ -81,7 +89,7 @@ impl jacquard_common::IntoStatic for UpdateRuleOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -110,7 +118,9 @@ impl jacquard_common::IntoStatic for UpdateRuleError<'_> {
     type Output = UpdateRuleError<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            UpdateRuleError::RuleNotFound(v) => UpdateRuleError::RuleNotFound(v.into_static()),
+            UpdateRuleError::RuleNotFound(v) => {
+                UpdateRuleError::RuleNotFound(v.into_static())
+            }
             UpdateRuleError::Unknown(v) => UpdateRuleError::Unknown(v.into_static()),
         }
     }
@@ -119,15 +129,17 @@ impl jacquard_common::IntoStatic for UpdateRuleError<'_> {
 ///Response type for
 ///tools.ozone.safelink.updateRule
 pub struct UpdateRuleResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for UpdateRuleResponse {
+impl jacquard_common::xrpc::XrpcResp for UpdateRuleResponse {
+    const NSID: &'static str = "tools.ozone.safelink.updateRule";
     const ENCODING: &'static str = "application/json";
-    type Output = UpdateRuleOutput<'de>;
-    type Err = UpdateRuleError<'de>;
+    type Output<'de> = UpdateRuleOutput<'de>;
+    type Err<'de> = UpdateRuleError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpdateRule<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateRule<'de> {
     const NSID: &'static str = "tools.ozone.safelink.updateRule";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = UpdateRuleResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateRuleResponse;
 }

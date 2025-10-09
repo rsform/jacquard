@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct RegisterPush<'a> {
@@ -50,15 +58,17 @@ impl jacquard_common::IntoStatic for RegisterPush<'_> {
 ///Response type for
 ///app.bsky.notification.registerPush
 pub struct RegisterPushResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for RegisterPushResponse {
+impl jacquard_common::xrpc::XrpcResp for RegisterPushResponse {
+    const NSID: &'static str = "app.bsky.notification.registerPush";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RegisterPush<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RegisterPush<'de> {
     const NSID: &'static str = "app.bsky.notification.registerPush";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = RegisterPushResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = RegisterPushResponse;
 }

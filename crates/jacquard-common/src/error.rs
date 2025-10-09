@@ -1,6 +1,6 @@
 //! Error types for XRPC client operations
 
-use crate::types::xrpc::EncodeError;
+use crate::xrpc::EncodeError;
 use bytes::Bytes;
 
 /// Client error type wrapping all possible error conditions

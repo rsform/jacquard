@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTaggedSuggestions {}
@@ -37,17 +45,17 @@ impl jacquard_common::IntoStatic for GetTaggedSuggestionsOutput<'_> {
 ///Response type for
 ///app.bsky.unspecced.getTaggedSuggestions
 pub struct GetTaggedSuggestionsResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetTaggedSuggestionsResponse {
+impl jacquard_common::xrpc::XrpcResp for GetTaggedSuggestionsResponse {
+    const NSID: &'static str = "app.bsky.unspecced.getTaggedSuggestions";
     const ENCODING: &'static str = "application/json";
-    type Output = GetTaggedSuggestionsOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = GetTaggedSuggestionsOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetTaggedSuggestions {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetTaggedSuggestions {
     const NSID: &'static str = "app.bsky.unspecced.getTaggedSuggestions";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = GetTaggedSuggestionsResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetTaggedSuggestionsResponse;
 }
 
 #[jacquard_derive::lexicon]

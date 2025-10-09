@@ -11,15 +11,17 @@ pub struct ActivateAccount;
 ///Response type for
 ///com.atproto.server.activateAccount
 pub struct ActivateAccountResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for ActivateAccountResponse {
+impl jacquard_common::xrpc::XrpcResp for ActivateAccountResponse {
+    const NSID: &'static str = "com.atproto.server.activateAccount";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ActivateAccount {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ActivateAccount {
     const NSID: &'static str = "com.atproto.server.activateAccount";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = ActivateAccountResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = ActivateAccountResponse;
 }

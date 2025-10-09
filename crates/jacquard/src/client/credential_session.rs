@@ -1,18 +1,13 @@
 use std::sync::Arc;
 
-use jacquard_api::com_atproto::server::{
-    create_session::{CreateSession, CreateSessionOutput},
-    refresh_session::RefreshSession,
-};
+use jacquard_api::com_atproto::server::refresh_session::RefreshSession;
 use jacquard_common::{
     AuthorizationToken, CowStr, IntoStatic,
     error::{AuthError, ClientError, XrpcResult},
     http_client::HttpClient,
     session::SessionStore,
-    types::{
-        did::Did,
-        xrpc::{CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest},
-    },
+    types::did::Did,
+    xrpc::{CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest},
 };
 use tokio::sync::RwLock;
 use url::Url;
@@ -129,10 +124,10 @@ where
             .client
             .xrpc(endpoint)
             .with_options(opts)
-            .send(RefreshSession)
+            .send(&RefreshSession)
             .await?;
         let refresh = response
-            .output::<RefreshSession>()
+            .parse()
             .map_err(|_| ClientError::Auth(jacquard_common::error::AuthError::RefreshFailed))?;
 
         let new_session: AtpSession = refresh.into();
@@ -239,10 +234,10 @@ where
             .client
             .xrpc(pds.clone())
             .with_options(self.options.read().await.clone())
-            .send(req)
+            .send(&req)
             .await?;
         let out = resp
-            .output::<CreateSession<'_>>()
+            .parse()
             .map_err(|_| ClientError::Auth(AuthError::NotAuthenticated))?;
         let session = AtpSession::from(out);
 
@@ -417,13 +412,13 @@ where
             )
         }
     }
-    async fn send<
-        'de,
-        R: jacquard_common::types::xrpc::XrpcRequest<'de> + Clone + Send + Sync + 'de,
-    >(
+    async fn send<'s, R>(
         &self,
-        request: &R,
-    ) -> XrpcResult<Response<'de, R>> {
+        request: R,
+    ) -> XrpcResult<Response<<R as XrpcRequest<'s>>::Response>>
+    where
+        R: XrpcRequest<'s>,
+    {
         let base_uri = self.base_uri();
         let auth = self.access_token().await;
         let mut opts = self.options.read().await.clone();
@@ -432,7 +427,7 @@ where
             .client
             .xrpc(base_uri.clone())
             .with_options(opts.clone())
-            .send(request.clone())
+            .send(&request)
             .await;
 
         match resp {
@@ -442,7 +437,7 @@ where
                 self.client
                     .xrpc(base_uri)
                     .with_options(opts)
-                    .send(request.clone())
+                    .send(&request)
                     .await
             }
             resp => resp,

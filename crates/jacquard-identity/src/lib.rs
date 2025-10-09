@@ -19,14 +19,14 @@ use crate::resolver::{
     ResolverOptions,
 };
 use bytes::Bytes;
-use jacquard_api::com_atproto::identity::resolve_did::{self, ResolveDid, ResolveDidOutput};
+use jacquard_api::com_atproto::identity::resolve_did;
 use jacquard_api::com_atproto::identity::resolve_handle::ResolveHandle;
 use jacquard_common::error::TransportError;
 use jacquard_common::http_client::HttpClient;
 use jacquard_common::types::did::Did;
 use jacquard_common::types::did_doc::DidDocument;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_common::types::xrpc::{OwnedResponse, XrpcExt};
+use jacquard_common::xrpc::XrpcExt;
 use jacquard_common::{IntoStatic, types::string::Handle};
 use percent_encoding::percent_decode_str;
 use reqwest::StatusCode;
@@ -209,7 +209,7 @@ impl JacquardResolver {
             .await
             .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
         let out = resp
-            .into_output()
+            .parse()
             .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
         Did::new_owned(out.did.as_str())
             .map(|d| d.into_static())
@@ -273,7 +273,6 @@ impl JacquardResolver {
     }
 }
 
-#[async_trait::async_trait]
 impl IdentityResolver for JacquardResolver {
     fn options(&self) -> &ResolverOptions {
         &self.opts

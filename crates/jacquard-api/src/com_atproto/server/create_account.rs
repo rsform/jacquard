@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct CreateAccount<'a> {
@@ -116,7 +124,7 @@ impl jacquard_common::IntoStatic for CreateAccountOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
+    miette::Diagnostic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -219,7 +227,9 @@ impl jacquard_common::IntoStatic for CreateAccountError<'_> {
             CreateAccountError::IncompatibleDidDoc(v) => {
                 CreateAccountError::IncompatibleDidDoc(v.into_static())
             }
-            CreateAccountError::Unknown(v) => CreateAccountError::Unknown(v.into_static()),
+            CreateAccountError::Unknown(v) => {
+                CreateAccountError::Unknown(v.into_static())
+            }
         }
     }
 }
@@ -227,15 +237,17 @@ impl jacquard_common::IntoStatic for CreateAccountError<'_> {
 ///Response type for
 ///com.atproto.server.createAccount
 pub struct CreateAccountResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for CreateAccountResponse {
+impl jacquard_common::xrpc::XrpcResp for CreateAccountResponse {
+    const NSID: &'static str = "com.atproto.server.createAccount";
     const ENCODING: &'static str = "application/json";
-    type Output = CreateAccountOutput<'de>;
-    type Err = CreateAccountError<'de>;
+    type Output<'de> = CreateAccountOutput<'de>;
+    type Err<'de> = CreateAccountError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CreateAccount<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateAccount<'de> {
     const NSID: &'static str = "com.atproto.server.createAccount";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = CreateAccountResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = CreateAccountResponse;
 }

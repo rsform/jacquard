@@ -21,6 +21,8 @@ pub mod macros;
 pub mod session;
 /// Baseline fundamental AT Protocol data types.
 pub mod types;
+/// XRPC protocol types and traits
+pub mod xrpc;
 
 /// Authorization token types for XRPC requests.
 #[derive(Debug, Clone)]

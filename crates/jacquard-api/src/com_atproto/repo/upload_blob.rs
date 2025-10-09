@@ -5,7 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct UploadBlob {
@@ -40,23 +48,29 @@ impl jacquard_common::IntoStatic for UploadBlobOutput<'_> {
 ///Response type for
 ///com.atproto.repo.uploadBlob
 pub struct UploadBlobResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for UploadBlobResponse {
+impl jacquard_common::xrpc::XrpcResp for UploadBlobResponse {
+    const NSID: &'static str = "com.atproto.repo.uploadBlob";
     const ENCODING: &'static str = "application/json";
-    type Output = UploadBlobOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = UploadBlobOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UploadBlob {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UploadBlob {
     const NSID: &'static str = "com.atproto.repo.uploadBlob";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("*/*");
-    type Response<'de1> = UploadBlobResponse;
-    fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::types::xrpc::EncodeError> {
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
+    type Response = UploadBlobResponse;
+    fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
         Ok(self.body.to_vec())
     }
-    fn decode_body(body: &'de [u8]) -> Result<Box<Self>, jacquard_common::error::DecodeError> {
-        Ok(Box::new(Self {
-            body: bytes::Bytes::copy_from_slice(body),
-        }))
+    fn decode_body(
+        body: &'de [u8],
+    ) -> Result<Box<Self>, jacquard_common::error::DecodeError> {
+        Ok(
+            Box::new(Self {
+                body: bytes::Bytes::copy_from_slice(body),
+            }),
+        )
     }
 }

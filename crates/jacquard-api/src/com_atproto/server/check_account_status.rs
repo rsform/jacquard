@@ -46,15 +46,15 @@ pub struct CheckAccountStatus;
 ///Response type for
 ///com.atproto.server.checkAccountStatus
 pub struct CheckAccountStatusResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for CheckAccountStatusResponse {
+impl jacquard_common::xrpc::XrpcResp for CheckAccountStatusResponse {
+    const NSID: &'static str = "com.atproto.server.checkAccountStatus";
     const ENCODING: &'static str = "application/json";
-    type Output = CheckAccountStatusOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = CheckAccountStatusOutput<'de>;
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CheckAccountStatus {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CheckAccountStatus {
     const NSID: &'static str = "com.atproto.server.checkAccountStatus";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Query;
-    type Response<'de1> = CheckAccountStatusResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = CheckAccountStatusResponse;
 }

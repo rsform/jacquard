@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct UpdateAccountEmail<'a> {
@@ -39,15 +47,17 @@ impl jacquard_common::IntoStatic for UpdateAccountEmail<'_> {
 ///Response type for
 ///com.atproto.admin.updateAccountEmail
 pub struct UpdateAccountEmailResponse;
-impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for UpdateAccountEmailResponse {
+impl jacquard_common::xrpc::XrpcResp for UpdateAccountEmailResponse {
+    const NSID: &'static str = "com.atproto.admin.updateAccountEmail";
     const ENCODING: &'static str = "application/json";
-    type Output = ();
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Output<'de> = ();
+    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpdateAccountEmail<'de> {
+impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateAccountEmail<'de> {
     const NSID: &'static str = "com.atproto.admin.updateAccountEmail";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
-        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    type Response<'de1> = UpdateAccountEmailResponse;
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Response = UpdateAccountEmailResponse;
 }
