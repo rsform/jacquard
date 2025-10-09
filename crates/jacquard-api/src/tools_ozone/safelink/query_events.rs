@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -49,22 +50,16 @@ pub struct QueryEvents<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for QueryEvents<'_> {
-    type Output = QueryEvents<'static>;
-    fn into_static(self) -> Self::Output {
-        QueryEvents {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            pattern_type: self.pattern_type.into_static(),
-            sort_direction: self.sort_direction.into_static(),
-            urls: self.urls.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryEventsOutput<'a> {
     ///Next cursor for pagination. Only present if there are more results.
@@ -73,17 +68,6 @@ pub struct QueryEventsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub events: Vec<crate::tools_ozone::safelink::Event<'a>>,
-}
-
-impl jacquard_common::IntoStatic for QueryEventsOutput<'_> {
-    type Output = QueryEventsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        QueryEventsOutput {
-            cursor: self.cursor.into_static(),
-            events: self.events.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

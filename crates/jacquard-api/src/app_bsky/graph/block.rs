@@ -7,7 +7,15 @@
 
 ///Record declaring a 'block' relationship against another account. NOTE: blocks are public in Bluesky; see blog posts for details.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Block<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
@@ -18,15 +26,4 @@ pub struct Block<'a> {
 
 impl jacquard_common::types::collection::Collection for Block<'_> {
     const NSID: &'static str = "app.bsky.graph.block";
-}
-
-impl jacquard_common::IntoStatic for Block<'_> {
-    type Output = Block<'static>;
-    fn into_static(self) -> Self::Output {
-        Block {
-            created_at: self.created_at.into_static(),
-            subject: self.subject.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

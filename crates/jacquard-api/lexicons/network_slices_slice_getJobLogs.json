@@ -1,0 +1,108 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.getJobLogs",
+  "defs": {
+    "logEntry": {
+      "type": "object",
+      "required": [
+        "id",
+        "createdAt",
+        "logType",
+        "level",
+        "message"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "When the log entry was created",
+          "format": "datetime"
+        },
+        "id": {
+          "type": "integer",
+          "description": "Log entry ID"
+        },
+        "jobId": {
+          "type": "string",
+          "description": "UUID of related job if applicable"
+        },
+        "level": {
+          "type": "string",
+          "description": "Log level",
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "logType": {
+          "type": "string",
+          "description": "Type of log entry",
+          "enum": [
+            "sync_job",
+            "jetstream",
+            "system"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "description": "Log message"
+        },
+        "metadata": {
+          "type": "unknown",
+          "description": "Additional metadata associated with the log entry"
+        },
+        "sliceUri": {
+          "type": "string",
+          "description": "AT-URI of related slice if applicable"
+        },
+        "userDid": {
+          "type": "string",
+          "description": "DID of related user if applicable",
+          "format": "did"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Get logs for a specific sync job.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "jobId"
+        ],
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "description": "UUID of the sync job"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of log entries to return",
+            "default": 100,
+            "minimum": 1,
+            "maximum": 1000
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "logs"
+          ],
+          "properties": {
+            "logs": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#logEntry"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

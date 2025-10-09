@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "blue.zio.atfile.finger",
+  "defs": {
+    "browser": {
+      "type": "object",
+      "description": "A fingerprint of a browser upload.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userAgent": {
+          "type": "string"
+        }
+      }
+    },
+    "machine": {
+      "type": "object",
+      "description": "A fingerprint of a machine upload.",
+      "properties": {
+        "app": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "os": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

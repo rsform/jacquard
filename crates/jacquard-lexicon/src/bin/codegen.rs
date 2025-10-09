@@ -31,7 +31,7 @@ fn main() -> miette::Result<()> {
     let codegen = CodeGenerator::new(&corpus, args.root_module);
     codegen.write_to_disk(&args.output)?;
 
-    println!("✨ Generated code to {:?}", args.output);
+    println!("Generated code to {:?}", args.output);
 
     Ok(())
 }

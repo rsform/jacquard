@@ -1,0 +1,28 @@
+{
+  "lexicon": 1,
+  "id": "did:plc:jh6yfs5dk47kykvhp7r6qwrb",
+  "description": "A test schema to probe parser behavior.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 1024
+          }
+        }
+      }
+    }
+  }
+}

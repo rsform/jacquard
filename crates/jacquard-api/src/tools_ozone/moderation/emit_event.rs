@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -47,7 +48,15 @@ pub struct EmitEvent<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmitEventRecordEvent<'a> {
@@ -111,87 +120,26 @@ pub enum EmitEventRecordEvent<'a> {
     DefsRevokeAccountCredentialsEvent(
         Box<crate::tools_ozone::moderation::RevokeAccountCredentialsEvent<'a>>,
     ),
-}
-
-impl jacquard_common::IntoStatic for EmitEventRecordEvent<'_> {
-    type Output = EmitEventRecordEvent<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            EmitEventRecordEvent::DefsModEventTakedown(v) => {
-                EmitEventRecordEvent::DefsModEventTakedown(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventAcknowledge(v) => {
-                EmitEventRecordEvent::DefsModEventAcknowledge(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventEscalate(v) => {
-                EmitEventRecordEvent::DefsModEventEscalate(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventComment(v) => {
-                EmitEventRecordEvent::DefsModEventComment(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventLabel(v) => {
-                EmitEventRecordEvent::DefsModEventLabel(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventReport(v) => {
-                EmitEventRecordEvent::DefsModEventReport(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventMute(v) => {
-                EmitEventRecordEvent::DefsModEventMute(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventUnmute(v) => {
-                EmitEventRecordEvent::DefsModEventUnmute(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventMuteReporter(v) => {
-                EmitEventRecordEvent::DefsModEventMuteReporter(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventUnmuteReporter(v) => {
-                EmitEventRecordEvent::DefsModEventUnmuteReporter(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventReverseTakedown(v) => {
-                EmitEventRecordEvent::DefsModEventReverseTakedown(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventResolveAppeal(v) => {
-                EmitEventRecordEvent::DefsModEventResolveAppeal(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventEmail(v) => {
-                EmitEventRecordEvent::DefsModEventEmail(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventDivert(v) => {
-                EmitEventRecordEvent::DefsModEventDivert(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventTag(v) => {
-                EmitEventRecordEvent::DefsModEventTag(v.into_static())
-            }
-            EmitEventRecordEvent::DefsAccountEvent(v) => {
-                EmitEventRecordEvent::DefsAccountEvent(v.into_static())
-            }
-            EmitEventRecordEvent::DefsIdentityEvent(v) => {
-                EmitEventRecordEvent::DefsIdentityEvent(v.into_static())
-            }
-            EmitEventRecordEvent::DefsRecordEvent(v) => {
-                EmitEventRecordEvent::DefsRecordEvent(v.into_static())
-            }
-            EmitEventRecordEvent::DefsModEventPriorityScore(v) => {
-                EmitEventRecordEvent::DefsModEventPriorityScore(v.into_static())
-            }
-            EmitEventRecordEvent::DefsAgeAssuranceEvent(v) => {
-                EmitEventRecordEvent::DefsAgeAssuranceEvent(v.into_static())
-            }
-            EmitEventRecordEvent::DefsAgeAssuranceOverrideEvent(v) => {
-                EmitEventRecordEvent::DefsAgeAssuranceOverrideEvent(v.into_static())
-            }
-            EmitEventRecordEvent::DefsRevokeAccountCredentialsEvent(v) => {
-                EmitEventRecordEvent::DefsRevokeAccountCredentialsEvent(v.into_static())
-            }
-            EmitEventRecordEvent::Unknown(v) => {
-                EmitEventRecordEvent::Unknown(v.into_static())
-            }
-        }
-    }
+    #[serde(rename = "tools.ozone.moderation.defs#scheduleTakedownEvent")]
+    DefsScheduleTakedownEvent(
+        Box<crate::tools_ozone::moderation::ScheduleTakedownEvent<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#cancelScheduledTakedownEvent")]
+    DefsCancelScheduledTakedownEvent(
+        Box<crate::tools_ozone::moderation::CancelScheduledTakedownEvent<'a>>,
+    ),
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmitEventRecordSubject<'a> {
@@ -201,55 +149,21 @@ pub enum EmitEventRecordSubject<'a> {
     StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
 }
 
-impl jacquard_common::IntoStatic for EmitEventRecordSubject<'_> {
-    type Output = EmitEventRecordSubject<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            EmitEventRecordSubject::DefsRepoRef(v) => {
-                EmitEventRecordSubject::DefsRepoRef(v.into_static())
-            }
-            EmitEventRecordSubject::StrongRef(v) => {
-                EmitEventRecordSubject::StrongRef(v.into_static())
-            }
-            EmitEventRecordSubject::Unknown(v) => {
-                EmitEventRecordSubject::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for EmitEvent<'_> {
-    type Output = EmitEvent<'static>;
-    fn into_static(self) -> Self::Output {
-        EmitEvent {
-            created_by: self.created_by.into_static(),
-            event: self.event.into_static(),
-            external_id: self.external_id.into_static(),
-            mod_tool: self.mod_tool.into_static(),
-            subject: self.subject.into_static(),
-            subject_blob_cids: self.subject_blob_cids.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct EmitEventOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
     pub value: crate::tools_ozone::moderation::ModEventView<'a>,
-}
-
-impl jacquard_common::IntoStatic for EmitEventOutput<'_> {
-    type Output = EmitEventOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        EmitEventOutput {
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

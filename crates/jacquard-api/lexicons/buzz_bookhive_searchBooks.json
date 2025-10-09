@@ -1,0 +1,58 @@
+{
+  "lexicon": 1,
+  "id": "buzz.bookhive.searchBooks",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Find books matching the search criteria. Requires authentication.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "q"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the book within the hive."
+          },
+          "limit": {
+            "type": "integer",
+            "default": 25,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset for pagination into the result set"
+          },
+          "q": {
+            "type": "string",
+            "description": "Search query string. Will be matched against title and authors fields."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "books"
+          ],
+          "properties": {
+            "books": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "buzz.bookhive.hiveBook#record"
+              }
+            },
+            "offset": {
+              "type": "integer",
+              "description": "The next offset to use for pagination (result of limit + offset)"
+            }
+          }
+        }
+      }
+    }
+  }
+}

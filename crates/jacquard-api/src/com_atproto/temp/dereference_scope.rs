@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -22,32 +23,21 @@ pub struct DereferenceScope<'a> {
     pub scope: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for DereferenceScope<'_> {
-    type Output = DereferenceScope<'static>;
-    fn into_static(self) -> Self::Output {
-        DereferenceScope {
-            scope: self.scope.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct DereferenceScopeOutput<'a> {
     ///The full oauth permission scope
     #[serde(borrow)]
     pub scope: jacquard_common::CowStr<'a>,
-}
-
-impl jacquard_common::IntoStatic for DereferenceScopeOutput<'_> {
-    type Output = DereferenceScopeOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        DereferenceScopeOutput {
-            scope: self.scope.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

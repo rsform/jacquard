@@ -25,10 +25,41 @@ fn value_to_variant_name(value: &str) -> String {
     }
 }
 
+/// Sanitize a string to be safe for identifiers and filenames
+fn sanitize_name(s: &str) -> String {
+    if s.is_empty() {
+        return "unknown".to_string();
+    }
+
+    // Replace invalid characters with underscores
+    let mut sanitized: String = s
+        .chars()
+        .map(|c| if c.is_alphanumeric() || c == '_' { c } else { '_' })
+        .collect();
+
+    // Ensure it doesn't start with a digit
+    if sanitized.chars().next().map_or(false, |c| c.is_ascii_digit()) {
+        sanitized = format!("_{}", sanitized);
+    }
+
+    sanitized
+}
+
 /// Create an identifier, using raw identifier if necessary for keywords
 fn make_ident(s: &str) -> syn::Ident {
-    syn::parse_str::<syn::Ident>(s)
-        .unwrap_or_else(|_| syn::Ident::new_raw(s, proc_macro2::Span::call_site()))
+    if s.is_empty() {
+        eprintln!("Warning: Empty identifier encountered, using 'unknown' as fallback");
+        return syn::Ident::new("unknown", proc_macro2::Span::call_site());
+    }
+
+    let sanitized = sanitize_name(s);
+
+    // Try to parse as ident, fall back to raw ident if needed
+    syn::parse_str::<syn::Ident>(&sanitized)
+        .unwrap_or_else(|_| {
+            eprintln!("Warning: Invalid identifier '{}' sanitized to '{}'", s, sanitized);
+            syn::Ident::new_raw(&sanitized, proc_macro2::Span::call_site())
+        })
 }
 
 /// Code generator for lexicon types
@@ -160,24 +191,33 @@ impl<'c> CodeGenerator<'c> {
                 let struct_def = quote! {
                     #doc
                     #[jacquard_derive::lexicon]
-                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
                     #[serde(rename_all = "camelCase")]
                     pub struct #ident<'a> {
                         #fields
                     }
                 };
 
-                // Generate union types for this record
+                // Generate union types and nested object types for this record
                 let mut unions = Vec::new();
                 for (field_name, field_type) in &obj.properties {
-                    if let LexObjectProperty::Union(union) = field_type {
-                        let union_name =
-                            format!("{}Record{}", type_name, field_name.to_pascal_case());
-                        // Clone refs to avoid lifetime issues
-                        let refs: Vec<_> = union.refs.iter().cloned().collect();
-                        let union_def =
-                            self.generate_union(&union_name, &refs, None, union.closed)?;
-                        unions.push(union_def);
+                    match field_type {
+                        LexObjectProperty::Union(union) => {
+                            let union_name =
+                                format!("{}Record{}", type_name, field_name.to_pascal_case());
+                            // Clone refs to avoid lifetime issues
+                            let refs: Vec<_> = union.refs.iter().cloned().collect();
+                            let union_def =
+                                self.generate_union(&union_name, &refs, None, union.closed)?;
+                            unions.push(union_def);
+                        }
+                        LexObjectProperty::Object(nested_obj) => {
+                            let object_name =
+                                format!("{}Record{}", type_name, field_name.to_pascal_case());
+                            let obj_def = self.generate_object(nsid, &object_name, nested_obj)?;
+                            unions.push(obj_def);
+                        }
+                        _ => {}
                     }
                 }
 
@@ -189,15 +229,15 @@ impl<'c> CodeGenerator<'c> {
                 };
 
                 // Generate IntoStatic impl
-                let field_names: Vec<&str> = obj.properties.keys().map(|k| k.as_str()).collect();
-                let into_static_impl =
-                    self.generate_into_static_for_struct(&type_name, &field_names, true, true);
+                // let field_names: Vec<&str> = obj.properties.keys().map(|k| k.as_str()).collect();
+                // let into_static_impl =
+                //     self.generate_into_static_for_struct(&type_name, &field_names, true, true);
 
                 Ok(quote! {
                     #struct_def
                     #(#unions)*
                     #collection_impl
-                    #into_static_impl
+                    //#into_static_impl
                 })
             }
         }
@@ -221,33 +261,41 @@ impl<'c> CodeGenerator<'c> {
         let struct_def = quote! {
             #doc
             #[jacquard_derive::lexicon]
-            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
             #[serde(rename_all = "camelCase")]
             pub struct #ident<'a> {
                 #fields
             }
         };
 
-        // Generate union types for this object
+        // Generate union types and nested object types for this object
         let mut unions = Vec::new();
         for (field_name, field_type) in &obj.properties {
-            if let LexObjectProperty::Union(union) = field_type {
-                let union_name = format!("{}Record{}", type_name, field_name.to_pascal_case());
-                let refs: Vec<_> = union.refs.iter().cloned().collect();
-                let union_def = self.generate_union(&union_name, &refs, None, union.closed)?;
-                unions.push(union_def);
+            match field_type {
+                LexObjectProperty::Union(union) => {
+                    let union_name = format!("{}Record{}", type_name, field_name.to_pascal_case());
+                    let refs: Vec<_> = union.refs.iter().cloned().collect();
+                    let union_def = self.generate_union(&union_name, &refs, None, union.closed)?;
+                    unions.push(union_def);
+                }
+                LexObjectProperty::Object(nested_obj) => {
+                    let object_name = format!("{}Record{}", type_name, field_name.to_pascal_case());
+                    let obj_def = self.generate_object(nsid, &object_name, nested_obj)?;
+                    unions.push(obj_def);
+                }
+                _ => {}
             }
         }
 
         // Generate IntoStatic impl
-        let field_names: Vec<&str> = obj.properties.keys().map(|k| k.as_str()).collect();
-        let into_static_impl =
-            self.generate_into_static_for_struct(&type_name, &field_names, true, true);
+        // let field_names: Vec<&str> = obj.properties.keys().map(|k| k.as_str()).collect();
+        // let into_static_impl =
+        //     self.generate_into_static_for_struct(&type_name, &field_names, true, true);
 
         Ok(quote! {
             #struct_def
             #(#unions)*
-            #into_static_impl
+            //#into_static_impl
         })
     }
 
@@ -288,6 +336,12 @@ impl<'c> CodeGenerator<'c> {
         is_required: bool,
         is_builder: bool,
     ) -> Result<TokenStream> {
+        if field_name.is_empty() {
+            eprintln!(
+                "Warning: Empty field name in lexicon '{}' type '{}', using 'unknown' as fallback",
+                nsid, parent_type_name
+            );
+        }
         let field_ident = make_ident(&field_name.to_snake_case());
 
         let rust_type =
@@ -311,6 +365,7 @@ impl<'c> CodeGenerator<'c> {
             LexObjectProperty::CidLink(c) => c.description.as_ref(),
             LexObjectProperty::Array(a) => a.description.as_ref(),
             LexObjectProperty::Blob(b) => b.description.as_ref(),
+            LexObjectProperty::Object(o) => o.description.as_ref(),
             LexObjectProperty::Boolean(b) => b.description.as_ref(),
             LexObjectProperty::Integer(i) => i.description.as_ref(),
             LexObjectProperty::String(s) => s.description.as_ref(),
@@ -351,6 +406,7 @@ impl<'c> CodeGenerator<'c> {
             | LexObjectProperty::Blob(_)
             | LexObjectProperty::Unknown(_) => true,
             LexObjectProperty::Array(array) => self.array_item_needs_lifetime(&array.items),
+            LexObjectProperty::Object(_) => true, // Nested objects have lifetimes
             LexObjectProperty::Ref(ref_type) => {
                 // Check if the ref target actually needs a lifetime
                 self.ref_needs_lifetime(&ref_type.r#ref)
@@ -366,6 +422,7 @@ impl<'c> CodeGenerator<'c> {
             LexArrayItem::String(s) => self.string_needs_lifetime(s),
             LexArrayItem::Bytes(_) => false,
             LexArrayItem::CidLink(_) | LexArrayItem::Blob(_) | LexArrayItem::Unknown(_) => true,
+            LexArrayItem::Object(_) => true, // Nested objects have lifetimes
             LexArrayItem::Ref(ref_type) => self.ref_needs_lifetime(&ref_type.r#ref),
             LexArrayItem::Union(_) => true,
         }
@@ -469,6 +526,13 @@ impl<'c> CodeGenerator<'c> {
                 let item_type = self.array_item_to_rust_type(nsid, &array.items)?;
                 Ok(quote! { Vec<#item_type> })
             }
+            LexObjectProperty::Object(_object) => {
+                // Generate unique nested object type name: StatusView + metadata -> StatusViewRecordMetadata
+                let object_name =
+                    format!("{}Record{}", parent_type_name, field_name.to_pascal_case());
+                let object_ident = syn::Ident::new(&object_name, proc_macro2::Span::call_site());
+                Ok(quote! { #object_ident<'a> })
+            }
             LexObjectProperty::Ref(ref_type) => {
                 // Handle local refs (starting with #) by prepending the current NSID
                 let ref_str = if ref_type.r#ref.starts_with('#') {
@@ -498,6 +562,10 @@ impl<'c> CodeGenerator<'c> {
             LexArrayItem::CidLink(_) => Ok(quote! { jacquard_common::types::cid::CidLink<'a> }),
             LexArrayItem::Blob(_) => Ok(quote! { jacquard_common::types::blob::Blob<'a> }),
             LexArrayItem::Unknown(_) => Ok(quote! { jacquard_common::types::value::Data<'a> }),
+            LexArrayItem::Object(_) => {
+                // For inline objects in arrays, use Data since we can't generate a unique type name
+                Ok(quote! { jacquard_common::types::value::Data<'a> })
+            }
             LexArrayItem::Ref(ref_type) => {
                 // Handle local refs (starting with #) by prepending the current NSID
                 let ref_str = if ref_type.r#ref.starts_with('#') {
@@ -536,7 +604,7 @@ impl<'c> CodeGenerator<'c> {
             Some(LexStringFormat::RecordKey) => {
                 quote! { jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>> }
             }
-            None => quote! { jacquard_common::CowStr<'a> },
+            _ => quote! { jacquard_common::CowStr<'a> },
         }
     }
 
@@ -839,41 +907,41 @@ impl<'c> CodeGenerator<'c> {
                 let doc = self.generate_doc_comment(union.description.as_ref());
 
                 // Generate IntoStatic impl for the enum
-                let variant_info: Vec<(String, EnumVariantKind)> = union
-                    .refs
-                    .iter()
-                    .map(|ref_str| {
-                        let ref_def = if let Some((_, fragment)) = ref_str.split_once('#') {
-                            fragment
-                        } else {
-                            "main"
-                        };
-                        let variant_name = if ref_def == "main" {
-                            ref_str.split('.').last().unwrap().to_pascal_case()
-                        } else {
-                            ref_def.to_pascal_case()
-                        };
-                        (variant_name, EnumVariantKind::Tuple)
-                    })
-                    .collect();
-                let into_static_impl = self.generate_into_static_for_enum(
-                    &enum_name,
-                    &variant_info,
-                    true,
-                    true, // open union
-                );
+                // let variant_info: Vec<(String, EnumVariantKind)> = union
+                //     .refs
+                //     .iter()
+                //     .map(|ref_str| {
+                //         let ref_def = if let Some((_, fragment)) = ref_str.split_once('#') {
+                //             fragment
+                //         } else {
+                //             "main"
+                //         };
+                //         let variant_name = if ref_def == "main" {
+                //             ref_str.split('.').last().unwrap().to_pascal_case()
+                //         } else {
+                //             ref_def.to_pascal_case()
+                //         };
+                //         (variant_name, EnumVariantKind::Tuple)
+                //     })
+                //     .collect();
+                // let into_static_impl = self.generate_into_static_for_enum(
+                //     &enum_name,
+                //     &variant_info,
+                //     true,
+                //     true, // open union
+                // );
 
                 Ok(quote! {
                     #doc
                     #[jacquard_derive::open_union]
-                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
                     #[serde(tag = "$type")]
                     #[serde(bound(deserialize = "'de: 'a"))]
                     pub enum #enum_ident<'a> {
                         #(#variants,)*
                     }
 
-                    #into_static_impl
+                    //#into_static_impl
                 })
             }
             LexXrpcSubscriptionMessageSchema::Object(obj) => {
@@ -889,7 +957,7 @@ impl<'c> CodeGenerator<'c> {
                 let struct_def = quote! {
                     #doc
                     #[jacquard_derive::lexicon]
-                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
                     #[serde(rename_all = "camelCase")]
                     pub struct #struct_ident<'a> {
                         #fields
@@ -910,14 +978,14 @@ impl<'c> CodeGenerator<'c> {
                 }
 
                 // Generate IntoStatic impl
-                let field_names: Vec<&str> = obj.properties.keys().map(|k| k.as_str()).collect();
-                let into_static_impl =
-                    self.generate_into_static_for_struct(&struct_name, &field_names, true, true);
+                // let field_names: Vec<&str> = obj.properties.keys().map(|k| k.as_str()).collect();
+                // let into_static_impl =
+                //     self.generate_into_static_for_struct(&struct_name, &field_names, true, true);
 
                 Ok(quote! {
                     #struct_def
                     #(#unions)*
-                    #into_static_impl
+                    //#into_static_impl
                 })
             }
             LexXrpcSubscriptionMessageSchema::Ref(ref_type) => {
@@ -969,14 +1037,14 @@ impl<'c> CodeGenerator<'c> {
 
         if parts.len() < 2 {
             // Shouldn't happen with valid NSIDs, but handle gracefully
-            return format!("{}.rs", parts[0]).into();
+            return format!("{}.rs", sanitize_name(parts[0])).into();
         }
 
         let last = parts.last().unwrap();
 
         if *last == "defs" && parts.len() >= 3 {
             // defs go in parent module: com.atproto.label.defs → com_atproto/label.rs
-            let first_two = format!("{}_{}", parts[0], parts[1]);
+            let first_two = format!("{}_{}", sanitize_name(parts[0]), sanitize_name(parts[1]));
             if parts.len() == 3 {
                 // com.atproto.defs → com_atproto.rs
                 format!("{}.rs", first_two).into()
@@ -985,21 +1053,21 @@ impl<'c> CodeGenerator<'c> {
                 let middle: Vec<&str> = parts[2..parts.len() - 1].iter().copied().collect();
                 let mut path = std::path::PathBuf::from(first_two);
                 for segment in &middle[..middle.len() - 1] {
-                    path.push(segment);
+                    path.push(sanitize_name(segment));
                 }
-                path.push(format!("{}.rs", middle.last().unwrap()));
+                path.push(format!("{}.rs", sanitize_name(middle.last().unwrap())));
                 path
             }
         } else {
             // Regular path: app.bsky.feed.post → app_bsky/feed/post.rs
-            let first_two = format!("{}_{}", parts[0], parts[1]);
+            let first_two = format!("{}_{}", sanitize_name(parts[0]), sanitize_name(parts[1]));
             let mut path = std::path::PathBuf::from(first_two);
 
             for segment in &parts[2..parts.len() - 1] {
-                path.push(segment);
+                path.push(sanitize_name(segment));
             }
 
-            path.push(format!("{}.rs", last.to_snake_case()));
+            path.push(format!("{}.rs", sanitize_name(&last.to_snake_case())));
             path
         }
     }
@@ -1087,11 +1155,12 @@ impl<'c> CodeGenerator<'c> {
             } else {
                 // Subdirectory: app_bsky/feed -> app_bsky/feed.rs (Rust 2018 style)
                 let dir_name = dir.file_name().and_then(|s| s.to_str()).unwrap_or("mod");
+                let sanitized_dir_name = sanitize_name(dir_name);
                 let mut path = dir
                     .parent()
                     .unwrap_or_else(|| std::path::Path::new(""))
                     .to_path_buf();
-                path.push(format!("{}.rs", dir_name));
+                path.push(format!("{}.rs", sanitized_dir_name));
                 path
             };
 
@@ -1099,7 +1168,7 @@ impl<'c> CodeGenerator<'c> {
             let mods: Vec<_> = module_names
                 .iter()
                 .map(|name| {
-                    let ident = syn::Ident::new(name, proc_macro2::Span::call_site());
+                    let ident = make_ident(name);
                     if is_root {
                         // Top-level modules get feature gates
                         quote! {
@@ -1289,15 +1358,15 @@ impl<'c> CodeGenerator<'c> {
         let needs_lifetime = self.params_need_lifetime(p);
 
         let derives = quote! {
-            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder, jacquard_derive::IntoStatic)]
             #[builder(start_fn = new)]
         };
 
         // Generate IntoStatic impl
-        let field_names: Vec<&str> = p.properties.keys().map(|k| k.as_str()).collect();
-        let type_name = ident.to_string();
-        let into_static_impl =
-            self.generate_into_static_for_struct(&type_name, &field_names, needs_lifetime, false);
+        // let field_names: Vec<&str> = p.properties.keys().map(|k| k.as_str()).collect();
+        // let type_name = ident.to_string();
+        // let into_static_impl =
+        //     self.generate_into_static_for_struct(&type_name, &field_names, needs_lifetime, false);
 
         if needs_lifetime {
             Ok(quote! {
@@ -1310,7 +1379,7 @@ impl<'c> CodeGenerator<'c> {
                     #(#fields)*
                 }
 
-                #into_static_impl
+                //#into_static_impl
             })
         } else {
             Ok(quote! {
@@ -1323,7 +1392,7 @@ impl<'c> CodeGenerator<'c> {
                     #(#fields)*
                 }
 
-                #into_static_impl
+                //#into_static_impl
             })
         }
     }
@@ -1479,7 +1548,7 @@ impl<'c> CodeGenerator<'c> {
         let struct_def = if is_binary_body {
             quote! {
                 #doc
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder, jacquard_derive::IntoStatic)]
                 #[builder(start_fn = new)]
                 #[serde(rename_all = "camelCase")]
                 pub struct #ident {
@@ -1492,7 +1561,7 @@ impl<'c> CodeGenerator<'c> {
             quote! {
                 #doc
                 #[jacquard_derive::lexicon]
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder, jacquard_derive::IntoStatic)]
                 #[serde(rename_all = "camelCase")]
                 #[builder(start_fn = new)]
                 pub struct #ident<'a> {
@@ -1522,37 +1591,37 @@ impl<'c> CodeGenerator<'c> {
         }
 
         // Generate IntoStatic impl
-        let into_static_impl = if is_binary_body {
-            // Binary bodies: simple clone of the Bytes field
-            quote! {
-                impl jacquard_common::IntoStatic for #ident {
-                    type Output = #ident;
-                    fn into_static(self) -> Self::Output {
-                        self
-                    }
-                }
-            }
-        } else {
-            let field_names: Vec<&str> = match &body.schema {
-                Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) => {
-                    obj.properties.keys().map(|k| k.as_str()).collect()
-                }
-                Some(_) => {
-                    // For Ref or Union schemas, there's just a single flattened field
-                    vec!["value"]
-                }
-                None => {
-                    // No schema means no fields, just extra_data
-                    vec![]
-                }
-            };
-            self.generate_into_static_for_struct(type_base, &field_names, true, true)
-        };
+        // let into_static_impl = if is_binary_body {
+        //     // Binary bodies: simple clone of the Bytes field
+        //     quote! {
+        //         impl jacquard_common::IntoStatic for #ident {
+        //             type Output = #ident;
+        //             fn into_static(self) -> Self::Output {
+        //                 self
+        //             }
+        //         }
+        //     }
+        // } else {
+        //     let field_names: Vec<&str> = match &body.schema {
+        //         Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) => {
+        //             obj.properties.keys().map(|k| k.as_str()).collect()
+        //         }
+        //         Some(_) => {
+        //             // For Ref or Union schemas, there's just a single flattened field
+        //             vec!["value"]
+        //         }
+        //         None => {
+        //             // No schema means no fields, just extra_data
+        //             vec![]
+        //         }
+        //     };
+        //     self.generate_into_static_for_struct(type_base, &field_names, true, true)
+        // };
 
         Ok(quote! {
             #struct_def
             #(#unions)*
-            #into_static_impl
+            //#into_static_impl
         })
     }
 
@@ -1578,7 +1647,7 @@ impl<'c> CodeGenerator<'c> {
         let struct_def = quote! {
             #doc
             #[jacquard_derive::lexicon]
-            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
             #[serde(rename_all = "camelCase")]
             pub struct #ident<'a> {
                 #fields
@@ -1600,26 +1669,26 @@ impl<'c> CodeGenerator<'c> {
         }
 
         // Generate IntoStatic impl
-        let field_names: Vec<&str> = match &body.schema {
-            Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) => {
-                obj.properties.keys().map(|k| k.as_str()).collect()
-            }
-            Some(_) => {
-                // For Ref or Union schemas, there's just a single flattened field
-                vec!["value"]
-            }
-            None => {
-                // No schema means no fields, just extra_data
-                vec![]
-            }
-        };
-        let into_static_impl =
-            self.generate_into_static_for_struct(&struct_name, &field_names, true, true);
+        // let field_names: Vec<&str> = match &body.schema {
+        //     Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) => {
+        //         obj.properties.keys().map(|k| k.as_str()).collect()
+        //     }
+        //     Some(_) => {
+        //         // For Ref or Union schemas, there's just a single flattened field
+        //         vec!["value"]
+        //     }
+        //     None => {
+        //         // No schema means no fields, just extra_data
+        //         vec![]
+        //     }
+        // };
+        // let into_static_impl =
+        //     self.generate_into_static_for_struct(&struct_name, &field_names, true, true);
 
         Ok(quote! {
             #struct_def
             #(#unions)*
-            #into_static_impl
+            //#into_static_impl
         })
     }
 
@@ -2176,61 +2245,62 @@ impl<'c> CodeGenerator<'c> {
         let is_open = closed != Some(true);
 
         // Generate IntoStatic impl
-        let variant_info: Vec<(String, EnumVariantKind)> = refs
-            .iter()
-            .filter_map(|ref_str| {
-                // Skip unknown refs
-                if !self.corpus.ref_exists(ref_str.as_ref()) {
-                    return None;
-                }
+        // let variant_info: Vec<(String, EnumVariantKind)> = refs
+        //     .iter()
+        //     .filter_map(|ref_str| {
+        //         // Skip unknown refs
+        //         if !self.corpus.ref_exists(ref_str.as_ref()) {
+        //             return None;
+        //         }
 
-                let (ref_nsid, ref_def) = if let Some((nsid, fragment)) = ref_str.split_once('#') {
-                    (nsid, fragment)
-                } else {
-                    (ref_str.as_ref(), "main")
-                };
+        //         let (ref_nsid, ref_def) = if let Some((nsid, fragment)) = ref_str.split_once('#') {
+        //             (nsid, fragment)
+        //         } else {
+        //             (ref_str.as_ref(), "main")
+        //         };
 
-                let variant_name = if ref_def == "main" {
-                    ref_nsid.split('.').last().unwrap().to_pascal_case()
-                } else {
-                    let last_segment = ref_nsid.split('.').last().unwrap().to_pascal_case();
-                    format!("{}{}", last_segment, ref_def.to_pascal_case())
-                };
-                Some((variant_name, EnumVariantKind::Tuple))
-            })
-            .collect();
-        let into_static_impl =
-            self.generate_into_static_for_enum(union_name, &variant_info, true, is_open);
+        //         let variant_name = if ref_def == "main" {
+        //             ref_nsid.split('.').last().unwrap().to_pascal_case()
+        //         } else {
+        //             let last_segment = ref_nsid.split('.').last().unwrap().to_pascal_case();
+        //             format!("{}{}", last_segment, ref_def.to_pascal_case())
+        //         };
+        //         Some((variant_name, EnumVariantKind::Tuple))
+        //     })
+        //     .collect();
+        // let into_static_impl =
+        //     self.generate_into_static_for_enum(union_name, &variant_info, true, is_open);
 
         if is_open {
             Ok(quote! {
                 #doc
                 #[jacquard_derive::open_union]
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
                 #[serde(tag = "$type")]
                 #[serde(bound(deserialize = "'de: 'a"))]
                 pub enum #enum_ident<'a> {
                     #(#variants,)*
                 }
 
-                #into_static_impl
+                //#into_static_impl
             })
         } else {
             Ok(quote! {
                 #doc
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
                 #[serde(tag = "$type")]
                 #[serde(bound(deserialize = "'de: 'a"))]
                 pub enum #enum_ident<'a> {
                     #(#variants,)*
                 }
 
-                #into_static_impl
+                //#into_static_impl
             })
         }
     }
 
     /// Generate IntoStatic impl for a struct
+    #[allow(dead_code)]
     fn generate_into_static_for_struct(
         &self,
         type_name: &str,

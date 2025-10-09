@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -34,21 +35,16 @@ pub struct SearchActorsSkeleton<'a> {
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-impl jacquard_common::IntoStatic for SearchActorsSkeleton<'_> {
-    type Output = SearchActorsSkeleton<'static>;
-    fn into_static(self) -> Self::Output {
-        SearchActorsSkeleton {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            q: self.q.into_static(),
-            typeahead: self.typeahead.into_static(),
-            viewer: self.viewer.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchActorsSkeletonOutput<'a> {
     #[serde(borrow)]
@@ -59,18 +55,6 @@ pub struct SearchActorsSkeletonOutput<'a> {
     ///Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub hits_total: std::option::Option<i64>,
-}
-
-impl jacquard_common::IntoStatic for SearchActorsSkeletonOutput<'_> {
-    type Output = SearchActorsSkeletonOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        SearchActorsSkeletonOutput {
-            actors: self.actors.into_static(),
-            cursor: self.cursor.into_static(),
-            hits_total: self.hits_total.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

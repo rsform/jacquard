@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -38,22 +39,16 @@ pub struct GetPostThreadV2<'a> {
     pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GetPostThreadV2<'_> {
-    type Output = GetPostThreadV2<'static>;
-    fn into_static(self) -> Self::Output {
-        GetPostThreadV2 {
-            above: self.above.into_static(),
-            anchor: self.anchor.into_static(),
-            below: self.below.into_static(),
-            branching_factor: self.branching_factor.into_static(),
-            prioritize_followed_users: self.prioritize_followed_users.into_static(),
-            sort: self.sort.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThreadV2Output<'a> {
     ///Whether this thread has additional replies. If true, a call can be made to the `getPostThreadOtherV2` endpoint to retrieve them.
@@ -64,18 +59,6 @@ pub struct GetPostThreadV2Output<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub threadgate: std::option::Option<crate::app_bsky::feed::ThreadgateView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetPostThreadV2Output<'_> {
-    type Output = GetPostThreadV2Output<'static>;
-    fn into_static(self) -> Self::Output {
-        GetPostThreadV2Output {
-            has_other_replies: self.has_other_replies.into_static(),
-            thread: self.thread.into_static(),
-            threadgate: self.threadgate.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for
@@ -95,7 +78,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetPostThreadV2<'de> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItem<'a> {
     ///The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
@@ -107,7 +98,15 @@ pub struct ThreadItem<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ThreadItemRecordValue<'a> {
@@ -121,39 +120,4 @@ pub enum ThreadItemRecordValue<'a> {
     DefsThreadItemNotFound(Box<crate::app_bsky::unspecced::ThreadItemNotFound<'a>>),
     #[serde(rename = "app.bsky.unspecced.defs#threadItemBlocked")]
     DefsThreadItemBlocked(Box<crate::app_bsky::unspecced::ThreadItemBlocked<'a>>),
-}
-
-impl jacquard_common::IntoStatic for ThreadItemRecordValue<'_> {
-    type Output = ThreadItemRecordValue<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThreadItemRecordValue::DefsThreadItemPost(v) => {
-                ThreadItemRecordValue::DefsThreadItemPost(v.into_static())
-            }
-            ThreadItemRecordValue::DefsThreadItemNoUnauthenticated(v) => {
-                ThreadItemRecordValue::DefsThreadItemNoUnauthenticated(v.into_static())
-            }
-            ThreadItemRecordValue::DefsThreadItemNotFound(v) => {
-                ThreadItemRecordValue::DefsThreadItemNotFound(v.into_static())
-            }
-            ThreadItemRecordValue::DefsThreadItemBlocked(v) => {
-                ThreadItemRecordValue::DefsThreadItemBlocked(v.into_static())
-            }
-            ThreadItemRecordValue::Unknown(v) => {
-                ThreadItemRecordValue::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ThreadItem<'_> {
-    type Output = ThreadItem<'static>;
-    fn into_static(self) -> Self::Output {
-        ThreadItem {
-            depth: self.depth.into_static(),
-            uri: self.uri.into_static(),
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

@@ -1,0 +1,87 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.label.definition",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "valueType",
+          "scope",
+          "createdAt"
+        ],
+        "properties": {
+          "color": {
+            "type": "string",
+            "description": "The hex value for the background color for the label. Appviews may choose to respect this."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "multiple": {
+            "type": "boolean",
+            "description": "Whether this label can be repeated for a given entity, eg.: [reviewer:foo, reviewer:bar]"
+          },
+          "name": {
+            "type": "string",
+            "description": "The display name of this label.",
+            "minGraphemes": 1,
+            "maxGraphemes": 40
+          },
+          "scope": {
+            "type": "array",
+            "description": "The areas of the repo this label may apply to, eg.: sh.tangled.repo.issue. Appviews may choose to respect this.",
+            "items": {
+              "type": "string",
+              "format": "nsid"
+            }
+          },
+          "valueType": {
+            "type": "ref",
+            "description": "The type definition of this label. Appviews may allow sorting for certain types.",
+            "ref": "#valueType"
+          }
+        }
+      }
+    },
+    "valueType": {
+      "type": "object",
+      "required": [
+        "type",
+        "format"
+      ],
+      "properties": {
+        "enum": {
+          "type": "array",
+          "description": "Closed set of values that this label can take.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "format": {
+          "type": "string",
+          "description": "An optional constraint that can be applied on string concrete types.",
+          "enum": [
+            "any",
+            "did",
+            "nsid"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "description": "The concrete type of this label's value.",
+          "enum": [
+            "null",
+            "boolean",
+            "integer",
+            "string"
+          ]
+        }
+      }
+    }
+  }
+}

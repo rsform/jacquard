@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -28,19 +29,16 @@ pub struct GetFeedSkeleton<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for GetFeedSkeleton<'_> {
-    type Output = GetFeedSkeleton<'static>;
-    fn into_static(self) -> Self::Output {
-        GetFeedSkeleton {
-            cursor: self.cursor.into_static(),
-            feed: self.feed.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedSkeletonOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -52,18 +50,6 @@ pub struct GetFeedSkeletonOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub req_id: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetFeedSkeletonOutput<'_> {
-    type Output = GetFeedSkeletonOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetFeedSkeletonOutput {
-            cursor: self.cursor.into_static(),
-            feed: self.feed.into_static(),
-            req_id: self.req_id.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

@@ -1,0 +1,42 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.forkSync",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Sync a forked repository with its upstream source",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "did",
+            "source",
+            "name",
+            "branch"
+          ],
+          "properties": {
+            "branch": {
+              "type": "string",
+              "description": "Branch to sync"
+            },
+            "did": {
+              "type": "string",
+              "description": "DID of the fork owner",
+              "format": "did"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the forked repository"
+            },
+            "source": {
+              "type": "string",
+              "description": "AT-URI of the source repository",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

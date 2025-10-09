@@ -1,0 +1,27 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.graph.follow",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

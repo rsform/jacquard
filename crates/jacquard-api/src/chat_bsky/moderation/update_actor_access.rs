@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -32,18 +33,6 @@ pub struct UpdateActorAccess<'a> {
         ::jacquard_common::smol_str::SmolStr,
         ::jacquard_common::types::value::Data<'a>,
     >,
-}
-
-impl jacquard_common::IntoStatic for UpdateActorAccess<'_> {
-    type Output = UpdateActorAccess<'static>;
-    fn into_static(self) -> Self::Output {
-        UpdateActorAccess {
-            actor: self.actor.into_static(),
-            allow_access: self.allow_access.into_static(),
-            r#ref: self.r#ref.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

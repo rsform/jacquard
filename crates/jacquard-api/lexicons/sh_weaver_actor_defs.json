@@ -1,0 +1,181 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.actor.defs",
+  "defs": {
+    "author": {
+      "type": "object",
+      "description": "A single author in a Weaver notebook.",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        }
+      }
+    },
+    "profileDataView": {
+      "type": "object",
+      "required": [
+        "inner"
+      ],
+      "properties": {
+        "inner": {
+          "type": "union",
+          "refs": [
+            "sh.weaver.actor.defs#profileView",
+            "app.bsky.actor.defs#profileViewDetailed"
+          ]
+        }
+      }
+    },
+    "profileView": {
+      "type": "object",
+      "required": [
+        "did",
+        "handle"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "string",
+          "format": "uri"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2560,
+          "maxGraphemes": 256
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#label"
+          }
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Any URI, intended for social profiles or websites, can be used to link DIDs/AT-URIs too.",
+            "format": "uri"
+          },
+          "minLength": 0,
+          "maxLength": 5
+        },
+        "location": {
+          "type": "string",
+          "description": "Free-form location text.",
+          "maxLength": 400,
+          "maxGraphemes": 40
+        },
+        "pronouns": {
+          "type": "ref",
+          "description": "Pronouns to use in user-generated content.",
+          "ref": "sh.weaver.actor.profile#pronounsList"
+        }
+      }
+    },
+    "tangledProfileView": {
+      "type": "object",
+      "required": [
+        "bluesky",
+        "did",
+        "handle"
+      ],
+      "properties": {
+        "bluesky": {
+          "type": "boolean",
+          "description": "Include link to this account on Bluesky."
+        },
+        "description": {
+          "type": "string",
+          "description": "Free-form profile description text.",
+          "maxLength": 2560,
+          "maxGraphemes": 256
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Any URI, intended for social profiles or websites, can be used to link DIDs/AT-URIs too.",
+            "format": "uri"
+          },
+          "minLength": 0,
+          "maxLength": 5
+        },
+        "location": {
+          "type": "string",
+          "description": "Free-form location text.",
+          "maxLength": 400,
+          "maxGraphemes": 40
+        },
+        "pinnedRepositories": {
+          "type": "array",
+          "description": "Any ATURI, it is up to appviews to validate these fields.",
+          "items": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "minLength": 0,
+          "maxLength": 6
+        },
+        "stats": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Vanity stats.",
+            "enum": [
+              "merged-pull-request-count",
+              "closed-pull-request-count",
+              "open-pull-request-count",
+              "open-issue-count",
+              "closed-issue-count",
+              "repository-count"
+            ]
+          },
+          "minLength": 0,
+          "maxLength": 2
+        }
+      }
+    }
+  }
+}

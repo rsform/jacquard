@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -25,33 +26,20 @@ pub struct GetOnboardingSuggestedStarterPacksSkeleton<'a> {
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GetOnboardingSuggestedStarterPacksSkeleton<'_> {
-    type Output = GetOnboardingSuggestedStarterPacksSkeleton<'static>;
-    fn into_static(self) -> Self::Output {
-        GetOnboardingSuggestedStarterPacksSkeleton {
-            limit: self.limit.into_static(),
-            viewer: self.viewer.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetOnboardingSuggestedStarterPacksSkeletonOutput<'a> {
     #[serde(borrow)]
     pub starter_packs: Vec<jacquard_common::types::string::AtUri<'a>>,
-}
-
-impl jacquard_common::IntoStatic
-for GetOnboardingSuggestedStarterPacksSkeletonOutput<'_> {
-    type Output = GetOnboardingSuggestedStarterPacksSkeletonOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetOnboardingSuggestedStarterPacksSkeletonOutput {
-            starter_packs: self.starter_packs.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

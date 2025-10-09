@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "com.bad-example.identity.resolveMiniDoc",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Like [com.atproto.identity.resolveIdentity](https://docs.bsky.app/docs/api/com-atproto-identity-resolve-identity) but instead of the full `didDoc` it returns an atproto-relevant subset.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "identifier"
+        ],
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "description": "Handle or DID to resolve",
+            "format": "at-identifier"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "did",
+            "handle",
+            "pds",
+            "signing_key"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "DID, bi-directionally verified if a handle was provided in the query.",
+              "format": "did"
+            },
+            "handle": {
+              "type": "string",
+              "description": "The validated handle of the account or `handle.invalid` if the handle\ndid not bi-directionally match the DID document.",
+              "format": "handle"
+            },
+            "pds": {
+              "type": "string",
+              "description": "The identity's PDS URL",
+              "format": "uri"
+            },
+            "signing_key": {
+              "type": "string",
+              "description": "The atproto signing key publicKeyMultibase\n\nLegacy key encoding not supported. the key is returned directly; `id`,\n`type`, and `controller` are omitted."
+            }
+          }
+        }
+      }
+    }
+  }
+}

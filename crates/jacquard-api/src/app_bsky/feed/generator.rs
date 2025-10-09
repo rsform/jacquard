@@ -7,7 +7,15 @@
 
 ///Record declaring of the existence of a feed generator, and containing metadata about it. The record can exist in any repository.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Generator<'a> {
     ///Declaration that a feed accepts feedback interactions from a client through app.bsky.feed.sendInteractions
@@ -39,7 +47,15 @@ pub struct Generator<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GeneratorRecordLabels<'a> {
@@ -47,38 +63,6 @@ pub enum GeneratorRecordLabels<'a> {
     DefsSelfLabels(Box<crate::com_atproto::label::SelfLabels<'a>>),
 }
 
-impl jacquard_common::IntoStatic for GeneratorRecordLabels<'_> {
-    type Output = GeneratorRecordLabels<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GeneratorRecordLabels::DefsSelfLabels(v) => {
-                GeneratorRecordLabels::DefsSelfLabels(v.into_static())
-            }
-            GeneratorRecordLabels::Unknown(v) => {
-                GeneratorRecordLabels::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
 impl jacquard_common::types::collection::Collection for Generator<'_> {
     const NSID: &'static str = "app.bsky.feed.generator";
-}
-
-impl jacquard_common::IntoStatic for Generator<'_> {
-    type Output = Generator<'static>;
-    fn into_static(self) -> Self::Output {
-        Generator {
-            accepts_interactions: self.accepts_interactions.into_static(),
-            avatar: self.avatar.into_static(),
-            content_mode: self.content_mode.into_static(),
-            created_at: self.created_at.into_static(),
-            description: self.description.into_static(),
-            description_facets: self.description_facets.into_static(),
-            did: self.did.into_static(),
-            display_name: self.display_name.into_static(),
-            labels: self.labels.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

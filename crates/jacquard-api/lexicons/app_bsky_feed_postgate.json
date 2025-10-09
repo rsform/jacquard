@@ -1,0 +1,54 @@
+{
+  "lexicon": 1,
+  "id": "app.bsky.feed.postgate",
+  "defs": {
+    "disableRule": {
+      "type": "object",
+      "description": "Disables embedding of this post.",
+      "properties": {}
+    },
+    "main": {
+      "type": "record",
+      "description": "Record defining interaction rules for a post. The record key (rkey) of the postgate record must match the record key of the post, and that record must be in the same repository.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "post",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "detachedEmbeddingUris": {
+            "type": "array",
+            "description": "List of AT-URIs embedding this post that the author has detached from.",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "maxLength": 50
+          },
+          "embeddingRules": {
+            "type": "array",
+            "description": "List of rules defining who can embed this post. If value is an empty array or is undefined, no particular rules apply and anyone can embed.",
+            "items": {
+              "type": "union",
+              "refs": [
+                "#disableRule"
+              ]
+            },
+            "maxLength": 5
+          },
+          "post": {
+            "type": "string",
+            "description": "Reference (AT-URI) to the post record.",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

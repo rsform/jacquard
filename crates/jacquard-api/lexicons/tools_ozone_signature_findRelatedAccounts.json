@@ -1,0 +1,71 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.signature.findRelatedAccounts",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get accounts that share some matching threat signatures with the root account.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "did"
+        ],
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "did": {
+            "type": "string",
+            "format": "did"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "accounts"
+          ],
+          "properties": {
+            "accounts": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#relatedAccount"
+              }
+            },
+            "cursor": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "relatedAccount": {
+      "type": "object",
+      "required": [
+        "account"
+      ],
+      "properties": {
+        "account": {
+          "type": "ref",
+          "ref": "com.atproto.admin.defs#accountView"
+        },
+        "similarities": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "tools.ozone.signature.defs#sigDetail"
+          }
+        }
+      }
+    }
+  }
+}

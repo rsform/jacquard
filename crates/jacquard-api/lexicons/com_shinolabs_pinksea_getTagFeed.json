@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "com.shinolabs.pinksea.getTagFeed",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Gets the feed for a given tag.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "tag"
+        ],
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "The limit on posts to fetch.",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 50
+          },
+          "since": {
+            "type": "string",
+            "description": "Since when should the query begin?",
+            "format": "datetime"
+          },
+          "tag": {
+            "type": "string",
+            "description": "The tag to fetch posts for."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "oekaki"
+          ],
+          "properties": {
+            "oekaki": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "com.shinolabs.pinksea.appViewDefs#hydratedOekaki"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

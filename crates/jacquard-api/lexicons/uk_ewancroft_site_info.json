@@ -1,0 +1,284 @@
+{
+  "lexicon": 1,
+  "id": "uk.ewancroft.site.info",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Information about the website.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "properties": {
+          "additionalInfo": {
+            "type": "object",
+            "description": "Additional flexible information about the website.",
+            "properties": {
+              "purpose": {
+                "type": "string",
+                "description": "Website purpose or mission statement.",
+                "maxLength": 10000,
+                "maxGraphemes": 1000
+              },
+              "sectionLicense": {
+                "type": "array",
+                "description": "License information for specific content sections, such as a blog.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "maxLength": 1000,
+                      "maxGraphemes": 100
+                    },
+                    "section": {
+                      "type": "string",
+                      "maxLength": 1000,
+                      "maxGraphemes": 100
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                }
+              },
+              "websiteBirthYear": {
+                "type": "integer",
+                "description": "The year the website was first launched or created.",
+                "minimum": 1990
+              }
+            }
+          },
+          "credits": {
+            "type": "array",
+            "description": "Credits for assets, fonts, libraries, or other resources used.",
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "type"
+              ],
+              "properties": {
+                "author": {
+                  "type": "string",
+                  "maxLength": 1000,
+                  "maxGraphemes": 100
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 5000,
+                  "maxGraphemes": 500
+                },
+                "license": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "maxLength": 1000,
+                      "maxGraphemes": 100
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 1000,
+                  "maxGraphemes": 100
+                },
+                "section": {
+                  "type": "string",
+                  "maxLength": 1000,
+                  "maxGraphemes": 100
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Type of credit (font, library, asset, etc.)",
+                  "maxLength": 500,
+                  "maxGraphemes": 50
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            },
+            "maxLength": 50
+          },
+          "openSourceInfo": {
+            "type": "object",
+            "description": "Information about the open-source nature of the website.",
+            "properties": {
+              "basedOn": {
+                "type": "array",
+                "description": "Projects or libraries this is based on or forked from.",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "maxLength": 5000,
+                      "maxGraphemes": 500
+                    },
+                    "name": {
+                      "type": "string",
+                      "maxLength": 1000,
+                      "maxGraphemes": 100
+                    },
+                    "section": {
+                      "type": "string",
+                      "maxLength": 1000,
+                      "maxGraphemes": 100
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "Type of relationship (fork, inspiration, dependency, etc.)",
+                      "maxLength": 500,
+                      "maxGraphemes": 50
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                },
+                "maxLength": 20
+              },
+              "description": {
+                "type": "string",
+                "description": "General description of the open-source nature.",
+                "maxLength": 20000,
+                "maxGraphemes": 2000
+              },
+              "license": {
+                "type": "object",
+                "description": "License information for the project.",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "maxGraphemes": 100
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              },
+              "relatedServices": {
+                "type": "array",
+                "description": "Related services or platforms.",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "maxLength": 5000,
+                      "maxGraphemes": 500
+                    },
+                    "name": {
+                      "type": "string",
+                      "maxLength": 1000,
+                      "maxGraphemes": 100
+                    },
+                    "relationship": {
+                      "type": "string",
+                      "description": "How this service relates to the website",
+                      "maxLength": 1000,
+                      "maxGraphemes": 100
+                    },
+                    "section": {
+                      "type": "string",
+                      "maxLength": 1000,
+                      "maxGraphemes": 100
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                },
+                "maxLength": 20
+              },
+              "repositories": {
+                "type": "array",
+                "description": "Source code repositories.",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "url"
+                  ],
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "maxLength": 2000,
+                      "maxGraphemes": 200
+                    },
+                    "platform": {
+                      "type": "string",
+                      "description": "Platform name (github, gitlab, tangled, etc.)",
+                      "maxLength": 500,
+                      "maxGraphemes": 50
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "Repository type (primary, mirror, fork, etc.)",
+                      "maxLength": 500,
+                      "maxGraphemes": 50
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                },
+                "maxLength": 20
+              }
+            }
+          },
+          "privacyStatement": {
+            "type": "string",
+            "description": "A statement about website privacy and data handling.",
+            "maxLength": 50000,
+            "maxGraphemes": 5000
+          },
+          "technologyStack": {
+            "type": "array",
+            "description": "A list of technologies used to build the website.",
+            "items": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "description": {
+                  "type": "string",
+                  "maxLength": 5000,
+                  "maxGraphemes": 500
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 1000,
+                  "maxGraphemes": 100
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            },
+            "maxLength": 50
+          }
+        }
+      }
+    }
+  }
+}

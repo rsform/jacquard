@@ -1,0 +1,283 @@
+{
+  "lexicon": 1,
+  "id": "app.bsky.unspecced.defs",
+  "defs": {
+    "ageAssuranceEvent": {
+      "type": "object",
+      "description": "Object used to store age assurance data in stash.",
+      "required": [
+        "createdAt",
+        "status",
+        "attemptId"
+      ],
+      "properties": {
+        "attemptId": {
+          "type": "string",
+          "description": "The unique identifier for this instance of the age assurance flow, in UUID format."
+        },
+        "completeIp": {
+          "type": "string",
+          "description": "The IP address used when completing the AA flow."
+        },
+        "completeUa": {
+          "type": "string",
+          "description": "The user agent used when completing the AA flow."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date and time of this write operation.",
+          "format": "datetime"
+        },
+        "email": {
+          "type": "string",
+          "description": "The email used for AA."
+        },
+        "initIp": {
+          "type": "string",
+          "description": "The IP address used when initiating the AA flow."
+        },
+        "initUa": {
+          "type": "string",
+          "description": "The user agent used when initiating the AA flow."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the age assurance process.",
+          "knownValues": [
+            "unknown",
+            "pending",
+            "assured"
+          ]
+        }
+      }
+    },
+    "ageAssuranceState": {
+      "type": "object",
+      "description": "The computed state of the age assurance process, returned to the user in question on certain authenticated requests.",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "lastInitiatedAt": {
+          "type": "string",
+          "description": "The timestamp when this state was last updated.",
+          "format": "datetime"
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the age assurance process.",
+          "knownValues": [
+            "unknown",
+            "pending",
+            "assured",
+            "blocked"
+          ]
+        }
+      }
+    },
+    "skeletonSearchActor": {
+      "type": "object",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        }
+      }
+    },
+    "skeletonSearchPost": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "skeletonSearchStarterPack": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "skeletonTrend": {
+      "type": "object",
+      "required": [
+        "topic",
+        "displayName",
+        "link",
+        "startedAt",
+        "postCount",
+        "dids"
+      ],
+      "properties": {
+        "category": {
+          "type": "string"
+        },
+        "dids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "did"
+          }
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "postCount": {
+          "type": "integer"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "status": {
+          "type": "string",
+          "knownValues": [
+            "hot"
+          ]
+        },
+        "topic": {
+          "type": "string"
+        }
+      }
+    },
+    "threadItemBlocked": {
+      "type": "object",
+      "required": [
+        "author"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "app.bsky.feed.defs#blockedAuthor"
+        }
+      }
+    },
+    "threadItemNoUnauthenticated": {
+      "type": "object",
+      "properties": {}
+    },
+    "threadItemNotFound": {
+      "type": "object",
+      "properties": {}
+    },
+    "threadItemPost": {
+      "type": "object",
+      "required": [
+        "post",
+        "moreParents",
+        "moreReplies",
+        "opThread",
+        "hiddenByThreadgate",
+        "mutedByViewer"
+      ],
+      "properties": {
+        "hiddenByThreadgate": {
+          "type": "boolean",
+          "description": "The threadgate created by the author indicates this post as a reply to be hidden for everyone consuming the thread."
+        },
+        "moreParents": {
+          "type": "boolean",
+          "description": "This post has more parents that were not present in the response. This is just a boolean, without the number of parents."
+        },
+        "moreReplies": {
+          "type": "integer",
+          "description": "This post has more replies that were not present in the response. This is a numeric value, which is best-effort and might not be accurate."
+        },
+        "mutedByViewer": {
+          "type": "boolean",
+          "description": "This is by an account muted by the viewer requesting it."
+        },
+        "opThread": {
+          "type": "boolean",
+          "description": "This post is part of a contiguous thread by the OP from the thread root. Many different OP threads can happen in the same thread."
+        },
+        "post": {
+          "type": "ref",
+          "ref": "app.bsky.feed.defs#postView"
+        }
+      }
+    },
+    "trendView": {
+      "type": "object",
+      "required": [
+        "topic",
+        "displayName",
+        "link",
+        "startedAt",
+        "postCount",
+        "actors"
+      ],
+      "properties": {
+        "actors": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "app.bsky.actor.defs#profileViewBasic"
+          }
+        },
+        "category": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "postCount": {
+          "type": "integer"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "status": {
+          "type": "string",
+          "knownValues": [
+            "hot"
+          ]
+        },
+        "topic": {
+          "type": "string"
+        }
+      }
+    },
+    "trendingTopic": {
+      "type": "object",
+      "required": [
+        "topic",
+        "link"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "topic": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -6,23 +6,21 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ListTemplatesOutput<'a> {
     #[serde(borrow)]
     pub communication_templates: Vec<
         crate::tools_ozone::communication::TemplateView<'a>,
     >,
-}
-
-impl jacquard_common::IntoStatic for ListTemplatesOutput<'_> {
-    type Output = ListTemplatesOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        ListTemplatesOutput {
-            communication_templates: self.communication_templates.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 /// XRPC request marker type

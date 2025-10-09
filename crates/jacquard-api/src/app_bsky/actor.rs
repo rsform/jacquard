@@ -16,44 +16,48 @@ pub mod search_actors_typeahead;
 pub mod status;
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct AdultContentPref<'a> {
     pub enabled: bool,
 }
 
-impl jacquard_common::IntoStatic for AdultContentPref<'_> {
-    type Output = AdultContentPref<'static>;
-    fn into_static(self) -> Self::Output {
-        AdultContentPref {
-            enabled: self.enabled.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///If set, an active progress guide. Once completed, can be set to undefined. Should have unspecced fields tracking progress.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct BskyAppProgressGuide<'a> {
     #[serde(borrow)]
     pub guide: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for BskyAppProgressGuide<'_> {
-    type Output = BskyAppProgressGuide<'static>;
-    fn into_static(self) -> Self::Output {
-        BskyAppProgressGuide {
-            guide: self.guide.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///A grab bag of state that's specific to the bsky.app program. Third-party apps shouldn't use this.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct BskyAppStatePref<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -71,20 +75,16 @@ pub struct BskyAppStatePref<'a> {
     pub queued_nudges: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-impl jacquard_common::IntoStatic for BskyAppStatePref<'_> {
-    type Output = BskyAppStatePref<'static>;
-    fn into_static(self) -> Self::Output {
-        BskyAppStatePref {
-            active_progress_guide: self.active_progress_guide.into_static(),
-            nuxs: self.nuxs.into_static(),
-            queued_nudges: self.queued_nudges.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ContentLabelPref<'a> {
     #[serde(borrow)]
@@ -97,20 +97,16 @@ pub struct ContentLabelPref<'a> {
     pub visibility: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for ContentLabelPref<'_> {
-    type Output = ContentLabelPref<'static>;
-    fn into_static(self) -> Self::Output {
-        ContentLabelPref {
-            label: self.label.into_static(),
-            labeler_did: self.labeler_did.into_static(),
-            visibility: self.visibility.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct FeedViewPref<'a> {
     ///The URI of the feed, or an identifier which describes the feed.
@@ -133,23 +129,16 @@ pub struct FeedViewPref<'a> {
     pub hide_reposts: std::option::Option<bool>,
 }
 
-impl jacquard_common::IntoStatic for FeedViewPref<'_> {
-    type Output = FeedViewPref<'static>;
-    fn into_static(self) -> Self::Output {
-        FeedViewPref {
-            feed: self.feed.into_static(),
-            hide_quote_posts: self.hide_quote_posts.into_static(),
-            hide_replies: self.hide_replies.into_static(),
-            hide_replies_by_like_count: self.hide_replies_by_like_count.into_static(),
-            hide_replies_by_unfollowed: self.hide_replies_by_unfollowed.into_static(),
-            hide_reposts: self.hide_reposts.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct HiddenPostsPref<'a> {
     ///A list of URIs of posts the account owner has hidden.
@@ -157,18 +146,16 @@ pub struct HiddenPostsPref<'a> {
     pub items: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
-impl jacquard_common::IntoStatic for HiddenPostsPref<'_> {
-    type Output = HiddenPostsPref<'static>;
-    fn into_static(self) -> Self::Output {
-        HiddenPostsPref {
-            items: self.items.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct InterestsPref<'a> {
     ///A list of tags which describe the account owner's interests gathered during onboarding.
@@ -176,19 +163,17 @@ pub struct InterestsPref<'a> {
     pub tags: Vec<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for InterestsPref<'_> {
-    type Output = InterestsPref<'static>;
-    fn into_static(self) -> Self::Output {
-        InterestsPref {
-            tags: self.tags.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///The subject's followers whom you also follow
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct KnownFollowers<'a> {
     pub count: i64,
@@ -196,56 +181,49 @@ pub struct KnownFollowers<'a> {
     pub followers: Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>,
 }
 
-impl jacquard_common::IntoStatic for KnownFollowers<'_> {
-    type Output = KnownFollowers<'static>;
-    fn into_static(self) -> Self::Output {
-        KnownFollowers {
-            count: self.count.into_static(),
-            followers: self.followers.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerPrefItem<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
-impl jacquard_common::IntoStatic for LabelerPrefItem<'_> {
-    type Output = LabelerPrefItem<'static>;
-    fn into_static(self) -> Self::Output {
-        LabelerPrefItem {
-            did: self.did.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LabelersPref<'a> {
     #[serde(borrow)]
     pub labelers: Vec<crate::app_bsky::actor::LabelerPrefItem<'a>>,
 }
 
-impl jacquard_common::IntoStatic for LabelersPref<'_> {
-    type Output = LabelersPref<'static>;
-    fn into_static(self) -> Self::Output {
-        LabelersPref {
-            labelers: self.labelers.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///A word that the account owner has muted.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct MutedWord<'a> {
     ///Groups of users to apply the muted word to. If undefined, applies to all users.
@@ -264,20 +242,6 @@ pub struct MutedWord<'a> {
     ///The muted word itself.
     #[serde(borrow)]
     pub value: jacquard_common::CowStr<'a>,
-}
-
-impl jacquard_common::IntoStatic for MutedWord<'_> {
-    type Output = MutedWord<'static>;
-    fn into_static(self) -> Self::Output {
-        MutedWord {
-            actor_target: self.actor_target.into_static(),
-            expires_at: self.expires_at.into_static(),
-            id: self.id.into_static(),
-            targets: self.targets.into_static(),
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -357,7 +321,15 @@ impl jacquard_common::IntoStatic for MutedWordTarget<'_> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct MutedWordsPref<'a> {
     ///A list of words the account owner has muted.
@@ -365,19 +337,17 @@ pub struct MutedWordsPref<'a> {
     pub items: Vec<crate::app_bsky::actor::MutedWord<'a>>,
 }
 
-impl jacquard_common::IntoStatic for MutedWordsPref<'_> {
-    type Output = MutedWordsPref<'static>;
-    fn into_static(self) -> Self::Output {
-        MutedWordsPref {
-            items: self.items.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///A new user experiences (NUX) storage object
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Nux<'a> {
     pub completed: bool,
@@ -392,21 +362,16 @@ pub struct Nux<'a> {
     pub id: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for Nux<'_> {
-    type Output = Nux<'static>;
-    fn into_static(self) -> Self::Output {
-        Nux {
-            completed: self.completed.into_static(),
-            data: self.data.into_static(),
-            expires_at: self.expires_at.into_static(),
-            id: self.id.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct PersonalDetailsPref<'a> {
     ///The birth date of account owner.
@@ -414,19 +379,17 @@ pub struct PersonalDetailsPref<'a> {
     pub birth_date: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
-impl jacquard_common::IntoStatic for PersonalDetailsPref<'_> {
-    type Output = PersonalDetailsPref<'static>;
-    fn into_static(self) -> Self::Output {
-        PersonalDetailsPref {
-            birth_date: self.birth_date.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Default post interaction settings for the account. These values should be applied as default values when creating new posts. These refs should mirror the threadgate and postgate records exactly.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct PostInteractionSettingsPref<'a> {
     ///Matches postgate record. List of rules defining who can embed this users posts. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
@@ -443,20 +406,17 @@ pub struct PostInteractionSettingsPref<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for PostInteractionSettingsPref<'_> {
-    type Output = PostInteractionSettingsPref<'static>;
-    fn into_static(self) -> Self::Output {
-        PostInteractionSettingsPref {
-            postgate_embedding_rules: self.postgate_embedding_rules.into_static(),
-            threadgate_allow_rules: self.threadgate_allow_rules.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 pub type Preferences<'a> = Vec<jacquard_common::types::value::Data<'a>>;
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileAssociated<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -477,59 +437,48 @@ pub struct ProfileAssociated<'a> {
     pub starter_packs: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for ProfileAssociated<'_> {
-    type Output = ProfileAssociated<'static>;
-    fn into_static(self) -> Self::Output {
-        ProfileAssociated {
-            activity_subscription: self.activity_subscription.into_static(),
-            chat: self.chat.into_static(),
-            feedgens: self.feedgens.into_static(),
-            labeler: self.labeler.into_static(),
-            lists: self.lists.into_static(),
-            starter_packs: self.starter_packs.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileAssociatedActivitySubscription<'a> {
     #[serde(borrow)]
     pub allow_subscriptions: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for ProfileAssociatedActivitySubscription<'_> {
-    type Output = ProfileAssociatedActivitySubscription<'static>;
-    fn into_static(self) -> Self::Output {
-        ProfileAssociatedActivitySubscription {
-            allow_subscriptions: self.allow_subscriptions.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileAssociatedChat<'a> {
     #[serde(borrow)]
     pub allow_incoming: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for ProfileAssociatedChat<'_> {
-    type Output = ProfileAssociatedChat<'static>;
-    fn into_static(self) -> Self::Output {
-        ProfileAssociatedChat {
-            allow_incoming: self.allow_incoming.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -569,30 +518,16 @@ pub struct ProfileView<'a> {
     pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ProfileView<'_> {
-    type Output = ProfileView<'static>;
-    fn into_static(self) -> Self::Output {
-        ProfileView {
-            associated: self.associated.into_static(),
-            avatar: self.avatar.into_static(),
-            created_at: self.created_at.into_static(),
-            description: self.description.into_static(),
-            did: self.did.into_static(),
-            display_name: self.display_name.into_static(),
-            handle: self.handle.into_static(),
-            indexed_at: self.indexed_at.into_static(),
-            labels: self.labels.into_static(),
-            pronouns: self.pronouns.into_static(),
-            status: self.status.into_static(),
-            verification: self.verification.into_static(),
-            viewer: self.viewer.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileViewBasic<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -627,28 +562,16 @@ pub struct ProfileViewBasic<'a> {
     pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ProfileViewBasic<'_> {
-    type Output = ProfileViewBasic<'static>;
-    fn into_static(self) -> Self::Output {
-        ProfileViewBasic {
-            associated: self.associated.into_static(),
-            avatar: self.avatar.into_static(),
-            created_at: self.created_at.into_static(),
-            did: self.did.into_static(),
-            display_name: self.display_name.into_static(),
-            handle: self.handle.into_static(),
-            labels: self.labels.into_static(),
-            pronouns: self.pronouns.into_static(),
-            status: self.status.into_static(),
-            verification: self.verification.into_static(),
-            viewer: self.viewer.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileViewDetailed<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -710,37 +633,16 @@ pub struct ProfileViewDetailed<'a> {
     pub website: std::option::Option<jacquard_common::types::string::Uri<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ProfileViewDetailed<'_> {
-    type Output = ProfileViewDetailed<'static>;
-    fn into_static(self) -> Self::Output {
-        ProfileViewDetailed {
-            associated: self.associated.into_static(),
-            avatar: self.avatar.into_static(),
-            banner: self.banner.into_static(),
-            created_at: self.created_at.into_static(),
-            description: self.description.into_static(),
-            did: self.did.into_static(),
-            display_name: self.display_name.into_static(),
-            followers_count: self.followers_count.into_static(),
-            follows_count: self.follows_count.into_static(),
-            handle: self.handle.into_static(),
-            indexed_at: self.indexed_at.into_static(),
-            joined_via_starter_pack: self.joined_via_starter_pack.into_static(),
-            labels: self.labels.into_static(),
-            pinned_post: self.pinned_post.into_static(),
-            posts_count: self.posts_count.into_static(),
-            pronouns: self.pronouns.into_static(),
-            status: self.status.into_static(),
-            verification: self.verification.into_static(),
-            viewer: self.viewer.into_static(),
-            website: self.website.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SavedFeed<'a> {
     #[serde(borrow)]
@@ -752,21 +654,16 @@ pub struct SavedFeed<'a> {
     pub value: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for SavedFeed<'_> {
-    type Output = SavedFeed<'static>;
-    fn into_static(self) -> Self::Output {
-        SavedFeed {
-            id: self.id.into_static(),
-            pinned: self.pinned.into_static(),
-            r#type: self.r#type.into_static(),
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SavedFeedsPref<'a> {
     #[serde(borrow)]
@@ -777,38 +674,32 @@ pub struct SavedFeedsPref<'a> {
     pub timeline_index: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for SavedFeedsPref<'_> {
-    type Output = SavedFeedsPref<'static>;
-    fn into_static(self) -> Self::Output {
-        SavedFeedsPref {
-            pinned: self.pinned.into_static(),
-            saved: self.saved.into_static(),
-            timeline_index: self.timeline_index.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SavedFeedsPrefV2<'a> {
     #[serde(borrow)]
     pub items: Vec<crate::app_bsky::actor::SavedFeed<'a>>,
 }
 
-impl jacquard_common::IntoStatic for SavedFeedsPrefV2<'_> {
-    type Output = SavedFeedsPrefV2<'static>;
-    fn into_static(self) -> Self::Output {
-        SavedFeedsPrefV2 {
-            items: self.items.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct StatusView<'a> {
     ///An optional embed associated with the status.
@@ -829,7 +720,15 @@ pub struct StatusView<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum StatusViewRecordEmbed<'a> {
@@ -837,36 +736,16 @@ pub enum StatusViewRecordEmbed<'a> {
     ExternalView(Box<crate::app_bsky::embed::external::View<'a>>),
 }
 
-impl jacquard_common::IntoStatic for StatusViewRecordEmbed<'_> {
-    type Output = StatusViewRecordEmbed<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            StatusViewRecordEmbed::ExternalView(v) => {
-                StatusViewRecordEmbed::ExternalView(v.into_static())
-            }
-            StatusViewRecordEmbed::Unknown(v) => {
-                StatusViewRecordEmbed::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for StatusView<'_> {
-    type Output = StatusView<'static>;
-    fn into_static(self) -> Self::Output {
-        StatusView {
-            embed: self.embed.into_static(),
-            expires_at: self.expires_at.into_static(),
-            is_active: self.is_active.into_static(),
-            record: self.record.into_static(),
-            status: self.status.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadViewPref<'a> {
     ///Show followed users at the top of all replies.
@@ -878,20 +757,17 @@ pub struct ThreadViewPref<'a> {
     pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ThreadViewPref<'_> {
-    type Output = ThreadViewPref<'static>;
-    fn into_static(self) -> Self::Output {
-        ThreadViewPref {
-            prioritize_followed_users: self.prioritize_followed_users.into_static(),
-            sort: self.sort.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Preferences for how verified accounts appear in the app.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct VerificationPrefs<'a> {
     ///Hide the blue check badges for verified accounts and trusted verifiers.
@@ -899,19 +775,17 @@ pub struct VerificationPrefs<'a> {
     pub hide_badges: std::option::Option<bool>,
 }
 
-impl jacquard_common::IntoStatic for VerificationPrefs<'_> {
-    type Output = VerificationPrefs<'static>;
-    fn into_static(self) -> Self::Output {
-        VerificationPrefs {
-            hide_badges: self.hide_badges.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Represents the verification information about the user this object is attached to.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct VerificationState<'a> {
     ///The user's status as a trusted verifier.
@@ -925,21 +799,17 @@ pub struct VerificationState<'a> {
     pub verified_status: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for VerificationState<'_> {
-    type Output = VerificationState<'static>;
-    fn into_static(self) -> Self::Output {
-        VerificationState {
-            trusted_verifier_status: self.trusted_verifier_status.into_static(),
-            verifications: self.verifications.into_static(),
-            verified_status: self.verified_status.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///An individual verification for an associated subject.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct VerificationView<'a> {
     ///Timestamp when the verification was created.
@@ -954,22 +824,17 @@ pub struct VerificationView<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl jacquard_common::IntoStatic for VerificationView<'_> {
-    type Output = VerificationView<'static>;
-    fn into_static(self) -> Self::Output {
-        VerificationView {
-            created_at: self.created_at.into_static(),
-            is_valid: self.is_valid.into_static(),
-            issuer: self.issuer.into_static(),
-            uri: self.uri.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Metadata about the requesting account's relationship with the subject account. Only has meaningful content for authed requests.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ViewerState<'a> {
     ///This property is present only in selected cases, as an optimization.
@@ -1001,22 +866,4 @@ pub struct ViewerState<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub muted_by_list: std::option::Option<crate::app_bsky::graph::ListViewBasic<'a>>,
-}
-
-impl jacquard_common::IntoStatic for ViewerState<'_> {
-    type Output = ViewerState<'static>;
-    fn into_static(self) -> Self::Output {
-        ViewerState {
-            activity_subscription: self.activity_subscription.into_static(),
-            blocked_by: self.blocked_by.into_static(),
-            blocking: self.blocking.into_static(),
-            blocking_by_list: self.blocking_by_list.into_static(),
-            followed_by: self.followed_by.into_static(),
-            following: self.following.into_static(),
-            known_followers: self.known_followers.into_static(),
-            muted: self.muted.into_static(),
-            muted_by_list: self.muted_by_list.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

@@ -7,7 +7,15 @@
 
 ///A declaration of a Bluesky account status.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Status<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
@@ -24,7 +32,15 @@ pub struct Status<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum StatusRecordEmbed<'a> {
@@ -32,31 +48,6 @@ pub enum StatusRecordEmbed<'a> {
     External(Box<crate::app_bsky::embed::external::ExternalRecord<'a>>),
 }
 
-impl jacquard_common::IntoStatic for StatusRecordEmbed<'_> {
-    type Output = StatusRecordEmbed<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            StatusRecordEmbed::External(v) => {
-                StatusRecordEmbed::External(v.into_static())
-            }
-            StatusRecordEmbed::Unknown(v) => StatusRecordEmbed::Unknown(v.into_static()),
-        }
-    }
-}
-
 impl jacquard_common::types::collection::Collection for Status<'_> {
     const NSID: &'static str = "app.bsky.actor.status";
-}
-
-impl jacquard_common::IntoStatic for Status<'_> {
-    type Output = Status<'static>;
-    fn into_static(self) -> Self::Output {
-        Status {
-            created_at: self.created_at.into_static(),
-            duration_minutes: self.duration_minutes.into_static(),
-            embed: self.embed.into_static(),
-            status: self.status.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

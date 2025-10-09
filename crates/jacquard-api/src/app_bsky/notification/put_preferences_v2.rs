@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -86,44 +87,20 @@ pub struct PutPreferencesV2<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for PutPreferencesV2<'_> {
-    type Output = PutPreferencesV2<'static>;
-    fn into_static(self) -> Self::Output {
-        PutPreferencesV2 {
-            chat: self.chat.into_static(),
-            follow: self.follow.into_static(),
-            like: self.like.into_static(),
-            like_via_repost: self.like_via_repost.into_static(),
-            mention: self.mention.into_static(),
-            quote: self.quote.into_static(),
-            reply: self.reply.into_static(),
-            repost: self.repost.into_static(),
-            repost_via_repost: self.repost_via_repost.into_static(),
-            starterpack_joined: self.starterpack_joined.into_static(),
-            subscribed_post: self.subscribed_post.into_static(),
-            unverified: self.unverified.into_static(),
-            verified: self.verified.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct PutPreferencesV2Output<'a> {
     #[serde(borrow)]
     pub preferences: crate::app_bsky::notification::Preferences<'a>,
-}
-
-impl jacquard_common::IntoStatic for PutPreferencesV2Output<'_> {
-    type Output = PutPreferencesV2Output<'static>;
-    fn into_static(self) -> Self::Output {
-        PutPreferencesV2Output {
-            preferences: self.preferences.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

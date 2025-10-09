@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -22,29 +23,20 @@ pub struct GetTrends {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for GetTrends {
-    type Output = GetTrends;
-    fn into_static(self) -> Self::Output {
-        self
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTrendsOutput<'a> {
     #[serde(borrow)]
     pub trends: Vec<crate::app_bsky::unspecced::TrendView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetTrendsOutput<'_> {
-    type Output = GetTrendsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetTrendsOutput {
-            trends: self.trends.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -36,7 +37,15 @@ pub struct UpdateSubjectStatus<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdateSubjectStatusRecordSubject<'a> {
@@ -48,40 +57,16 @@ pub enum UpdateSubjectStatusRecordSubject<'a> {
     DefsRepoBlobRef(Box<crate::com_atproto::admin::RepoBlobRef<'a>>),
 }
 
-impl jacquard_common::IntoStatic for UpdateSubjectStatusRecordSubject<'_> {
-    type Output = UpdateSubjectStatusRecordSubject<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            UpdateSubjectStatusRecordSubject::DefsRepoRef(v) => {
-                UpdateSubjectStatusRecordSubject::DefsRepoRef(v.into_static())
-            }
-            UpdateSubjectStatusRecordSubject::StrongRef(v) => {
-                UpdateSubjectStatusRecordSubject::StrongRef(v.into_static())
-            }
-            UpdateSubjectStatusRecordSubject::DefsRepoBlobRef(v) => {
-                UpdateSubjectStatusRecordSubject::DefsRepoBlobRef(v.into_static())
-            }
-            UpdateSubjectStatusRecordSubject::Unknown(v) => {
-                UpdateSubjectStatusRecordSubject::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for UpdateSubjectStatus<'_> {
-    type Output = UpdateSubjectStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        UpdateSubjectStatus {
-            deactivated: self.deactivated.into_static(),
-            subject: self.subject.into_static(),
-            takedown: self.takedown.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateSubjectStatusOutput<'a> {
     #[serde(borrow)]
@@ -92,7 +77,15 @@ pub struct UpdateSubjectStatusOutput<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdateSubjectStatusOutputRecordSubject<'a> {
@@ -102,37 +95,6 @@ pub enum UpdateSubjectStatusOutputRecordSubject<'a> {
     StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
     #[serde(rename = "com.atproto.admin.defs#repoBlobRef")]
     DefsRepoBlobRef(Box<crate::com_atproto::admin::RepoBlobRef<'a>>),
-}
-
-impl jacquard_common::IntoStatic for UpdateSubjectStatusOutputRecordSubject<'_> {
-    type Output = UpdateSubjectStatusOutputRecordSubject<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            UpdateSubjectStatusOutputRecordSubject::DefsRepoRef(v) => {
-                UpdateSubjectStatusOutputRecordSubject::DefsRepoRef(v.into_static())
-            }
-            UpdateSubjectStatusOutputRecordSubject::StrongRef(v) => {
-                UpdateSubjectStatusOutputRecordSubject::StrongRef(v.into_static())
-            }
-            UpdateSubjectStatusOutputRecordSubject::DefsRepoBlobRef(v) => {
-                UpdateSubjectStatusOutputRecordSubject::DefsRepoBlobRef(v.into_static())
-            }
-            UpdateSubjectStatusOutputRecordSubject::Unknown(v) => {
-                UpdateSubjectStatusOutputRecordSubject::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for UpdateSubjectStatusOutput<'_> {
-    type Output = UpdateSubjectStatusOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        UpdateSubjectStatusOutput {
-            subject: self.subject.into_static(),
-            takedown: self.takedown.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

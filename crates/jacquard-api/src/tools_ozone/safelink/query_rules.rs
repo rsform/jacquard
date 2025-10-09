@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -62,25 +63,16 @@ pub struct QueryRules<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for QueryRules<'_> {
-    type Output = QueryRules<'static>;
-    fn into_static(self) -> Self::Output {
-        QueryRules {
-            actions: self.actions.into_static(),
-            created_by: self.created_by.into_static(),
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            pattern_type: self.pattern_type.into_static(),
-            reason: self.reason.into_static(),
-            sort_direction: self.sort_direction.into_static(),
-            urls: self.urls.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryRulesOutput<'a> {
     ///Next cursor for pagination. Only present if there are more results.
@@ -89,17 +81,6 @@ pub struct QueryRulesOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub rules: Vec<crate::tools_ozone::safelink::UrlRule<'a>>,
-}
-
-impl jacquard_common::IntoStatic for QueryRulesOutput<'_> {
-    type Output = QueryRulesOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        QueryRulesOutput {
-            cursor: self.cursor.into_static(),
-            rules: self.rules.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

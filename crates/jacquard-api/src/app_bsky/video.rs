@@ -10,7 +10,15 @@ pub mod get_upload_limits;
 pub mod upload_video;
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct JobStatus<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -32,20 +40,4 @@ pub struct JobStatus<'a> {
     ///The state of the video processing job. All values not listed as a known value indicate that the job is in process.
     #[serde(borrow)]
     pub state: jacquard_common::CowStr<'a>,
-}
-
-impl jacquard_common::IntoStatic for JobStatus<'_> {
-    type Output = JobStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        JobStatus {
-            blob: self.blob.into_static(),
-            did: self.did.into_static(),
-            error: self.error.into_static(),
-            job_id: self.job_id.into_static(),
-            message: self.message.into_static(),
-            progress: self.progress.into_static(),
-            state: self.state.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

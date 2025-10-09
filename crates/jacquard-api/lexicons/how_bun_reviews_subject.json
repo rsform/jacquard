@@ -1,0 +1,18 @@
+{
+  "lexicon": 1,
+  "id": "how.bun.reviews.subject",
+  "defs": {
+    "wikidataObject": {
+      "type": "object",
+      "description": "An entity on wikidata.org.",
+      "required": [
+        "qid"
+      ],
+      "properties": {
+        "qid": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

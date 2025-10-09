@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -28,19 +29,16 @@ pub struct FindRelatedAccounts<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for FindRelatedAccounts<'_> {
-    type Output = FindRelatedAccounts<'static>;
-    fn into_static(self) -> Self::Output {
-        FindRelatedAccounts {
-            cursor: self.cursor.into_static(),
-            did: self.did.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct FindRelatedAccountsOutput<'a> {
     #[serde(borrow)]
@@ -48,17 +46,6 @@ pub struct FindRelatedAccountsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl jacquard_common::IntoStatic for FindRelatedAccountsOutput<'_> {
-    type Output = FindRelatedAccountsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        FindRelatedAccountsOutput {
-            accounts: self.accounts.into_static(),
-            cursor: self.cursor.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for
@@ -78,7 +65,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for FindRelatedAccounts<'de> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct RelatedAccount<'a> {
     #[serde(borrow)]
@@ -88,15 +83,4 @@ pub struct RelatedAccount<'a> {
     pub similarities: std::option::Option<
         Vec<crate::tools_ozone::signature::SigDetail<'a>>,
     >,
-}
-
-impl jacquard_common::IntoStatic for RelatedAccount<'_> {
-    type Output = RelatedAccount<'static>;
-    fn into_static(self) -> Self::Output {
-        RelatedAccount {
-            account: self.account.into_static(),
-            similarities: self.similarities.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

@@ -1,0 +1,49 @@
+{
+  "lexicon": 1,
+  "id": "com.shinolabs.pinksea.getParentForReply",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Gets the parent for a reply.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "did",
+          "rkey"
+        ],
+        "properties": {
+          "did": {
+            "type": "string",
+            "description": "The DID of the author.",
+            "format": "at-identifier"
+          },
+          "rkey": {
+            "type": "string",
+            "description": "The record key."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "did",
+            "rkey"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "The DID of the author.",
+              "format": "at-identifier"
+            },
+            "rkey": {
+              "type": "string",
+              "description": "The record key."
+            }
+          }
+        }
+      }
+    }
+  }
+}

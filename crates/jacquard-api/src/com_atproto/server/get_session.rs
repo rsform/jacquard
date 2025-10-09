@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSessionOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -29,23 +37,6 @@ pub struct GetSessionOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetSessionOutput<'_> {
-    type Output = GetSessionOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetSessionOutput {
-            active: self.active.into_static(),
-            did: self.did.into_static(),
-            did_doc: self.did_doc.into_static(),
-            email: self.email.into_static(),
-            email_auth_factor: self.email_auth_factor.into_static(),
-            email_confirmed: self.email_confirmed.into_static(),
-            handle: self.handle.into_static(),
-            status: self.status.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 /// XRPC request marker type

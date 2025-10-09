@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "com.atproto.repo.describeRepo",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get information about an account and repository, including the list of collections. Does not require auth.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo"
+        ],
+        "properties": {
+          "repo": {
+            "type": "string",
+            "description": "The handle or DID of the repo.",
+            "format": "at-identifier"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "handle",
+            "did",
+            "didDoc",
+            "collections",
+            "handleIsCorrect"
+          ],
+          "properties": {
+            "collections": {
+              "type": "array",
+              "description": "List of all the collections (NSIDs) for which this repo contains at least one record.",
+              "items": {
+                "type": "string",
+                "format": "nsid"
+              }
+            },
+            "did": {
+              "type": "string",
+              "format": "did"
+            },
+            "didDoc": {
+              "type": "unknown",
+              "description": "The complete DID document for this account."
+            },
+            "handle": {
+              "type": "string",
+              "format": "handle"
+            },
+            "handleIsCorrect": {
+              "type": "boolean",
+              "description": "Indicates if handle is currently valid (resolves bi-directionally)"
+            }
+          }
+        }
+      }
+    }
+  }
+}

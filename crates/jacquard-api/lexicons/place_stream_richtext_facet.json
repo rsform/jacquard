@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.richtext.facet",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "Annotation of a sub-string within rich text.",
+      "required": [
+        "index",
+        "features"
+      ],
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": [
+              "app.bsky.richtext.facet#mention",
+              "app.bsky.richtext.facet#link"
+            ]
+          }
+        },
+        "index": {
+          "type": "ref",
+          "ref": "app.bsky.richtext.facet#byteSlice"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "com.atproto.identity.resolveHandle",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Resolves an atproto handle (hostname) to a DID. Does not necessarily bi-directionally verify against the the DID document.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "handle"
+        ],
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "The handle to resolve.",
+            "format": "handle"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "did"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "The resolution process confirmed that the handle does not resolve to any DID.",
+          "name": "HandleNotFound"
+        }
+      ]
+    }
+  }
+}

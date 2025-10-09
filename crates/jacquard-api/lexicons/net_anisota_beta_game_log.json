@@ -1,0 +1,303 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.beta.game.log",
+  "defs": {
+    "collectionData": {
+      "type": "object",
+      "description": "Details about item/specimen collection",
+      "properties": {
+        "catchProbability": {
+          "type": "string",
+          "description": "Catch probability for specimens (decimal string between 0.0 and 1.0)"
+        },
+        "inventoryRecordUri": {
+          "type": "string",
+          "description": "URI of the created inventory record"
+        },
+        "method": {
+          "type": "string",
+          "description": "How the item was obtained",
+          "enum": [
+            "game_card",
+            "daily_reward",
+            "quest",
+            "trade",
+            "crafted"
+          ]
+        },
+        "specimenRecordUri": {
+          "type": "string",
+          "description": "URI of the created specimen record"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "Whether collection was successful"
+        },
+        "timeSinceGeneration": {
+          "type": "integer",
+          "description": "Milliseconds between card generation and collection",
+          "minimum": 0
+        },
+        "timeSinceViewed": {
+          "type": "integer",
+          "description": "Milliseconds between card being viewed and collected",
+          "minimum": 0
+        }
+      }
+    },
+    "dailyRewardsData": {
+      "type": "object",
+      "description": "Details about daily rewards claim",
+      "properties": {
+        "rewardItems": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#rewardItem"
+          }
+        },
+        "rewardsCount": {
+          "type": "integer",
+          "description": "Number of rewards claimed",
+          "minimum": 1
+        },
+        "streak": {
+          "type": "integer",
+          "description": "Current daily reward streak",
+          "minimum": 1
+        },
+        "timeSinceLastClaim": {
+          "type": "integer",
+          "description": "Milliseconds since last claim",
+          "minimum": 0
+        }
+      }
+    },
+    "feedContext": {
+      "type": "object",
+      "description": "Context about the feed when event occurred",
+      "properties": {
+        "feedUri": {
+          "type": "string",
+          "description": "URI of the feed being viewed"
+        },
+        "gameCardCount": {
+          "type": "integer",
+          "description": "Number of game cards injected",
+          "minimum": 0
+        },
+        "postCount": {
+          "type": "integer",
+          "description": "Number of posts in the feed",
+          "minimum": 0
+        },
+        "scrollPosition": {
+          "type": "integer",
+          "description": "User's scroll position or card index",
+          "minimum": 0
+        }
+      }
+    },
+    "gameCardData": {
+      "type": "object",
+      "description": "Details about game cards generated or interacted with",
+      "properties": {
+        "cardType": {
+          "type": "string",
+          "description": "Type of game card",
+          "enum": [
+            "item",
+            "specimen"
+          ]
+        },
+        "cardUri": {
+          "type": "string",
+          "description": "Unique identifier for the game card"
+        },
+        "generationSeed": {
+          "type": "string",
+          "description": "Random seed used for generation (for verification)"
+        },
+        "injectionPosition": {
+          "type": "integer",
+          "description": "Position where card was injected in feed",
+          "minimum": 0
+        },
+        "itemId": {
+          "type": "string",
+          "description": "ID of the item/specimen"
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "Quantity of items",
+          "minimum": 1
+        },
+        "rarity": {
+          "type": "string",
+          "description": "Rarity of the item/specimen",
+          "enum": [
+            "veryCommon",
+            "common",
+            "uncommon",
+            "rare",
+            "veryRare",
+            "epic",
+            "legendary"
+          ]
+        }
+      }
+    },
+    "itemUsageData": {
+      "type": "object",
+      "description": "Details about item usage",
+      "properties": {
+        "effectApplied": {
+          "type": "string",
+          "description": "Effect that was applied"
+        },
+        "inventoryRecordUri": {
+          "type": "string",
+          "description": "URI of the modified inventory record"
+        },
+        "itemId": {
+          "type": "string",
+          "description": "ID of the item used"
+        },
+        "quantityUsed": {
+          "type": "integer",
+          "description": "Quantity of the item used",
+          "minimum": 1
+        },
+        "remainingQuantity": {
+          "type": "integer",
+          "description": "Remaining quantity after use",
+          "minimum": 0
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A log record for tracking game events and user actions for provenance and anti-bot analysis",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "eventType",
+          "timestamp",
+          "sessionId"
+        ],
+        "properties": {
+          "collectionData": {
+            "type": "ref",
+            "ref": "#collectionData"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the log record was created",
+            "format": "datetime"
+          },
+          "dailyRewardsData": {
+            "type": "ref",
+            "ref": "#dailyRewardsData"
+          },
+          "eventType": {
+            "type": "string",
+            "description": "Type of event being logged",
+            "enum": [
+              "feed_loaded",
+              "game_cards_generated",
+              "item_collected",
+              "specimen_collected",
+              "daily_rewards_claimed",
+              "item_used",
+              "stamina_depleted",
+              "level_up",
+              "session_started"
+            ]
+          },
+          "feedContext": {
+            "type": "ref",
+            "ref": "#feedContext"
+          },
+          "gameCardData": {
+            "type": "ref",
+            "ref": "#gameCardData"
+          },
+          "gameCardId": {
+            "type": "string",
+            "description": "Unique ID of the game card this event relates to"
+          },
+          "itemUsageData": {
+            "type": "ref",
+            "ref": "#itemUsageData"
+          },
+          "metadata": {
+            "type": "ref",
+            "ref": "#metadata"
+          },
+          "parentLogUri": {
+            "type": "string",
+            "description": "URI of the parent log record that triggered this event"
+          },
+          "rootLogUri": {
+            "type": "string",
+            "description": "URI of the root log record in this event chain"
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "Unique session identifier to group related events",
+            "maxLength": 64
+          },
+          "sessionUri": {
+            "type": "string",
+            "description": "URI of the session record this event belongs to (at://did/collection/rkey)"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "When the event occurred (ISO 8601)",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional event-specific metadata",
+      "properties": {
+        "clientVersion": {
+          "type": "string",
+          "description": "Version of the client application"
+        },
+        "networkLatency": {
+          "type": "integer",
+          "description": "Network latency in milliseconds",
+          "minimum": 0
+        },
+        "performanceTimings": {
+          "type": "unknown",
+          "description": "Performance timing data"
+        },
+        "platform": {
+          "type": "string",
+          "description": "Platform (web, mobile, etc.)"
+        }
+      }
+    },
+    "rewardItem": {
+      "type": "object",
+      "description": "Item received as a reward",
+      "properties": {
+        "itemId": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "rarity": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

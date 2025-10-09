@@ -1,4 +1,5 @@
 use super::*;
+use std::str::FromStr;
 
 /// Canonicalize JSON by sorting object keys recursively
 fn canonicalize_json(value: &serde_json::Value) -> serde_json::Value {
@@ -76,7 +77,9 @@ fn serialize_deserialize_bytes_json() {
 
 #[test]
 fn serialize_deserialize_cid_link_json() {
-    let data = Data::CidLink(Cid::str("bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha"));
+    let data = Data::CidLink(Cid::str(
+        "bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha",
+    ));
 
     // JSON: should be {"$link": "cid_string"}
     let json = serde_json::to_string(&data).unwrap();
@@ -85,7 +88,10 @@ fn serialize_deserialize_cid_link_json() {
 
     let parsed: Data = serde_json::from_str(&json).unwrap();
     match parsed {
-        Data::CidLink(cid) => assert_eq!(cid.as_str(), "bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha"),
+        Data::CidLink(cid) => assert_eq!(
+            cid.as_str(),
+            "bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha"
+        ),
         _ => panic!("expected CidLink"),
     }
 }
@@ -122,7 +128,10 @@ fn serialize_deserialize_array() {
 #[test]
 fn serialize_deserialize_object() {
     let mut map = BTreeMap::new();
-    map.insert("name".to_smolstr(), Data::String(AtprotoStr::String("alice".into())));
+    map.insert(
+        "name".to_smolstr(),
+        Data::String(AtprotoStr::String("alice".into())),
+    );
     map.insert("age".to_smolstr(), Data::Integer(30));
     map.insert("active".to_smolstr(), Data::Boolean(true));
 
@@ -298,8 +307,421 @@ fn integration_bluesky_thread() {
         let original_canonical = canonicalize_json(&original_value);
         let serialized_canonical = canonicalize_json(&serialized_value);
 
-        assert_eq!(original_canonical, serialized_canonical, "Serialized JSON should match original structure")
+        assert_eq!(
+            original_canonical, serialized_canonical,
+            "Serialized JSON should match original structure"
+        )
     } else {
         panic!("expected top-level object");
+    }
+}
+
+#[test]
+fn test_from_data_struct() {
+    use serde::Deserialize;
+
+    #[derive(Debug, PartialEq, Deserialize)]
+    struct TestStruct<'a> {
+        #[serde(borrow)]
+        name: &'a str,
+        age: i64,
+    }
+
+    let mut map = BTreeMap::new();
+    map.insert(
+        SmolStr::new_static("name"),
+        Data::String(AtprotoStr::String("Alice".into())),
+    );
+    map.insert(SmolStr::new_static("age"), Data::Integer(30));
+    let data = Data::Object(Object(map));
+
+    let result: TestStruct = from_data(&data).unwrap();
+    assert_eq!(result.name, "Alice");
+    assert_eq!(result.age, 30);
+}
+
+#[test]
+fn test_from_data_vec() {
+    let data = Data::Array(Array(vec![
+        Data::Integer(1),
+        Data::Integer(2),
+        Data::Integer(3),
+    ]));
+
+    let result: Vec<i64> = from_data(&data).unwrap();
+    assert_eq!(result, vec![1, 2, 3]);
+}
+
+#[test]
+fn test_from_data_nested() {
+    use serde::Deserialize;
+
+    #[derive(Debug, PartialEq, Deserialize)]
+    struct Nested<'a> {
+        #[serde(borrow)]
+        value: &'a str,
+    }
+
+    #[derive(Debug, PartialEq, Deserialize)]
+    struct Parent<'a> {
+        #[serde(borrow)]
+        nested: Nested<'a>,
+        count: i64,
+    }
+
+    let mut nested_map = BTreeMap::new();
+    nested_map.insert(
+        SmolStr::new_static("value"),
+        Data::String(AtprotoStr::String("test".into())),
+    );
+
+    let mut parent_map = BTreeMap::new();
+    parent_map.insert(
+        SmolStr::new_static("nested"),
+        Data::Object(Object(nested_map)),
+    );
+    parent_map.insert(SmolStr::new_static("count"), Data::Integer(42));
+
+    let data = Data::Object(Object(parent_map));
+
+    let result: Parent = from_data(&data).unwrap();
+    assert_eq!(result.nested.value, "test");
+    assert_eq!(result.count, 42);
+}
+
+#[test]
+fn test_from_raw_data_struct() {
+    use serde::Deserialize;
+
+    #[derive(Debug, PartialEq, Deserialize)]
+    struct TestStruct<'a> {
+        #[serde(borrow)]
+        name: &'a str,
+        age: u64,
+    }
+
+    let mut map = BTreeMap::new();
+    map.insert(SmolStr::new_static("name"), RawData::String("Bob".into()));
+    map.insert(SmolStr::new_static("age"), RawData::UnsignedInt(25));
+    let data = RawData::Object(map);
+
+    let result: TestStruct = from_raw_data(&data).unwrap();
+    assert_eq!(result.name, "Bob");
+    assert_eq!(result.age, 25);
+}
+
+#[test]
+fn test_from_data_option() {
+    use serde::Deserialize;
+
+    #[derive(Debug, PartialEq, Deserialize)]
+    struct WithOption<'a> {
+        #[serde(borrow)]
+        required: &'a str,
+        optional: Option<i64>,
+    }
+
+    let mut map = BTreeMap::new();
+    map.insert(
+        SmolStr::new_static("required"),
+        Data::String(AtprotoStr::String("value".into())),
+    );
+    // optional field not present
+    let data = Data::Object(Object(map));
+
+    let result: WithOption = from_data(&data).unwrap();
+    assert_eq!(result.required, "value");
+    assert_eq!(result.optional, None);
+}
+
+#[test]
+fn test_borrowed_string_deserialization() {
+    use serde::Deserialize;
+
+    #[derive(Debug, PartialEq, Deserialize)]
+    struct BorrowTest<'a> {
+        #[serde(borrow)]
+        text: &'a str,
+    }
+
+    // Use borrowed CowStr explicitly
+    let borrowed_str = "borrowed text";
+    let mut map = BTreeMap::new();
+    map.insert(
+        SmolStr::new_static("text"),
+        Data::String(AtprotoStr::String(CowStr::Borrowed(borrowed_str))),
+    );
+    let data = Data::Object(Object(map));
+
+    let result: BorrowTest = from_data(&data).unwrap();
+    assert_eq!(result.text, "borrowed text");
+
+    // Verify the borrowed string has the same address (zero-copy)
+    assert_eq!(result.text.as_ptr(), borrowed_str.as_ptr());
+}
+
+#[test]
+fn test_atproto_types_deserialization() {
+    use serde::Deserialize;
+
+    #[derive(Debug, Deserialize)]
+    struct AtprotoTypes<'a> {
+        #[serde(borrow)]
+        did: Did<'a>,
+        handle: Handle<'a>,
+        cid: Cid<'a>,
+    }
+
+    let mut map = BTreeMap::new();
+    map.insert(
+        SmolStr::new_static("did"),
+        Data::String(AtprotoStr::Did(Did::new("did:plc:abc123").unwrap())),
+    );
+    map.insert(
+        SmolStr::new_static("handle"),
+        Data::String(AtprotoStr::Handle(
+            Handle::new("alice.bsky.social").unwrap(),
+        )),
+    );
+    map.insert(
+        SmolStr::new_static("cid"),
+        Data::String(AtprotoStr::Cid(Cid::str(
+            "bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha",
+        ))),
+    );
+    let data = Data::Object(Object(map));
+
+    let result: AtprotoTypes = from_data(&data).unwrap();
+    assert_eq!(result.did.as_str(), "did:plc:abc123");
+    assert_eq!(result.handle.as_str(), "alice.bsky.social");
+    assert_eq!(
+        result.cid.as_str(),
+        "bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha"
+    );
+}
+
+#[test]
+fn test_datetime_and_nsid_deserialization() {
+    use serde::Deserialize;
+
+    #[derive(Debug, Deserialize)]
+    struct MixedTypes<'a> {
+        #[serde(borrow)]
+        nsid: Nsid<'a>,
+        handle: Handle<'a>,
+        did: Did<'a>,
+        // These use SmolStr internally, so they allocate but still deserialize fine
+        tid: Tid,
+        created_at: Datetime,
+    }
+
+    let mut map = BTreeMap::new();
+    map.insert(
+        SmolStr::new_static("nsid"),
+        Data::String(AtprotoStr::Nsid(Nsid::new("app.bsky.feed.post").unwrap())),
+    );
+    map.insert(
+        SmolStr::new_static("handle"),
+        Data::String(AtprotoStr::Handle(
+            Handle::new("alice.bsky.social").unwrap(),
+        )),
+    );
+    map.insert(
+        SmolStr::new_static("did"),
+        Data::String(AtprotoStr::Did(Did::new("did:plc:test123").unwrap())),
+    );
+    map.insert(
+        SmolStr::new_static("tid"),
+        Data::String(AtprotoStr::Tid(Tid::new("3jzfcijpj2z2a").unwrap())),
+    );
+    map.insert(
+        SmolStr::new_static("created_at"),
+        Data::String(AtprotoStr::Datetime(
+            Datetime::from_str("2024-01-15T12:30:45.123456Z").unwrap(),
+        )),
+    );
+    let data = Data::Object(Object(map));
+
+    let result: MixedTypes = from_data(&data).unwrap();
+    assert_eq!(result.nsid.as_str(), "app.bsky.feed.post");
+    assert_eq!(result.handle.as_str(), "alice.bsky.social");
+    assert_eq!(result.did.as_str(), "did:plc:test123");
+    assert_eq!(result.tid.as_str(), "3jzfcijpj2z2a");
+    assert_eq!(result.created_at.as_str(), "2024-01-15T12:30:45.123456Z");
+}
+
+#[test]
+fn test_aturi_deserialization() {
+    use serde::Deserialize;
+
+    #[derive(Debug, Deserialize)]
+    struct WithAtUri<'a> {
+        #[serde(borrow)]
+        uri: AtUri<'a>,
+        did: Did<'a>,
+    }
+
+    let mut map = BTreeMap::new();
+    map.insert(
+        SmolStr::new_static("uri"),
+        Data::String(AtprotoStr::AtUri(
+            AtUri::new("at://alice.bsky.social/app.bsky.feed.post/3jk5").unwrap(),
+        )),
+    );
+    map.insert(
+        SmolStr::new_static("did"),
+        Data::String(AtprotoStr::Did(Did::new("did:plc:test").unwrap())),
+    );
+    let data = Data::Object(Object(map));
+
+    let result: WithAtUri = from_data(&data).unwrap();
+    assert_eq!(
+        result.uri.as_str(),
+        "at://alice.bsky.social/app.bsky.feed.post/3jk5"
+    );
+    assert_eq!(result.did.as_str(), "did:plc:test");
+}
+
+#[test]
+fn test_aturi_zero_copy() {
+    use serde::Deserialize;
+
+    #[derive(Debug, Deserialize)]
+    struct WithAtUri<'a> {
+        #[serde(borrow)]
+        uri: AtUri<'a>,
+    }
+
+    // Use borrowed CowStr to create the AtUri
+    let uri_str = "at://alice.bsky.social/app.bsky.feed.post/3jk5";
+    let mut map = BTreeMap::new();
+    map.insert(
+        SmolStr::new_static("uri"),
+        Data::String(AtprotoStr::AtUri(AtUri::new(uri_str).unwrap()))
+    );
+    let data = Data::Object(Object(map));
+
+    let result: WithAtUri = from_data(&data).unwrap();
+
+    // Check if the AtUri borrowed from the original string
+    assert_eq!(result.uri.as_str().as_ptr(), uri_str.as_ptr());
+}
+
+#[test]
+fn test_atidentifier_deserialization() {
+    use serde::Deserialize;
+
+    #[derive(Debug, Deserialize)]
+    struct WithIdentifiers<'a> {
+        #[serde(borrow)]
+        ident_did: AtIdentifier<'a>,
+        ident_handle: AtIdentifier<'a>,
+    }
+
+    let mut map = BTreeMap::new();
+    map.insert(
+        SmolStr::new_static("ident_did"),
+        Data::String(AtprotoStr::AtIdentifier(AtIdentifier::Did(
+            Did::new("did:plc:abc").unwrap(),
+        ))),
+    );
+    map.insert(
+        SmolStr::new_static("ident_handle"),
+        Data::String(AtprotoStr::AtIdentifier(AtIdentifier::Handle(
+            Handle::new("bob.test").unwrap(),
+        ))),
+    );
+    let data = Data::Object(Object(map));
+
+    let result: WithIdentifiers = from_data(&data).unwrap();
+    match &result.ident_did {
+        AtIdentifier::Did(did) => assert_eq!(did.as_str(), "did:plc:abc"),
+        _ => panic!("expected Did variant"),
+    }
+    match &result.ident_handle {
+        AtIdentifier::Handle(handle) => assert_eq!(handle.as_str(), "bob.test"),
+        _ => panic!("expected Handle variant"),
+    }
+}
+
+#[test]
+fn test_to_raw_data() {
+    use serde::Serialize;
+
+    #[derive(Serialize)]
+    struct TestStruct {
+        name: String,
+        age: i64,
+        active: bool,
+    }
+
+    let value = TestStruct {
+        name: "alice".to_string(),
+        age: 30,
+        active: true,
+    };
+
+    let raw_data = to_raw_data(&value).unwrap();
+
+    match raw_data {
+        RawData::Object(map) => {
+            assert_eq!(map.len(), 3);
+            match map.get("name").unwrap() {
+                RawData::String(s) => assert_eq!(s.as_ref(), "alice"),
+                _ => panic!("expected string"),
+            }
+            match map.get("age").unwrap() {
+                RawData::SignedInt(i) => assert_eq!(*i, 30),
+                _ => panic!("expected signed int"),
+            }
+            match map.get("active").unwrap() {
+                RawData::Boolean(b) => assert!(*b),
+                _ => panic!("expected boolean"),
+            }
+        }
+        _ => panic!("expected object"),
+    }
+}
+
+#[test]
+fn test_to_data_with_inference() {
+    use serde::Serialize;
+
+    #[derive(Serialize)]
+    struct Post {
+        text: String,
+        author_did: String,
+        created_at: String,
+    }
+
+    let post = Post {
+        text: "hello world".to_string(),
+        author_did: "did:plc:abc123".to_string(),
+        created_at: "2024-01-15T12:30:45.123Z".to_string(),
+    };
+
+    let data = to_data(&post).unwrap();
+
+    match data {
+        Data::Object(obj) => {
+            // Check text is plain string
+            match obj.0.get("text").unwrap() {
+                Data::String(AtprotoStr::String(s)) => assert_eq!(s.as_ref(), "hello world"),
+                _ => panic!("expected plain string for text"),
+            }
+            // Check DID was inferred
+            match obj.0.get("author_did").unwrap() {
+                Data::String(AtprotoStr::Did(did)) => assert_eq!(did.as_str(), "did:plc:abc123"),
+                _ => panic!("expected Did type"),
+            }
+            // Check datetime was inferred
+            match obj.0.get("created_at").unwrap() {
+                Data::String(AtprotoStr::Datetime(dt)) => {
+                    assert_eq!(dt.as_str(), "2024-01-15T12:30:45.123Z")
+                }
+                _ => panic!("expected Datetime type"),
+            }
+        }
+        _ => panic!("expected object"),
     }
 }

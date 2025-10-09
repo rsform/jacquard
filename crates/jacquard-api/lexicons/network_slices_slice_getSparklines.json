@@ -1,0 +1,89 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.getSparklines",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Get time-series sparkline data for multiple slices showing record indexing activity over time.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "slices"
+          ],
+          "properties": {
+            "duration": {
+              "type": "string",
+              "description": "Time range to fetch data for",
+              "default": "24h",
+              "enum": [
+                "1h",
+                "24h",
+                "7d",
+                "30d"
+              ]
+            },
+            "interval": {
+              "type": "string",
+              "description": "Time interval for data points",
+              "default": "hour",
+              "enum": [
+                "minute",
+                "hour",
+                "day"
+              ]
+            },
+            "slices": {
+              "type": "array",
+              "description": "Array of slice AT-URIs to get sparkline data for",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "sparklines"
+          ],
+          "properties": {
+            "sparklines": {
+              "type": "array",
+              "description": "Array of slice sparkline data entries",
+              "items": {
+                "type": "ref",
+                "ref": "#sparklineEntry"
+              }
+            }
+          }
+        }
+      }
+    },
+    "sparklineEntry": {
+      "type": "object",
+      "required": [
+        "sliceUri",
+        "points"
+      ],
+      "properties": {
+        "points": {
+          "type": "array",
+          "description": "Array of sparkline data points",
+          "items": {
+            "type": "ref",
+            "ref": "network.slices.slice.defs#sparklinePoint"
+          }
+        },
+        "sliceUri": {
+          "type": "string",
+          "description": "AT-URI of the slice"
+        }
+      }
+    }
+  }
+}

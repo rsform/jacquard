@@ -1,0 +1,71 @@
+{
+  "lexicon": 1,
+  "id": "place.atwork.searchListings",
+  "defs": {
+    "listingRecord": {
+      "type": "object",
+      "description": "A job listing record with metadata for strong references",
+      "required": [
+        "uri",
+        "cid"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "description": "CID of the listing record",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the listing (at://did/place.atwork.listing/rkey)",
+          "format": "at-uri"
+        },
+        "value": {
+          "type": "ref",
+          "description": "The full job listing record",
+          "ref": "place.atwork.listing"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Search job listings using full-text query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "query"
+        ],
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query string for full-text search"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "listings"
+          ],
+          "properties": {
+            "listings": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#listingRecord"
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Failed to search listings",
+          "name": "SearchFailed"
+        }
+      ]
+    }
+  }
+}

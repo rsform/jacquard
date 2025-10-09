@@ -1,0 +1,152 @@
+{
+  "lexicon": 1,
+  "id": "app.bsky.labeler.defs",
+  "defs": {
+    "labelerPolicies": {
+      "type": "object",
+      "required": [
+        "labelValues"
+      ],
+      "properties": {
+        "labelValueDefinitions": {
+          "type": "array",
+          "description": "Label values created by this labeler and scoped exclusively to it. Labels defined here will override global label definitions for this labeler.",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#labelValueDefinition"
+          }
+        },
+        "labelValues": {
+          "type": "array",
+          "description": "The label values which this labeler publishes. May include global or custom labels.",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#labelValue"
+          }
+        }
+      }
+    },
+    "labelerView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "creator",
+        "indexedAt"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "creator": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileView"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#label"
+          }
+        },
+        "likeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "viewer": {
+          "type": "ref",
+          "ref": "#labelerViewerState"
+        }
+      }
+    },
+    "labelerViewDetailed": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "creator",
+        "policies",
+        "indexedAt"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "creator": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileView"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#label"
+          }
+        },
+        "likeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "policies": {
+          "type": "ref",
+          "ref": "app.bsky.labeler.defs#labelerPolicies"
+        },
+        "reasonTypes": {
+          "type": "array",
+          "description": "The set of report reason 'codes' which are in-scope for this service to review and action. These usually align to policy categories. If not defined (distinct from empty array), all reason types are allowed.",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.moderation.defs#reasonType"
+          }
+        },
+        "subjectCollections": {
+          "type": "array",
+          "description": "Set of record types (collection NSIDs) which can be reported to this service. If not defined (distinct from empty array), default is any record type.",
+          "items": {
+            "type": "string",
+            "format": "nsid"
+          }
+        },
+        "subjectTypes": {
+          "type": "array",
+          "description": "The set of subject types (account, record, etc) this service accepts reports on.",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.moderation.defs#subjectType"
+          }
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "viewer": {
+          "type": "ref",
+          "ref": "#labelerViewerState"
+        }
+      }
+    },
+    "labelerViewerState": {
+      "type": "object",
+      "properties": {
+        "like": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

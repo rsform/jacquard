@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -63,29 +64,16 @@ pub struct SearchPostsSkeleton<'a> {
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-impl jacquard_common::IntoStatic for SearchPostsSkeleton<'_> {
-    type Output = SearchPostsSkeleton<'static>;
-    fn into_static(self) -> Self::Output {
-        SearchPostsSkeleton {
-            author: self.author.into_static(),
-            cursor: self.cursor.into_static(),
-            domain: self.domain.into_static(),
-            lang: self.lang.into_static(),
-            limit: self.limit.into_static(),
-            mentions: self.mentions.into_static(),
-            q: self.q.into_static(),
-            since: self.since.into_static(),
-            sort: self.sort.into_static(),
-            tag: self.tag.into_static(),
-            until: self.until.into_static(),
-            url: self.url.into_static(),
-            viewer: self.viewer.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchPostsSkeletonOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -96,18 +84,6 @@ pub struct SearchPostsSkeletonOutput<'a> {
     pub hits_total: std::option::Option<i64>,
     #[serde(borrow)]
     pub posts: Vec<crate::app_bsky::unspecced::SkeletonSearchPost<'a>>,
-}
-
-impl jacquard_common::IntoStatic for SearchPostsSkeletonOutput<'_> {
-    type Output = SearchPostsSkeletonOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        SearchPostsSkeletonOutput {
-            cursor: self.cursor.into_static(),
-            hits_total: self.hits_total.into_static(),
-            posts: self.posts.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

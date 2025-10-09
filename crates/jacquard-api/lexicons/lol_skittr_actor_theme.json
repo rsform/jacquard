@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "lol.skittr.actor.theme",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Profile customization values",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "bg_color",
+          "text_color",
+          "link_color",
+          "side_color",
+          "side_border"
+        ],
+        "properties": {
+          "background": {
+            "type": "blob",
+            "description": "A background image, must be either PNG or JPEG",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "bg_color": {
+            "type": "string",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "link_color": {
+            "type": "string",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "side_border": {
+            "type": "string",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "side_color": {
+            "type": "string",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "text_color": {
+            "type": "string",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          }
+        }
+      }
+    }
+  }
+}

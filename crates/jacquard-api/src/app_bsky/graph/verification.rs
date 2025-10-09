@@ -7,7 +7,15 @@
 
 ///Record declaring a verification relationship between two accounts. Verifications are only considered valid by an app if issued by an account the app considers trusted.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Verification<'a> {
     ///Date of when the verification was created.
@@ -25,17 +33,4 @@ pub struct Verification<'a> {
 
 impl jacquard_common::types::collection::Collection for Verification<'_> {
     const NSID: &'static str = "app.bsky.graph.verification";
-}
-
-impl jacquard_common::IntoStatic for Verification<'_> {
-    type Output = Verification<'static>;
-    fn into_static(self) -> Self::Output {
-        Verification {
-            created_at: self.created_at.into_static(),
-            display_name: self.display_name.into_static(),
-            handle: self.handle.into_static(),
-            subject: self.subject.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

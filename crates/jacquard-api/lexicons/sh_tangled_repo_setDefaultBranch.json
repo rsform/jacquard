@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.setDefaultBranch",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Set the default branch for a repository",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repo",
+            "defaultBranch"
+          ],
+          "properties": {
+            "defaultBranch": {
+              "type": "string"
+            },
+            "repo": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.getDefaultBranch",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo"
+        ],
+        "properties": {
+          "repo": {
+            "type": "string",
+            "description": "Repository identifier in format 'did:plc:.../repoName'"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "name",
+            "hash",
+            "when"
+          ],
+          "properties": {
+            "author": {
+              "type": "ref",
+              "ref": "#signature"
+            },
+            "hash": {
+              "type": "string",
+              "description": "Latest commit hash on default branch"
+            },
+            "message": {
+              "type": "string",
+              "description": "Latest commit message"
+            },
+            "name": {
+              "type": "string",
+              "description": "Default branch name"
+            },
+            "shortHash": {
+              "type": "string",
+              "description": "Short commit hash"
+            },
+            "when": {
+              "type": "string",
+              "description": "Timestamp of latest commit",
+              "format": "datetime"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Repository not found or access denied",
+          "name": "RepoNotFound"
+        },
+        {
+          "description": "Invalid request parameters",
+          "name": "InvalidRequest"
+        }
+      ]
+    },
+    "signature": {
+      "type": "object",
+      "required": [
+        "name",
+        "email",
+        "when"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Author email"
+        },
+        "name": {
+          "type": "string",
+          "description": "Author name"
+        },
+        "when": {
+          "type": "string",
+          "description": "Author timestamp",
+          "format": "datetime"
+        }
+      }
+    }
+  }
+}

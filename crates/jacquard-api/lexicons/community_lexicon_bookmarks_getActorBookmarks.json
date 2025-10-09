@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "community.lexicon.bookmarks.getActorBookmarks",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a list of bookmarks by actor. Optionally add a list of tags to include, default will be all bookmarks. Requires auth, actor must be the requesting account.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "bookmarks"
+          ],
+          "properties": {
+            "bookmarks": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "community.lexicon.bookmarks.bookmark"
+              }
+            },
+            "cursor": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

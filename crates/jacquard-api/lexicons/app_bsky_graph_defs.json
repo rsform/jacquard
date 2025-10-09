@@ -1,0 +1,332 @@
+{
+  "lexicon": 1,
+  "id": "app.bsky.graph.defs",
+  "defs": {
+    "curatelist": {
+      "type": "token",
+      "description": "A list of actors used for curation purposes such as list feeds or interaction gating."
+    },
+    "listItemView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "subject"
+      ],
+      "properties": {
+        "subject": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileView"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "listPurpose": {
+      "type": "string",
+      "knownValues": [
+        "app.bsky.graph.defs#modlist",
+        "app.bsky.graph.defs#curatelist",
+        "app.bsky.graph.defs#referencelist"
+      ]
+    },
+    "listView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "creator",
+        "name",
+        "purpose",
+        "indexedAt"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "string",
+          "format": "uri"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "creator": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileView"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 3000,
+          "maxGraphemes": 300
+        },
+        "descriptionFacets": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "app.bsky.richtext.facet"
+          }
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#label"
+          }
+        },
+        "listItemCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "purpose": {
+          "type": "ref",
+          "ref": "#listPurpose"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "viewer": {
+          "type": "ref",
+          "ref": "#listViewerState"
+        }
+      }
+    },
+    "listViewBasic": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "name",
+        "purpose"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "string",
+          "format": "uri"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#label"
+          }
+        },
+        "listItemCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "purpose": {
+          "type": "ref",
+          "ref": "#listPurpose"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "viewer": {
+          "type": "ref",
+          "ref": "#listViewerState"
+        }
+      }
+    },
+    "listViewerState": {
+      "type": "object",
+      "properties": {
+        "blocked": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "muted": {
+          "type": "boolean"
+        }
+      }
+    },
+    "modlist": {
+      "type": "token",
+      "description": "A list of actors to apply an aggregate moderation action (mute/block) on."
+    },
+    "notFoundActor": {
+      "type": "object",
+      "description": "indicates that a handle or DID could not be resolved",
+      "required": [
+        "actor",
+        "notFound"
+      ],
+      "properties": {
+        "actor": {
+          "type": "string",
+          "format": "at-identifier"
+        },
+        "notFound": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "referencelist": {
+      "type": "token",
+      "description": "A list of actors used for only for reference purposes such as within a starter pack."
+    },
+    "relationship": {
+      "type": "object",
+      "description": "lists the bi-directional graph relationships between one actor (not indicated in the object), and the target actors (the DID included in the object)",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "followedBy": {
+          "type": "string",
+          "description": "if the actor is followed by this DID, contains the AT-URI of the follow record",
+          "format": "at-uri"
+        },
+        "following": {
+          "type": "string",
+          "description": "if the actor follows this DID, this is the AT-URI of the follow record",
+          "format": "at-uri"
+        }
+      }
+    },
+    "starterPackView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "record",
+        "creator",
+        "indexedAt"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "creator": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "feeds": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "app.bsky.feed.defs#generatorView"
+          },
+          "maxLength": 3
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "joinedAllTimeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "joinedWeekCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#label"
+          }
+        },
+        "list": {
+          "type": "ref",
+          "ref": "#listViewBasic"
+        },
+        "listItemsSample": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#listItemView"
+          },
+          "maxLength": 12
+        },
+        "record": {
+          "type": "unknown"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "starterPackViewBasic": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "record",
+        "creator",
+        "indexedAt"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "creator": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "joinedAllTimeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "joinedWeekCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#label"
+          }
+        },
+        "listItemCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "record": {
+          "type": "unknown"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

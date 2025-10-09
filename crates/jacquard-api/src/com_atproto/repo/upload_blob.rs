@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -20,29 +21,20 @@ pub struct UploadBlob {
     pub body: bytes::Bytes,
 }
 
-impl jacquard_common::IntoStatic for UploadBlob {
-    type Output = UploadBlob;
-    fn into_static(self) -> Self::Output {
-        self
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct UploadBlobOutput<'a> {
     #[serde(borrow)]
     pub blob: jacquard_common::types::blob::Blob<'a>,
-}
-
-impl jacquard_common::IntoStatic for UploadBlobOutput<'_> {
-    type Output = UploadBlobOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        UploadBlobOutput {
-            blob: self.blob.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -7,7 +7,15 @@
 
 ///Record declaring a social 'follow' relationship of another account. Duplicate follows will be ignored by the AppView.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Follow<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
@@ -17,15 +25,4 @@ pub struct Follow<'a> {
 
 impl jacquard_common::types::collection::Collection for Follow<'_> {
     const NSID: &'static str = "app.bsky.graph.follow";
-}
-
-impl jacquard_common::IntoStatic for Follow<'_> {
-    type Output = Follow<'static>;
-    fn into_static(self) -> Self::Output {
-        Follow {
-            created_at: self.created_at.into_static(),
-            subject: self.subject.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

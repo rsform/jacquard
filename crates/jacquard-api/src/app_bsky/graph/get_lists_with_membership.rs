@@ -7,7 +7,15 @@
 
 ///A list and an optional list item indicating membership of a target user to that list.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ListWithMembership<'a> {
     #[serde(borrow)]
@@ -17,17 +25,6 @@ pub struct ListWithMembership<'a> {
     pub list_item: std::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ListWithMembership<'_> {
-    type Output = ListWithMembership<'static>;
-    fn into_static(self) -> Self::Output {
-        ListWithMembership {
-            list: self.list.into_static(),
-            list_item: self.list_item.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -35,7 +32,8 @@ impl jacquard_common::IntoStatic for ListWithMembership<'_> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -54,20 +52,16 @@ pub struct GetListsWithMembership<'a> {
     pub purposes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-impl jacquard_common::IntoStatic for GetListsWithMembership<'_> {
-    type Output = GetListsWithMembership<'static>;
-    fn into_static(self) -> Self::Output {
-        GetListsWithMembership {
-            actor: self.actor.into_static(),
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            purposes: self.purposes.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetListsWithMembershipOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -75,17 +69,6 @@ pub struct GetListsWithMembershipOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub lists_with_membership: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetListsWithMembershipOutput<'_> {
-    type Output = GetListsWithMembershipOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetListsWithMembershipOutput {
-            cursor: self.cursor.into_static(),
-            lists_with_membership: self.lists_with_membership.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -21,17 +22,16 @@ pub struct GetRepoStatus<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetRepoStatus<'_> {
-    type Output = GetRepoStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        GetRepoStatus {
-            did: self.did.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepoStatusOutput<'a> {
     pub active: bool,
@@ -44,19 +44,6 @@ pub struct GetRepoStatusOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetRepoStatusOutput<'_> {
-    type Output = GetRepoStatusOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetRepoStatusOutput {
-            active: self.active.into_static(),
-            did: self.did.into_static(),
-            rev: self.rev.into_static(),
-            status: self.status.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

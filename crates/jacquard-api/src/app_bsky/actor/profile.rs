@@ -7,7 +7,15 @@
 
 ///A declaration of a Bluesky account profile.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
     ///Small image to be displayed next to posts from account. AKA, 'profile picture'
@@ -51,7 +59,15 @@ pub struct Profile<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ProfileRecordLabels<'a> {
@@ -59,39 +75,6 @@ pub enum ProfileRecordLabels<'a> {
     DefsSelfLabels(Box<crate::com_atproto::label::SelfLabels<'a>>),
 }
 
-impl jacquard_common::IntoStatic for ProfileRecordLabels<'_> {
-    type Output = ProfileRecordLabels<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ProfileRecordLabels::DefsSelfLabels(v) => {
-                ProfileRecordLabels::DefsSelfLabels(v.into_static())
-            }
-            ProfileRecordLabels::Unknown(v) => {
-                ProfileRecordLabels::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
 impl jacquard_common::types::collection::Collection for Profile<'_> {
     const NSID: &'static str = "app.bsky.actor.profile";
-}
-
-impl jacquard_common::IntoStatic for Profile<'_> {
-    type Output = Profile<'static>;
-    fn into_static(self) -> Self::Output {
-        Profile {
-            avatar: self.avatar.into_static(),
-            banner: self.banner.into_static(),
-            created_at: self.created_at.into_static(),
-            description: self.description.into_static(),
-            display_name: self.display_name.into_static(),
-            joined_via_starter_pack: self.joined_via_starter_pack.into_static(),
-            labels: self.labels.into_static(),
-            pinned_post: self.pinned_post.into_static(),
-            pronouns: self.pronouns.into_static(),
-            website: self.website.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

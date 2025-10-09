@@ -157,6 +157,8 @@ pub enum LexArrayItem<'s> {
     // lexBlob
     #[serde(borrow)]
     Blob(LexBlob<'s>),
+    // lexObject
+    Object(LexObject<'s>),
     // lexRefVariant
     Ref(LexRef<'s>),
     Union(LexRefUnion<'s>),
@@ -214,6 +216,8 @@ pub enum LexObjectProperty<'s> {
     Array(LexArray<'s>),
     // lexBlob
     Blob(LexBlob<'s>),
+    // lexObject (nested)
+    Object(LexObject<'s>),
     // lexPrimitive
     Boolean(LexBoolean<'s>),
     Integer(LexInteger<'s>),
@@ -572,6 +576,7 @@ impl IntoStatic for LexArrayItem<'_> {
             Self::Bytes(x) => LexArrayItem::Bytes(x.into_static()),
             Self::CidLink(x) => LexArrayItem::CidLink(x.into_static()),
             Self::Blob(x) => LexArrayItem::Blob(x.into_static()),
+            Self::Object(x) => LexArrayItem::Object(x.into_static()),
             Self::Ref(x) => LexArrayItem::Ref(x.into_static()),
             Self::Union(x) => LexArrayItem::Union(x.into_static()),
         }
@@ -633,6 +638,7 @@ impl IntoStatic for LexObjectProperty<'_> {
             Self::CidLink(x) => LexObjectProperty::CidLink(x.into_static()),
             Self::Array(x) => LexObjectProperty::Array(x.into_static()),
             Self::Blob(x) => LexObjectProperty::Blob(x.into_static()),
+            Self::Object(x) => LexObjectProperty::Object(x.into_static()),
             Self::Boolean(x) => LexObjectProperty::Boolean(x.into_static()),
             Self::Integer(x) => LexObjectProperty::Integer(x.into_static()),
             Self::String(x) => LexObjectProperty::String(x.into_static()),

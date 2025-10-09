@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -28,19 +29,16 @@ pub struct GetSubjectStatus<'a> {
     pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GetSubjectStatus<'_> {
-    type Output = GetSubjectStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        GetSubjectStatus {
-            blob: self.blob.into_static(),
-            did: self.did.into_static(),
-            uri: self.uri.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSubjectStatusOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -54,7 +52,15 @@ pub struct GetSubjectStatusOutput<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetSubjectStatusOutputRecordSubject<'a> {
@@ -64,38 +70,6 @@ pub enum GetSubjectStatusOutputRecordSubject<'a> {
     StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
     #[serde(rename = "com.atproto.admin.defs#repoBlobRef")]
     DefsRepoBlobRef(Box<crate::com_atproto::admin::RepoBlobRef<'a>>),
-}
-
-impl jacquard_common::IntoStatic for GetSubjectStatusOutputRecordSubject<'_> {
-    type Output = GetSubjectStatusOutputRecordSubject<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetSubjectStatusOutputRecordSubject::DefsRepoRef(v) => {
-                GetSubjectStatusOutputRecordSubject::DefsRepoRef(v.into_static())
-            }
-            GetSubjectStatusOutputRecordSubject::StrongRef(v) => {
-                GetSubjectStatusOutputRecordSubject::StrongRef(v.into_static())
-            }
-            GetSubjectStatusOutputRecordSubject::DefsRepoBlobRef(v) => {
-                GetSubjectStatusOutputRecordSubject::DefsRepoBlobRef(v.into_static())
-            }
-            GetSubjectStatusOutputRecordSubject::Unknown(v) => {
-                GetSubjectStatusOutputRecordSubject::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetSubjectStatusOutput<'_> {
-    type Output = GetSubjectStatusOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetSubjectStatusOutput {
-            deactivated: self.deactivated.into_static(),
-            subject: self.subject.into_static(),
-            takedown: self.takedown.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

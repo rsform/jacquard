@@ -32,7 +32,15 @@ pub mod revoke_app_password;
 pub mod update_email;
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct InviteCode<'a> {
     pub available: i64,
@@ -48,38 +56,19 @@ pub struct InviteCode<'a> {
     pub uses: Vec<crate::com_atproto::server::InviteCodeUse<'a>>,
 }
 
-impl jacquard_common::IntoStatic for InviteCode<'_> {
-    type Output = InviteCode<'static>;
-    fn into_static(self) -> Self::Output {
-        InviteCode {
-            available: self.available.into_static(),
-            code: self.code.into_static(),
-            created_at: self.created_at.into_static(),
-            created_by: self.created_by.into_static(),
-            disabled: self.disabled.into_static(),
-            for_account: self.for_account.into_static(),
-            uses: self.uses.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct InviteCodeUse<'a> {
     pub used_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub used_by: jacquard_common::types::string::Did<'a>,
-}
-
-impl jacquard_common::IntoStatic for InviteCodeUse<'_> {
-    type Output = InviteCodeUse<'static>;
-    fn into_static(self) -> Self::Output {
-        InviteCodeUse {
-            used_at: self.used_at.into_static(),
-            used_by: self.used_by.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

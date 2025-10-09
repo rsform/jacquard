@@ -1,0 +1,80 @@
+{
+  "lexicon": 1,
+  "id": "pub.leaflet.comment",
+  "revision": 1,
+  "description": "A lexicon for comments on documents",
+  "defs": {
+    "linearDocumentQuote": {
+      "type": "object",
+      "required": [
+        "document",
+        "quote"
+      ],
+      "properties": {
+        "document": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "quote": {
+          "type": "ref",
+          "ref": "pub.leaflet.pages.linearDocument#quote"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Record containing a comment",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "plaintext",
+          "createdAt"
+        ],
+        "properties": {
+          "attachment": {
+            "type": "union",
+            "refs": [
+              "#linearDocumentQuote"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "facets": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "pub.leaflet.richtext.facet"
+            }
+          },
+          "plaintext": {
+            "type": "string"
+          },
+          "reply": {
+            "type": "ref",
+            "ref": "#replyRef"
+          },
+          "subject": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        }
+      }
+    },
+    "replyRef": {
+      "type": "object",
+      "required": [
+        "parent"
+      ],
+      "properties": {
+        "parent": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

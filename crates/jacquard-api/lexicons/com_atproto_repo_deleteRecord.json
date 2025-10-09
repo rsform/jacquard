@@ -1,0 +1,65 @@
+{
+  "lexicon": 1,
+  "id": "com.atproto.repo.deleteRecord",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Delete a repository record, or ensure it doesn't exist. Requires auth, implemented by PDS.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repo",
+            "collection",
+            "rkey"
+          ],
+          "properties": {
+            "collection": {
+              "type": "string",
+              "description": "The NSID of the record collection.",
+              "format": "nsid"
+            },
+            "repo": {
+              "type": "string",
+              "description": "The handle or DID of the repo (aka, current account).",
+              "format": "at-identifier"
+            },
+            "rkey": {
+              "type": "string",
+              "description": "The Record Key.",
+              "format": "record-key"
+            },
+            "swapCommit": {
+              "type": "string",
+              "description": "Compare and swap with the previous commit by CID.",
+              "format": "cid"
+            },
+            "swapRecord": {
+              "type": "string",
+              "description": "Compare and swap with the previous record by CID.",
+              "format": "cid"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "commit": {
+              "type": "ref",
+              "ref": "com.atproto.repo.defs#commitMeta"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidSwap"
+        }
+      ]
+    }
+  }
+}

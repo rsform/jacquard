@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.deleteOAuthClient",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Delete an OAuth client. Requires authentication.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "clientId"
+          ],
+          "properties": {
+            "clientId": {
+              "type": "string",
+              "description": "OAuth client ID to delete"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string",
+              "description": "Success confirmation message"
+            }
+          }
+        }
+      }
+    }
+  }
+}

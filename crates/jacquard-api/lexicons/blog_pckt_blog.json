@@ -1,0 +1,83 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.blog",
+  "description": "A blog record type for publishing blog metadata and configuration. Contains name, description, URL, RSS feed, theme settings, and an icon.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "blob",
+            "accept": [
+              "image/*"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "rss": {
+            "type": "string",
+            "format": "uri"
+          },
+          "theme": {
+            "type": "ref",
+            "ref": "#theme"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    },
+    "palette": {
+      "type": "object",
+      "properties": {
+        "accent": {
+          "type": "string"
+        },
+        "background": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "surfaceHover": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "properties": {
+        "dark": {
+          "type": "ref",
+          "ref": "#palette"
+        },
+        "font": {
+          "type": "string"
+        },
+        "light": {
+          "type": "ref",
+          "ref": "#palette"
+        }
+      }
+    }
+  }
+}

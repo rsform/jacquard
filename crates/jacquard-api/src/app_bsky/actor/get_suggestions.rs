@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -26,18 +27,16 @@ pub struct GetSuggestions<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for GetSuggestions<'_> {
-    type Output = GetSuggestions<'static>;
-    fn into_static(self) -> Self::Output {
-        GetSuggestions {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestionsOutput<'a> {
     #[serde(borrow)]
@@ -48,18 +47,6 @@ pub struct GetSuggestionsOutput<'a> {
     ///Snowflake for this recommendation, use when submitting recommendation events.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub rec_id: std::option::Option<i64>,
-}
-
-impl jacquard_common::IntoStatic for GetSuggestionsOutput<'_> {
-    type Output = GetSuggestionsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetSuggestionsOutput {
-            actors: self.actors.into_static(),
-            cursor: self.cursor.into_static(),
-            rec_id: self.rec_id.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

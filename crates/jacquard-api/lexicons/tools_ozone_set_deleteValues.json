@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.set.deleteValues",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Delete values from a specific set. Attempting to delete values that are not in the set will not result in an error",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "name",
+            "values"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of the set to delete values from"
+            },
+            "values": {
+              "type": "array",
+              "description": "Array of string values to delete from the set",
+              "items": {
+                "type": "string"
+              },
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "set with the given name does not exist",
+          "name": "SetNotFound"
+        }
+      ]
+    }
+  }
+}

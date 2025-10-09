@@ -1,0 +1,89 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.defs",
+  "defs": {
+    "sliceView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "name",
+        "domain",
+        "creator",
+        "createdAt"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "creator": {
+          "type": "ref",
+          "description": "Profile of the slice creator",
+          "ref": "network.slices.actor.defs#profileViewBasic"
+        },
+        "domain": {
+          "type": "string",
+          "description": "Primary domain namespace for this slice (e.g. social.grain)"
+        },
+        "indexedActorCount": {
+          "type": "integer",
+          "description": "Total number of unique indexed actors in this slice"
+        },
+        "indexedCollectionCount": {
+          "type": "integer",
+          "description": "Number of collections with indexed records"
+        },
+        "indexedRecordCount": {
+          "type": "integer",
+          "description": "Total number of indexed records in this slice"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the slice"
+        },
+        "sparkline": {
+          "type": "array",
+          "description": "Recent activity sparkline data points for the last 24 hours",
+          "items": {
+            "type": "ref",
+            "ref": "#sparklinePoint"
+          }
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "waitlistInviteCount": {
+          "type": "integer",
+          "description": "Total number of waitlist invites for this slice"
+        },
+        "waitlistRequestCount": {
+          "type": "integer",
+          "description": "Total number of waitlist requests for this slice"
+        }
+      }
+    },
+    "sparklinePoint": {
+      "type": "object",
+      "required": [
+        "timestamp",
+        "count"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    }
+  }
+}

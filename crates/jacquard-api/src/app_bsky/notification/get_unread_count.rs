@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -23,28 +24,19 @@ pub struct GetUnreadCount {
     pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
-impl jacquard_common::IntoStatic for GetUnreadCount {
-    type Output = GetUnreadCount;
-    fn into_static(self) -> Self::Output {
-        self
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetUnreadCountOutput<'a> {
     pub count: i64,
-}
-
-impl jacquard_common::IntoStatic for GetUnreadCountOutput<'_> {
-    type Output = GetUnreadCountOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetUnreadCountOutput {
-            count: self.count.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

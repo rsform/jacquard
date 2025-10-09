@@ -1,0 +1,144 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.hosting.getAccountHistory",
+  "defs": {
+    "accountCreated": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        }
+      }
+    },
+    "emailConfirmed": {
+      "type": "object",
+      "required": [
+        "email"
+      ],
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "emailUpdated": {
+      "type": "object",
+      "required": [
+        "email"
+      ],
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "required": [
+        "details",
+        "createdBy",
+        "createdAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "details": {
+          "type": "union",
+          "refs": [
+            "#accountCreated",
+            "#emailUpdated",
+            "#emailConfirmed",
+            "#passwordUpdated",
+            "#handleUpdated"
+          ]
+        }
+      }
+    },
+    "handleUpdated": {
+      "type": "object",
+      "required": [
+        "handle"
+      ],
+      "properties": {
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Get account history, e.g. log of updated email addresses or other identity information.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "did"
+        ],
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "did": {
+            "type": "string",
+            "format": "did"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "knownValues": [
+                "accountCreated",
+                "emailUpdated",
+                "emailConfirmed",
+                "passwordUpdated",
+                "handleUpdated"
+              ]
+            }
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "events"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "events": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#event"
+              }
+            }
+          }
+        }
+      }
+    },
+    "passwordUpdated": {
+      "type": "object",
+      "required": [],
+      "properties": {}
+    }
+  }
+}

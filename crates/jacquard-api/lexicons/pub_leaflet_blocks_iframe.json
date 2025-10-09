@@ -1,0 +1,23 @@
+{
+  "lexicon": 1,
+  "id": "pub.leaflet.blocks.iframe",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "minimum": 16,
+          "maximum": 1600
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

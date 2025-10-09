@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -28,19 +29,16 @@ pub struct GetFeed<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for GetFeed<'_> {
-    type Output = GetFeed<'static>;
-    fn into_static(self) -> Self::Output {
-        GetFeed {
-            cursor: self.cursor.into_static(),
-            feed: self.feed.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -48,17 +46,6 @@ pub struct GetFeedOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub feed: Vec<crate::app_bsky::feed::FeedViewPost<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetFeedOutput<'_> {
-    type Output = GetFeedOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetFeedOutput {
-            cursor: self.cursor.into_static(),
-            feed: self.feed.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

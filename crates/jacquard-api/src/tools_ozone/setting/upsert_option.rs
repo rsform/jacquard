@@ -6,7 +6,16 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    bon::Builder,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct UpsertOption<'a> {
@@ -34,36 +43,20 @@ pub struct UpsertOption<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for UpsertOption<'_> {
-    type Output = UpsertOption<'static>;
-    fn into_static(self) -> Self::Output {
-        UpsertOption {
-            description: self.description.into_static(),
-            key: self.key.into_static(),
-            manager_role: self.manager_role.into_static(),
-            scope: self.scope.into_static(),
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct UpsertOptionOutput<'a> {
     #[serde(borrow)]
     pub option: crate::tools_ozone::setting::Option<'a>,
-}
-
-impl jacquard_common::IntoStatic for UpsertOptionOutput<'_> {
-    type Output = UpsertOptionOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        UpsertOptionOutput {
-            option: self.option.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for
@@ -78,7 +71,8 @@ impl jacquard_common::xrpc::XrpcResp for UpsertOptionResponse {
 
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpsertOption<'de> {
     const NSID: &'static str = "tools.ozone.setting.upsertOption";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpsertOptionResponse;
 }

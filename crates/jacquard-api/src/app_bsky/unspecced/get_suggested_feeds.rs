@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -22,29 +23,20 @@ pub struct GetSuggestedFeeds {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for GetSuggestedFeeds {
-    type Output = GetSuggestedFeeds;
-    fn into_static(self) -> Self::Output {
-        self
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedFeedsOutput<'a> {
     #[serde(borrow)]
     pub feeds: Vec<crate::app_bsky::feed::GeneratorView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetSuggestedFeedsOutput<'_> {
-    type Output = GetSuggestedFeedsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetSuggestedFeedsOutput {
-            feeds: self.feeds.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

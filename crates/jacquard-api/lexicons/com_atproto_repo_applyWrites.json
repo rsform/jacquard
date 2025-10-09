@@ -1,0 +1,195 @@
+{
+  "lexicon": 1,
+  "id": "com.atproto.repo.applyWrites",
+  "defs": {
+    "create": {
+      "type": "object",
+      "description": "Operation which creates a new record.",
+      "required": [
+        "collection",
+        "value"
+      ],
+      "properties": {
+        "collection": {
+          "type": "string",
+          "format": "nsid"
+        },
+        "rkey": {
+          "type": "string",
+          "description": "NOTE: maxLength is redundant with record-key format. Keeping it temporarily to ensure backwards compatibility.",
+          "format": "record-key",
+          "maxLength": 512
+        },
+        "value": {
+          "type": "unknown"
+        }
+      }
+    },
+    "createResult": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "validationStatus": {
+          "type": "string",
+          "knownValues": [
+            "valid",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "delete": {
+      "type": "object",
+      "description": "Operation which deletes an existing record.",
+      "required": [
+        "collection",
+        "rkey"
+      ],
+      "properties": {
+        "collection": {
+          "type": "string",
+          "format": "nsid"
+        },
+        "rkey": {
+          "type": "string",
+          "format": "record-key"
+        }
+      }
+    },
+    "deleteResult": {
+      "type": "object",
+      "required": [],
+      "properties": {}
+    },
+    "main": {
+      "type": "procedure",
+      "description": "Apply a batch transaction of repository creates, updates, and deletes. Requires auth, implemented by PDS.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repo",
+            "writes"
+          ],
+          "properties": {
+            "repo": {
+              "type": "string",
+              "description": "The handle or DID of the repo (aka, current account).",
+              "format": "at-identifier"
+            },
+            "swapCommit": {
+              "type": "string",
+              "description": "If provided, the entire operation will fail if the current repo commit CID does not match this value. Used to prevent conflicting repo mutations.",
+              "format": "cid"
+            },
+            "validate": {
+              "type": "boolean",
+              "description": "Can be set to 'false' to skip Lexicon schema validation of record data across all operations, 'true' to require it, or leave unset to validate only for known Lexicons."
+            },
+            "writes": {
+              "type": "array",
+              "items": {
+                "type": "union",
+                "refs": [
+                  "#create",
+                  "#update",
+                  "#delete"
+                ],
+                "closed": true
+              }
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [],
+          "properties": {
+            "commit": {
+              "type": "ref",
+              "ref": "com.atproto.repo.defs#commitMeta"
+            },
+            "results": {
+              "type": "array",
+              "items": {
+                "type": "union",
+                "refs": [
+                  "#createResult",
+                  "#updateResult",
+                  "#deleteResult"
+                ],
+                "closed": true
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Indicates that the 'swapCommit' parameter did not match current commit.",
+          "name": "InvalidSwap"
+        }
+      ]
+    },
+    "update": {
+      "type": "object",
+      "description": "Operation which updates an existing record.",
+      "required": [
+        "collection",
+        "rkey",
+        "value"
+      ],
+      "properties": {
+        "collection": {
+          "type": "string",
+          "format": "nsid"
+        },
+        "rkey": {
+          "type": "string",
+          "format": "record-key"
+        },
+        "value": {
+          "type": "unknown"
+        }
+      }
+    },
+    "updateResult": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "validationStatus": {
+          "type": "string",
+          "knownValues": [
+            "valid",
+            "unknown"
+          ]
+        }
+      }
+    }
+  }
+}

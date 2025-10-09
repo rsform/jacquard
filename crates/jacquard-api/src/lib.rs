@@ -6,11 +6,116 @@
 #[cfg(feature = "app_bsky")]
 pub mod app_bsky;
 
+#[cfg(feature = "blog_pckt")]
+pub mod blog_pckt;
+
+#[cfg(feature = "blue_linkat")]
+pub mod blue_linkat;
+
+#[cfg(feature = "blue_rito")]
+pub mod blue_rito;
+
+#[cfg(feature = "blue_zio")]
+pub mod blue_zio;
+
+#[cfg(feature = "buzz_bookhive")]
+pub mod buzz_bookhive;
+
 #[cfg(feature = "chat_bsky")]
 pub mod chat_bsky;
 
 #[cfg(feature = "com_atproto")]
 pub mod com_atproto;
 
+#[cfg(feature = "com_bad_example")]
+pub mod com_bad_example;
+
+#[cfg(feature = "com_shinolabs")]
+pub mod com_shinolabs;
+
+#[cfg(feature = "com_welistskyblue")]
+pub mod com_welistskyblue;
+
+#[cfg(feature = "com_whtwnd")]
+pub mod com_whtwnd;
+
+#[cfg(feature = "community_lexicon")]
+pub mod community_lexicon;
+
+#[cfg(feature = "dev_fudgeu")]
+pub mod dev_fudgeu;
+
+#[cfg(feature = "dev_ocbwoy3")]
+pub mod dev_ocbwoy3;
+
+#[cfg(feature = "dev_regnault")]
+pub mod dev_regnault;
+
+#[cfg(feature = "did_plc_jh6yfs5dk47kykvhp7r6qwrb")]
+pub mod did_plc_jh6yfs5dk47kykvhp7r6qwrb;
+
+#[cfg(feature = "events_smokesignal")]
+pub mod events_smokesignal;
+
+#[cfg(feature = "fyi_unravel")]
+pub mod fyi_unravel;
+
+#[cfg(feature = "how_bun")]
+pub mod how_bun;
+
+#[cfg(feature = "inc_toronto")]
+pub mod inc_toronto;
+
+#[cfg(feature = "lol_atmo")]
+pub mod lol_atmo;
+
+#[cfg(feature = "lol_skittr")]
+pub mod lol_skittr;
+
+#[cfg(feature = "moe_karashiiro")]
+pub mod moe_karashiiro;
+
+#[cfg(feature = "my_skylights")]
+pub mod my_skylights;
+
+#[cfg(feature = "net_anisota")]
+pub mod net_anisota;
+
+#[cfg(feature = "net_bnewbold")]
+pub mod net_bnewbold;
+
+#[cfg(feature = "network_slices")]
+pub mod network_slices;
+
+#[cfg(feature = "place_atwork")]
+pub mod place_atwork;
+
+#[cfg(feature = "place_stream")]
+pub mod place_stream;
+
+#[cfg(feature = "pub_leaflet")]
+pub mod pub_leaflet;
+
+#[cfg(feature = "sh_tangled")]
+pub mod sh_tangled;
+
+#[cfg(feature = "sh_weaver")]
+pub mod sh_weaver;
+
+#[cfg(feature = "social_psky")]
+pub mod social_psky;
+
 #[cfg(feature = "tools_ozone")]
 pub mod tools_ozone;
+
+#[cfg(feature = "tools_smokesignal")]
+pub mod tools_smokesignal;
+
+#[cfg(feature = "uk_ewancroft")]
+pub mod uk_ewancroft;
+
+#[cfg(feature = "win_tomo_x")]
+pub mod win_tomo_x;
+
+#[cfg(feature = "xyz_autonomylab")]
+pub mod xyz_autonomylab;

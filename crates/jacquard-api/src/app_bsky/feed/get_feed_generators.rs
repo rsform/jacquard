@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -21,31 +22,20 @@ pub struct GetFeedGenerators<'a> {
     pub feeds: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GetFeedGenerators<'_> {
-    type Output = GetFeedGenerators<'static>;
-    fn into_static(self) -> Self::Output {
-        GetFeedGenerators {
-            feeds: self.feeds.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedGeneratorsOutput<'a> {
     #[serde(borrow)]
     pub feeds: Vec<crate::app_bsky::feed::GeneratorView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetFeedGeneratorsOutput<'_> {
-    type Output = GetFeedGeneratorsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetFeedGeneratorsOutput {
-            feeds: self.feeds.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -1,0 +1,78 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.startSync",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Start a background sync job to index AT Protocol records into a slice. Requires authentication.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "slice"
+          ],
+          "properties": {
+            "collections": {
+              "type": "array",
+              "description": "List of collection NSIDs to sync (primary collections matching slice domain)",
+              "items": {
+                "type": "string",
+                "format": "nsid"
+              }
+            },
+            "externalCollections": {
+              "type": "array",
+              "description": "List of external collection NSIDs to sync (collections outside slice domain)",
+              "items": {
+                "type": "string",
+                "format": "nsid"
+              }
+            },
+            "limitPerRepo": {
+              "type": "integer",
+              "description": "Maximum number of records to sync per repository"
+            },
+            "repos": {
+              "type": "array",
+              "description": "List of specific repository DIDs to sync from",
+              "items": {
+                "type": "string",
+                "format": "did"
+              }
+            },
+            "skipValidation": {
+              "type": "boolean",
+              "description": "Skip lexicon validation during sync",
+              "default": false
+            },
+            "slice": {
+              "type": "string",
+              "description": "AT-URI of the slice to sync data into"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "jobId",
+            "message"
+          ],
+          "properties": {
+            "jobId": {
+              "type": "string",
+              "description": "UUID of the enqueued sync job"
+            },
+            "message": {
+              "type": "string",
+              "description": "Success message confirming job enqueue"
+            }
+          }
+        }
+      }
+    }
+  }
+}

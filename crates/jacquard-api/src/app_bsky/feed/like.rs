@@ -7,7 +7,15 @@
 
 ///Record declaring a 'like' of a piece of subject content.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Like<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
@@ -20,16 +28,4 @@ pub struct Like<'a> {
 
 impl jacquard_common::types::collection::Collection for Like<'_> {
     const NSID: &'static str = "app.bsky.feed.like";
-}
-
-impl jacquard_common::IntoStatic for Like<'_> {
-    type Output = Like<'static>;
-    fn into_static(self) -> Self::Output {
-        Like {
-            created_at: self.created_at.into_static(),
-            subject: self.subject.into_static(),
-            via: self.via.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

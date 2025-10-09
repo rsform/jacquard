@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -32,20 +33,16 @@ pub struct SearchStarterPacksSkeleton<'a> {
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-impl jacquard_common::IntoStatic for SearchStarterPacksSkeleton<'_> {
-    type Output = SearchStarterPacksSkeleton<'static>;
-    fn into_static(self) -> Self::Output {
-        SearchStarterPacksSkeleton {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            q: self.q.into_static(),
-            viewer: self.viewer.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchStarterPacksSkeletonOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -56,18 +53,6 @@ pub struct SearchStarterPacksSkeletonOutput<'a> {
     pub hits_total: std::option::Option<i64>,
     #[serde(borrow)]
     pub starter_packs: Vec<crate::app_bsky::unspecced::SkeletonSearchStarterPack<'a>>,
-}
-
-impl jacquard_common::IntoStatic for SearchStarterPacksSkeletonOutput<'_> {
-    type Output = SearchStarterPacksSkeletonOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        SearchStarterPacksSkeletonOutput {
-            cursor: self.cursor.into_static(),
-            hits_total: self.hits_total.into_static(),
-            starter_packs: self.starter_packs.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

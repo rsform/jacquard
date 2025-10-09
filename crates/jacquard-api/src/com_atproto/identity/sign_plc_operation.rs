@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -46,37 +47,21 @@ pub struct SignPlcOperation<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for SignPlcOperation<'_> {
-    type Output = SignPlcOperation<'static>;
-    fn into_static(self) -> Self::Output {
-        SignPlcOperation {
-            also_known_as: self.also_known_as.into_static(),
-            rotation_keys: self.rotation_keys.into_static(),
-            services: self.services.into_static(),
-            token: self.token.into_static(),
-            verification_methods: self.verification_methods.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SignPlcOperationOutput<'a> {
     ///A signed DID PLC operation.
     #[serde(borrow)]
     pub operation: jacquard_common::types::value::Data<'a>,
-}
-
-impl jacquard_common::IntoStatic for SignPlcOperationOutput<'_> {
-    type Output = SignPlcOperationOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        SignPlcOperationOutput {
-            operation: self.operation.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

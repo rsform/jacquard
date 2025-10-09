@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "pub.leaflet.document",
+  "revision": 1,
+  "description": "A lexicon for long form rich media documents",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record containing a document",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "pages",
+          "author",
+          "title",
+          "publication"
+        ],
+        "properties": {
+          "author": {
+            "type": "string",
+            "format": "at-identifier"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "pages": {
+            "type": "array",
+            "items": {
+              "type": "union",
+              "refs": [
+                "pub.leaflet.pages.linearDocument"
+              ]
+            }
+          },
+          "postRef": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "publication": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 1280,
+            "maxGraphemes": 128
+          }
+        }
+      }
+    }
+  }
+}

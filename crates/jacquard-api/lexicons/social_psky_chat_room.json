@@ -1,0 +1,75 @@
+{
+  "lexicon": 1,
+  "id": "social.psky.chat.room",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A Picosky room belonging to the user.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "allowlist": {
+            "type": "ref",
+            "description": "List of users allowed to send messages in the room.",
+            "ref": "#modlistRef"
+          },
+          "denylist": {
+            "type": "ref",
+            "description": "List of users disallowed to send messages in the room.",
+            "ref": "#modlistRef"
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "language"
+            },
+            "maxLength": 3
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 320,
+            "maxGraphemes": 32
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxLength": 20
+          },
+          "topic": {
+            "type": "string",
+            "description": "Topic title of the room.",
+            "maxLength": 2560,
+            "maxGraphemes": 256
+          }
+        }
+      }
+    },
+    "modlistRef": {
+      "type": "object",
+      "required": [
+        "active",
+        "users"
+      ],
+      "properties": {
+        "active": {
+          "type": "boolean",
+          "default": false
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

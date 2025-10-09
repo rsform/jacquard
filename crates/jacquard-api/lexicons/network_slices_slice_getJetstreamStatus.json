@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.getJetstreamStatus",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the current connection status of the Jetstream real-time indexing service.",
+      "parameters": {
+        "type": "params",
+        "properties": {}
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "connected"
+          ],
+          "properties": {
+            "connected": {
+              "type": "boolean",
+              "description": "Whether Jetstream is currently connected and receiving events"
+            }
+          }
+        }
+      }
+    }
+  }
+}

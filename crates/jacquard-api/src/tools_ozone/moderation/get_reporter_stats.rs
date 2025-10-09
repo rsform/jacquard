@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -21,31 +22,20 @@ pub struct GetReporterStats<'a> {
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GetReporterStats<'_> {
-    type Output = GetReporterStats<'static>;
-    fn into_static(self) -> Self::Output {
-        GetReporterStats {
-            dids: self.dids.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetReporterStatsOutput<'a> {
     #[serde(borrow)]
     pub stats: Vec<crate::tools_ozone::moderation::ReporterStats<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetReporterStatsOutput<'_> {
-    type Output = GetReporterStatsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetReporterStatsOutput {
-            stats: self.stats.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

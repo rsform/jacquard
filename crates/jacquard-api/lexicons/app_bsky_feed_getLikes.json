@@ -1,0 +1,89 @@
+{
+  "lexicon": 1,
+  "id": "app.bsky.feed.getLikes",
+  "defs": {
+    "like": {
+      "type": "object",
+      "required": [
+        "indexedAt",
+        "createdAt",
+        "actor"
+      ],
+      "properties": {
+        "actor": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileView"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Get like records which reference a subject (by AT-URI and CID).",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "cid": {
+            "type": "string",
+            "description": "CID of the subject record (aka, specific version of record), to filter likes.",
+            "format": "cid"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "uri": {
+            "type": "string",
+            "description": "AT-URI of the subject (eg, a post record).",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "likes"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "format": "cid"
+            },
+            "cursor": {
+              "type": "string"
+            },
+            "likes": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#like"
+              }
+            },
+            "uri": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

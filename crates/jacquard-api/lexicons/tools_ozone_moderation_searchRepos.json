@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.moderation.searchRepos",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Find repositories based on a search term.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "q": {
+            "type": "string"
+          },
+          "term": {
+            "type": "string",
+            "description": "DEPRECATED: use 'q' instead"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repos"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "repos": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "tools.ozone.moderation.defs#repoView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

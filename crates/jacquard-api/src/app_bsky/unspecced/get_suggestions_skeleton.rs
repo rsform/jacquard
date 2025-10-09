@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -32,20 +33,16 @@ pub struct GetSuggestionsSkeleton<'a> {
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GetSuggestionsSkeleton<'_> {
-    type Output = GetSuggestionsSkeleton<'static>;
-    fn into_static(self) -> Self::Output {
-        GetSuggestionsSkeleton {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            relative_to_did: self.relative_to_did.into_static(),
-            viewer: self.viewer.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestionsSkeletonOutput<'a> {
     #[serde(borrow)]
@@ -60,19 +57,6 @@ pub struct GetSuggestionsSkeletonOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub relative_to_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetSuggestionsSkeletonOutput<'_> {
-    type Output = GetSuggestionsSkeletonOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetSuggestionsSkeletonOutput {
-            actors: self.actors.into_static(),
-            cursor: self.cursor.into_static(),
-            rec_id: self.rec_id.into_static(),
-            relative_to_did: self.relative_to_did.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

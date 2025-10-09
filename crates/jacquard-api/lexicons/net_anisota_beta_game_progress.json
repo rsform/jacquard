@@ -1,0 +1,163 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.beta.game.progress",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record representing a player's level progression and game statistics",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "level",
+          "totalXP",
+          "progressPercentage",
+          "xpToNextLevel",
+          "createdAt"
+        ],
+        "properties": {
+          "cardUri": {
+            "type": "string",
+            "description": "URI of the card that was advanced when triggerSource is card_advance"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the progress record was created",
+            "format": "datetime"
+          },
+          "currentStamina": {
+            "type": "string",
+            "description": "Current stamina level when this progress was recorded (decimal string, e.g. '85.5')"
+          },
+          "level": {
+            "type": "integer",
+            "description": "Current player level",
+            "minimum": 1
+          },
+          "metadata": {
+            "type": "ref",
+            "ref": "#metadata"
+          },
+          "previousLevel": {
+            "type": "integer",
+            "description": "Previous level before this update (for tracking level progression)",
+            "minimum": 1
+          },
+          "progressPercentage": {
+            "type": "string",
+            "description": "Progress percentage to the next level (decimal string, e.g. '75.5')"
+          },
+          "relatedLogUris": {
+            "type": "array",
+            "description": "URIs of related game log records that contributed to this progress",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "Session ID when this progress was recorded (for linking with log records)"
+          },
+          "sessionUri": {
+            "type": "string",
+            "description": "URI of the session record when this progress was recorded"
+          },
+          "stats": {
+            "type": "ref",
+            "ref": "#stats"
+          },
+          "totalXP": {
+            "type": "integer",
+            "description": "Total experience points accumulated",
+            "minimum": 0
+          },
+          "triggerSource": {
+            "type": "string",
+            "description": "What action triggered this progress save",
+            "enum": [
+              "card_advance",
+              "post",
+              "post_to_list",
+              "specimen_discover",
+              "specimen_catch_new",
+              "specimen_catch_repeat",
+              "level_up",
+              "manual_save",
+              "session_end"
+            ]
+          },
+          "xpGainedSinceLastSave": {
+            "type": "integer",
+            "description": "Experience points gained since the last progress save",
+            "minimum": 0
+          },
+          "xpToNextLevel": {
+            "type": "integer",
+            "description": "Experience points needed to reach the next level",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata about this progress update",
+      "properties": {
+        "clientVersion": {
+          "type": "string",
+          "description": "Version of the client when this progress was recorded"
+        },
+        "platform": {
+          "type": "string",
+          "description": "Platform where the level up occurred (web, mobile, etc.)"
+        }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "description": "Game-specific statistics and metrics",
+      "properties": {
+        "dailyRewardsClaimed": {
+          "type": "integer",
+          "description": "Total daily rewards claimed",
+          "minimum": 0
+        },
+        "itemsCollected": {
+          "type": "integer",
+          "description": "Total items collected",
+          "minimum": 0
+        },
+        "lastPostReadDate": {
+          "type": "string",
+          "description": "Date when posts read today was last updated (for daily reset tracking)",
+          "format": "datetime"
+        },
+        "postsReadToday": {
+          "type": "integer",
+          "description": "Posts read today (resets daily)",
+          "minimum": 0
+        },
+        "postsReadTotal": {
+          "type": "integer",
+          "description": "Total posts read (all time, cumulative)",
+          "minimum": 0
+        },
+        "postsViewed": {
+          "type": "integer",
+          "description": "Total posts viewed",
+          "minimum": 0
+        },
+        "shufflesPerformed": {
+          "type": "integer",
+          "description": "Total shuffles performed",
+          "minimum": 0
+        },
+        "specimensCollected": {
+          "type": "integer",
+          "description": "Total specimens collected",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

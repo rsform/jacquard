@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -31,19 +32,16 @@ pub struct GetInviteCodes<'a> {
     pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GetInviteCodes<'_> {
-    type Output = GetInviteCodes<'static>;
-    fn into_static(self) -> Self::Output {
-        GetInviteCodes {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            sort: self.sort.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetInviteCodesOutput<'a> {
     #[serde(borrow)]
@@ -51,17 +49,6 @@ pub struct GetInviteCodesOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetInviteCodesOutput<'_> {
-    type Output = GetInviteCodesOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetInviteCodesOutput {
-            codes: self.codes.into_static(),
-            cursor: self.cursor.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

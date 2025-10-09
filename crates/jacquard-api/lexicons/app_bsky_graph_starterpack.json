@@ -1,0 +1,69 @@
+{
+  "lexicon": 1,
+  "id": "app.bsky.graph.starterpack",
+  "defs": {
+    "feedItem": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Record defining a starter pack of actors and feeds for new users.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "list",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "descriptionFacets": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "feeds": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#feedItem"
+            },
+            "maxLength": 3
+          },
+          "list": {
+            "type": "string",
+            "description": "Reference (AT-URI) to the list record.",
+            "format": "at-uri"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for starter pack; can not be empty.",
+            "minLength": 1,
+            "maxLength": 500,
+            "maxGraphemes": 50
+          }
+        }
+      }
+    }
+  }
+}

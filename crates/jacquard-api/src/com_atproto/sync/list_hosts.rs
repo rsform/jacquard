@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Host<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -22,19 +30,6 @@ pub struct Host<'a> {
     pub status: std::option::Option<crate::com_atproto::sync::HostStatus<'a>>,
 }
 
-impl jacquard_common::IntoStatic for Host<'_> {
-    type Output = Host<'static>;
-    fn into_static(self) -> Self::Output {
-        Host {
-            account_count: self.account_count.into_static(),
-            hostname: self.hostname.into_static(),
-            seq: self.seq.into_static(),
-            status: self.status.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -42,7 +37,8 @@ impl jacquard_common::IntoStatic for Host<'_> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -56,18 +52,16 @@ pub struct ListHosts<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for ListHosts<'_> {
-    type Output = ListHosts<'static>;
-    fn into_static(self) -> Self::Output {
-        ListHosts {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ListHostsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -76,17 +70,6 @@ pub struct ListHostsOutput<'a> {
     ///Sort order is not formally specified. Recommended order is by time host was first seen by the server, with oldest first.
     #[serde(borrow)]
     pub hosts: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for ListHostsOutput<'_> {
-    type Output = ListHostsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        ListHostsOutput {
-            cursor: self.cursor.into_static(),
-            hosts: self.hosts.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

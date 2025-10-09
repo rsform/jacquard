@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -36,19 +37,6 @@ pub struct UnregisterPush<'a> {
         ::jacquard_common::smol_str::SmolStr,
         ::jacquard_common::types::value::Data<'a>,
     >,
-}
-
-impl jacquard_common::IntoStatic for UnregisterPush<'_> {
-    type Output = UnregisterPush<'static>;
-    fn into_static(self) -> Self::Output {
-        UnregisterPush {
-            app_id: self.app_id.into_static(),
-            platform: self.platform.into_static(),
-            service_did: self.service_did.into_static(),
-            token: self.token.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "com.atproto.admin.updateAccountEmail",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Administrative action to update an account's email.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "account",
+            "email"
+          ],
+          "properties": {
+            "account": {
+              "type": "string",
+              "description": "The handle or DID of the repo.",
+              "format": "at-identifier"
+            },
+            "email": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

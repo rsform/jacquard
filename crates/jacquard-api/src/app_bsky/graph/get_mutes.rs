@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -26,18 +27,16 @@ pub struct GetMutes<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for GetMutes<'_> {
-    type Output = GetMutes<'static>;
-    fn into_static(self) -> Self::Output {
-        GetMutes {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetMutesOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -45,17 +44,6 @@ pub struct GetMutesOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub mutes: Vec<crate::app_bsky::actor::ProfileView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetMutesOutput<'_> {
-    type Output = GetMutesOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetMutesOutput {
-            cursor: self.cursor.into_static(),
-            mutes: self.mutes.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

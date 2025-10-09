@@ -1,0 +1,107 @@
+{
+  "lexicon": 1,
+  "id": "pub.leaflet.publication",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring a publication",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "base_path": {
+            "type": "string",
+            "format": "uri"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "icon": {
+            "type": "blob",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 1000000
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "preferences": {
+            "type": "ref",
+            "ref": "#preferences"
+          },
+          "theme": {
+            "type": "ref",
+            "ref": "#theme"
+          }
+        }
+      }
+    },
+    "preferences": {
+      "type": "object",
+      "properties": {
+        "showComments": {
+          "type": "boolean",
+          "default": true
+        },
+        "showInDiscover": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "properties": {
+        "accentBackground": {
+          "type": "union",
+          "refs": [
+            "pub.leaflet.theme.color#rgba",
+            "pub.leaflet.theme.color#rgb"
+          ]
+        },
+        "accentText": {
+          "type": "union",
+          "refs": [
+            "pub.leaflet.theme.color#rgba",
+            "pub.leaflet.theme.color#rgb"
+          ]
+        },
+        "backgroundColor": {
+          "type": "union",
+          "refs": [
+            "pub.leaflet.theme.color#rgba",
+            "pub.leaflet.theme.color#rgb"
+          ]
+        },
+        "backgroundImage": {
+          "type": "ref",
+          "ref": "pub.leaflet.theme.backgroundImage"
+        },
+        "pageBackground": {
+          "type": "union",
+          "refs": [
+            "pub.leaflet.theme.color#rgba",
+            "pub.leaflet.theme.color#rgb"
+          ]
+        },
+        "primary": {
+          "type": "union",
+          "refs": [
+            "pub.leaflet.theme.color#rgba",
+            "pub.leaflet.theme.color#rgb"
+          ]
+        },
+        "showPageBackground": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}

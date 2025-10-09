@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.diff",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "ref"
+        ],
+        "properties": {
+          "ref": {
+            "type": "string",
+            "description": "Git reference (branch, tag, or commit SHA)"
+          },
+          "repo": {
+            "type": "string",
+            "description": "Repository identifier in format 'did:plc:.../repoName'"
+          }
+        }
+      },
+      "output": {
+        "encoding": "*/*"
+      },
+      "errors": [
+        {
+          "description": "Repository not found or access denied",
+          "name": "RepoNotFound"
+        },
+        {
+          "description": "Git reference not found",
+          "name": "RefNotFound"
+        },
+        {
+          "description": "Invalid request parameters",
+          "name": "InvalidRequest"
+        }
+      ]
+    }
+  }
+}

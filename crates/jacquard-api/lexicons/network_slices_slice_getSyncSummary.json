@@ -1,0 +1,100 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.getSyncSummary",
+  "defs": {
+    "collectionSummary": {
+      "type": "object",
+      "required": [
+        "collection",
+        "estimatedRepos",
+        "isExternal"
+      ],
+      "properties": {
+        "collection": {
+          "type": "string"
+        },
+        "estimatedRepos": {
+          "type": "integer"
+        },
+        "isExternal": {
+          "type": "boolean"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Get a summary of what would be synced before running a sync operation",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "slice"
+        ],
+        "properties": {
+          "collections": {
+            "type": "array",
+            "description": "Primary collections to sync",
+            "items": {
+              "type": "string"
+            }
+          },
+          "externalCollections": {
+            "type": "array",
+            "description": "External collections to sync",
+            "items": {
+              "type": "string"
+            }
+          },
+          "repos": {
+            "type": "array",
+            "description": "Specific repositories to sync (DIDs)",
+            "items": {
+              "type": "string"
+            }
+          },
+          "slice": {
+            "type": "string",
+            "description": "URI of the slice to sync"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "totalRepos",
+            "cappedRepos",
+            "collectionsSummary",
+            "wouldBeCapped",
+            "appliedLimit"
+          ],
+          "properties": {
+            "appliedLimit": {
+              "type": "integer",
+              "description": "The actual limit applied (user-specified or default)"
+            },
+            "cappedRepos": {
+              "type": "integer",
+              "description": "Number of repositories after applying limit"
+            },
+            "collectionsSummary": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#collectionSummary"
+              }
+            },
+            "totalRepos": {
+              "type": "integer",
+              "description": "Total number of repositories that would be synced"
+            },
+            "wouldBeCapped": {
+              "type": "boolean",
+              "description": "Whether the sync would be limited by maxRepos"
+            }
+          }
+        }
+      }
+    }
+  }
+}

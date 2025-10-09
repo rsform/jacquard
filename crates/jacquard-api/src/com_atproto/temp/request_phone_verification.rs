@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -28,16 +29,6 @@ pub struct RequestPhoneVerification<'a> {
         ::jacquard_common::smol_str::SmolStr,
         ::jacquard_common::types::value::Data<'a>,
     >,
-}
-
-impl jacquard_common::IntoStatic for RequestPhoneVerification<'_> {
-    type Output = RequestPhoneVerification<'static>;
-    fn into_static(self) -> Self::Output {
-        RequestPhoneVerification {
-            phone_number: self.phone_number.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

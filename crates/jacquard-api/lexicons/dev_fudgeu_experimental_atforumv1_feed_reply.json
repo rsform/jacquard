@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "dev.fudgeu.experimental.atforumv1.feed.reply",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An initial post that starts a discussion",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "content",
+          "createdAt",
+          "root"
+        ],
+        "properties": {
+          "content": {
+            "type": "string",
+            "maxLength": 10000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "root": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetUploadLimitsOutput<'a> {
     pub can_upload: bool,
@@ -20,20 +28,6 @@ pub struct GetUploadLimitsOutput<'a> {
     pub remaining_daily_bytes: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub remaining_daily_videos: std::option::Option<i64>,
-}
-
-impl jacquard_common::IntoStatic for GetUploadLimitsOutput<'_> {
-    type Output = GetUploadLimitsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetUploadLimitsOutput {
-            can_upload: self.can_upload.into_static(),
-            error: self.error.into_static(),
-            message: self.message.into_static(),
-            remaining_daily_bytes: self.remaining_daily_bytes.into_static(),
-            remaining_daily_videos: self.remaining_daily_videos.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 /// XRPC request marker type

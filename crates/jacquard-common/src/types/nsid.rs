@@ -27,7 +27,7 @@ use std::{ops::Deref, str::FromStr};
 #[derive(Clone, PartialEq, Eq, Serialize, Hash, PartialOrd, Ord)]
 #[serde(transparent)]
 #[repr(transparent)]
-pub struct Nsid<'n>(CowStr<'n>);
+pub struct Nsid<'n>(pub(crate) CowStr<'n>);
 
 /// Regex for NSID validation per AT Protocol spec
 pub static NSID_REGEX: LazyLock<Regex> = LazyLock::new(|| {

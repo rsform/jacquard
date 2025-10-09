@@ -11,11 +11,11 @@ use crate::{
 };
 use jacquard_common::{
     AuthorizationToken, CowStr, IntoStatic,
-    error::{ClientError, TransportError, XrpcResult},
+    error::{AuthError, ClientError, TransportError, XrpcResult},
     http_client::HttpClient,
     types::did::Did,
     xrpc::{
-        CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest, build_http_request,
+        CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest, XrpcResp, build_http_request,
         process_response,
     },
 };
@@ -394,8 +394,9 @@ where
             .send(build_http_request(&base_uri, &request, &opts)?)
             .await
             .map_err(|e| TransportError::Other(Box::new(e)))?;
+        let resp = process_response(http_response);
         drop(guard);
-        if is_invalid_token_response(&http_response) {
+        if is_invalid_token_response(&resp) {
             opts.auth = Some(
                 self.refresh()
                     .await
@@ -411,21 +412,21 @@ where
                 .map_err(|e| TransportError::Other(Box::new(e)))?;
             process_response(http_response)
         } else {
-            process_response(http_response)
+            resp
         }
     }
 }
 
-fn is_invalid_token_response(response: &http::Response<Vec<u8>>) -> bool {
-    let status = response.status();
-    if status.as_u16() == 401 {
-        if let Some(www_auth) = response
-            .headers()
-            .get("WWW-Authenticate")
-            .and_then(|v| v.to_str().ok())
-        {
-            return www_auth.starts_with("DPoP") && www_auth.contains(r#"error="invalid_token""#);
-        }
+fn is_invalid_token_response<R: XrpcResp>(response: &XrpcResult<Response<R>>) -> bool {
+    match response {
+        Err(ClientError::Auth(AuthError::InvalidToken)) => true,
+        Err(ClientError::Auth(AuthError::Other(value))) => value
+            .to_str()
+            .is_ok_and(|s| s.starts_with("DPoP ") && s.contains("error=\"invalid_token\"")),
+        Ok(resp) => match resp.parse() {
+            Err(jacquard_common::xrpc::XrpcError::Auth(AuthError::InvalidToken)) => true,
+            _ => false,
+        },
+        _ => false,
     }
-    false
 }

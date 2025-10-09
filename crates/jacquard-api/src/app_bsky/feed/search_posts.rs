@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -60,28 +61,16 @@ pub struct SearchPosts<'a> {
     pub url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
 }
 
-impl jacquard_common::IntoStatic for SearchPosts<'_> {
-    type Output = SearchPosts<'static>;
-    fn into_static(self) -> Self::Output {
-        SearchPosts {
-            author: self.author.into_static(),
-            cursor: self.cursor.into_static(),
-            domain: self.domain.into_static(),
-            lang: self.lang.into_static(),
-            limit: self.limit.into_static(),
-            mentions: self.mentions.into_static(),
-            q: self.q.into_static(),
-            since: self.since.into_static(),
-            sort: self.sort.into_static(),
-            tag: self.tag.into_static(),
-            until: self.until.into_static(),
-            url: self.url.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchPostsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -92,18 +81,6 @@ pub struct SearchPostsOutput<'a> {
     pub hits_total: std::option::Option<i64>,
     #[serde(borrow)]
     pub posts: Vec<crate::app_bsky::feed::PostView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for SearchPostsOutput<'_> {
-    type Output = SearchPostsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        SearchPostsOutput {
-            cursor: self.cursor.into_static(),
-            hits_total: self.hits_total.into_static(),
-            posts: self.posts.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

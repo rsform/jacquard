@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -26,18 +27,16 @@ pub struct GetRelationships<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for GetRelationships<'_> {
-    type Output = GetRelationships<'static>;
-    fn into_static(self) -> Self::Output {
-        GetRelationships {
-            actor: self.actor.into_static(),
-            others: self.others.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRelationshipsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -45,17 +44,6 @@ pub struct GetRelationshipsOutput<'a> {
     pub actor: std::option::Option<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
     pub relationships: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetRelationshipsOutput<'_> {
-    type Output = GetRelationshipsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetRelationshipsOutput {
-            actor: self.actor.into_static(),
-            relationships: self.relationships.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

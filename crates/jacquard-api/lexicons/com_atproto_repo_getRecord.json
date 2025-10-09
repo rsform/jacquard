@@ -1,0 +1,68 @@
+{
+  "lexicon": 1,
+  "id": "com.atproto.repo.getRecord",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a single record from a repository. Does not require auth.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "collection",
+          "rkey"
+        ],
+        "properties": {
+          "cid": {
+            "type": "string",
+            "description": "The CID of the version of the record. If not specified, then return the most recent version.",
+            "format": "cid"
+          },
+          "collection": {
+            "type": "string",
+            "description": "The NSID of the record collection.",
+            "format": "nsid"
+          },
+          "repo": {
+            "type": "string",
+            "description": "The handle or DID of the repo.",
+            "format": "at-identifier"
+          },
+          "rkey": {
+            "type": "string",
+            "description": "The Record Key.",
+            "format": "record-key"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "value"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "value": {
+              "type": "unknown"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "RecordNotFound"
+        }
+      ]
+    }
+  }
+}

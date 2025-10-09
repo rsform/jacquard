@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -35,21 +36,16 @@ pub struct ListMembers<'a> {
     pub roles: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-impl jacquard_common::IntoStatic for ListMembers<'_> {
-    type Output = ListMembers<'static>;
-    fn into_static(self) -> Self::Output {
-        ListMembers {
-            cursor: self.cursor.into_static(),
-            disabled: self.disabled.into_static(),
-            limit: self.limit.into_static(),
-            q: self.q.into_static(),
-            roles: self.roles.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ListMembersOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -57,17 +53,6 @@ pub struct ListMembersOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub members: Vec<crate::tools_ozone::team::Member<'a>>,
-}
-
-impl jacquard_common::IntoStatic for ListMembersOutput<'_> {
-    type Output = ListMembersOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        ListMembersOutput {
-            cursor: self.cursor.into_static(),
-            members: self.members.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

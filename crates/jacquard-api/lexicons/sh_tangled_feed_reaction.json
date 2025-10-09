@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.feed.reaction",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "reaction",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "reaction": {
+            "type": "string",
+            "enum": [
+              "👍",
+              "👎",
+              "😆",
+              "🎉",
+              "🫤",
+              "❤️",
+              "🚀",
+              "👀"
+            ]
+          },
+          "subject": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.verification.listVerifications",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List verifications",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "createdAfter": {
+            "type": "string",
+            "description": "Filter to verifications created after this timestamp",
+            "format": "datetime"
+          },
+          "createdBefore": {
+            "type": "string",
+            "description": "Filter to verifications created before this timestamp",
+            "format": "datetime"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor"
+          },
+          "isRevoked": {
+            "type": "boolean",
+            "description": "Filter to verifications that are revoked or not. By default, includes both."
+          },
+          "issuers": {
+            "type": "array",
+            "description": "Filter to verifications from specific issuers",
+            "items": {
+              "type": "string",
+              "format": "did"
+            },
+            "maxLength": 100
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of results to return",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "sortDirection": {
+            "type": "string",
+            "description": "Sort direction for creation date",
+            "default": "desc",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          "subjects": {
+            "type": "array",
+            "description": "Filter to specific verified DIDs",
+            "items": {
+              "type": "string",
+              "format": "did"
+            },
+            "maxLength": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "verifications"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "verifications": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "tools.ozone.verification.defs#verificationView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

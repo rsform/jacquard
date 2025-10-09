@@ -1,0 +1,155 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.beta.game.collection",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Beta version: Record representing a collected specimen in a player's collection",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "specimenId",
+          "quantity",
+          "acquiredAt",
+          "createdAt"
+        ],
+        "properties": {
+          "acquiredAt": {
+            "type": "string",
+            "description": "When the specimen was first acquired",
+            "format": "datetime"
+          },
+          "commonName": {
+            "type": "string",
+            "description": "Common name of the specimen",
+            "maxLength": 200
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the record was created",
+            "format": "datetime"
+          },
+          "family": {
+            "type": "string",
+            "description": "Taxonomic family",
+            "maxLength": 100
+          },
+          "genus": {
+            "type": "string",
+            "description": "Taxonomic genus",
+            "maxLength": 100
+          },
+          "lastModified": {
+            "type": "string",
+            "description": "When the record was last modified",
+            "format": "datetime"
+          },
+          "lastSeen": {
+            "type": "string",
+            "description": "When the specimen was last encountered",
+            "format": "datetime"
+          },
+          "logRecordUri": {
+            "type": "string",
+            "description": "URI of the game.log record that documents the acquisition of this specimen"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Number of specimens collected",
+            "minimum": 1
+          },
+          "rarity": {
+            "type": "string",
+            "description": "Rarity level of the specimen",
+            "enum": [
+              "common",
+              "uncommon",
+              "rare",
+              "epic",
+              "legendary"
+            ]
+          },
+          "scientificName": {
+            "type": "string",
+            "description": "Scientific name of the specimen",
+            "maxLength": 200
+          },
+          "source": {
+            "type": "string",
+            "description": "How the specimen was acquired",
+            "enum": [
+              "game_card",
+              "field_observation",
+              "trade",
+              "quest",
+              "research"
+            ]
+          },
+          "sourceDetails": {
+            "type": "ref",
+            "ref": "#sourceDetails"
+          },
+          "species": {
+            "type": "string",
+            "description": "Taxonomic species",
+            "maxLength": 100
+          },
+          "specimenData": {
+            "type": "ref",
+            "ref": "#specimenData"
+          },
+          "specimenId": {
+            "type": "string",
+            "description": "Unique identifier for the specimen",
+            "maxLength": 100
+          },
+          "status": {
+            "type": "string",
+            "description": "Collection status of this specimen",
+            "enum": [
+              "seen",
+              "collected"
+            ]
+          }
+        }
+      }
+    },
+    "sourceDetails": {
+      "type": "object",
+      "description": "Additional details about how the specimen was acquired",
+      "properties": {
+        "attempts": {
+          "type": "integer",
+          "description": "Number of attempts before successful capture"
+        },
+        "catchProbability": {
+          "type": "string",
+          "description": "Probability used when catching this specimen (decimal string, e.g. '0.75')"
+        },
+        "gameCardUri": {
+          "type": "string",
+          "description": "URI of the game card that provided this specimen"
+        },
+        "location": {
+          "type": "string",
+          "description": "Location where specimen was found or observed"
+        }
+      }
+    },
+    "specimenData": {
+      "type": "object",
+      "description": "Complete specimen information",
+      "properties": {
+        "authorship": {
+          "type": "string",
+          "description": "Scientific authorship of the species"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the specimen"
+        }
+      }
+    }
+  }
+}

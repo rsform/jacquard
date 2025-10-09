@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -32,34 +33,20 @@ pub struct GetMessageContext<'a> {
     pub message_id: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetMessageContext<'_> {
-    type Output = GetMessageContext<'static>;
-    fn into_static(self) -> Self::Output {
-        GetMessageContext {
-            after: self.after.into_static(),
-            before: self.before.into_static(),
-            convo_id: self.convo_id.into_static(),
-            message_id: self.message_id.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetMessageContextOutput<'a> {
     #[serde(borrow)]
     pub messages: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetMessageContextOutput<'_> {
-    type Output = GetMessageContextOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetMessageContextOutput {
-            messages: self.messages.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

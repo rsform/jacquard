@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -28,19 +29,16 @@ pub struct GetActorLikes<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for GetActorLikes<'_> {
-    type Output = GetActorLikes<'static>;
-    fn into_static(self) -> Self::Output {
-        GetActorLikes {
-            actor: self.actor.into_static(),
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorLikesOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -48,17 +46,6 @@ pub struct GetActorLikesOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub feed: Vec<crate::app_bsky::feed::FeedViewPost<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetActorLikesOutput<'_> {
-    type Output = GetActorLikesOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetActorLikesOutput {
-            cursor: self.cursor.into_static(),
-            feed: self.feed.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

@@ -1,0 +1,76 @@
+{
+  "lexicon": 1,
+  "id": "my.skylights.rel",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "item"
+        ],
+        "properties": {
+          "finishedAt": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "datetime"
+            }
+          },
+          "item": {
+            "type": "ref",
+            "ref": "my.skylights.defs#item"
+          },
+          "note": {
+            "type": "ref",
+            "ref": "#note"
+          },
+          "rating": {
+            "type": "ref",
+            "ref": "#rating"
+          }
+        }
+      }
+    },
+    "note": {
+      "type": "object",
+      "required": [
+        "value",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "rating": {
+      "type": "object",
+      "required": [
+        "value",
+        "createdAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "value": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        }
+      }
+    }
+  }
+}

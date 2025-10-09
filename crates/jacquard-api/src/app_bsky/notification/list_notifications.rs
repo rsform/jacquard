@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -33,21 +34,16 @@ pub struct ListNotifications<'a> {
     pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
-impl jacquard_common::IntoStatic for ListNotifications<'_> {
-    type Output = ListNotifications<'static>;
-    fn into_static(self) -> Self::Output {
-        ListNotifications {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            priority: self.priority.into_static(),
-            reasons: self.reasons.into_static(),
-            seen_at: self.seen_at.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ListNotificationsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -59,19 +55,6 @@ pub struct ListNotificationsOutput<'a> {
     pub priority: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
-impl jacquard_common::IntoStatic for ListNotificationsOutput<'_> {
-    type Output = ListNotificationsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        ListNotificationsOutput {
-            cursor: self.cursor.into_static(),
-            notifications: self.notifications.into_static(),
-            priority: self.priority.into_static(),
-            seen_at: self.seen_at.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for
@@ -91,7 +74,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListNotifications<'de> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Notification<'a> {
     #[serde(borrow)]
@@ -113,22 +104,4 @@ pub struct Notification<'a> {
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
-impl jacquard_common::IntoStatic for Notification<'_> {
-    type Output = Notification<'static>;
-    fn into_static(self) -> Self::Output {
-        Notification {
-            author: self.author.into_static(),
-            cid: self.cid.into_static(),
-            indexed_at: self.indexed_at.into_static(),
-            is_read: self.is_read.into_static(),
-            labels: self.labels.into_static(),
-            reason: self.reason.into_static(),
-            reason_subject: self.reason_subject.into_static(),
-            record: self.record.into_static(),
-            uri: self.uri.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

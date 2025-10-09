@@ -7,7 +7,15 @@
 
 ///Deprecated: use facets instead.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Entity<'a> {
     #[serde(borrow)]
@@ -19,21 +27,17 @@ pub struct Entity<'a> {
     pub value: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for Entity<'_> {
-    type Output = Entity<'static>;
-    fn into_static(self) -> Self::Output {
-        Entity {
-            index: self.index.into_static(),
-            r#type: self.r#type.into_static(),
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Record containing a Bluesky post.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
     ///Client-declared timestamp when this post was originally created.
@@ -69,7 +73,15 @@ pub struct Post<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum PostRecordEmbed<'a> {
@@ -85,24 +97,16 @@ pub enum PostRecordEmbed<'a> {
     RecordWithMedia(Box<crate::app_bsky::embed::record_with_media::RecordWithMedia<'a>>),
 }
 
-impl jacquard_common::IntoStatic for PostRecordEmbed<'_> {
-    type Output = PostRecordEmbed<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            PostRecordEmbed::Images(v) => PostRecordEmbed::Images(v.into_static()),
-            PostRecordEmbed::Video(v) => PostRecordEmbed::Video(v.into_static()),
-            PostRecordEmbed::External(v) => PostRecordEmbed::External(v.into_static()),
-            PostRecordEmbed::Record(v) => PostRecordEmbed::Record(v.into_static()),
-            PostRecordEmbed::RecordWithMedia(v) => {
-                PostRecordEmbed::RecordWithMedia(v.into_static())
-            }
-            PostRecordEmbed::Unknown(v) => PostRecordEmbed::Unknown(v.into_static()),
-        }
-    }
-}
-
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum PostRecordLabels<'a> {
@@ -110,42 +114,20 @@ pub enum PostRecordLabels<'a> {
     DefsSelfLabels(Box<crate::com_atproto::label::SelfLabels<'a>>),
 }
 
-impl jacquard_common::IntoStatic for PostRecordLabels<'_> {
-    type Output = PostRecordLabels<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            PostRecordLabels::DefsSelfLabels(v) => {
-                PostRecordLabels::DefsSelfLabels(v.into_static())
-            }
-            PostRecordLabels::Unknown(v) => PostRecordLabels::Unknown(v.into_static()),
-        }
-    }
-}
-
 impl jacquard_common::types::collection::Collection for Post<'_> {
     const NSID: &'static str = "app.bsky.feed.post";
 }
 
-impl jacquard_common::IntoStatic for Post<'_> {
-    type Output = Post<'static>;
-    fn into_static(self) -> Self::Output {
-        Post {
-            created_at: self.created_at.into_static(),
-            embed: self.embed.into_static(),
-            entities: self.entities.into_static(),
-            facets: self.facets.into_static(),
-            labels: self.labels.into_static(),
-            langs: self.langs.into_static(),
-            reply: self.reply.into_static(),
-            tags: self.tags.into_static(),
-            text: self.text.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ReplyRef<'a> {
     #[serde(borrow)]
@@ -154,33 +136,19 @@ pub struct ReplyRef<'a> {
     pub root: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
-impl jacquard_common::IntoStatic for ReplyRef<'_> {
-    type Output = ReplyRef<'static>;
-    fn into_static(self) -> Self::Output {
-        ReplyRef {
-            parent: self.parent.into_static(),
-            root: self.root.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Deprecated. Use app.bsky.richtext instead -- A text segment. Start is inclusive, end is exclusive. Indices are for utf16-encoded strings.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct TextSlice<'a> {
     pub end: i64,
     pub start: i64,
-}
-
-impl jacquard_common::IntoStatic for TextSlice<'_> {
-    type Output = TextSlice<'static>;
-    fn into_static(self) -> Self::Output {
-        TextSlice {
-            end: self.end.into_static(),
-            start: self.start.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

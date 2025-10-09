@@ -24,7 +24,15 @@ pub mod update_all_read;
 pub mod update_read;
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ConvoView<'a> {
     #[serde(borrow)]
@@ -47,56 +55,41 @@ pub struct ConvoView<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ConvoViewRecordLastMessage<'a> {}
-impl jacquard_common::IntoStatic for ConvoViewRecordLastMessage<'_> {
-    type Output = ConvoViewRecordLastMessage<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ConvoViewRecordLastMessage::Unknown(v) => {
-                ConvoViewRecordLastMessage::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ConvoViewRecordLastReaction<'a> {}
-impl jacquard_common::IntoStatic for ConvoViewRecordLastReaction<'_> {
-    type Output = ConvoViewRecordLastReaction<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ConvoViewRecordLastReaction::Unknown(v) => {
-                ConvoViewRecordLastReaction::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ConvoView<'_> {
-    type Output = ConvoView<'static>;
-    fn into_static(self) -> Self::Output {
-        ConvoView {
-            id: self.id.into_static(),
-            last_message: self.last_message.into_static(),
-            last_reaction: self.last_reaction.into_static(),
-            members: self.members.into_static(),
-            muted: self.muted.into_static(),
-            rev: self.rev.into_static(),
-            status: self.status.into_static(),
-            unread_count: self.unread_count.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct DeletedMessageView<'a> {
     #[serde(borrow)]
@@ -108,21 +101,16 @@ pub struct DeletedMessageView<'a> {
     pub sent_at: jacquard_common::types::string::Datetime,
 }
 
-impl jacquard_common::IntoStatic for DeletedMessageView<'_> {
-    type Output = DeletedMessageView<'static>;
-    fn into_static(self) -> Self::Output {
-        DeletedMessageView {
-            id: self.id.into_static(),
-            rev: self.rev.into_static(),
-            sender: self.sender.into_static(),
-            sent_at: self.sent_at.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LogAcceptConvo<'a> {
     #[serde(borrow)]
@@ -131,19 +119,16 @@ pub struct LogAcceptConvo<'a> {
     pub rev: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for LogAcceptConvo<'_> {
-    type Output = LogAcceptConvo<'static>;
-    fn into_static(self) -> Self::Output {
-        LogAcceptConvo {
-            convo_id: self.convo_id.into_static(),
-            rev: self.rev.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LogAddReaction<'a> {
     #[serde(borrow)]
@@ -157,36 +142,28 @@ pub struct LogAddReaction<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LogAddReactionRecordMessage<'a> {}
-impl jacquard_common::IntoStatic for LogAddReactionRecordMessage<'_> {
-    type Output = LogAddReactionRecordMessage<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            LogAddReactionRecordMessage::Unknown(v) => {
-                LogAddReactionRecordMessage::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for LogAddReaction<'_> {
-    type Output = LogAddReaction<'static>;
-    fn into_static(self) -> Self::Output {
-        LogAddReaction {
-            convo_id: self.convo_id.into_static(),
-            message: self.message.into_static(),
-            reaction: self.reaction.into_static(),
-            rev: self.rev.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LogBeginConvo<'a> {
     #[serde(borrow)]
@@ -195,19 +172,16 @@ pub struct LogBeginConvo<'a> {
     pub rev: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for LogBeginConvo<'_> {
-    type Output = LogBeginConvo<'static>;
-    fn into_static(self) -> Self::Output {
-        LogBeginConvo {
-            convo_id: self.convo_id.into_static(),
-            rev: self.rev.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LogCreateMessage<'a> {
     #[serde(borrow)]
@@ -219,35 +193,28 @@ pub struct LogCreateMessage<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LogCreateMessageRecordMessage<'a> {}
-impl jacquard_common::IntoStatic for LogCreateMessageRecordMessage<'_> {
-    type Output = LogCreateMessageRecordMessage<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            LogCreateMessageRecordMessage::Unknown(v) => {
-                LogCreateMessageRecordMessage::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for LogCreateMessage<'_> {
-    type Output = LogCreateMessage<'static>;
-    fn into_static(self) -> Self::Output {
-        LogCreateMessage {
-            convo_id: self.convo_id.into_static(),
-            message: self.message.into_static(),
-            rev: self.rev.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LogDeleteMessage<'a> {
     #[serde(borrow)]
@@ -259,35 +226,28 @@ pub struct LogDeleteMessage<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LogDeleteMessageRecordMessage<'a> {}
-impl jacquard_common::IntoStatic for LogDeleteMessageRecordMessage<'_> {
-    type Output = LogDeleteMessageRecordMessage<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            LogDeleteMessageRecordMessage::Unknown(v) => {
-                LogDeleteMessageRecordMessage::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for LogDeleteMessage<'_> {
-    type Output = LogDeleteMessage<'static>;
-    fn into_static(self) -> Self::Output {
-        LogDeleteMessage {
-            convo_id: self.convo_id.into_static(),
-            message: self.message.into_static(),
-            rev: self.rev.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LogLeaveConvo<'a> {
     #[serde(borrow)]
@@ -296,19 +256,16 @@ pub struct LogLeaveConvo<'a> {
     pub rev: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for LogLeaveConvo<'_> {
-    type Output = LogLeaveConvo<'static>;
-    fn into_static(self) -> Self::Output {
-        LogLeaveConvo {
-            convo_id: self.convo_id.into_static(),
-            rev: self.rev.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LogMuteConvo<'a> {
     #[serde(borrow)]
@@ -317,19 +274,16 @@ pub struct LogMuteConvo<'a> {
     pub rev: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for LogMuteConvo<'_> {
-    type Output = LogMuteConvo<'static>;
-    fn into_static(self) -> Self::Output {
-        LogMuteConvo {
-            convo_id: self.convo_id.into_static(),
-            rev: self.rev.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LogReadMessage<'a> {
     #[serde(borrow)]
@@ -341,35 +295,28 @@ pub struct LogReadMessage<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LogReadMessageRecordMessage<'a> {}
-impl jacquard_common::IntoStatic for LogReadMessageRecordMessage<'_> {
-    type Output = LogReadMessageRecordMessage<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            LogReadMessageRecordMessage::Unknown(v) => {
-                LogReadMessageRecordMessage::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for LogReadMessage<'_> {
-    type Output = LogReadMessage<'static>;
-    fn into_static(self) -> Self::Output {
-        LogReadMessage {
-            convo_id: self.convo_id.into_static(),
-            message: self.message.into_static(),
-            rev: self.rev.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LogRemoveReaction<'a> {
     #[serde(borrow)]
@@ -383,36 +330,28 @@ pub struct LogRemoveReaction<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LogRemoveReactionRecordMessage<'a> {}
-impl jacquard_common::IntoStatic for LogRemoveReactionRecordMessage<'_> {
-    type Output = LogRemoveReactionRecordMessage<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            LogRemoveReactionRecordMessage::Unknown(v) => {
-                LogRemoveReactionRecordMessage::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for LogRemoveReaction<'_> {
-    type Output = LogRemoveReaction<'static>;
-    fn into_static(self) -> Self::Output {
-        LogRemoveReaction {
-            convo_id: self.convo_id.into_static(),
-            message: self.message.into_static(),
-            reaction: self.reaction.into_static(),
-            rev: self.rev.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LogUnmuteConvo<'a> {
     #[serde(borrow)]
@@ -421,19 +360,16 @@ pub struct LogUnmuteConvo<'a> {
     pub rev: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for LogUnmuteConvo<'_> {
-    type Output = LogUnmuteConvo<'static>;
-    fn into_static(self) -> Self::Output {
-        LogUnmuteConvo {
-            convo_id: self.convo_id.into_static(),
-            rev: self.rev.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct MessageAndReactionView<'a> {
     #[serde(borrow)]
@@ -442,19 +378,16 @@ pub struct MessageAndReactionView<'a> {
     pub reaction: crate::chat_bsky::convo::ReactionView<'a>,
 }
 
-impl jacquard_common::IntoStatic for MessageAndReactionView<'_> {
-    type Output = MessageAndReactionView<'static>;
-    fn into_static(self) -> Self::Output {
-        MessageAndReactionView {
-            message: self.message.into_static(),
-            reaction: self.reaction.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct MessageInput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -469,7 +402,15 @@ pub struct MessageInput<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum MessageInputRecordEmbed<'a> {
@@ -477,34 +418,16 @@ pub enum MessageInputRecordEmbed<'a> {
     Record(Box<crate::app_bsky::embed::record::Record<'a>>),
 }
 
-impl jacquard_common::IntoStatic for MessageInputRecordEmbed<'_> {
-    type Output = MessageInputRecordEmbed<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            MessageInputRecordEmbed::Record(v) => {
-                MessageInputRecordEmbed::Record(v.into_static())
-            }
-            MessageInputRecordEmbed::Unknown(v) => {
-                MessageInputRecordEmbed::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for MessageInput<'_> {
-    type Output = MessageInput<'static>;
-    fn into_static(self) -> Self::Output {
-        MessageInput {
-            embed: self.embed.into_static(),
-            facets: self.facets.into_static(),
-            text: self.text.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct MessageRef<'a> {
     #[serde(borrow)]
@@ -515,20 +438,16 @@ pub struct MessageRef<'a> {
     pub message_id: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for MessageRef<'_> {
-    type Output = MessageRef<'static>;
-    fn into_static(self) -> Self::Output {
-        MessageRef {
-            convo_id: self.convo_id.into_static(),
-            did: self.did.into_static(),
-            message_id: self.message_id.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct MessageView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -554,7 +473,15 @@ pub struct MessageView<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum MessageViewRecordEmbed<'a> {
@@ -562,57 +489,32 @@ pub enum MessageViewRecordEmbed<'a> {
     RecordView(Box<crate::app_bsky::embed::record::View<'a>>),
 }
 
-impl jacquard_common::IntoStatic for MessageViewRecordEmbed<'_> {
-    type Output = MessageViewRecordEmbed<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            MessageViewRecordEmbed::RecordView(v) => {
-                MessageViewRecordEmbed::RecordView(v.into_static())
-            }
-            MessageViewRecordEmbed::Unknown(v) => {
-                MessageViewRecordEmbed::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for MessageView<'_> {
-    type Output = MessageView<'static>;
-    fn into_static(self) -> Self::Output {
-        MessageView {
-            embed: self.embed.into_static(),
-            facets: self.facets.into_static(),
-            id: self.id.into_static(),
-            reactions: self.reactions.into_static(),
-            rev: self.rev.into_static(),
-            sender: self.sender.into_static(),
-            sent_at: self.sent_at.into_static(),
-            text: self.text.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct MessageViewSender<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
-impl jacquard_common::IntoStatic for MessageViewSender<'_> {
-    type Output = MessageViewSender<'static>;
-    fn into_static(self) -> Self::Output {
-        MessageViewSender {
-            did: self.did.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ReactionView<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
@@ -622,32 +524,18 @@ pub struct ReactionView<'a> {
     pub value: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for ReactionView<'_> {
-    type Output = ReactionView<'static>;
-    fn into_static(self) -> Self::Output {
-        ReactionView {
-            created_at: self.created_at.into_static(),
-            sender: self.sender.into_static(),
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ReactionViewSender<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-}
-
-impl jacquard_common::IntoStatic for ReactionViewSender<'_> {
-    type Output = ReactionViewSender<'static>;
-    fn into_static(self) -> Self::Output {
-        ReactionViewSender {
-            did: self.did.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

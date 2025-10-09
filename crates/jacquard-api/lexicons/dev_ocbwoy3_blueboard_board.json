@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "dev.ocbwoy3.blueboard.board",
+  "description": "This record defines a board on Blue Board (e.g. /at/, /pic/, etc.)",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "nsfw",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "The date and time when the board was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "A short description of the board",
+            "maxGraphemes": 30
+          },
+          "nsfw": {
+            "type": "boolean",
+            "description": "Whether the board is NSFW"
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the board (e.g. /at/)",
+            "maxLength": 10
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "lexicon": 1,
+  "id": "buzz.bookhive.book",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A book in the user's library",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "authors",
+          "hiveId",
+          "createdAt"
+        ],
+        "properties": {
+          "authors": {
+            "type": "string",
+            "description": "The authors of the book (tab separated)",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "cover": {
+            "type": "blob",
+            "description": "Cover image of the book",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "finishedAt": {
+            "type": "string",
+            "description": "The date the user finished reading the book",
+            "format": "datetime"
+          },
+          "hiveId": {
+            "type": "string",
+            "description": "The book's hive id, used to correlate user's books with the hive"
+          },
+          "review": {
+            "type": "string",
+            "description": "The book's review",
+            "maxGraphemes": 15000
+          },
+          "stars": {
+            "type": "integer",
+            "description": "Number of stars given to the book (1-10) which will be mapped to 1-5 stars",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "startedAt": {
+            "type": "string",
+            "description": "The date the user started reading the book",
+            "format": "datetime"
+          },
+          "status": {
+            "type": "string",
+            "knownValues": [
+              "buzz.bookhive.defs#finished",
+              "buzz.bookhive.defs#reading",
+              "buzz.bookhive.defs#wantToRead",
+              "buzz.bookhive.defs#abandoned",
+              "buzz.bookhive.defs#owned"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the book",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        }
+      }
+    }
+  }
+}

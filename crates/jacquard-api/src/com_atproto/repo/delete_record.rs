@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -46,37 +47,21 @@ pub struct DeleteRecord<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for DeleteRecord<'_> {
-    type Output = DeleteRecord<'static>;
-    fn into_static(self) -> Self::Output {
-        DeleteRecord {
-            collection: self.collection.into_static(),
-            repo: self.repo.into_static(),
-            rkey: self.rkey.into_static(),
-            swap_commit: self.swap_commit.into_static(),
-            swap_record: self.swap_record.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteRecordOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub commit: std::option::Option<crate::com_atproto::repo::CommitMeta<'a>>,
-}
-
-impl jacquard_common::IntoStatic for DeleteRecordOutput<'_> {
-    type Output = DeleteRecordOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        DeleteRecordOutput {
-            commit: self.commit.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

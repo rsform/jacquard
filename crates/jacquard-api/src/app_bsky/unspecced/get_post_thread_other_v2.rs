@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -24,33 +25,21 @@ pub struct GetPostThreadOtherV2<'a> {
     pub prioritize_followed_users: std::option::Option<bool>,
 }
 
-impl jacquard_common::IntoStatic for GetPostThreadOtherV2<'_> {
-    type Output = GetPostThreadOtherV2<'static>;
-    fn into_static(self) -> Self::Output {
-        GetPostThreadOtherV2 {
-            anchor: self.anchor.into_static(),
-            prioritize_followed_users: self.prioritize_followed_users.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThreadOtherV2Output<'a> {
     ///A flat list of other thread items. The depth of each item is indicated by the depth property inside the item.
     #[serde(borrow)]
     pub thread: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetPostThreadOtherV2Output<'_> {
-    type Output = GetPostThreadOtherV2Output<'static>;
-    fn into_static(self) -> Self::Output {
-        GetPostThreadOtherV2Output {
-            thread: self.thread.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for
@@ -70,7 +59,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetPostThreadOtherV2<'de> 
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItem<'a> {
     ///The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
@@ -82,36 +79,18 @@ pub struct ThreadItem<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ThreadItemRecordValue<'a> {
     #[serde(rename = "app.bsky.unspecced.defs#threadItemPost")]
     DefsThreadItemPost(Box<crate::app_bsky::unspecced::ThreadItemPost<'a>>),
-}
-
-impl jacquard_common::IntoStatic for ThreadItemRecordValue<'_> {
-    type Output = ThreadItemRecordValue<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThreadItemRecordValue::DefsThreadItemPost(v) => {
-                ThreadItemRecordValue::DefsThreadItemPost(v.into_static())
-            }
-            ThreadItemRecordValue::Unknown(v) => {
-                ThreadItemRecordValue::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ThreadItem<'_> {
-    type Output = ThreadItem<'static>;
-    fn into_static(self) -> Self::Output {
-        ThreadItem {
-            depth: self.depth.into_static(),
-            uri: self.uri.into_static(),
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

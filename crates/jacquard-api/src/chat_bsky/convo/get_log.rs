@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -23,17 +24,16 @@ pub struct GetLog<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GetLog<'_> {
-    type Output = GetLog<'static>;
-    fn into_static(self) -> Self::Output {
-        GetLog {
-            cursor: self.cursor.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLogOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -41,17 +41,6 @@ pub struct GetLogOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub logs: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetLogOutput<'_> {
-    type Output = GetLogOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetLogOutput {
-            cursor: self.cursor.into_static(),
-            logs: self.logs.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

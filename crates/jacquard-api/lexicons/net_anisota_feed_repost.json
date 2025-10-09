@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.feed.repost",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record representing a 'repost' of an existing piece of content published in the Anisota feed. The target of the repost is the 'subject' of the record.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this repost was created.",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "The subject of the repost.",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

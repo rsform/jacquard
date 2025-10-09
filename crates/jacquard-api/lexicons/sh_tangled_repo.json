@@ -1,0 +1,54 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "knot",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "minGraphemes": 1,
+            "maxGraphemes": 140
+          },
+          "knot": {
+            "type": "string",
+            "description": "knot where the repo was created"
+          },
+          "labels": {
+            "type": "array",
+            "description": "List of labels that this repo subscribes to",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "name of the repo"
+          },
+          "source": {
+            "type": "string",
+            "description": "source of the repo",
+            "format": "uri"
+          },
+          "spindle": {
+            "type": "string",
+            "description": "CI runner to send jobs to and receive results from"
+          }
+        }
+      }
+    }
+  }
+}

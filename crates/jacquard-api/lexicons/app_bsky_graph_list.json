@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "app.bsky.graph.list",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record representing a list of accounts (actors). Scope includes both moderation-oriented lists and curration-oriented lists.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "purpose",
+          "createdAt"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "descriptionFacets": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "labels": {
+            "type": "union",
+            "refs": [
+              "com.atproto.label.defs#selfLabels"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for list; can not be empty.",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "purpose": {
+            "type": "ref",
+            "description": "Defines the purpose of the list (aka, moderation-oriented or curration-oriented)",
+            "ref": "app.bsky.graph.defs#listPurpose"
+          }
+        }
+      }
+    }
+  }
+}

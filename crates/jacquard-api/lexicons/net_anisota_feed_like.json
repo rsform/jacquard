@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.feed.like",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring a 'like' of a piece of content published in the Anisota feed. The target of the like is the 'subject' of the record.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this like was created.",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "The subject of the like.",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

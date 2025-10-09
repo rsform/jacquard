@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -28,19 +29,16 @@ pub struct GetStarterPacksWithMembership<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for GetStarterPacksWithMembership<'_> {
-    type Output = GetStarterPacksWithMembership<'static>;
-    fn into_static(self) -> Self::Output {
-        GetStarterPacksWithMembership {
-            actor: self.actor.into_static(),
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStarterPacksWithMembershipOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -48,19 +46,6 @@ pub struct GetStarterPacksWithMembershipOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub starter_packs_with_membership: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetStarterPacksWithMembershipOutput<'_> {
-    type Output = GetStarterPacksWithMembershipOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetStarterPacksWithMembershipOutput {
-            cursor: self.cursor.into_static(),
-            starter_packs_with_membership: self
-                .starter_packs_with_membership
-                .into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for
@@ -82,7 +67,15 @@ for GetStarterPacksWithMembership<'de> {
 
 ///A starter pack and an optional list item indicating membership of a target user to that starter pack.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct StarterPackWithMembership<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -90,15 +83,4 @@ pub struct StarterPackWithMembership<'a> {
     pub list_item: std::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
     #[serde(borrow)]
     pub starter_pack: crate::app_bsky::graph::StarterPackView<'a>,
-}
-
-impl jacquard_common::IntoStatic for StarterPackWithMembership<'_> {
-    type Output = StarterPackWithMembership<'static>;
-    fn into_static(self) -> Self::Output {
-        StarterPackWithMembership {
-            list_item: self.list_item.into_static(),
-            starter_pack: self.starter_pack.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

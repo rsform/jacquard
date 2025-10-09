@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -34,20 +35,16 @@ pub struct SearchRepos<'a> {
     pub term: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for SearchRepos<'_> {
-    type Output = SearchRepos<'static>;
-    fn into_static(self) -> Self::Output {
-        SearchRepos {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            q: self.q.into_static(),
-            term: self.term.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchReposOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -55,17 +52,6 @@ pub struct SearchReposOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub repos: Vec<crate::tools_ozone::moderation::RepoView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for SearchReposOutput<'_> {
-    type Output = SearchReposOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        SearchReposOutput {
-            cursor: self.cursor.into_static(),
-            repos: self.repos.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

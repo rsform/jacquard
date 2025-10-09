@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "place.atwork.profile",
+  "defs": {
+    "forhire": {
+      "type": "token",
+      "description": "Indicates the identity is available for hire"
+    },
+    "hiring": {
+      "type": "token",
+      "description": "Indicates the identity is actively hiring"
+    },
+    "main": {
+      "type": "record",
+      "description": "A user profile for AT://Work.Place",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "A free text description of the identity.",
+            "maxLength": 2000,
+            "maxGraphemes": 2000
+          },
+          "displayName": {
+            "type": "string",
+            "description": "The display name of the identity.",
+            "maxLength": 200,
+            "maxGraphemes": 200
+          },
+          "facets": {
+            "type": "array",
+            "description": "Annotations of text (mentions, URLs, hashtags, etc) in the description.",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "The current status of the identity.",
+            "knownValues": [
+              "place.atwork.profile#hiring",
+              "place.atwork.profile#forhire"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

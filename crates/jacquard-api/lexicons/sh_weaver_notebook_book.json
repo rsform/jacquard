@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.book",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Authors of a Weaver notebook.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "authors",
+          "entryList"
+        ],
+        "properties": {
+          "authors": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "sh.weaver.actor.defs#author"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this was originally created.",
+            "format": "datetime"
+          },
+          "entryList": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            }
+          },
+          "tags": {
+            "type": "ref",
+            "ref": "sh.weaver.notebook.defs#tags"
+          },
+          "title": {
+            "type": "ref",
+            "ref": "sh.weaver.notebook.defs#title"
+          }
+        }
+      }
+    }
+  }
+}

@@ -4,7 +4,7 @@ use std::{collections::BTreeMap, str::FromStr};
 use base64::{Engine, prelude::BASE64_STANDARD};
 use bytes::Bytes;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::VariantAccess};
-use smol_str::SmolStr;
+use smol_str::{SmolStr, ToSmolStr};
 
 use crate::{
     IntoStatic,
@@ -133,9 +133,12 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
     where
         E: serde::de::Error,
     {
-        Err(E::custom(
-            "floating point numbers not allowed in AT protocol data",
-        ))
+        Ok(Data::String(AtprotoStr::String(
+            CowStr::Owned(_v.to_smolstr()).into_static(),
+        )))
+        // Err(E::custom(
+        //     "floating point numbers not allowed in AT protocol data",
+        // ))
     }
 
     fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
@@ -757,4 +760,741 @@ fn apply_raw_type_inference<'s>(
     }
 
     Ok(RawData::Object(map))
+}
+
+// Deserializer implementation for &Data<'de> - allows deserializing typed data from Data values
+impl<'de> serde::Deserializer<'de> for &'de Data<'de> {
+    type Error = DataDeserializerError;
+
+    fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::Visitor<'de>,
+    {
+        match self {
+            Data::Null => visitor.visit_unit(),
+            Data::Boolean(b) => visitor.visit_bool(*b),
+            Data::Integer(i) => visitor.visit_i64(*i),
+            Data::String(s) => {
+                // Get the string with 'de lifetime first
+                let string_ref: &'de str = s.as_str();
+
+                // Try to borrow from types that contain CowStr
+                match s {
+                    AtprotoStr::String(cow) => match cow {
+                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
+                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
+                    },
+                    AtprotoStr::Did(Did(cow)) => match cow {
+                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
+                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
+                    },
+                    AtprotoStr::Handle(Handle(cow)) => match cow {
+                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
+                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
+                    },
+                    AtprotoStr::Nsid(Nsid(cow)) => match cow {
+                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
+                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
+                    },
+                    AtprotoStr::Uri(Uri::Did(Did(cow))) => match cow {
+                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
+                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
+                    },
+                    AtprotoStr::Uri(Uri::Any(cow)) => match cow {
+                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
+                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
+                    },
+                    AtprotoStr::Cid(Cid::Str(cow)) => match cow {
+                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
+                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
+                    },
+                    AtprotoStr::AtIdentifier(AtIdentifier::Did(Did(cow))) => match cow {
+                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
+                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
+                    },
+                    AtprotoStr::AtIdentifier(AtIdentifier::Handle(Handle(cow))) => match cow {
+                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
+                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
+                    },
+                    AtprotoStr::RecordKey(RecordKey(Rkey(cow))) => match cow {
+                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
+                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
+                    },
+                    // All other types (Tid, Datetime, Language, AtUri with SmolStr):
+                    // use visit_borrowed_str with the &'de str so they can borrow if needed
+                    _ => visitor.visit_borrowed_str(string_ref),
+                }
+            }
+            Data::Bytes(b) => visitor.visit_bytes(b),
+            Data::CidLink(cid) => visitor.visit_str(cid.as_str()),
+            Data::Array(arr) => visitor.visit_seq(ArrayDeserializer::new(&arr.0)),
+            Data::Object(obj) => visitor.visit_map(ObjectDeserializer::new(&obj.0)),
+            Data::Blob(blob) => {
+                // Blob is a root type - deserialize as the Blob itself via map representation
+                visitor.visit_map(BlobDeserializer::new(blob))
+            }
+        }
+    }
+
+    serde::forward_to_deserialize_any! {
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+        bytes byte_buf option unit unit_struct newtype_struct seq tuple
+        tuple_struct map struct enum identifier ignored_any
+    }
+}
+
+// Deserializer implementation for &RawData<'de>
+impl<'de> serde::Deserializer<'de> for &'de RawData<'de> {
+    type Error = DataDeserializerError;
+
+    fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::Visitor<'de>,
+    {
+        match self {
+            RawData::Null => visitor.visit_unit(),
+            RawData::Boolean(b) => visitor.visit_bool(*b),
+            RawData::SignedInt(i) => visitor.visit_i64(*i),
+            RawData::UnsignedInt(u) => visitor.visit_u64(*u),
+            RawData::String(cow) => match cow {
+                CowStr::Borrowed(s) => visitor.visit_borrowed_str(s),
+                CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
+            },
+            RawData::Bytes(b) => visitor.visit_bytes(b),
+            RawData::CidLink(cid) => visitor.visit_str(cid.as_str()),
+            RawData::Array(arr) => visitor.visit_seq(RawArrayDeserializer::new(arr)),
+            RawData::Object(obj) => visitor.visit_map(RawObjectDeserializer::new(obj)),
+            RawData::Blob(blob) => visitor.visit_map(BlobDeserializer::new(blob)),
+            RawData::InvalidBlob(data) => data.as_ref().deserialize_any(visitor),
+            RawData::InvalidNumber(bytes) => visitor.visit_bytes(bytes),
+            RawData::InvalidData(bytes) => visitor.visit_bytes(bytes),
+        }
+    }
+
+    serde::forward_to_deserialize_any! {
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+        bytes byte_buf option unit unit_struct newtype_struct seq tuple
+        tuple_struct map struct enum identifier ignored_any
+    }
+}
+
+/// Error type for Data/RawData deserializer
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum DataDeserializerError {
+    /// Custom error message
+    #[error("{0}")]
+    Message(String),
+    /// Invalid type error
+    #[error("invalid type: expected {expected}, found {found}")]
+    InvalidType {
+        /// Expected type
+        expected: String,
+        /// Found type
+        found: String,
+    },
+    /// Unknown field error
+    #[error("unknown field: {0}")]
+    UnknownField(String),
+    /// Missing field error
+    #[error("missing field: {0}")]
+    MissingField(String),
+}
+
+impl serde::de::Error for DataDeserializerError {
+    fn custom<T: fmt::Display>(msg: T) -> Self {
+        DataDeserializerError::Message(msg.to_string())
+    }
+}
+
+// MapAccess implementation for Blob - allows borrowing from blob fields
+struct BlobDeserializer<'de> {
+    blob: &'de Blob<'de>,
+    field_index: usize,
+}
+
+impl<'de> BlobDeserializer<'de> {
+    fn new(blob: &'de Blob<'de>) -> Self {
+        Self {
+            blob,
+            field_index: 0,
+        }
+    }
+}
+
+impl<'de> serde::de::MapAccess<'de> for BlobDeserializer<'de> {
+    type Error = DataDeserializerError;
+
+    fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>, Self::Error>
+    where
+        K: serde::de::DeserializeSeed<'de>,
+    {
+        let key = match self.field_index {
+            0 => "$type",
+            1 => "ref",
+            2 => "mimeType",
+            3 => "size",
+            _ => return Ok(None),
+        };
+        self.field_index += 1;
+        seed.deserialize(BorrowedStrDeserializer(key)).map(Some)
+    }
+
+    fn next_value_seed<V>(&mut self, seed: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::DeserializeSeed<'de>,
+    {
+        match self.field_index - 1 {
+            0 => seed.deserialize(BorrowedStrDeserializer("blob")),
+            1 => seed.deserialize(BorrowedStrDeserializer(self.blob.r#ref.as_str())),
+            2 => seed.deserialize(BorrowedStrDeserializer(self.blob.mime_type.as_str())),
+            3 => seed.deserialize(I64Deserializer(self.blob.size as i64)),
+            _ => Err(DataDeserializerError::Message(
+                "invalid field index".to_string(),
+            )),
+        }
+    }
+}
+
+// Helper deserializer for borrowed strings
+struct BorrowedStrDeserializer<'de>(&'de str);
+
+impl<'de> serde::Deserializer<'de> for BorrowedStrDeserializer<'de> {
+    type Error = DataDeserializerError;
+
+    fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::Visitor<'de>,
+    {
+        visitor.visit_borrowed_str(self.0)
+    }
+
+    serde::forward_to_deserialize_any! {
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+        bytes byte_buf option unit unit_struct newtype_struct seq tuple
+        tuple_struct map struct enum identifier ignored_any
+    }
+}
+
+// Helper deserializer for i64 values
+struct I64Deserializer(i64);
+
+impl<'de> serde::Deserializer<'de> for I64Deserializer {
+    type Error = DataDeserializerError;
+
+    fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::Visitor<'de>,
+    {
+        visitor.visit_i64(self.0)
+    }
+
+    serde::forward_to_deserialize_any! {
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+        bytes byte_buf option unit unit_struct newtype_struct seq tuple
+        tuple_struct map struct enum identifier ignored_any
+    }
+}
+
+// SeqAccess implementation for Data::Array
+struct ArrayDeserializer<'de> {
+    iter: std::slice::Iter<'de, Data<'de>>,
+}
+
+impl<'de> ArrayDeserializer<'de> {
+    fn new(slice: &'de [Data<'de>]) -> Self {
+        Self { iter: slice.iter() }
+    }
+}
+
+impl<'de> serde::de::SeqAccess<'de> for ArrayDeserializer<'de> {
+    type Error = DataDeserializerError;
+
+    fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
+    where
+        T: serde::de::DeserializeSeed<'de>,
+    {
+        match self.iter.next() {
+            Some(value) => seed.deserialize(value).map(Some),
+            None => Ok(None),
+        }
+    }
+}
+
+// MapAccess implementation for Data::Object
+struct ObjectDeserializer<'de> {
+    iter: std::collections::btree_map::Iter<'de, SmolStr, Data<'de>>,
+    value: Option<&'de Data<'de>>,
+}
+
+impl<'de> ObjectDeserializer<'de> {
+    fn new(map: &'de BTreeMap<SmolStr, Data<'de>>) -> Self {
+        Self {
+            iter: map.iter(),
+            value: None,
+        }
+    }
+}
+
+impl<'de> serde::de::MapAccess<'de> for ObjectDeserializer<'de> {
+    type Error = DataDeserializerError;
+
+    fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>, Self::Error>
+    where
+        K: serde::de::DeserializeSeed<'de>,
+    {
+        match self.iter.next() {
+            Some((key, value)) => {
+                self.value = Some(value);
+                seed.deserialize(BorrowedStrDeserializer(key.as_str()))
+                    .map(Some)
+            }
+            None => Ok(None),
+        }
+    }
+
+    fn next_value_seed<V>(&mut self, seed: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::DeserializeSeed<'de>,
+    {
+        match self.value.take() {
+            Some(value) => seed.deserialize(value),
+            None => Err(DataDeserializerError::Message(
+                "value is missing".to_string(),
+            )),
+        }
+    }
+}
+
+// SeqAccess implementation for RawData::Array
+struct RawArrayDeserializer<'de> {
+    iter: std::slice::Iter<'de, RawData<'de>>,
+}
+
+impl<'de> RawArrayDeserializer<'de> {
+    fn new(slice: &'de [RawData<'de>]) -> Self {
+        Self { iter: slice.iter() }
+    }
+}
+
+impl<'de> serde::de::SeqAccess<'de> for RawArrayDeserializer<'de> {
+    type Error = DataDeserializerError;
+
+    fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
+    where
+        T: serde::de::DeserializeSeed<'de>,
+    {
+        match self.iter.next() {
+            Some(value) => seed.deserialize(value).map(Some),
+            None => Ok(None),
+        }
+    }
+}
+
+// MapAccess implementation for RawData::Object
+struct RawObjectDeserializer<'de> {
+    iter: std::collections::btree_map::Iter<'de, SmolStr, RawData<'de>>,
+    value: Option<&'de RawData<'de>>,
+}
+
+impl<'de> RawObjectDeserializer<'de> {
+    fn new(map: &'de BTreeMap<SmolStr, RawData<'de>>) -> Self {
+        Self {
+            iter: map.iter(),
+            value: None,
+        }
+    }
+}
+
+impl<'de> serde::de::MapAccess<'de> for RawObjectDeserializer<'de> {
+    type Error = DataDeserializerError;
+
+    fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>, Self::Error>
+    where
+        K: serde::de::DeserializeSeed<'de>,
+    {
+        match self.iter.next() {
+            Some((key, value)) => {
+                self.value = Some(value);
+                seed.deserialize(BorrowedStrDeserializer(key.as_str()))
+                    .map(Some)
+            }
+            None => Ok(None),
+        }
+    }
+
+    fn next_value_seed<V>(&mut self, seed: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::DeserializeSeed<'de>,
+    {
+        match self.value.take() {
+            Some(value) => seed.deserialize(value),
+            None => Err(DataDeserializerError::Message(
+                "value is missing".to_string(),
+            )),
+        }
+    }
+}
+
+// ========================================================================
+// SERIALIZER IMPLEMENTATION - Serializing to RawData
+// ========================================================================
+
+/// Error type for RawData serialization
+#[derive(Debug)]
+pub enum RawDataSerializerError {
+    Message(String),
+}
+
+impl fmt::Display for RawDataSerializerError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Message(msg) => write!(f, "{}", msg),
+        }
+    }
+}
+
+impl std::error::Error for RawDataSerializerError {}
+
+impl serde::ser::Error for RawDataSerializerError {
+    fn custom<T: fmt::Display>(msg: T) -> Self {
+        Self::Message(msg.to_string())
+    }
+}
+
+/// Serializer that produces RawData values
+pub struct RawDataSerializer;
+
+impl serde::Serializer for RawDataSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    type SerializeSeq = RawDataSeqSerializer;
+    type SerializeTuple = RawDataSeqSerializer;
+    type SerializeTupleStruct = RawDataSeqSerializer;
+    type SerializeTupleVariant = RawDataSeqSerializer;
+    type SerializeMap = RawDataMapSerializer;
+    type SerializeStruct = RawDataMapSerializer;
+    type SerializeStructVariant = RawDataMapSerializer;
+
+    fn serialize_bool(self, v: bool) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::Boolean(v))
+    }
+
+    fn serialize_i8(self, v: i8) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::SignedInt(v as i64))
+    }
+
+    fn serialize_i16(self, v: i16) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::SignedInt(v as i64))
+    }
+
+    fn serialize_i32(self, v: i32) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::SignedInt(v as i64))
+    }
+
+    fn serialize_i64(self, v: i64) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::SignedInt(v))
+    }
+
+    fn serialize_u8(self, v: u8) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::UnsignedInt(v as u64))
+    }
+
+    fn serialize_u16(self, v: u16) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::UnsignedInt(v as u64))
+    }
+
+    fn serialize_u32(self, v: u32) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::UnsignedInt(v as u64))
+    }
+
+    fn serialize_u64(self, v: u64) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::UnsignedInt(v))
+    }
+
+    fn serialize_f32(self, _v: f32) -> Result<Self::Ok, Self::Error> {
+        Err(RawDataSerializerError::Message(
+            "floating point numbers not supported in AT Protocol data".to_string(),
+        ))
+    }
+
+    fn serialize_f64(self, _v: f64) -> Result<Self::Ok, Self::Error> {
+        Err(RawDataSerializerError::Message(
+            "floating point numbers not supported in AT Protocol data".to_string(),
+        ))
+    }
+
+    fn serialize_char(self, v: char) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::String(v.to_string().into()))
+    }
+
+    fn serialize_str(self, v: &str) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::String(CowStr::Owned(v.to_smolstr())))
+    }
+
+    fn serialize_bytes(self, v: &[u8]) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::Bytes(Bytes::copy_from_slice(v)))
+    }
+
+    fn serialize_none(self) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::Null)
+    }
+
+    fn serialize_some<T: ?Sized>(self, value: &T) -> Result<Self::Ok, Self::Error>
+    where
+        T: Serialize,
+    {
+        value.serialize(self)
+    }
+
+    fn serialize_unit(self) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::Null)
+    }
+
+    fn serialize_unit_struct(self, _name: &'static str) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::Null)
+    }
+
+    fn serialize_unit_variant(
+        self,
+        _name: &'static str,
+        _variant_index: u32,
+        variant: &'static str,
+    ) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::String(CowStr::Owned(variant.to_smolstr())))
+    }
+
+    fn serialize_newtype_struct<T: ?Sized>(
+        self,
+        _name: &'static str,
+        value: &T,
+    ) -> Result<Self::Ok, Self::Error>
+    where
+        T: Serialize,
+    {
+        value.serialize(self)
+    }
+
+    fn serialize_newtype_variant<T: ?Sized>(
+        self,
+        _name: &'static str,
+        _variant_index: u32,
+        variant: &'static str,
+        value: &T,
+    ) -> Result<Self::Ok, Self::Error>
+    where
+        T: Serialize,
+    {
+        let mut map = BTreeMap::new();
+        map.insert(variant.to_smolstr(), value.serialize(RawDataSerializer)?);
+        Ok(RawData::Object(map))
+    }
+
+    fn serialize_seq(self, len: Option<usize>) -> Result<Self::SerializeSeq, Self::Error> {
+        Ok(RawDataSeqSerializer {
+            items: Vec::with_capacity(len.unwrap_or(0)),
+        })
+    }
+
+    fn serialize_tuple(self, len: usize) -> Result<Self::SerializeTuple, Self::Error> {
+        self.serialize_seq(Some(len))
+    }
+
+    fn serialize_tuple_struct(
+        self,
+        _name: &'static str,
+        len: usize,
+    ) -> Result<Self::SerializeTupleStruct, Self::Error> {
+        self.serialize_seq(Some(len))
+    }
+
+    fn serialize_tuple_variant(
+        self,
+        _name: &'static str,
+        _variant_index: u32,
+        _variant: &'static str,
+        len: usize,
+    ) -> Result<Self::SerializeTupleVariant, Self::Error> {
+        self.serialize_seq(Some(len))
+    }
+
+    fn serialize_map(self, _len: Option<usize>) -> Result<Self::SerializeMap, Self::Error> {
+        Ok(RawDataMapSerializer {
+            map: BTreeMap::new(),
+            next_key: None,
+        })
+    }
+
+    fn serialize_struct(
+        self,
+        _name: &'static str,
+        len: usize,
+    ) -> Result<Self::SerializeStruct, Self::Error> {
+        self.serialize_map(Some(len))
+    }
+
+    fn serialize_struct_variant(
+        self,
+        _name: &'static str,
+        _variant_index: u32,
+        _variant: &'static str,
+        len: usize,
+    ) -> Result<Self::SerializeStructVariant, Self::Error> {
+        self.serialize_map(Some(len))
+    }
+}
+
+// Sequence serializer accumulator
+pub struct RawDataSeqSerializer {
+    items: Vec<RawData<'static>>,
+}
+
+impl serde::ser::SerializeSeq for RawDataSeqSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    fn serialize_element<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        self.items.push(value.serialize(RawDataSerializer)?);
+        Ok(())
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::Array(self.items))
+    }
+}
+
+impl serde::ser::SerializeTuple for RawDataSeqSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    fn serialize_element<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        serde::ser::SerializeSeq::serialize_element(self, value)
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        serde::ser::SerializeSeq::end(self)
+    }
+}
+
+impl serde::ser::SerializeTupleStruct for RawDataSeqSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    fn serialize_field<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        serde::ser::SerializeSeq::serialize_element(self, value)
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        serde::ser::SerializeSeq::end(self)
+    }
+}
+
+impl serde::ser::SerializeTupleVariant for RawDataSeqSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    fn serialize_field<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        serde::ser::SerializeSeq::serialize_element(self, value)
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        serde::ser::SerializeSeq::end(self)
+    }
+}
+
+// Map serializer accumulator
+pub struct RawDataMapSerializer {
+    map: BTreeMap<SmolStr, RawData<'static>>,
+    next_key: Option<SmolStr>,
+}
+
+impl serde::ser::SerializeMap for RawDataMapSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    fn serialize_key<T: ?Sized>(&mut self, key: &T) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        let key_data = key.serialize(RawDataSerializer)?;
+        match key_data {
+            RawData::String(s) => {
+                self.next_key = Some(s.to_smolstr());
+                Ok(())
+            }
+            _ => Err(RawDataSerializerError::Message(
+                "map keys must be strings".to_string(),
+            )),
+        }
+    }
+
+    fn serialize_value<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        let key = self
+            .next_key
+            .take()
+            .ok_or_else(|| RawDataSerializerError::Message("missing key".to_string()))?;
+        self.map.insert(key, value.serialize(RawDataSerializer)?);
+        Ok(())
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::Object(self.map))
+    }
+}
+
+impl serde::ser::SerializeStruct for RawDataMapSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    fn serialize_field<T: ?Sized>(
+        &mut self,
+        key: &'static str,
+        value: &T,
+    ) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        self.map
+            .insert(key.to_smolstr(), value.serialize(RawDataSerializer)?);
+        Ok(())
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::Object(self.map))
+    }
+}
+
+impl serde::ser::SerializeStructVariant for RawDataMapSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    fn serialize_field<T: ?Sized>(
+        &mut self,
+        key: &'static str,
+        value: &T,
+    ) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        serde::ser::SerializeStruct::serialize_field(self, key, value)
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        serde::ser::SerializeStruct::end(self)
+    }
 }

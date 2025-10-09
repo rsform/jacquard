@@ -1,0 +1,10 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.pull.status.closed",
+  "defs": {
+    "main": {
+      "type": "token",
+      "description": "closed pull request"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "uk.ewancroft.now",
+  "description": "A status lexicon, made for short messages in plain text for display on profiles.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "The ISO 8601 date and time when the status was created.",
+            "format": "datetime"
+          },
+          "text": {
+            "type": "string",
+            "description": "The status text formatted as plain text.",
+            "minLength": 1,
+            "maxLength": 64
+          }
+        }
+      }
+    }
+  }
+}

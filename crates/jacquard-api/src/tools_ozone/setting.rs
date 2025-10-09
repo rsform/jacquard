@@ -10,7 +10,15 @@ pub mod remove_options;
 pub mod upsert_option;
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Option<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -35,23 +43,4 @@ pub struct Option<'a> {
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub value: jacquard_common::types::value::Data<'a>,
-}
-
-impl jacquard_common::IntoStatic for Option<'_> {
-    type Output = Option<'static>;
-    fn into_static(self) -> Self::Output {
-        Option {
-            created_at: self.created_at.into_static(),
-            created_by: self.created_by.into_static(),
-            description: self.description.into_static(),
-            did: self.did.into_static(),
-            key: self.key.into_static(),
-            last_updated_by: self.last_updated_by.into_static(),
-            manager_role: self.manager_role.into_static(),
-            scope: self.scope.into_static(),
-            updated_at: self.updated_at.into_static(),
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

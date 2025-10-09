@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -29,29 +30,18 @@ pub struct SendInteractions<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for SendInteractions<'_> {
-    type Output = SendInteractions<'static>;
-    fn into_static(self) -> Self::Output {
-        SendInteractions {
-            interactions: self.interactions.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SendInteractionsOutput<'a> {}
-impl jacquard_common::IntoStatic for SendInteractionsOutput<'_> {
-    type Output = SendInteractionsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        SendInteractionsOutput {
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Response type for
 ///app.bsky.feed.sendInteractions
 pub struct SendInteractionsResponse;

@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "buzz.bookhive.buzz",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record containing a Bookhive comment.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "comment",
+          "createdAt",
+          "book",
+          "parent"
+        ],
+        "properties": {
+          "book": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "comment": {
+            "type": "string",
+            "description": "The content of the comment.",
+            "maxLength": 100000,
+            "maxGraphemes": 10000
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this comment was originally created.",
+            "format": "datetime"
+          },
+          "parent": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

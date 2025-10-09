@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "dev.ocbwoy3.dotsyncd.refsDependency",
+  "description": "This defines the various dependency types used in dotsyncd",
+  "defs": {
+    "distro": {
+      "type": "object",
+      "description": "A specific Linux distribution",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The distro ID identified in /etc/os-release, such as nixos, cachyos, etc."
+        }
+      }
+    },
+    "hyprland": {
+      "type": "object",
+      "description": "A specific Hyprland version",
+      "required": [
+        "version"
+      ],
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "Must be semver"
+        }
+      }
+    },
+    "tangledRepo": {
+      "type": "object",
+      "description": "A repo from Tangled cloned into a specific directory",
+      "required": [
+        "owner",
+        "repo",
+        "dir"
+      ],
+      "properties": {
+        "dir": {
+          "type": "string",
+          "description": "The location of the cloned git repo. Must be a valid POSIX (not NT) path. Example: /home/ocbwoy3/config"
+        },
+        "owner": {
+          "type": "string",
+          "description": "The owner of the repo. In the case of https://tangled.sh/@ocbwoy3.dev/nix, owner would be the DID of @ocbwoy3.dev",
+          "format": "did"
+        },
+        "repo": {
+          "type": "string",
+          "description": "The repository name"
+        }
+      }
+    }
+  }
+}

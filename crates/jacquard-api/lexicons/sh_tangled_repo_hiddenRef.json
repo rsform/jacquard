@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.hiddenRef",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create a hidden ref in a repository",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repo",
+            "forkRef",
+            "remoteRef"
+          ],
+          "properties": {
+            "forkRef": {
+              "type": "string",
+              "description": "Fork reference name"
+            },
+            "remoteRef": {
+              "type": "string",
+              "description": "Remote reference name"
+            },
+            "repo": {
+              "type": "string",
+              "description": "AT-URI of the repository",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "error": {
+              "type": "string",
+              "description": "Error message if creation failed"
+            },
+            "ref": {
+              "type": "string",
+              "description": "The created hidden ref name"
+            },
+            "success": {
+              "type": "boolean",
+              "description": "Whether the hidden ref was created successfully"
+            }
+          }
+        }
+      }
+    }
+  }
+}

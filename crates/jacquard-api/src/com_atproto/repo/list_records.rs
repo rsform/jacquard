@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -32,21 +33,16 @@ pub struct ListRecords<'a> {
     pub reverse: std::option::Option<bool>,
 }
 
-impl jacquard_common::IntoStatic for ListRecords<'_> {
-    type Output = ListRecords<'static>;
-    fn into_static(self) -> Self::Output {
-        ListRecords {
-            collection: self.collection.into_static(),
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            repo: self.repo.into_static(),
-            reverse: self.reverse.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ListRecordsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -54,17 +50,6 @@ pub struct ListRecordsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub records: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for ListRecordsOutput<'_> {
-    type Output = ListRecordsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        ListRecordsOutput {
-            cursor: self.cursor.into_static(),
-            records: self.records.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for
@@ -84,7 +69,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListRecords<'de> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Record<'a> {
     #[serde(borrow)]
@@ -93,16 +86,4 @@ pub struct Record<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
     pub value: jacquard_common::types::value::Data<'a>,
-}
-
-impl jacquard_common::IntoStatic for Record<'_> {
-    type Output = Record<'static>;
-    fn into_static(self) -> Self::Output {
-        Record {
-            cid: self.cid.into_static(),
-            uri: self.uri.into_static(),
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

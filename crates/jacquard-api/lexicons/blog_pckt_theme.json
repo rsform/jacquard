@@ -1,0 +1,74 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.theme",
+  "description": "Theme record for blog publications with light and dark mode color schemes.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Theme configuration for a blog publication",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "light",
+          "dark"
+        ],
+        "properties": {
+          "dark": {
+            "type": "ref",
+            "description": "Dark mode color palette",
+            "ref": "#palette"
+          },
+          "font": {
+            "type": "string",
+            "description": "Font family name (optional)",
+            "maxLength": 100
+          },
+          "light": {
+            "type": "ref",
+            "description": "Light mode color palette",
+            "ref": "#palette"
+          }
+        }
+      }
+    },
+    "palette": {
+      "type": "object",
+      "description": "Color palette with CSS hex values",
+      "required": [
+        "link",
+        "text",
+        "accent",
+        "background",
+        "surfaceHover"
+      ],
+      "properties": {
+        "accent": {
+          "type": "string",
+          "description": "Accent color (hex value)",
+          "maxLength": 7
+        },
+        "background": {
+          "type": "string",
+          "description": "Background color (hex value)",
+          "maxLength": 7
+        },
+        "link": {
+          "type": "string",
+          "description": "Link color (hex value)",
+          "maxLength": 7
+        },
+        "surfaceHover": {
+          "type": "string",
+          "description": "Surface hover color (hex value)",
+          "maxLength": 7
+        },
+        "text": {
+          "type": "string",
+          "description": "Primary text color (hex value)",
+          "maxLength": 7
+        }
+      }
+    }
+  }
+}

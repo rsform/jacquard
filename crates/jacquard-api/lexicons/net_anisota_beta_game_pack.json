@@ -1,0 +1,102 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.beta.game.pack",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Beta version: Record tracking daily pack openings and streak information",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "lastOpenTime",
+          "totalOpens",
+          "streak",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When the record was created",
+            "format": "datetime"
+          },
+          "lastModified": {
+            "type": "string",
+            "description": "When the record was last modified",
+            "format": "datetime"
+          },
+          "lastOpenTime": {
+            "type": "string",
+            "description": "When daily pack was last opened",
+            "format": "datetime"
+          },
+          "longestStreak": {
+            "type": "integer",
+            "description": "Longest daily pack opening streak achieved",
+            "minimum": 0
+          },
+          "packHistory": {
+            "type": "array",
+            "description": "History of the last few pack openings",
+            "items": {
+              "type": "ref",
+              "ref": "#packHistoryEntry"
+            },
+            "maxLength": 30
+          },
+          "streak": {
+            "type": "integer",
+            "description": "Current daily pack opening streak count",
+            "minimum": 0
+          },
+          "totalOpens": {
+            "type": "integer",
+            "description": "Total number of times daily packs have been opened",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "packHistoryEntry": {
+      "type": "object",
+      "description": "A single pack opening entry in the history",
+      "properties": {
+        "itemsReceived": {
+          "type": "array",
+          "description": "Items received from this pack",
+          "items": {
+            "type": "ref",
+            "ref": "#receivedItem"
+          }
+        },
+        "openTime": {
+          "type": "string",
+          "description": "When this pack was opened",
+          "format": "datetime"
+        },
+        "streakCount": {
+          "type": "integer",
+          "description": "Streak count at time of opening"
+        }
+      }
+    },
+    "receivedItem": {
+      "type": "object",
+      "description": "An item received from a pack opening",
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "description": "ID of the item received"
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "Quantity received"
+        },
+        "rarity": {
+          "type": "string",
+          "description": "Rarity of the item"
+        }
+      }
+    }
+  }
+}

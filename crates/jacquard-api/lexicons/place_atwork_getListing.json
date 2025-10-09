@@ -1,0 +1,69 @@
+{
+  "lexicon": 1,
+  "id": "place.atwork.getListing",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a single job listing by repo (DID) and record key",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "rkey"
+        ],
+        "properties": {
+          "repo": {
+            "type": "string",
+            "description": "The DID of the repo (repository owner)",
+            "format": "at-identifier"
+          },
+          "rkey": {
+            "type": "string",
+            "description": "The record key (TID)"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "value"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "CID of the listing record",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the listing",
+              "format": "at-uri"
+            },
+            "value": {
+              "type": "ref",
+              "description": "The job listing record",
+              "ref": "place.atwork.listing"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "The requested listing does not exist",
+          "name": "ListingNotFound"
+        },
+        {
+          "description": "Failed to parse the listing data",
+          "name": "ListingParseFailed"
+        },
+        {
+          "description": "Failed to fetch the listing from storage",
+          "name": "ListingFetchFailed"
+        }
+      ]
+    }
+  }
+}

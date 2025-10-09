@@ -1,0 +1,90 @@
+output {
+    lexicons "crates/jacquard-api/lexicons"
+    codegen "crates/jacquard-api/src"
+}
+
+source "leaflet" type="git" priority=100 {
+    repo "https://github.com/hyperlink-academy/leaflet"
+    pattern "**/*.json"
+}
+
+source "slices" type="git" priority=100 {
+    repo "https://tangled.org/@slices.network/slices"
+    pattern "**/*.json"
+}
+
+source "bluesky" type="git" priority=101 {
+    repo "https://github.com/bluesky-social/atproto"
+    pattern "**/*.json"
+}
+
+source "tangled" type="git" priority=100 {
+    repo "https://tangled.org/@tangled.org/core"
+    pattern "**/*.json"
+}
+
+source "weaver" type="git" priority=90 {
+    repo "https://github.com/rsform/weaver"
+    pattern "**/*.json"
+}
+
+source "anisota" type="atproto" {
+    endpoint "did:plc:lcieujcfkv4jx7gehsvok3pr"
+}
+
+source "slices-api" type="slices" {
+    slice "at://did:plc:fpruhuo22xkm5o7ttr2ktxdo/network.slices.slice/3m2f7adwhp22a"
+}
+
+source "ufos" type="http" {
+    url "https://ufos-api.microcosm.blue/records?collection=com.atproto.lexicon.schema"
+}
+
+// source "bluemoji" type="git" priority=50 {
+//     repo "https://github.com/aendra-rininsland/bluemoji"
+//     pattern "**/*.json"
+// }
+source "streamplace" type="git" priority=50 {
+    repo "https://github.com/streamplace/streamplace"
+    pattern "**/*.json"
+}
+
+source "whitewind" type="git" priority=50 {
+    repo "https://github.com/whtwnd/whitewind-blog"
+    pattern "**/*.json"
+}
+
+source "lexicon-community" type="git" priority=50 {
+    repo "https://github.com/lexicon-community/lexicon"
+    pattern "**/*.json"
+}
+
+source "at-file" type="git" priority=50 {
+    repo "https://github.com/ziodotsh/lexicons"
+    pattern "**/*.json"
+}
+
+source "pinksea" type="git" priority=50 {
+    repo "https://github.com/shinolabs/PinkSea/"
+    pattern "**/*.json"
+}
+
+source "linkat" type="git" priority=50 {
+    repo "https://github.com/mkizka/linkat"
+    pattern "**/*.json"
+}
+
+source "frontpage" type="git" priority=50 {
+    repo "https://github.com/likeandscribe/frontpage"
+    pattern "**/*.json"
+}
+
+source "picosky" type="git" priority=50 {
+    repo "https://github.com/psky-atp/client"
+    pattern "**/*.json"
+}
+
+source "skylights" type="git" priority=50 {
+    repo "https://github.com/Gregoor/skylights"
+    pattern "**/*.json"
+}

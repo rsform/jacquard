@@ -6,24 +6,21 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct AccountCodes<'a> {
     #[serde(borrow)]
     pub account: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub codes: Vec<jacquard_common::CowStr<'a>>,
-}
-
-impl jacquard_common::IntoStatic for AccountCodes<'_> {
-    type Output = AccountCodes<'static>;
-    fn into_static(self) -> Self::Output {
-        AccountCodes {
-            account: self.account.into_static(),
-            codes: self.codes.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::lexicon]
@@ -34,7 +31,8 @@ impl jacquard_common::IntoStatic for AccountCodes<'_> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -53,34 +51,20 @@ pub struct CreateInviteCodes<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for CreateInviteCodes<'_> {
-    type Output = CreateInviteCodes<'static>;
-    fn into_static(self) -> Self::Output {
-        CreateInviteCodes {
-            code_count: self.code_count.into_static(),
-            for_accounts: self.for_accounts.into_static(),
-            use_count: self.use_count.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateInviteCodesOutput<'a> {
     #[serde(borrow)]
     pub codes: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for CreateInviteCodesOutput<'_> {
-    type Output = CreateInviteCodesOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        CreateInviteCodesOutput {
-            codes: self.codes.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

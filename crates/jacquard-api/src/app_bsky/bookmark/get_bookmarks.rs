@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -26,18 +27,16 @@ pub struct GetBookmarks<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for GetBookmarks<'_> {
-    type Output = GetBookmarks<'static>;
-    fn into_static(self) -> Self::Output {
-        GetBookmarks {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBookmarksOutput<'a> {
     #[serde(borrow)]
@@ -45,17 +44,6 @@ pub struct GetBookmarksOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetBookmarksOutput<'_> {
-    type Output = GetBookmarksOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetBookmarksOutput {
-            bookmarks: self.bookmarks.into_static(),
-            cursor: self.cursor.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

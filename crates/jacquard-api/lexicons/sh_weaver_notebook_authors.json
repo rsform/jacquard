@@ -1,0 +1,49 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.authors",
+  "defs": {
+    "authorListItem": {
+      "type": "object",
+      "description": "A single author in a Weaver notebook.",
+      "required": [
+        "profile, index"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "profile": {
+          "type": "union",
+          "refs": [
+            "app.bsky.actor.defs#profileViewBasic",
+            "sh.weaver.actor.defs#profileView"
+          ]
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Authors of a Weaver notebook.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "authorList"
+        ],
+        "properties": {
+          "authorList": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#authorListItem"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

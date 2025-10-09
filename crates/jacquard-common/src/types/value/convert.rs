@@ -2,18 +2,20 @@ use crate::types::{
     DataModelType,
     cid::Cid,
     string::AtprotoStr,
-    value::{Array, Data, Object},
+    value::{Array, Data, Object, RawData, parsing},
 };
+use crate::{CowStr, IntoStatic};
 use bytes::Bytes;
 use core::{any::TypeId, fmt};
 use smol_str::SmolStr;
 use std::{borrow::ToOwned, boxed::Box, collections::BTreeMap, vec::Vec};
 
 /// Error used for converting from and into [`crate::types::value::Data`].
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, thiserror::Error, miette::Diagnostic)]
 #[non_exhaustive]
 pub enum ConversionError {
     /// Error when the Atproto data type wasn't the one we expected.
+    #[error("kind error: expected {expected:?} but found {found:?}")]
     WrongAtprotoType {
         /// The expected type.
         expected: DataModelType,
@@ -21,36 +23,20 @@ pub enum ConversionError {
         found: DataModelType,
     },
     /// Error when the given Atproto data type cannot be converted into a certain value type.
+    #[error("conversion error: cannot convert {from:?} into {into:?}")]
     FromAtprotoData {
         /// The Atproto data type trying to convert from.
         from: DataModelType,
         /// The type trying to convert into.
         into: TypeId,
     },
+    /// Error when converting from RawData containing invalid data
+    #[error("invalid raw data: {message}")]
+    InvalidRawData {
+        /// Description of what was invalid
+        message: String,
+    },
 }
-
-impl fmt::Display for ConversionError {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::WrongAtprotoType { expected, found } => {
-                write!(
-                    formatter,
-                    "kind error: expected {:?} but found {:?}",
-                    expected, found
-                )
-            }
-            Self::FromAtprotoData { from, into } => {
-                write!(
-                    formatter,
-                    "conversion error: cannot convert {:?} into {:?}",
-                    from, into
-                )
-            }
-        }
-    }
-}
-
-impl std::error::Error for ConversionError {}
 
 impl TryFrom<Data<'_>> for () {
     type Error = ConversionError;
@@ -263,3 +249,78 @@ derive_try_from_atproto_option!(Bytes, Vec<u8>);
 derive_try_from_atproto_option!(Array, Array<'static>);
 derive_try_from_atproto_option!(Object, Object<'static>);
 derive_try_from_atproto_option!(CidLink, Cid<'static>);
+
+/// Convert RawData to validated Data with type inference
+impl<'s> TryFrom<RawData<'s>> for Data<'s> {
+    type Error = ConversionError;
+
+    fn try_from(raw: RawData<'s>) -> Result<Self, Self::Error> {
+        match raw {
+            RawData::Null => Ok(Data::Null),
+            RawData::Boolean(b) => Ok(Data::Boolean(b)),
+            RawData::SignedInt(i) => Ok(Data::Integer(i)),
+            RawData::UnsignedInt(u) => {
+                // Convert to i64, clamping if necessary
+                Ok(Data::Integer((u % (i64::MAX as u64)) as i64))
+            }
+            RawData::String(s) => {
+                // Apply string type inference
+                // Need to convert to owned because parse_string borrows from its input
+                Ok(Data::String(parsing::parse_string(&s).into_static()))
+            }
+            RawData::Bytes(b) => Ok(Data::Bytes(b)),
+            RawData::CidLink(cid) => Ok(Data::CidLink(cid)),
+            RawData::Array(arr) => {
+                let mut validated = Vec::with_capacity(arr.len());
+                for item in arr {
+                    validated.push(item.try_into()?);
+                }
+                Ok(Data::Array(Array(validated)))
+            }
+            RawData::Object(map) => {
+                // Check for special blob structure
+                if let Some(RawData::String(type_str)) = map.get("$type") {
+                    if parsing::infer_from_type(type_str) == DataModelType::Blob {
+                        // Try to parse as blob
+                        if let (Some(RawData::CidLink(cid)), Some(RawData::String(mime)), Some(size)) = (
+                            map.get("ref"),
+                            map.get("mimeType"),
+                            map.get("size")
+                        ) {
+                            let size_val = match size {
+                                RawData::UnsignedInt(u) => *u as usize,
+                                RawData::SignedInt(i) => *i as usize,
+                                _ => return Err(ConversionError::InvalidRawData {
+                                    message: "blob size must be integer".to_string(),
+                                }),
+                            };
+                            return Ok(Data::Blob(crate::types::blob::Blob {
+                                r#ref: cid.clone(),
+                                mime_type: crate::types::blob::MimeType::from(mime.clone()),
+                                size: size_val,
+                            }));
+                        }
+                    }
+                }
+
+                // Regular object - convert recursively with type inference based on keys
+                let mut validated = BTreeMap::new();
+                for (key, value) in map {
+                    let data_value: Data = value.try_into()?;
+                    validated.insert(key, data_value);
+                }
+                Ok(Data::Object(Object(validated)))
+            }
+            RawData::Blob(blob) => Ok(Data::Blob(blob)),
+            RawData::InvalidBlob(_) => Err(ConversionError::InvalidRawData {
+                message: "invalid blob structure".to_string(),
+            }),
+            RawData::InvalidNumber(_) => Err(ConversionError::InvalidRawData {
+                message: "invalid number (likely float)".to_string(),
+            }),
+            RawData::InvalidData(_) => Err(ConversionError::InvalidRawData {
+                message: "invalid data".to_string(),
+            }),
+        }
+    }
+}

@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "com.shinolabs.pinksea.getIdentity",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Returns the identity of the authenticated user.",
+      "parameters": {
+        "type": "params",
+        "required": [],
+        "properties": {}
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "did",
+            "handle"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "The DID of the user.",
+              "format": "at-identifier"
+            },
+            "handle": {
+              "type": "string",
+              "description": "The handle of the author.",
+              "format": "handle"
+            }
+          }
+        }
+      }
+    }
+  }
+}

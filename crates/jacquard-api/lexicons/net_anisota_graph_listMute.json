@@ -1,0 +1,80 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.graph.listMute",
+  "defs": {
+    "contentTypes": {
+      "type": "object",
+      "description": "Configuration for which types of content to mute",
+      "properties": {
+        "posts": {
+          "type": "boolean",
+          "description": "Mute regular posts from accounts on this list",
+          "default": true
+        },
+        "quotes": {
+          "type": "boolean",
+          "description": "Mute quote posts from accounts on this list",
+          "default": true
+        },
+        "replies": {
+          "type": "boolean",
+          "description": "Mute replies from accounts on this list",
+          "default": true
+        },
+        "reposts": {
+          "type": "boolean",
+          "description": "Mute reposts from accounts on this list",
+          "default": true
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A record for muting content from all accounts on a list with fine-grained control over content types, duration, and feed targeting",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "contentTypes": {
+            "type": "ref",
+            "description": "Types of content to mute from accounts on this list",
+            "ref": "#contentTypes"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the mute was created",
+            "format": "datetime"
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "When this mute expires. If not set, mute is permanent",
+            "format": "datetime"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Optional reason for muting this list",
+            "maxLength": 300
+          },
+          "subject": {
+            "type": "string",
+            "description": "AT-URI of the list to mute (app.bsky.graph.list record)",
+            "format": "at-uri"
+          },
+          "targetFeeds": {
+            "type": "array",
+            "description": "Specific feeds where this mute should apply. If empty, applies to all feeds",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "maxLength": 50
+          }
+        }
+      }
+    }
+  }
+}

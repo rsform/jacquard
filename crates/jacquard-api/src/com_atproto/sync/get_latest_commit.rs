@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -21,33 +22,21 @@ pub struct GetLatestCommit<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetLatestCommit<'_> {
-    type Output = GetLatestCommit<'static>;
-    fn into_static(self) -> Self::Output {
-        GetLatestCommit {
-            did: self.did.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLatestCommitOutput<'a> {
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub rev: jacquard_common::types::string::Tid,
-}
-
-impl jacquard_common::IntoStatic for GetLatestCommitOutput<'_> {
-    type Output = GetLatestCommitOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetLatestCommitOutput {
-            cid: self.cid.into_static(),
-            rev: self.rev.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -64,26 +65,16 @@ pub struct CreateAccount<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for CreateAccount<'_> {
-    type Output = CreateAccount<'static>;
-    fn into_static(self) -> Self::Output {
-        CreateAccount {
-            did: self.did.into_static(),
-            email: self.email.into_static(),
-            handle: self.handle.into_static(),
-            invite_code: self.invite_code.into_static(),
-            password: self.password.into_static(),
-            plc_op: self.plc_op.into_static(),
-            recovery_key: self.recovery_key.into_static(),
-            verification_code: self.verification_code.into_static(),
-            verification_phone: self.verification_phone.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateAccountOutput<'a> {
     #[serde(borrow)]
@@ -99,20 +90,6 @@ pub struct CreateAccountOutput<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(borrow)]
     pub refresh_jwt: jacquard_common::CowStr<'a>,
-}
-
-impl jacquard_common::IntoStatic for CreateAccountOutput<'_> {
-    type Output = CreateAccountOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        CreateAccountOutput {
-            access_jwt: self.access_jwt.into_static(),
-            did: self.did.into_static(),
-            did_doc: self.did_doc.into_static(),
-            handle: self.handle.into_static(),
-            refresh_jwt: self.refresh_jwt.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

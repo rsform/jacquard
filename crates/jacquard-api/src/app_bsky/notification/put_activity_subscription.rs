@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -31,19 +32,16 @@ pub struct PutActivitySubscription<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for PutActivitySubscription<'_> {
-    type Output = PutActivitySubscription<'static>;
-    fn into_static(self) -> Self::Output {
-        PutActivitySubscription {
-            activity_subscription: self.activity_subscription.into_static(),
-            subject: self.subject.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct PutActivitySubscriptionOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -53,17 +51,6 @@ pub struct PutActivitySubscriptionOutput<'a> {
     >,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
-}
-
-impl jacquard_common::IntoStatic for PutActivitySubscriptionOutput<'_> {
-    type Output = PutActivitySubscriptionOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        PutActivitySubscriptionOutput {
-            activity_subscription: self.activity_subscription.into_static(),
-            subject: self.subject.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

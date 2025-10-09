@@ -1,0 +1,447 @@
+{
+  "lexicon": 1,
+  "id": "dev.regnault.webfishing.save",
+  "defs": {
+    "aqua_fish": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "quality": {
+          "type": "integer"
+        },
+        "ref": {
+          "type": "integer"
+        },
+        "size": {
+          "type": "string"
+        }
+      }
+    },
+    "bait_inv": {
+      "type": "object",
+      "properties": {
+        "": {
+          "type": "integer"
+        },
+        "cricket": {
+          "type": "integer"
+        },
+        "leech": {
+          "type": "integer"
+        },
+        "minnow": {
+          "type": "integer"
+        },
+        "nautilus": {
+          "type": "integer"
+        },
+        "squid": {
+          "type": "integer"
+        },
+        "worms": {
+          "type": "integer"
+        }
+      }
+    },
+    "cosmetics": {
+      "type": "object",
+      "properties": {
+        "accessory": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bobber": {
+          "type": "string"
+        },
+        "eye": {
+          "type": "string"
+        },
+        "hat": {
+          "type": "string"
+        },
+        "legs": {
+          "type": "string"
+        },
+        "mouth": {
+          "type": "string"
+        },
+        "nose": {
+          "type": "string"
+        },
+        "overshirt": {
+          "type": "string"
+        },
+        "pattern": {
+          "type": "string"
+        },
+        "primary_color": {
+          "type": "string"
+        },
+        "secondary_color": {
+          "type": "string"
+        },
+        "species": {
+          "type": "string"
+        },
+        "tail": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "undershirt": {
+          "type": "string"
+        }
+      }
+    },
+    "guitar_shape": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "minLength": 6,
+      "maxLength": 6
+    },
+    "guitar_shapes": {
+      "type": "array",
+      "items": {
+        "type": "ref",
+        "ref": "#guitar_shape"
+      }
+    },
+    "hotbar": {
+      "type": "object",
+      "properties": {
+        "0": {
+          "type": "integer"
+        },
+        "1": {
+          "type": "integer"
+        },
+        "2": {
+          "type": "integer"
+        },
+        "3": {
+          "type": "integer"
+        },
+        "4": {
+          "type": "integer"
+        }
+      }
+    },
+    "item": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "custom_name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "quality": {
+          "type": "integer"
+        },
+        "ref": {
+          "type": "integer"
+        },
+        "size": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "journal_category": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#journal_entry"
+          }
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "journal_entry": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "quality": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "record": {
+          "type": "string"
+        }
+      }
+    },
+    "letter": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string"
+        },
+        "closing": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "header": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#item"
+          }
+        },
+        "letter_id": {
+          "type": "integer"
+        },
+        "to": {
+          "type": "string"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Record declaring a save data of the game webfishing",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "inventory"
+        ],
+        "properties": {
+          "bait_inv": {
+            "type": "ref",
+            "ref": "#bait_inv"
+          },
+          "bait_selected": {
+            "type": "string"
+          },
+          "bait_unlocked": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "buddy_level": {
+            "type": "integer"
+          },
+          "buddy_speed": {
+            "type": "integer"
+          },
+          "cash_total": {
+            "type": "integer"
+          },
+          "completed_quests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cosmetics_equipped": {
+            "type": "ref",
+            "ref": "#cosmetics"
+          },
+          "cosmetics_unlocked": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fish_caught": {
+            "type": "integer"
+          },
+          "guitar_shapes": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#guitar_shapes"
+            }
+          },
+          "hotbar": {
+            "type": "ref",
+            "ref": "#hotbar"
+          },
+          "inbound_mail": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#letter"
+            }
+          },
+          "inventory": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#item"
+            }
+          },
+          "journal": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#journal_category"
+            }
+          },
+          "level": {
+            "type": "integer"
+          },
+          "loan_left": {
+            "type": "integer"
+          },
+          "loan_level": {
+            "type": "integer"
+          },
+          "locked_refs": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "lure_selected": {
+            "type": "string"
+          },
+          "lure_unlocked": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "max_bait": {
+            "type": "integer"
+          },
+          "money": {
+            "type": "integer"
+          },
+          "new_cosmetics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "quests": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#quest_entry"
+            }
+          },
+          "rod_chance": {
+            "type": "integer"
+          },
+          "rod_luck": {
+            "type": "integer"
+          },
+          "rod_power": {
+            "type": "integer"
+          },
+          "rod_speed": {
+            "type": "integer"
+          },
+          "saved_aqua_fish": {
+            "type": "ref",
+            "ref": "#aqua_fish"
+          },
+          "saved_tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "version": {
+            "type": "string"
+          },
+          "voice_pitch": {
+            "type": "string"
+          },
+          "voice_speed": {
+            "type": "integer"
+          },
+          "xp": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "quest_entry": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "goal_amt": {
+          "type": "integer"
+        },
+        "goal_array": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "goal_id": {
+          "type": "string"
+        },
+        "gold_reward": {
+          "type": "integer"
+        },
+        "hidden": {
+          "type": "boolean"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "max_level": {
+          "type": "integer"
+        },
+        "progress": {
+          "type": "integer"
+        },
+        "rewards": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tier": {
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "xp_reward": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

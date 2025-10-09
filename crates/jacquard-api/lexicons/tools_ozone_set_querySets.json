@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.set.querySets",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Query available sets",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "namePrefix": {
+            "type": "string"
+          },
+          "sortBy": {
+            "type": "string",
+            "default": "name",
+            "enum": [
+              "name",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "sortDirection": {
+            "type": "string",
+            "description": "Defaults to ascending order of name field.",
+            "default": "asc",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "sets"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "sets": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "tools.ozone.set.defs#setView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

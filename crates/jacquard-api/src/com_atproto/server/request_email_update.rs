@@ -6,20 +6,18 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct RequestEmailUpdateOutput<'a> {
     pub token_required: bool,
-}
-
-impl jacquard_common::IntoStatic for RequestEmailUpdateOutput<'_> {
-    type Output = RequestEmailUpdateOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        RequestEmailUpdateOutput {
-            token_required: self.token_required.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 /// XRPC request marker type

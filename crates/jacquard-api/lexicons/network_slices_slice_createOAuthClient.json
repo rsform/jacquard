@@ -1,0 +1,86 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.createOAuthClient",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Register a new OAuth client for a slice. Requires authentication.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "sliceUri",
+            "clientName",
+            "redirectUris"
+          ],
+          "properties": {
+            "clientName": {
+              "type": "string",
+              "description": "Human-readable name of the OAuth client",
+              "maxLength": 256
+            },
+            "clientUri": {
+              "type": "string",
+              "description": "URI of the client application",
+              "format": "uri"
+            },
+            "grantTypes": {
+              "type": "array",
+              "description": "OAuth grant types",
+              "items": {
+                "type": "string"
+              }
+            },
+            "logoUri": {
+              "type": "string",
+              "description": "URI of the client logo",
+              "format": "uri"
+            },
+            "policyUri": {
+              "type": "string",
+              "description": "URI of the privacy policy",
+              "format": "uri"
+            },
+            "redirectUris": {
+              "type": "array",
+              "description": "Allowed redirect URIs for OAuth flow (must use HTTP or HTTPS)",
+              "items": {
+                "type": "string",
+                "format": "uri"
+              },
+              "minLength": 1
+            },
+            "responseTypes": {
+              "type": "array",
+              "description": "OAuth response types",
+              "items": {
+                "type": "string"
+              }
+            },
+            "scope": {
+              "type": "string",
+              "description": "OAuth scope"
+            },
+            "sliceUri": {
+              "type": "string",
+              "description": "AT-URI of the slice to register the OAuth client for"
+            },
+            "tosUri": {
+              "type": "string",
+              "description": "URI of the terms of service",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "network.slices.slice.getOAuthClients#oauthClientDetails"
+        }
+      }
+    }
+  }
+}

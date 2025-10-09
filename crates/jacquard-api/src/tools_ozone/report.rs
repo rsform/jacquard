@@ -8,27 +8,24 @@
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReasonType<'a> {
     ToolsOzoneReportDefsReasonAppeal,
-    ToolsOzoneReportDefsReasonViolenceAnimalWelfare,
+    ToolsOzoneReportDefsReasonOther,
+    ToolsOzoneReportDefsReasonViolenceAnimal,
     ToolsOzoneReportDefsReasonViolenceThreats,
     ToolsOzoneReportDefsReasonViolenceGraphicContent,
-    ToolsOzoneReportDefsReasonViolenceSelfHarm,
     ToolsOzoneReportDefsReasonViolenceGlorification,
     ToolsOzoneReportDefsReasonViolenceExtremistContent,
     ToolsOzoneReportDefsReasonViolenceTrafficking,
     ToolsOzoneReportDefsReasonViolenceOther,
     ToolsOzoneReportDefsReasonSexualAbuseContent,
     ToolsOzoneReportDefsReasonSexualNcii,
-    ToolsOzoneReportDefsReasonSexualSextortion,
     ToolsOzoneReportDefsReasonSexualDeepfake,
     ToolsOzoneReportDefsReasonSexualAnimal,
     ToolsOzoneReportDefsReasonSexualUnlabeled,
     ToolsOzoneReportDefsReasonSexualOther,
     ToolsOzoneReportDefsReasonChildSafetyCsam,
     ToolsOzoneReportDefsReasonChildSafetyGroom,
-    ToolsOzoneReportDefsReasonChildSafetyMinorPrivacy,
-    ToolsOzoneReportDefsReasonChildSafetyEndangerment,
+    ToolsOzoneReportDefsReasonChildSafetyPrivacy,
     ToolsOzoneReportDefsReasonChildSafetyHarassment,
-    ToolsOzoneReportDefsReasonChildSafetyPromotion,
     ToolsOzoneReportDefsReasonChildSafetyOther,
     ToolsOzoneReportDefsReasonHarassmentTroll,
     ToolsOzoneReportDefsReasonHarassmentTargeted,
@@ -39,19 +36,17 @@ pub enum ReasonType<'a> {
     ToolsOzoneReportDefsReasonMisleadingImpersonation,
     ToolsOzoneReportDefsReasonMisleadingSpam,
     ToolsOzoneReportDefsReasonMisleadingScam,
-    ToolsOzoneReportDefsReasonMisleadingSyntheticContent,
-    ToolsOzoneReportDefsReasonMisleadingMisinformation,
+    ToolsOzoneReportDefsReasonMisleadingElections,
     ToolsOzoneReportDefsReasonMisleadingOther,
     ToolsOzoneReportDefsReasonRuleSiteSecurity,
-    ToolsOzoneReportDefsReasonRuleStolenContent,
     ToolsOzoneReportDefsReasonRuleProhibitedSales,
     ToolsOzoneReportDefsReasonRuleBanEvasion,
     ToolsOzoneReportDefsReasonRuleOther,
-    ToolsOzoneReportDefsReasonCivicElectoralProcess,
-    ToolsOzoneReportDefsReasonCivicDisclosure,
-    ToolsOzoneReportDefsReasonCivicInterference,
-    ToolsOzoneReportDefsReasonCivicMisinformation,
-    ToolsOzoneReportDefsReasonCivicImpersonation,
+    ToolsOzoneReportDefsReasonSelfHarmContent,
+    ToolsOzoneReportDefsReasonSelfHarmEd,
+    ToolsOzoneReportDefsReasonSelfHarmStunts,
+    ToolsOzoneReportDefsReasonSelfHarmSubstances,
+    ToolsOzoneReportDefsReasonSelfHarmOther,
     Other(jacquard_common::CowStr<'a>),
 }
 
@@ -61,17 +56,17 @@ impl<'a> ReasonType<'a> {
             Self::ToolsOzoneReportDefsReasonAppeal => {
                 "tools.ozone.report.defs#reasonAppeal"
             }
-            Self::ToolsOzoneReportDefsReasonViolenceAnimalWelfare => {
-                "tools.ozone.report.defs#reasonViolenceAnimalWelfare"
+            Self::ToolsOzoneReportDefsReasonOther => {
+                "tools.ozone.report.defs#reasonOther"
+            }
+            Self::ToolsOzoneReportDefsReasonViolenceAnimal => {
+                "tools.ozone.report.defs#reasonViolenceAnimal"
             }
             Self::ToolsOzoneReportDefsReasonViolenceThreats => {
                 "tools.ozone.report.defs#reasonViolenceThreats"
             }
             Self::ToolsOzoneReportDefsReasonViolenceGraphicContent => {
                 "tools.ozone.report.defs#reasonViolenceGraphicContent"
-            }
-            Self::ToolsOzoneReportDefsReasonViolenceSelfHarm => {
-                "tools.ozone.report.defs#reasonViolenceSelfHarm"
             }
             Self::ToolsOzoneReportDefsReasonViolenceGlorification => {
                 "tools.ozone.report.defs#reasonViolenceGlorification"
@@ -91,9 +86,6 @@ impl<'a> ReasonType<'a> {
             Self::ToolsOzoneReportDefsReasonSexualNcii => {
                 "tools.ozone.report.defs#reasonSexualNCII"
             }
-            Self::ToolsOzoneReportDefsReasonSexualSextortion => {
-                "tools.ozone.report.defs#reasonSexualSextortion"
-            }
             Self::ToolsOzoneReportDefsReasonSexualDeepfake => {
                 "tools.ozone.report.defs#reasonSexualDeepfake"
             }
@@ -112,17 +104,11 @@ impl<'a> ReasonType<'a> {
             Self::ToolsOzoneReportDefsReasonChildSafetyGroom => {
                 "tools.ozone.report.defs#reasonChildSafetyGroom"
             }
-            Self::ToolsOzoneReportDefsReasonChildSafetyMinorPrivacy => {
-                "tools.ozone.report.defs#reasonChildSafetyMinorPrivacy"
-            }
-            Self::ToolsOzoneReportDefsReasonChildSafetyEndangerment => {
-                "tools.ozone.report.defs#reasonChildSafetyEndangerment"
+            Self::ToolsOzoneReportDefsReasonChildSafetyPrivacy => {
+                "tools.ozone.report.defs#reasonChildSafetyPrivacy"
             }
             Self::ToolsOzoneReportDefsReasonChildSafetyHarassment => {
                 "tools.ozone.report.defs#reasonChildSafetyHarassment"
-            }
-            Self::ToolsOzoneReportDefsReasonChildSafetyPromotion => {
-                "tools.ozone.report.defs#reasonChildSafetyPromotion"
             }
             Self::ToolsOzoneReportDefsReasonChildSafetyOther => {
                 "tools.ozone.report.defs#reasonChildSafetyOther"
@@ -154,20 +140,14 @@ impl<'a> ReasonType<'a> {
             Self::ToolsOzoneReportDefsReasonMisleadingScam => {
                 "tools.ozone.report.defs#reasonMisleadingScam"
             }
-            Self::ToolsOzoneReportDefsReasonMisleadingSyntheticContent => {
-                "tools.ozone.report.defs#reasonMisleadingSyntheticContent"
-            }
-            Self::ToolsOzoneReportDefsReasonMisleadingMisinformation => {
-                "tools.ozone.report.defs#reasonMisleadingMisinformation"
+            Self::ToolsOzoneReportDefsReasonMisleadingElections => {
+                "tools.ozone.report.defs#reasonMisleadingElections"
             }
             Self::ToolsOzoneReportDefsReasonMisleadingOther => {
                 "tools.ozone.report.defs#reasonMisleadingOther"
             }
             Self::ToolsOzoneReportDefsReasonRuleSiteSecurity => {
                 "tools.ozone.report.defs#reasonRuleSiteSecurity"
-            }
-            Self::ToolsOzoneReportDefsReasonRuleStolenContent => {
-                "tools.ozone.report.defs#reasonRuleStolenContent"
             }
             Self::ToolsOzoneReportDefsReasonRuleProhibitedSales => {
                 "tools.ozone.report.defs#reasonRuleProhibitedSales"
@@ -178,20 +158,20 @@ impl<'a> ReasonType<'a> {
             Self::ToolsOzoneReportDefsReasonRuleOther => {
                 "tools.ozone.report.defs#reasonRuleOther"
             }
-            Self::ToolsOzoneReportDefsReasonCivicElectoralProcess => {
-                "tools.ozone.report.defs#reasonCivicElectoralProcess"
+            Self::ToolsOzoneReportDefsReasonSelfHarmContent => {
+                "tools.ozone.report.defs#reasonSelfHarmContent"
             }
-            Self::ToolsOzoneReportDefsReasonCivicDisclosure => {
-                "tools.ozone.report.defs#reasonCivicDisclosure"
+            Self::ToolsOzoneReportDefsReasonSelfHarmEd => {
+                "tools.ozone.report.defs#reasonSelfHarmED"
             }
-            Self::ToolsOzoneReportDefsReasonCivicInterference => {
-                "tools.ozone.report.defs#reasonCivicInterference"
+            Self::ToolsOzoneReportDefsReasonSelfHarmStunts => {
+                "tools.ozone.report.defs#reasonSelfHarmStunts"
             }
-            Self::ToolsOzoneReportDefsReasonCivicMisinformation => {
-                "tools.ozone.report.defs#reasonCivicMisinformation"
+            Self::ToolsOzoneReportDefsReasonSelfHarmSubstances => {
+                "tools.ozone.report.defs#reasonSelfHarmSubstances"
             }
-            Self::ToolsOzoneReportDefsReasonCivicImpersonation => {
-                "tools.ozone.report.defs#reasonCivicImpersonation"
+            Self::ToolsOzoneReportDefsReasonSelfHarmOther => {
+                "tools.ozone.report.defs#reasonSelfHarmOther"
             }
             Self::Other(s) => s.as_ref(),
         }
@@ -204,17 +184,17 @@ impl<'a> From<&'a str> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonAppeal" => {
                 Self::ToolsOzoneReportDefsReasonAppeal
             }
-            "tools.ozone.report.defs#reasonViolenceAnimalWelfare" => {
-                Self::ToolsOzoneReportDefsReasonViolenceAnimalWelfare
+            "tools.ozone.report.defs#reasonOther" => {
+                Self::ToolsOzoneReportDefsReasonOther
+            }
+            "tools.ozone.report.defs#reasonViolenceAnimal" => {
+                Self::ToolsOzoneReportDefsReasonViolenceAnimal
             }
             "tools.ozone.report.defs#reasonViolenceThreats" => {
                 Self::ToolsOzoneReportDefsReasonViolenceThreats
             }
             "tools.ozone.report.defs#reasonViolenceGraphicContent" => {
                 Self::ToolsOzoneReportDefsReasonViolenceGraphicContent
-            }
-            "tools.ozone.report.defs#reasonViolenceSelfHarm" => {
-                Self::ToolsOzoneReportDefsReasonViolenceSelfHarm
             }
             "tools.ozone.report.defs#reasonViolenceGlorification" => {
                 Self::ToolsOzoneReportDefsReasonViolenceGlorification
@@ -234,9 +214,6 @@ impl<'a> From<&'a str> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonSexualNCII" => {
                 Self::ToolsOzoneReportDefsReasonSexualNcii
             }
-            "tools.ozone.report.defs#reasonSexualSextortion" => {
-                Self::ToolsOzoneReportDefsReasonSexualSextortion
-            }
             "tools.ozone.report.defs#reasonSexualDeepfake" => {
                 Self::ToolsOzoneReportDefsReasonSexualDeepfake
             }
@@ -255,17 +232,11 @@ impl<'a> From<&'a str> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonChildSafetyGroom" => {
                 Self::ToolsOzoneReportDefsReasonChildSafetyGroom
             }
-            "tools.ozone.report.defs#reasonChildSafetyMinorPrivacy" => {
-                Self::ToolsOzoneReportDefsReasonChildSafetyMinorPrivacy
-            }
-            "tools.ozone.report.defs#reasonChildSafetyEndangerment" => {
-                Self::ToolsOzoneReportDefsReasonChildSafetyEndangerment
+            "tools.ozone.report.defs#reasonChildSafetyPrivacy" => {
+                Self::ToolsOzoneReportDefsReasonChildSafetyPrivacy
             }
             "tools.ozone.report.defs#reasonChildSafetyHarassment" => {
                 Self::ToolsOzoneReportDefsReasonChildSafetyHarassment
-            }
-            "tools.ozone.report.defs#reasonChildSafetyPromotion" => {
-                Self::ToolsOzoneReportDefsReasonChildSafetyPromotion
             }
             "tools.ozone.report.defs#reasonChildSafetyOther" => {
                 Self::ToolsOzoneReportDefsReasonChildSafetyOther
@@ -297,20 +268,14 @@ impl<'a> From<&'a str> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonMisleadingScam" => {
                 Self::ToolsOzoneReportDefsReasonMisleadingScam
             }
-            "tools.ozone.report.defs#reasonMisleadingSyntheticContent" => {
-                Self::ToolsOzoneReportDefsReasonMisleadingSyntheticContent
-            }
-            "tools.ozone.report.defs#reasonMisleadingMisinformation" => {
-                Self::ToolsOzoneReportDefsReasonMisleadingMisinformation
+            "tools.ozone.report.defs#reasonMisleadingElections" => {
+                Self::ToolsOzoneReportDefsReasonMisleadingElections
             }
             "tools.ozone.report.defs#reasonMisleadingOther" => {
                 Self::ToolsOzoneReportDefsReasonMisleadingOther
             }
             "tools.ozone.report.defs#reasonRuleSiteSecurity" => {
                 Self::ToolsOzoneReportDefsReasonRuleSiteSecurity
-            }
-            "tools.ozone.report.defs#reasonRuleStolenContent" => {
-                Self::ToolsOzoneReportDefsReasonRuleStolenContent
             }
             "tools.ozone.report.defs#reasonRuleProhibitedSales" => {
                 Self::ToolsOzoneReportDefsReasonRuleProhibitedSales
@@ -321,20 +286,20 @@ impl<'a> From<&'a str> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonRuleOther" => {
                 Self::ToolsOzoneReportDefsReasonRuleOther
             }
-            "tools.ozone.report.defs#reasonCivicElectoralProcess" => {
-                Self::ToolsOzoneReportDefsReasonCivicElectoralProcess
+            "tools.ozone.report.defs#reasonSelfHarmContent" => {
+                Self::ToolsOzoneReportDefsReasonSelfHarmContent
             }
-            "tools.ozone.report.defs#reasonCivicDisclosure" => {
-                Self::ToolsOzoneReportDefsReasonCivicDisclosure
+            "tools.ozone.report.defs#reasonSelfHarmED" => {
+                Self::ToolsOzoneReportDefsReasonSelfHarmEd
             }
-            "tools.ozone.report.defs#reasonCivicInterference" => {
-                Self::ToolsOzoneReportDefsReasonCivicInterference
+            "tools.ozone.report.defs#reasonSelfHarmStunts" => {
+                Self::ToolsOzoneReportDefsReasonSelfHarmStunts
             }
-            "tools.ozone.report.defs#reasonCivicMisinformation" => {
-                Self::ToolsOzoneReportDefsReasonCivicMisinformation
+            "tools.ozone.report.defs#reasonSelfHarmSubstances" => {
+                Self::ToolsOzoneReportDefsReasonSelfHarmSubstances
             }
-            "tools.ozone.report.defs#reasonCivicImpersonation" => {
-                Self::ToolsOzoneReportDefsReasonCivicImpersonation
+            "tools.ozone.report.defs#reasonSelfHarmOther" => {
+                Self::ToolsOzoneReportDefsReasonSelfHarmOther
             }
             _ => Self::Other(jacquard_common::CowStr::from(s)),
         }
@@ -347,17 +312,17 @@ impl<'a> From<String> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonAppeal" => {
                 Self::ToolsOzoneReportDefsReasonAppeal
             }
-            "tools.ozone.report.defs#reasonViolenceAnimalWelfare" => {
-                Self::ToolsOzoneReportDefsReasonViolenceAnimalWelfare
+            "tools.ozone.report.defs#reasonOther" => {
+                Self::ToolsOzoneReportDefsReasonOther
+            }
+            "tools.ozone.report.defs#reasonViolenceAnimal" => {
+                Self::ToolsOzoneReportDefsReasonViolenceAnimal
             }
             "tools.ozone.report.defs#reasonViolenceThreats" => {
                 Self::ToolsOzoneReportDefsReasonViolenceThreats
             }
             "tools.ozone.report.defs#reasonViolenceGraphicContent" => {
                 Self::ToolsOzoneReportDefsReasonViolenceGraphicContent
-            }
-            "tools.ozone.report.defs#reasonViolenceSelfHarm" => {
-                Self::ToolsOzoneReportDefsReasonViolenceSelfHarm
             }
             "tools.ozone.report.defs#reasonViolenceGlorification" => {
                 Self::ToolsOzoneReportDefsReasonViolenceGlorification
@@ -377,9 +342,6 @@ impl<'a> From<String> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonSexualNCII" => {
                 Self::ToolsOzoneReportDefsReasonSexualNcii
             }
-            "tools.ozone.report.defs#reasonSexualSextortion" => {
-                Self::ToolsOzoneReportDefsReasonSexualSextortion
-            }
             "tools.ozone.report.defs#reasonSexualDeepfake" => {
                 Self::ToolsOzoneReportDefsReasonSexualDeepfake
             }
@@ -398,17 +360,11 @@ impl<'a> From<String> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonChildSafetyGroom" => {
                 Self::ToolsOzoneReportDefsReasonChildSafetyGroom
             }
-            "tools.ozone.report.defs#reasonChildSafetyMinorPrivacy" => {
-                Self::ToolsOzoneReportDefsReasonChildSafetyMinorPrivacy
-            }
-            "tools.ozone.report.defs#reasonChildSafetyEndangerment" => {
-                Self::ToolsOzoneReportDefsReasonChildSafetyEndangerment
+            "tools.ozone.report.defs#reasonChildSafetyPrivacy" => {
+                Self::ToolsOzoneReportDefsReasonChildSafetyPrivacy
             }
             "tools.ozone.report.defs#reasonChildSafetyHarassment" => {
                 Self::ToolsOzoneReportDefsReasonChildSafetyHarassment
-            }
-            "tools.ozone.report.defs#reasonChildSafetyPromotion" => {
-                Self::ToolsOzoneReportDefsReasonChildSafetyPromotion
             }
             "tools.ozone.report.defs#reasonChildSafetyOther" => {
                 Self::ToolsOzoneReportDefsReasonChildSafetyOther
@@ -440,20 +396,14 @@ impl<'a> From<String> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonMisleadingScam" => {
                 Self::ToolsOzoneReportDefsReasonMisleadingScam
             }
-            "tools.ozone.report.defs#reasonMisleadingSyntheticContent" => {
-                Self::ToolsOzoneReportDefsReasonMisleadingSyntheticContent
-            }
-            "tools.ozone.report.defs#reasonMisleadingMisinformation" => {
-                Self::ToolsOzoneReportDefsReasonMisleadingMisinformation
+            "tools.ozone.report.defs#reasonMisleadingElections" => {
+                Self::ToolsOzoneReportDefsReasonMisleadingElections
             }
             "tools.ozone.report.defs#reasonMisleadingOther" => {
                 Self::ToolsOzoneReportDefsReasonMisleadingOther
             }
             "tools.ozone.report.defs#reasonRuleSiteSecurity" => {
                 Self::ToolsOzoneReportDefsReasonRuleSiteSecurity
-            }
-            "tools.ozone.report.defs#reasonRuleStolenContent" => {
-                Self::ToolsOzoneReportDefsReasonRuleStolenContent
             }
             "tools.ozone.report.defs#reasonRuleProhibitedSales" => {
                 Self::ToolsOzoneReportDefsReasonRuleProhibitedSales
@@ -464,20 +414,20 @@ impl<'a> From<String> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonRuleOther" => {
                 Self::ToolsOzoneReportDefsReasonRuleOther
             }
-            "tools.ozone.report.defs#reasonCivicElectoralProcess" => {
-                Self::ToolsOzoneReportDefsReasonCivicElectoralProcess
+            "tools.ozone.report.defs#reasonSelfHarmContent" => {
+                Self::ToolsOzoneReportDefsReasonSelfHarmContent
             }
-            "tools.ozone.report.defs#reasonCivicDisclosure" => {
-                Self::ToolsOzoneReportDefsReasonCivicDisclosure
+            "tools.ozone.report.defs#reasonSelfHarmED" => {
+                Self::ToolsOzoneReportDefsReasonSelfHarmEd
             }
-            "tools.ozone.report.defs#reasonCivicInterference" => {
-                Self::ToolsOzoneReportDefsReasonCivicInterference
+            "tools.ozone.report.defs#reasonSelfHarmStunts" => {
+                Self::ToolsOzoneReportDefsReasonSelfHarmStunts
             }
-            "tools.ozone.report.defs#reasonCivicMisinformation" => {
-                Self::ToolsOzoneReportDefsReasonCivicMisinformation
+            "tools.ozone.report.defs#reasonSelfHarmSubstances" => {
+                Self::ToolsOzoneReportDefsReasonSelfHarmSubstances
             }
-            "tools.ozone.report.defs#reasonCivicImpersonation" => {
-                Self::ToolsOzoneReportDefsReasonCivicImpersonation
+            "tools.ozone.report.defs#reasonSelfHarmOther" => {
+                Self::ToolsOzoneReportDefsReasonSelfHarmOther
             }
             _ => Self::Other(jacquard_common::CowStr::from(s)),
         }
@@ -519,17 +469,17 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
             ReasonType::ToolsOzoneReportDefsReasonAppeal => {
                 ReasonType::ToolsOzoneReportDefsReasonAppeal
             }
-            ReasonType::ToolsOzoneReportDefsReasonViolenceAnimalWelfare => {
-                ReasonType::ToolsOzoneReportDefsReasonViolenceAnimalWelfare
+            ReasonType::ToolsOzoneReportDefsReasonOther => {
+                ReasonType::ToolsOzoneReportDefsReasonOther
+            }
+            ReasonType::ToolsOzoneReportDefsReasonViolenceAnimal => {
+                ReasonType::ToolsOzoneReportDefsReasonViolenceAnimal
             }
             ReasonType::ToolsOzoneReportDefsReasonViolenceThreats => {
                 ReasonType::ToolsOzoneReportDefsReasonViolenceThreats
             }
             ReasonType::ToolsOzoneReportDefsReasonViolenceGraphicContent => {
                 ReasonType::ToolsOzoneReportDefsReasonViolenceGraphicContent
-            }
-            ReasonType::ToolsOzoneReportDefsReasonViolenceSelfHarm => {
-                ReasonType::ToolsOzoneReportDefsReasonViolenceSelfHarm
             }
             ReasonType::ToolsOzoneReportDefsReasonViolenceGlorification => {
                 ReasonType::ToolsOzoneReportDefsReasonViolenceGlorification
@@ -549,9 +499,6 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
             ReasonType::ToolsOzoneReportDefsReasonSexualNcii => {
                 ReasonType::ToolsOzoneReportDefsReasonSexualNcii
             }
-            ReasonType::ToolsOzoneReportDefsReasonSexualSextortion => {
-                ReasonType::ToolsOzoneReportDefsReasonSexualSextortion
-            }
             ReasonType::ToolsOzoneReportDefsReasonSexualDeepfake => {
                 ReasonType::ToolsOzoneReportDefsReasonSexualDeepfake
             }
@@ -570,17 +517,11 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
             ReasonType::ToolsOzoneReportDefsReasonChildSafetyGroom => {
                 ReasonType::ToolsOzoneReportDefsReasonChildSafetyGroom
             }
-            ReasonType::ToolsOzoneReportDefsReasonChildSafetyMinorPrivacy => {
-                ReasonType::ToolsOzoneReportDefsReasonChildSafetyMinorPrivacy
-            }
-            ReasonType::ToolsOzoneReportDefsReasonChildSafetyEndangerment => {
-                ReasonType::ToolsOzoneReportDefsReasonChildSafetyEndangerment
+            ReasonType::ToolsOzoneReportDefsReasonChildSafetyPrivacy => {
+                ReasonType::ToolsOzoneReportDefsReasonChildSafetyPrivacy
             }
             ReasonType::ToolsOzoneReportDefsReasonChildSafetyHarassment => {
                 ReasonType::ToolsOzoneReportDefsReasonChildSafetyHarassment
-            }
-            ReasonType::ToolsOzoneReportDefsReasonChildSafetyPromotion => {
-                ReasonType::ToolsOzoneReportDefsReasonChildSafetyPromotion
             }
             ReasonType::ToolsOzoneReportDefsReasonChildSafetyOther => {
                 ReasonType::ToolsOzoneReportDefsReasonChildSafetyOther
@@ -612,20 +553,14 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
             ReasonType::ToolsOzoneReportDefsReasonMisleadingScam => {
                 ReasonType::ToolsOzoneReportDefsReasonMisleadingScam
             }
-            ReasonType::ToolsOzoneReportDefsReasonMisleadingSyntheticContent => {
-                ReasonType::ToolsOzoneReportDefsReasonMisleadingSyntheticContent
-            }
-            ReasonType::ToolsOzoneReportDefsReasonMisleadingMisinformation => {
-                ReasonType::ToolsOzoneReportDefsReasonMisleadingMisinformation
+            ReasonType::ToolsOzoneReportDefsReasonMisleadingElections => {
+                ReasonType::ToolsOzoneReportDefsReasonMisleadingElections
             }
             ReasonType::ToolsOzoneReportDefsReasonMisleadingOther => {
                 ReasonType::ToolsOzoneReportDefsReasonMisleadingOther
             }
             ReasonType::ToolsOzoneReportDefsReasonRuleSiteSecurity => {
                 ReasonType::ToolsOzoneReportDefsReasonRuleSiteSecurity
-            }
-            ReasonType::ToolsOzoneReportDefsReasonRuleStolenContent => {
-                ReasonType::ToolsOzoneReportDefsReasonRuleStolenContent
             }
             ReasonType::ToolsOzoneReportDefsReasonRuleProhibitedSales => {
                 ReasonType::ToolsOzoneReportDefsReasonRuleProhibitedSales
@@ -636,20 +571,20 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
             ReasonType::ToolsOzoneReportDefsReasonRuleOther => {
                 ReasonType::ToolsOzoneReportDefsReasonRuleOther
             }
-            ReasonType::ToolsOzoneReportDefsReasonCivicElectoralProcess => {
-                ReasonType::ToolsOzoneReportDefsReasonCivicElectoralProcess
+            ReasonType::ToolsOzoneReportDefsReasonSelfHarmContent => {
+                ReasonType::ToolsOzoneReportDefsReasonSelfHarmContent
             }
-            ReasonType::ToolsOzoneReportDefsReasonCivicDisclosure => {
-                ReasonType::ToolsOzoneReportDefsReasonCivicDisclosure
+            ReasonType::ToolsOzoneReportDefsReasonSelfHarmEd => {
+                ReasonType::ToolsOzoneReportDefsReasonSelfHarmEd
             }
-            ReasonType::ToolsOzoneReportDefsReasonCivicInterference => {
-                ReasonType::ToolsOzoneReportDefsReasonCivicInterference
+            ReasonType::ToolsOzoneReportDefsReasonSelfHarmStunts => {
+                ReasonType::ToolsOzoneReportDefsReasonSelfHarmStunts
             }
-            ReasonType::ToolsOzoneReportDefsReasonCivicMisinformation => {
-                ReasonType::ToolsOzoneReportDefsReasonCivicMisinformation
+            ReasonType::ToolsOzoneReportDefsReasonSelfHarmSubstances => {
+                ReasonType::ToolsOzoneReportDefsReasonSelfHarmSubstances
             }
-            ReasonType::ToolsOzoneReportDefsReasonCivicImpersonation => {
-                ReasonType::ToolsOzoneReportDefsReasonCivicImpersonation
+            ReasonType::ToolsOzoneReportDefsReasonSelfHarmOther => {
+                ReasonType::ToolsOzoneReportDefsReasonSelfHarmOther
             }
             ReasonType::Other(v) => ReasonType::Other(v.into_static()),
         }

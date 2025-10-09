@@ -1,0 +1,87 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.moderation.listScheduledActions",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "List scheduled moderation actions with optional filtering",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "statuses"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "description": "Cursor for pagination"
+            },
+            "endsBefore": {
+              "type": "string",
+              "description": "Filter actions scheduled to execute before this time",
+              "format": "datetime"
+            },
+            "limit": {
+              "type": "integer",
+              "description": "Maximum number of results to return",
+              "default": 50,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "startsAfter": {
+              "type": "string",
+              "description": "Filter actions scheduled to execute after this time",
+              "format": "datetime"
+            },
+            "statuses": {
+              "type": "array",
+              "description": "Filter actions by status",
+              "items": {
+                "type": "string",
+                "knownValues": [
+                  "pending",
+                  "executed",
+                  "cancelled",
+                  "failed"
+                ]
+              },
+              "minLength": 1
+            },
+            "subjects": {
+              "type": "array",
+              "description": "Filter actions for specific DID subjects",
+              "items": {
+                "type": "string",
+                "format": "did"
+              },
+              "maxLength": 100
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "actions"
+          ],
+          "properties": {
+            "actions": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "tools.ozone.moderation.defs#scheduledActionView"
+              }
+            },
+            "cursor": {
+              "type": "string",
+              "description": "Cursor for next page of results"
+            }
+          }
+        }
+      }
+    }
+  }
+}

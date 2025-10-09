@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -21,31 +22,20 @@ pub struct GetHead<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetHead<'_> {
-    type Output = GetHead<'static>;
-    fn into_static(self) -> Self::Output {
-        GetHead {
-            did: self.did.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHeadOutput<'a> {
     #[serde(borrow)]
     pub root: jacquard_common::types::string::Cid<'a>,
-}
-
-impl jacquard_common::IntoStatic for GetHeadOutput<'_> {
-    type Output = GetHeadOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetHeadOutput {
-            root: self.root.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

@@ -1,0 +1,64 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.defs",
+  "defs": {
+    "blockView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "blocker",
+        "record",
+        "indexedAt"
+      ],
+      "properties": {
+        "blocker": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "record": {
+          "type": "ref",
+          "ref": "app.bsky.graph.block"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "rendition": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "renditions": {
+      "type": "object",
+      "required": [
+        "renditions"
+      ],
+      "properties": {
+        "renditions": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#rendition"
+          }
+        }
+      }
+    }
+  }
+}

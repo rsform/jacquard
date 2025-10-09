@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -29,17 +30,6 @@ pub struct UpdateAccountHandle<'a> {
         ::jacquard_common::smol_str::SmolStr,
         ::jacquard_common::types::value::Data<'a>,
     >,
-}
-
-impl jacquard_common::IntoStatic for UpdateAccountHandle<'_> {
-    type Output = UpdateAccountHandle<'static>;
-    fn into_static(self) -> Self::Output {
-        UpdateAccountHandle {
-            did: self.did.into_static(),
-            handle: self.handle.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -24,7 +24,7 @@ use std::{ops::Deref, str::FromStr};
 #[derive(Clone, PartialEq, Eq, Serialize, Hash, PartialOrd, Ord)]
 #[serde(transparent)]
 #[repr(transparent)]
-pub struct Did<'d>(CowStr<'d>);
+pub struct Did<'d>(pub(crate) CowStr<'d>);
 
 /// Regex for DID validation per AT Protocol spec.
 ///

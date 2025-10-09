@@ -6,24 +6,21 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct BatchItem<'a> {
     #[serde(borrow)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub message: crate::chat_bsky::convo::MessageInput<'a>,
-}
-
-impl jacquard_common::IntoStatic for BatchItem<'_> {
-    type Output = BatchItem<'static>;
-    fn into_static(self) -> Self::Output {
-        BatchItem {
-            convo_id: self.convo_id.into_static(),
-            message: self.message.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::lexicon]
@@ -34,7 +31,8 @@ impl jacquard_common::IntoStatic for BatchItem<'_> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -50,32 +48,20 @@ pub struct SendMessageBatch<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for SendMessageBatch<'_> {
-    type Output = SendMessageBatch<'static>;
-    fn into_static(self) -> Self::Output {
-        SendMessageBatch {
-            items: self.items.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SendMessageBatchOutput<'a> {
     #[serde(borrow)]
     pub items: Vec<crate::chat_bsky::convo::MessageView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for SendMessageBatchOutput<'_> {
-    type Output = SendMessageBatchOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        SendMessageBatchOutput {
-            items: self.items.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

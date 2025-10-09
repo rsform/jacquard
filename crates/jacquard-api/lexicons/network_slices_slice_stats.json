@@ -1,0 +1,88 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.stats",
+  "defs": {
+    "collectionStats": {
+      "type": "object",
+      "required": [
+        "collection",
+        "recordCount",
+        "uniqueActors"
+      ],
+      "properties": {
+        "collection": {
+          "type": "string",
+          "description": "Collection NSID",
+          "format": "nsid"
+        },
+        "recordCount": {
+          "type": "integer",
+          "description": "Number of records in this collection"
+        },
+        "uniqueActors": {
+          "type": "integer",
+          "description": "Number of unique actors with records in this collection"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Get statistics for a slice including collection counts, record counts, and actor counts.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "slice"
+        ],
+        "properties": {
+          "slice": {
+            "type": "string",
+            "description": "AT-URI of the slice to get statistics for"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "collections",
+            "collectionStats",
+            "totalLexicons",
+            "totalRecords",
+            "totalActors"
+          ],
+          "properties": {
+            "collectionStats": {
+              "type": "array",
+              "description": "Per-collection statistics",
+              "items": {
+                "type": "ref",
+                "ref": "#collectionStats"
+              }
+            },
+            "collections": {
+              "type": "array",
+              "description": "List of collection NSIDs indexed in this slice",
+              "items": {
+                "type": "string",
+                "format": "nsid"
+              }
+            },
+            "totalActors": {
+              "type": "integer",
+              "description": "Total number of unique actors indexed in this slice"
+            },
+            "totalLexicons": {
+              "type": "integer",
+              "description": "Total number of lexicons defined for this slice"
+            },
+            "totalRecords": {
+              "type": "integer",
+              "description": "Total number of records indexed in this slice"
+            }
+          }
+        }
+      }
+    }
+  }
+}

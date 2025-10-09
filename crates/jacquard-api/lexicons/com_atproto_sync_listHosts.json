@@ -1,0 +1,69 @@
+{
+  "lexicon": 1,
+  "id": "com.atproto.sync.listHosts",
+  "defs": {
+    "host": {
+      "type": "object",
+      "required": [
+        "hostname"
+      ],
+      "properties": {
+        "accountCount": {
+          "type": "integer"
+        },
+        "hostname": {
+          "type": "string",
+          "description": "hostname of server; not a URL (no scheme)"
+        },
+        "seq": {
+          "type": "integer",
+          "description": "Recent repo stream event sequence number. May be delayed from actual stream processing (eg, persisted cursor not in-memory cursor)."
+        },
+        "status": {
+          "type": "ref",
+          "ref": "com.atproto.sync.defs#hostStatus"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Enumerates upstream hosts (eg, PDS or relay instances) that this service consumes from. Implemented by relays.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 200,
+            "minimum": 1,
+            "maximum": 1000
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "hosts"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "hosts": {
+              "type": "array",
+              "description": "Sort order is not formally specified. Recommended order is by time host was first seen by the server, with oldest first.",
+              "items": {
+                "type": "ref",
+                "ref": "#host"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

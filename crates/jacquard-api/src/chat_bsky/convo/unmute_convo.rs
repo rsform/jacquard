@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -30,32 +31,20 @@ pub struct UnmuteConvo<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for UnmuteConvo<'_> {
-    type Output = UnmuteConvo<'static>;
-    fn into_static(self) -> Self::Output {
-        UnmuteConvo {
-            convo_id: self.convo_id.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct UnmuteConvoOutput<'a> {
     #[serde(borrow)]
     pub convo: crate::chat_bsky::convo::ConvoView<'a>,
-}
-
-impl jacquard_common::IntoStatic for UnmuteConvoOutput<'_> {
-    type Output = UnmuteConvoOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        UnmuteConvoOutput {
-            convo: self.convo.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

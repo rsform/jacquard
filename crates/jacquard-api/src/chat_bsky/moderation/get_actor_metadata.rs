@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -21,17 +22,16 @@ pub struct GetActorMetadata<'a> {
     pub actor: jacquard_common::types::string::Did<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetActorMetadata<'_> {
-    type Output = GetActorMetadata<'static>;
-    fn into_static(self) -> Self::Output {
-        GetActorMetadata {
-            actor: self.actor.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorMetadataOutput<'a> {
     #[serde(borrow)]
@@ -40,18 +40,6 @@ pub struct GetActorMetadataOutput<'a> {
     pub day: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
     pub month: jacquard_common::types::value::Data<'a>,
-}
-
-impl jacquard_common::IntoStatic for GetActorMetadataOutput<'_> {
-    type Output = GetActorMetadataOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetActorMetadataOutput {
-            all: self.all.into_static(),
-            day: self.day.into_static(),
-            month: self.month.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for
@@ -71,24 +59,19 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetActorMetadata<'de> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Metadata<'a> {
     pub convos: i64,
     pub convos_started: i64,
     pub messages_received: i64,
     pub messages_sent: i64,
-}
-
-impl jacquard_common::IntoStatic for Metadata<'_> {
-    type Output = Metadata<'static>;
-    fn into_static(self) -> Self::Output {
-        Metadata {
-            convos: self.convos.into_static(),
-            convos_started: self.convos_started.into_static(),
-            messages_received: self.messages_received.into_static(),
-            messages_sent: self.messages_sent.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

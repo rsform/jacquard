@@ -1,0 +1,72 @@
+{
+  "lexicon": 1,
+  "id": "my.skylights.listItem",
+  "defs": {
+    "abandoned": {
+      "type": "token",
+      "description": "User gave up on finishing the item"
+    },
+    "builtin": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "union",
+          "refs": [
+            "my.skylights.listItem#inProgress",
+            "my.skylights.listItem#queue",
+            "my.skylights.listItem#abandoned",
+            "my.skylights.listItem#owned",
+            "my.skylights.listItem#wishlist"
+          ]
+        }
+      }
+    },
+    "inProgress": {
+      "type": "token",
+      "description": "User is currently reading/watching/... the item"
+    },
+    "main": {
+      "type": "object",
+      "required": [
+        "list",
+        "addedAt",
+        "position"
+      ],
+      "properties": {
+        "addedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "item": {
+          "type": "ref",
+          "ref": "my.skylights.defs#item"
+        },
+        "list": {
+          "type": "union",
+          "refs": [
+            "my.skylights.list",
+            "#builtin"
+          ]
+        },
+        "note": {
+          "type": "string"
+        },
+        "position": {
+          "type": "string"
+        }
+      }
+    },
+    "owned": {
+      "type": "token",
+      "description": "User owns the item"
+    },
+    "queue": {
+      "type": "token",
+      "description": "User plans to read/watch/... the item"
+    },
+    "wishlist": {
+      "type": "token",
+      "description": "User wants to own the item"
+    }
+  }
+}

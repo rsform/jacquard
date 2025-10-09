@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -89,38 +90,16 @@ pub struct QueryEvents<'a> {
     pub types: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-impl jacquard_common::IntoStatic for QueryEvents<'_> {
-    type Output = QueryEvents<'static>;
-    fn into_static(self) -> Self::Output {
-        QueryEvents {
-            added_labels: self.added_labels.into_static(),
-            added_tags: self.added_tags.into_static(),
-            age_assurance_state: self.age_assurance_state.into_static(),
-            batch_id: self.batch_id.into_static(),
-            collections: self.collections.into_static(),
-            comment: self.comment.into_static(),
-            created_after: self.created_after.into_static(),
-            created_before: self.created_before.into_static(),
-            created_by: self.created_by.into_static(),
-            cursor: self.cursor.into_static(),
-            has_comment: self.has_comment.into_static(),
-            include_all_user_records: self.include_all_user_records.into_static(),
-            limit: self.limit.into_static(),
-            mod_tool: self.mod_tool.into_static(),
-            policies: self.policies.into_static(),
-            removed_labels: self.removed_labels.into_static(),
-            removed_tags: self.removed_tags.into_static(),
-            report_types: self.report_types.into_static(),
-            sort_direction: self.sort_direction.into_static(),
-            subject: self.subject.into_static(),
-            subject_type: self.subject_type.into_static(),
-            types: self.types.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryEventsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -128,17 +107,6 @@ pub struct QueryEventsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub events: Vec<crate::tools_ozone::moderation::ModEventView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for QueryEventsOutput<'_> {
-    type Output = QueryEventsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        QueryEventsOutput {
-            cursor: self.cursor.into_static(),
-            events: self.events.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

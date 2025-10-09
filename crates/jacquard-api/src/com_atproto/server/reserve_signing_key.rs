@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -31,33 +32,21 @@ pub struct ReserveSigningKey<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for ReserveSigningKey<'_> {
-    type Output = ReserveSigningKey<'static>;
-    fn into_static(self) -> Self::Output {
-        ReserveSigningKey {
-            did: self.did.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ReserveSigningKeyOutput<'a> {
     ///The public key for the reserved signing key, in did:key serialization.
     #[serde(borrow)]
     pub signing_key: jacquard_common::CowStr<'a>,
-}
-
-impl jacquard_common::IntoStatic for ReserveSigningKeyOutput<'_> {
-    type Output = ReserveSigningKeyOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        ReserveSigningKeyOutput {
-            signing_key: self.signing_key.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

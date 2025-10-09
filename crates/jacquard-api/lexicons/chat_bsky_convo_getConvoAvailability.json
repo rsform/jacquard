@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "chat.bsky.convo.getConvoAvailability",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get whether the requester and the other members can chat. If an existing convo is found for these members, it is returned.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "members"
+        ],
+        "properties": {
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "did"
+            },
+            "minLength": 1,
+            "maxLength": 10
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "canChat"
+          ],
+          "properties": {
+            "canChat": {
+              "type": "boolean"
+            },
+            "convo": {
+              "type": "ref",
+              "ref": "chat.bsky.convo.defs#convoView"
+            }
+          }
+        }
+      }
+    }
+  }
+}

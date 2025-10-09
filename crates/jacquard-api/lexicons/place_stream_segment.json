@@ -1,0 +1,143 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.segment",
+  "defs": {
+    "audio": {
+      "type": "object",
+      "required": [
+        "codec",
+        "rate",
+        "channels"
+      ],
+      "properties": {
+        "channels": {
+          "type": "integer"
+        },
+        "codec": {
+          "type": "string",
+          "enum": [
+            "opus"
+          ]
+        },
+        "rate": {
+          "type": "integer"
+        }
+      }
+    },
+    "framerate": {
+      "type": "object",
+      "required": [
+        "num",
+        "den"
+      ],
+      "properties": {
+        "den": {
+          "type": "integer"
+        },
+        "num": {
+          "type": "integer"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Media file representing a segment of a livestream",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "id",
+          "signingKey",
+          "startTime",
+          "creator"
+        ],
+        "properties": {
+          "audio": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#audio"
+            }
+          },
+          "creator": {
+            "type": "string",
+            "format": "did"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "The duration of the segment in nanoseconds"
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the segment"
+          },
+          "signingKey": {
+            "type": "string",
+            "description": "The DID of the signing key used for this segment"
+          },
+          "size": {
+            "type": "integer",
+            "description": "The size of the segment in bytes"
+          },
+          "startTime": {
+            "type": "string",
+            "description": "When this segment started",
+            "format": "datetime"
+          },
+          "video": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#video"
+            }
+          }
+        }
+      }
+    },
+    "segmentView": {
+      "type": "object",
+      "required": [
+        "cid",
+        "record"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "record": {
+          "type": "unknown"
+        }
+      }
+    },
+    "video": {
+      "type": "object",
+      "required": [
+        "codec",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "bframes": {
+          "type": "boolean"
+        },
+        "codec": {
+          "type": "string",
+          "enum": [
+            "h264"
+          ]
+        },
+        "framerate": {
+          "type": "ref",
+          "ref": "#framerate"
+        },
+        "height": {
+          "type": "integer"
+        },
+        "width": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

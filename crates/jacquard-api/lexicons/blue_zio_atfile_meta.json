@@ -1,0 +1,15 @@
+{
+  "lexicon": 1,
+  "id": "blue.zio.atfile.meta",
+  "defs": {
+    "unknown": {
+      "type": "object",
+      "description": "Unknown metadata for an uploaded file.",
+      "properties": {
+        "reason": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.edit.cursor",
+  "defs": {
+    "containerId": {
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "type": "union",
+          "refs": [
+            "#normalContainerId",
+            "#rootContainerId"
+          ]
+        }
+      }
+    },
+    "cursorSide": {
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "type": "integer",
+          "description": "The side of an item the cursor is on (left = -1, right = 1, middle = 0)",
+          "enum": [
+            -1,
+            0,
+            1
+          ]
+        }
+      }
+    },
+    "id": {
+      "type": "object",
+      "required": [
+        "peer",
+        "counter"
+      ],
+      "properties": {
+        "counter": {
+          "type": "integer"
+        },
+        "peer": {
+          "type": "integer"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "An edit record for a notebook.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "container",
+          "die"
+        ],
+        "properties": {
+          "container": {
+            "type": "ref",
+            "ref": "#containerId"
+          },
+          "id": {
+            "type": "ref",
+            "ref": "#id"
+          },
+          "side": {
+            "type": "ref",
+            "ref": "#cursorSide"
+          }
+        }
+      }
+    },
+    "normalContainerId": {
+      "type": "object",
+      "required": [
+        "peer",
+        "counter",
+        "container_type"
+      ],
+      "properties": {
+        "container_type": {
+          "type": "string",
+          "enum": [
+            "Map",
+            "List",
+            "Text",
+            "Tree",
+            "MovableList",
+            "Counter"
+          ]
+        },
+        "counter": {
+          "type": "integer"
+        },
+        "peer": {
+          "type": "integer"
+        }
+      }
+    },
+    "rootContainerId": {
+      "type": "object",
+      "required": [
+        "name",
+        "container_type"
+      ],
+      "properties": {
+        "container_type": {
+          "type": "string",
+          "enum": [
+            "Map",
+            "List",
+            "Text",
+            "Tree",
+            "MovableList",
+            "Counter"
+          ]
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

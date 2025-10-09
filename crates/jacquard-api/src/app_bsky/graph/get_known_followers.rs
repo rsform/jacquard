@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -28,19 +29,16 @@ pub struct GetKnownFollowers<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for GetKnownFollowers<'_> {
-    type Output = GetKnownFollowers<'static>;
-    fn into_static(self) -> Self::Output {
-        GetKnownFollowers {
-            actor: self.actor.into_static(),
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetKnownFollowersOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -50,18 +48,6 @@ pub struct GetKnownFollowersOutput<'a> {
     pub followers: Vec<crate::app_bsky::actor::ProfileView<'a>>,
     #[serde(borrow)]
     pub subject: crate::app_bsky::actor::ProfileView<'a>,
-}
-
-impl jacquard_common::IntoStatic for GetKnownFollowersOutput<'_> {
-    type Output = GetKnownFollowersOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetKnownFollowersOutput {
-            cursor: self.cursor.into_static(),
-            followers: self.followers.into_static(),
-            subject: self.subject.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

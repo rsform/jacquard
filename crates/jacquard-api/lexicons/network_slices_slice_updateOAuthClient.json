@@ -1,0 +1,69 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.updateOAuthClient",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update an existing OAuth client. Requires authentication.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "clientId"
+          ],
+          "properties": {
+            "clientId": {
+              "type": "string",
+              "description": "OAuth client ID to update"
+            },
+            "clientName": {
+              "type": "string",
+              "description": "New human-readable name of the OAuth client",
+              "maxLength": 256
+            },
+            "clientUri": {
+              "type": "string",
+              "description": "New URI of the client application",
+              "format": "uri"
+            },
+            "logoUri": {
+              "type": "string",
+              "description": "New URI of the client logo",
+              "format": "uri"
+            },
+            "policyUri": {
+              "type": "string",
+              "description": "New URI of the privacy policy",
+              "format": "uri"
+            },
+            "redirectUris": {
+              "type": "array",
+              "description": "New allowed redirect URIs for OAuth flow",
+              "items": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "scope": {
+              "type": "string",
+              "description": "New OAuth scope"
+            },
+            "tosUri": {
+              "type": "string",
+              "description": "New URI of the terms of service",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "network.slices.slice.getOAuthClients#oauthClientDetails"
+        }
+      }
+    }
+  }
+}

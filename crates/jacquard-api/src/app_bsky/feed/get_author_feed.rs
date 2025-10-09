@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -36,21 +37,16 @@ pub struct GetAuthorFeed<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for GetAuthorFeed<'_> {
-    type Output = GetAuthorFeed<'static>;
-    fn into_static(self) -> Self::Output {
-        GetAuthorFeed {
-            actor: self.actor.into_static(),
-            cursor: self.cursor.into_static(),
-            filter: self.filter.into_static(),
-            include_pins: self.include_pins.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAuthorFeedOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -58,17 +54,6 @@ pub struct GetAuthorFeedOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub feed: Vec<crate::app_bsky::feed::FeedViewPost<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetAuthorFeedOutput<'_> {
-    type Output = GetAuthorFeedOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetAuthorFeedOutput {
-            cursor: self.cursor.into_static(),
-            feed: self.feed.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

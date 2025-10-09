@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -30,33 +31,20 @@ pub struct SearchActorsTypeahead<'a> {
     pub term: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for SearchActorsTypeahead<'_> {
-    type Output = SearchActorsTypeahead<'static>;
-    fn into_static(self) -> Self::Output {
-        SearchActorsTypeahead {
-            limit: self.limit.into_static(),
-            q: self.q.into_static(),
-            term: self.term.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchActorsTypeaheadOutput<'a> {
     #[serde(borrow)]
     pub actors: Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>,
-}
-
-impl jacquard_common::IntoStatic for SearchActorsTypeaheadOutput<'_> {
-    type Output = SearchActorsTypeaheadOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        SearchActorsTypeaheadOutput {
-            actors: self.actors.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

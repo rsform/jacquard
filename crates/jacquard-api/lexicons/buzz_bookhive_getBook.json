@@ -1,0 +1,100 @@
+{
+  "lexicon": 1,
+  "id": "buzz.bookhive.getBook",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a book's info. Requires authentication.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The book's hive ID"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "book",
+            "reviews",
+            "comments"
+          ],
+          "properties": {
+            "book": {
+              "type": "ref",
+              "description": "The hive book's info",
+              "ref": "buzz.bookhive.hiveBook#record"
+            },
+            "comments": {
+              "type": "array",
+              "description": "Comments on the book",
+              "items": {
+                "type": "ref",
+                "ref": "buzz.bookhive.defs#comment"
+              }
+            },
+            "cover": {
+              "type": "blob",
+              "description": "Cover image of the book",
+              "accept": [
+                "image/png",
+                "image/jpeg"
+              ],
+              "maxSize": 1000000
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "datetime"
+            },
+            "finishedAt": {
+              "type": "string",
+              "description": "The date the user finished reading the book",
+              "format": "datetime"
+            },
+            "review": {
+              "type": "string",
+              "description": "The book's review",
+              "maxGraphemes": 15000
+            },
+            "reviews": {
+              "type": "array",
+              "description": "Reviews of the book",
+              "items": {
+                "type": "ref",
+                "ref": "buzz.bookhive.defs#review"
+              }
+            },
+            "stars": {
+              "type": "integer",
+              "description": "Number of stars given to the book (1-10) which will be mapped to 1-5 stars",
+              "minimum": 1,
+              "maximum": 10
+            },
+            "startedAt": {
+              "type": "string",
+              "description": "The date the user started reading the book",
+              "format": "datetime"
+            },
+            "status": {
+              "type": "string",
+              "knownValues": [
+                "buzz.bookhive.defs#finished",
+                "buzz.bookhive.defs#reading",
+                "buzz.bookhive.defs#wantToRead",
+                "buzz.bookhive.defs#abandoned",
+                "buzz.bookhive.defs#owned"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

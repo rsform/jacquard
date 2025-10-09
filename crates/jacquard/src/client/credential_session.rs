@@ -1,13 +1,15 @@
 use std::sync::Arc;
 
-use jacquard_api::com_atproto::server::refresh_session::RefreshSession;
+use jacquard_api::com_atproto::server::{
+    create_session::CreateSession, refresh_session::RefreshSession,
+};
 use jacquard_common::{
     AuthorizationToken, CowStr, IntoStatic,
-    error::{AuthError, ClientError, XrpcResult},
+    error::{AuthError, ClientError, TransportError, XrpcResult},
     http_client::HttpClient,
     session::SessionStore,
     types::did::Did,
-    xrpc::{CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest},
+    xrpc::{CallOptions, Response, XrpcClient, XrpcError, XrpcExt, XrpcRequest, XrpcResp},
 };
 use tokio::sync::RwLock;
 use url::Url;
@@ -113,9 +115,12 @@ where
 {
     /// Refresh the active session by calling `com.atproto.server.refreshSession`.
     pub async fn refresh(&self) -> Result<AuthorizationToken<'_>, ClientError> {
-        let key = self.key.read().await.clone().ok_or(ClientError::Auth(
-            jacquard_common::error::AuthError::NotAuthenticated,
-        ))?;
+        let key = self
+            .key
+            .read()
+            .await
+            .clone()
+            .ok_or(ClientError::Auth(AuthError::NotAuthenticated))?;
         let session = self.store.get(&key).await;
         let endpoint = self.endpoint().await;
         let mut opts = self.options.read().await.clone();
@@ -128,14 +133,14 @@ where
             .await?;
         let refresh = response
             .parse()
-            .map_err(|_| ClientError::Auth(jacquard_common::error::AuthError::RefreshFailed))?;
+            .map_err(|_| ClientError::Auth(AuthError::RefreshFailed))?;
 
         let new_session: AtpSession = refresh.into();
         let token = AuthorizationToken::Bearer(new_session.access_jwt.clone());
         self.store
             .set(key, new_session)
             .await
-            .map_err(|_| ClientError::Auth(jacquard_common::error::AuthError::RefreshFailed))?;
+            .map_err(|_| ClientError::Auth(AuthError::RefreshFailed))?;
 
         Ok(token)
     }
@@ -167,28 +172,25 @@ where
             || identifier.as_ref().starts_with("https://")
         {
             Url::parse(identifier.as_ref()).map_err(|e| {
-                ClientError::Transport(jacquard_common::error::TransportError::InvalidRequest(
-                    e.to_string(),
-                ))
+                ClientError::Transport(TransportError::InvalidRequest(e.to_string()))
             })?
         } else if identifier.as_ref().starts_with("did:") {
             let did = Did::new(identifier.as_ref()).map_err(|e| {
-                ClientError::Transport(jacquard_common::error::TransportError::InvalidRequest(
-                    format!("invalid did: {:?}", e),
-                ))
+                ClientError::Transport(TransportError::InvalidRequest(format!(
+                    "invalid did: {:?}",
+                    e
+                )))
             })?;
-            let resp = self.client.resolve_did_doc(&did).await.map_err(|e| {
-                ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
-            })?;
+            let resp = self
+                .client
+                .resolve_did_doc(&did)
+                .await
+                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
             resp.into_owned()
-                .map_err(|e| {
-                    ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(
-                        e,
-                    )))
-                })?
+                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?
                 .pds_endpoint()
                 .ok_or_else(|| {
-                    ClientError::Transport(jacquard_common::error::TransportError::InvalidRequest(
+                    ClientError::Transport(TransportError::InvalidRequest(
                         "missing PDS endpoint".into(),
                     ))
                 })?
@@ -196,25 +198,26 @@ where
             // treat as handle
             let handle =
                 jacquard_common::types::string::Handle::new(identifier.as_ref()).map_err(|e| {
-                    ClientError::Transport(jacquard_common::error::TransportError::InvalidRequest(
-                        format!("invalid handle: {:?}", e),
-                    ))
-                })?;
-            let did = self.client.resolve_handle(&handle).await.map_err(|e| {
-                ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
-            })?;
-            let resp = self.client.resolve_did_doc(&did).await.map_err(|e| {
-                ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
-            })?;
-            resp.into_owned()
-                .map_err(|e| {
-                    ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(
-                        e,
+                    ClientError::Transport(TransportError::InvalidRequest(format!(
+                        "invalid handle: {:?}",
+                        e
                     )))
-                })?
+                })?;
+            let did = self
+                .client
+                .resolve_handle(&handle)
+                .await
+                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
+            let resp = self
+                .client
+                .resolve_did_doc(&did)
+                .await
+                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
+            resp.into_owned()
+                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?
                 .pds_endpoint()
                 .ok_or_else(|| {
-                    ClientError::Transport(jacquard_common::error::TransportError::InvalidRequest(
+                    ClientError::Transport(TransportError::InvalidRequest(
                         "missing PDS endpoint".into(),
                     ))
                 })?
@@ -222,7 +225,7 @@ where
 
         // Build and send createSession
         use std::collections::BTreeMap;
-        let req = jacquard_api::com_atproto::server::create_session::CreateSession {
+        let req = CreateSession {
             allow_takendown,
             auth_factor_token,
             identifier: identifier.clone().into_static(),
@@ -246,9 +249,7 @@ where
         self.store
             .set(key.clone(), session.clone())
             .await
-            .map_err(|e| {
-                ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
-            })?;
+            .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
         // If using FileAuthStore, persist PDS for faster resume
         if let Some(file_store) =
             (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
@@ -280,18 +281,16 @@ where
             None
         }
         .unwrap_or({
-            let resp = self.client.resolve_did_doc(&did).await.map_err(|e| {
-                ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
-            })?;
+            let resp = self
+                .client
+                .resolve_did_doc(&did)
+                .await
+                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
             resp.into_owned()
-                .map_err(|e| {
-                    ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(
-                        e,
-                    )))
-                })?
+                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?
                 .pds_endpoint()
                 .ok_or_else(|| {
-                    ClientError::Transport(jacquard_common::error::TransportError::InvalidRequest(
+                    ClientError::Transport(TransportError::InvalidRequest(
                         "missing PDS endpoint".into(),
                     ))
                 })?
@@ -304,9 +303,7 @@ where
         self.store
             .set((sess.did.clone(), session_id.into_static()), sess)
             .await
-            .map_err(|e| {
-                ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
-            })?;
+            .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
         if let Some(file_store) =
             (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
         {
@@ -337,18 +334,16 @@ where
             None
         }
         .unwrap_or({
-            let resp = self.client.resolve_did_doc(&did).await.map_err(|e| {
-                ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
-            })?;
+            let resp = self
+                .client
+                .resolve_did_doc(&did)
+                .await
+                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
             resp.into_owned()
-                .map_err(|e| {
-                    ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(
-                        e,
-                    )))
-                })?
+                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?
                 .pds_endpoint()
                 .ok_or_else(|| {
-                    ClientError::Transport(jacquard_common::error::TransportError::InvalidRequest(
+                    ClientError::Transport(TransportError::InvalidRequest(
                         "missing PDS endpoint".into(),
                     ))
                 })?
@@ -368,9 +363,10 @@ where
         let Some(key) = self.key.read().await.clone() else {
             return Ok(());
         };
-        self.store.del(&key).await.map_err(|e| {
-            ClientError::Transport(jacquard_common::error::TransportError::Other(Box::new(e)))
-        })?;
+        self.store
+            .del(&key)
+            .await
+            .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
         *self.key.write().await = None;
         Ok(())
     }
@@ -430,17 +426,28 @@ where
             .send(&request)
             .await;
 
-        match resp {
-            Err(ClientError::Auth(AuthError::TokenExpired)) => {
-                let auth = self.refresh().await?;
-                opts.auth = Some(auth);
-                self.client
-                    .xrpc(base_uri)
-                    .with_options(opts)
-                    .send(&request)
-                    .await
-            }
-            resp => resp,
+        if is_expired(&resp) {
+            let auth = self.refresh().await?;
+            opts.auth = Some(auth);
+            self.client
+                .xrpc(base_uri)
+                .with_options(opts)
+                .send(&request)
+                .await
+        } else {
+            resp
         }
+    }
+}
+
+#[inline]
+fn is_expired<R: XrpcResp>(response: &XrpcResult<Response<R>>) -> bool {
+    match response {
+        Err(ClientError::Auth(AuthError::TokenExpired)) => true,
+        Ok(resp) => match resp.parse() {
+            Err(XrpcError::Auth(AuthError::TokenExpired)) => true,
+            _ => false,
+        },
+        _ => false,
     }
 }

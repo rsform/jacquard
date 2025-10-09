@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "win.tomo-x.pushat.pushNotify",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "body",
+            "target"
+          ],
+          "properties": {
+            "body": {
+              "type": "ref",
+              "ref": "win.tomo-x.pushat.defs#notifyBody"
+            },
+            "target": {
+              "type": "string",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    }
+  }
+}

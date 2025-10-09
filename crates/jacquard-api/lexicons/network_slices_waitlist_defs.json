@@ -1,0 +1,72 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.waitlist.defs",
+  "defs": {
+    "inviteView": {
+      "type": "object",
+      "description": "An invite granting a DID access with profile information",
+      "required": [
+        "did",
+        "slice",
+        "createdAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "When this invitation was created",
+          "format": "datetime"
+        },
+        "did": {
+          "type": "string",
+          "description": "The DID being invited",
+          "format": "did"
+        },
+        "expiresAt": {
+          "type": "string",
+          "description": "Optional expiration date for this invitation",
+          "format": "datetime"
+        },
+        "profile": {
+          "type": "ref",
+          "description": "Profile of the invitee",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "slice": {
+          "type": "string",
+          "description": "The AT URI of the slice this invite is for",
+          "format": "at-uri"
+        },
+        "uri": {
+          "type": "string",
+          "description": "The AT URI of this invite record",
+          "format": "at-uri"
+        }
+      }
+    },
+    "requestView": {
+      "type": "object",
+      "description": "A request to join the waitlist with profile information",
+      "required": [
+        "slice",
+        "createdAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "When the user joined the waitlist",
+          "format": "datetime"
+        },
+        "profile": {
+          "type": "ref",
+          "description": "Profile of the requester",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "slice": {
+          "type": "string",
+          "description": "The AT URI of the slice being requested access to",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

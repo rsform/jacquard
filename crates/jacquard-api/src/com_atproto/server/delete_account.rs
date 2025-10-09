@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -33,18 +34,6 @@ pub struct DeleteAccount<'a> {
         ::jacquard_common::smol_str::SmolStr,
         ::jacquard_common::types::value::Data<'a>,
     >,
-}
-
-impl jacquard_common::IntoStatic for DeleteAccount<'_> {
-    type Output = DeleteAccount<'static>;
-    fn into_static(self) -> Self::Output {
-        DeleteAccount {
-            did: self.did.into_static(),
-            password: self.password.into_static(),
-            token: self.token.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

@@ -22,7 +22,15 @@ pub mod update_account_signing_key;
 pub mod update_subject_status;
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct AccountView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -62,29 +70,16 @@ pub struct AccountView<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for AccountView<'_> {
-    type Output = AccountView<'static>;
-    fn into_static(self) -> Self::Output {
-        AccountView {
-            deactivated_at: self.deactivated_at.into_static(),
-            did: self.did.into_static(),
-            email: self.email.into_static(),
-            email_confirmed_at: self.email_confirmed_at.into_static(),
-            handle: self.handle.into_static(),
-            indexed_at: self.indexed_at.into_static(),
-            invite_note: self.invite_note.into_static(),
-            invited_by: self.invited_by.into_static(),
-            invites: self.invites.into_static(),
-            invites_disabled: self.invites_disabled.into_static(),
-            related_records: self.related_records.into_static(),
-            threat_signatures: self.threat_signatures.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct RepoBlobRef<'a> {
     #[serde(borrow)]
@@ -96,38 +91,32 @@ pub struct RepoBlobRef<'a> {
     pub record_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
-impl jacquard_common::IntoStatic for RepoBlobRef<'_> {
-    type Output = RepoBlobRef<'static>;
-    fn into_static(self) -> Self::Output {
-        RepoBlobRef {
-            cid: self.cid.into_static(),
-            did: self.did.into_static(),
-            record_uri: self.record_uri.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct RepoRef<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
-impl jacquard_common::IntoStatic for RepoRef<'_> {
-    type Output = RepoRef<'static>;
-    fn into_static(self) -> Self::Output {
-        RepoRef {
-            did: self.did.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct StatusAttr<'a> {
     pub applied: bool,
@@ -136,34 +125,20 @@ pub struct StatusAttr<'a> {
     pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for StatusAttr<'_> {
-    type Output = StatusAttr<'static>;
-    fn into_static(self) -> Self::Output {
-        StatusAttr {
-            applied: self.applied.into_static(),
-            r#ref: self.r#ref.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreatSignature<'a> {
     #[serde(borrow)]
     pub property: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub value: jacquard_common::CowStr<'a>,
-}
-
-impl jacquard_common::IntoStatic for ThreatSignature<'_> {
-    type Output = ThreatSignature<'static>;
-    fn into_static(self) -> Self::Output {
-        ThreatSignature {
-            property: self.property.into_static(),
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

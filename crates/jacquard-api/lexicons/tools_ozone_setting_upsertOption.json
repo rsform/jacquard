@@ -1,0 +1,65 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.setting.upsertOption",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create or update setting option",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "key",
+            "scope",
+            "value"
+          ],
+          "properties": {
+            "description": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "key": {
+              "type": "string",
+              "format": "nsid"
+            },
+            "managerRole": {
+              "type": "string",
+              "knownValues": [
+                "tools.ozone.team.defs#roleModerator",
+                "tools.ozone.team.defs#roleTriage",
+                "tools.ozone.team.defs#roleVerifier",
+                "tools.ozone.team.defs#roleAdmin"
+              ]
+            },
+            "scope": {
+              "type": "string",
+              "knownValues": [
+                "instance",
+                "personal"
+              ]
+            },
+            "value": {
+              "type": "unknown"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "option"
+          ],
+          "properties": {
+            "option": {
+              "type": "ref",
+              "ref": "tools.ozone.setting.defs#option"
+            }
+          }
+        }
+      }
+    }
+  }
+}

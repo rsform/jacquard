@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -20,29 +21,20 @@ pub struct UploadVideo {
     pub body: bytes::Bytes,
 }
 
-impl jacquard_common::IntoStatic for UploadVideo {
-    type Output = UploadVideo;
-    fn into_static(self) -> Self::Output {
-        self
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct UploadVideoOutput<'a> {
     #[serde(borrow)]
     pub job_status: crate::app_bsky::video::JobStatus<'a>,
-}
-
-impl jacquard_common::IntoStatic for UploadVideoOutput<'_> {
-    type Output = UploadVideoOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        UploadVideoOutput {
-            job_status: self.job_status.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -7,7 +7,15 @@
 
 ///Error object for failed verifications.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GrantError<'a> {
     ///Error message describing the reason for failure.
@@ -18,17 +26,6 @@ pub struct GrantError<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
-impl jacquard_common::IntoStatic for GrantError<'_> {
-    type Output = GrantError<'static>;
-    fn into_static(self) -> Self::Output {
-        GrantError {
-            error: self.error.into_static(),
-            subject: self.subject.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -37,7 +34,8 @@ impl jacquard_common::IntoStatic for GrantError<'_> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -54,35 +52,22 @@ pub struct GrantVerifications<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for GrantVerifications<'_> {
-    type Output = GrantVerifications<'static>;
-    fn into_static(self) -> Self::Output {
-        GrantVerifications {
-            verifications: self.verifications.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GrantVerificationsOutput<'a> {
     #[serde(borrow)]
     pub failed_verifications: Vec<jacquard_common::types::value::Data<'a>>,
     #[serde(borrow)]
     pub verifications: Vec<crate::tools_ozone::verification::VerificationView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GrantVerificationsOutput<'_> {
-    type Output = GrantVerificationsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GrantVerificationsOutput {
-            failed_verifications: self.failed_verifications.into_static(),
-            verifications: self.verifications.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for
@@ -104,7 +89,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GrantVerifications<'de> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct VerificationInput<'a> {
     ///Timestamp for verification record. Defaults to current time when not specified.
@@ -119,17 +112,4 @@ pub struct VerificationInput<'a> {
     ///The did of the subject being verified
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
-}
-
-impl jacquard_common::IntoStatic for VerificationInput<'_> {
-    type Output = VerificationInput<'static>;
-    fn into_static(self) -> Self::Output {
-        VerificationInput {
-            created_at: self.created_at.into_static(),
-            display_name: self.display_name.into_static(),
-            handle: self.handle.into_static(),
-            subject: self.subject.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

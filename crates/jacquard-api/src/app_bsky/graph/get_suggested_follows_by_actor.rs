@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -21,17 +22,16 @@ pub struct GetSuggestedFollowsByActor<'a> {
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetSuggestedFollowsByActor<'_> {
-    type Output = GetSuggestedFollowsByActor<'static>;
-    fn into_static(self) -> Self::Output {
-        GetSuggestedFollowsByActor {
-            actor: self.actor.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedFollowsByActorOutput<'a> {
     ///If true, response has fallen-back to generic results, and is not scoped using relativeToDid
@@ -42,18 +42,6 @@ pub struct GetSuggestedFollowsByActorOutput<'a> {
     pub rec_id: std::option::Option<i64>,
     #[serde(borrow)]
     pub suggestions: Vec<crate::app_bsky::actor::ProfileView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetSuggestedFollowsByActorOutput<'_> {
-    type Output = GetSuggestedFollowsByActorOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetSuggestedFollowsByActorOutput {
-            is_fallback: self.is_fallback.into_static(),
-            rec_id: self.rec_id.into_static(),
-            suggestions: self.suggestions.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -29,19 +30,16 @@ pub struct GetValues<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetValues<'_> {
-    type Output = GetValues<'static>;
-    fn into_static(self) -> Self::Output {
-        GetValues {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            name: self.name.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetValuesOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -51,18 +49,6 @@ pub struct GetValuesOutput<'a> {
     pub set: crate::tools_ozone::set::SetView<'a>,
     #[serde(borrow)]
     pub values: Vec<jacquard_common::CowStr<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetValuesOutput<'_> {
-    type Output = GetValuesOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetValuesOutput {
-            cursor: self.cursor.into_static(),
-            set: self.set.into_static(),
-            values: self.values.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

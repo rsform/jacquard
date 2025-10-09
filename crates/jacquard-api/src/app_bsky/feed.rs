@@ -31,7 +31,15 @@ pub mod send_interactions;
 pub mod threadgate;
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct BlockedAuthor<'a> {
     #[serde(borrow)]
@@ -41,19 +49,16 @@ pub struct BlockedAuthor<'a> {
     pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
 }
 
-impl jacquard_common::IntoStatic for BlockedAuthor<'_> {
-    type Output = BlockedAuthor<'static>;
-    fn into_static(self) -> Self::Output {
-        BlockedAuthor {
-            did: self.did.into_static(),
-            viewer: self.viewer.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct BlockedPost<'a> {
     #[serde(borrow)]
@@ -63,20 +68,16 @@ pub struct BlockedPost<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl jacquard_common::IntoStatic for BlockedPost<'_> {
-    type Output = BlockedPost<'static>;
-    fn into_static(self) -> Self::Output {
-        BlockedPost {
-            author: self.author.into_static(),
-            blocked: self.blocked.into_static(),
-            uri: self.uri.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct FeedViewPost<'a> {
     ///Context provided by feed generator that may be passed back alongside interactions.
@@ -98,37 +99,28 @@ pub struct FeedViewPost<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum FeedViewPostRecordReason<'a> {}
-impl jacquard_common::IntoStatic for FeedViewPostRecordReason<'_> {
-    type Output = FeedViewPostRecordReason<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            FeedViewPostRecordReason::Unknown(v) => {
-                FeedViewPostRecordReason::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for FeedViewPost<'_> {
-    type Output = FeedViewPost<'static>;
-    fn into_static(self) -> Self::Output {
-        FeedViewPost {
-            feed_context: self.feed_context.into_static(),
-            post: self.post.into_static(),
-            reason: self.reason.into_static(),
-            reply: self.reply.into_static(),
-            req_id: self.req_id.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GeneratorView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -168,31 +160,16 @@ pub struct GeneratorView<'a> {
     pub viewer: std::option::Option<crate::app_bsky::feed::GeneratorViewerState<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GeneratorView<'_> {
-    type Output = GeneratorView<'static>;
-    fn into_static(self) -> Self::Output {
-        GeneratorView {
-            accepts_interactions: self.accepts_interactions.into_static(),
-            avatar: self.avatar.into_static(),
-            cid: self.cid.into_static(),
-            content_mode: self.content_mode.into_static(),
-            creator: self.creator.into_static(),
-            description: self.description.into_static(),
-            description_facets: self.description_facets.into_static(),
-            did: self.did.into_static(),
-            display_name: self.display_name.into_static(),
-            indexed_at: self.indexed_at.into_static(),
-            labels: self.labels.into_static(),
-            like_count: self.like_count.into_static(),
-            uri: self.uri.into_static(),
-            viewer: self.viewer.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GeneratorViewerState<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -200,18 +177,16 @@ pub struct GeneratorViewerState<'a> {
     pub like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GeneratorViewerState<'_> {
-    type Output = GeneratorViewerState<'static>;
-    fn into_static(self) -> Self::Output {
-        GeneratorViewerState {
-            like: self.like.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Interaction<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -230,21 +205,16 @@ pub struct Interaction<'a> {
     pub req_id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for Interaction<'_> {
-    type Output = Interaction<'static>;
-    fn into_static(self) -> Self::Output {
-        Interaction {
-            event: self.event.into_static(),
-            feed_context: self.feed_context.into_static(),
-            item: self.item.into_static(),
-            req_id: self.req_id.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct NotFoundPost<'a> {
     pub not_found: bool,
@@ -252,19 +222,16 @@ pub struct NotFoundPost<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl jacquard_common::IntoStatic for NotFoundPost<'_> {
-    type Output = NotFoundPost<'static>;
-    fn into_static(self) -> Self::Output {
-        NotFoundPost {
-            not_found: self.not_found.into_static(),
-            uri: self.uri.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct PostView<'a> {
     #[serde(borrow)]
@@ -301,7 +268,15 @@ pub struct PostView<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum PostViewRecordEmbed<'a> {
@@ -317,70 +292,28 @@ pub enum PostViewRecordEmbed<'a> {
     RecordWithMediaView(Box<crate::app_bsky::embed::record_with_media::View<'a>>),
 }
 
-impl jacquard_common::IntoStatic for PostViewRecordEmbed<'_> {
-    type Output = PostViewRecordEmbed<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            PostViewRecordEmbed::ImagesView(v) => {
-                PostViewRecordEmbed::ImagesView(v.into_static())
-            }
-            PostViewRecordEmbed::VideoView(v) => {
-                PostViewRecordEmbed::VideoView(v.into_static())
-            }
-            PostViewRecordEmbed::ExternalView(v) => {
-                PostViewRecordEmbed::ExternalView(v.into_static())
-            }
-            PostViewRecordEmbed::RecordView(v) => {
-                PostViewRecordEmbed::RecordView(v.into_static())
-            }
-            PostViewRecordEmbed::RecordWithMediaView(v) => {
-                PostViewRecordEmbed::RecordWithMediaView(v.into_static())
-            }
-            PostViewRecordEmbed::Unknown(v) => {
-                PostViewRecordEmbed::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for PostView<'_> {
-    type Output = PostView<'static>;
-    fn into_static(self) -> Self::Output {
-        PostView {
-            author: self.author.into_static(),
-            bookmark_count: self.bookmark_count.into_static(),
-            cid: self.cid.into_static(),
-            embed: self.embed.into_static(),
-            indexed_at: self.indexed_at.into_static(),
-            labels: self.labels.into_static(),
-            like_count: self.like_count.into_static(),
-            quote_count: self.quote_count.into_static(),
-            record: self.record.into_static(),
-            reply_count: self.reply_count.into_static(),
-            repost_count: self.repost_count.into_static(),
-            threadgate: self.threadgate.into_static(),
-            uri: self.uri.into_static(),
-            viewer: self.viewer.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ReasonPin<'a> {}
-impl jacquard_common::IntoStatic for ReasonPin<'_> {
-    type Output = ReasonPin<'static>;
-    fn into_static(self) -> Self::Output {
-        ReasonPin {
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ReasonRepost<'a> {
     #[serde(borrow)]
@@ -394,21 +327,16 @@ pub struct ReasonRepost<'a> {
     pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ReasonRepost<'_> {
-    type Output = ReasonRepost<'static>;
-    fn into_static(self) -> Self::Output {
-        ReasonRepost {
-            by: self.by.into_static(),
-            cid: self.cid.into_static(),
-            indexed_at: self.indexed_at.into_static(),
-            uri: self.uri.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ReplyRef<'a> {
     ///When parent is a reply to another post, this is the author of that post.
@@ -424,51 +352,41 @@ pub struct ReplyRef<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ReplyRefRecordParent<'a> {}
-impl jacquard_common::IntoStatic for ReplyRefRecordParent<'_> {
-    type Output = ReplyRefRecordParent<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ReplyRefRecordParent::Unknown(v) => {
-                ReplyRefRecordParent::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ReplyRefRecordRoot<'a> {}
-impl jacquard_common::IntoStatic for ReplyRefRecordRoot<'_> {
-    type Output = ReplyRefRecordRoot<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ReplyRefRecordRoot::Unknown(v) => {
-                ReplyRefRecordRoot::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ReplyRef<'_> {
-    type Output = ReplyRef<'static>;
-    fn into_static(self) -> Self::Output {
-        ReplyRef {
-            grandparent_author: self.grandparent_author.into_static(),
-            parent: self.parent.into_static(),
-            root: self.root.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonFeedPost<'a> {
     ///Context that will be passed through to client and may be passed to feed generator back alongside interactions.
@@ -483,67 +401,57 @@ pub struct SkeletonFeedPost<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SkeletonFeedPostRecordReason<'a> {}
-impl jacquard_common::IntoStatic for SkeletonFeedPostRecordReason<'_> {
-    type Output = SkeletonFeedPostRecordReason<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SkeletonFeedPostRecordReason::Unknown(v) => {
-                SkeletonFeedPostRecordReason::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for SkeletonFeedPost<'_> {
-    type Output = SkeletonFeedPost<'static>;
-    fn into_static(self) -> Self::Output {
-        SkeletonFeedPost {
-            feed_context: self.feed_context.into_static(),
-            post: self.post.into_static(),
-            reason: self.reason.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonReasonPin<'a> {}
-impl jacquard_common::IntoStatic for SkeletonReasonPin<'_> {
-    type Output = SkeletonReasonPin<'static>;
-    fn into_static(self) -> Self::Output {
-        SkeletonReasonPin {
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonReasonRepost<'a> {
     #[serde(borrow)]
     pub repost: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl jacquard_common::IntoStatic for SkeletonReasonRepost<'_> {
-    type Output = SkeletonReasonRepost<'static>;
-    fn into_static(self) -> Self::Output {
-        SkeletonReasonRepost {
-            repost: self.repost.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Metadata about this post within the context of the thread it is in.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadContext<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -551,18 +459,16 @@ pub struct ThreadContext<'a> {
     pub root_author_like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ThreadContext<'_> {
-    type Output = ThreadContext<'static>;
-    fn into_static(self) -> Self::Output {
-        ThreadContext {
-            root_author_like: self.root_author_like.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadViewPost<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -579,36 +485,28 @@ pub struct ThreadViewPost<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ThreadViewPostRecordParent<'a> {}
-impl jacquard_common::IntoStatic for ThreadViewPostRecordParent<'_> {
-    type Output = ThreadViewPostRecordParent<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ThreadViewPostRecordParent::Unknown(v) => {
-                ThreadViewPostRecordParent::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ThreadViewPost<'_> {
-    type Output = ThreadViewPost<'static>;
-    fn into_static(self) -> Self::Output {
-        ThreadViewPost {
-            parent: self.parent.into_static(),
-            post: self.post.into_static(),
-            replies: self.replies.into_static(),
-            thread_context: self.thread_context.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadgateView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -625,22 +523,17 @@ pub struct ThreadgateView<'a> {
     pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ThreadgateView<'_> {
-    type Output = ThreadgateView<'static>;
-    fn into_static(self) -> Self::Output {
-        ThreadgateView {
-            cid: self.cid.into_static(),
-            lists: self.lists.into_static(),
-            record: self.record.into_static(),
-            uri: self.uri.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ViewerState<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -659,20 +552,4 @@ pub struct ViewerState<'a> {
     pub repost: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub thread_muted: std::option::Option<bool>,
-}
-
-impl jacquard_common::IntoStatic for ViewerState<'_> {
-    type Output = ViewerState<'static>;
-    fn into_static(self) -> Self::Output {
-        ViewerState {
-            bookmarked: self.bookmarked.into_static(),
-            embedding_disabled: self.embedding_disabled.into_static(),
-            like: self.like.into_static(),
-            pinned: self.pinned.into_static(),
-            reply_disabled: self.reply_disabled.into_static(),
-            repost: self.repost.into_static(),
-            thread_muted: self.thread_muted.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

@@ -1,0 +1,27 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.publish.blob",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A simple record referencing a file hosted on a PDS",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "upload"
+        ],
+        "properties": {
+          "upload": {
+            "type": "blob",
+            "description": "Reference to the uploaded file",
+            "accept": [
+              "*/*"
+            ],
+            "maxSize": 10000000
+          }
+        }
+      }
+    }
+  }
+}

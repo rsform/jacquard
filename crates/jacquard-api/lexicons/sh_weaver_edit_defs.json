@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.edit.defs",
+  "defs": {
+    "docRef": {
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "type": "union",
+          "refs": [
+            "#notebookRef",
+            "#entryRef"
+          ]
+        }
+      }
+    },
+    "entryRef": {
+      "type": "object",
+      "required": [
+        "notebook"
+      ],
+      "properties": {
+        "notebook": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    },
+    "notebookRef": {
+      "type": "object",
+      "required": [
+        "notebook"
+      ],
+      "properties": {
+        "notebook": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    }
+  }
+}

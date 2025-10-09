@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "com.welistskyblue.list.item",
+  "description": "A task record with name, status, and timestamps.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "status",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "Task name/title.",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "status": {
+            "type": "string",
+            "description": "Task status.",
+            "default": "ongoing",
+            "enum": [
+              "ongoing",
+              "done"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

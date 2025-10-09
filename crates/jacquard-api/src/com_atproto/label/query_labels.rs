@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -31,20 +32,16 @@ pub struct QueryLabels<'a> {
     pub uri_patterns: Vec<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for QueryLabels<'_> {
-    type Output = QueryLabels<'static>;
-    fn into_static(self) -> Self::Output {
-        QueryLabels {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            sources: self.sources.into_static(),
-            uri_patterns: self.uri_patterns.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryLabelsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -52,17 +49,6 @@ pub struct QueryLabelsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub labels: Vec<crate::com_atproto::label::Label<'a>>,
-}
-
-impl jacquard_common::IntoStatic for QueryLabelsOutput<'_> {
-    type Output = QueryLabelsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        QueryLabelsOutput {
-            cursor: self.cursor.into_static(),
-            labels: self.labels.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

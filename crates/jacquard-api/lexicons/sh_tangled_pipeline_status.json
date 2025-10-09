@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.pipeline.status",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "pipeline",
+          "workflow",
+          "status",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "time of creation of this status update",
+            "format": "datetime"
+          },
+          "error": {
+            "type": "string",
+            "description": "error message if failed"
+          },
+          "exitCode": {
+            "type": "integer",
+            "description": "exit code if failed"
+          },
+          "pipeline": {
+            "type": "string",
+            "description": "ATURI of the pipeline",
+            "format": "at-uri"
+          },
+          "status": {
+            "type": "string",
+            "description": "status of the workflow",
+            "enum": [
+              "pending",
+              "running",
+              "failed",
+              "timeout",
+              "cancelled",
+              "success"
+            ]
+          },
+          "workflow": {
+            "type": "string",
+            "description": "name of the workflow within this pipeline",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

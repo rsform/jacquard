@@ -7,7 +7,15 @@
 
 ///A declaration of a Bluesky chat account.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Declaration<'a> {
     #[serde(borrow)]
@@ -16,14 +24,4 @@ pub struct Declaration<'a> {
 
 impl jacquard_common::types::collection::Collection for Declaration<'_> {
     const NSID: &'static str = "chat.bsky.actor.declaration";
-}
-
-impl jacquard_common::IntoStatic for Declaration<'_> {
-    type Output = Declaration<'static>;
-    fn into_static(self) -> Self::Output {
-        Declaration {
-            allow_incoming: self.allow_incoming.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

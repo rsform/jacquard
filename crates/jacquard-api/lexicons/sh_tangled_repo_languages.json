@@ -1,0 +1,108 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.languages",
+  "defs": {
+    "language": {
+      "type": "object",
+      "required": [
+        "name",
+        "size",
+        "percentage"
+      ],
+      "properties": {
+        "color": {
+          "type": "string",
+          "description": "Hex color code for this language"
+        },
+        "extensions": {
+          "type": "array",
+          "description": "File extensions associated with this language",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fileCount": {
+          "type": "integer",
+          "description": "Number of files in this language"
+        },
+        "name": {
+          "type": "string",
+          "description": "Programming language name"
+        },
+        "percentage": {
+          "type": "integer",
+          "description": "Percentage of total codebase (0-100)"
+        },
+        "size": {
+          "type": "integer",
+          "description": "Total size of files in this language (bytes)"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo"
+        ],
+        "properties": {
+          "ref": {
+            "type": "string",
+            "description": "Git reference (branch, tag, or commit SHA)",
+            "default": "HEAD"
+          },
+          "repo": {
+            "type": "string",
+            "description": "Repository identifier in format 'did:plc:.../repoName'"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "ref",
+            "languages"
+          ],
+          "properties": {
+            "languages": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#language"
+              }
+            },
+            "ref": {
+              "type": "string",
+              "description": "The git reference used"
+            },
+            "totalFiles": {
+              "type": "integer",
+              "description": "Total number of files analyzed"
+            },
+            "totalSize": {
+              "type": "integer",
+              "description": "Total size of all analyzed files in bytes"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Repository not found or access denied",
+          "name": "RepoNotFound"
+        },
+        {
+          "description": "Git reference not found",
+          "name": "RefNotFound"
+        },
+        {
+          "description": "Invalid request parameters",
+          "name": "InvalidRequest"
+        }
+      ]
+    }
+  }
+}

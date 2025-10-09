@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LiveNowConfig<'a> {
     #[serde(borrow)]
@@ -15,19 +23,16 @@ pub struct LiveNowConfig<'a> {
     pub domains: Vec<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for LiveNowConfig<'_> {
-    type Output = LiveNowConfig<'static>;
-    fn into_static(self) -> Self::Output {
-        LiveNowConfig {
-            did: self.did.into_static(),
-            domains: self.domains.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetConfigOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -35,17 +40,6 @@ pub struct GetConfigOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub live_now: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-}
-
-impl jacquard_common::IntoStatic for GetConfigOutput<'_> {
-    type Output = GetConfigOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetConfigOutput {
-            check_email_confirmed: self.check_email_confirmed.into_static(),
-            live_now: self.live_now.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 /// XRPC request marker type

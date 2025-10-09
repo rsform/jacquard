@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -21,17 +22,16 @@ pub struct GetFeedGenerator<'a> {
     pub feed: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetFeedGenerator<'_> {
-    type Output = GetFeedGenerator<'static>;
-    fn into_static(self) -> Self::Output {
-        GetFeedGenerator {
-            feed: self.feed.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedGeneratorOutput<'a> {
     ///Indicates whether the feed generator service has been online recently, or else seems to be inactive.
@@ -40,18 +40,6 @@ pub struct GetFeedGeneratorOutput<'a> {
     pub is_valid: bool,
     #[serde(borrow)]
     pub view: crate::app_bsky::feed::GeneratorView<'a>,
-}
-
-impl jacquard_common::IntoStatic for GetFeedGeneratorOutput<'_> {
-    type Output = GetFeedGeneratorOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetFeedGeneratorOutput {
-            is_online: self.is_online.into_static(),
-            is_valid: self.is_valid.into_static(),
-            view: self.view.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

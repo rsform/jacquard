@@ -6,18 +6,17 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ExportAccountDataOutput<'a> {}
-impl jacquard_common::IntoStatic for ExportAccountDataOutput<'_> {
-    type Output = ExportAccountDataOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        ExportAccountDataOutput {
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ExportAccountData;

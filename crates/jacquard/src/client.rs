@@ -10,6 +10,8 @@ pub mod token;
 
 use core::future::Future;
 
+use jacquard_api::com_atproto::server::create_session::CreateSessionOutput;
+use jacquard_api::com_atproto::server::refresh_session::RefreshSessionOutput;
 use jacquard_common::AuthorizationToken;
 use jacquard_common::error::TransportError;
 pub use jacquard_common::error::{ClientError, XrpcResult};
@@ -45,12 +47,8 @@ pub struct AtpSession {
     pub handle: Handle<'static>,
 }
 
-impl From<jacquard_api::com_atproto::server::create_session::CreateSessionOutput<'_>>
-    for AtpSession
-{
-    fn from(
-        output: jacquard_api::com_atproto::server::create_session::CreateSessionOutput<'_>,
-    ) -> Self {
+impl From<CreateSessionOutput<'_>> for AtpSession {
+    fn from(output: CreateSessionOutput<'_>) -> Self {
         Self {
             access_jwt: output.access_jwt.into_static(),
             refresh_jwt: output.refresh_jwt.into_static(),
@@ -60,12 +58,8 @@ impl From<jacquard_api::com_atproto::server::create_session::CreateSessionOutput
     }
 }
 
-impl From<jacquard_api::com_atproto::server::refresh_session::RefreshSessionOutput<'_>>
-    for AtpSession
-{
-    fn from(
-        output: jacquard_api::com_atproto::server::refresh_session::RefreshSessionOutput<'_>,
-    ) -> Self {
+impl From<RefreshSessionOutput<'_>> for AtpSession {
+    fn from(output: RefreshSessionOutput<'_>) -> Self {
         Self {
             access_jwt: output.access_jwt.into_static(),
             refresh_jwt: output.refresh_jwt.into_static(),

@@ -1,0 +1,122 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.getOAuthClients",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get all OAuth clients registered for a slice. Requires authentication.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "slice"
+        ],
+        "properties": {
+          "slice": {
+            "type": "string",
+            "description": "AT-URI of the slice to get OAuth clients for"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "clients"
+          ],
+          "properties": {
+            "clients": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#oauthClientDetails"
+              }
+            }
+          }
+        }
+      }
+    },
+    "oauthClientDetails": {
+      "type": "object",
+      "required": [
+        "clientId",
+        "clientName",
+        "redirectUris",
+        "grantTypes",
+        "responseTypes",
+        "createdAt",
+        "createdByDid"
+      ],
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "OAuth client ID"
+        },
+        "clientName": {
+          "type": "string",
+          "description": "Human-readable name of the OAuth client"
+        },
+        "clientSecret": {
+          "type": "string",
+          "description": "OAuth client secret (only returned on creation)"
+        },
+        "clientUri": {
+          "type": "string",
+          "description": "URI of the client application",
+          "format": "uri"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "When the OAuth client was created",
+          "format": "datetime"
+        },
+        "createdByDid": {
+          "type": "string",
+          "description": "DID of the user who created this client",
+          "format": "did"
+        },
+        "grantTypes": {
+          "type": "array",
+          "description": "Allowed OAuth grant types",
+          "items": {
+            "type": "string"
+          }
+        },
+        "logoUri": {
+          "type": "string",
+          "description": "URI of the client logo",
+          "format": "uri"
+        },
+        "policyUri": {
+          "type": "string",
+          "description": "URI of the privacy policy",
+          "format": "uri"
+        },
+        "redirectUris": {
+          "type": "array",
+          "description": "Allowed redirect URIs for OAuth flow",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "responseTypes": {
+          "type": "array",
+          "description": "Allowed OAuth response types",
+          "items": {
+            "type": "string"
+          }
+        },
+        "scope": {
+          "type": "string",
+          "description": "OAuth scope"
+        },
+        "tosUri": {
+          "type": "string",
+          "description": "URI of the terms of service",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

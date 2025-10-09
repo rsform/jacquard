@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -22,31 +23,20 @@ pub struct GetJobStatus<'a> {
     pub job_id: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetJobStatus<'_> {
-    type Output = GetJobStatus<'static>;
-    fn into_static(self) -> Self::Output {
-        GetJobStatus {
-            job_id: self.job_id.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetJobStatusOutput<'a> {
     #[serde(borrow)]
     pub job_status: crate::app_bsky::video::JobStatus<'a>,
-}
-
-impl jacquard_common::IntoStatic for GetJobStatusOutput<'_> {
-    type Output = GetJobStatusOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetJobStatusOutput {
-            job_status: self.job_status.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -28,7 +28,7 @@ use std::{ops::Deref, str::FromStr};
 #[derive(Clone, PartialEq, Eq, Serialize, Hash)]
 #[serde(transparent)]
 #[repr(transparent)]
-pub struct Handle<'h>(CowStr<'h>);
+pub struct Handle<'h>(pub(crate) CowStr<'h>);
 
 /// Regex for handle validation per AT Protocol spec
 pub static HANDLE_REGEX: LazyLock<Regex> = LazyLock::new(|| {

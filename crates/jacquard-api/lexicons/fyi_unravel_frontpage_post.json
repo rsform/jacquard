@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "fyi.unravel.frontpage.post",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record containing a Frontpage post.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "url",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this post was originally created.",
+            "format": "datetime"
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the post.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL of the post.",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

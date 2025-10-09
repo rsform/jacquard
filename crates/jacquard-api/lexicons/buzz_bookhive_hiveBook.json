@@ -1,0 +1,83 @@
+{
+  "lexicon": 1,
+  "id": "buzz.bookhive.hiveBook",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A book within the hive",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "authors",
+          "createdAt",
+          "updatedAt",
+          "thumbnail"
+        ],
+        "properties": {
+          "authors": {
+            "type": "string",
+            "description": "The authors of the book (tab separated)",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "cover": {
+            "type": "string",
+            "description": "URL to full-size cover image"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Book description/summary",
+            "maxLength": 5000
+          },
+          "id": {
+            "type": "string",
+            "description": "The book's hive id, used to correlate user's books with the hive"
+          },
+          "rating": {
+            "type": "integer",
+            "description": "Average rating (0-1000)",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "ratingsCount": {
+            "type": "integer",
+            "description": "Number of ratings"
+          },
+          "source": {
+            "type": "string",
+            "description": "The source service name (e.g. Goodreads)"
+          },
+          "sourceId": {
+            "type": "string",
+            "description": "ID of the book in the source service"
+          },
+          "sourceUrl": {
+            "type": "string",
+            "description": "URL to the book on the source service"
+          },
+          "thumbnail": {
+            "type": "string",
+            "description": "URL to thumbnail image"
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the book",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

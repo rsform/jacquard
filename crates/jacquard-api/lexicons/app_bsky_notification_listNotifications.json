@@ -1,0 +1,132 @@
+{
+  "lexicon": 1,
+  "id": "app.bsky.notification.listNotifications",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Enumerate notifications for the requesting account. Requires auth.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "priority": {
+            "type": "boolean"
+          },
+          "reasons": {
+            "type": "array",
+            "description": "Notification reasons to include in response.",
+            "items": {
+              "type": "string",
+              "description": "A reason that matches the reason property of #notification."
+            }
+          },
+          "seenAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "notifications"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "notifications": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#notification"
+              }
+            },
+            "priority": {
+              "type": "boolean"
+            },
+            "seenAt": {
+              "type": "string",
+              "format": "datetime"
+            }
+          }
+        }
+      }
+    },
+    "notification": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "reason",
+        "record",
+        "isRead",
+        "indexedAt"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileView"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "isRead": {
+          "type": "boolean"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#label"
+          }
+        },
+        "reason": {
+          "type": "string",
+          "description": "The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.",
+          "knownValues": [
+            "like",
+            "repost",
+            "follow",
+            "mention",
+            "reply",
+            "quote",
+            "starterpack-joined",
+            "verified",
+            "unverified",
+            "like-via-repost",
+            "repost-via-repost",
+            "subscribed-post"
+          ]
+        },
+        "reasonSubject": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "record": {
+          "type": "unknown"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

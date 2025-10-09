@@ -1,0 +1,86 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.embed.external",
+  "description": "A set of records embedded in a blog post.",
+  "defs": {
+    "external": {
+      "type": "object",
+      "required": [
+        "uri",
+        "title",
+        "description"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "thumb": {
+          "type": "blob",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 1000000
+        },
+        "title": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "required": [
+        "embeds"
+      ],
+      "properties": {
+        "embeds": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#external"
+          },
+          "maxLength": 48
+        }
+      }
+    },
+    "view": {
+      "type": "object",
+      "required": [
+        "external"
+      ],
+      "properties": {
+        "external": {
+          "type": "ref",
+          "ref": "#viewExternal"
+        }
+      }
+    },
+    "viewExternal": {
+      "type": "object",
+      "required": [
+        "uri",
+        "title",
+        "description"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "thumb": {
+          "type": "string",
+          "format": "uri"
+        },
+        "title": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

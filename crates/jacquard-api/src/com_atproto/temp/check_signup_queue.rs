@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct CheckSignupQueueOutput<'a> {
     pub activated: bool,
@@ -14,18 +22,6 @@ pub struct CheckSignupQueueOutput<'a> {
     pub estimated_time_ms: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub place_in_queue: std::option::Option<i64>,
-}
-
-impl jacquard_common::IntoStatic for CheckSignupQueueOutput<'_> {
-    type Output = CheckSignupQueueOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        CheckSignupQueueOutput {
-            activated: self.activated.into_static(),
-            estimated_time_ms: self.estimated_time_ms.into_static(),
-            place_in_queue: self.place_in_queue.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 /// XRPC request marker type

@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.pull.status",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "pull",
+          "status"
+        ],
+        "properties": {
+          "pull": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "status": {
+            "type": "string",
+            "description": "status of the pull request",
+            "default": "sh.tangled.repo.pull.status.open",
+            "knownValues": [
+              "sh.tangled.repo.pull.status.open",
+              "sh.tangled.repo.pull.status.closed",
+              "sh.tangled.repo.pull.status.merged"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.getActors",
+  "defs": {
+    "actor": {
+      "type": "object",
+      "required": [
+        "did",
+        "sliceUri",
+        "indexedAt"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "description": "Decentralized identifier of the actor",
+          "format": "did"
+        },
+        "handle": {
+          "type": "string",
+          "description": "Human-readable handle of the actor",
+          "format": "handle"
+        },
+        "indexedAt": {
+          "type": "string",
+          "description": "When this actor was indexed",
+          "format": "datetime"
+        },
+        "sliceUri": {
+          "type": "string",
+          "description": "AT-URI of the slice this actor is indexed in"
+        }
+      }
+    },
+    "main": {
+      "type": "procedure",
+      "description": "Get actors (users) indexed in a slice with optional filtering and pagination.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "slice"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "description": "Pagination cursor from previous response"
+            },
+            "limit": {
+              "type": "integer",
+              "description": "Maximum number of actors to return",
+              "default": 50,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "slice": {
+              "type": "string",
+              "description": "AT-URI of the slice to query"
+            },
+            "where": {
+              "type": "unknown",
+              "description": "Flexible filtering conditions for querying actors"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "actors"
+          ],
+          "properties": {
+            "actors": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#actor"
+              }
+            },
+            "cursor": {
+              "type": "string",
+              "description": "Pagination cursor for next page"
+            }
+          }
+        }
+      }
+    }
+  }
+}

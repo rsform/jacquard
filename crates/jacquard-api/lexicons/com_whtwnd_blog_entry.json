@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "com.whtwnd.blog.entry",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of a post.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "blobs": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "com.whtwnd.blog.defs#blobMetadata"
+            }
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 100000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "isDraft": {
+            "type": "boolean",
+            "description": "(DEPRECATED) Marks this entry as draft to tell AppViews not to show it to anyone except for the author"
+          },
+          "ogp": {
+            "type": "ref",
+            "ref": "com.whtwnd.blog.defs#ogp"
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "theme": {
+            "type": "string",
+            "enum": [
+              "github-light"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "visibility": {
+            "type": "string",
+            "description": "Tells the visibility of the article to AppView.",
+            "default": "public",
+            "enum": [
+              "public",
+              "url",
+              "author"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

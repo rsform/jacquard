@@ -1,0 +1,55 @@
+{
+  "lexicon": 1,
+  "id": "chat.bsky.actor.defs",
+  "defs": {
+    "profileViewBasic": {
+      "type": "object",
+      "required": [
+        "did",
+        "handle"
+      ],
+      "properties": {
+        "associated": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileAssociated"
+        },
+        "avatar": {
+          "type": "string",
+          "format": "uri"
+        },
+        "chatDisabled": {
+          "type": "boolean",
+          "description": "Set to true when the actor cannot actively participate in conversations"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#label"
+          }
+        },
+        "verification": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#verificationState"
+        },
+        "viewer": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#viewerState"
+        }
+      }
+    }
+  }
+}

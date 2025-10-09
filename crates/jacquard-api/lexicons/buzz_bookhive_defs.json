@@ -1,0 +1,243 @@
+{
+  "lexicon": 1,
+  "id": "buzz.bookhive.defs",
+  "defs": {
+    "abandoned": {
+      "type": "token",
+      "description": "User has abandoned the book"
+    },
+    "activity": {
+      "type": "object",
+      "required": [
+        "type",
+        "createdAt",
+        "hiveId",
+        "title"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "hiveId": {
+          "type": "string",
+          "description": "The hive id of the book"
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the book"
+        },
+        "type": {
+          "type": "string",
+          "knownValues": [
+            "review",
+            "rated",
+            "started",
+            "finished"
+          ]
+        }
+      }
+    },
+    "comment": {
+      "type": "object",
+      "required": [
+        "comment",
+        "createdAt",
+        "book",
+        "parent",
+        "did",
+        "handle"
+      ],
+      "properties": {
+        "book": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "comment": {
+          "type": "string",
+          "description": "The content of the comment.",
+          "maxLength": 100000,
+          "maxGraphemes": 10000
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Client-declared timestamp when this comment was originally created.",
+          "format": "datetime"
+        },
+        "did": {
+          "type": "string",
+          "description": "The DID of the user who made the comment"
+        },
+        "handle": {
+          "type": "string",
+          "description": "The handle of the user who made the comment"
+        },
+        "parent": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    },
+    "finished": {
+      "type": "token",
+      "description": "User has finished reading the book"
+    },
+    "owned": {
+      "type": "token",
+      "description": "User owns the book"
+    },
+    "profile": {
+      "type": "object",
+      "required": [
+        "displayName",
+        "handle",
+        "booksRead",
+        "reviews"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "string"
+        },
+        "booksRead": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "description": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "handle": {
+          "type": "string"
+        },
+        "reviews": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "reading": {
+      "type": "token",
+      "description": "User is currently reading the book"
+    },
+    "review": {
+      "type": "object",
+      "required": [
+        "review",
+        "createdAt",
+        "did",
+        "handle"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "The date the review was created",
+          "format": "datetime"
+        },
+        "did": {
+          "type": "string",
+          "description": "The DID of the user who made the review"
+        },
+        "handle": {
+          "type": "string",
+          "description": "The handle of the user who made the review"
+        },
+        "review": {
+          "type": "string",
+          "description": "The review content"
+        },
+        "stars": {
+          "type": "integer",
+          "description": "The number of stars given to the book"
+        }
+      }
+    },
+    "userBook": {
+      "type": "object",
+      "required": [
+        "title",
+        "authors",
+        "hiveId",
+        "createdAt",
+        "thumbnail"
+      ],
+      "properties": {
+        "authors": {
+          "type": "string",
+          "description": "The authors of the book (tab separated)",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "cover": {
+          "type": "string",
+          "description": "Cover image of the book"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "description": {
+          "type": "string",
+          "description": "Book description/summary",
+          "maxLength": 5000
+        },
+        "finishedAt": {
+          "type": "string",
+          "description": "The date the user finished reading the book",
+          "format": "datetime"
+        },
+        "hiveId": {
+          "type": "string",
+          "description": "The book's hive id, used to correlate user's books with the hive"
+        },
+        "rating": {
+          "type": "integer",
+          "description": "Average rating (0-1000)",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "review": {
+          "type": "string",
+          "description": "The book's review",
+          "maxGraphemes": 15000
+        },
+        "stars": {
+          "type": "integer",
+          "description": "Number of stars given to the book (1-10) which will be mapped to 1-5 stars",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "startedAt": {
+          "type": "string",
+          "description": "The date the user started reading the book",
+          "format": "datetime"
+        },
+        "status": {
+          "type": "string",
+          "knownValues": [
+            "buzz.bookhive.defs#finished",
+            "buzz.bookhive.defs#reading",
+            "buzz.bookhive.defs#wantToRead",
+            "buzz.bookhive.defs#abandoned",
+            "buzz.bookhive.defs#owned"
+          ]
+        },
+        "thumbnail": {
+          "type": "string",
+          "description": "Cover image of the book"
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the book",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      }
+    },
+    "wantToRead": {
+      "type": "token",
+      "description": "User wants to read the book"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.waitlist.invite",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An invite granting a DID access, created by the slice owner",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "did",
+          "slice",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When this invitation was created",
+            "format": "datetime"
+          },
+          "did": {
+            "type": "string",
+            "description": "The DID being invited",
+            "format": "did"
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "Optional expiration date for this invitation",
+            "format": "datetime"
+          },
+          "slice": {
+            "type": "string",
+            "description": "The AT URI of the slice this invite is for",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

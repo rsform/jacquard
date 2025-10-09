@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.chat.message",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record containing a Streamplace chat message.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "text",
+          "createdAt",
+          "streamer"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this message was originally created.",
+            "format": "datetime"
+          },
+          "facets": {
+            "type": "array",
+            "description": "Annotations of text (mentions, URLs, etc)",
+            "items": {
+              "type": "ref",
+              "ref": "place.stream.richtext.facet"
+            }
+          },
+          "reply": {
+            "type": "ref",
+            "ref": "#replyRef"
+          },
+          "streamer": {
+            "type": "string",
+            "description": "The DID of the streamer whose chat this is.",
+            "format": "did"
+          },
+          "text": {
+            "type": "string",
+            "description": "The primary message content. May be an empty string, if there are embeds.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          }
+        }
+      }
+    },
+    "replyRef": {
+      "type": "object",
+      "required": [
+        "root",
+        "parent"
+      ],
+      "properties": {
+        "parent": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "root": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    }
+  }
+}

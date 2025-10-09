@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -26,18 +27,16 @@ pub struct ListRepos<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for ListRepos<'_> {
-    type Output = ListRepos<'static>;
-    fn into_static(self) -> Self::Output {
-        ListRepos {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ListReposOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -45,17 +44,6 @@ pub struct ListReposOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub repos: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for ListReposOutput<'_> {
-    type Output = ListReposOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        ListReposOutput {
-            cursor: self.cursor.into_static(),
-            repos: self.repos.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for
@@ -75,7 +63,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListRepos<'de> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Repo<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -90,18 +86,4 @@ pub struct Repo<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl jacquard_common::IntoStatic for Repo<'_> {
-    type Output = Repo<'static>;
-    fn into_static(self) -> Self::Output {
-        Repo {
-            active: self.active.into_static(),
-            did: self.did.into_static(),
-            head: self.head.into_static(),
-            rev: self.rev.into_static(),
-            status: self.status.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

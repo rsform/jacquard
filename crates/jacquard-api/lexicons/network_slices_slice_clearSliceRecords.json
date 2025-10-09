@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.clearSliceRecords",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Clear all indexed records and actors from a slice. Data can be re-indexed through sync. Requires authentication.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "slice"
+          ],
+          "properties": {
+            "slice": {
+              "type": "string",
+              "description": "AT-URI of the slice to clear"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string",
+              "description": "Success message"
+            }
+          }
+        }
+      }
+    }
+  }
+}

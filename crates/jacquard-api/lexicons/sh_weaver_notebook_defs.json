@@ -1,0 +1,202 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.defs",
+  "defs": {
+    "authorListView": {
+      "type": "object",
+      "required": [
+        "profile",
+        "index"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "index": {
+          "type": "integer"
+        },
+        "record": {
+          "type": "unknown"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "bookEntryRef": {
+      "type": "object",
+      "required": [
+        "entry"
+      ],
+      "properties": {
+        "entry": {
+          "type": "ref",
+          "ref": "#entryView"
+        }
+      }
+    },
+    "bookEntryView": {
+      "type": "object",
+      "description": "An ordered entry in a Weaver notebook.",
+      "required": [
+        "entry",
+        "index"
+      ],
+      "properties": {
+        "entry": {
+          "type": "ref",
+          "ref": "#entryView"
+        },
+        "index": {
+          "type": "integer"
+        },
+        "next": {
+          "type": "ref",
+          "ref": "#bookEntryRef"
+        },
+        "prev": {
+          "type": "ref",
+          "ref": "#bookEntryRef"
+        }
+      }
+    },
+    "contentFormat": {
+      "type": "object",
+      "description": "The format of the content. This is used to determine how to render the content.",
+      "properties": {
+        "markdown": {
+          "type": "string",
+          "description": "The format of the content. This is used to determine how to render the content.",
+          "default": "weaver",
+          "enum": [
+            "commonmark",
+            "gfm",
+            "obsidian",
+            "weaver"
+          ]
+        }
+      }
+    },
+    "entryView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "record",
+        "indexedAt"
+      ],
+      "properties": {
+        "authors": {
+          "type": "ref",
+          "ref": "#authorListView"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "record": {
+          "type": "unknown"
+        },
+        "renderedView": {
+          "type": "ref",
+          "ref": "#renderedView"
+        },
+        "tags": {
+          "type": "ref",
+          "ref": "#tags"
+        },
+        "title": {
+          "type": "ref",
+          "ref": "#title"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "notebookView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "record",
+        "indexedAt"
+      ],
+      "properties": {
+        "authors": {
+          "type": "ref",
+          "ref": "#authorListView"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "record": {
+          "type": "unknown"
+        },
+        "tags": {
+          "type": "ref",
+          "ref": "#tags"
+        },
+        "title": {
+          "type": "ref",
+          "ref": "#title"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "renderedView": {
+      "type": "object",
+      "description": "View of a rendered and cached notebook entry",
+      "required": [
+        "html"
+      ],
+      "properties": {
+        "css": {
+          "type": "blob",
+          "accept": [
+            "text/css"
+          ],
+          "maxSize": 1000000
+        },
+        "html": {
+          "type": "blob",
+          "accept": [
+            "text/html"
+          ],
+          "maxSize": 1000000
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "description": "An array of tags associated with the notebook entry. Tags can help categorize and organize entries.",
+      "items": {
+        "type": "string",
+        "maxLength": 64
+      },
+      "maxLength": 10
+    },
+    "title": {
+      "type": "string",
+      "description": "The title of the notebook entry.",
+      "maxLength": 420
+    }
+  }
+}

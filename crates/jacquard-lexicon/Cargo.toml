@@ -15,21 +15,34 @@ license.workspace = true
 name = "jacquard-codegen"
 path = "src/bin/codegen.rs"
 
+[[bin]]
+name = "lex-fetch"
+path = "src/bin/lex_fetch.rs"
+
 [dependencies]
+async-trait = "0.1"
 clap.workspace = true
+glob = "0.3"
 heck.workspace = true
 itertools.workspace = true
+jacquard-api = { version = "0.3.0", path = "../jacquard-api" }
 jacquard-common = { version = "0.3.0", path = "../jacquard-common" }
+jacquard-identity = { version = "0.3.0", path = "../jacquard-identity" }
+kdl = "6"
 miette = { workspace = true, features = ["fancy"] }
 prettyplease.workspace = true
 proc-macro2.workspace = true
 quote.workspace = true
+reqwest.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 serde_repr.workspace = true
 serde_with.workspace = true
 syn.workspace = true
+tempfile = "3.23"
 thiserror.workspace = true
+tokio = { workspace = true, features = ["full"] }
+walkdir = "2.5"
 
 [dev-dependencies]
 tempfile = { version = "3.23.0" }

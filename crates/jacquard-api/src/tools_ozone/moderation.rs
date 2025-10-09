@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod cancel_scheduled_actions;
 pub mod emit_event;
 pub mod get_account_timeline;
 pub mod get_event;
@@ -14,13 +15,23 @@ pub mod get_repo;
 pub mod get_reporter_stats;
 pub mod get_repos;
 pub mod get_subjects;
+pub mod list_scheduled_actions;
 pub mod query_events;
 pub mod query_statuses;
+pub mod schedule_action;
 pub mod search_repos;
 
 ///Logs account status related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct AccountEvent<'a> {
     ///Indicates that the account has a repository which can be fetched from the host that emitted this event.
@@ -34,21 +45,16 @@ pub struct AccountEvent<'a> {
     pub timestamp: jacquard_common::types::string::Datetime,
 }
 
-impl jacquard_common::IntoStatic for AccountEvent<'_> {
-    type Output = AccountEvent<'static>;
-    fn into_static(self) -> Self::Output {
-        AccountEvent {
-            active: self.active.into_static(),
-            comment: self.comment.into_static(),
-            status: self.status.into_static(),
-            timestamp: self.timestamp.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct AccountHosting<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -65,24 +71,17 @@ pub struct AccountHosting<'a> {
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
-impl jacquard_common::IntoStatic for AccountHosting<'_> {
-    type Output = AccountHosting<'static>;
-    fn into_static(self) -> Self::Output {
-        AccountHosting {
-            created_at: self.created_at.into_static(),
-            deactivated_at: self.deactivated_at.into_static(),
-            deleted_at: self.deleted_at.into_static(),
-            reactivated_at: self.reactivated_at.into_static(),
-            status: self.status.into_static(),
-            updated_at: self.updated_at.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Statistics about a particular account subject
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct AccountStats<'a> {
     ///Total number of appeals against a moderation action on the account
@@ -102,23 +101,17 @@ pub struct AccountStats<'a> {
     pub takedown_count: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for AccountStats<'_> {
-    type Output = AccountStats<'static>;
-    fn into_static(self) -> Self::Output {
-        AccountStats {
-            appeal_count: self.appeal_count.into_static(),
-            escalate_count: self.escalate_count.into_static(),
-            report_count: self.report_count.into_static(),
-            suspend_count: self.suspend_count.into_static(),
-            takedown_count: self.takedown_count.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Age assurance info coming directly from users. Only works on DID subjects.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct AgeAssuranceEvent<'a> {
     ///The unique identifier for this instance of the age assurance flow, in UUID format.
@@ -147,25 +140,17 @@ pub struct AgeAssuranceEvent<'a> {
     pub status: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for AgeAssuranceEvent<'_> {
-    type Output = AgeAssuranceEvent<'static>;
-    fn into_static(self) -> Self::Output {
-        AgeAssuranceEvent {
-            attempt_id: self.attempt_id.into_static(),
-            complete_ip: self.complete_ip.into_static(),
-            complete_ua: self.complete_ua.into_static(),
-            created_at: self.created_at.into_static(),
-            init_ip: self.init_ip.into_static(),
-            init_ua: self.init_ua.into_static(),
-            status: self.status.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Age assurance status override by moderators. Only works on DID subjects.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct AgeAssuranceOverrideEvent<'a> {
     ///Comment describing the reason for the override.
@@ -176,19 +161,16 @@ pub struct AgeAssuranceOverrideEvent<'a> {
     pub status: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for AgeAssuranceOverrideEvent<'_> {
-    type Output = AgeAssuranceOverrideEvent<'static>;
-    fn into_static(self) -> Self::Output {
-        AgeAssuranceOverrideEvent {
-            comment: self.comment.into_static(),
-            status: self.status.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct BlobView<'a> {
     #[serde(borrow)]
@@ -206,39 +188,47 @@ pub struct BlobView<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum BlobViewRecordDetails<'a> {}
-impl jacquard_common::IntoStatic for BlobViewRecordDetails<'_> {
-    type Output = BlobViewRecordDetails<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            BlobViewRecordDetails::Unknown(v) => {
-                BlobViewRecordDetails::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for BlobView<'_> {
-    type Output = BlobView<'static>;
-    fn into_static(self) -> Self::Output {
-        BlobView {
-            cid: self.cid.into_static(),
-            created_at: self.created_at.into_static(),
-            details: self.details.into_static(),
-            mime_type: self.mime_type.into_static(),
-            moderation: self.moderation.into_static(),
-            size: self.size.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
+///Logs cancellation of a scheduled takedown action for an account.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CancelScheduledTakedownEvent<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 ///Logs identity related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct IdentityEvent<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -255,41 +245,32 @@ pub struct IdentityEvent<'a> {
     pub tombstone: std::option::Option<bool>,
 }
 
-impl jacquard_common::IntoStatic for IdentityEvent<'_> {
-    type Output = IdentityEvent<'static>;
-    fn into_static(self) -> Self::Output {
-        IdentityEvent {
-            comment: self.comment.into_static(),
-            handle: self.handle.into_static(),
-            pds_host: self.pds_host.into_static(),
-            timestamp: self.timestamp.into_static(),
-            tombstone: self.tombstone.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ImageDetails<'a> {
     pub height: i64,
     pub width: i64,
 }
 
-impl jacquard_common::IntoStatic for ImageDetails<'_> {
-    type Output = ImageDetails<'static>;
-    fn into_static(self) -> Self::Output {
-        ImageDetails {
-            height: self.height.into_static(),
-            width: self.width.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventAcknowledge<'a> {
     ///If true, all other reports on content authored by this account will be resolved (acknowledged).
@@ -300,22 +281,17 @@ pub struct ModEventAcknowledge<'a> {
     pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ModEventAcknowledge<'_> {
-    type Output = ModEventAcknowledge<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventAcknowledge {
-            acknowledge_account_subjects: self
-                .acknowledge_account_subjects
-                .into_static(),
-            comment: self.comment.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Add a comment to a subject. An empty comment will clear any previously set sticky comment.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventComment<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -326,20 +302,17 @@ pub struct ModEventComment<'a> {
     pub sticky: std::option::Option<bool>,
 }
 
-impl jacquard_common::IntoStatic for ModEventComment<'_> {
-    type Output = ModEventComment<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventComment {
-            comment: self.comment.into_static(),
-            sticky: self.sticky.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Divert a record's blobs to a 3rd party service for further scanning/tagging
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventDivert<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -347,19 +320,17 @@ pub struct ModEventDivert<'a> {
     pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ModEventDivert<'_> {
-    type Output = ModEventDivert<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventDivert {
-            comment: self.comment.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Keep a log of outgoing email to a user
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventEmail<'a> {
     ///Additional comment about the outgoing comm.
@@ -375,20 +346,16 @@ pub struct ModEventEmail<'a> {
     pub subject_line: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for ModEventEmail<'_> {
-    type Output = ModEventEmail<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventEmail {
-            comment: self.comment.into_static(),
-            content: self.content.into_static(),
-            subject_line: self.subject_line.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventEscalate<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -396,19 +363,17 @@ pub struct ModEventEscalate<'a> {
     pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ModEventEscalate<'_> {
-    type Output = ModEventEscalate<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventEscalate {
-            comment: self.comment.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Apply/Negate labels on a subject
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventLabel<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -423,22 +388,17 @@ pub struct ModEventLabel<'a> {
     pub negate_label_vals: Vec<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ModEventLabel<'_> {
-    type Output = ModEventLabel<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventLabel {
-            comment: self.comment.into_static(),
-            create_label_vals: self.create_label_vals.into_static(),
-            duration_in_hours: self.duration_in_hours.into_static(),
-            negate_label_vals: self.negate_label_vals.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Mute incoming reports on a subject
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventMute<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -448,20 +408,17 @@ pub struct ModEventMute<'a> {
     pub duration_in_hours: i64,
 }
 
-impl jacquard_common::IntoStatic for ModEventMute<'_> {
-    type Output = ModEventMute<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventMute {
-            comment: self.comment.into_static(),
-            duration_in_hours: self.duration_in_hours.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Mute incoming reports from an account
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventMuteReporter<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -472,20 +429,17 @@ pub struct ModEventMuteReporter<'a> {
     pub duration_in_hours: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for ModEventMuteReporter<'_> {
-    type Output = ModEventMuteReporter<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventMuteReporter {
-            comment: self.comment.into_static(),
-            duration_in_hours: self.duration_in_hours.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Set priority score of the subject. Higher score means higher priority.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventPriorityScore<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -494,20 +448,17 @@ pub struct ModEventPriorityScore<'a> {
     pub score: i64,
 }
 
-impl jacquard_common::IntoStatic for ModEventPriorityScore<'_> {
-    type Output = ModEventPriorityScore<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventPriorityScore {
-            comment: self.comment.into_static(),
-            score: self.score.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Report a subject
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventReport<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -520,21 +471,17 @@ pub struct ModEventReport<'a> {
     pub report_type: crate::com_atproto::moderation::ReasonType<'a>,
 }
 
-impl jacquard_common::IntoStatic for ModEventReport<'_> {
-    type Output = ModEventReport<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventReport {
-            comment: self.comment.into_static(),
-            is_reporter_muted: self.is_reporter_muted.into_static(),
-            report_type: self.report_type.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Resolve appeal on a subject
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventResolveAppeal<'a> {
     ///Describe resolution.
@@ -543,19 +490,17 @@ pub struct ModEventResolveAppeal<'a> {
     pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ModEventResolveAppeal<'_> {
-    type Output = ModEventResolveAppeal<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventResolveAppeal {
-            comment: self.comment.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Revert take down action on a subject
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventReverseTakedown<'a> {
     ///Describe reasoning behind the reversal.
@@ -564,19 +509,17 @@ pub struct ModEventReverseTakedown<'a> {
     pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ModEventReverseTakedown<'_> {
-    type Output = ModEventReverseTakedown<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventReverseTakedown {
-            comment: self.comment.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Add/Remove a tag on a subject
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventTag<'a> {
     ///Tags to be added to the subject. If already exists, won't be duplicated.
@@ -591,21 +534,17 @@ pub struct ModEventTag<'a> {
     pub remove: Vec<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ModEventTag<'_> {
-    type Output = ModEventTag<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventTag {
-            add: self.add.into_static(),
-            comment: self.comment.into_static(),
-            remove: self.remove.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Take down a subject permanently or temporarily
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventTakedown<'a> {
     ///If true, all other reports on content authored by this account will be resolved (acknowledged).
@@ -623,24 +562,17 @@ pub struct ModEventTakedown<'a> {
     pub policies: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-impl jacquard_common::IntoStatic for ModEventTakedown<'_> {
-    type Output = ModEventTakedown<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventTakedown {
-            acknowledge_account_subjects: self
-                .acknowledge_account_subjects
-                .into_static(),
-            comment: self.comment.into_static(),
-            duration_in_hours: self.duration_in_hours.into_static(),
-            policies: self.policies.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Unmute action on a subject
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventUnmute<'a> {
     ///Describe reasoning behind the reversal.
@@ -649,19 +581,17 @@ pub struct ModEventUnmute<'a> {
     pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ModEventUnmute<'_> {
-    type Output = ModEventUnmute<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventUnmute {
-            comment: self.comment.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Unmute incoming reports from an account
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventUnmuteReporter<'a> {
     ///Describe reasoning behind the reversal.
@@ -670,18 +600,16 @@ pub struct ModEventUnmuteReporter<'a> {
     pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ModEventUnmuteReporter<'_> {
-    type Output = ModEventUnmuteReporter<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventUnmuteReporter {
-            comment: self.comment.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventView<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
@@ -706,23 +634,28 @@ pub struct ModEventView<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ModEventViewRecordEvent<'a> {}
-impl jacquard_common::IntoStatic for ModEventViewRecordEvent<'_> {
-    type Output = ModEventViewRecordEvent<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ModEventViewRecordEvent::Unknown(v) => {
-                ModEventViewRecordEvent::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ModEventViewRecordSubject<'a> {
@@ -734,46 +667,16 @@ pub enum ModEventViewRecordSubject<'a> {
     DefsMessageRef(Box<crate::chat_bsky::convo::MessageRef<'a>>),
 }
 
-impl jacquard_common::IntoStatic for ModEventViewRecordSubject<'_> {
-    type Output = ModEventViewRecordSubject<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ModEventViewRecordSubject::DefsRepoRef(v) => {
-                ModEventViewRecordSubject::DefsRepoRef(v.into_static())
-            }
-            ModEventViewRecordSubject::StrongRef(v) => {
-                ModEventViewRecordSubject::StrongRef(v.into_static())
-            }
-            ModEventViewRecordSubject::DefsMessageRef(v) => {
-                ModEventViewRecordSubject::DefsMessageRef(v.into_static())
-            }
-            ModEventViewRecordSubject::Unknown(v) => {
-                ModEventViewRecordSubject::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ModEventView<'_> {
-    type Output = ModEventView<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventView {
-            created_at: self.created_at.into_static(),
-            created_by: self.created_by.into_static(),
-            creator_handle: self.creator_handle.into_static(),
-            event: self.event.into_static(),
-            id: self.id.into_static(),
-            mod_tool: self.mod_tool.into_static(),
-            subject: self.subject.into_static(),
-            subject_blob_cids: self.subject_blob_cids.into_static(),
-            subject_handle: self.subject_handle.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventViewDetail<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
@@ -792,56 +695,42 @@ pub struct ModEventViewDetail<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ModEventViewDetailRecordEvent<'a> {}
-impl jacquard_common::IntoStatic for ModEventViewDetailRecordEvent<'_> {
-    type Output = ModEventViewDetailRecordEvent<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ModEventViewDetailRecordEvent::Unknown(v) => {
-                ModEventViewDetailRecordEvent::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ModEventViewDetailRecordSubject<'a> {}
-impl jacquard_common::IntoStatic for ModEventViewDetailRecordSubject<'_> {
-    type Output = ModEventViewDetailRecordSubject<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ModEventViewDetailRecordSubject::Unknown(v) => {
-                ModEventViewDetailRecordSubject::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ModEventViewDetail<'_> {
-    type Output = ModEventViewDetail<'static>;
-    fn into_static(self) -> Self::Output {
-        ModEventViewDetail {
-            created_at: self.created_at.into_static(),
-            created_by: self.created_by.into_static(),
-            event: self.event.into_static(),
-            id: self.id.into_static(),
-            mod_tool: self.mod_tool.into_static(),
-            subject: self.subject.into_static(),
-            subject_blobs: self.subject_blobs.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Moderation tool information for tracing the source of the action
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModTool<'a> {
     ///Additional arbitrary metadata about the source
@@ -853,19 +742,16 @@ pub struct ModTool<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for ModTool<'_> {
-    type Output = ModTool<'static>;
-    fn into_static(self) -> Self::Output {
-        ModTool {
-            meta: self.meta.into_static(),
-            name: self.name.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Moderation<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -875,18 +761,16 @@ pub struct Moderation<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for Moderation<'_> {
-    type Output = Moderation<'static>;
-    fn into_static(self) -> Self::Output {
-        Moderation {
-            subject_status: self.subject_status.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ModerationDetail<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -896,19 +780,17 @@ pub struct ModerationDetail<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for ModerationDetail<'_> {
-    type Output = ModerationDetail<'static>;
-    fn into_static(self) -> Self::Output {
-        ModerationDetail {
-            subject_status: self.subject_status.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Logs lifecycle event on a record subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordEvent<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -922,21 +804,16 @@ pub struct RecordEvent<'a> {
     pub timestamp: jacquard_common::types::string::Datetime,
 }
 
-impl jacquard_common::IntoStatic for RecordEvent<'_> {
-    type Output = RecordEvent<'static>;
-    fn into_static(self) -> Self::Output {
-        RecordEvent {
-            cid: self.cid.into_static(),
-            comment: self.comment.into_static(),
-            op: self.op.into_static(),
-            timestamp: self.timestamp.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordHosting<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -949,21 +826,16 @@ pub struct RecordHosting<'a> {
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
-impl jacquard_common::IntoStatic for RecordHosting<'_> {
-    type Output = RecordHosting<'static>;
-    fn into_static(self) -> Self::Output {
-        RecordHosting {
-            created_at: self.created_at.into_static(),
-            deleted_at: self.deleted_at.into_static(),
-            status: self.status.into_static(),
-            updated_at: self.updated_at.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordView<'a> {
     #[serde(borrow)]
@@ -981,24 +853,16 @@ pub struct RecordView<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
-impl jacquard_common::IntoStatic for RecordView<'_> {
-    type Output = RecordView<'static>;
-    fn into_static(self) -> Self::Output {
-        RecordView {
-            blob_cids: self.blob_cids.into_static(),
-            cid: self.cid.into_static(),
-            indexed_at: self.indexed_at.into_static(),
-            moderation: self.moderation.into_static(),
-            repo: self.repo.into_static(),
-            uri: self.uri.into_static(),
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordViewDetail<'a> {
     #[serde(borrow)]
@@ -1019,44 +883,33 @@ pub struct RecordViewDetail<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
-impl jacquard_common::IntoStatic for RecordViewDetail<'_> {
-    type Output = RecordViewDetail<'static>;
-    fn into_static(self) -> Self::Output {
-        RecordViewDetail {
-            blobs: self.blobs.into_static(),
-            cid: self.cid.into_static(),
-            indexed_at: self.indexed_at.into_static(),
-            labels: self.labels.into_static(),
-            moderation: self.moderation.into_static(),
-            repo: self.repo.into_static(),
-            uri: self.uri.into_static(),
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordViewNotFound<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl jacquard_common::IntoStatic for RecordViewNotFound<'_> {
-    type Output = RecordViewNotFound<'static>;
-    fn into_static(self) -> Self::Output {
-        RecordViewNotFound {
-            uri: self.uri.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Statistics about a set of record subject items
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordsStats<'a> {
     ///Number of items that were appealed at least once
@@ -1085,25 +938,16 @@ pub struct RecordsStats<'a> {
     pub total_reports: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for RecordsStats<'_> {
-    type Output = RecordsStats<'static>;
-    fn into_static(self) -> Self::Output {
-        RecordsStats {
-            appealed_count: self.appealed_count.into_static(),
-            escalated_count: self.escalated_count.into_static(),
-            pending_count: self.pending_count.into_static(),
-            processed_count: self.processed_count.into_static(),
-            reported_count: self.reported_count.into_static(),
-            subject_count: self.subject_count.into_static(),
-            takendown_count: self.takendown_count.into_static(),
-            total_reports: self.total_reports.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct RepoView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -1135,28 +979,16 @@ pub struct RepoView<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for RepoView<'_> {
-    type Output = RepoView<'static>;
-    fn into_static(self) -> Self::Output {
-        RepoView {
-            deactivated_at: self.deactivated_at.into_static(),
-            did: self.did.into_static(),
-            email: self.email.into_static(),
-            handle: self.handle.into_static(),
-            indexed_at: self.indexed_at.into_static(),
-            invite_note: self.invite_note.into_static(),
-            invited_by: self.invited_by.into_static(),
-            invites_disabled: self.invites_disabled.into_static(),
-            moderation: self.moderation.into_static(),
-            related_records: self.related_records.into_static(),
-            threat_signatures: self.threat_signatures.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct RepoViewDetail<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -1198,49 +1030,32 @@ pub struct RepoViewDetail<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for RepoViewDetail<'_> {
-    type Output = RepoViewDetail<'static>;
-    fn into_static(self) -> Self::Output {
-        RepoViewDetail {
-            deactivated_at: self.deactivated_at.into_static(),
-            did: self.did.into_static(),
-            email: self.email.into_static(),
-            email_confirmed_at: self.email_confirmed_at.into_static(),
-            handle: self.handle.into_static(),
-            indexed_at: self.indexed_at.into_static(),
-            invite_note: self.invite_note.into_static(),
-            invited_by: self.invited_by.into_static(),
-            invites: self.invites.into_static(),
-            invites_disabled: self.invites_disabled.into_static(),
-            labels: self.labels.into_static(),
-            moderation: self.moderation.into_static(),
-            related_records: self.related_records.into_static(),
-            threat_signatures: self.threat_signatures.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct RepoViewNotFound<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
-impl jacquard_common::IntoStatic for RepoViewNotFound<'_> {
-    type Output = RepoViewNotFound<'static>;
-    fn into_static(self) -> Self::Output {
-        RepoViewNotFound {
-            did: self.did.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ReporterStats<'a> {
     ///The total number of reports made by the user on accounts.
@@ -1263,27 +1078,17 @@ pub struct ReporterStats<'a> {
     pub takendown_record_count: i64,
 }
 
-impl jacquard_common::IntoStatic for ReporterStats<'_> {
-    type Output = ReporterStats<'static>;
-    fn into_static(self) -> Self::Output {
-        ReporterStats {
-            account_report_count: self.account_report_count.into_static(),
-            did: self.did.into_static(),
-            labeled_account_count: self.labeled_account_count.into_static(),
-            labeled_record_count: self.labeled_record_count.into_static(),
-            record_report_count: self.record_report_count.into_static(),
-            reported_account_count: self.reported_account_count.into_static(),
-            reported_record_count: self.reported_record_count.into_static(),
-            takendown_account_count: self.takendown_account_count.into_static(),
-            takendown_record_count: self.takendown_record_count.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Account credentials revocation by moderators. Only works on DID subjects.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct RevokeAccountCredentialsEvent<'a> {
     ///Comment describing the reason for the revocation.
@@ -1291,14 +1096,88 @@ pub struct RevokeAccountCredentialsEvent<'a> {
     pub comment: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for RevokeAccountCredentialsEvent<'_> {
-    type Output = RevokeAccountCredentialsEvent<'static>;
-    fn into_static(self) -> Self::Output {
-        RevokeAccountCredentialsEvent {
-            comment: self.comment.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
+///Logs a scheduled takedown action for an account.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ScheduleTakedownEvent<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub execute_after: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub execute_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub execute_until: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+///View of a scheduled moderation action
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ScheduledActionView<'a> {
+    ///Type of action to be executed
+    #[serde(borrow)]
+    pub action: jacquard_common::CowStr<'a>,
+    ///When the scheduled action was created
+    pub created_at: jacquard_common::types::string::Datetime,
+    ///DID of the user who created this scheduled action
+    #[serde(borrow)]
+    pub created_by: jacquard_common::types::string::Did<'a>,
+    ///Subject DID for the action
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+    ///Serialized event object that will be propagated to the event when performed
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub event_data: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    ///Earliest time to execute the action (for randomized scheduling)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub execute_after: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Exact time to execute the action
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub execute_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Latest time to execute the action (for randomized scheduling)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub execute_until: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///ID of the moderation event created when action was successfully executed
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub execution_event_id: std::option::Option<i64>,
+    ///Auto-incrementing row ID
+    pub id: i64,
+    ///When the action was last attempted to be executed
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_executed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Reason for the last execution failure
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub last_failure_reason: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///Whether execution time should be randomized within the specified range
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub randomize_execution: std::option::Option<bool>,
+    ///Current status of the scheduled action
+    #[serde(borrow)]
+    pub status: jacquard_common::CowStr<'a>,
+    ///When the scheduled action was last updated
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1388,7 +1267,15 @@ impl jacquard_common::IntoStatic for SubjectReviewState<'_> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SubjectStatusView<'a> {
     ///Statistics related to the account subject
@@ -1467,23 +1354,28 @@ pub struct SubjectStatusView<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SubjectStatusViewRecordHosting<'a> {}
-impl jacquard_common::IntoStatic for SubjectStatusViewRecordHosting<'_> {
-    type Output = SubjectStatusViewRecordHosting<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SubjectStatusViewRecordHosting::Unknown(v) => {
-                SubjectStatusViewRecordHosting::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SubjectStatusViewRecordSubject<'a> {
@@ -1495,62 +1387,17 @@ pub enum SubjectStatusViewRecordSubject<'a> {
     DefsMessageRef(Box<crate::chat_bsky::convo::MessageRef<'a>>),
 }
 
-impl jacquard_common::IntoStatic for SubjectStatusViewRecordSubject<'_> {
-    type Output = SubjectStatusViewRecordSubject<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SubjectStatusViewRecordSubject::DefsRepoRef(v) => {
-                SubjectStatusViewRecordSubject::DefsRepoRef(v.into_static())
-            }
-            SubjectStatusViewRecordSubject::StrongRef(v) => {
-                SubjectStatusViewRecordSubject::StrongRef(v.into_static())
-            }
-            SubjectStatusViewRecordSubject::DefsMessageRef(v) => {
-                SubjectStatusViewRecordSubject::DefsMessageRef(v.into_static())
-            }
-            SubjectStatusViewRecordSubject::Unknown(v) => {
-                SubjectStatusViewRecordSubject::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for SubjectStatusView<'_> {
-    type Output = SubjectStatusView<'static>;
-    fn into_static(self) -> Self::Output {
-        SubjectStatusView {
-            account_stats: self.account_stats.into_static(),
-            age_assurance_state: self.age_assurance_state.into_static(),
-            age_assurance_updated_by: self.age_assurance_updated_by.into_static(),
-            appealed: self.appealed.into_static(),
-            comment: self.comment.into_static(),
-            created_at: self.created_at.into_static(),
-            hosting: self.hosting.into_static(),
-            id: self.id.into_static(),
-            last_appealed_at: self.last_appealed_at.into_static(),
-            last_reported_at: self.last_reported_at.into_static(),
-            last_reviewed_at: self.last_reviewed_at.into_static(),
-            last_reviewed_by: self.last_reviewed_by.into_static(),
-            mute_reporting_until: self.mute_reporting_until.into_static(),
-            mute_until: self.mute_until.into_static(),
-            priority_score: self.priority_score.into_static(),
-            records_stats: self.records_stats.into_static(),
-            review_state: self.review_state.into_static(),
-            subject: self.subject.into_static(),
-            subject_blob_cids: self.subject_blob_cids.into_static(),
-            subject_repo_handle: self.subject_repo_handle.into_static(),
-            suspend_until: self.suspend_until.into_static(),
-            tags: self.tags.into_static(),
-            takendown: self.takendown.into_static(),
-            updated_at: self.updated_at.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Detailed view of a subject. For record subjects, the author's repo and profile will be returned.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SubjectView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -1576,53 +1423,31 @@ pub struct SubjectView<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SubjectViewRecordProfile<'a> {}
-impl jacquard_common::IntoStatic for SubjectViewRecordProfile<'_> {
-    type Output = SubjectViewRecordProfile<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SubjectViewRecordProfile::Unknown(v) => {
-                SubjectViewRecordProfile::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for SubjectView<'_> {
-    type Output = SubjectView<'static>;
-    fn into_static(self) -> Self::Output {
-        SubjectView {
-            profile: self.profile.into_static(),
-            record: self.record.into_static(),
-            repo: self.repo.into_static(),
-            status: self.status.into_static(),
-            subject: self.subject.into_static(),
-            r#type: self.r#type.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct VideoDetails<'a> {
     pub height: i64,
     pub length: i64,
     pub width: i64,
-}
-
-impl jacquard_common::IntoStatic for VideoDetails<'_> {
-    type Output = VideoDetails<'static>;
-    fn into_static(self) -> Self::Output {
-        VideoDetails {
-            height: self.height.into_static(),
-            length: self.length.into_static(),
-            width: self.width.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

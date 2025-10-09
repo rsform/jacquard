@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.chapter",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A grouping of entries in a notebook, intended to be displayed as a single page.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "notebook",
+          "authors",
+          "entryList"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this was originally created.",
+            "format": "datetime"
+          },
+          "entryList": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            }
+          },
+          "notebook": {
+            "type": "ref",
+            "description": "The notebook this page belongs to.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "tags": {
+            "type": "ref",
+            "ref": "sh.weaver.notebook.defs#tags"
+          },
+          "title": {
+            "type": "ref",
+            "ref": "sh.weaver.notebook.defs#title"
+          }
+        }
+      }
+    }
+  }
+}

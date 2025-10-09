@@ -7,7 +7,15 @@
 
 ///A declaration of the existence of labeler service.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Service<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
@@ -37,7 +45,15 @@ pub struct Service<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ServiceRecordLabels<'a> {
@@ -45,35 +61,6 @@ pub enum ServiceRecordLabels<'a> {
     DefsSelfLabels(Box<crate::com_atproto::label::SelfLabels<'a>>),
 }
 
-impl jacquard_common::IntoStatic for ServiceRecordLabels<'_> {
-    type Output = ServiceRecordLabels<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ServiceRecordLabels::DefsSelfLabels(v) => {
-                ServiceRecordLabels::DefsSelfLabels(v.into_static())
-            }
-            ServiceRecordLabels::Unknown(v) => {
-                ServiceRecordLabels::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
 impl jacquard_common::types::collection::Collection for Service<'_> {
     const NSID: &'static str = "app.bsky.labeler.service";
-}
-
-impl jacquard_common::IntoStatic for Service<'_> {
-    type Output = Service<'static>;
-    fn into_static(self) -> Self::Output {
-        Service {
-            created_at: self.created_at.into_static(),
-            labels: self.labels.into_static(),
-            policies: self.policies.into_static(),
-            reason_types: self.reason_types.into_static(),
-            subject_collections: self.subject_collections.into_static(),
-            subject_types: self.subject_types.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

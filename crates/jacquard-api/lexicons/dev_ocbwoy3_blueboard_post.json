@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "dev.ocbwoy3.blueboard.post",
+  "description": "This record defines a post on Blue Board",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "text",
+          "createdAt",
+          "parent"
+        ],
+        "properties": {
+          "attachment": {
+            "type": "blob",
+            "description": "The post's attachment blob. Must be present if parent is dev.ocbwoy3.blueboard.board, otherwise AppView will ignore it.",
+            "accept": [
+              "image/*",
+              "video/webm"
+            ],
+            "maxSize": 1000000
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The date and time when the post was created",
+            "format": "datetime"
+          },
+          "parent": {
+            "type": "string",
+            "description": "Determines the parent of the post. Must either be a `dev.ocbwoy3.blueboard.board` or a `dev.ocbwoy3.blueboard.post`.",
+            "format": "at-uri"
+          },
+          "text": {
+            "type": "string",
+            "description": "The post's text",
+            "maxLength": 1000
+          }
+        }
+      }
+    }
+  }
+}

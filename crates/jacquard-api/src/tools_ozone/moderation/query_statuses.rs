@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -126,51 +127,16 @@ pub struct QueryStatuses<'a> {
     pub takendown: std::option::Option<bool>,
 }
 
-impl jacquard_common::IntoStatic for QueryStatuses<'_> {
-    type Output = QueryStatuses<'static>;
-    fn into_static(self) -> Self::Output {
-        QueryStatuses {
-            age_assurance_state: self.age_assurance_state.into_static(),
-            appealed: self.appealed.into_static(),
-            collections: self.collections.into_static(),
-            comment: self.comment.into_static(),
-            cursor: self.cursor.into_static(),
-            exclude_tags: self.exclude_tags.into_static(),
-            hosting_deleted_after: self.hosting_deleted_after.into_static(),
-            hosting_deleted_before: self.hosting_deleted_before.into_static(),
-            hosting_statuses: self.hosting_statuses.into_static(),
-            hosting_updated_after: self.hosting_updated_after.into_static(),
-            hosting_updated_before: self.hosting_updated_before.into_static(),
-            ignore_subjects: self.ignore_subjects.into_static(),
-            include_all_user_records: self.include_all_user_records.into_static(),
-            include_muted: self.include_muted.into_static(),
-            last_reviewed_by: self.last_reviewed_by.into_static(),
-            limit: self.limit.into_static(),
-            min_account_suspend_count: self.min_account_suspend_count.into_static(),
-            min_priority_score: self.min_priority_score.into_static(),
-            min_reported_records_count: self.min_reported_records_count.into_static(),
-            min_takendown_records_count: self.min_takendown_records_count.into_static(),
-            only_muted: self.only_muted.into_static(),
-            queue_count: self.queue_count.into_static(),
-            queue_index: self.queue_index.into_static(),
-            queue_seed: self.queue_seed.into_static(),
-            reported_after: self.reported_after.into_static(),
-            reported_before: self.reported_before.into_static(),
-            review_state: self.review_state.into_static(),
-            reviewed_after: self.reviewed_after.into_static(),
-            reviewed_before: self.reviewed_before.into_static(),
-            sort_direction: self.sort_direction.into_static(),
-            sort_field: self.sort_field.into_static(),
-            subject: self.subject.into_static(),
-            subject_type: self.subject_type.into_static(),
-            tags: self.tags.into_static(),
-            takendown: self.takendown.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryStatusesOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -178,17 +144,6 @@ pub struct QueryStatusesOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub subject_statuses: Vec<crate::tools_ozone::moderation::SubjectStatusView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for QueryStatusesOutput<'_> {
-    type Output = QueryStatusesOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        QueryStatusesOutput {
-            cursor: self.cursor.into_static(),
-            subject_statuses: self.subject_statuses.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

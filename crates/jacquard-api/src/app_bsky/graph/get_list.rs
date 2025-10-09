@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -28,19 +29,16 @@ pub struct GetList<'a> {
     pub list: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetList<'_> {
-    type Output = GetList<'static>;
-    fn into_static(self) -> Self::Output {
-        GetList {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            list: self.list.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetListOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -50,18 +48,6 @@ pub struct GetListOutput<'a> {
     pub items: Vec<crate::app_bsky::graph::ListItemView<'a>>,
     #[serde(borrow)]
     pub list: crate::app_bsky::graph::ListView<'a>,
-}
-
-impl jacquard_common::IntoStatic for GetListOutput<'_> {
-    type Output = GetListOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetListOutput {
-            cursor: self.cursor.into_static(),
-            items: self.items.into_static(),
-            list: self.list.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

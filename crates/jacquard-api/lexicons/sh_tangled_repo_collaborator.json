@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.collaborator",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "repo",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "repo": {
+            "type": "string",
+            "description": "repo to add this user to",
+            "format": "at-uri"
+          },
+          "subject": {
+            "type": "string",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

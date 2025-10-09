@@ -7,7 +7,15 @@
 
 ///Record representing a block relationship against an entire an entire list of accounts (actors).
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Listblock<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
@@ -18,15 +26,4 @@ pub struct Listblock<'a> {
 
 impl jacquard_common::types::collection::Collection for Listblock<'_> {
     const NSID: &'static str = "app.bsky.graph.listblock";
-}
-
-impl jacquard_common::IntoStatic for Listblock<'_> {
-    type Output = Listblock<'static>;
-    fn into_static(self) -> Self::Output {
-        Listblock {
-            created_at: self.created_at.into_static(),
-            subject: self.subject.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

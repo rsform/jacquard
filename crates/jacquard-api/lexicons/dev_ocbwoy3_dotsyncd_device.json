@@ -1,0 +1,134 @@
+{
+  "lexicon": 1,
+  "id": "dev.ocbwoy3.dotsyncd.device",
+  "description": "This record defines a device connected to dotsyncd",
+  "defs": {
+    "distro": {
+      "type": "object",
+      "required": [
+        "name",
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The ID of the Linux distribution (e.g. nixos, gentoo)",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the Linux distribution (e.g. NixOS, Gentoo Linux)",
+          "minLength": 1,
+          "maxLength": 50
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "rig",
+          "setup",
+          "createdAt",
+          "distro",
+          "configInUse"
+        ],
+        "properties": {
+          "configInUse": {
+            "type": "string",
+            "description": "The config in use on the device",
+            "format": "uri",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The date and time when the device was added",
+            "format": "datetime"
+          },
+          "distro": {
+            "type": "ref",
+            "description": "The distro specifications of the device",
+            "ref": "#distro"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the device (e.g. Gaming PC, Laptop)",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "rig": {
+            "type": "ref",
+            "description": "The hardware specifications of the device",
+            "ref": "#rig"
+          },
+          "setup": {
+            "type": "ref",
+            "description": "The software setup of the device",
+            "ref": "#setup"
+          }
+        }
+      }
+    },
+    "rig": {
+      "type": "object",
+      "required": [
+        "cpu",
+        "gpu",
+        "ram",
+        "disk",
+        "diskType"
+      ],
+      "properties": {
+        "cpu": {
+          "type": "string",
+          "description": "The CPU model of the device",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "disk": {
+          "type": "string",
+          "description": "The amount of space in / (in numBlocks*blockSize, e.g. 32767*1024)",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "diskType": {
+          "type": "string",
+          "description": "The type of filesystem on / (e.g. ext4, btrfs)",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "gpu": {
+          "type": "string",
+          "description": "The GPU model of the device",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "ram": {
+          "type": "string",
+          "description": "The amount of RAM in the device (e.g. 16GB)",
+          "minLength": 1,
+          "maxLength": 20
+        }
+      }
+    },
+    "setup": {
+      "type": "object",
+      "required": [
+        "wm"
+      ],
+      "properties": {
+        "wm": {
+          "type": "string",
+          "description": "The WM/DE used on the device derived from $XDG_CURRENT_DESKTOP (e.g. Hyprland)",
+          "minLength": 1,
+          "maxLength": 50
+        }
+      }
+    }
+  }
+}

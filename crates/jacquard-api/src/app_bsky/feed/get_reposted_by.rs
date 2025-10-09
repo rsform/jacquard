@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -31,20 +32,16 @@ pub struct GetRepostedBy<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetRepostedBy<'_> {
-    type Output = GetRepostedBy<'static>;
-    fn into_static(self) -> Self::Output {
-        GetRepostedBy {
-            cid: self.cid.into_static(),
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            uri: self.uri.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepostedByOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -57,19 +54,6 @@ pub struct GetRepostedByOutput<'a> {
     pub reposted_by: Vec<crate::app_bsky::actor::ProfileView<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
-impl jacquard_common::IntoStatic for GetRepostedByOutput<'_> {
-    type Output = GetRepostedByOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetRepostedByOutput {
-            cid: self.cid.into_static(),
-            cursor: self.cursor.into_static(),
-            reposted_by: self.reposted_by.into_static(),
-            uri: self.uri.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

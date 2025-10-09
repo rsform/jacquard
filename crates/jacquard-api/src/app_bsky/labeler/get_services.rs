@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -24,32 +25,20 @@ pub struct GetServices<'a> {
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GetServices<'_> {
-    type Output = GetServices<'static>;
-    fn into_static(self) -> Self::Output {
-        GetServices {
-            detailed: self.detailed.into_static(),
-            dids: self.dids.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetServicesOutput<'a> {
     #[serde(borrow)]
     pub views: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetServicesOutput<'_> {
-    type Output = GetServicesOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetServicesOutput {
-            views: self.views.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -29,7 +29,7 @@
 //! use jacquard::client::{Agent, FileAuthStore};
 //! use jacquard::oauth::atproto::AtprotoClientMetadata;
 //! use jacquard::oauth::client::OAuthClient;
-//! use jacquard::types::xrpc::XrpcClient;
+//! use jacquard::xrpc::XrpcClient;
 //! # #[cfg(feature = "loopback")]
 //! use jacquard::oauth::loopback::LoopbackConfig;
 //! # use miette::IntoDiagnostic;
@@ -74,7 +74,7 @@
 //!     // Wrap in Agent and fetch the timeline
 //!     let agent: Agent<_> = Agent::from(session);
 //!     let timeline = agent
-//!         .send(&GetTimeline::new().limit(5).build())
+//!         .send(GetTimeline::new().limit(5).build())
 //!         .await?
 //!         .into_output()?;
 //!     for (i, post) in timeline.feed.iter().enumerate() {
@@ -95,7 +95,7 @@
 //!   optional `CallOptions` (auth, proxy, labelers, headers). Useful when you
 //!   want to pass auth on each call or build advanced flows.
 //!  ```no_run
-//!   #  use jacquard::types::xrpc::XrpcExt;
+//!   #  use jacquard::xrpc::XrpcExt;
 //!   #  use jacquard::api::app_bsky::feed::get_author_feed::GetAuthorFeed;
 //!   #  use jacquard::types::ident::AtIdentifier;
 //!   #  use miette::IntoDiagnostic;
@@ -128,7 +128,7 @@
 //! Per-request overrides (stateless)
 //! ```no_run
 //! # use jacquard::AuthorizationToken;
-//! # use jacquard::types::xrpc::XrpcExt;
+//! # use jacquard::xrpc::XrpcExt;
 //! # use jacquard::api::app_bsky::feed::get_author_feed::GetAuthorFeed;
 //! # use jacquard::types::ident::AtIdentifier;
 //! # use jacquard::CowStr;

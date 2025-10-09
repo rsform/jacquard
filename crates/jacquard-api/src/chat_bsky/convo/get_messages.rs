@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -29,19 +30,16 @@ pub struct GetMessages<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for GetMessages<'_> {
-    type Output = GetMessages<'static>;
-    fn into_static(self) -> Self::Output {
-        GetMessages {
-            convo_id: self.convo_id.into_static(),
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetMessagesOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -49,17 +47,6 @@ pub struct GetMessagesOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub messages: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetMessagesOutput<'_> {
-    type Output = GetMessagesOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetMessagesOutput {
-            cursor: self.cursor.into_static(),
-            messages: self.messages.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -1,0 +1,118 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.getJobStatus",
+  "defs": {
+    "jobStatus": {
+      "type": "object",
+      "required": [
+        "jobId",
+        "status",
+        "createdAt",
+        "retryCount"
+      ],
+      "properties": {
+        "completedAt": {
+          "type": "string",
+          "description": "When the job completed",
+          "format": "datetime"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "When the job was created",
+          "format": "datetime"
+        },
+        "error": {
+          "type": "string",
+          "description": "Error message if job failed"
+        },
+        "jobId": {
+          "type": "string",
+          "description": "UUID of the job"
+        },
+        "result": {
+          "type": "ref",
+          "description": "Job result if completed successfully",
+          "ref": "#syncJobResult"
+        },
+        "retryCount": {
+          "type": "integer",
+          "description": "Number of times the job has been retried"
+        },
+        "startedAt": {
+          "type": "string",
+          "description": "When the job started executing",
+          "format": "datetime"
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the job",
+          "enum": [
+            "pending",
+            "running",
+            "completed",
+            "failed"
+          ]
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Get the status of a sync job by its ID.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "jobId"
+        ],
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "description": "UUID of the sync job"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "#jobStatus"
+        }
+      }
+    },
+    "syncJobResult": {
+      "type": "object",
+      "required": [
+        "success",
+        "totalRecords",
+        "collectionsSynced",
+        "reposProcessed",
+        "message"
+      ],
+      "properties": {
+        "collectionsSynced": {
+          "type": "array",
+          "description": "List of collection NSIDs that were synced",
+          "items": {
+            "type": "string",
+            "format": "nsid"
+          }
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable message about the job completion"
+        },
+        "reposProcessed": {
+          "type": "integer",
+          "description": "Number of repositories processed"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "Whether the sync job completed successfully"
+        },
+        "totalRecords": {
+          "type": "integer",
+          "description": "Total number of records synced"
+        }
+      }
+    }
+  }
+}

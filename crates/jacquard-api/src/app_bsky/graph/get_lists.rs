@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -31,20 +32,16 @@ pub struct GetLists<'a> {
     pub purposes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-impl jacquard_common::IntoStatic for GetLists<'_> {
-    type Output = GetLists<'static>;
-    fn into_static(self) -> Self::Output {
-        GetLists {
-            actor: self.actor.into_static(),
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            purposes: self.purposes.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetListsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -52,17 +49,6 @@ pub struct GetListsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub lists: Vec<crate::app_bsky::graph::ListView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetListsOutput<'_> {
-    type Output = GetListsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetListsOutput {
-            cursor: self.cursor.into_static(),
-            lists: self.lists.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

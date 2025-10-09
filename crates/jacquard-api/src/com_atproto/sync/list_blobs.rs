@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -30,20 +31,16 @@ pub struct ListBlobs<'a> {
     pub since: std::option::Option<jacquard_common::types::string::Tid>,
 }
 
-impl jacquard_common::IntoStatic for ListBlobs<'_> {
-    type Output = ListBlobs<'static>;
-    fn into_static(self) -> Self::Output {
-        ListBlobs {
-            cursor: self.cursor.into_static(),
-            did: self.did.into_static(),
-            limit: self.limit.into_static(),
-            since: self.since.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ListBlobsOutput<'a> {
     #[serde(borrow)]
@@ -51,17 +48,6 @@ pub struct ListBlobsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl jacquard_common::IntoStatic for ListBlobsOutput<'_> {
-    type Output = ListBlobsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        ListBlobsOutput {
-            cids: self.cids.into_static(),
-            cursor: self.cursor.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

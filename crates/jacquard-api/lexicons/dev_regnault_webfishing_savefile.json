@@ -1,0 +1,27 @@
+{
+  "lexicon": 1,
+  "id": "dev.regnault.webfishing.savefile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring a savefile of Webfishing.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "uri"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "uri": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

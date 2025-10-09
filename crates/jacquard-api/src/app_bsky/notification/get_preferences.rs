@@ -12,34 +12,26 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPreferences {}
-impl jacquard_common::IntoStatic for GetPreferences {
-    type Output = GetPreferences;
-    fn into_static(self) -> Self::Output {
-        self
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPreferencesOutput<'a> {
     #[serde(borrow)]
     pub preferences: crate::app_bsky::notification::Preferences<'a>,
-}
-
-impl jacquard_common::IntoStatic for GetPreferencesOutput<'_> {
-    type Output = GetPreferencesOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetPreferencesOutput {
-            preferences: self.preferences.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

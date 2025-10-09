@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecommendedDidCredentialsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -24,19 +32,6 @@ pub struct GetRecommendedDidCredentialsOutput<'a> {
     pub verification_methods: std::option::Option<
         jacquard_common::types::value::Data<'a>,
     >,
-}
-
-impl jacquard_common::IntoStatic for GetRecommendedDidCredentialsOutput<'_> {
-    type Output = GetRecommendedDidCredentialsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetRecommendedDidCredentialsOutput {
-            also_known_as: self.also_known_as.into_static(),
-            rotation_keys: self.rotation_keys.into_static(),
-            services: self.services.into_static(),
-            verification_methods: self.verification_methods.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 /// XRPC request marker type

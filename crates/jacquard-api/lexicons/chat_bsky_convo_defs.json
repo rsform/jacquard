@@ -1,0 +1,444 @@
+{
+  "lexicon": 1,
+  "id": "chat.bsky.convo.defs",
+  "defs": {
+    "convoView": {
+      "type": "object",
+      "required": [
+        "id",
+        "rev",
+        "members",
+        "muted",
+        "unreadCount"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "lastMessage": {
+          "type": "union",
+          "refs": [
+            "#messageView",
+            "#deletedMessageView"
+          ]
+        },
+        "lastReaction": {
+          "type": "union",
+          "refs": [
+            "#messageAndReactionView"
+          ]
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "chat.bsky.actor.defs#profileViewBasic"
+          }
+        },
+        "muted": {
+          "type": "boolean"
+        },
+        "rev": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "knownValues": [
+            "request",
+            "accepted"
+          ]
+        },
+        "unreadCount": {
+          "type": "integer"
+        }
+      }
+    },
+    "deletedMessageView": {
+      "type": "object",
+      "required": [
+        "id",
+        "rev",
+        "sender",
+        "sentAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "rev": {
+          "type": "string"
+        },
+        "sender": {
+          "type": "ref",
+          "ref": "#messageViewSender"
+        },
+        "sentAt": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    },
+    "logAcceptConvo": {
+      "type": "object",
+      "required": [
+        "rev",
+        "convoId"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logAddReaction": {
+      "type": "object",
+      "required": [
+        "rev",
+        "convoId",
+        "message",
+        "reaction"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "union",
+          "refs": [
+            "#messageView",
+            "#deletedMessageView"
+          ]
+        },
+        "reaction": {
+          "type": "ref",
+          "ref": "#reactionView"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logBeginConvo": {
+      "type": "object",
+      "required": [
+        "rev",
+        "convoId"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logCreateMessage": {
+      "type": "object",
+      "required": [
+        "rev",
+        "convoId",
+        "message"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "union",
+          "refs": [
+            "#messageView",
+            "#deletedMessageView"
+          ]
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logDeleteMessage": {
+      "type": "object",
+      "required": [
+        "rev",
+        "convoId",
+        "message"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "union",
+          "refs": [
+            "#messageView",
+            "#deletedMessageView"
+          ]
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logLeaveConvo": {
+      "type": "object",
+      "required": [
+        "rev",
+        "convoId"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logMuteConvo": {
+      "type": "object",
+      "required": [
+        "rev",
+        "convoId"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logReadMessage": {
+      "type": "object",
+      "required": [
+        "rev",
+        "convoId",
+        "message"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "union",
+          "refs": [
+            "#messageView",
+            "#deletedMessageView"
+          ]
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logRemoveReaction": {
+      "type": "object",
+      "required": [
+        "rev",
+        "convoId",
+        "message",
+        "reaction"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "union",
+          "refs": [
+            "#messageView",
+            "#deletedMessageView"
+          ]
+        },
+        "reaction": {
+          "type": "ref",
+          "ref": "#reactionView"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "logUnmuteConvo": {
+      "type": "object",
+      "required": [
+        "rev",
+        "convoId"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "rev": {
+          "type": "string"
+        }
+      }
+    },
+    "messageAndReactionView": {
+      "type": "object",
+      "required": [
+        "message",
+        "reaction"
+      ],
+      "properties": {
+        "message": {
+          "type": "ref",
+          "ref": "#messageView"
+        },
+        "reaction": {
+          "type": "ref",
+          "ref": "#reactionView"
+        }
+      }
+    },
+    "messageInput": {
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "embed": {
+          "type": "union",
+          "refs": [
+            "app.bsky.embed.record"
+          ]
+        },
+        "facets": {
+          "type": "array",
+          "description": "Annotations of text (mentions, URLs, hashtags, etc)",
+          "items": {
+            "type": "ref",
+            "ref": "app.bsky.richtext.facet"
+          }
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 10000,
+          "maxGraphemes": 1000
+        }
+      }
+    },
+    "messageRef": {
+      "type": "object",
+      "required": [
+        "did",
+        "messageId",
+        "convoId"
+      ],
+      "properties": {
+        "convoId": {
+          "type": "string"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "messageId": {
+          "type": "string"
+        }
+      }
+    },
+    "messageView": {
+      "type": "object",
+      "required": [
+        "id",
+        "rev",
+        "text",
+        "sender",
+        "sentAt"
+      ],
+      "properties": {
+        "embed": {
+          "type": "union",
+          "refs": [
+            "app.bsky.embed.record#view"
+          ]
+        },
+        "facets": {
+          "type": "array",
+          "description": "Annotations of text (mentions, URLs, hashtags, etc)",
+          "items": {
+            "type": "ref",
+            "ref": "app.bsky.richtext.facet"
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "reactions": {
+          "type": "array",
+          "description": "Reactions to this message, in ascending order of creation time.",
+          "items": {
+            "type": "ref",
+            "ref": "#reactionView"
+          }
+        },
+        "rev": {
+          "type": "string"
+        },
+        "sender": {
+          "type": "ref",
+          "ref": "#messageViewSender"
+        },
+        "sentAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 10000,
+          "maxGraphemes": 1000
+        }
+      }
+    },
+    "messageViewSender": {
+      "type": "object",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        }
+      }
+    },
+    "reactionView": {
+      "type": "object",
+      "required": [
+        "value",
+        "sender",
+        "createdAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "sender": {
+          "type": "ref",
+          "ref": "#reactionViewSender"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "reactionViewSender": {
+      "type": "object",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        }
+      }
+    }
+  }
+}

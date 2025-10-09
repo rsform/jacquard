@@ -1,0 +1,70 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.post",
+  "description": "A blog post record. References a parent blog, and contains post title, body content, URL, tags, cover image, inline images, and timestamps.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "blocks",
+          "url",
+          "blog"
+        ],
+        "properties": {
+          "blocks": {
+            "type": "union",
+            "refs": [],
+            "closed": false
+          },
+          "blog": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "bodyPlain": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "blob",
+            "accept": [
+              "image/*"
+            ]
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "blob",
+              "accept": [
+                "image/*"
+              ]
+            }
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "title": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

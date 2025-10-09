@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.key",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record linking an atproto identity with a stream signing key",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "signingKey",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this key was created.",
+            "format": "datetime"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "The name of the client that created this key."
+          },
+          "signingKey": {
+            "type": "string",
+            "description": "The did:key signing key for the stream.",
+            "minLength": 57,
+            "maxLength": 57
+          }
+        }
+      }
+    }
+  }
+}

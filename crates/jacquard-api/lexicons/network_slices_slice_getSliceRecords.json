@@ -1,0 +1,108 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.getSliceRecords",
+  "defs": {
+    "indexedRecord": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "did",
+        "collection",
+        "value",
+        "indexedAt"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "description": "Content identifier of the record",
+          "format": "cid"
+        },
+        "collection": {
+          "type": "string",
+          "description": "NSID of the collection this record belongs to",
+          "format": "nsid"
+        },
+        "did": {
+          "type": "string",
+          "description": "DID of the record creator",
+          "format": "did"
+        },
+        "indexedAt": {
+          "type": "string",
+          "description": "When this record was indexed",
+          "format": "datetime"
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the record",
+          "format": "at-uri"
+        },
+        "value": {
+          "type": "unknown",
+          "description": "The record value/content"
+        }
+      }
+    },
+    "main": {
+      "type": "procedure",
+      "description": "Query records across all collections in a slice with filtering, sorting, and pagination.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "slice"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "description": "Pagination cursor from previous response"
+            },
+            "limit": {
+              "type": "integer",
+              "description": "Maximum number of records to return",
+              "default": 50,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "slice": {
+              "type": "string",
+              "description": "AT-URI of the slice to query"
+            },
+            "sortBy": {
+              "type": "unknown",
+              "description": "Sorting configuration for result ordering"
+            },
+            "where": {
+              "type": "unknown",
+              "description": "Flexible filtering conditions for querying records"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "records"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "description": "Pagination cursor for next page"
+            },
+            "records": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#indexedRecord"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

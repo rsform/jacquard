@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -27,19 +28,16 @@ pub struct CheckHandleAvailability<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
-impl jacquard_common::IntoStatic for CheckHandleAvailability<'_> {
-    type Output = CheckHandleAvailability<'static>;
-    fn into_static(self) -> Self::Output {
-        CheckHandleAvailability {
-            birth_date: self.birth_date.into_static(),
-            email: self.email.into_static(),
-            handle: self.handle.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct CheckHandleAvailabilityOutput<'a> {
     ///Echo of the input handle.
@@ -50,32 +48,18 @@ pub struct CheckHandleAvailabilityOutput<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CheckHandleAvailabilityOutputRecordResult<'a> {}
-impl jacquard_common::IntoStatic for CheckHandleAvailabilityOutputRecordResult<'_> {
-    type Output = CheckHandleAvailabilityOutputRecordResult<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CheckHandleAvailabilityOutputRecordResult::Unknown(v) => {
-                CheckHandleAvailabilityOutputRecordResult::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for CheckHandleAvailabilityOutput<'_> {
-    type Output = CheckHandleAvailabilityOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        CheckHandleAvailabilityOutput {
-            handle: self.handle.into_static(),
-            result: self.result.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -142,21 +126,28 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CheckHandleAvailability<'d
 
 ///Indicates the provided handle is available.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ResultAvailable<'a> {}
-impl jacquard_common::IntoStatic for ResultAvailable<'_> {
-    type Output = ResultAvailable<'static>;
-    fn into_static(self) -> Self::Output {
-        ResultAvailable {
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Indicates the provided handle is unavailable and gives suggestions of available handles.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ResultUnavailable<'a> {
     ///List of suggested handles based on the provided inputs.
@@ -166,18 +157,16 @@ pub struct ResultUnavailable<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for ResultUnavailable<'_> {
-    type Output = ResultUnavailable<'static>;
-    fn into_static(self) -> Self::Output {
-        ResultUnavailable {
-            suggestions: self.suggestions.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Suggestion<'a> {
     #[serde(borrow)]
@@ -185,15 +174,4 @@ pub struct Suggestion<'a> {
     ///Method used to build this suggestion. Should be considered opaque to clients. Can be used for metrics.
     #[serde(borrow)]
     pub method: jacquard_common::CowStr<'a>,
-}
-
-impl jacquard_common::IntoStatic for Suggestion<'_> {
-    type Output = Suggestion<'static>;
-    fn into_static(self) -> Self::Output {
-        Suggestion {
-            handle: self.handle.into_static(),
-            method: self.method.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

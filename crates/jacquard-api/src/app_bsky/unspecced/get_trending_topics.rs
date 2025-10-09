@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -25,35 +26,22 @@ pub struct GetTrendingTopics<'a> {
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GetTrendingTopics<'_> {
-    type Output = GetTrendingTopics<'static>;
-    fn into_static(self) -> Self::Output {
-        GetTrendingTopics {
-            limit: self.limit.into_static(),
-            viewer: self.viewer.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTrendingTopicsOutput<'a> {
     #[serde(borrow)]
     pub suggested: Vec<crate::app_bsky::unspecced::TrendingTopic<'a>>,
     #[serde(borrow)]
     pub topics: Vec<crate::app_bsky::unspecced::TrendingTopic<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetTrendingTopicsOutput<'_> {
-    type Output = GetTrendingTopicsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetTrendingTopicsOutput {
-            suggested: self.suggested.into_static(),
-            topics: self.topics.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -1,0 +1,28 @@
+{
+  "lexicon": 1,
+  "id": "com.welistskyblue.list.congrats",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring a 'congrats' of a completed com.welistskyblue.list.item record.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

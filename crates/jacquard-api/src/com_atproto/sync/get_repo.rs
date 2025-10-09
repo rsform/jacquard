@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -23,29 +24,18 @@ pub struct GetRepo<'a> {
     pub since: std::option::Option<jacquard_common::types::string::Tid>,
 }
 
-impl jacquard_common::IntoStatic for GetRepo<'_> {
-    type Output = GetRepo<'static>;
-    fn into_static(self) -> Self::Output {
-        GetRepo {
-            did: self.did.into_static(),
-            since: self.since.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepoOutput<'a> {}
-impl jacquard_common::IntoStatic for GetRepoOutput<'_> {
-    type Output = GetRepoOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetRepoOutput {
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,

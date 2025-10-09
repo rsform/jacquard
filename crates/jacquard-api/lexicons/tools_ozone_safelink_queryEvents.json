@@ -1,0 +1,71 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.safelink.queryEvents",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Query URL safety audit events",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "description": "Cursor for pagination"
+            },
+            "limit": {
+              "type": "integer",
+              "description": "Maximum number of results to return",
+              "default": 50,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "patternType": {
+              "type": "string",
+              "description": "Filter by pattern type"
+            },
+            "sortDirection": {
+              "type": "string",
+              "description": "Sort direction",
+              "default": "desc",
+              "knownValues": [
+                "asc",
+                "desc"
+              ]
+            },
+            "urls": {
+              "type": "array",
+              "description": "Filter by specific URLs or domains",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "events"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "description": "Next cursor for pagination. Only present if there are more results."
+            },
+            "events": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "tools.ozone.safelink.defs#event"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "events.smokesignal.automation.InvokeWebhook",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Process a Smoke Signal webhook event.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "event",
+            "record",
+            "context"
+          ],
+          "properties": {
+            "context": {
+              "type": "object",
+              "properties": {}
+            },
+            "event": {
+              "type": "string",
+              "knownValues": [
+                "test",
+                "rsvp.created",
+                "event.created"
+              ]
+            },
+            "record": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    }
+  }
+}

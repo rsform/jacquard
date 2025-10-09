@@ -1,0 +1,24 @@
+{
+  "lexicon": 1,
+  "id": "blue.rito.service.schema",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "This record defines the schema associated with a specific NSID.",
+      "key": "nsid",
+      "record": {
+        "type": "object",
+        "required": [
+          "schema"
+        ],
+        "properties": {
+          "schema": {
+            "type": "string",
+            "description": "The AppView URL for the NSID. For example, if the NSID is uk.skyblur.post, the URL should be https://skyblur.uk/post/{did}/{rkey}",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

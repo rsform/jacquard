@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -25,32 +26,20 @@ pub struct GetTrendsSkeleton<'a> {
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GetTrendsSkeleton<'_> {
-    type Output = GetTrendsSkeleton<'static>;
-    fn into_static(self) -> Self::Output {
-        GetTrendsSkeleton {
-            limit: self.limit.into_static(),
-            viewer: self.viewer.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTrendsSkeletonOutput<'a> {
     #[serde(borrow)]
     pub trends: Vec<crate::app_bsky::unspecced::SkeletonTrend<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetTrendsSkeletonOutput<'_> {
-    type Output = GetTrendsSkeletonOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetTrendsSkeletonOutput {
-            trends: self.trends.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -24,29 +25,20 @@ pub struct FetchLabels {
     pub since: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for FetchLabels {
-    type Output = FetchLabels;
-    fn into_static(self) -> Self::Output {
-        self
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct FetchLabelsOutput<'a> {
     #[serde(borrow)]
     pub labels: Vec<crate::com_atproto::label::Label<'a>>,
-}
-
-impl jacquard_common::IntoStatic for FetchLabelsOutput<'_> {
-    type Output = FetchLabelsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        FetchLabelsOutput {
-            labels: self.labels.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

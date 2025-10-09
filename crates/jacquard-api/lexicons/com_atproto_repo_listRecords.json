@@ -1,0 +1,85 @@
+{
+  "lexicon": 1,
+  "id": "com.atproto.repo.listRecords",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List a range of records in a repository, matching a specific collection. Does not require auth.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "collection"
+        ],
+        "properties": {
+          "collection": {
+            "type": "string",
+            "description": "The NSID of the record type.",
+            "format": "nsid"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The number of records to return.",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "repo": {
+            "type": "string",
+            "description": "The handle or DID of the repo.",
+            "format": "at-identifier"
+          },
+          "reverse": {
+            "type": "boolean",
+            "description": "Flag to reverse the order of the returned records."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "records"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "records": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#record"
+              }
+            }
+          }
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "value"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "value": {
+          "type": "unknown"
+        }
+      }
+    }
+  }
+}

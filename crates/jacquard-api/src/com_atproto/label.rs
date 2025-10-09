@@ -10,7 +10,15 @@ pub mod subscribe_labels;
 
 ///Metadata tag on an atproto resource (eg, repo or record).
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Label<'a> {
     ///Optionally, CID specifying the specific version of 'uri' resource this label applies to.
@@ -40,24 +48,6 @@ pub struct Label<'a> {
     ///The AT Protocol version of the label object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub ver: std::option::Option<i64>,
-}
-
-impl jacquard_common::IntoStatic for Label<'_> {
-    type Output = Label<'static>;
-    fn into_static(self) -> Self::Output {
-        Label {
-            cid: self.cid.into_static(),
-            cts: self.cts.into_static(),
-            exp: self.exp.into_static(),
-            neg: self.neg.into_static(),
-            sig: self.sig.into_static(),
-            src: self.src.into_static(),
-            uri: self.uri.into_static(),
-            val: self.val.into_static(),
-            ver: self.ver.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -183,7 +173,15 @@ impl jacquard_common::IntoStatic for LabelValue<'_> {
 
 ///Declares a label value and its expected interpretations and behaviors.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LabelValueDefinition<'a> {
     ///Does the user need to have adult content enabled in order to configure this label?
@@ -206,24 +204,17 @@ pub struct LabelValueDefinition<'a> {
     pub severity: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for LabelValueDefinition<'_> {
-    type Output = LabelValueDefinition<'static>;
-    fn into_static(self) -> Self::Output {
-        LabelValueDefinition {
-            adult_only: self.adult_only.into_static(),
-            blurs: self.blurs.into_static(),
-            default_setting: self.default_setting.into_static(),
-            identifier: self.identifier.into_static(),
-            locales: self.locales.into_static(),
-            severity: self.severity.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Strings which describe the label in the UI, localized into a specific language.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LabelValueDefinitionStrings<'a> {
     ///A longer description of what the label means and why it might be applied.
@@ -236,21 +227,17 @@ pub struct LabelValueDefinitionStrings<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for LabelValueDefinitionStrings<'_> {
-    type Output = LabelValueDefinitionStrings<'static>;
-    fn into_static(self) -> Self::Output {
-        LabelValueDefinitionStrings {
-            description: self.description.into_static(),
-            lang: self.lang.into_static(),
-            name: self.name.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Metadata tag on an atproto record, published by the author within the record. Note that schemas should use #selfLabels, not #selfLabel.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SelfLabel<'a> {
     ///The short string name of the value or type of this label.
@@ -258,31 +245,19 @@ pub struct SelfLabel<'a> {
     pub val: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for SelfLabel<'_> {
-    type Output = SelfLabel<'static>;
-    fn into_static(self) -> Self::Output {
-        SelfLabel {
-            val: self.val.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Metadata tags on an atproto record, published by the author within the record.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SelfLabels<'a> {
     #[serde(borrow)]
     pub values: Vec<crate::com_atproto::label::SelfLabel<'a>>,
-}
-
-impl jacquard_common::IntoStatic for SelfLabels<'_> {
-    type Output = SelfLabels<'static>;
-    fn into_static(self) -> Self::Output {
-        SelfLabels {
-            values: self.values.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

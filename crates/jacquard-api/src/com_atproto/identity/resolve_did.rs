@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -21,32 +22,21 @@ pub struct ResolveDid<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
-impl jacquard_common::IntoStatic for ResolveDid<'_> {
-    type Output = ResolveDid<'static>;
-    fn into_static(self) -> Self::Output {
-        ResolveDid {
-            did: self.did.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveDidOutput<'a> {
     ///The complete DID document for the identity.
     #[serde(borrow)]
     pub did_doc: jacquard_common::types::value::Data<'a>,
-}
-
-impl jacquard_common::IntoStatic for ResolveDidOutput<'_> {
-    type Output = ResolveDidOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        ResolveDidOutput {
-            did_doc: self.did_doc.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -40,21 +41,16 @@ pub struct QuerySets<'a> {
     pub sort_direction: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for QuerySets<'_> {
-    type Output = QuerySets<'static>;
-    fn into_static(self) -> Self::Output {
-        QuerySets {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            name_prefix: self.name_prefix.into_static(),
-            sort_by: self.sort_by.into_static(),
-            sort_direction: self.sort_direction.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct QuerySetsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -62,17 +58,6 @@ pub struct QuerySetsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub sets: Vec<crate::tools_ozone::set::SetView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for QuerySetsOutput<'_> {
-    type Output = QuerySetsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        QuerySetsOutput {
-            cursor: self.cursor.into_static(),
-            sets: self.sets.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

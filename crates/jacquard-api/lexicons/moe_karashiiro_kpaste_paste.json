@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "moe.karashiiro.kpaste.paste",
+  "description": "Record representing a code/text paste",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "description": "A code/text paste",
+        "required": [
+          "content",
+          "createdAt"
+        ],
+        "properties": {
+          "content": {
+            "type": "blob",
+            "description": "Blob reference to the paste content",
+            "accept": [
+              "text/plain",
+              "text/*"
+            ],
+            "maxSize": 10000000
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the paste was created",
+            "format": "datetime"
+          },
+          "language": {
+            "type": "string",
+            "description": "Programming language for syntax highlighting",
+            "default": "text",
+            "maxLength": 50
+          },
+          "title": {
+            "type": "string",
+            "description": "Optional title for the paste",
+            "maxLength": 200
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the paste was last modified (optional, defaults to createdAt)",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

@@ -11,7 +11,15 @@ pub mod list_templates;
 pub mod update_template;
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct TemplateView<'a> {
     ///Subject of the message, used in emails.
@@ -35,22 +43,4 @@ pub struct TemplateView<'a> {
     #[serde(borrow)]
     pub subject: std::option::Option<jacquard_common::CowStr<'a>>,
     pub updated_at: jacquard_common::types::string::Datetime,
-}
-
-impl jacquard_common::IntoStatic for TemplateView<'_> {
-    type Output = TemplateView<'static>;
-    fn into_static(self) -> Self::Output {
-        TemplateView {
-            content_markdown: self.content_markdown.into_static(),
-            created_at: self.created_at.into_static(),
-            disabled: self.disabled.into_static(),
-            id: self.id.into_static(),
-            lang: self.lang.into_static(),
-            last_updated_by: self.last_updated_by.into_static(),
-            name: self.name.into_static(),
-            subject: self.subject.into_static(),
-            updated_at: self.updated_at.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

@@ -1,0 +1,64 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.archive",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "ref"
+        ],
+        "properties": {
+          "format": {
+            "type": "string",
+            "description": "Archive format",
+            "default": "tar.gz",
+            "enum": [
+              "tar",
+              "zip",
+              "tar.gz",
+              "tar.bz2",
+              "tar.xz"
+            ]
+          },
+          "prefix": {
+            "type": "string",
+            "description": "Prefix for files in the archive"
+          },
+          "ref": {
+            "type": "string",
+            "description": "Git reference (branch, tag, or commit SHA)"
+          },
+          "repo": {
+            "type": "string",
+            "description": "Repository identifier in format 'did:plc:.../repoName'"
+          }
+        }
+      },
+      "output": {
+        "description": "Binary archive data",
+        "encoding": "*/*"
+      },
+      "errors": [
+        {
+          "description": "Repository not found or access denied",
+          "name": "RepoNotFound"
+        },
+        {
+          "description": "Git reference not found",
+          "name": "RefNotFound"
+        },
+        {
+          "description": "Invalid request parameters",
+          "name": "InvalidRequest"
+        },
+        {
+          "description": "Failed to create archive",
+          "name": "ArchiveError"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "fyi.unravel.frontpage.vote",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record containing a Frontpage vote.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this vote was originally created.",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "lexicon": 1,
+  "id": "tools.smokesignal.blahg.content.post",
+  "defs": {
+    "attachment": {
+      "type": "object",
+      "required": [
+        "content"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text description of the content, for accessibility."
+        },
+        "content": {
+          "type": "blob",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 3000000
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A blagh post",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#attachment"
+            }
+          },
+          "content": {
+            "type": "blob",
+            "description": "The content of the post",
+            "accept": [
+              "text/plain",
+              "text/html",
+              "text/markdown"
+            ],
+            "maxSize": 1000000
+          },
+          "langs": {
+            "type": "array",
+            "description": "Indicates human language of text content.",
+            "items": {
+              "type": "string",
+              "format": "language"
+            },
+            "maxLength": 3
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 2000,
+            "maxGraphemes": 200
+          }
+        }
+      }
+    }
+  }
+}

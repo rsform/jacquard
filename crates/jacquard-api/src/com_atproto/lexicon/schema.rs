@@ -7,7 +7,15 @@
 
 ///Representation of Lexicon schemas themselves, when published as atproto records. Note that the schema language is not defined in Lexicon; this meta schema currently only includes a single version field ('lexicon'). See the atproto specifications for description of the other expected top-level fields ('id', 'defs', etc).
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Schema<'a> {
     ///Indicates the 'version' of the Lexicon language. Must be '1' for the current atproto/Lexicon schema system.
@@ -16,14 +24,4 @@ pub struct Schema<'a> {
 
 impl jacquard_common::types::collection::Collection for Schema<'_> {
     const NSID: &'static str = "com.atproto.lexicon.schema";
-}
-
-impl jacquard_common::IntoStatic for Schema<'_> {
-    type Output = Schema<'static>;
-    fn into_static(self) -> Self::Output {
-        Schema {
-            lexicon: self.lexicon.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

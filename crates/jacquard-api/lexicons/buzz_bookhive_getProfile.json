@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "buzz.bookhive.getProfile",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a profile's info. Does not require authentication.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "did": {
+            "type": "string",
+            "description": "The user's DID to get the profile of"
+          },
+          "handle": {
+            "type": "string",
+            "description": "The user's handle to get the profile of"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "books",
+            "profile",
+            "activity"
+          ],
+          "properties": {
+            "activity": {
+              "type": "array",
+              "description": "The user's activity",
+              "items": {
+                "type": "ref",
+                "ref": "buzz.bookhive.defs#activity"
+              }
+            },
+            "books": {
+              "type": "array",
+              "description": "All books in the user's library",
+              "items": {
+                "type": "ref",
+                "ref": "buzz.bookhive.defs#userBook"
+              }
+            },
+            "profile": {
+              "type": "ref",
+              "description": "The user's profile",
+              "ref": "buzz.bookhive.defs#profile"
+            }
+          }
+        }
+      }
+    }
+  }
+}

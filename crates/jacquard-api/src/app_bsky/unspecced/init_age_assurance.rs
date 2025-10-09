@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -39,35 +40,21 @@ pub struct InitAgeAssurance<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for InitAgeAssurance<'_> {
-    type Output = InitAgeAssurance<'static>;
-    fn into_static(self) -> Self::Output {
-        InitAgeAssurance {
-            country_code: self.country_code.into_static(),
-            email: self.email.into_static(),
-            language: self.language.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct InitAgeAssuranceOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
     pub value: crate::app_bsky::unspecced::AgeAssuranceState<'a>,
-}
-
-impl jacquard_common::IntoStatic for InitAgeAssuranceOutput<'_> {
-    type Output = InitAgeAssuranceOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        InitAgeAssuranceOutput {
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

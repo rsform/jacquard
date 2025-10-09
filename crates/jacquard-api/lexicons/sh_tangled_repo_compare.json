@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.compare",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "rev1",
+          "rev2"
+        ],
+        "properties": {
+          "repo": {
+            "type": "string",
+            "description": "Repository identifier in format 'did:plc:.../repoName'"
+          },
+          "rev1": {
+            "type": "string",
+            "description": "First revision (commit, branch, or tag)"
+          },
+          "rev2": {
+            "type": "string",
+            "description": "Second revision (commit, branch, or tag)"
+          }
+        }
+      },
+      "output": {
+        "description": "Compare output in application/json",
+        "encoding": "*/*"
+      },
+      "errors": [
+        {
+          "description": "Repository not found or access denied",
+          "name": "RepoNotFound"
+        },
+        {
+          "description": "One or both revisions not found",
+          "name": "RevisionNotFound"
+        },
+        {
+          "description": "Invalid request parameters",
+          "name": "InvalidRequest"
+        },
+        {
+          "description": "Failed to compare revisions",
+          "name": "CompareError"
+        }
+      ]
+    }
+  }
+}

@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -34,20 +35,16 @@ pub struct ListConvos<'a> {
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for ListConvos<'_> {
-    type Output = ListConvos<'static>;
-    fn into_static(self) -> Self::Output {
-        ListConvos {
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            read_state: self.read_state.into_static(),
-            status: self.status.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ListConvosOutput<'a> {
     #[serde(borrow)]
@@ -55,17 +52,6 @@ pub struct ListConvosOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-}
-
-impl jacquard_common::IntoStatic for ListConvosOutput<'_> {
-    type Output = ListConvosOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        ListConvosOutput {
-            convos: self.convos.into_static(),
-            cursor: self.cursor.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

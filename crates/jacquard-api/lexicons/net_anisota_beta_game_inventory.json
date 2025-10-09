@@ -1,0 +1,127 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.beta.game.inventory",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Beta version: Record representing an item in a player's game inventory",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "itemId",
+          "quantity",
+          "acquiredAt",
+          "createdAt"
+        ],
+        "properties": {
+          "acquiredAt": {
+            "type": "string",
+            "description": "When the item was acquired",
+            "format": "datetime"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the record was created",
+            "format": "datetime"
+          },
+          "itemId": {
+            "type": "string",
+            "description": "Unique identifier for the item from gameItems.json",
+            "maxLength": 100
+          },
+          "itemName": {
+            "type": "string",
+            "description": "Display name of the item",
+            "maxLength": 200
+          },
+          "itemType": {
+            "type": "string",
+            "description": "Type category of the item (consumable, tool, equipment, etc.)",
+            "maxLength": 50
+          },
+          "itemValue": {
+            "type": "integer",
+            "description": "Base value of the item in game currency",
+            "minimum": 0
+          },
+          "lastModified": {
+            "type": "string",
+            "description": "When the record was last modified",
+            "format": "datetime"
+          },
+          "logRecordUri": {
+            "type": "string",
+            "description": "URI of the game.log record that documents the acquisition of this item"
+          },
+          "maxStack": {
+            "type": "integer",
+            "description": "Maximum stack size for this item",
+            "minimum": 1
+          },
+          "metadata": {
+            "type": "unknown",
+            "description": "Additional item-specific data (stats, attributes, enchantments, etc.)"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Number of items in the stack",
+            "minimum": 1
+          },
+          "rarity": {
+            "type": "string",
+            "description": "Rarity level of the item",
+            "enum": [
+              "veryCommon",
+              "common",
+              "uncommon",
+              "rare",
+              "veryRare",
+              "epic",
+              "legendary"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "description": "How the item was acquired",
+            "enum": [
+              "daily_reward",
+              "game_card",
+              "quest",
+              "trade",
+              "crafted",
+              "found",
+              "purchased"
+            ]
+          },
+          "sourceDetails": {
+            "type": "ref",
+            "ref": "#sourceDetails"
+          },
+          "stackable": {
+            "type": "boolean",
+            "description": "Whether this item can be stacked with others of the same type"
+          }
+        }
+      }
+    },
+    "sourceDetails": {
+      "type": "object",
+      "description": "Additional details about how the item was acquired",
+      "properties": {
+        "gameCardUri": {
+          "type": "string",
+          "description": "URI of the game card that provided this item"
+        },
+        "questId": {
+          "type": "string",
+          "description": "ID of the quest that rewarded this item"
+        },
+        "rewardStreak": {
+          "type": "integer",
+          "description": "Daily reward streak when item was acquired"
+        }
+      }
+    }
+  }
+}

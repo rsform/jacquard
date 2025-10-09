@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -31,33 +32,20 @@ pub struct CreateInviteCode<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for CreateInviteCode<'_> {
-    type Output = CreateInviteCode<'static>;
-    fn into_static(self) -> Self::Output {
-        CreateInviteCode {
-            for_account: self.for_account.into_static(),
-            use_count: self.use_count.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateInviteCodeOutput<'a> {
     #[serde(borrow)]
     pub code: jacquard_common::CowStr<'a>,
-}
-
-impl jacquard_common::IntoStatic for CreateInviteCodeOutput<'_> {
-    type Output = CreateInviteCodeOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        CreateInviteCodeOutput {
-            code: self.code.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -1,0 +1,141 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.safelink.defs",
+  "defs": {
+    "actionType": {
+      "type": "string",
+      "knownValues": [
+        "block",
+        "warn",
+        "whitelist"
+      ]
+    },
+    "event": {
+      "type": "object",
+      "description": "An event for URL safety decisions",
+      "required": [
+        "id",
+        "eventType",
+        "url",
+        "pattern",
+        "action",
+        "reason",
+        "createdBy",
+        "createdAt"
+      ],
+      "properties": {
+        "action": {
+          "type": "ref",
+          "ref": "#actionType"
+        },
+        "comment": {
+          "type": "string",
+          "description": "Optional comment about the decision"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "DID of the user who created this rule",
+          "format": "did"
+        },
+        "eventType": {
+          "type": "ref",
+          "ref": "#eventType"
+        },
+        "id": {
+          "type": "integer",
+          "description": "Auto-incrementing row ID"
+        },
+        "pattern": {
+          "type": "ref",
+          "ref": "#patternType"
+        },
+        "reason": {
+          "type": "ref",
+          "ref": "#reasonType"
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL that this rule applies to"
+        }
+      }
+    },
+    "eventType": {
+      "type": "string",
+      "knownValues": [
+        "addRule",
+        "updateRule",
+        "removeRule"
+      ]
+    },
+    "patternType": {
+      "type": "string",
+      "knownValues": [
+        "domain",
+        "url"
+      ]
+    },
+    "reasonType": {
+      "type": "string",
+      "knownValues": [
+        "csam",
+        "spam",
+        "phishing",
+        "none"
+      ]
+    },
+    "urlRule": {
+      "type": "object",
+      "description": "Input for creating a URL safety rule",
+      "required": [
+        "url",
+        "pattern",
+        "action",
+        "reason",
+        "createdBy",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "action": {
+          "type": "ref",
+          "ref": "#actionType"
+        },
+        "comment": {
+          "type": "string",
+          "description": "Optional comment about the decision"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the rule was created",
+          "format": "datetime"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "DID of the user added the rule.",
+          "format": "did"
+        },
+        "pattern": {
+          "type": "ref",
+          "ref": "#patternType"
+        },
+        "reason": {
+          "type": "ref",
+          "ref": "#reasonType"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the rule was last updated",
+          "format": "datetime"
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL or domain to apply the rule to"
+        }
+      }
+    }
+  }
+}

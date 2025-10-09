@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -21,31 +22,20 @@ pub struct ResolveHandle<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
-impl jacquard_common::IntoStatic for ResolveHandle<'_> {
-    type Output = ResolveHandle<'static>;
-    fn into_static(self) -> Self::Output {
-        ResolveHandle {
-            handle: self.handle.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveHandleOutput<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-}
-
-impl jacquard_common::IntoStatic for ResolveHandleOutput<'_> {
-    type Output = ResolveHandleOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        ResolveHandleOutput {
-            did: self.did.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

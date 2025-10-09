@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -21,31 +22,20 @@ pub struct GetPosts<'a> {
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
-impl jacquard_common::IntoStatic for GetPosts<'_> {
-    type Output = GetPosts<'static>;
-    fn into_static(self) -> Self::Output {
-        GetPosts {
-            uris: self.uris.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostsOutput<'a> {
     #[serde(borrow)]
     pub posts: Vec<crate::app_bsky::feed::PostView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetPostsOutput<'_> {
-    type Output = GetPostsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetPostsOutput {
-            posts: self.posts.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -43,24 +44,16 @@ pub struct ListVerifications<'a> {
     pub subjects: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
 }
 
-impl jacquard_common::IntoStatic for ListVerifications<'_> {
-    type Output = ListVerifications<'static>;
-    fn into_static(self) -> Self::Output {
-        ListVerifications {
-            created_after: self.created_after.into_static(),
-            created_before: self.created_before.into_static(),
-            cursor: self.cursor.into_static(),
-            is_revoked: self.is_revoked.into_static(),
-            issuers: self.issuers.into_static(),
-            limit: self.limit.into_static(),
-            sort_direction: self.sort_direction.into_static(),
-            subjects: self.subjects.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ListVerificationsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -68,17 +61,6 @@ pub struct ListVerificationsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub verifications: Vec<crate::tools_ozone::verification::VerificationView<'a>>,
-}
-
-impl jacquard_common::IntoStatic for ListVerificationsOutput<'_> {
-    type Output = ListVerificationsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        ListVerificationsOutput {
-            cursor: self.cursor.into_static(),
-            verifications: self.verifications.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

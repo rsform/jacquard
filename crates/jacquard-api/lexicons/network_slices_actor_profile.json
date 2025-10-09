@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.actor.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of a basic account profile.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "Small image to be displayed next to posts from account. AKA, 'profile picture'",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-form profile description text.",
+            "maxLength": 2560,
+            "maxGraphemes": 256
+          },
+          "displayName": {
+            "type": "string",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          }
+        }
+      }
+    }
+  }
+}

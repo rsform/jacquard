@@ -7,21 +7,28 @@
 
 ///Disables embedding of this post.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct DisableRule<'a> {}
-impl jacquard_common::IntoStatic for DisableRule<'_> {
-    type Output = DisableRule<'static>;
-    fn into_static(self) -> Self::Output {
-        DisableRule {
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///Record defining interaction rules for a post. The record key (rkey) of the postgate record must match the record key of the post, and that record must be in the same repository.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Postgate<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
@@ -44,17 +51,4 @@ pub struct Postgate<'a> {
 
 impl jacquard_common::types::collection::Collection for Postgate<'_> {
     const NSID: &'static str = "app.bsky.feed.postgate";
-}
-
-impl jacquard_common::IntoStatic for Postgate<'_> {
-    type Output = Postgate<'static>;
-    fn into_static(self) -> Self::Output {
-        Postgate {
-            created_at: self.created_at.into_static(),
-            detached_embedding_uris: self.detached_embedding_uris.into_static(),
-            embedding_rules: self.embedding_rules.into_static(),
-            post: self.post.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

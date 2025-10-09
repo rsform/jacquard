@@ -12,34 +12,26 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTaggedSuggestions {}
-impl jacquard_common::IntoStatic for GetTaggedSuggestions {
-    type Output = GetTaggedSuggestions;
-    fn into_static(self) -> Self::Output {
-        self
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTaggedSuggestionsOutput<'a> {
     #[serde(borrow)]
     pub suggestions: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetTaggedSuggestionsOutput<'_> {
-    type Output = GetTaggedSuggestionsOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetTaggedSuggestionsOutput {
-            suggestions: self.suggestions.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for
@@ -59,7 +51,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetTaggedSuggestions {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Suggestion<'a> {
     #[serde(borrow)]
@@ -68,16 +68,4 @@ pub struct Suggestion<'a> {
     pub subject_type: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub tag: jacquard_common::CowStr<'a>,
-}
-
-impl jacquard_common::IntoStatic for Suggestion<'_> {
-    type Output = Suggestion<'static>;
-    fn into_static(self) -> Self::Output {
-        Suggestion {
-            subject: self.subject.into_static(),
-            subject_type: self.subject_type.into_static(),
-            tag: self.tag.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

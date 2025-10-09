@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.slice.syncUserCollections",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Synchronously sync the authenticated user's collections into a slice with a configurable timeout. Requires authentication.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "slice"
+          ],
+          "properties": {
+            "slice": {
+              "type": "string",
+              "description": "AT-URI of the slice to sync user data into"
+            },
+            "timeoutSeconds": {
+              "type": "integer",
+              "description": "Timeout in seconds for the sync operation",
+              "default": 30,
+              "minimum": 1,
+              "maximum": 300
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "reposProcessed",
+            "recordsSynced",
+            "timedOut"
+          ],
+          "properties": {
+            "recordsSynced": {
+              "type": "integer",
+              "description": "Number of records successfully synced"
+            },
+            "reposProcessed": {
+              "type": "integer",
+              "description": "Number of repositories processed during sync"
+            },
+            "timedOut": {
+              "type": "boolean",
+              "description": "Whether the sync operation exceeded the timeout"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Contact<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -14,18 +22,16 @@ pub struct Contact<'a> {
     pub email: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for Contact<'_> {
-    type Output = Contact<'static>;
-    fn into_static(self) -> Self::Output {
-        Contact {
-            email: self.email.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Links<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -36,19 +42,16 @@ pub struct Links<'a> {
     pub terms_of_service: std::option::Option<jacquard_common::types::string::Uri<'a>>,
 }
 
-impl jacquard_common::IntoStatic for Links<'_> {
-    type Output = Links<'static>;
-    fn into_static(self) -> Self::Output {
-        Links {
-            privacy_policy: self.privacy_policy.into_static(),
-            terms_of_service: self.terms_of_service.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct DescribeServerOutput<'a> {
     ///List of domain suffixes that can be used in account handles.
@@ -70,21 +73,6 @@ pub struct DescribeServerOutput<'a> {
     ///If true, a phone verification token must be supplied to create an account on this instance.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub phone_verification_required: std::option::Option<bool>,
-}
-
-impl jacquard_common::IntoStatic for DescribeServerOutput<'_> {
-    type Output = DescribeServerOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        DescribeServerOutput {
-            available_user_domains: self.available_user_domains.into_static(),
-            contact: self.contact.into_static(),
-            did: self.did.into_static(),
-            invite_code_required: self.invite_code_required.into_static(),
-            links: self.links.into_static(),
-            phone_verification_required: self.phone_verification_required.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 /// XRPC request marker type

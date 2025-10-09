@@ -1,0 +1,74 @@
+{
+  "lexicon": 1,
+  "id": "app.bsky.actor.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of a Bluesky account profile.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "Small image to be displayed next to posts from account. AKA, 'profile picture'",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "banner": {
+            "type": "blob",
+            "description": "Larger horizontal image to display behind profile view.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-form profile description text.",
+            "maxLength": 2560,
+            "maxGraphemes": 256
+          },
+          "displayName": {
+            "type": "string",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "joinedViaStarterPack": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "labels": {
+            "type": "union",
+            "description": "Self-label values, specific to the Bluesky application, on the overall account.",
+            "refs": [
+              "com.atproto.label.defs#selfLabels"
+            ]
+          },
+          "pinnedPost": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "pronouns": {
+            "type": "string",
+            "description": "Free-form pronouns text.",
+            "maxLength": 200,
+            "maxGraphemes": 20
+          },
+          "website": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

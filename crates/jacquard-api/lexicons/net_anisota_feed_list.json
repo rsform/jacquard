@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.feed.list",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A list of posts for curation, bookmarking, or organization",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "Optional avatar image for the list",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the list was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description of the list",
+            "maxLength": 300
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the list",
+            "maxLength": 64
+          },
+          "tags": {
+            "type": "array",
+            "description": "Tags for categorizing the list",
+            "items": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "maxLength": 10
+          }
+        }
+      }
+    }
+  }
+}

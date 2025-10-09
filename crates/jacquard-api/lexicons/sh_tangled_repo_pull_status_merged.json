@@ -1,0 +1,10 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.pull.status.merged",
+  "defs": {
+    "main": {
+      "type": "token",
+      "description": "merged pull request"
+    }
+  }
+}

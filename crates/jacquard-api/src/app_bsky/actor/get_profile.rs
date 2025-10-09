@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -21,32 +22,21 @@ pub struct GetProfile<'a> {
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetProfile<'_> {
-    type Output = GetProfile<'static>;
-    fn into_static(self) -> Self::Output {
-        GetProfile {
-            actor: self.actor.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfileOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
     pub value: crate::app_bsky::actor::ProfileViewDetailed<'a>,
-}
-
-impl jacquard_common::IntoStatic for GetProfileOutput<'_> {
-    type Output = GetProfileOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetProfileOutput {
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -30,19 +31,16 @@ pub struct GetTimeline<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for GetTimeline<'_> {
-    type Output = GetTimeline<'static>;
-    fn into_static(self) -> Self::Output {
-        GetTimeline {
-            algorithm: self.algorithm.into_static(),
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTimelineOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -50,17 +48,6 @@ pub struct GetTimelineOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub feed: Vec<crate::app_bsky::feed::FeedViewPost<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetTimelineOutput<'_> {
-    type Output = GetTimelineOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetTimelineOutput {
-            cursor: self.cursor.into_static(),
-            feed: self.feed.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

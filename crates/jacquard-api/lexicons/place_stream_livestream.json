@@ -1,0 +1,123 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.livestream",
+  "defs": {
+    "livestreamView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "record",
+        "indexedAt"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "record": {
+          "type": "unknown"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "viewerCount": {
+          "type": "ref",
+          "description": "The number of viewers watching this livestream. Use when you can't reasonably use #viewerCount directly.",
+          "ref": "place.stream.livestream#viewerCount"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Record announcing a livestream is happening",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "createdAt"
+        ],
+        "properties": {
+          "agent": {
+            "type": "string",
+            "description": "The source of the livestream, if available, in a User Agent format: `<product> / <product-version> <comment>` e.g. Streamplace/0.7.5 iOS"
+          },
+          "canonicalUrl": {
+            "type": "string",
+            "description": "The primary URL where this livestream can be viewed, if available.",
+            "format": "uri"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this livestream started.",
+            "format": "datetime"
+          },
+          "post": {
+            "type": "ref",
+            "description": "The post that announced this livestream.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "thumb": {
+            "type": "blob",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 1000000
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the livestream, as it will be announced to followers.",
+            "maxLength": 1400,
+            "maxGraphemes": 140
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL where this stream can be found. This is primarily a hint for other Streamplace nodes to locate and replicate the stream.",
+            "format": "uri"
+          }
+        }
+      }
+    },
+    "streamplaceAnything": {
+      "type": "object",
+      "required": [
+        "livestream"
+      ],
+      "properties": {
+        "livestream": {
+          "type": "union",
+          "refs": [
+            "#livestreamView",
+            "#viewerCount",
+            "place.stream.defs#blockView",
+            "place.stream.defs#renditions",
+            "place.stream.defs#rendition",
+            "place.stream.chat.defs#messageView"
+          ]
+        }
+      }
+    },
+    "viewerCount": {
+      "type": "object",
+      "required": [
+        "count"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

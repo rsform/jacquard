@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -22,31 +23,20 @@ pub struct GetConvo<'a> {
     pub convo_id: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetConvo<'_> {
-    type Output = GetConvo<'static>;
-    fn into_static(self) -> Self::Output {
-        GetConvo {
-            convo_id: self.convo_id.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetConvoOutput<'a> {
     #[serde(borrow)]
     pub convo: crate::chat_bsky::convo::ConvoView<'a>,
-}
-
-impl jacquard_common::IntoStatic for GetConvoOutput<'_> {
-    type Output = GetConvoOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetConvoOutput {
-            convo: self.convo.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

@@ -94,7 +94,15 @@ impl jacquard_common::IntoStatic for ActionType<'_> {
 
 ///An event for URL safety decisions
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
     #[serde(borrow)]
@@ -118,24 +126,6 @@ pub struct Event<'a> {
     ///The URL that this rule applies to
     #[serde(borrow)]
     pub url: jacquard_common::CowStr<'a>,
-}
-
-impl jacquard_common::IntoStatic for Event<'_> {
-    type Output = Event<'static>;
-    fn into_static(self) -> Self::Output {
-        Event {
-            action: self.action.into_static(),
-            comment: self.comment.into_static(),
-            created_at: self.created_at.into_static(),
-            created_by: self.created_by.into_static(),
-            event_type: self.event_type.into_static(),
-            id: self.id.into_static(),
-            pattern: self.pattern.into_static(),
-            reason: self.reason.into_static(),
-            url: self.url.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -383,7 +373,15 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
 
 ///Input for creating a URL safety rule
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct UrlRule<'a> {
     #[serde(borrow)]
@@ -406,21 +404,4 @@ pub struct UrlRule<'a> {
     ///The URL or domain to apply the rule to
     #[serde(borrow)]
     pub url: jacquard_common::CowStr<'a>,
-}
-
-impl jacquard_common::IntoStatic for UrlRule<'_> {
-    type Output = UrlRule<'static>;
-    fn into_static(self) -> Self::Output {
-        UrlRule {
-            action: self.action.into_static(),
-            comment: self.comment.into_static(),
-            created_at: self.created_at.into_static(),
-            created_by: self.created_by.into_static(),
-            pattern: self.pattern.into_static(),
-            reason: self.reason.into_static(),
-            updated_at: self.updated_at.into_static(),
-            url: self.url.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

@@ -1,0 +1,85 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.verification.defs",
+  "defs": {
+    "verificationView": {
+      "type": "object",
+      "description": "Verification data for the associated subject.",
+      "required": [
+        "issuer",
+        "uri",
+        "subject",
+        "handle",
+        "displayName",
+        "createdAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the verification was created.",
+          "format": "datetime"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the subject the verification applies to at the moment of verifying, which might not be the same at the time of viewing. The verification is only valid if the current displayName matches the one at the time of verifying."
+        },
+        "handle": {
+          "type": "string",
+          "description": "Handle of the subject the verification applies to at the moment of verifying, which might not be the same at the time of viewing. The verification is only valid if the current handle matches the one at the time of verifying.",
+          "format": "handle"
+        },
+        "issuer": {
+          "type": "string",
+          "description": "The user who issued this verification.",
+          "format": "did"
+        },
+        "issuerProfile": {
+          "type": "union",
+          "refs": []
+        },
+        "issuerRepo": {
+          "type": "union",
+          "refs": [
+            "tools.ozone.moderation.defs#repoViewDetail",
+            "tools.ozone.moderation.defs#repoViewNotFound"
+          ]
+        },
+        "revokeReason": {
+          "type": "string",
+          "description": "Describes the reason for revocation, also indicating that the verification is no longer valid."
+        },
+        "revokedAt": {
+          "type": "string",
+          "description": "Timestamp when the verification was revoked.",
+          "format": "datetime"
+        },
+        "revokedBy": {
+          "type": "string",
+          "description": "The user who revoked this verification.",
+          "format": "did"
+        },
+        "subject": {
+          "type": "string",
+          "description": "The subject of the verification.",
+          "format": "did"
+        },
+        "subjectProfile": {
+          "type": "union",
+          "refs": []
+        },
+        "subjectRepo": {
+          "type": "union",
+          "refs": [
+            "tools.ozone.moderation.defs#repoViewDetail",
+            "tools.ozone.moderation.defs#repoViewNotFound"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "description": "The AT-URI of the verification record.",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

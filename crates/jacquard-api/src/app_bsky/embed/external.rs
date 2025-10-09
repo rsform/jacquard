@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct External<'a> {
     #[serde(borrow)]
@@ -20,58 +28,49 @@ pub struct External<'a> {
     pub uri: jacquard_common::types::string::Uri<'a>,
 }
 
-impl jacquard_common::IntoStatic for External<'_> {
-    type Output = External<'static>;
-    fn into_static(self) -> Self::Output {
-        External {
-            description: self.description.into_static(),
-            thumb: self.thumb.into_static(),
-            title: self.title.into_static(),
-            uri: self.uri.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 ///A representation of some externally linked content (eg, a URL and 'card'), embedded in a Bluesky record (eg, a post).
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ExternalRecord<'a> {
     #[serde(borrow)]
     pub external: crate::app_bsky::embed::external::External<'a>,
 }
 
-impl jacquard_common::IntoStatic for ExternalRecord<'_> {
-    type Output = ExternalRecord<'static>;
-    fn into_static(self) -> Self::Output {
-        ExternalRecord {
-            external: self.external.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct View<'a> {
     #[serde(borrow)]
     pub external: crate::app_bsky::embed::external::ViewExternal<'a>,
 }
 
-impl jacquard_common::IntoStatic for View<'_> {
-    type Output = View<'static>;
-    fn into_static(self) -> Self::Output {
-        View {
-            external: self.external.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct ViewExternal<'a> {
     #[serde(borrow)]
@@ -83,17 +82,4 @@ pub struct ViewExternal<'a> {
     pub title: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
-}
-
-impl jacquard_common::IntoStatic for ViewExternal<'_> {
-    type Output = ViewExternal<'static>;
-    fn into_static(self) -> Self::Output {
-        ViewExternal {
-            description: self.description.into_static(),
-            thumb: self.thumb.into_static(),
-            title: self.title.into_static(),
-            uri: self.uri.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

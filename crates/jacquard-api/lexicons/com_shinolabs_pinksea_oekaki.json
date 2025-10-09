@@ -1,0 +1,78 @@
+{
+  "lexicon": 1,
+  "id": "com.shinolabs.pinksea.oekaki",
+  "defs": {
+    "image": {
+      "type": "object",
+      "required": [
+        "blob",
+        "imageLink"
+      ],
+      "properties": {
+        "blob": {
+          "type": "blob",
+          "description": "The actual atproto image blob.",
+          "accept": [
+            "image/png"
+          ],
+          "maxSize": 1048576
+        },
+        "imageLink": {
+          "type": "ref",
+          "ref": "#imageLink"
+        }
+      }
+    },
+    "imageLink": {
+      "type": "object",
+      "description": "A link to the image, it can be either directly to the PDS or to a CDN.",
+      "required": [],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text description of the image, for accessibility."
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "An oekaki post.",
+      "record": {
+        "type": "object",
+        "required": [
+          "image",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "The timestamp of creation.",
+            "format": "datetime"
+          },
+          "image": {
+            "type": "ref",
+            "ref": "#image"
+          },
+          "inResponseTo": {
+            "type": "ref",
+            "description": "What this oekaki post is a response to.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "nsfw": {
+            "type": "boolean",
+            "description": "Is this oekaki NSFW?"
+          },
+          "tags": {
+            "type": "array",
+            "description": "An array of tags this image had.",
+            "items": {
+              "type": "string",
+              "maxLength": 640
+            },
+            "maxLength": 10
+          }
+        }
+      }
+    }
+  }
+}

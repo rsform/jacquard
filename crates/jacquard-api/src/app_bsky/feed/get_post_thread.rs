@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -27,19 +28,16 @@ pub struct GetPostThread<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetPostThread<'_> {
-    type Output = GetPostThread<'static>;
-    fn into_static(self) -> Self::Output {
-        GetPostThread {
-            depth: self.depth.into_static(),
-            parent_height: self.parent_height.into_static(),
-            uri: self.uri.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThreadOutput<'a> {
     #[serde(borrow)]
@@ -50,7 +48,15 @@ pub struct GetPostThreadOutput<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetPostThreadOutputRecordThread<'a> {
@@ -60,37 +66,6 @@ pub enum GetPostThreadOutputRecordThread<'a> {
     DefsNotFoundPost(Box<crate::app_bsky::feed::NotFoundPost<'a>>),
     #[serde(rename = "app.bsky.feed.defs#blockedPost")]
     DefsBlockedPost(Box<crate::app_bsky::feed::BlockedPost<'a>>),
-}
-
-impl jacquard_common::IntoStatic for GetPostThreadOutputRecordThread<'_> {
-    type Output = GetPostThreadOutputRecordThread<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetPostThreadOutputRecordThread::DefsThreadViewPost(v) => {
-                GetPostThreadOutputRecordThread::DefsThreadViewPost(v.into_static())
-            }
-            GetPostThreadOutputRecordThread::DefsNotFoundPost(v) => {
-                GetPostThreadOutputRecordThread::DefsNotFoundPost(v.into_static())
-            }
-            GetPostThreadOutputRecordThread::DefsBlockedPost(v) => {
-                GetPostThreadOutputRecordThread::DefsBlockedPost(v.into_static())
-            }
-            GetPostThreadOutputRecordThread::Unknown(v) => {
-                GetPostThreadOutputRecordThread::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetPostThreadOutput<'_> {
-    type Output = GetPostThreadOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetPostThreadOutput {
-            thread: self.thread.into_static(),
-            threadgate: self.threadgate.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[jacquard_derive::open_union]

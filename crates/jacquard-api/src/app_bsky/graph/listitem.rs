@@ -7,7 +7,15 @@
 
 ///Record representing an account's inclusion on a specific list. The AppView will ignore duplicate listitem records.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Listitem<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
@@ -21,16 +29,4 @@ pub struct Listitem<'a> {
 
 impl jacquard_common::types::collection::Collection for Listitem<'_> {
     const NSID: &'static str = "app.bsky.graph.listitem";
-}
-
-impl jacquard_common::IntoStatic for Listitem<'_> {
-    type Output = Listitem<'static>;
-    fn into_static(self) -> Self::Output {
-        Listitem {
-            created_at: self.created_at.into_static(),
-            list: self.list.into_static(),
-            subject: self.subject.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

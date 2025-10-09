@@ -12,7 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -21,17 +22,16 @@ pub struct DescribeRepo<'a> {
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
 }
 
-impl jacquard_common::IntoStatic for DescribeRepo<'_> {
-    type Output = DescribeRepo<'static>;
-    fn into_static(self) -> Self::Output {
-        DescribeRepo {
-            repo: self.repo.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct DescribeRepoOutput<'a> {
     ///List of all the collections (NSIDs) for which this repo contains at least one record.
@@ -46,20 +46,6 @@ pub struct DescribeRepoOutput<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
     ///Indicates if handle is currently valid (resolves bi-directionally)
     pub handle_is_correct: bool,
-}
-
-impl jacquard_common::IntoStatic for DescribeRepoOutput<'_> {
-    type Output = DescribeRepoOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        DescribeRepoOutput {
-            collections: self.collections.into_static(),
-            did: self.did.into_static(),
-            did_doc: self.did_doc.into_static(),
-            handle: self.handle.into_static(),
-            handle_is_correct: self.handle_is_correct.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

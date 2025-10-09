@@ -78,7 +78,7 @@ where
 #[derive(Clone, PartialEq, Eq, Serialize, Hash)]
 #[serde(transparent)]
 #[repr(transparent)]
-pub struct Rkey<'r>(CowStr<'r>);
+pub struct Rkey<'r>(pub(crate) CowStr<'r>);
 
 unsafe impl<'r> RecordKeyType for Rkey<'r> {
     fn as_str(&self) -> &str {

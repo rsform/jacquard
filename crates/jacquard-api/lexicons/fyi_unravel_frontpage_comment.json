@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "fyi.unravel.frontpage.comment",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record containing a Frontpage comment.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "content",
+          "createdAt",
+          "post"
+        ],
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "The content of the comment.",
+            "maxLength": 100000,
+            "maxGraphemes": 10000
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this comment was originally created.",
+            "format": "datetime"
+          },
+          "parent": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "post": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -30,17 +31,6 @@ pub struct UpdateAccountSigningKey<'a> {
         ::jacquard_common::smol_str::SmolStr,
         ::jacquard_common::types::value::Data<'a>,
     >,
-}
-
-impl jacquard_common::IntoStatic for UpdateAccountSigningKey<'_> {
-    type Output = UpdateAccountSigningKey<'static>;
-    fn into_static(self) -> Self::Output {
-        UpdateAccountSigningKey {
-            did: self.did.into_static(),
-            signing_key: self.signing_key.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

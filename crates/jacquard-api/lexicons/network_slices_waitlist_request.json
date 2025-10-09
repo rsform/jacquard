@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.waitlist.request",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A request to join the waitlist",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "slice",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When the user joined the waitlist",
+            "format": "datetime"
+          },
+          "slice": {
+            "type": "string",
+            "description": "The AT URI of the slice being requested access to",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

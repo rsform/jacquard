@@ -6,22 +6,20 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAgeAssuranceStateOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
     pub value: crate::app_bsky::unspecced::AgeAssuranceState<'a>,
-}
-
-impl jacquard_common::IntoStatic for GetAgeAssuranceStateOutput<'_> {
-    type Output = GetAgeAssuranceStateOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetAgeAssuranceStateOutput {
-            value: self.value.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 /// XRPC request marker type

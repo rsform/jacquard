@@ -16,7 +16,15 @@ pub mod submit_plc_operation;
 pub mod update_handle;
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct IdentityInfo<'a> {
     #[serde(borrow)]
@@ -27,16 +35,4 @@ pub struct IdentityInfo<'a> {
     ///The validated handle of the account; or 'handle.invalid' if the handle did not bi-directionally match the DID document.
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
-}
-
-impl jacquard_common::IntoStatic for IdentityInfo<'_> {
-    type Output = IdentityInfo<'static>;
-    fn into_static(self) -> Self::Output {
-        IdentityInfo {
-            did: self.did.into_static(),
-            did_doc: self.did_doc.into_static(),
-            handle: self.handle.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

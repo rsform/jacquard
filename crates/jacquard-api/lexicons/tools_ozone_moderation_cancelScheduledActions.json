@@ -1,0 +1,85 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.moderation.cancelScheduledActions",
+  "defs": {
+    "cancellationResults": {
+      "type": "object",
+      "required": [
+        "succeeded",
+        "failed"
+      ],
+      "properties": {
+        "failed": {
+          "type": "array",
+          "description": "DIDs for which cancellation failed with error details",
+          "items": {
+            "type": "ref",
+            "ref": "#failedCancellation"
+          }
+        },
+        "succeeded": {
+          "type": "array",
+          "description": "DIDs for which all pending scheduled actions were successfully cancelled",
+          "items": {
+            "type": "string",
+            "format": "did"
+          }
+        }
+      }
+    },
+    "failedCancellation": {
+      "type": "object",
+      "required": [
+        "did",
+        "error"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "error": {
+          "type": "string"
+        },
+        "errorCode": {
+          "type": "string"
+        }
+      }
+    },
+    "main": {
+      "type": "procedure",
+      "description": "Cancel all pending scheduled moderation actions for specified subjects",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "subjects"
+          ],
+          "properties": {
+            "comment": {
+              "type": "string",
+              "description": "Optional comment describing the reason for cancellation"
+            },
+            "subjects": {
+              "type": "array",
+              "description": "Array of DID subjects to cancel scheduled actions for",
+              "items": {
+                "type": "string",
+                "format": "did"
+              },
+              "maxLength": 100
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "#cancellationResults"
+        }
+      }
+    }
+  }
+}

@@ -14,6 +14,8 @@ pub mod parsing;
 /// Serde implementations for Data types
 pub mod serde_impl;
 
+pub use serde_impl::{DataDeserializerError, RawDataSerializerError};
+
 #[cfg(test)]
 mod tests;
 
@@ -348,4 +350,116 @@ pub enum RawData<'s> {
     InvalidNumber(Bytes),
     /// Invalid/unknown data (captured as bytes)
     InvalidData(Bytes),
+}
+
+/// Deserialize a typed value from a `Data` value
+///
+/// Allows extracting strongly-typed structures from untyped `Data` values,
+/// similar to `serde_json::from_value()`.
+///
+/// # Example
+/// ```ignore
+/// use jacquard_common::types::value::{Data, from_data};
+/// use serde::Deserialize;
+///
+/// #[derive(Deserialize)]
+/// struct Post<'a> {
+///     #[serde(borrow)]
+///     text: &'a str,
+///     #[serde(borrow)]
+///     author: &'a str,
+/// }
+///
+/// let data: Data = /* ... */;
+/// let post: Post = from_data(&data)?;
+/// ```
+pub fn from_data<'de, T>(data: &'de Data<'de>) -> Result<T, DataDeserializerError>
+where
+    T: serde::Deserialize<'de>,
+{
+    T::deserialize(data)
+}
+
+/// Deserialize a typed value from a `RawData` value
+///
+/// Allows extracting strongly-typed structures from untyped `RawData` values.
+///
+/// # Example
+/// ```ignore
+/// use jacquard_common::types::value::{RawData, from_raw_data};
+/// use serde::Deserialize;
+///
+/// #[derive(Deserialize)]
+/// struct Post<'a> {
+///     #[serde(borrow)]
+///     text: &'a str,
+///     #[serde(borrow)]
+///     author: &'a str,
+/// }
+///
+/// let data: RawData = /* ... */;
+/// let post: Post = from_raw_data(&data)?;
+/// ```
+pub fn from_raw_data<'de, T>(data: &'de RawData<'de>) -> Result<T, DataDeserializerError>
+where
+    T: serde::Deserialize<'de>,
+{
+    T::deserialize(data)
+}
+
+/// Serialize a typed value into a `RawData` value
+///
+/// Allows converting strongly-typed structures into untyped `RawData` values.
+///
+/// # Example
+/// ```ignore
+/// use jacquard_common::types::value::{RawData, to_raw_data};
+/// use serde::Serialize;
+///
+/// #[derive(Serialize)]
+/// struct Post {
+///     text: String,
+///     likes: i64,
+/// }
+///
+/// let post = Post { text: "hello".to_string(), likes: 42 };
+/// let data: RawData = to_raw_data(&post)?;
+/// ```
+pub fn to_raw_data<T>(value: &T) -> Result<RawData<'static>, serde_impl::RawDataSerializerError>
+where
+    T: serde::Serialize,
+{
+    value.serialize(serde_impl::RawDataSerializer)
+}
+
+/// Serialize a typed value into a validated `Data` value with type inference
+///
+/// Combines `to_raw_data()` and validation/type inference in one step.
+///
+/// # Example
+/// ```ignore
+/// use jacquard_common::types::value::{Data, to_data};
+/// use serde::Serialize;
+///
+/// #[derive(Serialize)]
+/// struct Post {
+///     text: String,
+///     did: String,  // Will be inferred as Did if valid
+/// }
+///
+/// let post = Post {
+///     text: "hello".to_string(),
+///     did: "did:plc:abc123".to_string()
+/// };
+/// let data: Data = to_data(&post)?;
+/// ```
+pub fn to_data<T>(value: &T) -> Result<Data<'static>, convert::ConversionError>
+where
+    T: serde::Serialize,
+{
+    let raw = to_raw_data(value)
+        .map_err(|e| convert::ConversionError::InvalidRawData {
+            message: e.to_string()
+        })?;
+    raw.try_into()
 }

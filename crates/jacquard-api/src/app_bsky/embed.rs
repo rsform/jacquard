@@ -13,20 +13,17 @@ pub mod video;
 
 ///width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct AspectRatio<'a> {
     pub height: i64,
     pub width: i64,
-}
-
-impl jacquard_common::IntoStatic for AspectRatio<'_> {
-    type Output = AspectRatio<'static>;
-    fn into_static(self) -> Self::Output {
-        AspectRatio {
-            height: self.height.into_static(),
-            width: self.width.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }

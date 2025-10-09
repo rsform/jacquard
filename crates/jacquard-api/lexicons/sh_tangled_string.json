@@ -1,0 +1,38 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.string",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "filename",
+          "description",
+          "createdAt",
+          "contents"
+        ],
+        "properties": {
+          "contents": {
+            "type": "string",
+            "minGraphemes": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxGraphemes": 280
+          },
+          "filename": {
+            "type": "string",
+            "minGraphemes": 1,
+            "maxGraphemes": 140
+          }
+        }
+      }
+    }
+  }
+}

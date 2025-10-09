@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -31,32 +32,20 @@ pub struct UpdateAllRead<'a> {
     >,
 }
 
-impl jacquard_common::IntoStatic for UpdateAllRead<'_> {
-    type Output = UpdateAllRead<'static>;
-    fn into_static(self) -> Self::Output {
-        UpdateAllRead {
-            status: self.status.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAllReadOutput<'a> {
     ///The count of updated convos.
     pub updated_count: i64,
-}
-
-impl jacquard_common::IntoStatic for UpdateAllReadOutput<'_> {
-    type Output = UpdateAllReadOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        UpdateAllReadOutput {
-            updated_count: self.updated_count.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

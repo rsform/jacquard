@@ -1,0 +1,112 @@
+{
+  "lexicon": 1,
+  "id": "com.atproto.server.createAccount",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create an account. Implemented by PDS.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "handle"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "Pre-existing atproto DID, being imported to a new account.",
+              "format": "did"
+            },
+            "email": {
+              "type": "string"
+            },
+            "handle": {
+              "type": "string",
+              "description": "Requested handle for the account.",
+              "format": "handle"
+            },
+            "inviteCode": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string",
+              "description": "Initial account password. May need to meet instance-specific password strength requirements."
+            },
+            "plcOp": {
+              "type": "unknown",
+              "description": "A signed DID PLC operation to be submitted as part of importing an existing account to this instance. NOTE: this optional field may be updated when full account migration is implemented."
+            },
+            "recoveryKey": {
+              "type": "string",
+              "description": "DID PLC rotation key (aka, recovery key) to be included in PLC creation operation."
+            },
+            "verificationCode": {
+              "type": "string"
+            },
+            "verificationPhone": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "description": "Account login session returned on successful account creation.",
+          "required": [
+            "accessJwt",
+            "refreshJwt",
+            "handle",
+            "did"
+          ],
+          "properties": {
+            "accessJwt": {
+              "type": "string"
+            },
+            "did": {
+              "type": "string",
+              "description": "The DID of the new account.",
+              "format": "did"
+            },
+            "didDoc": {
+              "type": "unknown",
+              "description": "Complete DID document."
+            },
+            "handle": {
+              "type": "string",
+              "format": "handle"
+            },
+            "refreshJwt": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidHandle"
+        },
+        {
+          "name": "InvalidPassword"
+        },
+        {
+          "name": "InvalidInviteCode"
+        },
+        {
+          "name": "HandleNotAvailable"
+        },
+        {
+          "name": "UnsupportedDomain"
+        },
+        {
+          "name": "UnresolvableDid"
+        },
+        {
+          "name": "IncompatibleDidDoc"
+        }
+      ]
+    }
+  }
+}

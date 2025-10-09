@@ -1,0 +1,157 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.blob",
+  "defs": {
+    "lastCommit": {
+      "type": "object",
+      "required": [
+        "hash",
+        "message",
+        "when"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "#signature"
+        },
+        "hash": {
+          "type": "string",
+          "description": "Commit hash"
+        },
+        "message": {
+          "type": "string",
+          "description": "Commit message"
+        },
+        "shortHash": {
+          "type": "string",
+          "description": "Short commit hash"
+        },
+        "when": {
+          "type": "string",
+          "description": "Commit timestamp",
+          "format": "datetime"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "ref",
+          "path"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to the file within the repository"
+          },
+          "raw": {
+            "type": "boolean",
+            "description": "Return raw file content instead of JSON response",
+            "default": false
+          },
+          "ref": {
+            "type": "string",
+            "description": "Git reference (branch, tag, or commit SHA)"
+          },
+          "repo": {
+            "type": "string",
+            "description": "Repository identifier in format 'did:plc:.../repoName'"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "ref",
+            "path",
+            "content"
+          ],
+          "properties": {
+            "content": {
+              "type": "string",
+              "description": "File content (base64 encoded for binary files)"
+            },
+            "encoding": {
+              "type": "string",
+              "description": "Content encoding",
+              "enum": [
+                "utf-8",
+                "base64"
+              ]
+            },
+            "isBinary": {
+              "type": "boolean",
+              "description": "Whether the file is binary"
+            },
+            "lastCommit": {
+              "type": "ref",
+              "ref": "#lastCommit"
+            },
+            "mimeType": {
+              "type": "string",
+              "description": "MIME type of the file"
+            },
+            "path": {
+              "type": "string",
+              "description": "The file path"
+            },
+            "ref": {
+              "type": "string",
+              "description": "The git reference used"
+            },
+            "size": {
+              "type": "integer",
+              "description": "File size in bytes"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Repository not found or access denied",
+          "name": "RepoNotFound"
+        },
+        {
+          "description": "Git reference not found",
+          "name": "RefNotFound"
+        },
+        {
+          "description": "File not found at the specified path",
+          "name": "FileNotFound"
+        },
+        {
+          "description": "Invalid request parameters",
+          "name": "InvalidRequest"
+        }
+      ]
+    },
+    "signature": {
+      "type": "object",
+      "required": [
+        "name",
+        "email",
+        "when"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Author email"
+        },
+        "name": {
+          "type": "string",
+          "description": "Author name"
+        },
+        "when": {
+          "type": "string",
+          "description": "Author timestamp",
+          "format": "datetime"
+        }
+      }
+    }
+  }
+}

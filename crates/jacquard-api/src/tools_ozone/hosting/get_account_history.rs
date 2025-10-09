@@ -6,7 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct AccountCreated<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -17,55 +25,48 @@ pub struct AccountCreated<'a> {
     pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
 }
 
-impl jacquard_common::IntoStatic for AccountCreated<'_> {
-    type Output = AccountCreated<'static>;
-    fn into_static(self) -> Self::Output {
-        AccountCreated {
-            email: self.email.into_static(),
-            handle: self.handle.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct EmailConfirmed<'a> {
     #[serde(borrow)]
     pub email: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for EmailConfirmed<'_> {
-    type Output = EmailConfirmed<'static>;
-    fn into_static(self) -> Self::Output {
-        EmailConfirmed {
-            email: self.email.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct EmailUpdated<'a> {
     #[serde(borrow)]
     pub email: jacquard_common::CowStr<'a>,
 }
 
-impl jacquard_common::IntoStatic for EmailUpdated<'_> {
-    type Output = EmailUpdated<'static>;
-    fn into_static(self) -> Self::Output {
-        EmailUpdated {
-            email: self.email.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
@@ -76,49 +77,32 @@ pub struct Event<'a> {
 }
 
 #[jacquard_derive::open_union]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EventRecordDetails<'a> {}
-impl jacquard_common::IntoStatic for EventRecordDetails<'_> {
-    type Output = EventRecordDetails<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            EventRecordDetails::Unknown(v) => {
-                EventRecordDetails::Unknown(v.into_static())
-            }
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for Event<'_> {
-    type Output = Event<'static>;
-    fn into_static(self) -> Self::Output {
-        Event {
-            created_at: self.created_at.into_static(),
-            created_by: self.created_by.into_static(),
-            details: self.details.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct HandleUpdated<'a> {
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
-}
-
-impl jacquard_common::IntoStatic for HandleUpdated<'_> {
-    type Output = HandleUpdated<'static>;
-    fn into_static(self) -> Self::Output {
-        HandleUpdated {
-            handle: self.handle.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[derive(
@@ -128,7 +112,8 @@ impl jacquard_common::IntoStatic for HandleUpdated<'_> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -147,20 +132,16 @@ pub struct GetAccountHistory<'a> {
     pub limit: std::option::Option<i64>,
 }
 
-impl jacquard_common::IntoStatic for GetAccountHistory<'_> {
-    type Output = GetAccountHistory<'static>;
-    fn into_static(self) -> Self::Output {
-        GetAccountHistory {
-            cursor: self.cursor.into_static(),
-            did: self.did.into_static(),
-            events: self.events.into_static(),
-            limit: self.limit.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountHistoryOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -168,17 +149,6 @@ pub struct GetAccountHistoryOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub events: Vec<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for GetAccountHistoryOutput<'_> {
-    type Output = GetAccountHistoryOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetAccountHistoryOutput {
-            cursor: self.cursor.into_static(),
-            events: self.events.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for
@@ -198,14 +168,14 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAccountHistory<'de> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct PasswordUpdated<'a> {}
-impl jacquard_common::IntoStatic for PasswordUpdated<'_> {
-    type Output = PasswordUpdated<'static>;
-    fn into_static(self) -> Self::Output {
-        PasswordUpdated {
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}

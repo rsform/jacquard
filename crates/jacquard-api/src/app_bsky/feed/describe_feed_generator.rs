@@ -6,25 +6,31 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Feed<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl jacquard_common::IntoStatic for Feed<'_> {
-    type Output = Feed<'static>;
-    fn into_static(self) -> Self::Output {
-        Feed {
-            uri: self.uri.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Links<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -35,19 +41,16 @@ pub struct Links<'a> {
     pub terms_of_service: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl jacquard_common::IntoStatic for Links<'_> {
-    type Output = Links<'static>;
-    fn into_static(self) -> Self::Output {
-        Links {
-            privacy_policy: self.privacy_policy.into_static(),
-            terms_of_service: self.terms_of_service.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct DescribeFeedGeneratorOutput<'a> {
     #[serde(borrow)]
@@ -57,18 +60,6 @@ pub struct DescribeFeedGeneratorOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub links: std::option::Option<jacquard_common::types::value::Data<'a>>,
-}
-
-impl jacquard_common::IntoStatic for DescribeFeedGeneratorOutput<'_> {
-    type Output = DescribeFeedGeneratorOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        DescribeFeedGeneratorOutput {
-            did: self.did.into_static(),
-            feeds: self.feeds.into_static(),
-            links: self.links.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 /// XRPC request marker type

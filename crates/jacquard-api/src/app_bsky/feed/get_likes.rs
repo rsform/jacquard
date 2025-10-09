@@ -6,25 +6,21 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct Like<'a> {
     #[serde(borrow)]
     pub actor: crate::app_bsky::actor::ProfileView<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     pub indexed_at: jacquard_common::types::string::Datetime,
-}
-
-impl jacquard_common::IntoStatic for Like<'_> {
-    type Output = Like<'static>;
-    fn into_static(self) -> Self::Output {
-        Like {
-            actor: self.actor.into_static(),
-            created_at: self.created_at.into_static(),
-            indexed_at: self.indexed_at.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 #[derive(
@@ -34,7 +30,8 @@ impl jacquard_common::IntoStatic for Like<'_> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -53,20 +50,16 @@ pub struct GetLikes<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl jacquard_common::IntoStatic for GetLikes<'_> {
-    type Output = GetLikes<'static>;
-    fn into_static(self) -> Self::Output {
-        GetLikes {
-            cid: self.cid.into_static(),
-            cursor: self.cursor.into_static(),
-            limit: self.limit.into_static(),
-            uri: self.uri.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLikesOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -79,19 +72,6 @@ pub struct GetLikesOutput<'a> {
     pub likes: Vec<jacquard_common::types::value::Data<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-}
-
-impl jacquard_common::IntoStatic for GetLikesOutput<'_> {
-    type Output = GetLikesOutput<'static>;
-    fn into_static(self) -> Self::Output {
-        GetLikesOutput {
-            cid: self.cid.into_static(),
-            cursor: self.cursor.into_static(),
-            likes: self.likes.into_static(),
-            uri: self.uri.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
 
 ///Response type for

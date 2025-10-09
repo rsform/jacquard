@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "uk.ewancroft.snake.score",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A validated record of a user's score in the Snake game.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "score",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When the score was achieved",
+            "format": "datetime"
+          },
+          "gameProof": {
+            "type": "object",
+            "description": "Validation proof to prevent score manipulation",
+            "properties": {
+              "actionCount": {
+                "type": "integer",
+                "description": "Number of recorded game actions",
+                "minimum": 2
+              },
+              "checksum": {
+                "type": "string",
+                "description": "Cryptographic checksum of game actions"
+              },
+              "duration": {
+                "type": "integer",
+                "description": "Game duration in milliseconds",
+                "minimum": 1000
+              }
+            }
+          },
+          "score": {
+            "type": "integer",
+            "description": "The player's final score",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}

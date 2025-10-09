@@ -12,19 +12,13 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder
+    bon::Builder,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct ImportRepo {
     pub body: bytes::Bytes,
-}
-
-impl jacquard_common::IntoStatic for ImportRepo {
-    type Output = ImportRepo;
-    fn into_static(self) -> Self::Output {
-        self
-    }
 }
 
 ///Response type for

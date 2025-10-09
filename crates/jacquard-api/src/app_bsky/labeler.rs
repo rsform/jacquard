@@ -9,7 +9,15 @@ pub mod get_services;
 pub mod service;
 
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerPolicies<'a> {
     ///Label values created by this labeler and scoped exclusively to it. Labels defined here will override global label definitions for this labeler.
@@ -23,19 +31,16 @@ pub struct LabelerPolicies<'a> {
     pub label_values: Vec<crate::com_atproto::label::LabelValue<'a>>,
 }
 
-impl jacquard_common::IntoStatic for LabelerPolicies<'_> {
-    type Output = LabelerPolicies<'static>;
-    fn into_static(self) -> Self::Output {
-        LabelerPolicies {
-            label_value_definitions: self.label_value_definitions.into_static(),
-            label_values: self.label_values.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerView<'a> {
     #[serde(borrow)]
@@ -55,24 +60,16 @@ pub struct LabelerView<'a> {
     pub viewer: std::option::Option<crate::app_bsky::labeler::LabelerViewerState<'a>>,
 }
 
-impl jacquard_common::IntoStatic for LabelerView<'_> {
-    type Output = LabelerView<'static>;
-    fn into_static(self) -> Self::Output {
-        LabelerView {
-            cid: self.cid.into_static(),
-            creator: self.creator.into_static(),
-            indexed_at: self.indexed_at.into_static(),
-            labels: self.labels.into_static(),
-            like_count: self.like_count.into_static(),
-            uri: self.uri.into_static(),
-            viewer: self.viewer.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerViewDetailed<'a> {
     #[serde(borrow)]
@@ -112,41 +109,19 @@ pub struct LabelerViewDetailed<'a> {
     pub viewer: std::option::Option<crate::app_bsky::labeler::LabelerViewerState<'a>>,
 }
 
-impl jacquard_common::IntoStatic for LabelerViewDetailed<'_> {
-    type Output = LabelerViewDetailed<'static>;
-    fn into_static(self) -> Self::Output {
-        LabelerViewDetailed {
-            cid: self.cid.into_static(),
-            creator: self.creator.into_static(),
-            indexed_at: self.indexed_at.into_static(),
-            labels: self.labels.into_static(),
-            like_count: self.like_count.into_static(),
-            policies: self.policies.into_static(),
-            reason_types: self.reason_types.into_static(),
-            subject_collections: self.subject_collections.into_static(),
-            subject_types: self.subject_types.into_static(),
-            uri: self.uri.into_static(),
-            viewer: self.viewer.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
-}
-
 #[jacquard_derive::lexicon]
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerViewerState<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-}
-
-impl jacquard_common::IntoStatic for LabelerViewerState<'_> {
-    type Output = LabelerViewerState<'static>;
-    fn into_static(self) -> Self::Output {
-        LabelerViewerState {
-            like: self.like.into_static(),
-            extra_data: self.extra_data.into_static(),
-        }
-    }
 }
