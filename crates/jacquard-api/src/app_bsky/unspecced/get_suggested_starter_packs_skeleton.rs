@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedStarterPacksSkeleton<'a> {
@@ -53,11 +45,18 @@ impl jacquard_common::IntoStatic for GetSuggestedStarterPacksSkeletonOutput<'_> 
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de>
-for GetSuggestedStarterPacksSkeleton<'de> {
-    const NSID: &'static str = "app.bsky.unspecced.getSuggestedStarterPacksSkeleton";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.unspecced.getSuggestedStarterPacksSkeleton
+pub struct GetSuggestedStarterPacksSkeletonResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetSuggestedStarterPacksSkeletonResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetSuggestedStarterPacksSkeletonOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetSuggestedStarterPacksSkeleton<'de> {
+    const NSID: &'static str = "app.bsky.unspecced.getSuggestedStarterPacksSkeleton";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetSuggestedStarterPacksSkeletonResponse;
 }

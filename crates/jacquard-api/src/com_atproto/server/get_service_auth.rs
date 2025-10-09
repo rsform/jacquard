@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetServiceAuth<'a> {
@@ -64,7 +56,7 @@ impl jacquard_common::IntoStatic for GetServiceAuthOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -96,17 +88,23 @@ impl jacquard_common::IntoStatic for GetServiceAuthError<'_> {
             GetServiceAuthError::BadExpiration(v) => {
                 GetServiceAuthError::BadExpiration(v.into_static())
             }
-            GetServiceAuthError::Unknown(v) => {
-                GetServiceAuthError::Unknown(v.into_static())
-            }
+            GetServiceAuthError::Unknown(v) => GetServiceAuthError::Unknown(v.into_static()),
         }
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetServiceAuth<'de> {
-    const NSID: &'static str = "com.atproto.server.getServiceAuth";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.server.getServiceAuth
+pub struct GetServiceAuthResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetServiceAuthResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetServiceAuthOutput<'de>;
     type Err = GetServiceAuthError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetServiceAuth<'de> {
+    const NSID: &'static str = "com.atproto.server.getServiceAuth";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetServiceAuthResponse;
 }

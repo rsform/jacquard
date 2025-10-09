@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepoStatus<'a> {
@@ -68,7 +60,7 @@ impl jacquard_common::IntoStatic for GetRepoStatusOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -99,17 +91,23 @@ impl jacquard_common::IntoStatic for GetRepoStatusError<'_> {
             GetRepoStatusError::RepoNotFound(v) => {
                 GetRepoStatusError::RepoNotFound(v.into_static())
             }
-            GetRepoStatusError::Unknown(v) => {
-                GetRepoStatusError::Unknown(v.into_static())
-            }
+            GetRepoStatusError::Unknown(v) => GetRepoStatusError::Unknown(v.into_static()),
         }
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetRepoStatus<'de> {
-    const NSID: &'static str = "com.atproto.sync.getRepoStatus";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.sync.getRepoStatus
+pub struct GetRepoStatusResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetRepoStatusResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetRepoStatusOutput<'de>;
     type Err = GetRepoStatusError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetRepoStatus<'de> {
+    const NSID: &'static str = "com.atproto.sync.getRepoStatus";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetRepoStatusResponse;
 }

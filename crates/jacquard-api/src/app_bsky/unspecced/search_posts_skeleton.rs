@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchPostsSkeleton<'a> {
@@ -119,7 +111,7 @@ impl jacquard_common::IntoStatic for SearchPostsSkeletonOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -157,10 +149,18 @@ impl jacquard_common::IntoStatic for SearchPostsSkeletonError<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for SearchPostsSkeleton<'de> {
-    const NSID: &'static str = "app.bsky.unspecced.searchPostsSkeleton";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.unspecced.searchPostsSkeleton
+pub struct SearchPostsSkeletonResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for SearchPostsSkeletonResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = SearchPostsSkeletonOutput<'de>;
     type Err = SearchPostsSkeletonError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for SearchPostsSkeleton<'de> {
+    const NSID: &'static str = "app.bsky.unspecced.searchPostsSkeleton";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = SearchPostsSkeletonResponse;
 }

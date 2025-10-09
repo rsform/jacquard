@@ -129,11 +129,10 @@ where
             .client
             .xrpc(endpoint)
             .with_options(opts)
-            .send(&RefreshSession)
+            .send(RefreshSession)
             .await?;
         let refresh = response
-            .owned::<RefreshSession>()
-            .output()
+            .output::<RefreshSession>()
             .map_err(|_| ClientError::Auth(jacquard_common::error::AuthError::RefreshFailed))?;
 
         let new_session: AtpSession = refresh.into();
@@ -240,11 +239,10 @@ where
             .client
             .xrpc(pds.clone())
             .with_options(self.options.read().await.clone())
-            .send(&req)
+            .send(req)
             .await?;
-        let out: CreateSessionOutput<'_> = resp
-            .owned::<CreateSession<'_>>()
-            .output()
+        let out = resp
+            .output::<CreateSession<'_>>()
             .map_err(|_| ClientError::Auth(AuthError::NotAuthenticated))?;
         let session = AtpSession::from(out);
 
@@ -419,9 +417,12 @@ where
             )
         }
     }
-    async fn send<'de, R: jacquard_common::types::xrpc::XrpcRequest<'de> + Send>(
+    async fn send<
+        'de,
+        R: jacquard_common::types::xrpc::XrpcRequest<'de> + Clone + Send + Sync + 'de,
+    >(
         &self,
-        request: &'de R,
+        request: &R,
     ) -> XrpcResult<Response<'de, R>> {
         let base_uri = self.base_uri();
         let auth = self.access_token().await;
@@ -431,27 +432,20 @@ where
             .client
             .xrpc(base_uri.clone())
             .with_options(opts.clone())
-            .send(request)
+            .send(request.clone())
             .await;
 
-        if is_expired(&resp) {
-            let auth = self.refresh().await?;
-            opts.auth = Some(auth);
-            self.client
-                .xrpc(base_uri)
-                .with_options(opts)
-                .send(request)
-                .await
-        } else {
-            resp
+        match resp {
+            Err(ClientError::Auth(AuthError::TokenExpired)) => {
+                let auth = self.refresh().await?;
+                opts.auth = Some(auth);
+                self.client
+                    .xrpc(base_uri)
+                    .with_options(opts)
+                    .send(request.clone())
+                    .await
+            }
+            resp => resp,
         }
-    }
-}
-
-fn is_expired<'de, R: XrpcRequest<'de>>(response: &XrpcResult<Response<'de, R>>) -> bool {
-    match response {
-        Err(ClientError::Auth(AuthError::TokenExpired)) => true,
-
-        _ => false,
     }
 }

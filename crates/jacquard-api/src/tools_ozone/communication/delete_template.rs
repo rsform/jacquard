@@ -6,15 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct DeleteTemplate<'a> {
@@ -40,12 +32,18 @@ impl jacquard_common::IntoStatic for DeleteTemplate<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DeleteTemplate<'de> {
-    const NSID: &'static str = "tools.ozone.communication.deleteTemplate";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///tools.ozone.communication.deleteTemplate
+pub struct DeleteTemplateResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for DeleteTemplateResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = ();
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DeleteTemplate<'de> {
+    const NSID: &'static str = "tools.ozone.communication.deleteTemplate";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = DeleteTemplateResponse;
 }

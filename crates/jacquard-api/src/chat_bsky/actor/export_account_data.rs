@@ -21,10 +21,18 @@ impl jacquard_common::IntoStatic for ExportAccountDataOutput<'_> {
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ExportAccountData;
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ExportAccountData {
-    const NSID: &'static str = "chat.bsky.actor.exportAccountData";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/jsonl";
+///Response type for
+///chat.bsky.actor.exportAccountData
+pub struct ExportAccountDataResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for ExportAccountDataResponse {
+    const ENCODING: &'static str = "application/jsonl";
     type Output = ExportAccountDataOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ExportAccountData {
+    const NSID: &'static str = "chat.bsky.actor.exportAccountData";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = ExportAccountDataResponse;
 }

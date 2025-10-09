@@ -51,10 +51,18 @@ impl jacquard_common::IntoStatic for GetSessionOutput<'_> {
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct GetSession;
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetSession {
-    const NSID: &'static str = "com.atproto.server.getSession";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.server.getSession
+pub struct GetSessionResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetSessionResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetSessionOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetSession {
+    const NSID: &'static str = "com.atproto.server.getSession";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetSessionResponse;
 }

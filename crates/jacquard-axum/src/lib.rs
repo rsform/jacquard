@@ -14,7 +14,7 @@ use jacquard::types::xrpc::{XrpcError, XrpcMethod, XrpcRequest};
 use serde::Serialize;
 use serde_json::json;
 
-pub struct ExtractXrpc<R: XrpcRequest<'static>>(R);
+pub struct ExtractXrpc<R: XrpcRequest<'static>>(Option<R>);
 
 impl<S, R> FromRequest<S> for ExtractXrpc<R>
 where
@@ -43,27 +43,68 @@ where
                             )
                                 .into_response()
                         })?;
-                        Ok(ExtractXrpc(value))
+                        Ok(ExtractXrpc(Some(value)))
                     }
                     "*/*" => {
-                        //
-                        todo!()
+                        let decoded = R::decode_body(&body);
+                        match decoded {
+                            Ok(value) => Ok(ExtractXrpc(Some(*value))),
+                            Err(err) => Err((
+                                StatusCode::BAD_REQUEST,
+                                serde_json::to_string(&json!({
+                                    "error": "InvalidRequest",
+                                    "message": format!("failed to decode request: {}", err)
+                                }))
+                                .expect("Failed to serialize error response"),
+                            )
+                                .into_response()),
+                        }
                     }
-                    _ => todo!(),
+                    _ => todo!("handle other encodings"),
                 }
             }
             XrpcMethod::Query => {
                 if let Some(path_query) = req.uri().path_and_query() {
                     let path = path_query.path();
-                    let query = path_query.query();
                     if path.ends_with(R::NSID) {
-                        // success
+                        if let Some(query) = path_query.query() {
+                            let value: R = serde_html_form::from_str(query).map_err(|e| {
+                                (
+                                    StatusCode::BAD_REQUEST,
+                                    serde_json::to_string(&json!({
+                                        "error": "InvalidRequest",
+                                        "message": format!("failed to decode request: {}", e)
+                                    }))
+                                    .expect("Failed to serialize error response"),
+                                )
+                                    .into_response()
+                            })?;
+                            Ok(ExtractXrpc(Some(value)))
+                        } else {
+                            Ok(ExtractXrpc(None))
+                        }
                     } else {
-                        // wrong endpoint
+                        Err((
+                            StatusCode::BAD_REQUEST,
+                            serde_json::to_string(&json!({
+                                "error": "InvalidRequest",
+                                "message": "wrong nsid for wherever this ended up"
+                            }))
+                            .expect("Failed to serialize error response"),
+                        )
+                            .into_response())
                     }
+                } else {
+                    Err((
+                        StatusCode::BAD_REQUEST,
+                        serde_json::to_string(&json!({
+                            "error": "InvalidRequest",
+                            "message": "wrong nsid for wherever this ended up"
+                        }))
+                        .expect("Failed to serialize error response"),
+                    )
+                        .into_response())
                 }
-
-                todo!()
             }
         }
     }

@@ -1790,6 +1790,7 @@ dependencies = [
  "jacquard-common",
  "miette",
  "serde",
+ "serde_html_form",
  "serde_ipld_dagcbor",
  "serde_json",
  "thiserror 2.0.17",

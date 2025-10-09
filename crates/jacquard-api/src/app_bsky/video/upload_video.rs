@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct UploadVideo {
@@ -45,25 +37,26 @@ impl jacquard_common::IntoStatic for UploadVideoOutput<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UploadVideo {
-    const NSID: &'static str = "app.bsky.video.uploadVideo";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "video/mp4",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.video.uploadVideo
+pub struct UploadVideoResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for UploadVideoResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = UploadVideoOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UploadVideo {
+    const NSID: &'static str = "app.bsky.video.uploadVideo";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("video/mp4");
+    type Response<'de1> = UploadVideoResponse;
     fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::types::xrpc::EncodeError> {
         Ok(self.body.to_vec())
     }
-    fn decode_body(
-        &self,
-        body: &'de [u8],
-    ) -> Result<Box<Self>, jacquard_common::error::DecodeError> {
-        Ok(
-            Box::new(Self {
-                body: bytes::Bytes::copy_from_slice(body),
-            }),
-        )
+    fn decode_body(body: &'de [u8]) -> Result<Box<Self>, jacquard_common::error::DecodeError> {
+        Ok(Box::new(Self {
+            body: bytes::Bytes::copy_from_slice(body),
+        }))
     }
 }

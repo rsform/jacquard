@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStarterPacksWithMembership<'a> {
@@ -55,21 +47,26 @@ impl jacquard_common::IntoStatic for GetStarterPacksWithMembershipOutput<'_> {
     fn into_static(self) -> Self::Output {
         GetStarterPacksWithMembershipOutput {
             cursor: self.cursor.into_static(),
-            starter_packs_with_membership: self
-                .starter_packs_with_membership
-                .into_static(),
+            starter_packs_with_membership: self.starter_packs_with_membership.into_static(),
             extra_data: self.extra_data.into_static(),
         }
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de>
-for GetStarterPacksWithMembership<'de> {
-    const NSID: &'static str = "app.bsky.graph.getStarterPacksWithMembership";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.graph.getStarterPacksWithMembership
+pub struct GetStarterPacksWithMembershipResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetStarterPacksWithMembershipResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetStarterPacksWithMembershipOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetStarterPacksWithMembership<'de> {
+    const NSID: &'static str = "app.bsky.graph.getStarterPacksWithMembership";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetStarterPacksWithMembershipResponse;
 }
 
 ///A starter pack and an optional list item indicating membership of a target user to that starter pack.

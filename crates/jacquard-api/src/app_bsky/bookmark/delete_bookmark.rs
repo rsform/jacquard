@@ -6,15 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct DeleteBookmark<'a> {
@@ -48,7 +40,7 @@ impl jacquard_common::IntoStatic for DeleteBookmark<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -80,19 +72,23 @@ impl jacquard_common::IntoStatic for DeleteBookmarkError<'_> {
             DeleteBookmarkError::UnsupportedCollection(v) => {
                 DeleteBookmarkError::UnsupportedCollection(v.into_static())
             }
-            DeleteBookmarkError::Unknown(v) => {
-                DeleteBookmarkError::Unknown(v.into_static())
-            }
+            DeleteBookmarkError::Unknown(v) => DeleteBookmarkError::Unknown(v.into_static()),
         }
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DeleteBookmark<'de> {
-    const NSID: &'static str = "app.bsky.bookmark.deleteBookmark";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.bookmark.deleteBookmark
+pub struct DeleteBookmarkResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for DeleteBookmarkResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = ();
     type Err = DeleteBookmarkError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DeleteBookmark<'de> {
+    const NSID: &'static str = "app.bsky.bookmark.deleteBookmark";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = DeleteBookmarkResponse;
 }

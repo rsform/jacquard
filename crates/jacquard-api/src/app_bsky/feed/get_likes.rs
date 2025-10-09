@@ -27,15 +27,7 @@ impl jacquard_common::IntoStatic for Like<'_> {
     }
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLikes<'a> {
@@ -94,10 +86,18 @@ impl jacquard_common::IntoStatic for GetLikesOutput<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetLikes<'de> {
-    const NSID: &'static str = "app.bsky.feed.getLikes";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.feed.getLikes
+pub struct GetLikesResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetLikesResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetLikesOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetLikes<'de> {
+    const NSID: &'static str = "app.bsky.feed.getLikes";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetLikesResponse;
 }

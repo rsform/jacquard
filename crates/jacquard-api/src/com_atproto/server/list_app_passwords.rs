@@ -55,7 +55,7 @@ impl jacquard_common::IntoStatic for ListAppPasswordsOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -86,9 +86,7 @@ impl jacquard_common::IntoStatic for ListAppPasswordsError<'_> {
             ListAppPasswordsError::AccountTakedown(v) => {
                 ListAppPasswordsError::AccountTakedown(v.into_static())
             }
-            ListAppPasswordsError::Unknown(v) => {
-                ListAppPasswordsError::Unknown(v.into_static())
-            }
+            ListAppPasswordsError::Unknown(v) => ListAppPasswordsError::Unknown(v.into_static()),
         }
     }
 }
@@ -96,10 +94,18 @@ impl jacquard_common::IntoStatic for ListAppPasswordsError<'_> {
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ListAppPasswords;
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ListAppPasswords {
-    const NSID: &'static str = "com.atproto.server.listAppPasswords";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.server.listAppPasswords
+pub struct ListAppPasswordsResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for ListAppPasswordsResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = ListAppPasswordsOutput<'de>;
     type Err = ListAppPasswordsError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ListAppPasswords {
+    const NSID: &'static str = "com.atproto.server.listAppPasswords";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = ListAppPasswordsResponse;
 }

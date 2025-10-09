@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHostStatus<'a> {
@@ -70,7 +62,7 @@ impl jacquard_common::IntoStatic for GetHostStatusOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -101,17 +93,23 @@ impl jacquard_common::IntoStatic for GetHostStatusError<'_> {
             GetHostStatusError::HostNotFound(v) => {
                 GetHostStatusError::HostNotFound(v.into_static())
             }
-            GetHostStatusError::Unknown(v) => {
-                GetHostStatusError::Unknown(v.into_static())
-            }
+            GetHostStatusError::Unknown(v) => GetHostStatusError::Unknown(v.into_static()),
         }
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetHostStatus<'de> {
-    const NSID: &'static str = "com.atproto.sync.getHostStatus";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.sync.getHostStatus
+pub struct GetHostStatusResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetHostStatusResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetHostStatusOutput<'de>;
     type Err = GetHostStatusError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetHostStatus<'de> {
+    const NSID: &'static str = "com.atproto.sync.getHostStatus";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetHostStatusResponse;
 }

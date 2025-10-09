@@ -37,20 +37,24 @@ impl jacquard_common::IntoStatic for UploadBlobOutput<'_> {
     }
 }
 
+///Response type for
+///com.atproto.repo.uploadBlob
+pub struct UploadBlobResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for UploadBlobResponse {
+    const ENCODING: &'static str = "application/json";
+    type Output = UploadBlobOutput<'de>;
+    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
 impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UploadBlob {
     const NSID: &'static str = "com.atproto.repo.uploadBlob";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod =
         jacquard_common::types::xrpc::XrpcMethod::Procedure("*/*");
-    const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output = UploadBlobOutput<'de>;
-    type Err = jacquard_common::types::xrpc::GenericError<'de>;
+    type Response<'de1> = UploadBlobResponse;
     fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::types::xrpc::EncodeError> {
         Ok(self.body.to_vec())
     }
-    fn decode_body(
-        &self,
-        body: &'de [u8],
-    ) -> Result<Box<Self>, jacquard_common::error::DecodeError> {
+    fn decode_body(body: &'de [u8]) -> Result<Box<Self>, jacquard_common::error::DecodeError> {
         Ok(Box::new(Self {
             body: bytes::Bytes::copy_from_slice(body),
         }))

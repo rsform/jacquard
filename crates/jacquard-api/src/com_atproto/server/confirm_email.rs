@@ -6,15 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct ConfirmEmail<'a> {
@@ -53,7 +45,7 @@ impl jacquard_common::IntoStatic for ConfirmEmail<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -111,26 +103,26 @@ impl jacquard_common::IntoStatic for ConfirmEmailError<'_> {
             ConfirmEmailError::AccountNotFound(v) => {
                 ConfirmEmailError::AccountNotFound(v.into_static())
             }
-            ConfirmEmailError::ExpiredToken(v) => {
-                ConfirmEmailError::ExpiredToken(v.into_static())
-            }
-            ConfirmEmailError::InvalidToken(v) => {
-                ConfirmEmailError::InvalidToken(v.into_static())
-            }
-            ConfirmEmailError::InvalidEmail(v) => {
-                ConfirmEmailError::InvalidEmail(v.into_static())
-            }
+            ConfirmEmailError::ExpiredToken(v) => ConfirmEmailError::ExpiredToken(v.into_static()),
+            ConfirmEmailError::InvalidToken(v) => ConfirmEmailError::InvalidToken(v.into_static()),
+            ConfirmEmailError::InvalidEmail(v) => ConfirmEmailError::InvalidEmail(v.into_static()),
             ConfirmEmailError::Unknown(v) => ConfirmEmailError::Unknown(v.into_static()),
         }
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ConfirmEmail<'de> {
-    const NSID: &'static str = "com.atproto.server.confirmEmail";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.server.confirmEmail
+pub struct ConfirmEmailResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for ConfirmEmailResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = ();
     type Err = ConfirmEmailError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ConfirmEmail<'de> {
+    const NSID: &'static str = "com.atproto.server.confirmEmail";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = ConfirmEmailResponse;
 }

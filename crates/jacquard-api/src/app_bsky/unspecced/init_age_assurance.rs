@@ -6,15 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct InitAgeAssurance<'a> {
@@ -79,7 +71,7 @@ impl jacquard_common::IntoStatic for InitAgeAssuranceOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -134,19 +126,23 @@ impl jacquard_common::IntoStatic for InitAgeAssuranceError<'_> {
             InitAgeAssuranceError::InvalidInitiation(v) => {
                 InitAgeAssuranceError::InvalidInitiation(v.into_static())
             }
-            InitAgeAssuranceError::Unknown(v) => {
-                InitAgeAssuranceError::Unknown(v.into_static())
-            }
+            InitAgeAssuranceError::Unknown(v) => InitAgeAssuranceError::Unknown(v.into_static()),
         }
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for InitAgeAssurance<'de> {
-    const NSID: &'static str = "app.bsky.unspecced.initAgeAssurance";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.unspecced.initAgeAssurance
+pub struct InitAgeAssuranceResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for InitAgeAssuranceResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = InitAgeAssuranceOutput<'de>;
     type Err = InitAgeAssuranceError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for InitAgeAssurance<'de> {
+    const NSID: &'static str = "app.bsky.unspecced.initAgeAssurance";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = InitAgeAssuranceResponse;
 }

@@ -19,7 +19,7 @@ use crate::resolver::{
     ResolverOptions,
 };
 use bytes::Bytes;
-use jacquard_api::com_atproto::identity::resolve_did::{self, ResolveDid};
+use jacquard_api::com_atproto::identity::resolve_did::{self, ResolveDid, ResolveDidOutput};
 use jacquard_api::com_atproto::identity::resolve_handle::ResolveHandle;
 use jacquard_common::error::TransportError;
 use jacquard_common::http_client::HttpClient;
@@ -208,9 +208,8 @@ impl JacquardResolver {
             .send(&req)
             .await
             .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
-        let owned: OwnedResponse<ResolveHandle<'static>> = resp.owned();
-        let out = owned
-            .output()
+        let out = resp
+            .into_output()
             .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
         Did::new_owned(out.did.as_str())
             .map(|d| d.into_static())
@@ -233,9 +232,8 @@ impl JacquardResolver {
             .send(&req)
             .await
             .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
-        let owned: OwnedResponse<ResolveDid<'static>> = resp.owned();
-        let out = owned
-            .output()
+        let out = resp
+            .parse()
             .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
         let doc_json = serde_json::to_value(&out.did_doc)?;
         let s = serde_json::to_string(&doc_json)?;

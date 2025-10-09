@@ -6,15 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct PutActivitySubscription<'a> {
@@ -48,9 +40,8 @@ impl jacquard_common::IntoStatic for PutActivitySubscription<'_> {
 pub struct PutActivitySubscriptionOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub activity_subscription: std::option::Option<
-        crate::app_bsky::notification::ActivitySubscription<'a>,
-    >,
+    pub activity_subscription:
+        std::option::Option<crate::app_bsky::notification::ActivitySubscription<'a>>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }
@@ -66,13 +57,18 @@ impl jacquard_common::IntoStatic for PutActivitySubscriptionOutput<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de>
-for PutActivitySubscription<'de> {
-    const NSID: &'static str = "app.bsky.notification.putActivitySubscription";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.notification.putActivitySubscription
+pub struct PutActivitySubscriptionResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for PutActivitySubscriptionResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = PutActivitySubscriptionOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for PutActivitySubscription<'de> {
+    const NSID: &'static str = "app.bsky.notification.putActivitySubscription";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = PutActivitySubscriptionResponse;
 }

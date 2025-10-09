@@ -375,9 +375,12 @@ where
         self.options.read().await.clone()
     }
 
-    async fn send<'de, R: jacquard_common::types::xrpc::XrpcRequest<'de> + Send>(
+    async fn send<
+        'de,
+        R: jacquard_common::types::xrpc::XrpcRequest<'de> + Clone + Send + Sync + 'de,
+    >(
         &self,
-        request: &'de R,
+        request: &R,
     ) -> XrpcResult<Response<'de, R>> {
         let base_uri = self.base_uri();
         let mut opts = self.options.read().await.clone();

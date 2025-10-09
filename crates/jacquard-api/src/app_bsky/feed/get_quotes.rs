@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetQuotes<'a> {
@@ -72,10 +64,18 @@ impl jacquard_common::IntoStatic for GetQuotesOutput<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetQuotes<'de> {
-    const NSID: &'static str = "app.bsky.feed.getQuotes";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.feed.getQuotes
+pub struct GetQuotesResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetQuotesResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetQuotesOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetQuotes<'de> {
+    const NSID: &'static str = "app.bsky.feed.getQuotes";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetQuotesResponse;
 }

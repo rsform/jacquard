@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBookmarks<'a> {
@@ -58,10 +50,18 @@ impl jacquard_common::IntoStatic for GetBookmarksOutput<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetBookmarks<'de> {
-    const NSID: &'static str = "app.bsky.bookmark.getBookmarks";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.bookmark.getBookmarks
+pub struct GetBookmarksResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetBookmarksResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetBookmarksOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetBookmarks<'de> {
+    const NSID: &'static str = "app.bsky.bookmark.getBookmarks";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetBookmarksResponse;
 }

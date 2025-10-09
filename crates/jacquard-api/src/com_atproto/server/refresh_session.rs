@@ -53,7 +53,7 @@ impl jacquard_common::IntoStatic for RefreshSessionOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -84,9 +84,7 @@ impl jacquard_common::IntoStatic for RefreshSessionError<'_> {
             RefreshSessionError::AccountTakedown(v) => {
                 RefreshSessionError::AccountTakedown(v.into_static())
             }
-            RefreshSessionError::Unknown(v) => {
-                RefreshSessionError::Unknown(v.into_static())
-            }
+            RefreshSessionError::Unknown(v) => RefreshSessionError::Unknown(v.into_static()),
         }
     }
 }
@@ -94,12 +92,18 @@ impl jacquard_common::IntoStatic for RefreshSessionError<'_> {
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct RefreshSession;
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RefreshSession {
-    const NSID: &'static str = "com.atproto.server.refreshSession";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.server.refreshSession
+pub struct RefreshSessionResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for RefreshSessionResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = RefreshSessionOutput<'de>;
     type Err = RefreshSessionError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RefreshSession {
+    const NSID: &'static str = "com.atproto.server.refreshSession";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = RefreshSessionResponse;
 }

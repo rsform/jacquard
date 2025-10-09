@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct ImportRepo {
@@ -27,25 +19,26 @@ impl jacquard_common::IntoStatic for ImportRepo {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ImportRepo {
-    const NSID: &'static str = "com.atproto.repo.importRepo";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/vnd.ipld.car",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.repo.importRepo
+pub struct ImportRepoResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for ImportRepoResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = ();
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ImportRepo {
+    const NSID: &'static str = "com.atproto.repo.importRepo";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/vnd.ipld.car");
+    type Response<'de1> = ImportRepoResponse;
     fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::types::xrpc::EncodeError> {
         Ok(self.body.to_vec())
     }
-    fn decode_body(
-        &self,
-        body: &'de [u8],
-    ) -> Result<Box<Self>, jacquard_common::error::DecodeError> {
-        Ok(
-            Box::new(Self {
-                body: bytes::Bytes::copy_from_slice(body),
-            }),
-        )
+    fn decode_body(body: &'de [u8]) -> Result<Box<Self>, jacquard_common::error::DecodeError> {
+        Ok(Box::new(Self {
+            body: bytes::Bytes::copy_from_slice(body),
+        }))
     }
 }

@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetListMutes<'a> {
@@ -58,10 +50,18 @@ impl jacquard_common::IntoStatic for GetListMutesOutput<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetListMutes<'de> {
-    const NSID: &'static str = "app.bsky.graph.getListMutes";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.graph.getListMutes
+pub struct GetListMutesResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetListMutesResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetListMutesOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetListMutes<'de> {
+    const NSID: &'static str = "app.bsky.graph.getListMutes";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetListMutesResponse;
 }

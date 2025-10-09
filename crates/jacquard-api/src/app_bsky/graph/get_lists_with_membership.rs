@@ -28,15 +28,7 @@ impl jacquard_common::IntoStatic for ListWithMembership<'_> {
     }
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetListsWithMembership<'a> {
@@ -88,11 +80,18 @@ impl jacquard_common::IntoStatic for GetListsWithMembershipOutput<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de>
-for GetListsWithMembership<'de> {
-    const NSID: &'static str = "app.bsky.graph.getListsWithMembership";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.graph.getListsWithMembership
+pub struct GetListsWithMembershipResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetListsWithMembershipResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetListsWithMembershipOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetListsWithMembership<'de> {
+    const NSID: &'static str = "app.bsky.graph.getListsWithMembership";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetListsWithMembershipResponse;
 }

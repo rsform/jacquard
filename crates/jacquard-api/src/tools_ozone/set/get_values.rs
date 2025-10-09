@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetValues<'a> {
@@ -74,7 +66,7 @@ impl jacquard_common::IntoStatic for GetValuesOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -103,18 +95,24 @@ impl jacquard_common::IntoStatic for GetValuesError<'_> {
     type Output = GetValuesError<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            GetValuesError::SetNotFound(v) => {
-                GetValuesError::SetNotFound(v.into_static())
-            }
+            GetValuesError::SetNotFound(v) => GetValuesError::SetNotFound(v.into_static()),
             GetValuesError::Unknown(v) => GetValuesError::Unknown(v.into_static()),
         }
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetValues<'de> {
-    const NSID: &'static str = "tools.ozone.set.getValues";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///tools.ozone.set.getValues
+pub struct GetValuesResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetValuesResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetValuesOutput<'de>;
     type Err = GetValuesError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetValues<'de> {
+    const NSID: &'static str = "tools.ozone.set.getValues";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetValuesResponse;
 }

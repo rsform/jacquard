@@ -8,12 +8,18 @@
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct RequestEmailConfirmation;
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RequestEmailConfirmation {
-    const NSID: &'static str = "com.atproto.server.requestEmailConfirmation";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.server.requestEmailConfirmation
+pub struct RequestEmailConfirmationResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for RequestEmailConfirmationResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = ();
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RequestEmailConfirmation {
+    const NSID: &'static str = "com.atproto.server.requestEmailConfirmation";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = RequestEmailConfirmationResponse;
 }

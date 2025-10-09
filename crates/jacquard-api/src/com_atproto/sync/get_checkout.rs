@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetCheckout<'a> {
@@ -43,10 +35,18 @@ impl jacquard_common::IntoStatic for GetCheckoutOutput<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetCheckout<'de> {
-    const NSID: &'static str = "com.atproto.sync.getCheckout";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/vnd.ipld.car";
+///Response type for
+///com.atproto.sync.getCheckout
+pub struct GetCheckoutResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetCheckoutResponse {
+    const ENCODING: &'static str = "application/vnd.ipld.car";
     type Output = GetCheckoutOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetCheckout<'de> {
+    const NSID: &'static str = "com.atproto.sync.getCheckout";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetCheckoutResponse;
 }

@@ -6,15 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct QueryEvents<'a> {
@@ -86,12 +78,18 @@ impl jacquard_common::IntoStatic for QueryEventsOutput<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for QueryEvents<'de> {
-    const NSID: &'static str = "tools.ozone.safelink.queryEvents";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///tools.ozone.safelink.queryEvents
+pub struct QueryEventsResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for QueryEventsResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = QueryEventsOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for QueryEvents<'de> {
+    const NSID: &'static str = "tools.ozone.safelink.queryEvents";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = QueryEventsResponse;
 }

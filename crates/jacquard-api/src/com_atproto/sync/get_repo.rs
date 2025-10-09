@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepo<'a> {
@@ -55,7 +47,7 @@ impl jacquard_common::IntoStatic for GetRepoOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -111,24 +103,26 @@ impl jacquard_common::IntoStatic for GetRepoError<'_> {
     fn into_static(self) -> Self::Output {
         match self {
             GetRepoError::RepoNotFound(v) => GetRepoError::RepoNotFound(v.into_static()),
-            GetRepoError::RepoTakendown(v) => {
-                GetRepoError::RepoTakendown(v.into_static())
-            }
-            GetRepoError::RepoSuspended(v) => {
-                GetRepoError::RepoSuspended(v.into_static())
-            }
-            GetRepoError::RepoDeactivated(v) => {
-                GetRepoError::RepoDeactivated(v.into_static())
-            }
+            GetRepoError::RepoTakendown(v) => GetRepoError::RepoTakendown(v.into_static()),
+            GetRepoError::RepoSuspended(v) => GetRepoError::RepoSuspended(v.into_static()),
+            GetRepoError::RepoDeactivated(v) => GetRepoError::RepoDeactivated(v.into_static()),
             GetRepoError::Unknown(v) => GetRepoError::Unknown(v.into_static()),
         }
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetRepo<'de> {
-    const NSID: &'static str = "com.atproto.sync.getRepo";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/vnd.ipld.car";
+///Response type for
+///com.atproto.sync.getRepo
+pub struct GetRepoResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetRepoResponse {
+    const ENCODING: &'static str = "application/vnd.ipld.car";
     type Output = GetRepoOutput<'de>;
     type Err = GetRepoError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetRepo<'de> {
+    const NSID: &'static str = "com.atproto.sync.getRepo";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetRepoResponse;
 }

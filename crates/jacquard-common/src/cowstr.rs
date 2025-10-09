@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 use std::{
-    borrow::Cow,
+    borrow::{Borrow, Cow},
     fmt,
     hash::{Hash, Hasher},
     ops::Deref,
@@ -283,44 +283,7 @@ impl Serialize for CowStr<'_> {
     }
 }
 
-// impl<'de> Deserialize<'de> for CowStr<'_> {
-//     #[inline]
-//     fn deserialize<D>(deserializer: D) -> Result<CowStr<'static>, D::Error>
-//     where
-//         D: serde::Deserializer<'de>,
-//     {
-//         struct CowStrVisitor;
-
-//         impl<'de> serde::de::Visitor<'de> for CowStrVisitor {
-//             type Value = CowStr<'static>;
-
-//             #[inline]
-//             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-//                 write!(formatter, "a string")
-//             }
-
-//             #[inline]
-//             fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
-//             where
-//                 E: serde::de::Error,
-//             {
-//                 Ok(CowStr::copy_from_str(v))
-//             }
-
-//             #[inline]
-//             fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
-//             where
-//                 E: serde::de::Error,
-//             {
-//                 Ok(v.into())
-//             }
-//         }
-
-//         deserializer.deserialize_str(CowStrVisitor)
-//     }
-// }
-
-impl<'de, 'a, 'b> Deserialize<'de> for CowStr<'a>
+impl<'de, 'a> Deserialize<'de> for CowStr<'a>
 where
     'de: 'a,
 {

@@ -35,15 +35,7 @@ impl jacquard_common::IntoStatic for Host<'_> {
     }
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct ListHosts<'a> {
@@ -89,10 +81,18 @@ impl jacquard_common::IntoStatic for ListHostsOutput<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ListHosts<'de> {
-    const NSID: &'static str = "com.atproto.sync.listHosts";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.sync.listHosts
+pub struct ListHostsResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for ListHostsResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = ListHostsOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ListHosts<'de> {
+    const NSID: &'static str = "com.atproto.sync.listHosts";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = ListHostsResponse;
 }

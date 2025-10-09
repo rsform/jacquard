@@ -6,15 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct UpdateAllRead<'a> {
@@ -59,12 +51,18 @@ impl jacquard_common::IntoStatic for UpdateAllReadOutput<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpdateAllRead<'de> {
-    const NSID: &'static str = "chat.bsky.convo.updateAllRead";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///chat.bsky.convo.updateAllRead
+pub struct UpdateAllReadResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for UpdateAllReadResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = UpdateAllReadOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for UpdateAllRead<'de> {
+    const NSID: &'static str = "chat.bsky.convo.updateAllRead";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = UpdateAllReadResponse;
 }

@@ -19,6 +19,7 @@ jacquard = { version = "0.3.0", path = "../jacquard" }
 jacquard-common = { version = "0.3.0", path = "../jacquard-common", features = ["reqwest-client"] }
 miette.workspace = true
 serde.workspace = true
+serde_html_form.workspace = true
 serde_ipld_dagcbor.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

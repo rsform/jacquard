@@ -248,9 +248,9 @@ impl<A: AgentSession> XrpcClient for Agent<A> {
     fn opts(&self) -> impl Future<Output = CallOptions<'_>> {
         self.inner.opts()
     }
-    fn send<'de, R: XrpcRequest<'de> + Send>(
+    fn send<'de, R: XrpcRequest<'de> + Clone + Send + Sync + 'de>(
         &self,
-        request: &'de R,
+        request: &R,
     ) -> impl Future<Output = XrpcResult<Response<'de, R>>> {
         async move { self.inner.send(request).await }
     }

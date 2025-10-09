@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlocks<'a> {
@@ -58,10 +50,18 @@ impl jacquard_common::IntoStatic for GetBlocksOutput<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetBlocks<'de> {
-    const NSID: &'static str = "app.bsky.graph.getBlocks";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.graph.getBlocks
+pub struct GetBlocksResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetBlocksResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetBlocksOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetBlocks<'de> {
+    const NSID: &'static str = "app.bsky.graph.getBlocks";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetBlocksResponse;
 }

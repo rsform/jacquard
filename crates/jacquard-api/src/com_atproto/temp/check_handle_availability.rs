@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct CheckHandleAvailability<'a> {
@@ -85,7 +77,7 @@ impl jacquard_common::IntoStatic for CheckHandleAvailabilityOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -124,13 +116,20 @@ impl jacquard_common::IntoStatic for CheckHandleAvailabilityError<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de>
-for CheckHandleAvailability<'de> {
-    const NSID: &'static str = "com.atproto.temp.checkHandleAvailability";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.temp.checkHandleAvailability
+pub struct CheckHandleAvailabilityResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for CheckHandleAvailabilityResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = CheckHandleAvailabilityOutput<'de>;
     type Err = CheckHandleAvailabilityError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CheckHandleAvailability<'de> {
+    const NSID: &'static str = "com.atproto.temp.checkHandleAvailability";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = CheckHandleAvailabilityResponse;
 }
 
 ///Indicates the provided handle is available.
@@ -154,9 +153,7 @@ impl jacquard_common::IntoStatic for ResultAvailable<'_> {
 pub struct ResultUnavailable<'a> {
     ///List of suggested handles based on the provided inputs.
     #[serde(borrow)]
-    pub suggestions: Vec<
-        crate::com_atproto::temp::check_handle_availability::Suggestion<'a>,
-    >,
+    pub suggestions: Vec<crate::com_atproto::temp::check_handle_availability::Suggestion<'a>>,
 }
 
 impl jacquard_common::IntoStatic for ResultUnavailable<'_> {

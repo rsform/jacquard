@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThreadV2<'a> {
@@ -78,12 +70,20 @@ impl jacquard_common::IntoStatic for GetPostThreadV2Output<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetPostThreadV2<'de> {
-    const NSID: &'static str = "app.bsky.unspecced.getPostThreadV2";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.unspecced.getPostThreadV2
+pub struct GetPostThreadV2Response;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetPostThreadV2Response {
+    const ENCODING: &'static str = "application/json";
     type Output = GetPostThreadV2Output<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetPostThreadV2<'de> {
+    const NSID: &'static str = "app.bsky.unspecced.getPostThreadV2";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetPostThreadV2Response;
 }
 
 #[jacquard_derive::lexicon]
@@ -131,9 +131,7 @@ impl jacquard_common::IntoStatic for ThreadItemRecordValue<'_> {
             ThreadItemRecordValue::DefsThreadItemBlocked(v) => {
                 ThreadItemRecordValue::DefsThreadItemBlocked(v.into_static())
             }
-            ThreadItemRecordValue::Unknown(v) => {
-                ThreadItemRecordValue::Unknown(v.into_static())
-            }
+            ThreadItemRecordValue::Unknown(v) => ThreadItemRecordValue::Unknown(v.into_static()),
         }
     }
 }

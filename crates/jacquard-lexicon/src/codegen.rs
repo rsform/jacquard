@@ -2033,6 +2033,24 @@ impl<'c> CodeGenerator<'c> {
             quote! { jacquard_common::types::xrpc::GenericError<'de> }
         };
 
+        // Generate the response type that implements XrpcResp
+        let response_ident = syn::Ident::new(
+            &format!("{}Response", type_base),
+            proc_macro2::Span::call_site(),
+        );
+
+        let response_type = quote! {
+            #[doc = "Response type for "]
+            #[doc = #nsid]
+            pub struct #response_ident;
+
+            impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for #response_ident {
+                const ENCODING: &'static str = #output_encoding;
+                type Output = #output_type;
+                type Err = #error_type;
+            }
+        };
+
         // Generate encode_body() method for binary inputs
         let encode_body_method = if is_binary_input {
             quote! {
@@ -2048,7 +2066,6 @@ impl<'c> CodeGenerator<'c> {
         let decode_body_method = if is_binary_input {
             quote! {
                 fn decode_body(
-                    &self,
                     body: &'de [u8],
                 ) -> Result<Box<Self>, jacquard_common::error::DecodeError> {
                     Ok(Box::new(Self {
@@ -2070,13 +2087,13 @@ impl<'c> CodeGenerator<'c> {
             };
 
             Ok(quote! {
+                #response_type
+
                 impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for #impl_target {
                     const NSID: &'static str = #nsid;
                     const METHOD: jacquard_common::types::xrpc::XrpcMethod = #method;
-                    const OUTPUT_ENCODING: &'static str = #output_encoding;
 
-                    type Output = #output_type;
-                    type Err = #error_type;
+                    type Response<'de1> = #response_ident;
 
                     #encode_body_method
                     #decode_body_method
@@ -2091,13 +2108,13 @@ impl<'c> CodeGenerator<'c> {
                 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
                 pub struct #request_ident;
 
+                #response_type
+
                 impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for #request_ident {
                     const NSID: &'static str = #nsid;
                     const METHOD: jacquard_common::types::xrpc::XrpcMethod = #method;
-                    const OUTPUT_ENCODING: &'static str = #output_encoding;
 
-                    type Output = #output_type;
-                    type Err = #error_type;
+                    type Response<'de1> = #response_ident;
                 }
             })
         }

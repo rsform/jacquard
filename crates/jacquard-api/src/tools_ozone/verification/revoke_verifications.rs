@@ -6,15 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct RevokeVerifications<'a> {
@@ -69,14 +61,20 @@ impl jacquard_common::IntoStatic for RevokeVerificationsOutput<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RevokeVerifications<'de> {
-    const NSID: &'static str = "tools.ozone.verification.revokeVerifications";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///tools.ozone.verification.revokeVerifications
+pub struct RevokeVerificationsResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for RevokeVerificationsResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = RevokeVerificationsOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for RevokeVerifications<'de> {
+    const NSID: &'static str = "tools.ozone.verification.revokeVerifications";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = RevokeVerificationsResponse;
 }
 
 ///Error object for failed revocations

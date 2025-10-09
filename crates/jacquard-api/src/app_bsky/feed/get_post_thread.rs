@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThread<'a> {
@@ -102,7 +94,7 @@ impl jacquard_common::IntoStatic for GetPostThreadOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -130,20 +122,24 @@ impl jacquard_common::IntoStatic for GetPostThreadError<'_> {
     type Output = GetPostThreadError<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            GetPostThreadError::NotFound(v) => {
-                GetPostThreadError::NotFound(v.into_static())
-            }
-            GetPostThreadError::Unknown(v) => {
-                GetPostThreadError::Unknown(v.into_static())
-            }
+            GetPostThreadError::NotFound(v) => GetPostThreadError::NotFound(v.into_static()),
+            GetPostThreadError::Unknown(v) => GetPostThreadError::Unknown(v.into_static()),
         }
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetPostThread<'de> {
-    const NSID: &'static str = "app.bsky.feed.getPostThread";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.feed.getPostThread
+pub struct GetPostThreadResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetPostThreadResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetPostThreadOutput<'de>;
     type Err = GetPostThreadError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetPostThread<'de> {
+    const NSID: &'static str = "app.bsky.feed.getPostThread";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetPostThreadResponse;
 }

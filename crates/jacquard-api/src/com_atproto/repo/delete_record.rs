@@ -6,15 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct DeleteRecord<'a> {
@@ -26,9 +18,7 @@ pub struct DeleteRecord<'a> {
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
     ///The Record Key.
     #[serde(borrow)]
-    pub rkey: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub rkey: jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
     ///Compare and swap with the previous commit by CID.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -88,7 +78,7 @@ impl jacquard_common::IntoStatic for DeleteRecordOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -116,20 +106,24 @@ impl jacquard_common::IntoStatic for DeleteRecordError<'_> {
     type Output = DeleteRecordError<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            DeleteRecordError::InvalidSwap(v) => {
-                DeleteRecordError::InvalidSwap(v.into_static())
-            }
+            DeleteRecordError::InvalidSwap(v) => DeleteRecordError::InvalidSwap(v.into_static()),
             DeleteRecordError::Unknown(v) => DeleteRecordError::Unknown(v.into_static()),
         }
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DeleteRecord<'de> {
-    const NSID: &'static str = "com.atproto.repo.deleteRecord";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.repo.deleteRecord
+pub struct DeleteRecordResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for DeleteRecordResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = DeleteRecordOutput<'de>;
     type Err = DeleteRecordError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DeleteRecord<'de> {
+    const NSID: &'static str = "com.atproto.repo.deleteRecord";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = DeleteRecordResponse;
 }

@@ -130,11 +130,18 @@ impl jacquard_common::IntoStatic for PutRecordError<'_> {
     }
 }
 
+///Response type for
+///com.atproto.repo.putRecord
+pub struct PutRecordResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for PutRecordResponse {
+    const ENCODING: &'static str = "application/json";
+    type Output = PutRecordOutput<'de>;
+    type Err = PutRecordError<'de>;
+}
+
 impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for PutRecord<'de> {
     const NSID: &'static str = "com.atproto.repo.putRecord";
     const METHOD: jacquard_common::types::xrpc::XrpcMethod =
         jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
-    const OUTPUT_ENCODING: &'static str = "application/json";
-    type Output = PutRecordOutput<'de>;
-    type Err = PutRecordError<'de>;
+    type Response<'de1> = PutRecordResponse;
 }

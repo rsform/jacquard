@@ -16,9 +16,7 @@ pub struct Create<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rkey: std::option::Option<
-        jacquard_common::types::string::RecordKey<
-            jacquard_common::types::string::Rkey<'a>,
-        >,
+        jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
     >,
     #[serde(borrow)]
     pub value: jacquard_common::types::value::Data<'a>,
@@ -69,9 +67,7 @@ pub struct Delete<'a> {
     #[serde(borrow)]
     pub collection: jacquard_common::types::string::Nsid<'a>,
     #[serde(borrow)]
-    pub rkey: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub rkey: jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
 }
 
 impl jacquard_common::IntoStatic for Delete<'_> {
@@ -99,15 +95,7 @@ impl jacquard_common::IntoStatic for DeleteResult<'_> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct ApplyWrites<'a> {
@@ -177,7 +165,7 @@ impl jacquard_common::IntoStatic for ApplyWritesOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -206,22 +194,26 @@ impl jacquard_common::IntoStatic for ApplyWritesError<'_> {
     type Output = ApplyWritesError<'static>;
     fn into_static(self) -> Self::Output {
         match self {
-            ApplyWritesError::InvalidSwap(v) => {
-                ApplyWritesError::InvalidSwap(v.into_static())
-            }
+            ApplyWritesError::InvalidSwap(v) => ApplyWritesError::InvalidSwap(v.into_static()),
             ApplyWritesError::Unknown(v) => ApplyWritesError::Unknown(v.into_static()),
         }
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ApplyWrites<'de> {
-    const NSID: &'static str = "com.atproto.repo.applyWrites";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.repo.applyWrites
+pub struct ApplyWritesResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for ApplyWritesResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = ApplyWritesOutput<'de>;
     type Err = ApplyWritesError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ApplyWrites<'de> {
+    const NSID: &'static str = "com.atproto.repo.applyWrites";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = ApplyWritesResponse;
 }
 
 ///Operation which updates an existing record.
@@ -232,9 +224,7 @@ pub struct Update<'a> {
     #[serde(borrow)]
     pub collection: jacquard_common::types::string::Nsid<'a>,
     #[serde(borrow)]
-    pub rkey: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub rkey: jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>>,
     #[serde(borrow)]
     pub value: jacquard_common::types::value::Data<'a>,
 }

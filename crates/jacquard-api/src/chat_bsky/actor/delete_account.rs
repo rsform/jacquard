@@ -21,12 +21,18 @@ impl jacquard_common::IntoStatic for DeleteAccountOutput<'_> {
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct DeleteAccount;
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DeleteAccount {
-    const NSID: &'static str = "chat.bsky.actor.deleteAccount";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///chat.bsky.actor.deleteAccount
+pub struct DeleteAccountResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for DeleteAccountResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = DeleteAccountOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for DeleteAccount {
+    const NSID: &'static str = "chat.bsky.actor.deleteAccount";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = DeleteAccountResponse;
 }

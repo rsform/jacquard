@@ -32,15 +32,7 @@ impl jacquard_common::IntoStatic for AppPassword<'_> {
 }
 
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct CreateAppPassword<'a> {
@@ -99,7 +91,7 @@ impl jacquard_common::IntoStatic for CreateAppPasswordOutput<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -130,19 +122,23 @@ impl jacquard_common::IntoStatic for CreateAppPasswordError<'_> {
             CreateAppPasswordError::AccountTakedown(v) => {
                 CreateAppPasswordError::AccountTakedown(v.into_static())
             }
-            CreateAppPasswordError::Unknown(v) => {
-                CreateAppPasswordError::Unknown(v.into_static())
-            }
+            CreateAppPasswordError::Unknown(v) => CreateAppPasswordError::Unknown(v.into_static()),
         }
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CreateAppPassword<'de> {
-    const NSID: &'static str = "com.atproto.server.createAppPassword";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.server.createAppPassword
+pub struct CreateAppPasswordResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for CreateAppPasswordResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = CreateAppPasswordOutput<'de>;
     type Err = CreateAppPasswordError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CreateAppPassword<'de> {
+    const NSID: &'static str = "com.atproto.server.createAppPassword";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = CreateAppPasswordResponse;
 }

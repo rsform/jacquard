@@ -5,15 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder
-)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetUnreadCount {
@@ -47,10 +39,18 @@ impl jacquard_common::IntoStatic for GetUnreadCountOutput<'_> {
     }
 }
 
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetUnreadCount {
-    const NSID: &'static str = "app.bsky.notification.getUnreadCount";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///app.bsky.notification.getUnreadCount
+pub struct GetUnreadCountResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for GetUnreadCountResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = GetUnreadCountOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for GetUnreadCount {
+    const NSID: &'static str = "app.bsky.notification.getUnreadCount";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = GetUnreadCountResponse;
 }

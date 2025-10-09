@@ -31,10 +31,18 @@ impl jacquard_common::IntoStatic for CheckSignupQueueOutput<'_> {
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct CheckSignupQueue;
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CheckSignupQueue {
-    const NSID: &'static str = "com.atproto.temp.checkSignupQueue";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Query;
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.temp.checkSignupQueue
+pub struct CheckSignupQueueResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for CheckSignupQueueResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = CheckSignupQueueOutput<'de>;
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for CheckSignupQueue {
+    const NSID: &'static str = "com.atproto.temp.checkSignupQueue";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Query;
+    type Response<'de1> = CheckSignupQueueResponse;
 }

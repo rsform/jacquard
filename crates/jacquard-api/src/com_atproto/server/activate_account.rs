@@ -8,12 +8,18 @@
 /// XRPC request marker type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ActivateAccount;
-impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ActivateAccount {
-    const NSID: &'static str = "com.atproto.server.activateAccount";
-    const METHOD: jacquard_common::types::xrpc::XrpcMethod = jacquard_common::types::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
-    const OUTPUT_ENCODING: &'static str = "application/json";
+///Response type for
+///com.atproto.server.activateAccount
+pub struct ActivateAccountResponse;
+impl<'de> jacquard_common::types::xrpc::XrpcResp<'de> for ActivateAccountResponse {
+    const ENCODING: &'static str = "application/json";
     type Output = ();
     type Err = jacquard_common::types::xrpc::GenericError<'de>;
+}
+
+impl<'de> jacquard_common::types::xrpc::XrpcRequest<'de> for ActivateAccount {
+    const NSID: &'static str = "com.atproto.server.activateAccount";
+    const METHOD: jacquard_common::types::xrpc::XrpcMethod =
+        jacquard_common::types::xrpc::XrpcMethod::Procedure("application/json");
+    type Response<'de1> = ActivateAccountResponse;
 }
