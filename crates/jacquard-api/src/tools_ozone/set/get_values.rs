@@ -112,3 +112,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetValues<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetValuesResponse;
 }
+
+///Endpoint type for
+///tools.ozone.set.getValues
+pub struct GetValuesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetValuesRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.set.getValues";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetValues<'de>;
+    type Response = GetValuesResponse;
+}

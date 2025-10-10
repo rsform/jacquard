@@ -58,3 +58,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetLog<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLogResponse;
 }
+
+///Endpoint type for
+///chat.bsky.convo.getLog
+pub struct GetLogRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetLogRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.getLog";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetLog<'de>;
+    type Response = GetLogResponse;
+}

@@ -58,3 +58,13 @@ for GetSuggestedStarterPacksSkeleton<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSuggestedStarterPacksSkeletonResponse;
 }
+
+///Endpoint type for
+///app.bsky.unspecced.getSuggestedStarterPacksSkeleton
+pub struct GetSuggestedStarterPacksSkeletonRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedStarterPacksSkeletonRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedStarterPacksSkeleton";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSuggestedStarterPacksSkeleton<'de>;
+    type Response = GetSuggestedStarterPacksSkeletonResponse;
+}

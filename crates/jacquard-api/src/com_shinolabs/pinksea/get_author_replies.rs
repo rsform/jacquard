@@ -58,3 +58,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAuthorReplies<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAuthorRepliesResponse;
 }
+
+///Endpoint type for
+///com.shinolabs.pinksea.getAuthorReplies
+pub struct GetAuthorRepliesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorRepliesRequest {
+    const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getAuthorReplies";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetAuthorReplies<'de>;
+    type Response = GetAuthorRepliesResponse;
+}

@@ -84,7 +84,16 @@ impl jacquard_common::IntoStatic for RefreshSessionError<'_> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct RefreshSession;
 ///Response type for
 ///com.atproto.server.refreshSession
@@ -101,5 +110,17 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RefreshSession {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
+    type Response = RefreshSessionResponse;
+}
+
+///Endpoint type for
+///com.atproto.server.refreshSession
+pub struct RefreshSessionRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RefreshSessionRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.refreshSession";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RefreshSession;
     type Response = RefreshSessionResponse;
 }

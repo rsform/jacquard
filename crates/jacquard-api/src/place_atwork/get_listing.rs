@@ -136,3 +136,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetListing<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetListingResponse;
 }
+
+///Endpoint type for
+///place.atwork.getListing
+pub struct GetListingRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetListingRequest {
+    const PATH: &'static str = "/xrpc/place.atwork.getListing";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetListing<'de>;
+    type Response = GetListingResponse;
+}

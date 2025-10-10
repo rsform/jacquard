@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.page.createPage",
+  "revision": 1,
+  "description": "create a page",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "public": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "content": {
+              "type": "string"
+            },
+            "cuid": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "public": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}

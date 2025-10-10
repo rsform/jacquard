@@ -156,3 +156,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateSession<'de> {
     );
     type Response = CreateSessionResponse;
 }
+
+///Endpoint type for
+///com.atproto.server.createSession
+pub struct CreateSessionRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateSessionRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.createSession";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateSession<'de>;
+    type Response = CreateSessionResponse;
+}

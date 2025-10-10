@@ -1,0 +1,60 @@
+{
+  "lexicon": 1,
+  "id": "uk.skyblur.post.decryptByCid",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Decrypting the post by blob cid.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "pds",
+            "repo",
+            "cid",
+            "password"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "format": "cid"
+            },
+            "password": {
+              "type": "string"
+            },
+            "pds": {
+              "type": "string",
+              "format": "uri"
+            },
+            "repo": {
+              "type": "string",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "output": {
+        "description": "Returns the encrypted result.",
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "text"
+          ],
+          "properties": {
+            "additional": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "text": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

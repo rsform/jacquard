@@ -3,6 +3,8 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod endorsement;
+pub mod endorsement_proof;
 pub mod get_listing;
 pub mod get_listings;
 pub mod listing;

@@ -53,3 +53,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetMentionsByEntry<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetMentionsByEntryResponse;
 }
+
+///Endpoint type for
+///com.whtwnd.blog.getMentionsByEntry
+pub struct GetMentionsByEntryRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetMentionsByEntryRequest {
+    const PATH: &'static str = "/xrpc/com.whtwnd.blog.getMentionsByEntry";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetMentionsByEntry<'de>;
+    type Response = GetMentionsByEntryResponse;
+}

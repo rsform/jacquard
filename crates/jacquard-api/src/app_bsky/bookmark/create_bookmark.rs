@@ -97,3 +97,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateBookmark<'de> {
     );
     type Response = CreateBookmarkResponse;
 }
+
+///Endpoint type for
+///app.bsky.bookmark.createBookmark
+pub struct CreateBookmarkRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateBookmarkRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.bookmark.createBookmark";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateBookmark<'de>;
+    type Response = CreateBookmarkResponse;
+}

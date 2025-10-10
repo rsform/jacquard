@@ -59,3 +59,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSuggestedFollowsByActor
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSuggestedFollowsByActorResponse;
 }
+
+///Endpoint type for
+///app.bsky.graph.getSuggestedFollowsByActor
+pub struct GetSuggestedFollowsByActorRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedFollowsByActorRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.getSuggestedFollowsByActor";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSuggestedFollowsByActor<'de>;
+    type Response = GetSuggestedFollowsByActorResponse;
+}

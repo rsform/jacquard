@@ -1,5 +1,5 @@
 use super::LexiconSource;
-use crate::lexicon::LexiconDoc;
+use crate::{fetch::sources::parse_from_index_or_lexicon_file, lexicon::LexiconDoc};
 use jacquard_common::IntoStatic;
 use miette::{IntoDiagnostic, Result, miette};
 use std::collections::HashMap;
@@ -50,9 +50,8 @@ impl LexiconSource for GitSource {
             // Try to parse as lexicon
             let content = tokio::fs::read_to_string(&entry).await.into_diagnostic()?;
 
-            match serde_json::from_str::<LexiconDoc>(&content) {
-                Ok(doc) => {
-                    let nsid = doc.id.to_string();
+            match parse_from_index_or_lexicon_file(&content) {
+                Ok((nsid, doc)) => {
                     let doc = doc.into_static();
                     lexicons.insert(nsid, doc);
                 }

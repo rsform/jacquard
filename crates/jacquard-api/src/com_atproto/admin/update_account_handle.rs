@@ -49,3 +49,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateAccountHandle<'de> {
     );
     type Response = UpdateAccountHandleResponse;
 }
+
+///Endpoint type for
+///com.atproto.admin.updateAccountHandle
+pub struct UpdateAccountHandleRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountHandleRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountHandle";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateAccountHandle<'de>;
+    type Response = UpdateAccountHandleResponse;
+}

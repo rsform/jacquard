@@ -50,6 +50,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetTaggedSuggestions {
     type Response = GetTaggedSuggestionsResponse;
 }
 
+///Endpoint type for
+///app.bsky.unspecced.getTaggedSuggestions
+pub struct GetTaggedSuggestionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedSuggestionsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getTaggedSuggestions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTaggedSuggestions;
+    type Response = GetTaggedSuggestionsResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

@@ -1,0 +1,28 @@
+{
+  "lexicon": 1,
+  "id": "dev.fudgeu.experimental.atforumv1.forum.group",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Defines a group of categories",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.plugin.getManifest",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the manifest for an Ocho plugin.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "did",
+          "platform"
+        ],
+        "properties": {
+          "did": {
+            "type": "string",
+            "description": "The did of the plugin to retrieve the manifest for",
+            "format": "did"
+          },
+          "platform": {
+            "type": "string",
+            "description": "The platform for which to retrieve the plugin manifest",
+            "enum": [
+              "ios",
+              "android",
+              "web"
+            ]
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "description": "The plugin manifest, which includes the plugin's metadata, launch asset, and extra information. TODO: Fix these types.",
+          "ref": "app.ocho.plugin.defs#manifest"
+        }
+      }
+    }
+  }
+}

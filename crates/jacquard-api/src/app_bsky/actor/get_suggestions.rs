@@ -64,3 +64,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSuggestions<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSuggestionsResponse;
 }
+
+///Endpoint type for
+///app.bsky.actor.getSuggestions
+pub struct GetSuggestionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestionsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.actor.getSuggestions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSuggestions<'de>;
+    type Response = GetSuggestionsResponse;
+}

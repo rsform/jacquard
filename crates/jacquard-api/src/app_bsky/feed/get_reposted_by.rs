@@ -71,3 +71,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRepostedBy<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRepostedByResponse;
 }
+
+///Endpoint type for
+///app.bsky.feed.getRepostedBy
+pub struct GetRepostedByRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRepostedByRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.feed.getRepostedBy";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRepostedBy<'de>;
+    type Response = GetRepostedByResponse;
+}

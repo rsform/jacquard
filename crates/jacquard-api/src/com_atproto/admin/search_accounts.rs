@@ -65,3 +65,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SearchAccounts<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchAccountsResponse;
 }
+
+///Endpoint type for
+///com.atproto.admin.searchAccounts
+pub struct SearchAccountsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchAccountsRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.searchAccounts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchAccounts<'de>;
+    type Response = SearchAccountsResponse;
+}

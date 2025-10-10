@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "social.clippr.feed.tag",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A record containing a bookmark tag for organization.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "color": {
+            "type": "string",
+            "description": "A hexadecimal color code",
+            "maxLength": 70,
+            "maxGraphemes": 7
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "A client-defined timestamp for the creation of the tag",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the tag for additional context",
+            "maxLength": 50000,
+            "maxGraphemes": 5000
+          },
+          "name": {
+            "type": "string",
+            "description": "A de-duplicated string containing the name of the tag",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          }
+        }
+      }
+    }
+  }
+}

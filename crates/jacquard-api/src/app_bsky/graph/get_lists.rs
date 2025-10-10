@@ -66,3 +66,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetLists<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetListsResponse;
 }
+
+///Endpoint type for
+///app.bsky.graph.getLists
+pub struct GetListsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetListsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.getLists";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetLists<'de>;
+    type Response = GetListsResponse;
+}

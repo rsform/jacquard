@@ -56,3 +56,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetServices<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetServicesResponse;
 }
+
+///Endpoint type for
+///app.bsky.labeler.getServices
+pub struct GetServicesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetServicesRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.labeler.getServices";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetServices<'de>;
+    type Response = GetServicesResponse;
+}

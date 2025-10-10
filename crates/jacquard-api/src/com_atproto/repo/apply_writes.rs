@@ -205,6 +205,18 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ApplyWrites<'de> {
     type Response = ApplyWritesResponse;
 }
 
+///Endpoint type for
+///com.atproto.repo.applyWrites
+pub struct ApplyWritesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ApplyWritesRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.repo.applyWrites";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = ApplyWrites<'de>;
+    type Response = ApplyWritesResponse;
+}
+
 ///Operation which updates an existing record.
 #[jacquard_derive::lexicon]
 #[derive(

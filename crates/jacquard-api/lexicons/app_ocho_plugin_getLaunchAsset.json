@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.plugin.getLaunchAsset",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the launch asset for an Ocho plugin.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "did",
+          "platform"
+        ],
+        "properties": {
+          "did": {
+            "type": "string",
+            "description": "The did of the plugin to retrieve the manifest for",
+            "format": "did"
+          },
+          "platform": {
+            "type": "string",
+            "description": "The platform for which to retrieve the plugin manifest",
+            "enum": [
+              "ios",
+              "android",
+              "web"
+            ]
+          }
+        }
+      },
+      "output": {
+        "description": "The launch asset for the plugin, which is the main JavaScript bundle.",
+        "encoding": "text/javascript"
+      }
+    }
+  }
+}

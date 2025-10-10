@@ -122,6 +122,18 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateReport<'de> {
     type Response = CreateReportResponse;
 }
 
+///Endpoint type for
+///com.atproto.moderation.createReport
+pub struct CreateReportRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateReportRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.moderation.createReport";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateReport<'de>;
+    type Response = CreateReportResponse;
+}
+
 ///Moderation tool information for tracing the source of the action
 #[jacquard_derive::lexicon]
 #[derive(

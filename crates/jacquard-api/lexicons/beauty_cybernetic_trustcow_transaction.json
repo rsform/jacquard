@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "beauty.cybernetic.trustcow.transaction",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A verified transaction between two ATProto identities that must be stored in both parties' PDS",
+      "record": {
+        "type": "object",
+        "required": [
+          "serviceProvider",
+          "serviceConsumer",
+          "transactionId",
+          "createdAt"
+        ],
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Transaction amount (optional, in whatever currency applies)"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the transaction occurred",
+            "format": "datetime"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code (optional, e.g. USD, EUR, BTC)",
+            "maxLength": 10
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the service or product transacted",
+            "maxLength": 500
+          },
+          "serviceConsumer": {
+            "type": "string",
+            "description": "DID of the service consumer identity"
+          },
+          "serviceProvider": {
+            "type": "string",
+            "description": "DID of the service provider identity"
+          },
+          "transactionId": {
+            "type": "string",
+            "description": "Unique identifier for this transaction, must be identical in both parties' records",
+            "maxLength": 128
+          }
+        }
+      }
+    }
+  }
+}

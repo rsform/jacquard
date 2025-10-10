@@ -1,0 +1,93 @@
+{
+  "lexicon": 1,
+  "id": "club.stellz.evm.addressControl",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "address",
+        "signature",
+        "siwe"
+      ],
+      "properties": {
+        "address": {
+          "type": "bytes",
+          "description": "Ethereum address as bytes (20 bytes)"
+        },
+        "alsoOn": {
+          "type": "array",
+          "description": "List of all Chain IDs (besides the one in the sign-in message, though you can include it) that the holder of this address is also active on & accepts tokens thru.",
+          "items": {
+            "type": "integer",
+            "description": "Chain ID of a Ethereum VM network"
+          }
+        },
+        "signature": {
+          "type": "bytes",
+          "description": "Sign in With Ethereum message signature as bytes"
+        },
+        "siwe": {
+          "type": "ref",
+          "ref": "#siweMessage"
+        }
+      }
+    },
+    "siweMessage": {
+      "type": "object",
+      "required": [
+        "domain",
+        "address",
+        "statement",
+        "uri",
+        "version",
+        "chainId",
+        "nonce",
+        "issuedAt"
+      ],
+      "properties": {
+        "address": {
+          "type": "string",
+          "description": "Ethereum address in 0x-prefixed, checksummed hex format",
+          "minLength": 42,
+          "maxLength": 42
+        },
+        "chainId": {
+          "type": "integer",
+          "description": "Chain ID of the Ethereum VM network the address is on"
+        },
+        "domain": {
+          "type": "string",
+          "description": "Domain of the application requesting the signature, e.g. 'wallet-link.stellz.club'"
+        },
+        "issuedAt": {
+          "type": "string",
+          "description": "Timestamp when the message was signed",
+          "format": "datetime"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Random nonce the message was signed with",
+          "minLength": 8,
+          "maxLength": 256
+        },
+        "statement": {
+          "type": "string",
+          "description": "The message shown to the user in their wallet before signing, which MUST be of the format 'Prove control of ${address} to link it to ${did}', where ${address} is the linked Ethereum address in 0x-prefixed, checksummed hex format, and ${did} is the DID of the user.",
+          "minLength": 78
+        },
+        "uri": {
+          "type": "string",
+          "description": "URI of the application requesting the signature, e.g. 'https://wallet-link.stellz.club'",
+          "format": "uri"
+        },
+        "version": {
+          "type": "string",
+          "description": "Sign in With Ethereum message version",
+          "enum": [
+            "1"
+          ]
+        }
+      }
+    }
+  }
+}

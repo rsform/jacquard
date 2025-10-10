@@ -29,10 +29,14 @@
     },
     "main": {
       "type": "query",
-      "description": "Get job listings, optionally filtered by tag",
+      "description": "Get job listings, optionally filtered by tag or identity",
       "parameters": {
         "type": "params",
         "properties": {
+          "identity": {
+            "type": "string",
+            "description": "Filter listings by creator DID (e.g., did:plc:abc123)"
+          },
           "tag": {
             "type": "string",
             "description": "Filter listings by hashtag"

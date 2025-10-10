@@ -20,6 +20,15 @@
             "description": "URL where applicants can apply for the job.",
             "format": "uri"
           },
+          "banner": {
+            "type": "blob",
+            "description": "Larger horizontal image to display behind job listing view.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
           "description": {
             "type": "string",
             "description": "The description of the job listing.",

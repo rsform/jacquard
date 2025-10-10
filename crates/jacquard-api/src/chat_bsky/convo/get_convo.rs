@@ -54,3 +54,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetConvo<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetConvoResponse;
 }
+
+///Endpoint type for
+///chat.bsky.convo.getConvo
+pub struct GetConvoRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetConvoRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.getConvo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetConvo<'de>;
+    type Response = GetConvoResponse;
+}

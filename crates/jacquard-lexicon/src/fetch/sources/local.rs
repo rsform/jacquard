@@ -1,4 +1,5 @@
 use super::LexiconSource;
+use crate::fetch::sources::parse_from_index_or_lexicon_file;
 use crate::lexicon::LexiconDoc;
 use jacquard_common::IntoStatic;
 use miette::{IntoDiagnostic, Result};
@@ -8,6 +9,7 @@ use std::path::PathBuf;
 #[derive(Debug, Clone)]
 pub struct LocalSource {
     pub path: PathBuf,
+    pub pattern: Option<String>,
 }
 
 impl LexiconSource for LocalSource {
@@ -28,10 +30,8 @@ impl LexiconSource for LocalSource {
 
             // Try to parse as lexicon
             let content = std::fs::read_to_string(path).into_diagnostic()?;
-
-            match serde_json::from_str::<LexiconDoc>(&content) {
-                Ok(doc) => {
-                    let nsid = doc.id.to_string();
+            match parse_from_index_or_lexicon_file(&content) {
+                Ok((nsid, doc)) => {
                     let doc = doc.into_static();
                     lexicons.insert(nsid, doc);
                 }

@@ -54,3 +54,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetTheme<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetThemeResponse;
 }
+
+///Endpoint type for
+///lol.skittr.actor.getTheme
+pub struct GetThemeRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetThemeRequest {
+    const PATH: &'static str = "/xrpc/lol.skittr.actor.getTheme";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTheme<'de>;
+    type Response = GetThemeResponse;
+}

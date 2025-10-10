@@ -194,6 +194,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Blob<'de> {
     type Response = BlobResponse;
 }
 
+///Endpoint type for
+///sh.tangled.repo.blob
+pub struct BlobRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for BlobRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.blob";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Blob<'de>;
+    type Response = BlobResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

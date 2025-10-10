@@ -47,3 +47,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UnmuteThread<'de> {
     );
     type Response = UnmuteThreadResponse;
 }
+
+///Endpoint type for
+///app.bsky.graph.unmuteThread
+pub struct UnmuteThreadRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UnmuteThreadRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.unmuteThread";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UnmuteThread<'de>;
+    type Response = UnmuteThreadResponse;
+}

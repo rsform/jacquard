@@ -56,3 +56,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Delete<'de> {
     );
     type Response = DeleteResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.delete
+pub struct DeleteRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.delete";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Delete<'de>;
+    type Response = DeleteResponse;
+}

@@ -65,3 +65,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpsertSet<'de> {
     );
     type Response = UpsertSetResponse;
 }
+
+///Endpoint type for
+///tools.ozone.set.upsertSet
+pub struct UpsertSetRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpsertSetRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.set.upsertSet";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpsertSet<'de>;
+    type Response = UpsertSetResponse;
+}

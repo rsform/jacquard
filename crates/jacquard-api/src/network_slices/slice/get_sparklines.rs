@@ -76,6 +76,18 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSparklines<'de> {
     type Response = GetSparklinesResponse;
 }
 
+///Endpoint type for
+///network.slices.slice.getSparklines
+pub struct GetSparklinesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSparklinesRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.getSparklines";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = GetSparklines<'de>;
+    type Response = GetSparklinesResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

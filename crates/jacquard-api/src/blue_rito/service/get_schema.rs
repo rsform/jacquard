@@ -116,3 +116,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSchema<'de> {
     );
     type Response = GetSchemaResponse;
 }
+
+///Endpoint type for
+///blue.rito.service.getSchema
+pub struct GetSchemaRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSchemaRequest {
+    const PATH: &'static str = "/xrpc/blue.rito.service.getSchema";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = GetSchema<'de>;
+    type Response = GetSchemaResponse;
+}

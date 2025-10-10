@@ -75,3 +75,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for QuerySets<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = QuerySetsResponse;
 }
+
+///Endpoint type for
+///tools.ozone.set.querySets
+pub struct QuerySetsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for QuerySetsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.set.querySets";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = QuerySets<'de>;
+    type Response = QuerySetsResponse;
+}

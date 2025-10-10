@@ -70,3 +70,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for PutActivitySubscription<'d
     );
     type Response = PutActivitySubscriptionResponse;
 }
+
+///Endpoint type for
+///app.bsky.notification.putActivitySubscription
+pub struct PutActivitySubscriptionRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PutActivitySubscriptionRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.notification.putActivitySubscription";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = PutActivitySubscription<'de>;
+    type Response = PutActivitySubscriptionResponse;
+}

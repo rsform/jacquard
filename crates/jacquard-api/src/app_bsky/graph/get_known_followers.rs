@@ -65,3 +65,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetKnownFollowers<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetKnownFollowersResponse;
 }
+
+///Endpoint type for
+///app.bsky.graph.getKnownFollowers
+pub struct GetKnownFollowersRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetKnownFollowersRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.getKnownFollowers";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetKnownFollowers<'de>;
+    type Response = GetKnownFollowersResponse;
+}

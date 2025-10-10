@@ -113,3 +113,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CancelScheduledActions<'de
     );
     type Response = CancelScheduledActionsResponse;
 }
+
+///Endpoint type for
+///tools.ozone.moderation.cancelScheduledActions
+pub struct CancelScheduledActionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CancelScheduledActionsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.cancelScheduledActions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CancelScheduledActions<'de>;
+    type Response = CancelScheduledActionsResponse;
+}

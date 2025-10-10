@@ -65,3 +65,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateInviteCode<'de> {
     );
     type Response = CreateInviteCodeResponse;
 }
+
+///Endpoint type for
+///com.atproto.server.createInviteCode
+pub struct CreateInviteCodeRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateInviteCodeRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.createInviteCode";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateInviteCode<'de>;
+    type Response = CreateInviteCodeResponse;
+}

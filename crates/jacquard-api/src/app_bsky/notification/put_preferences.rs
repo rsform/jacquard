@@ -46,3 +46,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for PutPreferences<'de> {
     );
     type Response = PutPreferencesResponse;
 }
+
+///Endpoint type for
+///app.bsky.notification.putPreferences
+pub struct PutPreferencesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PutPreferencesRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.notification.putPreferences";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = PutPreferences<'de>;
+    type Response = PutPreferencesResponse;
+}

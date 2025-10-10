@@ -95,3 +95,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteBookmark<'de> {
     );
     type Response = DeleteBookmarkResponse;
 }
+
+///Endpoint type for
+///app.bsky.bookmark.deleteBookmark
+pub struct DeleteBookmarkRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteBookmarkRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.bookmark.deleteBookmark";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteBookmark<'de>;
+    type Response = DeleteBookmarkResponse;
+}

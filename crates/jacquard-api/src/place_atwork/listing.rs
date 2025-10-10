@@ -22,6 +22,10 @@ pub struct Listing<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub apply_link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ///Larger horizontal image to display behind job listing view.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub banner: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
     ///The description of the job listing.
     #[serde(borrow)]
     pub description: jacquard_common::CowStr<'a>,

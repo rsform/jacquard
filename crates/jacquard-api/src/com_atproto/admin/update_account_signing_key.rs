@@ -50,3 +50,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateAccountSigningKey<'d
     );
     type Response = UpdateAccountSigningKeyResponse;
 }
+
+///Endpoint type for
+///com.atproto.admin.updateAccountSigningKey
+pub struct UpdateAccountSigningKeyRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountSigningKeyRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountSigningKey";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateAccountSigningKey<'de>;
+    type Response = UpdateAccountSigningKeyResponse;
+}

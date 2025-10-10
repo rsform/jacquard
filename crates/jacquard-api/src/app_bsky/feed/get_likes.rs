@@ -89,3 +89,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetLikes<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLikesResponse;
 }
+
+///Endpoint type for
+///app.bsky.feed.getLikes
+pub struct GetLikesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetLikesRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.feed.getLikes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetLikes<'de>;
+    type Response = GetLikesResponse;
+}

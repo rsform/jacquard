@@ -56,3 +56,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetFollowingUser<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetFollowingUserResponse;
 }
+
+///Endpoint type for
+///place.stream.graph.getFollowingUser
+pub struct GetFollowingUserRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetFollowingUserRequest {
+    const PATH: &'static str = "/xrpc/place.stream.graph.getFollowingUser";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetFollowingUser<'de>;
+    type Response = GetFollowingUserResponse;
+}

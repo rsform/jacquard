@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.state.getConfig",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Creates a link between a service (hosted on the atproto) and its InstantDB App ID.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "id",
+            "adminToken",
+            "accountToken"
+          ],
+          "properties": {
+            "accountToken": {
+              "type": "string",
+              "description": "The token for the InstantDB account"
+            },
+            "adminToken": {
+              "type": "string",
+              "description": "The InstantDB admin token"
+            },
+            "id": {
+              "type": "string",
+              "description": "The App ID"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidID"
+        },
+        {
+          "name": "InvalidServiceAuth"
+        }
+      ]
+    }
+  }
+}

@@ -1,4 +1,7 @@
-use super::sources::{AtProtoSource, GitSource, HttpSource, JsonFileSource, LocalSource, SlicesSource, Source, SourceType};
+use super::sources::{
+    AtProtoSource, GitSource, HttpSource, JsonFileSource, LocalSource, SlicesSource, Source,
+    SourceType,
+};
 use miette::{Result, miette};
 use std::path::PathBuf;
 
@@ -249,6 +252,7 @@ fn parse_jsonfile_source(children: &kdl::KdlDocument) -> Result<SourceType> {
                     .ok_or_else(|| miette!("path expects a string value"))?;
                 path = Some(PathBuf::from(val));
             }
+
             other => {
                 return Err(miette!("Unknown jsonfile source field: {}", other));
             }
@@ -286,6 +290,7 @@ fn parse_slices_source(children: &kdl::KdlDocument) -> Result<SourceType> {
 
 fn parse_local_source(children: &kdl::KdlDocument) -> Result<SourceType> {
     let mut path: Option<PathBuf> = None;
+    let mut pattern: Option<String> = None;
 
     for child in children.nodes() {
         match child.name().value() {
@@ -297,6 +302,14 @@ fn parse_local_source(children: &kdl::KdlDocument) -> Result<SourceType> {
                     .ok_or_else(|| miette!("path expects a string value"))?;
                 path = Some(PathBuf::from(val));
             }
+            "pattern" => {
+                let val = child
+                    .entries()
+                    .get(0)
+                    .and_then(|e| e.value().as_string())
+                    .ok_or_else(|| miette!("pattern expects a string value"))?;
+                pattern = Some(val.to_string());
+            }
             other => {
                 return Err(miette!("Unknown local source field: {}", other));
             }
@@ -305,5 +318,6 @@ fn parse_local_source(children: &kdl::KdlDocument) -> Result<SourceType> {
 
     Ok(SourceType::Local(LocalSource {
         path: path.ok_or_else(|| miette!("Missing path"))?,
+        pattern,
     }))
 }

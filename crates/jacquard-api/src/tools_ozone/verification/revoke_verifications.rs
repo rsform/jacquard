@@ -74,6 +74,18 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RevokeVerifications<'de> {
     type Response = RevokeVerificationsResponse;
 }
 
+///Endpoint type for
+///tools.ozone.verification.revokeVerifications
+pub struct RevokeVerificationsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RevokeVerificationsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.verification.revokeVerifications";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RevokeVerifications<'de>;
+    type Response = RevokeVerificationsResponse;
+}
+
 ///Error object for failed revocations
 #[jacquard_derive::lexicon]
 #[derive(

@@ -50,3 +50,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SetDefaultBranch<'de> {
     );
     type Response = SetDefaultBranchResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.setDefaultBranch
+pub struct SetDefaultBranchRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SetDefaultBranchRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.setDefaultBranch";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = SetDefaultBranch<'de>;
+    type Response = SetDefaultBranchResponse;
+}

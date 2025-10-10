@@ -1,0 +1,55 @@
+{
+  "lexicon": 1,
+  "id": "net.mmatt.vitals.car",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "carFuelRange",
+          "carPercentFuelRemaining",
+          "amountRemaining",
+          "carTraveledDistance"
+        ],
+        "properties": {
+          "amountRemaining": {
+            "type": "string",
+            "description": "The car fuel amount remaining value (floating point string)"
+          },
+          "carFuelRange": {
+            "type": "integer",
+            "description": "The car fuel range value in miles"
+          },
+          "carMake": {
+            "type": "string",
+            "description": "The car make value"
+          },
+          "carModel": {
+            "type": "string",
+            "description": "The car model value"
+          },
+          "carPercentFuelRemaining": {
+            "type": "string",
+            "description": "The car fuel level value in percentage (floating point string)"
+          },
+          "carTraveledDistance": {
+            "type": "integer",
+            "description": "The car traveled distance value"
+          },
+          "carYear": {
+            "type": "integer",
+            "description": "The car year value"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The unix timestamp of when the vital was recorded",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

@@ -112,3 +112,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRecord<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRecordResponse;
 }
+
+///Endpoint type for
+///com.atproto.repo.getRecord
+pub struct GetRecordRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRecordRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.repo.getRecord";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRecord<'de>;
+    type Response = GetRecordResponse;
+}

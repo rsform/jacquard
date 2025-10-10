@@ -66,3 +66,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ReserveSigningKey<'de> {
     );
     type Response = ReserveSigningKeyResponse;
 }
+
+///Endpoint type for
+///com.atproto.server.reserveSigningKey
+pub struct ReserveSigningKeyRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ReserveSigningKeyRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.reserveSigningKey";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = ReserveSigningKey<'de>;
+    type Response = ReserveSigningKeyResponse;
+}

@@ -66,3 +66,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SearchBooks<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchBooksResponse;
 }
+
+///Endpoint type for
+///buzz.bookhive.searchBooks
+pub struct SearchBooksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchBooksRequest {
+    const PATH: &'static str = "/xrpc/buzz.bookhive.searchBooks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchBooks<'de>;
+    type Response = SearchBooksResponse;
+}

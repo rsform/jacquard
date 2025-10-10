@@ -1,0 +1,25 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.edu.googleCallback",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "A handler for the Ocho education verification Google callback",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "code",
+          "state"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.page.getPage",
+  "revision": 1,
+  "description": "get a page by id",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "content": {
+              "type": "string"
+            },
+            "cuid": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "public": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}

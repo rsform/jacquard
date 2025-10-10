@@ -80,3 +80,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ForkStatus<'de> {
     );
     type Response = ForkStatusResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.forkStatus
+pub struct ForkStatusRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ForkStatusRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.forkStatus";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = ForkStatus<'de>;
+    type Response = ForkStatusResponse;
+}

@@ -78,3 +78,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListVerifications<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListVerificationsResponse;
 }
+
+///Endpoint type for
+///tools.ozone.verification.listVerifications
+pub struct ListVerificationsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListVerificationsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.verification.listVerifications";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListVerifications<'de>;
+    type Response = ListVerificationsResponse;
+}

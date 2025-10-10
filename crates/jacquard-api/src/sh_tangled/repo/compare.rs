@@ -138,3 +138,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Compare<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = CompareResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.compare
+pub struct CompareRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CompareRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.compare";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Compare<'de>;
+    type Response = CompareResponse;
+}

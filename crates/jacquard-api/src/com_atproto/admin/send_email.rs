@@ -76,3 +76,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SendEmail<'de> {
     );
     type Response = SendEmailResponse;
 }
+
+///Endpoint type for
+///com.atproto.admin.sendEmail
+pub struct SendEmailRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SendEmailRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.sendEmail";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = SendEmail<'de>;
+    type Response = SendEmailResponse;
+}

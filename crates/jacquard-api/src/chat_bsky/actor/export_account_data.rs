@@ -18,7 +18,16 @@
 #[serde(rename_all = "camelCase")]
 pub struct ExportAccountDataOutput<'a> {}
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct ExportAccountData;
 ///Response type for
 ///chat.bsky.actor.exportAccountData
@@ -33,5 +42,15 @@ impl jacquard_common::xrpc::XrpcResp for ExportAccountDataResponse {
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ExportAccountData {
     const NSID: &'static str = "chat.bsky.actor.exportAccountData";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ExportAccountDataResponse;
+}
+
+///Endpoint type for
+///chat.bsky.actor.exportAccountData
+pub struct ExportAccountDataRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ExportAccountDataRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.actor.exportAccountData";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ExportAccountData;
     type Response = ExportAccountDataResponse;
 }

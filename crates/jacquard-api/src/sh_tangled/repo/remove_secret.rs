@@ -50,3 +50,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RemoveSecret<'de> {
     );
     type Response = RemoveSecretResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.removeSecret
+pub struct RemoveSecretRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RemoveSecretRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.removeSecret";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RemoveSecret<'de>;
+    type Response = RemoveSecretResponse;
+}

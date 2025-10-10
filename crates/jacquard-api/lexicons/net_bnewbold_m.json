@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "net.bnewbold.m",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "it's a kind of fungus",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "commonName"
+        ],
+        "properties": {
+          "commonName": {
+            "type": "string",
+            "maxLength": 2560,
+            "maxGraphemes": 256
+          },
+          "edible": {
+            "type": "boolean"
+          },
+          "species": {
+            "type": "string",
+            "maxLength": 2560,
+            "maxGraphemes": 256
+          }
+        }
+      }
+    }
+  }
+}

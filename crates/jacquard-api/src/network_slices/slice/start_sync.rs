@@ -89,3 +89,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for StartSync<'de> {
     );
     type Response = StartSyncResponse;
 }
+
+///Endpoint type for
+///network.slices.slice.startSync
+pub struct StartSyncRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for StartSyncRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.startSync";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = StartSync<'de>;
+    type Response = StartSyncResponse;
+}

@@ -61,3 +61,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetListMutes<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetListMutesResponse;
 }
+
+///Endpoint type for
+///app.bsky.graph.getListMutes
+pub struct GetListMutesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetListMutesRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.getListMutes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetListMutes<'de>;
+    type Response = GetListMutesResponse;
+}

@@ -123,3 +123,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RemoveRule<'de> {
     );
     type Response = RemoveRuleResponse;
 }
+
+///Endpoint type for
+///tools.ozone.safelink.removeRule
+pub struct RemoveRuleRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RemoveRuleRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.safelink.removeRule";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RemoveRule<'de>;
+    type Response = RemoveRuleResponse;
+}

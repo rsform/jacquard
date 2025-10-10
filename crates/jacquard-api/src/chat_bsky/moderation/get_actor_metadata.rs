@@ -58,6 +58,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetActorMetadata<'de> {
     type Response = GetActorMetadataResponse;
 }
 
+///Endpoint type for
+///chat.bsky.moderation.getActorMetadata
+pub struct GetActorMetadataRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetActorMetadataRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.moderation.getActorMetadata";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetActorMetadata<'de>;
+    type Response = GetActorMetadataResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

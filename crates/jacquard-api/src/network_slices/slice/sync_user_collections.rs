@@ -72,3 +72,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SyncUserCollections<'de> {
     );
     type Response = SyncUserCollectionsResponse;
 }
+
+///Endpoint type for
+///network.slices.slice.syncUserCollections
+pub struct SyncUserCollectionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SyncUserCollectionsRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.syncUserCollections";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = SyncUserCollections<'de>;
+    type Response = SyncUserCollectionsResponse;
+}

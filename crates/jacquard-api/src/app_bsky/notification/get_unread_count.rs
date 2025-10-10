@@ -54,3 +54,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetUnreadCount {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetUnreadCountResponse;
 }
+
+///Endpoint type for
+///app.bsky.notification.getUnreadCount
+pub struct GetUnreadCountRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetUnreadCountRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.notification.getUnreadCount";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetUnreadCount;
+    type Response = GetUnreadCountResponse;
+}

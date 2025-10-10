@@ -60,3 +60,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AddReservedHandle<'de> {
     );
     type Response = AddReservedHandleResponse;
 }
+
+///Endpoint type for
+///com.atproto.temp.addReservedHandle
+pub struct AddReservedHandleRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for AddReservedHandleRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.temp.addReservedHandle";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = AddReservedHandle<'de>;
+    type Response = AddReservedHandleResponse;
+}

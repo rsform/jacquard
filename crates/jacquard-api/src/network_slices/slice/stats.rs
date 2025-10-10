@@ -85,3 +85,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Stats<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = StatsResponse;
 }
+
+///Endpoint type for
+///network.slices.slice.stats
+pub struct StatsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for StatsRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.stats";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Stats<'de>;
+    type Response = StatsResponse;
+}

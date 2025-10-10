@@ -161,3 +161,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for QueryStatuses<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = QueryStatusesResponse;
 }
+
+///Endpoint type for
+///tools.ozone.moderation.queryStatuses
+pub struct QueryStatusesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for QueryStatusesRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.queryStatuses";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = QueryStatuses<'de>;
+    type Response = QueryStatusesResponse;
+}

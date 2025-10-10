@@ -100,3 +100,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetJobLogs<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetJobLogsResponse;
 }
+
+///Endpoint type for
+///network.slices.slice.getJobLogs
+pub struct GetJobLogsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetJobLogsRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.getJobLogs";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetJobLogs<'de>;
+    type Response = GetJobLogsResponse;
+}

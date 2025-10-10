@@ -64,3 +64,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for InvokeWebhook<'de> {
     );
     type Response = InvokeWebhookResponse;
 }
+
+///Endpoint type for
+///events.smokesignal.automation.InvokeWebhook
+pub struct InvokeWebhookRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for InvokeWebhookRequest {
+    const PATH: &'static str = "/xrpc/events.smokesignal.automation.InvokeWebhook";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = InvokeWebhook<'de>;
+    type Response = InvokeWebhookResponse;
+}

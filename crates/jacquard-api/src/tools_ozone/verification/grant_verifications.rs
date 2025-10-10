@@ -88,6 +88,18 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GrantVerifications<'de> {
     type Response = GrantVerificationsResponse;
 }
 
+///Endpoint type for
+///tools.ozone.verification.grantVerifications
+pub struct GrantVerificationsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GrantVerificationsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.verification.grantVerifications";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = GrantVerifications<'de>;
+    type Response = GrantVerificationsResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

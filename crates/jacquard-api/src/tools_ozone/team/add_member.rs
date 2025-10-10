@@ -113,3 +113,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AddMember<'de> {
     );
     type Response = AddMemberResponse;
 }
+
+///Endpoint type for
+///tools.ozone.team.addMember
+pub struct AddMemberRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for AddMemberRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.team.addMember";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = AddMember<'de>;
+    type Response = AddMemberResponse;
+}

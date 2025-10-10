@@ -47,3 +47,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteAccount<'de> {
     );
     type Response = DeleteAccountResponse;
 }
+
+///Endpoint type for
+///com.atproto.admin.deleteAccount
+pub struct DeleteAccountRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteAccountRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.deleteAccount";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteAccount<'de>;
+    type Response = DeleteAccountResponse;
+}

@@ -142,3 +142,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AddReaction<'de> {
     );
     type Response = AddReactionResponse;
 }
+
+///Endpoint type for
+///chat.bsky.convo.addReaction
+pub struct AddReactionRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for AddReactionRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.addReaction";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = AddReaction<'de>;
+    type Response = AddReactionResponse;
+}

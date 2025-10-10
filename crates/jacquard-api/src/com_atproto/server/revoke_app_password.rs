@@ -48,3 +48,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RevokeAppPassword<'de> {
     );
     type Response = RevokeAppPasswordResponse;
 }
+
+///Endpoint type for
+///com.atproto.server.revokeAppPassword
+pub struct RevokeAppPasswordRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RevokeAppPasswordRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.revokeAppPassword";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RevokeAppPassword<'de>;
+    type Response = RevokeAppPasswordResponse;
+}

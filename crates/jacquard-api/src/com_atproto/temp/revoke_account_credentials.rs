@@ -47,3 +47,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RevokeAccountCredentials<'
     );
     type Response = RevokeAccountCredentialsResponse;
 }
+
+///Endpoint type for
+///com.atproto.temp.revokeAccountCredentials
+pub struct RevokeAccountCredentialsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RevokeAccountCredentialsRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.temp.revokeAccountCredentials";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RevokeAccountCredentials<'de>;
+    type Response = RevokeAccountCredentialsResponse;
+}

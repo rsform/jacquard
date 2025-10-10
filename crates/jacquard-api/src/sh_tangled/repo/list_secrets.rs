@@ -54,6 +54,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListSecrets<'de> {
     type Response = ListSecretsResponse;
 }
 
+///Endpoint type for
+///sh.tangled.repo.listSecrets
+pub struct ListSecretsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListSecretsRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.listSecrets";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListSecrets<'de>;
+    type Response = ListSecretsResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

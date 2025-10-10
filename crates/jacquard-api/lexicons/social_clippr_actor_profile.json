@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "social.clippr.actor.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of a Clippr account's profile.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "displayName"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "Image to show on user's profiles",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The creation date of the profile",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Text for user to describe themselves",
+            "maxLength": 5000,
+            "maxGraphemes": 500
+          },
+          "displayName": {
+            "type": "string",
+            "description": "A display name to be shown on a profile",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          }
+        }
+      }
+    }
+  }
+}

@@ -96,6 +96,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetJobStatus<'de> {
     type Response = GetJobStatusResponse;
 }
 
+///Endpoint type for
+///network.slices.slice.getJobStatus
+pub struct GetJobStatusRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetJobStatusRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.getJobStatus";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetJobStatus<'de>;
+    type Response = GetJobStatusResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

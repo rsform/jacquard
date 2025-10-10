@@ -66,3 +66,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteOAuthClient<'de> {
     );
     type Response = DeleteOAuthClientResponse;
 }
+
+///Endpoint type for
+///network.slices.slice.deleteOAuthClient
+pub struct DeleteOAuthClientRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteOAuthClientRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.deleteOAuthClient";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteOAuthClient<'de>;
+    type Response = DeleteOAuthClientResponse;
+}

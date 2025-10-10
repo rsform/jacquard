@@ -1,0 +1,75 @@
+{
+  "lexicon": 1,
+  "id": "social.pmsky.proposal",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "description": "A proposed moderation action (e.g. adding a label or annotation to a post). Refers to some other resource via URI (e.g. an atproto post). Superset of 'com.atproto.proposal.defs#label.",
+        "required": [
+          "typ",
+          "src",
+          "uri",
+          "val",
+          "cts"
+        ],
+        "properties": {
+          "aid": {
+            "type": "string",
+            "description": "The persistent, anonymous identifier for the user creating the proposal."
+          },
+          "cid": {
+            "type": "string",
+            "description": "Optionally, CID specifying the specific version of 'uri' resource this proposal applies to.",
+            "format": "cid"
+          },
+          "cts": {
+            "type": "string",
+            "description": "Timestamp when this proposal was created.",
+            "format": "datetime"
+          },
+          "note": {
+            "type": "string",
+            "description": "For 'label' proposals where 'val' is 'needs-context', the full text of any proposed annotation (e.g. community note) to be shown below the post."
+          },
+          "reasons": {
+            "type": "array",
+            "description": "An optional array of predefined reasons justifying the moderation action.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sig": {
+            "type": "bytes",
+            "description": "Signature of dag-cbor encoded proposal."
+          },
+          "src": {
+            "type": "string",
+            "description": "DID of the actor who created this proposal.",
+            "format": "did"
+          },
+          "typ": {
+            "type": "string",
+            "description": "The type of moderation action being proposed. Currently expected values are 'allowed_user' or 'label'"
+          },
+          "uri": {
+            "type": "string",
+            "description": "AT URI of the record, repository (account), or other resource that this proposal applies to.",
+            "format": "uri"
+          },
+          "val": {
+            "type": "string",
+            "description": "For 'label' proposals, the short string name of the value of the proposed label.",
+            "maxLength": 128
+          },
+          "ver": {
+            "type": "integer",
+            "description": "The AT Protocol version of the proposal object."
+          }
+        }
+      }
+    }
+  }
+}

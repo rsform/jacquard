@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "blue.2048.player.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of a at://2048 player's profile",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "soloPlay",
+          "syncStatus",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "soloPlay": {
+            "type": "boolean",
+            "description": "Does not want to show up anywhere. Keep stats to your PDS.",
+            "default": false
+          },
+          "syncStatus": {
+            "type": "ref",
+            "description": "The sync status of this record with the users AT Protocol repo.",
+            "ref": "blue.2048.defs#syncStatus"
+          }
+        }
+      }
+    }
+  }
+}

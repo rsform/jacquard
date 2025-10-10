@@ -1,0 +1,104 @@
+{
+  "lexicon": 1,
+  "id": "social.grain.photo.defs",
+  "defs": {
+    "exifView": {
+      "type": "object",
+      "required": [
+        "photo",
+        "createdAt"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "dateTimeOriginal": {
+          "type": "string"
+        },
+        "exposureTime": {
+          "type": "string"
+        },
+        "fNumber": {
+          "type": "string"
+        },
+        "flash": {
+          "type": "string"
+        },
+        "focalLengthIn35mmFormat": {
+          "type": "string"
+        },
+        "iSO": {
+          "type": "integer"
+        },
+        "lensMake": {
+          "type": "string"
+        },
+        "lensModel": {
+          "type": "string"
+        },
+        "make": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "photo": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "photoView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "thumb",
+        "fullsize",
+        "alt"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text description of the image, for accessibility."
+        },
+        "aspectRatio": {
+          "type": "ref",
+          "ref": "social.grain.defs#aspectRatio"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "exif": {
+          "type": "ref",
+          "description": "EXIF metadata for the photo, if available.",
+          "ref": "social.grain.photo.defs#exifView"
+        },
+        "fullsize": {
+          "type": "string",
+          "description": "Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.",
+          "format": "uri"
+        },
+        "thumb": {
+          "type": "string",
+          "description": "Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.",
+          "format": "uri"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

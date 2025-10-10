@@ -53,3 +53,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSubjects<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSubjectsResponse;
 }
+
+///Endpoint type for
+///tools.ozone.moderation.getSubjects
+pub struct GetSubjectsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSubjectsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.getSubjects";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSubjects<'de>;
+    type Response = GetSubjectsResponse;
+}

@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "social.clippr.feed.getTags",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a list of tags. Does not require auth.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uris"
+        ],
+        "properties": {
+          "uris": {
+            "type": "array",
+            "description": "List of tag AT-URIs to return hydrated views for",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "maxLength": 25
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "tags"
+          ],
+          "properties": {
+            "tags": {
+              "type": "array",
+              "description": "An array of hydrated tag views",
+              "items": {
+                "type": "ref",
+                "ref": "social.clippr.feed.defs#tagView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -61,3 +61,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for PushNotify<'de> {
     );
     type Response = PushNotifyResponse;
 }
+
+///Endpoint type for
+///win.tomo-x.pushat.pushNotify
+pub struct PushNotifyRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PushNotifyRequest {
+    const PATH: &'static str = "/xrpc/win.tomo-x.pushat.pushNotify";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = PushNotify<'de>;
+    type Response = PushNotifyResponse;
+}

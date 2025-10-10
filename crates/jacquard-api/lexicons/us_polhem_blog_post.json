@@ -1,0 +1,72 @@
+{
+  "lexicon": 1,
+  "id": "us.polhem.blog.post",
+  "description": "Posts on my personal blog (https://polhem.us)",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record describing a blog post.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "content",
+          "slug",
+          "createdAt"
+        ],
+        "properties": {
+          "content": {
+            "type": "string",
+            "maxLength": 100000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "excerpt": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "featuredImage": {
+            "type": "ref",
+            "ref": "app.bsky.embed.images#image"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.embed.images#image"
+            }
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Reference (AT-URI) to a tag record (us.polhem.blog.tag).",
+              "format": "at-uri"
+            }
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "visibility": {
+            "type": "string",
+            "description": "Tells the visibility of the article to AppView.",
+            "default": "public",
+            "enum": [
+              "public",
+              "url",
+              "author"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -48,3 +48,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeactivateAccount<'de> {
     );
     type Response = DeactivateAccountResponse;
 }
+
+///Endpoint type for
+///com.atproto.server.deactivateAccount
+pub struct DeactivateAccountRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeactivateAccountRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.deactivateAccount";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeactivateAccount<'de>;
+    type Response = DeactivateAccountResponse;
+}

@@ -1,0 +1,25 @@
+{
+  "lexicon": 1,
+  "id": "blue.2048.verification.stats",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A record that holds a verification of a stats record saying the owner of the repo has verified that it is a valid and most likely not tampered with.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "verifiedRef": {
+            "type": "ref",
+            "description": "This is the record that holds the publicly verifiable signature of a stats record",
+            "ref": "blue.2048.verification.defs#verificationRef"
+          }
+        }
+      }
+    }
+  }
+}

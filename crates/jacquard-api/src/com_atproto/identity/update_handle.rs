@@ -48,3 +48,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateHandle<'de> {
     );
     type Response = UpdateHandleResponse;
 }
+
+///Endpoint type for
+///com.atproto.identity.updateHandle
+pub struct UpdateHandleRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateHandleRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.identity.updateHandle";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateHandle<'de>;
+    type Response = UpdateHandleResponse;
+}

@@ -81,3 +81,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetOekaki<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetOekakiResponse;
 }
+
+///Endpoint type for
+///com.shinolabs.pinksea.getOekaki
+pub struct GetOekakiRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetOekakiRequest {
+    const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getOekaki";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetOekaki<'de>;
+    type Response = GetOekakiResponse;
+}

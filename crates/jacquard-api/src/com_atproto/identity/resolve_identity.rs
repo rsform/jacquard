@@ -128,3 +128,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ResolveIdentity<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveIdentityResponse;
 }
+
+///Endpoint type for
+///com.atproto.identity.resolveIdentity
+pub struct ResolveIdentityRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ResolveIdentityRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.identity.resolveIdentity";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ResolveIdentity<'de>;
+    type Response = ResolveIdentityResponse;
+}

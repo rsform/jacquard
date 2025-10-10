@@ -67,3 +67,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ResolveMiniDoc<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveMiniDocResponse;
 }
+
+///Endpoint type for
+///com.bad-example.identity.resolveMiniDoc
+pub struct ResolveMiniDocRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ResolveMiniDocRequest {
+    const PATH: &'static str = "/xrpc/com.bad-example.identity.resolveMiniDoc";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ResolveMiniDoc<'de>;
+    type Response = ResolveMiniDocResponse;
+}

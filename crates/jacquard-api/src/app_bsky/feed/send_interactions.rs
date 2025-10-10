@@ -59,3 +59,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SendInteractions<'de> {
     );
     type Response = SendInteractionsResponse;
 }
+
+///Endpoint type for
+///app.bsky.feed.sendInteractions
+pub struct SendInteractionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SendInteractionsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.feed.sendInteractions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = SendInteractions<'de>;
+    type Response = SendInteractionsResponse;
+}

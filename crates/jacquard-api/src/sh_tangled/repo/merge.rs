@@ -80,3 +80,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Merge<'de> {
     );
     type Response = MergeResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.merge
+pub struct MergeRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for MergeRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.merge";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Merge<'de>;
+    type Response = MergeResponse;
+}

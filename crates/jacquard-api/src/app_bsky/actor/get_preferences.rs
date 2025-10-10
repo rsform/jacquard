@@ -49,3 +49,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetPreferences {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPreferencesResponse;
 }
+
+///Endpoint type for
+///app.bsky.actor.getPreferences
+pub struct GetPreferencesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetPreferencesRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.actor.getPreferences";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetPreferences;
+    type Response = GetPreferencesResponse;
+}

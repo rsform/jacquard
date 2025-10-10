@@ -61,3 +61,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSuggestedFeeds<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSuggestedFeedsResponse;
 }
+
+///Endpoint type for
+///app.bsky.feed.getSuggestedFeeds
+pub struct GetSuggestedFeedsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedFeedsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.feed.getSuggestedFeeds";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSuggestedFeeds<'de>;
+    type Response = GetSuggestedFeedsResponse;
+}

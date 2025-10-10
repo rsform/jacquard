@@ -148,6 +148,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Branch<'de> {
     type Response = BranchResponse;
 }
 
+///Endpoint type for
+///sh.tangled.repo.branch
+pub struct BranchRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for BranchRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.branch";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Branch<'de>;
+    type Response = BranchResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

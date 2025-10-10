@@ -48,3 +48,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteTemplate<'de> {
     );
     type Response = DeleteTemplateResponse;
 }
+
+///Endpoint type for
+///tools.ozone.communication.deleteTemplate
+pub struct DeleteTemplateRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteTemplateRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.communication.deleteTemplate";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteTemplate<'de>;
+    type Response = DeleteTemplateResponse;
+}

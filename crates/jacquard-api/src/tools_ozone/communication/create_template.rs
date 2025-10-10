@@ -128,3 +128,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateTemplate<'de> {
     );
     type Response = CreateTemplateResponse;
 }
+
+///Endpoint type for
+///tools.ozone.communication.createTemplate
+pub struct CreateTemplateRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateTemplateRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.communication.createTemplate";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateTemplate<'de>;
+    type Response = CreateTemplateResponse;
+}

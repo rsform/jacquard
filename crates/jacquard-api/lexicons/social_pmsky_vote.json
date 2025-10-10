@@ -1,0 +1,61 @@
+{
+  "lexicon": 1,
+  "id": "social.pmsky.vote",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "description": "A vote record, representing a user's approval or disapproval of the referenced resource. The resource my be a proposal, a post, a web page, or anything that can be agreed or disagreed with.",
+        "required": [
+          "src",
+          "uri",
+          "val",
+          "cts"
+        ],
+        "properties": {
+          "aid": {
+            "type": "string",
+            "description": "The persistent, anonymous identifier for the user casting the vote."
+          },
+          "cid": {
+            "type": "string",
+            "description": "Optionally, CID specifying the specific version of 'uri' resource this vote applies to.",
+            "format": "cid"
+          },
+          "cts": {
+            "type": "string",
+            "description": "Timestamp when this vote was created.",
+            "format": "datetime"
+          },
+          "reasons": {
+            "type": "array",
+            "description": "An optional array of predefined reasons justifying the vote.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sig": {
+            "type": "bytes",
+            "description": "Signature of dag-cbor encoded vote."
+          },
+          "src": {
+            "type": "string",
+            "description": "the account creating the vote, not necessarily the same as the user who voted",
+            "format": "did"
+          },
+          "uri": {
+            "type": "string",
+            "description": "AT URI of the record, repository (account), or other resource that this vote applies to.",
+            "format": "uri"
+          },
+          "val": {
+            "type": "integer",
+            "description": "The value of the vote. The exact meaning depends on what is being voted on, but generally '+1' means 'approval', -1 means 'disapproval', and 0 indicates 'neutrality'."
+          }
+        }
+      }
+    }
+  }
+}

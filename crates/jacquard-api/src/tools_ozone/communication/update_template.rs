@@ -137,3 +137,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateTemplate<'de> {
     );
     type Response = UpdateTemplateResponse;
 }
+
+///Endpoint type for
+///tools.ozone.communication.updateTemplate
+pub struct UpdateTemplateRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateTemplateRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.communication.updateTemplate";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateTemplate<'de>;
+    type Response = UpdateTemplateResponse;
+}

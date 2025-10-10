@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.server.swapLaunchToken",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the auth state for a user from the launch token.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "launchToken"
+        ],
+        "properties": {
+          "launchToken": {
+            "type": "string",
+            "description": "The launch token provided by the service"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "token"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "The did of the user",
+              "format": "did"
+            },
+            "handle": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "token": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

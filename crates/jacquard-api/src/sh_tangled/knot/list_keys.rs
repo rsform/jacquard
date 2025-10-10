@@ -109,6 +109,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListKeys<'de> {
     type Response = ListKeysResponse;
 }
 
+///Endpoint type for
+///sh.tangled.knot.listKeys
+pub struct ListKeysRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListKeysRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.knot.listKeys";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListKeys<'de>;
+    type Response = ListKeysResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

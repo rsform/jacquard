@@ -109,3 +109,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRelationships<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRelationshipsResponse;
 }
+
+///Endpoint type for
+///app.bsky.graph.getRelationships
+pub struct GetRelationshipsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRelationshipsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.getRelationships";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRelationships<'de>;
+    type Response = GetRelationshipsResponse;
+}

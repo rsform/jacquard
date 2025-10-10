@@ -58,3 +58,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetJetstreamLogs<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetJetstreamLogsResponse;
 }
+
+///Endpoint type for
+///network.slices.slice.getJetstreamLogs
+pub struct GetJetstreamLogsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetJetstreamLogsRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.getJetstreamLogs";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetJetstreamLogs<'de>;
+    type Response = GetJetstreamLogsResponse;
+}

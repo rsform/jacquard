@@ -68,3 +68,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteMessageForSelf<'de> 
     );
     type Response = DeleteMessageForSelfResponse;
 }
+
+///Endpoint type for
+///chat.bsky.convo.deleteMessageForSelf
+pub struct DeleteMessageForSelfRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteMessageForSelfRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.deleteMessageForSelf";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteMessageForSelf<'de>;
+    type Response = DeleteMessageForSelfResponse;
+}

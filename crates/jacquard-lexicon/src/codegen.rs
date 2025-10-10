@@ -34,11 +34,21 @@ fn sanitize_name(s: &str) -> String {
     // Replace invalid characters with underscores
     let mut sanitized: String = s
         .chars()
-        .map(|c| if c.is_alphanumeric() || c == '_' { c } else { '_' })
+        .map(|c| {
+            if c.is_alphanumeric() || c == '_' {
+                c
+            } else {
+                '_'
+            }
+        })
         .collect();
 
     // Ensure it doesn't start with a digit
-    if sanitized.chars().next().map_or(false, |c| c.is_ascii_digit()) {
+    if sanitized
+        .chars()
+        .next()
+        .map_or(false, |c| c.is_ascii_digit())
+    {
         sanitized = format!("_{}", sanitized);
     }
 
@@ -55,11 +65,13 @@ fn make_ident(s: &str) -> syn::Ident {
     let sanitized = sanitize_name(s);
 
     // Try to parse as ident, fall back to raw ident if needed
-    syn::parse_str::<syn::Ident>(&sanitized)
-        .unwrap_or_else(|_| {
-            eprintln!("Warning: Invalid identifier '{}' sanitized to '{}'", s, sanitized);
-            syn::Ident::new_raw(&sanitized, proc_macro2::Span::call_site())
-        })
+    syn::parse_str::<syn::Ident>(&sanitized).unwrap_or_else(|_| {
+        eprintln!(
+            "Warning: Invalid identifier '{}' sanitized to '{}'",
+            s, sanitized
+        );
+        syn::Ident::new_raw(&sanitized, proc_macro2::Span::call_site())
+    })
 }
 
 /// Code generator for lexicon types
@@ -634,13 +646,17 @@ impl<'c> CodeGenerator<'c> {
 
         let path_str = if *last_segment == "defs" && parts.len() >= 3 {
             // defs types go in parent module
-            let first_two = format!("{}_{}", parts[0], parts[1]);
+            let first_two = format!("{}_{}", sanitize_name(parts[0]), sanitize_name(parts[1]));
             if parts.len() == 3 {
                 // com.atproto.defs -> com_atproto::TypeName
                 format!("{}::{}::{}", self.root_module, first_two, type_name)
             } else {
                 // app.bsky.actor.defs -> app_bsky::actor::TypeName
-                let middle: Vec<&str> = parts[2..parts.len() - 1].iter().copied().collect();
+                let middle: Vec<_> = parts[2..parts.len() - 1]
+                    .iter()
+                    .copied()
+                    .map(|s| sanitize_name(s))
+                    .collect();
                 format!(
                     "{}::{}::{}::{}",
                     self.root_module,
@@ -653,12 +669,16 @@ impl<'c> CodeGenerator<'c> {
             // Regular types go in their own module file
             let (module_path, file_module) = if parts.len() >= 3 {
                 // Join first two segments with underscore
-                let first_two = format!("{}_{}", parts[0], parts[1]);
-                let file_name = last_segment.to_snake_case();
+                let first_two = format!("{}_{}", sanitize_name(parts[0]), sanitize_name(parts[1]));
+                let file_name = sanitize_name(last_segment).to_snake_case();
 
                 if parts.len() > 3 {
                     // Middle segments form the module path
-                    let middle: Vec<&str> = parts[2..parts.len() - 1].iter().copied().collect();
+                    let middle: Vec<_> = parts[2..parts.len() - 1]
+                        .iter()
+                        .copied()
+                        .map(|s| sanitize_name(s))
+                        .collect();
                     let base_path = format!("{}::{}", first_two, middle.join("::"));
                     (base_path, file_name)
                 } else {
@@ -667,8 +687,8 @@ impl<'c> CodeGenerator<'c> {
                 }
             } else if parts.len() == 2 {
                 // e.g., "com.example" -> "com_example", file: example
-                let first = parts[0].to_string();
-                let file_name = parts[1].to_snake_case();
+                let first = sanitize_name(parts[0]);
+                let file_name = sanitize_name(parts[1]).to_snake_case();
                 (first, file_name)
             } else {
                 (parts[0].to_string(), "main".to_string())
@@ -681,7 +701,7 @@ impl<'c> CodeGenerator<'c> {
         };
 
         let path: syn::Path = syn::parse_str(&path_str).map_err(|e| CodegenError::Other {
-            message: format!("Failed to parse path: {}", e),
+            message: format!("Failed to parse path: {} {}", path_str, e),
             source: None,
         })?;
 
@@ -2108,6 +2128,12 @@ impl<'c> CodeGenerator<'c> {
             proc_macro2::Span::call_site(),
         );
 
+        // Generate the endpoint type that implements XrpcEndpoint
+        let endpoint_ident = syn::Ident::new(
+            &format!("{}Request", type_base),
+            proc_macro2::Span::call_site(),
+        );
+
         let response_type = quote! {
             #[doc = "Response type for "]
             #[doc = #nsid]
@@ -2147,6 +2173,8 @@ impl<'c> CodeGenerator<'c> {
             quote! {}
         };
 
+        let endpoint_path = format!("/xrpc/{}", nsid);
+
         if has_params {
             // Implement on the params/input struct itself
             let request_ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
@@ -2168,6 +2196,18 @@ impl<'c> CodeGenerator<'c> {
                     #encode_body_method
                     #decode_body_method
                 }
+
+                #[doc = "Endpoint type for "]
+                #[doc = #nsid]
+                pub struct #endpoint_ident;
+
+                impl jacquard_common::xrpc::XrpcEndpoint for #endpoint_ident {
+                    const PATH: &'static str = #endpoint_path;
+                    const METHOD: jacquard_common::xrpc::XrpcMethod = #method;
+
+                    type Request<'de> = #impl_target;
+                    type Response = #response_ident;
+                }
             })
         } else {
             // No params - generate a marker struct
@@ -2175,7 +2215,7 @@ impl<'c> CodeGenerator<'c> {
 
             Ok(quote! {
                 /// XRPC request marker type
-                #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+                #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, jacquard_derive::IntoStatic)]
                 pub struct #request_ident;
 
                 #response_type
@@ -2184,6 +2224,18 @@ impl<'c> CodeGenerator<'c> {
                     const NSID: &'static str = #nsid;
                     const METHOD: jacquard_common::xrpc::XrpcMethod = #method;
 
+                    type Response = #response_ident;
+                }
+
+                #[doc = "Endpoint type for "]
+                #[doc = #nsid]
+                pub struct #endpoint_ident;
+
+                impl jacquard_common::xrpc::XrpcEndpoint for #endpoint_ident {
+                    const PATH: &'static str = #endpoint_path;
+                    const METHOD: jacquard_common::xrpc::XrpcMethod = #method;
+
+                    type Request<'de> = #request_ident;
                     type Response = #response_ident;
                 }
             })

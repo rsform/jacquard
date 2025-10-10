@@ -69,3 +69,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SearchRepos<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchReposResponse;
 }
+
+///Endpoint type for
+///tools.ozone.moderation.searchRepos
+pub struct SearchReposRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchReposRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.searchRepos";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchRepos<'de>;
+    type Response = SearchReposResponse;
+}

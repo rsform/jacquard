@@ -65,6 +65,16 @@ for GetStarterPacksWithMembership<'de> {
     type Response = GetStarterPacksWithMembershipResponse;
 }
 
+///Endpoint type for
+///app.bsky.graph.getStarterPacksWithMembership
+pub struct GetStarterPacksWithMembershipRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksWithMembershipRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.getStarterPacksWithMembership";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetStarterPacksWithMembership<'de>;
+    type Response = GetStarterPacksWithMembershipResponse;
+}
+
 ///A starter pack and an optional list item indicating membership of a target user to that starter pack.
 #[jacquard_derive::lexicon]
 #[derive(

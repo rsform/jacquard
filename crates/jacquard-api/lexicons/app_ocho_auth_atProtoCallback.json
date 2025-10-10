@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.auth.atProtoCallback",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "A handler for the Ocho AppView Oauth system",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "code",
+          "state",
+          "iss"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "iss": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

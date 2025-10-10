@@ -50,3 +50,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateAccountPassword<'de>
     );
     type Response = UpdateAccountPasswordResponse;
 }
+
+///Endpoint type for
+///com.atproto.admin.updateAccountPassword
+pub struct UpdateAccountPasswordRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountPasswordRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountPassword";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateAccountPassword<'de>;
+    type Response = UpdateAccountPasswordResponse;
+}

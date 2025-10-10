@@ -1,0 +1,38 @@
+{
+  "lexicon": 1,
+  "id": "social.grain.gallery",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "labels": {
+            "type": "union",
+            "description": "Self-label values for this post. Effectively content warnings.",
+            "refs": [
+              "com.atproto.label.defs#selfLabels"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 100
+          }
+        }
+      }
+    }
+  }
+}

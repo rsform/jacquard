@@ -53,3 +53,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetStarterPacks<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetStarterPacksResponse;
 }
+
+///Endpoint type for
+///app.bsky.graph.getStarterPacks
+pub struct GetStarterPacksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.getStarterPacks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetStarterPacks<'de>;
+    type Response = GetStarterPacksResponse;
+}

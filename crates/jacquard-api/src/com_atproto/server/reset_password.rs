@@ -110,3 +110,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ResetPassword<'de> {
     );
     type Response = ResetPasswordResponse;
 }
+
+///Endpoint type for
+///com.atproto.server.resetPassword
+pub struct ResetPasswordRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ResetPasswordRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.resetPassword";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = ResetPassword<'de>;
+    type Response = ResetPasswordResponse;
+}

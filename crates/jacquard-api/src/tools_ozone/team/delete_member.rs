@@ -106,3 +106,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteMember<'de> {
     );
     type Response = DeleteMemberResponse;
 }
+
+///Endpoint type for
+///tools.ozone.team.deleteMember
+pub struct DeleteMemberRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteMemberRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.team.deleteMember";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteMember<'de>;
+    type Response = DeleteMemberResponse;
+}

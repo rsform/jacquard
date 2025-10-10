@@ -3,17 +3,29 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[cfg(feature = "app_blebbit")]
+pub mod app_blebbit;
+
 #[cfg(feature = "app_bsky")]
 pub mod app_bsky;
+
+#[cfg(feature = "app_ocho")]
+pub mod app_ocho;
+
+#[cfg(feature = "beauty_cybernetic")]
+pub mod beauty_cybernetic;
 
 #[cfg(feature = "blog_pckt")]
 pub mod blog_pckt;
 
+#[cfg(feature = "blue__2048")]
+pub mod blue__2048;
+
+#[cfg(feature = "blue_atplane")]
+pub mod blue_atplane;
+
 #[cfg(feature = "blue_linkat")]
 pub mod blue_linkat;
-
-#[cfg(feature = "blue_rito")]
-pub mod blue_rito;
 
 #[cfg(feature = "blue_zio")]
 pub mod blue_zio;
@@ -24,23 +36,29 @@ pub mod buzz_bookhive;
 #[cfg(feature = "chat_bsky")]
 pub mod chat_bsky;
 
+#[cfg(feature = "club_stellz")]
+pub mod club_stellz;
+
 #[cfg(feature = "com_atproto")]
 pub mod com_atproto;
 
 #[cfg(feature = "com_bad_example")]
 pub mod com_bad_example;
 
+#[cfg(feature = "com_crabdance")]
+pub mod com_crabdance;
+
 #[cfg(feature = "com_shinolabs")]
 pub mod com_shinolabs;
-
-#[cfg(feature = "com_welistskyblue")]
-pub mod com_welistskyblue;
 
 #[cfg(feature = "com_whtwnd")]
 pub mod com_whtwnd;
 
 #[cfg(feature = "community_lexicon")]
 pub mod community_lexicon;
+
+#[cfg(feature = "dev_baileytownsend")]
+pub mod dev_baileytownsend;
 
 #[cfg(feature = "dev_fudgeu")]
 pub mod dev_fudgeu;
@@ -51,26 +69,11 @@ pub mod dev_ocbwoy3;
 #[cfg(feature = "dev_regnault")]
 pub mod dev_regnault;
 
-#[cfg(feature = "did_plc_jh6yfs5dk47kykvhp7r6qwrb")]
-pub mod did_plc_jh6yfs5dk47kykvhp7r6qwrb;
-
-#[cfg(feature = "events_smokesignal")]
-pub mod events_smokesignal;
-
 #[cfg(feature = "fyi_unravel")]
 pub mod fyi_unravel;
 
-#[cfg(feature = "how_bun")]
-pub mod how_bun;
-
-#[cfg(feature = "inc_toronto")]
-pub mod inc_toronto;
-
-#[cfg(feature = "lol_atmo")]
-pub mod lol_atmo;
-
-#[cfg(feature = "lol_skittr")]
-pub mod lol_skittr;
+#[cfg(feature = "garden_lexicon")]
+pub mod garden_lexicon;
 
 #[cfg(feature = "moe_karashiiro")]
 pub mod moe_karashiiro;
@@ -78,14 +81,26 @@ pub mod moe_karashiiro;
 #[cfg(feature = "my_skylights")]
 pub mod my_skylights;
 
+#[cfg(feature = "net_aftertheinter")]
+pub mod net_aftertheinter;
+
 #[cfg(feature = "net_anisota")]
 pub mod net_anisota;
 
 #[cfg(feature = "net_bnewbold")]
 pub mod net_bnewbold;
 
+#[cfg(feature = "net_mmatt")]
+pub mod net_mmatt;
+
 #[cfg(feature = "network_slices")]
 pub mod network_slices;
+
+#[cfg(feature = "org_devcon")]
+pub mod org_devcon;
+
+#[cfg(feature = "org_robocracy")]
+pub mod org_robocracy;
 
 #[cfg(feature = "place_atwork")]
 pub mod place_atwork;
@@ -102,6 +117,15 @@ pub mod sh_tangled;
 #[cfg(feature = "sh_weaver")]
 pub mod sh_weaver;
 
+#[cfg(feature = "social_clippr")]
+pub mod social_clippr;
+
+#[cfg(feature = "social_grain")]
+pub mod social_grain;
+
+#[cfg(feature = "social_pmsky")]
+pub mod social_pmsky;
+
 #[cfg(feature = "social_psky")]
 pub mod social_psky;
 
@@ -114,8 +138,11 @@ pub mod tools_smokesignal;
 #[cfg(feature = "uk_ewancroft")]
 pub mod uk_ewancroft;
 
+#[cfg(feature = "uk_skyblur")]
+pub mod uk_skyblur;
+
+#[cfg(feature = "us_polhem")]
+pub mod us_polhem;
+
 #[cfg(feature = "win_tomo_x")]
 pub mod win_tomo_x;
-
-#[cfg(feature = "xyz_autonomylab")]
-pub mod xyz_autonomylab;

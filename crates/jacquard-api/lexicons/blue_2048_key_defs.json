@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "blue.2048.key.defs",
+  "description": "Reusable types for an at://2048 authority to provide public did:keys and signatures for verification",
+  "defs": {
+    "key": {
+      "type": "object",
+      "description": "A record that holds a did:key used to verify records. Use the collection to know the type of verification. Example blue.2048.key.game is for blue.2048.game records",
+      "required": [
+        "key",
+        "createdAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "key": {
+          "type": "string",
+          "description": "A did:key used to verify records came from an at://2048 authority"
+        }
+      }
+    },
+    "signatureRef": {
+      "type": "object",
+      "description": "a signature for an at://2048 record meaning it has been verified by a service. Most likely @2048.blue",
+      "required": [
+        "atURI",
+        "signature",
+        "createdAt"
+      ],
+      "properties": {
+        "atURI": {
+          "type": "string",
+          "description": "The at://uri for the public did:key to verify this record. This also counts as the authority of the verification (example @2048.blue). As well as the type of verification by the collection name (blue.2048.key.game)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "signature": {
+          "type": "string",
+          "description": "The public verifiable signature of the record. Serialization of the records value minus the signature field"
+        }
+      }
+    }
+  }
+}

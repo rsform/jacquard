@@ -1,0 +1,71 @@
+{
+  "lexicon": 1,
+  "id": "blue.2048.player.stats",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of a at://2048 player's stats over the course of their playtime",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "highestScore",
+          "gamesPlayed",
+          "totalScore",
+          "highestNumberBlock",
+          "timesTwentyFortyEightBeenFound",
+          "leastMovesToFindTwentyFortyEight",
+          "averageScore",
+          "syncStatus",
+          "createdAt"
+        ],
+        "properties": {
+          "averageScore": {
+            "type": "integer",
+            "description": "Average score across all games",
+            "default": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "gamesPlayed": {
+            "type": "integer",
+            "description": "Total numbers of games the user has played",
+            "default": 0
+          },
+          "highestNumberBlock": {
+            "type": "integer",
+            "description": "The highest number block the player has fround. example 128, 256, etc",
+            "default": 0
+          },
+          "highestScore": {
+            "type": "integer",
+            "description": "The highest score the user has gotten in a game",
+            "default": 0
+          },
+          "leastMovesToFindTwentyFortyEight": {
+            "type": "integer",
+            "description": "The smallest number of moves to get the 2048 block",
+            "default": 0
+          },
+          "syncStatus": {
+            "type": "ref",
+            "description": "The sync status of this record with the users AT Protocol repo.",
+            "ref": "blue.2048.defs#syncStatus"
+          },
+          "timesTwentyFortyEightBeenFound": {
+            "type": "integer",
+            "description": "Times the 2048 block has been found also count as wins",
+            "default": 0
+          },
+          "totalScore": {
+            "type": "integer",
+            "description": "Total score across all games",
+            "default": 0
+          }
+        }
+      }
+    }
+  }
+}

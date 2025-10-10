@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "net.mmatt.right.now",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A personal lexicon for mmatt's statuslog.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "text"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "The unix timestamp of when the status was recorded",
+            "format": "datetime"
+          },
+          "emoji": {
+            "type": "string",
+            "description": "The emoji of the status update"
+          },
+          "text": {
+            "type": "string",
+            "description": "The text of the status update"
+          }
+        }
+      }
+    }
+  }
+}

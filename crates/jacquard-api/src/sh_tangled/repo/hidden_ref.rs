@@ -80,3 +80,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for HiddenRef<'de> {
     );
     type Response = HiddenRefResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.hiddenRef
+pub struct HiddenRefRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for HiddenRefRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.hiddenRef";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = HiddenRef<'de>;
+    type Response = HiddenRefResponse;
+}

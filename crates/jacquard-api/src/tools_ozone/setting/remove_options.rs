@@ -62,3 +62,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RemoveOptions<'de> {
     );
     type Response = RemoveOptionsResponse;
 }
+
+///Endpoint type for
+///tools.ozone.setting.removeOptions
+pub struct RemoveOptionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RemoveOptionsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.setting.removeOptions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RemoveOptions<'de>;
+    type Response = RemoveOptionsResponse;
+}

@@ -66,3 +66,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for QueryLabels<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = QueryLabelsResponse;
 }
+
+///Endpoint type for
+///com.atproto.label.queryLabels
+pub struct QueryLabelsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for QueryLabelsRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.label.queryLabels";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = QueryLabels<'de>;
+    type Response = QueryLabelsResponse;
+}

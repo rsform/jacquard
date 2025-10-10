@@ -131,3 +131,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RemoveReaction<'de> {
     );
     type Response = RemoveReactionResponse;
 }
+
+///Endpoint type for
+///chat.bsky.convo.removeReaction
+pub struct RemoveReactionRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RemoveReactionRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.removeReaction";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RemoveReaction<'de>;
+    type Response = RemoveReactionResponse;
+}

@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.group.defs",
+  "revision": 1,
+  "description": "Common defs for the Authr Example",
+  "defs": {
+    "groupForm": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "display": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "public": {
+          "type": "boolean"
+        }
+      }
+    },
+    "groupView": {
+      "type": "object",
+      "properties": {
+        "cuid": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "public": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

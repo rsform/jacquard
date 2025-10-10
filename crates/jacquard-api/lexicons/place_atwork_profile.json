@@ -17,6 +17,24 @@
       "record": {
         "type": "object",
         "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "Small image to be displayed next to job listings from account. AKA, 'profile picture'",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "banner": {
+            "type": "blob",
+            "description": "Larger horizontal image to display behind profile view.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
           "description": {
             "type": "string",
             "description": "A free text description of the identity.",
@@ -36,6 +54,23 @@
               "type": "ref",
               "ref": "app.bsky.richtext.facet"
             }
+          },
+          "profile_host": {
+            "type": "string",
+            "description": "The service used for profile links",
+            "knownValues": [
+              "bsky.app",
+              "blacksky.community"
+            ]
+          },
+          "resume": {
+            "type": "blob",
+            "description": "The identity's resume.",
+            "accept": [
+              "application/pdf",
+              "text/plain"
+            ],
+            "maxSize": 4000000
           },
           "status": {
             "type": "string",

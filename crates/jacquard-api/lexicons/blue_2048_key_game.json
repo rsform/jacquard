@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "blue.2048.key.game",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A record that holds a did:key for verifying a players game. This is intended to be written at a verification authorities repo",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "key",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "key": {
+            "type": "ref",
+            "description": "A did:key that is used to verify an at://2048 authority has verified this game to a certain degree",
+            "ref": "blue.2048.key.defs#key"
+          }
+        }
+      }
+    }
+  }
+}

@@ -112,3 +112,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Tags<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = TagsResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.tags
+pub struct TagsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for TagsRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.tags";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Tags<'de>;
+    type Response = TagsResponse;
+}

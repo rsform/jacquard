@@ -54,3 +54,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetProfile<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetProfileResponse;
 }
+
+///Endpoint type for
+///app.bsky.actor.getProfile
+pub struct GetProfileRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.actor.getProfile";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetProfile<'de>;
+    type Response = GetProfileResponse;
+}

@@ -142,3 +142,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Log<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = LogResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.log
+pub struct LogRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for LogRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.log";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Log<'de>;
+    type Response = LogResponse;
+}

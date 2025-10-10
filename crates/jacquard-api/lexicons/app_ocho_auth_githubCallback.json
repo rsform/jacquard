@@ -1,0 +1,25 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.auth.githubCallback",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "A handler for the Ocho AppView Oauth system",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "code",
+          "state"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

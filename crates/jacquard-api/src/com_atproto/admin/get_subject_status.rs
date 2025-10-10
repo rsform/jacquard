@@ -87,3 +87,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSubjectStatus<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSubjectStatusResponse;
 }
+
+///Endpoint type for
+///com.atproto.admin.getSubjectStatus
+pub struct GetSubjectStatusRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSubjectStatusRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.getSubjectStatus";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSubjectStatus<'de>;
+    type Response = GetSubjectStatusResponse;
+}

@@ -32,13 +32,18 @@ source "anisota" type="atproto" {
     endpoint "did:plc:lcieujcfkv4jx7gehsvok3pr"
 }
 
-source "slices-api" type="slices" {
-    slice "at://did:plc:fpruhuo22xkm5o7ttr2ktxdo/network.slices.slice/3m2f7adwhp22a"
+source "mary" type="git" priority=70 {
+    repo "https://github.com/mary-ext/atproto-lexicon-scraping"
+    pattern "**/*.json"
 }
 
-source "ufos" type="http" {
-    url "https://ufos-api.microcosm.blue/records?collection=com.atproto.lexicon.schema"
-}
+// source "slices-api" type="slices" {
+//     slice "at://did:plc:fpruhuo22xkm5o7ttr2ktxdo/network.slices.slice/3m2f7adwhp22a"
+// }
+
+// source "ufos" type="http" {
+//     url "https://ufos-api.microcosm.blue/records?collection=com.atproto.lexicon.schema"
+// }
 
 // source "bluemoji" type="git" priority=50 {
 //     repo "https://github.com/aendra-rininsland/bluemoji"

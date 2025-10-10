@@ -23,7 +23,16 @@ pub struct GetAgeAssuranceStateOutput<'a> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct GetAgeAssuranceState;
 ///Response type for
 ///app.bsky.unspecced.getAgeAssuranceState
@@ -38,5 +47,15 @@ impl jacquard_common::xrpc::XrpcResp for GetAgeAssuranceStateResponse {
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAgeAssuranceState {
     const NSID: &'static str = "app.bsky.unspecced.getAgeAssuranceState";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetAgeAssuranceStateResponse;
+}
+
+///Endpoint type for
+///app.bsky.unspecced.getAgeAssuranceState
+pub struct GetAgeAssuranceStateRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetAgeAssuranceStateRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getAgeAssuranceState";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetAgeAssuranceState;
     type Response = GetAgeAssuranceStateResponse;
 }

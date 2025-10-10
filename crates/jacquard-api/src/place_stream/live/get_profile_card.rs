@@ -97,3 +97,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetProfileCard<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetProfileCardResponse;
 }
+
+///Endpoint type for
+///place.stream.live.getProfileCard
+pub struct GetProfileCardRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetProfileCardRequest {
+    const PATH: &'static str = "/xrpc/place.stream.live.getProfileCard";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetProfileCard<'de>;
+    type Response = GetProfileCardResponse;
+}

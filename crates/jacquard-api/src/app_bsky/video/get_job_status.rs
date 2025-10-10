@@ -54,3 +54,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetJobStatus<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetJobStatusResponse;
 }
+
+///Endpoint type for
+///app.bsky.video.getJobStatus
+pub struct GetJobStatusRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetJobStatusRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.video.getJobStatus";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetJobStatus<'de>;
+    type Response = GetJobStatusResponse;
+}

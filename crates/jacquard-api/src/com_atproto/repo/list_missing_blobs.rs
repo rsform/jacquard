@@ -62,6 +62,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListMissingBlobs<'de> {
     type Response = ListMissingBlobsResponse;
 }
 
+///Endpoint type for
+///com.atproto.repo.listMissingBlobs
+pub struct ListMissingBlobsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListMissingBlobsRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.repo.listMissingBlobs";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListMissingBlobs<'de>;
+    type Response = ListMissingBlobsResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

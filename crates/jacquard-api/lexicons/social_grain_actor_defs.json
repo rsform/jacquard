@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "social.grain.actor.defs",
+  "defs": {
+    "profileView": {
+      "type": "object",
+      "required": [
+        "did",
+        "handle"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "string",
+          "format": "uri"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2560,
+          "maxGraphemes": 256
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#label"
+          }
+        }
+      }
+    }
+  }
+}

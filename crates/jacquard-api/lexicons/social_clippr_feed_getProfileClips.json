@@ -1,0 +1,65 @@
+{
+  "lexicon": 1,
+  "id": "social.clippr.feed.getProfileClips",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a view of a profile's reverse-chronological clips feed. Does not require auth.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "An actor to get feed data from",
+            "format": "at-identifier"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "A parameter to paginate results"
+          },
+          "filter": {
+            "type": "string",
+            "description": "What types to include in response",
+            "default": "all_clips",
+            "knownValues": [
+              "all_clips",
+              "tagged_clips",
+              "untagged_clips"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "description": "How many results to return with the query",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "feed"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "feed": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "social.clippr.feed.defs#clipView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

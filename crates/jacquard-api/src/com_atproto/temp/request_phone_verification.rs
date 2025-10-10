@@ -48,3 +48,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RequestPhoneVerification<'
     );
     type Response = RequestPhoneVerificationResponse;
 }
+
+///Endpoint type for
+///com.atproto.temp.requestPhoneVerification
+pub struct RequestPhoneVerificationRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RequestPhoneVerificationRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.temp.requestPhoneVerification";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RequestPhoneVerification<'de>;
+    type Response = RequestPhoneVerificationResponse;
+}

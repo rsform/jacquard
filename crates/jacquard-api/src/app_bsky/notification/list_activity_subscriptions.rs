@@ -61,3 +61,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListActivitySubscriptions<
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListActivitySubscriptionsResponse;
 }
+
+///Endpoint type for
+///app.bsky.notification.listActivitySubscriptions
+pub struct ListActivitySubscriptionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListActivitySubscriptionsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.notification.listActivitySubscriptions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListActivitySubscriptions<'de>;
+    type Response = ListActivitySubscriptionsResponse;
+}

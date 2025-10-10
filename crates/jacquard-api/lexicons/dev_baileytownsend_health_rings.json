@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "dev.baileytownsend.health.rings",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A record of daily activity rings (Apple Fitness), including move, exercise, and stand goals.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "move",
+          "moveGoal",
+          "exercise",
+          "exerciseGoal",
+          "standHours",
+          "standGoal",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "exercise": {
+            "type": "integer",
+            "description": "The total minutes of exercise completed."
+          },
+          "exerciseGoal": {
+            "type": "integer",
+            "description": "The daily exercise goal in minutes."
+          },
+          "move": {
+            "type": "integer",
+            "description": "The total active calories burned for the day."
+          },
+          "moveGoal": {
+            "type": "integer",
+            "description": "The daily move goal in calories."
+          },
+          "standGoal": {
+            "type": "integer",
+            "description": "The daily stand goal in hours."
+          },
+          "standHours": {
+            "type": "integer",
+            "description": "The number of hours the user stood up and moved around."
+          }
+        }
+      }
+    }
+  }
+}

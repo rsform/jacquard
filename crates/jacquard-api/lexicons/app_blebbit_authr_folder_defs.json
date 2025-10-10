@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.folder.defs",
+  "revision": 1,
+  "description": "Common folder defs for the Authr Example",
+  "defs": {
+    "folderForm": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "public": {
+          "type": "boolean"
+        }
+      }
+    },
+    "folderView": {
+      "type": "object",
+      "properties": {
+        "cuid": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "public": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

@@ -59,3 +59,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RegisterPush<'de> {
     );
     type Response = RegisterPushResponse;
 }
+
+///Endpoint type for
+///app.bsky.notification.registerPush
+pub struct RegisterPushRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RegisterPushRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.notification.registerPush";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RegisterPush<'de>;
+    type Response = RegisterPushResponse;
+}

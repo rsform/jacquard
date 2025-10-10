@@ -172,3 +172,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Languages<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = LanguagesResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.languages
+pub struct LanguagesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for LanguagesRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.languages";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Languages<'de>;
+    type Response = LanguagesResponse;
+}

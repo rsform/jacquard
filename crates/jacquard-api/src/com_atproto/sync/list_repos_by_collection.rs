@@ -64,6 +64,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListReposByCollection<'de>
     type Response = ListReposByCollectionResponse;
 }
 
+///Endpoint type for
+///com.atproto.sync.listReposByCollection
+pub struct ListReposByCollectionRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListReposByCollectionRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.listReposByCollection";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListReposByCollection<'de>;
+    type Response = ListReposByCollectionResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

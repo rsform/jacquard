@@ -1,0 +1,25 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.state.login",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Gets the email code to login on the InstantDB website",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "code"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "The code used to login on the InstantDB website"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -66,3 +66,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AcceptConvo<'de> {
     );
     type Response = AcceptConvoResponse;
 }
+
+///Endpoint type for
+///chat.bsky.convo.acceptConvo
+pub struct AcceptConvoRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for AcceptConvoRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.acceptConvo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = AcceptConvo<'de>;
+    type Response = AcceptConvoResponse;
+}

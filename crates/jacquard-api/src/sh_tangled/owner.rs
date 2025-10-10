@@ -66,7 +66,16 @@ impl jacquard_common::IntoStatic for OwnerError<'_> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct Owner;
 ///Response type for
 ///sh.tangled.owner
@@ -81,5 +90,15 @@ impl jacquard_common::xrpc::XrpcResp for OwnerResponse {
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Owner {
     const NSID: &'static str = "sh.tangled.owner";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = OwnerResponse;
+}
+
+///Endpoint type for
+///sh.tangled.owner
+pub struct OwnerRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for OwnerRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.owner";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Owner;
     type Response = OwnerResponse;
 }

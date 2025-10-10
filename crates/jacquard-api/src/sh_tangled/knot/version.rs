@@ -53,7 +53,16 @@ impl jacquard_common::IntoStatic for VersionError<'_> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct Version;
 ///Response type for
 ///sh.tangled.knot.version
@@ -68,5 +77,15 @@ impl jacquard_common::xrpc::XrpcResp for VersionResponse {
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Version {
     const NSID: &'static str = "sh.tangled.knot.version";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = VersionResponse;
+}
+
+///Endpoint type for
+///sh.tangled.knot.version
+pub struct VersionRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for VersionRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.knot.version";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Version;
     type Response = VersionResponse;
 }

@@ -145,3 +145,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for InitAgeAssurance<'de> {
     );
     type Response = InitAgeAssuranceResponse;
 }
+
+///Endpoint type for
+///app.bsky.unspecced.initAgeAssurance
+pub struct InitAgeAssuranceRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for InitAgeAssuranceRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.initAgeAssurance";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = InitAgeAssurance<'de>;
+    type Response = InitAgeAssuranceResponse;
+}

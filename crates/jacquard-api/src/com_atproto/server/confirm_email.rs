@@ -132,3 +132,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ConfirmEmail<'de> {
     );
     type Response = ConfirmEmailResponse;
 }
+
+///Endpoint type for
+///com.atproto.server.confirmEmail
+pub struct ConfirmEmailRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ConfirmEmailRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.confirmEmail";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = ConfirmEmail<'de>;
+    type Response = ConfirmEmailResponse;
+}

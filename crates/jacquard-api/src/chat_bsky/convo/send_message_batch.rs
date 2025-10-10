@@ -81,3 +81,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SendMessageBatch<'de> {
     );
     type Response = SendMessageBatchResponse;
 }
+
+///Endpoint type for
+///chat.bsky.convo.sendMessageBatch
+pub struct SendMessageBatchRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SendMessageBatchRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.sendMessageBatch";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = SendMessageBatch<'de>;
+    type Response = SendMessageBatchResponse;
+}

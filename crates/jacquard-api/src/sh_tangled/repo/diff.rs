@@ -119,3 +119,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Diff<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = DiffResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.diff
+pub struct DiffRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DiffRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.diff";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Diff<'de>;
+    type Response = DiffResponse;
+}

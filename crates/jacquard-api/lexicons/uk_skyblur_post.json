@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "uk.skyblur.post",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record containing a Skyblur post.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "text",
+          "createdAt",
+          "uri",
+          "visibility"
+        ],
+        "properties": {
+          "additional": {
+            "type": "string",
+            "description": "The post additional contents.",
+            "maxLength": 100000,
+            "maxGraphemes": 10000
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Created date assigned by client",
+            "format": "datetime"
+          },
+          "encryptBody": {
+            "type": "blob",
+            "description": "Encrypted post body. It shoud be decrypted by the client with AES-256."
+          },
+          "text": {
+            "type": "string",
+            "description": "The post main contents. Blurred text must be enclosed in brackets [].",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "uri": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "visibility": {
+            "type": "string",
+            "description": "For 'password', the text only contains blurred text, and additional is always empty. The unblurred text and additional are included in the encryptBody.",
+            "maxLength": 100,
+            "maxGraphemes": 10,
+            "enum": [
+              "public",
+              "password"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

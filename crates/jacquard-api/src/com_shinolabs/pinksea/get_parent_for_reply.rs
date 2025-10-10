@@ -60,3 +60,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetParentForReply<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetParentForReplyResponse;
 }
+
+///Endpoint type for
+///com.shinolabs.pinksea.getParentForReply
+pub struct GetParentForReplyRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetParentForReplyRequest {
+    const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getParentForReply";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetParentForReply<'de>;
+    type Response = GetParentForReplyResponse;
+}

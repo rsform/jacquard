@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "social.grain.gallery.defs",
+  "defs": {
+    "galleryView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "creator",
+        "record",
+        "indexedAt"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "creator": {
+          "type": "ref",
+          "ref": "social.grain.actor.defs#profileView"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": [
+              "social.grain.photo.defs#photoView"
+            ]
+          }
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#label"
+          }
+        },
+        "record": {
+          "type": "unknown"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

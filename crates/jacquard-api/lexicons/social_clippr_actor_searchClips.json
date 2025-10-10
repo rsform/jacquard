@@ -1,0 +1,61 @@
+{
+  "lexicon": 1,
+  "id": "social.clippr.actor.searchClips",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Find clips matching search criteria. Does not require auth.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "q"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "An actor to filter results to",
+            "format": "at-identifier"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "A parameter to paginate results"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "How many clips to return in the query output",
+            "default": 25,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "q": {
+            "type": "string",
+            "description": "Search query string"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "clips"
+          ],
+          "properties": {
+            "clips": {
+              "type": "array",
+              "description": "A list of clips and their associated details",
+              "items": {
+                "type": "ref",
+                "ref": "social.clippr.feed.defs#clipView"
+              }
+            },
+            "cursor": {
+              "type": "string",
+              "description": "A parameter to paginate results"
+            }
+          }
+        }
+      }
+    }
+  }
+}

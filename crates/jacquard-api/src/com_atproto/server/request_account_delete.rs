@@ -6,7 +6,16 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct RequestAccountDelete;
 ///Response type for
 ///com.atproto.server.requestAccountDelete
@@ -23,5 +32,17 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RequestAccountDelete {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
+    type Response = RequestAccountDeleteResponse;
+}
+
+///Endpoint type for
+///com.atproto.server.requestAccountDelete
+pub struct RequestAccountDeleteRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RequestAccountDeleteRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.requestAccountDelete";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RequestAccountDelete;
     type Response = RequestAccountDeleteResponse;
 }

@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "dev.baileytownsend.health.steps",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "steps",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "steps": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

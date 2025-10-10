@@ -1,0 +1,80 @@
+{
+  "lexicon": 1,
+  "id": "social.clippr.feed.defs",
+  "defs": {
+    "clipView": {
+      "type": "object",
+      "description": "A view of a single bookmark (or 'clip').",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "record",
+        "indexedAt"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "description": "A reference to the actor's profile",
+          "ref": "social.clippr.actor.defs#profileView"
+        },
+        "cid": {
+          "type": "string",
+          "description": "The CID of the clip",
+          "format": "cid"
+        },
+        "indexedAt": {
+          "type": "string",
+          "description": "When the tag was first indexed by the AppView",
+          "format": "datetime"
+        },
+        "record": {
+          "type": "unknown",
+          "description": "The raw record of the clip"
+        },
+        "uri": {
+          "type": "string",
+          "description": "The AT-URI of the clip",
+          "format": "at-uri"
+        }
+      }
+    },
+    "tagView": {
+      "type": "object",
+      "description": "A view of a single tag.",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "record",
+        "indexedAt"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "description": "A reference to the actor's profile",
+          "ref": "social.clippr.actor.defs#profileView"
+        },
+        "cid": {
+          "type": "string",
+          "description": "The CID of the tag",
+          "format": "cid"
+        },
+        "indexedAt": {
+          "type": "string",
+          "description": "When the tag was first indexed by the AppView",
+          "format": "datetime"
+        },
+        "record": {
+          "type": "unknown",
+          "description": "The raw record of the tag"
+        },
+        "uri": {
+          "type": "string",
+          "description": "The AT-URI to the tag",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

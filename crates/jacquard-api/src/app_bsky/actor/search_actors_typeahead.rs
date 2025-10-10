@@ -62,3 +62,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SearchActorsTypeahead<'de>
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchActorsTypeaheadResponse;
 }
+
+///Endpoint type for
+///app.bsky.actor.searchActorsTypeahead
+pub struct SearchActorsTypeaheadRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsTypeaheadRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.actor.searchActorsTypeahead";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchActorsTypeahead<'de>;
+    type Response = SearchActorsTypeaheadResponse;
+}

@@ -34,7 +34,6 @@
       "key": "literal:self",
       "record": {
         "type": "object",
-        "required": [],
         "properties": {
           "color": {
             "type": "ref",

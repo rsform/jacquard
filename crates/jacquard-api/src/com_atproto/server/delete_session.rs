@@ -6,7 +6,16 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct DeleteSession;
 ///Response type for
 ///com.atproto.server.deleteSession
@@ -23,5 +32,17 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteSession {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
+    type Response = DeleteSessionResponse;
+}
+
+///Endpoint type for
+///com.atproto.server.deleteSession
+pub struct DeleteSessionRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteSessionRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.deleteSession";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteSession;
     type Response = DeleteSessionResponse;
 }

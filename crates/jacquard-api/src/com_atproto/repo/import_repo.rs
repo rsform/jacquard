@@ -50,3 +50,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ImportRepo {
         )
     }
 }
+
+///Endpoint type for
+///com.atproto.repo.importRepo
+pub struct ImportRepoRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ImportRepoRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.repo.importRepo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/vnd.ipld.car",
+    );
+    type Request<'de> = ImportRepo;
+    type Response = ImportRepoResponse;
+}

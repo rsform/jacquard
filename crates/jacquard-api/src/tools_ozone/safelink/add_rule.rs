@@ -138,3 +138,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AddRule<'de> {
     );
     type Response = AddRuleResponse;
 }
+
+///Endpoint type for
+///tools.ozone.safelink.addRule
+pub struct AddRuleRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for AddRuleRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.safelink.addRule";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = AddRule<'de>;
+    type Response = AddRuleResponse;
+}

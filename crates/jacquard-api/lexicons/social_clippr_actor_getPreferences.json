@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "social.clippr.actor.getPreferences",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the private user preferences associated to the account.",
+      "parameters": {
+        "type": "params",
+        "properties": {}
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "preferences"
+          ],
+          "properties": {
+            "preferences": {
+              "type": "ref",
+              "description": "A ref to the user's preferences",
+              "ref": "social.clippr.actor.defs#preferences"
+            }
+          }
+        }
+      }
+    }
+  }
+}

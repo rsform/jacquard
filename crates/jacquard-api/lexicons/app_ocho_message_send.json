@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.message.send",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Sends a message to a user from an app.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "message",
+            "did"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "The user to send the message to."
+            },
+            "message": {
+              "type": "string",
+              "description": "The message to send to the user."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "description": "Whether the token was successfully registered."
+            }
+          }
+        }
+      }
+    }
+  }
+}

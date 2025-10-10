@@ -113,3 +113,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetWebhook<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetWebhookResponse;
 }
+
+///Endpoint type for
+///place.stream.server.getWebhook
+pub struct GetWebhookRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetWebhookRequest {
+    const PATH: &'static str = "/xrpc/place.stream.server.getWebhook";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetWebhook<'de>;
+    type Response = GetWebhookResponse;
+}

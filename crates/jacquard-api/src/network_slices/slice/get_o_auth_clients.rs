@@ -55,6 +55,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetOAuthClients<'de> {
     type Response = GetOAuthClientsResponse;
 }
 
+///Endpoint type for
+///network.slices.slice.getOAuthClients
+pub struct GetOAuthClientsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetOAuthClientsRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.getOAuthClients";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetOAuthClients<'de>;
+    type Response = GetOAuthClientsResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

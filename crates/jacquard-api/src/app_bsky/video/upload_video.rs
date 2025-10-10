@@ -66,3 +66,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UploadVideo {
         )
     }
 }
+
+///Endpoint type for
+///app.bsky.video.uploadVideo
+pub struct UploadVideoRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UploadVideoRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.video.uploadVideo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "video/mp4",
+    );
+    type Request<'de> = UploadVideo;
+    type Response = UploadVideoResponse;
+}

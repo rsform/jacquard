@@ -64,3 +64,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetActorBookmarks<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetActorBookmarksResponse;
 }
+
+///Endpoint type for
+///community.lexicon.bookmarks.getActorBookmarks
+pub struct GetActorBookmarksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetActorBookmarksRequest {
+    const PATH: &'static str = "/xrpc/community.lexicon.bookmarks.getActorBookmarks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetActorBookmarks<'de>;
+    type Response = GetActorBookmarksResponse;
+}

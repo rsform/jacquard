@@ -66,3 +66,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ClearSliceRecords<'de> {
     );
     type Response = ClearSliceRecordsResponse;
 }
+
+///Endpoint type for
+///network.slices.slice.clearSliceRecords
+pub struct ClearSliceRecordsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ClearSliceRecordsRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.clearSliceRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = ClearSliceRecords<'de>;
+    type Response = ClearSliceRecordsResponse;
+}

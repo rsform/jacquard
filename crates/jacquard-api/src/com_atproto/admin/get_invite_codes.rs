@@ -66,3 +66,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetInviteCodes<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetInviteCodesResponse;
 }
+
+///Endpoint type for
+///com.atproto.admin.getInviteCodes
+pub struct GetInviteCodesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetInviteCodesRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.getInviteCodes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetInviteCodes<'de>;
+    type Response = GetInviteCodesResponse;
+}

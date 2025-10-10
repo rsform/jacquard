@@ -96,3 +96,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateOAuthClient<'de> {
     );
     type Response = UpdateOAuthClientResponse;
 }
+
+///Endpoint type for
+///network.slices.slice.updateOAuthClient
+pub struct UpdateOAuthClientRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateOAuthClientRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.updateOAuthClient";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateOAuthClient<'de>;
+    type Response = UpdateOAuthClientResponse;
+}

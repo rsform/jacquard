@@ -107,3 +107,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetActors<'de> {
     );
     type Response = GetActorsResponse;
 }
+
+///Endpoint type for
+///network.slices.slice.getActors
+pub struct GetActorsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetActorsRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.getActors";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = GetActors<'de>;
+    type Response = GetActorsResponse;
+}

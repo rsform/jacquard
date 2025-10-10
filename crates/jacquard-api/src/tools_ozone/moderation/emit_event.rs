@@ -241,3 +241,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for EmitEvent<'de> {
     );
     type Response = EmitEventResponse;
 }
+
+///Endpoint type for
+///tools.ozone.moderation.emitEvent
+pub struct EmitEventRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for EmitEventRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.emitEvent";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = EmitEvent<'de>;
+    type Response = EmitEventResponse;
+}

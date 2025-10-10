@@ -1,0 +1,76 @@
+{
+  "lexicon": 1,
+  "id": "social.clippr.actor.defs",
+  "defs": {
+    "preferences": {
+      "type": "array",
+      "description": "An array of refs to various preferences.",
+      "items": {
+        "type": "union",
+        "refs": [
+          "#publishingScopesPref"
+        ]
+      }
+    },
+    "profileView": {
+      "type": "object",
+      "description": "A view of an actor's profile.",
+      "required": [
+        "did",
+        "handle",
+        "displayName"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "string",
+          "description": "A link to the profile's avatar",
+          "format": "uri"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "When the profile record was first created",
+          "format": "datetime"
+        },
+        "description": {
+          "type": "string",
+          "description": "The biography associated to the profile",
+          "maxLength": 5000,
+          "maxGraphemes": 500
+        },
+        "did": {
+          "type": "string",
+          "description": "The DID of the profile",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The display name associated to the profile",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "handle": {
+          "type": "string",
+          "description": "The handle of the profile",
+          "format": "handle"
+        }
+      }
+    },
+    "publishingScopesPref": {
+      "type": "object",
+      "description": "Preferences for an user's publishing scopes.",
+      "required": [
+        "defaultScope"
+      ],
+      "properties": {
+        "defaultScope": {
+          "type": "string",
+          "description": "What publishing scope to mark a clip as by default",
+          "knownValues": [
+            "public",
+            "unlisted"
+          ]
+        }
+      }
+    }
+  }
+}

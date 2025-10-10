@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.page.updatePage",
+  "revision": 1,
+  "description": "update a page",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "public": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "content": {
+              "type": "string"
+            },
+            "cuid": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "public": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}

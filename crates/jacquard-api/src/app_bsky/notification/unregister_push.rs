@@ -56,3 +56,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UnregisterPush<'de> {
     );
     type Response = UnregisterPushResponse;
 }
+
+///Endpoint type for
+///app.bsky.notification.unregisterPush
+pub struct UnregisterPushRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UnregisterPushRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.notification.unregisterPush";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UnregisterPush<'de>;
+    type Response = UnregisterPushResponse;
+}

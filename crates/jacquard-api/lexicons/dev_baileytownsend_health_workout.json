@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "dev.baileytownsend.health.workout",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "activity",
+          "caloriesBurned",
+          "duration",
+          "startTime",
+          "endTime",
+          "createdAt"
+        ],
+        "properties": {
+          "activity": {
+            "type": "string",
+            "description": "Type of activity. Walking, running, weights, etc."
+          },
+          "caloriesBurned": {
+            "type": "integer",
+            "description": "Active calories burned during the workout."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "distance": {
+            "type": "string",
+            "description": "Distance covered during the workout (optional)."
+          },
+          "duration": {
+            "type": "string",
+            "description": "How long the workout lasted in minutes."
+          },
+          "endTime": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

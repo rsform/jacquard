@@ -66,3 +66,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UploadBlob {
         )
     }
 }
+
+///Endpoint type for
+///com.atproto.repo.uploadBlob
+pub struct UploadBlobRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UploadBlobRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.repo.uploadBlob";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
+    type Request<'de> = UploadBlob;
+    type Response = UploadBlobResponse;
+}

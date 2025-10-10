@@ -1,0 +1,343 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.plugin.defs",
+  "defs": {
+    "adaptiveIcon": {
+      "type": "object",
+      "properties": {
+        "backgroundColor": {
+          "type": "string",
+          "description": "The background color of the adaptive icon."
+        },
+        "foregroundImage": {
+          "type": "string",
+          "description": "The URL to the foreground image of the adaptive icon."
+        },
+        "foregroundImageBlob": {
+          "type": "blob"
+        }
+      }
+    },
+    "android": {
+      "type": "object",
+      "properties": {
+        "adaptiveIcon": {
+          "type": "ref",
+          "description": "Configuration for the adaptive icon on Android.",
+          "ref": "#adaptiveIcon"
+        },
+        "edgeToEdgeEnabled": {
+          "type": "boolean",
+          "description": "Whether edge-to-edge mode is enabled for the app."
+        }
+      }
+    },
+    "androidStatusBar": {
+      "type": "object",
+      "description": "Android status bar configuration.",
+      "properties": {
+        "backgroundColor": {
+          "type": "string",
+          "description": "The background color of the Android status bar."
+        }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "required": [
+        "hash",
+        "blob",
+        "type"
+      ],
+      "properties": {
+        "blob": {
+          "type": "blob",
+          "description": "The blob of the asset"
+        },
+        "hash": {
+          "type": "string",
+          "description": "The hash of the asset"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of the asset"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "The date and time when this asset was last updated. Used to reset the jetstream cache, among other things.",
+          "format": "datetime"
+        }
+      }
+    },
+    "db": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The ID of the database."
+        }
+      }
+    },
+    "developer": {
+      "type": "object",
+      "required": [
+        "tool"
+      ],
+      "properties": {
+        "tool": {
+          "type": "string",
+          "description": "The tool used for development, e.g., 'expo-cli'."
+        }
+      }
+    },
+    "expoClient": {
+      "type": "object",
+      "required": [
+        "name",
+        "slug"
+      ],
+      "properties": {
+        "android": {
+          "type": "ref",
+          "description": "Android-specific configuration for the app.",
+          "ref": "#android"
+        },
+        "androidStatusBar": {
+          "type": "ref",
+          "description": "Configuration for the Android status bar.",
+          "ref": "#androidStatusBar"
+        },
+        "expirements": {
+          "type": "unknown",
+          "description": "Experimental features enabled for the app."
+        },
+        "extra": {
+          "type": "unknown",
+          "description": "Additional configuration for the app."
+        },
+        "icon": {
+          "type": "string",
+          "description": "The URL to the app icon."
+        },
+        "ios": {
+          "type": "ref",
+          "description": "ios-specific configuration for the app.",
+          "ref": "#ios"
+        },
+        "locales": {
+          "type": "unknown",
+          "description": "Localization settings for the app."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the Expo client application."
+        },
+        "newArchEnabled": {
+          "type": "boolean",
+          "description": "Whether the new architecture is enabled for the app."
+        },
+        "orientation": {
+          "type": "string",
+          "description": "The default orientation of the app.",
+          "enum": [
+            "portrait",
+            "landscape",
+            "default"
+          ]
+        },
+        "platforms": {
+          "type": "array",
+          "description": "The platforms supported by the app.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "ios",
+              "android",
+              "web"
+            ]
+          }
+        },
+        "plugins": {
+          "type": "unknown",
+          "description": "A list of plugins used by the app."
+        },
+        "scheme": {
+          "type": "string",
+          "description": "The custom URI scheme for deep linking."
+        },
+        "sdkVersion": {
+          "type": "string",
+          "description": "The SDK version of the Expo client."
+        },
+        "slug": {
+          "type": "string",
+          "description": "A URL-friendly identifier for the app."
+        },
+        "userInterfaceStyle": {
+          "type": "string",
+          "description": "The default user interface style."
+        },
+        "version": {
+          "type": "string",
+          "description": "The version of the app."
+        },
+        "web": {
+          "type": "ref",
+          "description": "Web-specific configuration for the app.",
+          "ref": "#web"
+        }
+      }
+    },
+    "expoGo": {
+      "type": "object",
+      "required": [
+        "developer"
+      ],
+      "properties": {
+        "developer": {
+          "type": "ref",
+          "description": "Developer-specific configuration for the Expo Go app.",
+          "ref": "#developer"
+        }
+      }
+    },
+    "ios": {
+      "type": "object",
+      "properties": {
+        "supportsTablet": {
+          "type": "boolean",
+          "description": "Whether the app supports iPad."
+        }
+      }
+    },
+    "launchAsset": {
+      "type": "object",
+      "required": [
+        "key",
+        "contentType",
+        "url"
+      ],
+      "properties": {
+        "contentType": {
+          "type": "string",
+          "description": "The MIME type of the asset, e.g., 'image/png'."
+        },
+        "key": {
+          "type": "string",
+          "description": "The unique key for this asset, used to reference it in the plugin."
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL where the asset can be accessed.",
+          "format": "uri"
+        }
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "required": [
+        "id",
+        "createdAt",
+        "runtimeVersion",
+        "launchAsset",
+        "metadata",
+        "extra"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "The date and time when this plugin manifest was created.",
+          "format": "datetime"
+        },
+        "extra": {
+          "type": "ref",
+          "description": "Additional metadata for the plugin, including Expo client and Go configurations.",
+          "ref": "app.ocho.plugin.defs#manifestExtra"
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for this plugin manifest."
+        },
+        "launchAsset": {
+          "type": "ref",
+          "description": "The launch asset for the plugin (the main javascipt bundle).",
+          "ref": "app.ocho.plugin.defs#launchAsset"
+        },
+        "metadata": {
+          "type": "unknown"
+        },
+        "runtimeVersion": {
+          "type": "string",
+          "description": "The version of the Expo runtime this plugin is compatible with."
+        }
+      }
+    },
+    "manifestExtra": {
+      "type": "object",
+      "required": [
+        "expoClient",
+        "expoGo"
+      ],
+      "properties": {
+        "expoClient": {
+          "type": "ref",
+          "ref": "#expoClient"
+        },
+        "expoGo": {
+          "type": "ref",
+          "ref": "#expoGo"
+        }
+      }
+    },
+    "plugin": {
+      "type": "array",
+      "items": {
+        "type": "union",
+        "refs": [
+          "#stringId",
+          "#pluginConfig"
+        ]
+      }
+    },
+    "pluginConfig": {
+      "type": "unknown",
+      "description": "Configuration object for a plugin, can be any valid JSON object."
+    },
+    "stringId": {
+      "type": "string",
+      "description": "A string identifier for a plugin, used to reference it in the app."
+    },
+    "web": {
+      "type": "object",
+      "properties": {
+        "bundler": {
+          "type": "string",
+          "description": "The bundler used for the web app.",
+          "enum": [
+            "webpack",
+            "metro"
+          ]
+        },
+        "favicon": {
+          "type": "string",
+          "description": "The URL to the favicon for the web app."
+        },
+        "faviconBlob": {
+          "type": "blob"
+        },
+        "output": {
+          "type": "string",
+          "description": "The output directory for the web app.",
+          "enum": [
+            "static",
+            "server",
+            "single"
+          ]
+        }
+      }
+    }
+  }
+}

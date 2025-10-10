@@ -53,3 +53,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for FindCorrelation<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = FindCorrelationResponse;
 }
+
+///Endpoint type for
+///tools.ozone.signature.findCorrelation
+pub struct FindCorrelationRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for FindCorrelationRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.signature.findCorrelation";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = FindCorrelation<'de>;
+    type Response = FindCorrelationResponse;
+}

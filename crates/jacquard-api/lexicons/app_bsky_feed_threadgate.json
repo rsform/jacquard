@@ -61,7 +61,7 @@
               "type": "string",
               "format": "at-uri"
             },
-            "maxLength": 50
+            "maxLength": 300
           },
           "post": {
             "type": "string",

@@ -64,3 +64,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for MuteConvo<'de> {
     );
     type Response = MuteConvoResponse;
 }
+
+///Endpoint type for
+///chat.bsky.convo.muteConvo
+pub struct MuteConvoRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for MuteConvoRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.muteConvo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = MuteConvo<'de>;
+    type Response = MuteConvoResponse;
+}

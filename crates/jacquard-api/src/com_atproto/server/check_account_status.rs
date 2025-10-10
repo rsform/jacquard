@@ -31,7 +31,16 @@ pub struct CheckAccountStatusOutput<'a> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct CheckAccountStatus;
 ///Response type for
 ///com.atproto.server.checkAccountStatus
@@ -46,5 +55,15 @@ impl jacquard_common::xrpc::XrpcResp for CheckAccountStatusResponse {
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CheckAccountStatus {
     const NSID: &'static str = "com.atproto.server.checkAccountStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = CheckAccountStatusResponse;
+}
+
+///Endpoint type for
+///com.atproto.server.checkAccountStatus
+pub struct CheckAccountStatusRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CheckAccountStatusRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.checkAccountStatus";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = CheckAccountStatus;
     type Response = CheckAccountStatusResponse;
 }

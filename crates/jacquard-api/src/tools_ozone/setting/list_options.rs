@@ -73,3 +73,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListOptions<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListOptionsResponse;
 }
+
+///Endpoint type for
+///tools.ozone.setting.listOptions
+pub struct ListOptionsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListOptionsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.setting.listOptions";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListOptions<'de>;
+    type Response = ListOptionsResponse;
+}

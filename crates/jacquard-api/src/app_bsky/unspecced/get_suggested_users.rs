@@ -58,3 +58,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSuggestedUsers<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSuggestedUsersResponse;
 }
+
+///Endpoint type for
+///app.bsky.unspecced.getSuggestedUsers
+pub struct GetSuggestedUsersRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedUsersRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedUsers";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSuggestedUsers<'de>;
+    type Response = GetSuggestedUsersResponse;
+}

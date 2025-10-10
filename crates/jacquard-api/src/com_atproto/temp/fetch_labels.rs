@@ -56,3 +56,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for FetchLabels {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = FetchLabelsResponse;
 }
+
+///Endpoint type for
+///com.atproto.temp.fetchLabels
+pub struct FetchLabelsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for FetchLabelsRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.temp.fetchLabels";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = FetchLabels;
+    type Response = FetchLabelsResponse;
+}

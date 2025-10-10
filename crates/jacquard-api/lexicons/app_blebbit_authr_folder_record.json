@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.folder.record",
+  "revision": 1,
+  "description": "Lexicon for folders on Authr Example",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "properties": {
+          "cuid": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "public": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

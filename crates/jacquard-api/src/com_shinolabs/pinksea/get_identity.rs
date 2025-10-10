@@ -53,3 +53,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetIdentity {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetIdentityResponse;
 }
+
+///Endpoint type for
+///com.shinolabs.pinksea.getIdentity
+pub struct GetIdentityRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetIdentityRequest {
+    const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getIdentity";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetIdentity;
+    type Response = GetIdentityResponse;
+}

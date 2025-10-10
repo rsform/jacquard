@@ -31,7 +31,16 @@ pub struct GetUploadLimitsOutput<'a> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct GetUploadLimits;
 ///Response type for
 ///app.bsky.video.getUploadLimits
@@ -46,5 +55,15 @@ impl jacquard_common::xrpc::XrpcResp for GetUploadLimitsResponse {
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetUploadLimits {
     const NSID: &'static str = "app.bsky.video.getUploadLimits";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetUploadLimitsResponse;
+}
+
+///Endpoint type for
+///app.bsky.video.getUploadLimits
+pub struct GetUploadLimitsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetUploadLimitsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.video.getUploadLimits";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetUploadLimits;
     type Response = GetUploadLimitsResponse;
 }

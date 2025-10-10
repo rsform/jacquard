@@ -4,4 +4,4 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod mushies;
-pub mod nested;
+pub mod mushroom;

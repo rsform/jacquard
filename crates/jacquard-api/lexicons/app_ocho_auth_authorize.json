@@ -1,0 +1,42 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.auth.authorize",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Login to the ATProto via OAuth",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "input",
+            "authorizeOptions"
+          ],
+          "properties": {
+            "authorizeOptions": {
+              "type": "unknown"
+            },
+            "input": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "url"
+          ],
+          "properties": {
+            "url": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

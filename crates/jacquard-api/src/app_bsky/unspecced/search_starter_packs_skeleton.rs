@@ -117,3 +117,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SearchStarterPacksSkeleton
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchStarterPacksSkeletonResponse;
 }
+
+///Endpoint type for
+///app.bsky.unspecced.searchStarterPacksSkeleton
+pub struct SearchStarterPacksSkeletonRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchStarterPacksSkeletonRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.searchStarterPacksSkeleton";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchStarterPacksSkeleton<'de>;
+    type Response = SearchStarterPacksSkeletonResponse;
+}

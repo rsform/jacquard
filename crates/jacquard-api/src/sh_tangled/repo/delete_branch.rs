@@ -50,3 +50,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteBranch<'de> {
     );
     type Response = DeleteBranchResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.deleteBranch
+pub struct DeleteBranchRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteBranchRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.deleteBranch";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteBranch<'de>;
+    type Response = DeleteBranchResponse;
+}

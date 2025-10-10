@@ -1,0 +1,72 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.payment.getStripeIntent",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "iss",
+          "amount",
+          "id"
+        ],
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "description": "The amount to charge in cents",
+            "minimum": 0
+          },
+          "id": {
+            "type": "string",
+            "description": "An identifier linking the payment intent to the user / transaction / payment. Provided by the plugin."
+          },
+          "iss": {
+            "type": "string",
+            "format": "did"
+          },
+          "token": {
+            "type": "string",
+            "description": "The token for the user, optional."
+          }
+        }
+      },
+      "output": {
+        "description": "The intent data",
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "paymentIntent",
+            "ephemeralKey",
+            "customer",
+            "customerSession",
+            "publishableKey"
+          ],
+          "properties": {
+            "customer": {
+              "type": "string",
+              "description": "The customer ID for the payment intent"
+            },
+            "customerSession": {
+              "type": "string",
+              "description": "The customer session ID for the payment intent"
+            },
+            "ephemeralKey": {
+              "type": "string",
+              "description": "The ephemeral key for the payment intent"
+            },
+            "paymentIntent": {
+              "type": "string",
+              "description": "The payment intent ID"
+            },
+            "publishableKey": {
+              "type": "string",
+              "description": "The publishable key for the payment intent"
+            }
+          }
+        }
+      }
+    }
+  }
+}

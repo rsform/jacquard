@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "dev.baileytownsend.health.calories",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A record of daily intake and burned calories.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "intake",
+          "burned",
+          "createdAt"
+        ],
+        "properties": {
+          "burned": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "intake": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

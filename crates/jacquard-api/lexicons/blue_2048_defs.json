@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "blue.2048.defs",
+  "description": "Reusable types for blue.2048 lexicons",
+  "defs": {
+    "syncStatus": {
+      "type": "object",
+      "description": "The sync status for a record used to help sync between your ATProto record and local record.",
+      "required": [
+        "hash",
+        "updatedAt",
+        "createdAt",
+        "syncedWithATRepo"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "hash": {
+          "type": "string",
+          "description": "A XXH3 hash of the record to tell if anything has changed"
+        },
+        "syncedWithATRepo": {
+          "type": "boolean",
+          "description": "A flag to know if it has been synced with the AT repo. Used mostly client side to filter what records need syncing",
+          "default": false
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    }
+  }
+}

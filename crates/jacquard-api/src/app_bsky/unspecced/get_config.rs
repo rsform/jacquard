@@ -43,7 +43,16 @@ pub struct GetConfigOutput<'a> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct GetConfig;
 ///Response type for
 ///app.bsky.unspecced.getConfig
@@ -58,5 +67,15 @@ impl jacquard_common::xrpc::XrpcResp for GetConfigResponse {
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetConfig {
     const NSID: &'static str = "app.bsky.unspecced.getConfig";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetConfigResponse;
+}
+
+///Endpoint type for
+///app.bsky.unspecced.getConfig
+pub struct GetConfigRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetConfigRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getConfig";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetConfig;
     type Response = GetConfigResponse;
 }

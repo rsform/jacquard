@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.edu.isVerified",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "domain"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string"
+          }
+        }
+      },
+      "output": {
+        "description": "Whether the user is verified on that domain",
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "verified"
+          ],
+          "properties": {
+            "verified": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}

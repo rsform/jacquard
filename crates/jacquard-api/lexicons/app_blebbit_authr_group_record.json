@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.group.record",
+  "revision": 1,
+  "description": "Lexicon for groups on Authr Example",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "properties": {
+          "cuid": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "display": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "public": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

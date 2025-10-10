@@ -116,3 +116,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSliceRecords<'de> {
     );
     type Response = GetSliceRecordsResponse;
 }
+
+///Endpoint type for
+///network.slices.slice.getSliceRecords
+pub struct GetSliceRecordsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSliceRecordsRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.getSliceRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = GetSliceRecords<'de>;
+    type Response = GetSliceRecordsResponse;
+}

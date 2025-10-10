@@ -1,0 +1,24 @@
+{
+  "lexicon": 1,
+  "id": "place.atwork.endorsementProof",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A cryptographic proof record that validates an endorsement by containing the CID of the endorsement content.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "cid"
+        ],
+        "properties": {
+          "cid": {
+            "type": "string",
+            "description": "The CID (Content Identifier) of the endorsement content that this proof validates. The endorsement's signatures array references this proof record.",
+            "format": "cid"
+          }
+        }
+      }
+    }
+  }
+}

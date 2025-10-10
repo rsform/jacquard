@@ -228,3 +228,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateAccount<'de> {
     );
     type Response = CreateAccountResponse;
 }
+
+///Endpoint type for
+///com.atproto.server.createAccount
+pub struct CreateAccountRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateAccountRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.createAccount";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateAccount<'de>;
+    type Response = CreateAccountResponse;
+}

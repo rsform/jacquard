@@ -109,3 +109,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetEntryMetadataByName<'de
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEntryMetadataByNameResponse;
 }
+
+///Endpoint type for
+///com.whtwnd.blog.getEntryMetadataByName
+pub struct GetEntryMetadataByNameRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetEntryMetadataByNameRequest {
+    const PATH: &'static str = "/xrpc/com.whtwnd.blog.getEntryMetadataByName";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetEntryMetadataByName<'de>;
+    type Response = GetEntryMetadataByNameResponse;
+}

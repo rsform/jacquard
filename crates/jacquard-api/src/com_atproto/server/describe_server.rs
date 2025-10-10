@@ -76,7 +76,16 @@ pub struct DescribeServerOutput<'a> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct DescribeServer;
 ///Response type for
 ///com.atproto.server.describeServer
@@ -91,5 +100,15 @@ impl jacquard_common::xrpc::XrpcResp for DescribeServerResponse {
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DescribeServer {
     const NSID: &'static str = "com.atproto.server.describeServer";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = DescribeServerResponse;
+}
+
+///Endpoint type for
+///com.atproto.server.describeServer
+pub struct DescribeServerRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DescribeServerRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.describeServer";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = DescribeServer;
     type Response = DescribeServerResponse;
 }

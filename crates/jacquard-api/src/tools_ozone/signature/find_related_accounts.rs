@@ -64,6 +64,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for FindRelatedAccounts<'de> {
     type Response = FindRelatedAccountsResponse;
 }
 
+///Endpoint type for
+///tools.ozone.signature.findRelatedAccounts
+pub struct FindRelatedAccountsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for FindRelatedAccountsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.signature.findRelatedAccounts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = FindRelatedAccounts<'de>;
+    type Response = FindRelatedAccountsResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

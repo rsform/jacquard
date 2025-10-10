@@ -139,3 +139,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for PutRecord<'de> {
     );
     type Response = PutRecordResponse;
 }
+
+///Endpoint type for
+///com.atproto.repo.putRecord
+pub struct PutRecordRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for PutRecordRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.repo.putRecord";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = PutRecord<'de>;
+    type Response = PutRecordResponse;
+}

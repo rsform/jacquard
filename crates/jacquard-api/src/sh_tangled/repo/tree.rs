@@ -177,6 +177,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Tree<'de> {
     type Response = TreeResponse;
 }
 
+///Endpoint type for
+///sh.tangled.repo.tree
+pub struct TreeRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for TreeRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.tree";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Tree<'de>;
+    type Response = TreeResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

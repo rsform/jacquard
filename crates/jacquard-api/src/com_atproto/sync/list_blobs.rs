@@ -146,3 +146,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListBlobs<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListBlobsResponse;
 }
+
+///Endpoint type for
+///com.atproto.sync.listBlobs
+pub struct ListBlobsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListBlobsRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.listBlobs";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListBlobs<'de>;
+    type Response = ListBlobsResponse;
+}

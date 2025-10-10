@@ -77,6 +77,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetPostThreadV2<'de> {
     type Response = GetPostThreadV2Response;
 }
 
+///Endpoint type for
+///app.bsky.unspecced.getPostThreadV2
+pub struct GetPostThreadV2Request;
+impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadV2Request {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getPostThreadV2";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetPostThreadV2<'de>;
+    type Response = GetPostThreadV2Response;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

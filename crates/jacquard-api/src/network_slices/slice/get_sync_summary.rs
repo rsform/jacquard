@@ -89,3 +89,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSyncSummary<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSyncSummaryResponse;
 }
+
+///Endpoint type for
+///network.slices.slice.getSyncSummary
+pub struct GetSyncSummaryRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSyncSummaryRequest {
+    const PATH: &'static str = "/xrpc/network.slices.slice.getSyncSummary";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSyncSummary<'de>;
+    type Response = GetSyncSummaryResponse;
+}

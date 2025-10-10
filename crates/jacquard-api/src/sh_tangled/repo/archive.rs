@@ -142,3 +142,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Archive<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ArchiveResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.archive
+pub struct ArchiveRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ArchiveRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.archive";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Archive<'de>;
+    type Response = ArchiveResponse;
+}

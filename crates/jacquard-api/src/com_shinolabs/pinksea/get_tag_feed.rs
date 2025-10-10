@@ -59,3 +59,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetTagFeed<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTagFeedResponse;
 }
+
+///Endpoint type for
+///com.shinolabs.pinksea.getTagFeed
+pub struct GetTagFeedRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTagFeedRequest {
+    const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getTagFeed";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTagFeed<'de>;
+    type Response = GetTagFeedResponse;
+}

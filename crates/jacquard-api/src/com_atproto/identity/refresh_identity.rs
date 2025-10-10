@@ -138,3 +138,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RefreshIdentity<'de> {
     );
     type Response = RefreshIdentityResponse;
 }
+
+///Endpoint type for
+///com.atproto.identity.refreshIdentity
+pub struct RefreshIdentityRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RefreshIdentityRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.identity.refreshIdentity";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RefreshIdentity<'de>;
+    type Response = RefreshIdentityResponse;
+}

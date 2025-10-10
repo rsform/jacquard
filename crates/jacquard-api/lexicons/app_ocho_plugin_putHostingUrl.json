@@ -1,0 +1,39 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.plugin.putHostingUrl",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Puts the URL your app is hosted on.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "url"
+          ],
+          "properties": {
+            "url": {
+              "type": "string",
+              "description": "The expo push token"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}

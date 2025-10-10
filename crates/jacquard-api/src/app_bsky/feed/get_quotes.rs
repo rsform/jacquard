@@ -71,3 +71,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetQuotes<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetQuotesResponse;
 }
+
+///Endpoint type for
+///app.bsky.feed.getQuotes
+pub struct GetQuotesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetQuotesRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.feed.getQuotes";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetQuotes<'de>;
+    type Response = GetQuotesResponse;
+}

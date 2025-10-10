@@ -6,7 +6,16 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct RequestPlcOperationSignature;
 ///Response type for
 ///com.atproto.identity.requestPlcOperationSignature
@@ -23,5 +32,17 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RequestPlcOperationSignatu
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
+    type Response = RequestPlcOperationSignatureResponse;
+}
+
+///Endpoint type for
+///com.atproto.identity.requestPlcOperationSignature
+pub struct RequestPlcOperationSignatureRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RequestPlcOperationSignatureRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.identity.requestPlcOperationSignature";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RequestPlcOperationSignature;
     type Response = RequestPlcOperationSignatureResponse;
 }

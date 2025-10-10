@@ -53,3 +53,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AddSecret<'de> {
     );
     type Response = AddSecretResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.addSecret
+pub struct AddSecretRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for AddSecretRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.addSecret";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = AddSecret<'de>;
+    type Response = AddSecretResponse;
+}

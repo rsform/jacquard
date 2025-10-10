@@ -101,3 +101,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ResolveHandle<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveHandleResponse;
 }
+
+///Endpoint type for
+///com.atproto.identity.resolveHandle
+pub struct ResolveHandleRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ResolveHandleRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.identity.resolveHandle";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ResolveHandle<'de>;
+    type Response = ResolveHandleResponse;
+}

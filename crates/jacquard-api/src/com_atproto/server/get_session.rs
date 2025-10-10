@@ -40,7 +40,16 @@ pub struct GetSessionOutput<'a> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct GetSession;
 ///Response type for
 ///com.atproto.server.getSession
@@ -55,5 +64,15 @@ impl jacquard_common::xrpc::XrpcResp for GetSessionResponse {
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSession {
     const NSID: &'static str = "com.atproto.server.getSession";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetSessionResponse;
+}
+
+///Endpoint type for
+///com.atproto.server.getSession
+pub struct GetSessionRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetSessionRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.getSession";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetSession;
     type Response = GetSessionResponse;
 }

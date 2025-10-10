@@ -21,7 +21,16 @@ pub struct RequestEmailUpdateOutput<'a> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct RequestEmailUpdate;
 ///Response type for
 ///com.atproto.server.requestEmailUpdate
@@ -38,5 +47,17 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RequestEmailUpdate {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
+    type Response = RequestEmailUpdateResponse;
+}
+
+///Endpoint type for
+///com.atproto.server.requestEmailUpdate
+pub struct RequestEmailUpdateRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RequestEmailUpdateRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.requestEmailUpdate";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RequestEmailUpdate;
     type Response = RequestEmailUpdateResponse;
 }

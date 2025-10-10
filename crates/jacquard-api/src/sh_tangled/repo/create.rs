@@ -59,3 +59,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Create<'de> {
     );
     type Response = CreateResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.create
+pub struct CreateRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.create";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = Create<'de>;
+    type Response = CreateResponse;
+}

@@ -1,0 +1,80 @@
+{
+  "lexicon": 1,
+  "id": "social.clippr.feed.clip",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record containing a bookmarked item, or 'clip'.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "url",
+          "title",
+          "description",
+          "unlisted",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when the bookmark is created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the bookmark's content. This should be ripped from the URL metadata and be static for all records using the URL.",
+            "maxLength": 40960,
+            "maxGraphemes": 4096
+          },
+          "languages": {
+            "type": "array",
+            "description": "Indicates human language of the given URL",
+            "items": {
+              "type": "string",
+              "format": "language"
+            },
+            "maxLength": 5
+          },
+          "notes": {
+            "type": "string",
+            "description": "User-written notes for the bookmark. Public and personal.",
+            "maxLength": 100000,
+            "maxGraphemes": 10000
+          },
+          "tags": {
+            "type": "array",
+            "description": "An array of tags. A format of solely alphanumeric characters and dashes should be used.",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            }
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the bookmark. If left empty, reuse the URL.",
+            "maxLength": 20480,
+            "maxGraphemes": 2048
+          },
+          "unlisted": {
+            "type": "boolean",
+            "description": "Whether the bookmark can be used for feed indexing and aggregation",
+            "default": false
+          },
+          "unread": {
+            "type": "boolean",
+            "description": "Whether the bookmark has been read by the user",
+            "default": true
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL of the bookmark. Cannot be left empty or be modified after creation.",
+            "format": "uri",
+            "maxLength": 20000,
+            "maxGraphemes": 2000
+          }
+        }
+      }
+    }
+  }
+}

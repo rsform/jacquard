@@ -25,7 +25,16 @@ pub struct CheckSignupQueueOutput<'a> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct CheckSignupQueue;
 ///Response type for
 ///com.atproto.temp.checkSignupQueue
@@ -40,5 +49,15 @@ impl jacquard_common::xrpc::XrpcResp for CheckSignupQueueResponse {
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CheckSignupQueue {
     const NSID: &'static str = "com.atproto.temp.checkSignupQueue";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = CheckSignupQueueResponse;
+}
+
+///Endpoint type for
+///com.atproto.temp.checkSignupQueue
+pub struct CheckSignupQueueRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CheckSignupQueueRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.temp.checkSignupQueue";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = CheckSignupQueue;
     type Response = CheckSignupQueueResponse;
 }

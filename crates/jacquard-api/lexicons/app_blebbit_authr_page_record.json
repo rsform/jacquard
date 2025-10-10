@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.page.record",
+  "revision": 1,
+  "description": "Lexicon for pages on Authr Example",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "cuid": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "public": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

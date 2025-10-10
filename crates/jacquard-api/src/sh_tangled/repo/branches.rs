@@ -116,3 +116,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Branches<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = BranchesResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.branches
+pub struct BranchesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for BranchesRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.branches";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = Branches<'de>;
+    type Response = BranchesResponse;
+}

@@ -66,3 +66,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for LeaveConvo<'de> {
     );
     type Response = LeaveConvoResponse;
 }
+
+///Endpoint type for
+///chat.bsky.convo.leaveConvo
+pub struct LeaveConvoRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for LeaveConvoRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.leaveConvo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = LeaveConvo<'de>;
+    type Response = LeaveConvoResponse;
+}

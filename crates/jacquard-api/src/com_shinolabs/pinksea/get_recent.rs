@@ -56,3 +56,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRecent {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRecentResponse;
 }
+
+///Endpoint type for
+///com.shinolabs.pinksea.getRecent
+pub struct GetRecentRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRecentRequest {
+    const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getRecent";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRecent;
+    type Response = GetRecentResponse;
+}

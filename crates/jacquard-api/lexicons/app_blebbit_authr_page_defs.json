@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.page.defs",
+  "revision": 1,
+  "description": "Common page defs for the Authr Example",
+  "defs": {
+    "pageForm": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "public": {
+          "type": "boolean"
+        }
+      }
+    },
+    "pageView": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "cuid": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "public": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

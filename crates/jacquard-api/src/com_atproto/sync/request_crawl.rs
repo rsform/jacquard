@@ -94,3 +94,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RequestCrawl<'de> {
     );
     type Response = RequestCrawlResponse;
 }
+
+///Endpoint type for
+///com.atproto.sync.requestCrawl
+pub struct RequestCrawlRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for RequestCrawlRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.requestCrawl";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = RequestCrawl<'de>;
+    type Response = RequestCrawlResponse;
+}

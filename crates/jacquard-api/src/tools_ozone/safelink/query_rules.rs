@@ -100,3 +100,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for QueryRules<'de> {
     );
     type Response = QueryRulesResponse;
 }
+
+///Endpoint type for
+///tools.ozone.safelink.queryRules
+pub struct QueryRulesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for QueryRulesRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.safelink.queryRules";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = QueryRules<'de>;
+    type Response = QueryRulesResponse;
+}

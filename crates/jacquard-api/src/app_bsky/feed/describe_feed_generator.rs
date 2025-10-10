@@ -63,7 +63,16 @@ pub struct DescribeFeedGeneratorOutput<'a> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct DescribeFeedGenerator;
 ///Response type for
 ///app.bsky.feed.describeFeedGenerator
@@ -78,5 +87,15 @@ impl jacquard_common::xrpc::XrpcResp for DescribeFeedGeneratorResponse {
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DescribeFeedGenerator {
     const NSID: &'static str = "app.bsky.feed.describeFeedGenerator";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = DescribeFeedGeneratorResponse;
+}
+
+///Endpoint type for
+///app.bsky.feed.describeFeedGenerator
+pub struct DescribeFeedGeneratorRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DescribeFeedGeneratorRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.feed.describeFeedGenerator";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = DescribeFeedGenerator;
     type Response = DescribeFeedGeneratorResponse;
 }

@@ -101,6 +101,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAccountTimeline<'de> {
     type Response = GetAccountTimelineResponse;
 }
 
+///Endpoint type for
+///tools.ozone.moderation.getAccountTimeline
+pub struct GetAccountTimelineRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetAccountTimelineRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.getAccountTimeline";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetAccountTimeline<'de>;
+    type Response = GetAccountTimelineResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

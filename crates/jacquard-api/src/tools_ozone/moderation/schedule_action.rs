@@ -110,6 +110,18 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ScheduleAction<'de> {
     type Response = ScheduleActionResponse;
 }
 
+///Endpoint type for
+///tools.ozone.moderation.scheduleAction
+pub struct ScheduleActionRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ScheduleActionRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.scheduleAction";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = ScheduleAction<'de>;
+    type Response = ScheduleActionResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

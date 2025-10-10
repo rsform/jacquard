@@ -54,3 +54,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetHandleFromDid<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetHandleFromDidResponse;
 }
+
+///Endpoint type for
+///com.shinolabs.pinksea.getHandleFromDid
+pub struct GetHandleFromDidRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetHandleFromDidRequest {
+    const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getHandleFromDid";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetHandleFromDid<'de>;
+    type Response = GetHandleFromDidResponse;
+}

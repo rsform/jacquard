@@ -114,3 +114,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetFeedSkeleton<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetFeedSkeletonResponse;
 }
+
+///Endpoint type for
+///app.bsky.feed.getFeedSkeleton
+pub struct GetFeedSkeletonRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetFeedSkeletonRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.feed.getFeedSkeleton";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetFeedSkeleton<'de>;
+    type Response = GetFeedSkeletonResponse;
+}

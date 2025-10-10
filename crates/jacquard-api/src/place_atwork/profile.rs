@@ -18,6 +18,14 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
+    ///Small image to be displayed next to job listings from account. AKA, 'profile picture'
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub avatar: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
+    ///Larger horizontal image to display behind profile view.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub banner: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
     ///A free text description of the identity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -30,6 +38,14 @@ pub struct Profile<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    ///The service used for profile links
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub profile_host: std::option::Option<jacquard_common::CowStr<'a>>,
+    ///The identity's resume.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub resume: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
     ///The current status of the identity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]

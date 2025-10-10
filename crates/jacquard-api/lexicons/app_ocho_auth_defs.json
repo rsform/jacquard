@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.auth.defs",
+  "defs": {
+    "authCallback": {
+      "type": "object",
+      "required": [
+        "refreshJwt",
+        "accessJwt",
+        "handle",
+        "did"
+      ],
+      "properties": {
+        "accessJwt": {
+          "type": "string"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "handle": {
+          "type": "string"
+        },
+        "refreshJwt": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

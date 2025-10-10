@@ -52,3 +52,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateActorAccess<'de> {
     );
     type Response = UpdateActorAccessResponse;
 }
+
+///Endpoint type for
+///chat.bsky.moderation.updateActorAccess
+pub struct UpdateActorAccessRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateActorAccessRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.moderation.updateActorAccess";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateActorAccess<'de>;
+    type Response = UpdateActorAccessResponse;
+}

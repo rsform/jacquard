@@ -1,0 +1,7 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.group.authzed",
+  "revision": 1,
+  "description": "Relations and permissions available on groups for the Authr Example",
+  "defs": {}
+}

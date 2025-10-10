@@ -106,3 +106,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetServiceAuth<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetServiceAuthResponse;
 }
+
+///Endpoint type for
+///com.atproto.server.getServiceAuth
+pub struct GetServiceAuthRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetServiceAuthRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.getServiceAuth";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetServiceAuth<'de>;
+    type Response = GetServiceAuthResponse;
+}

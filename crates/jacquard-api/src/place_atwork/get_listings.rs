@@ -46,6 +46,10 @@ pub struct GetListings<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     #[builder(into)]
+    pub identity: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    #[builder(into)]
     pub tag: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
@@ -78,5 +82,15 @@ impl jacquard_common::xrpc::XrpcResp for GetListingsResponse {
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetListings<'de> {
     const NSID: &'static str = "place.atwork.getListings";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetListingsResponse;
+}
+
+///Endpoint type for
+///place.atwork.getListings
+pub struct GetListingsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetListingsRequest {
+    const PATH: &'static str = "/xrpc/place.atwork.getListings";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetListings<'de>;
     type Response = GetListingsResponse;
 }

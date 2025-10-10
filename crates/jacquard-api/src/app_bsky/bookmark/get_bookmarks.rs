@@ -61,3 +61,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetBookmarks<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBookmarksResponse;
 }
+
+///Endpoint type for
+///app.bsky.bookmark.getBookmarks
+pub struct GetBookmarksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetBookmarksRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.bookmark.getBookmarks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetBookmarks<'de>;
+    type Response = GetBookmarksResponse;
+}

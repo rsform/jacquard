@@ -87,3 +87,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for QueryEvents<'de> {
     );
     type Response = QueryEventsResponse;
 }
+
+///Endpoint type for
+///tools.ozone.safelink.queryEvents
+pub struct QueryEventsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for QueryEventsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.safelink.queryEvents";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = QueryEvents<'de>;
+    type Response = QueryEventsResponse;
+}

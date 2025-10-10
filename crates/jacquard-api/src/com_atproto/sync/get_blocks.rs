@@ -144,3 +144,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetBlocks<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBlocksResponse;
 }
+
+///Endpoint type for
+///com.atproto.sync.getBlocks
+pub struct GetBlocksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetBlocksRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.getBlocks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetBlocks<'de>;
+    type Response = GetBlocksResponse;
+}

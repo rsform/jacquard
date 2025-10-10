@@ -73,6 +73,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListNotifications<'de> {
     type Response = ListNotificationsResponse;
 }
 
+///Endpoint type for
+///app.bsky.notification.listNotifications
+pub struct ListNotificationsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListNotificationsRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.notification.listNotifications";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListNotifications<'de>;
+    type Response = ListNotificationsResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

@@ -124,3 +124,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateEmail<'de> {
     );
     type Response = UpdateEmailResponse;
 }
+
+///Endpoint type for
+///com.atproto.server.updateEmail
+pub struct UpdateEmailRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateEmailRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.server.updateEmail";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateEmail<'de>;
+    type Response = UpdateEmailResponse;
+}

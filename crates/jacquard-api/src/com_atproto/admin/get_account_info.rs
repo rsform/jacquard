@@ -54,3 +54,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAccountInfo<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAccountInfoResponse;
 }
+
+///Endpoint type for
+///com.atproto.admin.getAccountInfo
+pub struct GetAccountInfoRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInfoRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.getAccountInfo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetAccountInfo<'de>;
+    type Response = GetAccountInfoResponse;
+}

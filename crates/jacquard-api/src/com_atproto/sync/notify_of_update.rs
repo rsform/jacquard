@@ -49,3 +49,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for NotifyOfUpdate<'de> {
     );
     type Response = NotifyOfUpdateResponse;
 }
+
+///Endpoint type for
+///com.atproto.sync.notifyOfUpdate
+pub struct NotifyOfUpdateRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for NotifyOfUpdateRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.notifyOfUpdate";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = NotifyOfUpdate<'de>;
+    type Response = NotifyOfUpdateResponse;
+}

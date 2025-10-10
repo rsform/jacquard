@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "social.clippr.feed.getClips",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a list of clips. Does not require auth.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uris"
+        ],
+        "properties": {
+          "uris": {
+            "type": "array",
+            "description": "List of clip AT-URIs to return hydrated views for",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "maxLength": 25
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "clips"
+          ],
+          "properties": {
+            "clips": {
+              "type": "array",
+              "description": "An array of hydrated clip views",
+              "items": {
+                "type": "ref",
+                "ref": "social.clippr.feed.defs#clipView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

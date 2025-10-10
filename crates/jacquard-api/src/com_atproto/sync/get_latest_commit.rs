@@ -137,3 +137,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetLatestCommit<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLatestCommitResponse;
 }
+
+///Endpoint type for
+///com.atproto.sync.getLatestCommit
+pub struct GetLatestCommitRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetLatestCommitRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.getLatestCommit";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetLatestCommit<'de>;
+    type Response = GetLatestCommitResponse;
+}

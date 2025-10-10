@@ -67,3 +67,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SendMessage<'de> {
     );
     type Response = SendMessageResponse;
 }
+
+///Endpoint type for
+///chat.bsky.convo.sendMessage
+pub struct SendMessageRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SendMessageRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.sendMessage";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = SendMessage<'de>;
+    type Response = SendMessageResponse;
+}

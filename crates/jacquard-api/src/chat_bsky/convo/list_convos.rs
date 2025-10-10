@@ -69,3 +69,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListConvos<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListConvosResponse;
 }
+
+///Endpoint type for
+///chat.bsky.convo.listConvos
+pub struct ListConvosRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListConvosRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.listConvos";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListConvos<'de>;
+    type Response = ListConvosResponse;
+}

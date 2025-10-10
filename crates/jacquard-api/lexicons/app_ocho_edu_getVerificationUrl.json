@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.edu.getVerificationUrl",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "domain"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string"
+          }
+        }
+      },
+      "output": {
+        "description": "The intent data",
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "url"
+          ],
+          "properties": {
+            "url": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -168,3 +168,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateWebhook<'de> {
     );
     type Response = CreateWebhookResponse;
 }
+
+///Endpoint type for
+///place.stream.server.createWebhook
+pub struct CreateWebhookRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CreateWebhookRequest {
+    const PATH: &'static str = "/xrpc/place.stream.server.createWebhook";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = CreateWebhook<'de>;
+    type Response = CreateWebhookResponse;
+}

@@ -1,0 +1,63 @@
+{
+  "lexicon": 1,
+  "id": "dev.fudgeu.experimental.atforumv1.feed.post",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An initial post that starts a discussion",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "content",
+          "createdAt",
+          "category",
+          "forum",
+          "tags"
+        ],
+        "properties": {
+          "category": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "forum": {
+            "type": "string",
+            "format": "at-identifier"
+          },
+          "solution": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 25
+            },
+            "maxLength": 20
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

@@ -59,3 +59,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ForkSync<'de> {
     );
     type Response = ForkSyncResponse;
 }
+
+///Endpoint type for
+///sh.tangled.repo.forkSync
+pub struct ForkSyncRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ForkSyncRequest {
+    const PATH: &'static str = "/xrpc/sh.tangled.repo.forkSync";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = ForkSync<'de>;
+    type Response = ForkSyncResponse;
+}

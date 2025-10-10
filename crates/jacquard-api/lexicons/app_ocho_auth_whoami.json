@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.auth.whoami",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "A handler for the Ocho AppView Oauth system",
+      "output": {
+        "description": "The session data",
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "did",
+            "handle"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "The user's DID"
+            },
+            "handle": {
+              "type": "string",
+              "description": "The user's ID"
+            }
+          }
+        }
+      }
+    }
+  }
+}

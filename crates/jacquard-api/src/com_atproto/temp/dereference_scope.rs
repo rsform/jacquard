@@ -103,3 +103,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DereferenceScope<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = DereferenceScopeResponse;
 }
+
+///Endpoint type for
+///com.atproto.temp.dereferenceScope
+pub struct DereferenceScopeRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DereferenceScopeRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.temp.dereferenceScope";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = DereferenceScope<'de>;
+    type Response = DereferenceScopeResponse;
+}

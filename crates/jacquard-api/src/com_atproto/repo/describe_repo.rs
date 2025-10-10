@@ -63,3 +63,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DescribeRepo<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = DescribeRepoResponse;
 }
+
+///Endpoint type for
+///com.atproto.repo.describeRepo
+pub struct DescribeRepoRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DescribeRepoRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.repo.describeRepo";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = DescribeRepo<'de>;
+    type Response = DescribeRepoResponse;
+}

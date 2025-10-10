@@ -47,3 +47,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SubmitPlcOperation<'de> {
     );
     type Response = SubmitPlcOperationResponse;
 }
+
+///Endpoint type for
+///com.atproto.identity.submitPlcOperation
+pub struct SubmitPlcOperationRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SubmitPlcOperationRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.identity.submitPlcOperation";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = SubmitPlcOperation<'de>;
+    type Response = SubmitPlcOperationResponse;
+}

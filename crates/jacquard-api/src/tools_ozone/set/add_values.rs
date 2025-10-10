@@ -52,3 +52,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AddValues<'de> {
     );
     type Response = AddValuesResponse;
 }
+
+///Endpoint type for
+///tools.ozone.set.addValues
+pub struct AddValuesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for AddValuesRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.set.addValues";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = AddValues<'de>;
+    type Response = AddValuesResponse;
+}

@@ -53,3 +53,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRecords<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRecordsResponse;
 }
+
+///Endpoint type for
+///tools.ozone.moderation.getRecords
+pub struct GetRecordsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRecordsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.moderation.getRecords";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRecords<'de>;
+    type Response = GetRecordsResponse;
+}

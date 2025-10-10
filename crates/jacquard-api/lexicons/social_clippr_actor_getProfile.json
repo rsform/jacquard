@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "social.clippr.actor.getProfile",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get profile view of an actor. Does not require auth.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "Handle or DID of account to fetch profile of",
+            "format": "at-identifier"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "description": "A reference to the profile view of the actor",
+          "ref": "social.clippr.actor.defs#profileView"
+        }
+      }
+    }
+  }
+}

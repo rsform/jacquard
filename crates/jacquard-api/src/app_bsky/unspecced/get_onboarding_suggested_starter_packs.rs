@@ -55,3 +55,13 @@ for GetOnboardingSuggestedStarterPacks {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetOnboardingSuggestedStarterPacksResponse;
 }
+
+///Endpoint type for
+///app.bsky.unspecced.getOnboardingSuggestedStarterPacks
+pub struct GetOnboardingSuggestedStarterPacksRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetOnboardingSuggestedStarterPacksRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.unspecced.getOnboardingSuggestedStarterPacks";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetOnboardingSuggestedStarterPacks;
+    type Response = GetOnboardingSuggestedStarterPacksResponse;
+}

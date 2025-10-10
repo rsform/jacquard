@@ -47,3 +47,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for MuteActorList<'de> {
     );
     type Response = MuteActorListResponse;
 }
+
+///Endpoint type for
+///app.bsky.graph.muteActorList
+pub struct MuteActorListRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for MuteActorListRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.graph.muteActorList";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = MuteActorList<'de>;
+    type Response = MuteActorListResponse;
+}

@@ -63,3 +63,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SearchAccounts<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchAccountsResponse;
 }
+
+///Endpoint type for
+///tools.ozone.signature.searchAccounts
+pub struct SearchAccountsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for SearchAccountsRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.signature.searchAccounts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = SearchAccounts<'de>;
+    type Response = SearchAccountsResponse;
+}

@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.plugin.service",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "The definitions for the plugin.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "permissions"
+        ],
+        "properties": {
+          "db": {
+            "type": "ref",
+            "ref": "app.ocho.plugin.defs#db"
+          },
+          "permissions": {
+            "type": "array",
+            "description": "Additional metadata for the plugin, including Expo client and Go configurations.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.group.createGroup",
+  "revision": 1,
+  "description": "create a group",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "display": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "public": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "cuid": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "display": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "public": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}

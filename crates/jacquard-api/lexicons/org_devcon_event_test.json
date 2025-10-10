@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "org.devcon.event.test",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "start",
+          "end"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the event"
+          },
+          "end": {
+            "type": "string",
+            "description": "End time of the event",
+            "format": "datetime"
+          },
+          "location": {
+            "type": "string",
+            "description": "Location of the event"
+          },
+          "start": {
+            "type": "string",
+            "description": "Start time of the event",
+            "format": "datetime"
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the event"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL of the event"
+          }
+        }
+      }
+    }
+  }
+}

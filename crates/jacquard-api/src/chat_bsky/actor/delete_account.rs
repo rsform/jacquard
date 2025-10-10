@@ -18,7 +18,16 @@
 #[serde(rename_all = "camelCase")]
 pub struct DeleteAccountOutput<'a> {}
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct DeleteAccount;
 ///Response type for
 ///chat.bsky.actor.deleteAccount
@@ -35,5 +44,17 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteAccount {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
+    type Response = DeleteAccountResponse;
+}
+
+///Endpoint type for
+///chat.bsky.actor.deleteAccount
+pub struct DeleteAccountRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteAccountRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.actor.deleteAccount";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteAccount;
     type Response = DeleteAccountResponse;
 }

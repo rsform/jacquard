@@ -65,3 +65,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetTimeline<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTimelineResponse;
 }
+
+///Endpoint type for
+///app.bsky.feed.getTimeline
+pub struct GetTimelineRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetTimelineRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.feed.getTimeline";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetTimeline<'de>;
+    type Response = GetTimelineResponse;
+}

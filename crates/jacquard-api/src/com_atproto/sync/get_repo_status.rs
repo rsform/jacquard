@@ -108,3 +108,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRepoStatus<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRepoStatusResponse;
 }
+
+///Endpoint type for
+///com.atproto.sync.getRepoStatus
+pub struct GetRepoStatusRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetRepoStatusRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.getRepoStatus";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetRepoStatus<'de>;
+    type Response = GetRepoStatusResponse;
+}

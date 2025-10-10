@@ -167,6 +167,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAccountHistory<'de> {
     type Response = GetAccountHistoryResponse;
 }
 
+///Endpoint type for
+///tools.ozone.hosting.getAccountHistory
+pub struct GetAccountHistoryRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetAccountHistoryRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.hosting.getAccountHistory";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetAccountHistory<'de>;
+    type Response = GetAccountHistoryResponse;
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

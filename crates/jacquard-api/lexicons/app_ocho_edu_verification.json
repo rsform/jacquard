@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "app.ocho.edu.verification",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring a verification relationship between an account and a .edu domain. Verifications are only considered valid by an app if issued by an account the app considers trusted.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "domain",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Date of when the verification was created.",
+            "format": "datetime"
+          },
+          "domain": {
+            "type": "string",
+            "description": "The domain the subject is verified under."
+          },
+          "subject": {
+            "type": "string",
+            "description": "DID of the subject the verification applies to.",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

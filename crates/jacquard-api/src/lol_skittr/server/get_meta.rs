@@ -29,7 +29,16 @@ pub struct GetMetaOutput<'a> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct GetMeta;
 ///Response type for
 ///lol.skittr.server.getMeta
@@ -44,5 +53,15 @@ impl jacquard_common::xrpc::XrpcResp for GetMetaResponse {
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetMeta {
     const NSID: &'static str = "lol.skittr.server.getMeta";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = GetMetaResponse;
+}
+
+///Endpoint type for
+///lol.skittr.server.getMeta
+pub struct GetMetaRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetMetaRequest {
+    const PATH: &'static str = "/xrpc/lol.skittr.server.getMeta";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetMeta;
     type Response = GetMetaResponse;
 }

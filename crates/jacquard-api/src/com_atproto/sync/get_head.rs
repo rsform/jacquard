@@ -96,3 +96,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetHead<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetHeadResponse;
 }
+
+///Endpoint type for
+///com.atproto.sync.getHead
+pub struct GetHeadRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetHeadRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.getHead";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetHead<'de>;
+    type Response = GetHeadResponse;
+}

@@ -52,3 +52,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DisableAccountInvites<'de>
     );
     type Response = DisableAccountInvitesResponse;
 }
+
+///Endpoint type for
+///com.atproto.admin.disableAccountInvites
+pub struct DisableAccountInvitesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DisableAccountInvitesRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.admin.disableAccountInvites";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DisableAccountInvites<'de>;
+    type Response = DisableAccountInvitesResponse;
+}

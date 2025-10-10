@@ -53,3 +53,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAuthorPosts<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAuthorPostsResponse;
 }
+
+///Endpoint type for
+///com.whtwnd.blog.getAuthorPosts
+pub struct GetAuthorPostsRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorPostsRequest {
+    const PATH: &'static str = "/xrpc/com.whtwnd.blog.getAuthorPosts";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetAuthorPosts<'de>;
+    type Response = GetAuthorPostsResponse;
+}

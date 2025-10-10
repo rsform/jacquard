@@ -68,3 +68,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateRead<'de> {
     );
     type Response = UpdateReadResponse;
 }
+
+///Endpoint type for
+///chat.bsky.convo.updateRead
+pub struct UpdateReadRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateReadRequest {
+    const PATH: &'static str = "/xrpc/chat.bsky.convo.updateRead";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateRead<'de>;
+    type Response = UpdateReadResponse;
+}

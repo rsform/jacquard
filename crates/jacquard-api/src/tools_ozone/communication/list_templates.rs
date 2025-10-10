@@ -24,7 +24,16 @@ pub struct ListTemplatesOutput<'a> {
 }
 
 /// XRPC request marker type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    jacquard_derive::IntoStatic
+)]
 pub struct ListTemplates;
 ///Response type for
 ///tools.ozone.communication.listTemplates
@@ -39,5 +48,15 @@ impl jacquard_common::xrpc::XrpcResp for ListTemplatesResponse {
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListTemplates {
     const NSID: &'static str = "tools.ozone.communication.listTemplates";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Response = ListTemplatesResponse;
+}
+
+///Endpoint type for
+///tools.ozone.communication.listTemplates
+pub struct ListTemplatesRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for ListTemplatesRequest {
+    const PATH: &'static str = "/xrpc/tools.ozone.communication.listTemplates";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = ListTemplates;
     type Response = ListTemplatesResponse;
 }

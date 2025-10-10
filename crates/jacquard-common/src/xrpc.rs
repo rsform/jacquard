@@ -483,13 +483,20 @@ where
         .map_err(|e| TransportError::InvalidRequest(e.to_string()))
 }
 
+pub trait XrpcEndpoint {
+    const PATH: &'static str;
+    const METHOD: XrpcMethod;
+    type Request<'de>: XrpcRequest<'de> + IntoStatic;
+    type Response: XrpcResp;
+}
+
 /// XRPC response wrapper that owns the response buffer
 ///
 /// Allows borrowing from the buffer when parsing to avoid unnecessary allocations.
 /// Generic over the response marker type (e.g., `GetAuthorFeedResponse`), not the request.
 pub struct Response<Resp>
 where
-    Resp: for<'any> XrpcResp, // HRTB: Resp works with any lifetime
+    Resp: XrpcResp, // HRTB: Resp works with any lifetime
 {
     _marker: PhantomData<fn() -> Resp>,
     buffer: Bytes,
@@ -498,7 +505,7 @@ where
 
 impl<Resp> Response<Resp>
 where
-    Resp: for<'any> XrpcResp,
+    Resp: XrpcResp,
 {
     /// Create a new response from a buffer and status code
     pub fn new(buffer: Bytes, status: StatusCode) -> Self {

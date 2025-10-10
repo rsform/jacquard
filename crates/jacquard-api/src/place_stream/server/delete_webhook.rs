@@ -126,3 +126,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteWebhook<'de> {
     );
     type Response = DeleteWebhookResponse;
 }
+
+///Endpoint type for
+///place.stream.server.deleteWebhook
+pub struct DeleteWebhookRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for DeleteWebhookRequest {
+    const PATH: &'static str = "/xrpc/place.stream.server.deleteWebhook";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = DeleteWebhook<'de>;
+    type Response = DeleteWebhookResponse;
+}

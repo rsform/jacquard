@@ -59,3 +59,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetLiveUsers {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLiveUsersResponse;
 }
+
+///Endpoint type for
+///place.stream.live.getLiveUsers
+pub struct GetLiveUsersRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetLiveUsersRequest {
+    const PATH: &'static str = "/xrpc/place.stream.live.getLiveUsers";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetLiveUsers;
+    type Response = GetLiveUsersResponse;
+}

@@ -49,3 +49,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetCheckout<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetCheckoutResponse;
 }
+
+///Endpoint type for
+///com.atproto.sync.getCheckout
+pub struct GetCheckoutRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetCheckoutRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.getCheckout";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetCheckout<'de>;
+    type Response = GetCheckoutResponse;
+}

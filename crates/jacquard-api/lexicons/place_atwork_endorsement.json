@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "place.atwork.endorsement",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A cryptographically-verified professional endorsement between two identities.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "giver",
+          "receiver",
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the endorsement was created.",
+            "format": "datetime"
+          },
+          "giver": {
+            "type": "string",
+            "description": "The DID of the identity giving the endorsement.",
+            "format": "did"
+          },
+          "receiver": {
+            "type": "string",
+            "description": "The DID of the identity receiving the endorsement.",
+            "format": "did"
+          },
+          "signatures": {
+            "type": "array",
+            "description": "Verified signatures from endorsement proofs (strong references).",
+            "items": {
+              "type": "union",
+              "refs": [
+                "com.atproto.repo.strongRef"
+              ]
+            }
+          },
+          "text": {
+            "type": "string",
+            "description": "The endorsement text content.",
+            "maxLength": 1000,
+            "maxGraphemes": 1000
+          }
+        }
+      }
+    }
+  }
+}

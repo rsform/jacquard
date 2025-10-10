@@ -46,3 +46,15 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateSeen<'de> {
     );
     type Response = UpdateSeenResponse;
 }
+
+///Endpoint type for
+///app.bsky.notification.updateSeen
+pub struct UpdateSeenRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for UpdateSeenRequest {
+    const PATH: &'static str = "/xrpc/app.bsky.notification.updateSeen";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
+    type Request<'de> = UpdateSeen<'de>;
+    type Response = UpdateSeenResponse;
+}

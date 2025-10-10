@@ -124,6 +124,16 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CheckHandleAvailability<'d
     type Response = CheckHandleAvailabilityResponse;
 }
 
+///Endpoint type for
+///com.atproto.temp.checkHandleAvailability
+pub struct CheckHandleAvailabilityRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for CheckHandleAvailabilityRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.temp.checkHandleAvailability";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = CheckHandleAvailability<'de>;
+    type Response = CheckHandleAvailabilityResponse;
+}
+
 ///Indicates the provided handle is available.
 #[jacquard_derive::lexicon]
 #[derive(

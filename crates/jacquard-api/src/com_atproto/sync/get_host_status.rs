@@ -110,3 +110,13 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetHostStatus<'de> {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetHostStatusResponse;
 }
+
+///Endpoint type for
+///com.atproto.sync.getHostStatus
+pub struct GetHostStatusRequest;
+impl jacquard_common::xrpc::XrpcEndpoint for GetHostStatusRequest {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.getHostStatus";
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
+    type Request<'de> = GetHostStatus<'de>;
+    type Response = GetHostStatusResponse;
+}
