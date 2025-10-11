@@ -97,7 +97,7 @@ Jacquard is broken up into several crates for modularity. The correct one to use
 
 ## Changelog
 
-[./CHANGELOG.md]
+[CHANGELOG.md](./CHANGELOG.md)
 
 Highlights:
 
