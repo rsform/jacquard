@@ -1874,7 +1874,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-identity"
-version = "0.3.1"
+version = "0.4.0"
 dependencies = [
  "async-trait",
  "bon",
@@ -1926,7 +1926,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-oauth"
-version = "0.3.1"
+version = "0.4.0"
 dependencies = [
  "async-trait",
  "base64 0.22.1",

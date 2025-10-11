@@ -2606,7 +2606,8 @@ impl<'c> CodeGenerator<'c> {
         if let Some(lib_rs) = lib_rs_path {
             if let Ok(content) = std::fs::read_to_string(lib_rs) {
                 for line in content.lines() {
-                    if let Some(feature) = line.trim()
+                    if let Some(feature) = line
+                        .trim()
                         .strip_prefix("#[cfg(feature = \"")
                         .and_then(|s| s.strip_suffix("\")]"))
                     {
@@ -2618,7 +2619,6 @@ impl<'c> CodeGenerator<'c> {
 
         let mut output = String::new();
         writeln!(&mut output, "# Generated namespace features").unwrap();
-        writeln!(&mut output, "# Each namespace feature automatically enables its dependencies").unwrap();
 
         // Convert namespace to feature name (matching module path sanitization)
         let to_feature_name = |ns: &str| {
@@ -2648,7 +2648,8 @@ impl<'c> CodeGenerator<'c> {
         feature_names.sort();
 
         // Map namespace to feature name for dependency lookup
-        let mut ns_to_feature: std::collections::HashMap<&str, String> = std::collections::HashMap::new();
+        let mut ns_to_feature: std::collections::HashMap<&str, String> =
+            std::collections::HashMap::new();
         for ns in &all_namespaces {
             ns_to_feature.insert(ns.as_str(), to_feature_name(ns));
         }

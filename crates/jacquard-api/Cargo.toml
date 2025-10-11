@@ -34,7 +34,6 @@ ufos = [ "moe_karashiiro", "dev_regnault", "buzz_bookhive", "uk_ewancroft",  "wi
 
 # --- generated ---
 # Generated namespace features
-# Each namespace feature automatically enables its dependencies
 app_blebbit = []
 app_bsky = ["com_atproto"]
 app_ocho = []

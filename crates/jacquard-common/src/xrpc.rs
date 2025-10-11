@@ -21,12 +21,12 @@ use std::fmt::{self, Debug};
 use std::{error::Error, marker::PhantomData};
 use url::Url;
 
-use crate::error::TransportError;
 use crate::http_client::HttpClient;
 use crate::types::value::Data;
 use crate::{AuthorizationToken, error::AuthError};
 use crate::{CowStr, error::XrpcResult};
 use crate::{IntoStatic, error::DecodeError};
+use crate::{error::TransportError, types::value::RawData};
 
 /// Error type for encoding XRPC requests
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
@@ -541,6 +541,106 @@ where
     pub fn parse<'s>(
         &'s self,
     ) -> Result<<Resp as XrpcResp>::Output<'s>, XrpcError<<Resp as XrpcResp>::Err<'s>>> {
+        // 200: parse as output
+        if self.status.is_success() {
+            match serde_json::from_slice::<_>(&self.buffer) {
+                Ok(output) => Ok(output),
+                Err(e) => Err(XrpcError::Decode(e)),
+            }
+        // 400: try typed XRPC error, fallback to generic error
+        } else if self.status.as_u16() == 400 {
+            match serde_json::from_slice::<_>(&self.buffer) {
+                Ok(error) => Err(XrpcError::Xrpc(error)),
+                Err(_) => {
+                    // Fallback to generic error (InvalidRequest, ExpiredToken, etc.)
+                    match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
+                        Ok(mut generic) => {
+                            generic.nsid = Resp::NSID;
+                            generic.method = ""; // method info only available on request
+                            generic.http_status = self.status;
+                            // Map auth-related errors to AuthError
+                            match generic.error.as_str() {
+                                "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
+                                "InvalidToken" => Err(XrpcError::Auth(AuthError::InvalidToken)),
+                                _ => Err(XrpcError::Generic(generic)),
+                            }
+                        }
+                        Err(e) => Err(XrpcError::Decode(e)),
+                    }
+                }
+            }
+        // 401: always auth error
+        } else {
+            match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
+                Ok(mut generic) => {
+                    generic.nsid = Resp::NSID;
+                    generic.method = ""; // method info only available on request
+                    generic.http_status = self.status;
+                    match generic.error.as_str() {
+                        "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
+                        "InvalidToken" => Err(XrpcError::Auth(AuthError::InvalidToken)),
+                        _ => Err(XrpcError::Auth(AuthError::NotAuthenticated)),
+                    }
+                }
+                Err(e) => Err(XrpcError::Decode(e)),
+            }
+        }
+    }
+
+    /// Parse this as validated, loosely typed atproto data.
+    ///
+    /// NOTE: If the response is an error, it will still parse as the matching error type for the request.
+    pub fn parse_data<'s>(&'s self) -> Result<Data<'s>, XrpcError<<Resp as XrpcResp>::Err<'s>>> {
+        // 200: parse as output
+        if self.status.is_success() {
+            match serde_json::from_slice::<_>(&self.buffer) {
+                Ok(output) => Ok(output),
+                Err(e) => Err(XrpcError::Decode(e)),
+            }
+        // 400: try typed XRPC error, fallback to generic error
+        } else if self.status.as_u16() == 400 {
+            match serde_json::from_slice::<_>(&self.buffer) {
+                Ok(error) => Err(XrpcError::Xrpc(error)),
+                Err(_) => {
+                    // Fallback to generic error (InvalidRequest, ExpiredToken, etc.)
+                    match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
+                        Ok(mut generic) => {
+                            generic.nsid = Resp::NSID;
+                            generic.method = ""; // method info only available on request
+                            generic.http_status = self.status;
+                            // Map auth-related errors to AuthError
+                            match generic.error.as_str() {
+                                "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
+                                "InvalidToken" => Err(XrpcError::Auth(AuthError::InvalidToken)),
+                                _ => Err(XrpcError::Generic(generic)),
+                            }
+                        }
+                        Err(e) => Err(XrpcError::Decode(e)),
+                    }
+                }
+            }
+        // 401: always auth error
+        } else {
+            match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
+                Ok(mut generic) => {
+                    generic.nsid = Resp::NSID;
+                    generic.method = ""; // method info only available on request
+                    generic.http_status = self.status;
+                    match generic.error.as_str() {
+                        "ExpiredToken" => Err(XrpcError::Auth(AuthError::TokenExpired)),
+                        "InvalidToken" => Err(XrpcError::Auth(AuthError::InvalidToken)),
+                        _ => Err(XrpcError::Auth(AuthError::NotAuthenticated)),
+                    }
+                }
+                Err(e) => Err(XrpcError::Decode(e)),
+            }
+        }
+    }
+
+    /// Parse this as raw atproto data with minimal validation.
+    ///
+    /// NOTE: If the response is an error, it will still parse as the matching error type for the request.
+    pub fn parse_raw<'s>(&'s self) -> Result<RawData<'s>, XrpcError<<Resp as XrpcResp>::Err<'s>>> {
         // 200: parse as output
         if self.status.is_success() {
             match serde_json::from_slice::<_>(&self.buffer) {
