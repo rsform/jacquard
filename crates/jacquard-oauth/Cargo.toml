@@ -12,8 +12,8 @@ exclude.workspace = true
 license.workspace = true
 
 [dependencies]
-jacquard-common = { version = "*", path = "../jacquard-common", features = ["reqwest-client"] }
-jacquard-identity = { version = "*", path = "../jacquard-identity" }
+jacquard-common = { version = "0.4", path = "../jacquard-common", features = ["reqwest-client"] }
+jacquard-identity = { version = "0.4", path = "../jacquard-identity" }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 url = { workspace = true }

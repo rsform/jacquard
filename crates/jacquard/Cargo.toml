@@ -33,11 +33,11 @@ path = "src/main.rs"
 
 
 [dependencies]
-jacquard-api = { version = "*", path = "../jacquard-api" }
-jacquard-common = { version = "*", path = "../jacquard-common", features = ["reqwest-client"] }
-jacquard-oauth = { version = "*", path = "../jacquard-oauth" }
-jacquard-derive = { version = "*", path = "../jacquard-derive", optional = true }
-jacquard-identity = { version = "*", path = "../jacquard-identity" }
+jacquard-api = { version = "0.4", path = "../jacquard-api" }
+jacquard-common = { version = "0.4", path = "../jacquard-common", features = ["reqwest-client"] }
+jacquard-oauth = { version = "0.4", path = "../jacquard-oauth" }
+jacquard-derive = { version = "0.4", path = "../jacquard-derive", optional = true }
+jacquard-identity = { version = "0.4", path = "../jacquard-identity" }
 
 bon.workspace = true
 async-trait.workspace = true

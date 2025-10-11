@@ -91,6 +91,36 @@
             };
           };
         };
+        "jacquard-identity" = {
+          imports = [globalCrateConfig];
+          autoWire = ["crate" "clippy"];
+          path = ./../../crates/jacquard-identity;
+          crane = {
+            args = {
+              buildInputs = commonBuildInputs;
+            };
+          };
+        };
+        "jacquard-oauth" = {
+          imports = [globalCrateConfig];
+          autoWire = ["crate" "clippy"];
+          path = ./../../crates/jacquard-oauth;
+          crane = {
+            args = {
+              buildInputs = commonBuildInputs;
+            };
+          };
+        };
+        "jacquard-axum" = {
+          imports = [globalCrateConfig];
+          autoWire = ["crate" "clippy"];
+          path = ./../../crates/jacquard-axum;
+          crane = {
+            args = {
+              buildInputs = commonBuildInputs;
+            };
+          };
+        };
       };
     };
     packages.default = self'.packages.jacquard;

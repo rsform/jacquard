@@ -102,7 +102,7 @@ Jacquard is broken up into several crates for modularity. The correct one to use
 Highlights:
 
 - A ton of new lexicons included in `jacquard-api`
-- `jacquard-axum` Axum extractor and a number of improvements to lifetimes and (de)serialization required to make that work (thanks [@thoth.ptnote.dev] for helping provide feedback and sample code to test against)
+- `jacquard-axum` Axum extractor and a number of improvements to lifetimes and (de)serialization required to make that work (thanks [@thoth.ptnote.dev](https://tangled.org/@thoth.ptnote.dev) for helping provide feedback and sample code to test against)
 - `from_data`, `from_raw_data`, `to_data`, and `to_raw_data` to serialize to and deserialize from the loosely typed value data formats (think `serde_json::from_value` and company). Particularly useful for second-stage deserialization of type "unknown" fields in lexicons, such as `PostView.record`.
 - better API code generation
 

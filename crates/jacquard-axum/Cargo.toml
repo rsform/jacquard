@@ -24,8 +24,8 @@ path = "src/main.rs"
 axum = "0.8.6"
 axum-macros = "0.5.0"
 bytes.workspace = true
-jacquard = { version = "*", path = "../jacquard" }
-jacquard-common = { version = "*", path = "../jacquard-common", features = ["reqwest-client"] }
+jacquard = { version = "0.4", path = "../jacquard" }
+jacquard-common = { version = "0.4", path = "../jacquard-common", features = ["reqwest-client"] }
 miette.workspace = true
 serde.workspace = true
 serde_html_form.workspace = true
