@@ -95,6 +95,17 @@ Jacquard is broken up into several crates for modularity. The correct one to use
 - `jacquard-lexicon`: Lexicon parsing and code generation [![Crates.io](https://img.shields.io/crates/v/jacquard-lexicon.svg)](https://crates.io/crates/jacquard-lexicon) [![Documentation](https://docs.rs/jacquard-lexicon/badge.svg)](https://docs.rs/jacquard-lexicon)
 - `jacquard-derive`: Derive macros for lexicon types [![Crates.io](https://img.shields.io/crates/v/jacquard-derive.svg)](https://crates.io/crates/jacquard-derive) [![Documentation](https://docs.rs/jacquard-derive/badge.svg)](https://docs.rs/jacquard-derive)
 
+## Changelog
+
+[./CHANGELOG.md]
+
+Highlights:
+
+- A ton of new lexicons included in `jacquard-api`
+- `jacquard-axum` Axum extractor and a number of improvements to lifetimes and (de)serialization required to make that work (thanks [@thoth.ptnote.dev] for helping provide feedback and sample code to test against)
+- `from_data`, `from_raw_data`, `to_data`, and `to_raw_data` to serialize to and deserialize from the loosely typed value data formats (think `serde_json::from_value` and company). Particularly useful for second-stage deserialization of type "unknown" fields in lexicons, such as `PostView.record`.
+- better API code generation
+
 ## Development
 
 This repo uses [Flakes](https://nixos.asia/en/flakes) from the get-go.
