@@ -5,6 +5,24 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+///Advertises an account as currently offering live content.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Live;
+impl std::fmt::Display for Live {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "live")
+    }
+}
+
 ///A declaration of a Bluesky account status.
 #[jacquard_derive::lexicon]
 #[derive(

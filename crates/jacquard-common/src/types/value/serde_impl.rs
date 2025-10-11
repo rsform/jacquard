@@ -1135,13 +1135,10 @@ impl<'de> serde::de::MapAccess<'de> for RawObjectDeserializer<'de> {
     }
 }
 
-// ========================================================================
-// SERIALIZER IMPLEMENTATION - Serializing to RawData
-// ========================================================================
-
 /// Error type for RawData serialization
 #[derive(Debug)]
 pub enum RawDataSerializerError {
+    /// Error message
     Message(String),
 }
 
@@ -1344,7 +1341,7 @@ impl serde::Serializer for RawDataSerializer {
     }
 }
 
-// Sequence serializer accumulator
+/// Sequence serializer accumulator
 pub struct RawDataSeqSerializer {
     items: Vec<RawData<'static>>,
 }
@@ -1414,7 +1411,7 @@ impl serde::ser::SerializeTupleVariant for RawDataSeqSerializer {
     }
 }
 
-// Map serializer accumulator
+/// Map serializer accumulator
 pub struct RawDataMapSerializer {
     map: BTreeMap<SmolStr, RawData<'static>>,
     next_key: Option<SmolStr>,

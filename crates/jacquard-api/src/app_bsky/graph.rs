@@ -36,6 +36,24 @@ pub mod unmute_actor_list;
 pub mod unmute_thread;
 pub mod verification;
 
+///A list of actors used for curation purposes such as list feeds or interaction gating.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Curatelist;
+impl std::fmt::Display for Curatelist {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "curatelist")
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -237,6 +255,24 @@ pub struct ListViewerState<'a> {
     pub muted: std::option::Option<bool>,
 }
 
+///A list of actors to apply an aggregate moderation action (mute/block) on.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Modlist;
+impl std::fmt::Display for Modlist {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "modlist")
+    }
+}
+
 ///indicates that a handle or DID could not be resolved
 #[jacquard_derive::lexicon]
 #[derive(
@@ -253,6 +289,24 @@ pub struct NotFoundActor<'a> {
     #[serde(borrow)]
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
     pub not_found: bool,
+}
+
+///A list of actors used for only for reference purposes such as within a starter pack.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Referencelist;
+impl std::fmt::Display for Referencelist {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "referencelist")
+    }
 }
 
 ///lists the bi-directional graph relationships between one actor (not indicated in the object), and the target actors (the DID included in the object)

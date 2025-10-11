@@ -5,6 +5,42 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+///Indicates the identity is available for hire
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Forhire;
+impl std::fmt::Display for Forhire {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "forhire")
+    }
+}
+
+///Indicates the identity is actively hiring
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Hiring;
+impl std::fmt::Display for Hiring {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "hiring")
+    }
+}
+
 ///A user profile for AT://Work.Place
 #[jacquard_derive::lexicon]
 #[derive(

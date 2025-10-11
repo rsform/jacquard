@@ -5,6 +5,24 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+///User gave up on finishing the item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Abandoned;
+impl std::fmt::Display for Abandoned {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "abandoned")
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -47,6 +65,24 @@ pub enum BuiltinRecordType<'a> {
     ListItemWishlist(Box<crate::my_skylights::list_item::Wishlist>),
 }
 
+///User is currently reading/watching/... the item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct InProgress;
+impl std::fmt::Display for InProgress {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "inProgress")
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -87,4 +123,58 @@ pub struct ListItem<'a> {
 pub enum ListItemRecordList<'a> {
     #[serde(rename = "my.skylights.list")]
     List(Box<crate::my_skylights::list::List<'a>>),
+}
+
+///User owns the item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Owned;
+impl std::fmt::Display for Owned {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "owned")
+    }
+}
+
+///User plans to read/watch/... the item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Queue;
+impl std::fmt::Display for Queue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "queue")
+    }
+}
+
+///User wants to own the item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Wishlist;
+impl std::fmt::Display for Wishlist {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "wishlist")
+    }
 }

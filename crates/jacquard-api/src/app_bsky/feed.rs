@@ -68,6 +68,114 @@ pub struct BlockedPost<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+///User clicked through to the author of the feed item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ClickthroughAuthor;
+impl std::fmt::Display for ClickthroughAuthor {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "clickthroughAuthor")
+    }
+}
+
+///User clicked through to the embedded content of the feed item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ClickthroughEmbed;
+impl std::fmt::Display for ClickthroughEmbed {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "clickthroughEmbed")
+    }
+}
+
+///User clicked through to the feed item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ClickthroughItem;
+impl std::fmt::Display for ClickthroughItem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "clickthroughItem")
+    }
+}
+
+///User clicked through to the reposter of the feed item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ClickthroughReposter;
+impl std::fmt::Display for ClickthroughReposter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "clickthroughReposter")
+    }
+}
+
+///Declares the feed generator returns any types of posts.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ContentModeUnspecified;
+impl std::fmt::Display for ContentModeUnspecified {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "contentModeUnspecified")
+    }
+}
+
+///Declares the feed generator returns posts containing app.bsky.embed.video embeds.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ContentModeVideo;
+impl std::fmt::Display for ContentModeVideo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "contentModeVideo")
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -203,6 +311,114 @@ pub struct Interaction<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub req_id: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+///User liked the feed item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct InteractionLike;
+impl std::fmt::Display for InteractionLike {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "interactionLike")
+    }
+}
+
+///User quoted the feed item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct InteractionQuote;
+impl std::fmt::Display for InteractionQuote {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "interactionQuote")
+    }
+}
+
+///User replied to the feed item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct InteractionReply;
+impl std::fmt::Display for InteractionReply {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "interactionReply")
+    }
+}
+
+///User reposted the feed item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct InteractionRepost;
+impl std::fmt::Display for InteractionRepost {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "interactionRepost")
+    }
+}
+
+///Feed item was seen by user
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct InteractionSeen;
+impl std::fmt::Display for InteractionSeen {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "interactionSeen")
+    }
+}
+
+///User shared the feed item
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct InteractionShare;
+impl std::fmt::Display for InteractionShare {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "interactionShare")
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -377,6 +593,42 @@ pub enum ReplyRefRecordParent<'a> {}
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ReplyRefRecordRoot<'a> {}
+///Request that less content like the given feed item be shown in the feed
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct RequestLess;
+impl std::fmt::Display for RequestLess {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "requestLess")
+    }
+}
+
+///Request that more content like the given feed item be shown in the feed
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct RequestMore;
+impl std::fmt::Display for RequestMore {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "requestMore")
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

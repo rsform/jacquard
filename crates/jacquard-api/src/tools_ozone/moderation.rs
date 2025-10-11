@@ -1078,6 +1078,78 @@ pub struct ReporterStats<'a> {
     pub takendown_record_count: i64,
 }
 
+///Moderator review status of a subject: Closed. Indicates that the subject was already reviewed and resolved by a moderator
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReviewClosed;
+impl std::fmt::Display for ReviewClosed {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reviewClosed")
+    }
+}
+
+///Moderator review status of a subject: Escalated. Indicates that the subject was escalated for review by a moderator
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReviewEscalated;
+impl std::fmt::Display for ReviewEscalated {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reviewEscalated")
+    }
+}
+
+///Moderator review status of a subject: Unnecessary. Indicates that the subject does not need a review at the moment but there is probably some moderation related metadata available for it
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReviewNone;
+impl std::fmt::Display for ReviewNone {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reviewNone")
+    }
+}
+
+///Moderator review status of a subject: Open. Indicates that the subject needs to be reviewed by a moderator
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReviewOpen;
+impl std::fmt::Display for ReviewOpen {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reviewOpen")
+    }
+}
+
 ///Account credentials revocation by moderators. Only works on DID subjects.
 #[jacquard_derive::lexicon]
 #[derive(
@@ -1435,6 +1507,60 @@ pub struct SubjectView<'a> {
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SubjectViewRecordProfile<'a> {}
+///Moderation event timeline event for a PLC create operation
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct TimelineEventPlcCreate;
+impl std::fmt::Display for TimelineEventPlcCreate {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "timelineEventPlcCreate")
+    }
+}
+
+///Moderation event timeline event for generic PLC operation
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct TimelineEventPlcOperation;
+impl std::fmt::Display for TimelineEventPlcOperation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "timelineEventPlcOperation")
+    }
+}
+
+///Moderation event timeline event for a PLC tombstone operation
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct TimelineEventPlcTombstone;
+impl std::fmt::Display for TimelineEventPlcTombstone {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "timelineEventPlcTombstone")
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

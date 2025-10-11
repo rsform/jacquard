@@ -5,6 +5,600 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+///Appeal a previously taken moderation action
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonAppeal;
+impl std::fmt::Display for ReasonAppeal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonAppeal")
+    }
+}
+
+///Child sexual abuse material (CSAM). These reports will be sent only be sent to the application's Moderation Authority.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonChildSafetyCsam;
+impl std::fmt::Display for ReasonChildSafetyCsam {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonChildSafetyCSAM")
+    }
+}
+
+///Grooming or predatory behavior. These reports will be sent only be sent to the application's Moderation Authority.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonChildSafetyGroom;
+impl std::fmt::Display for ReasonChildSafetyGroom {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonChildSafetyGroom")
+    }
+}
+
+///Harassment or bullying of minors
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonChildSafetyHarassment;
+impl std::fmt::Display for ReasonChildSafetyHarassment {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonChildSafetyHarassment")
+    }
+}
+
+///Other child safety. These reports will be sent only be sent to the application's Moderation Authority.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonChildSafetyOther;
+impl std::fmt::Display for ReasonChildSafetyOther {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonChildSafetyOther")
+    }
+}
+
+///Privacy violation involving a minor
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonChildSafetyPrivacy;
+impl std::fmt::Display for ReasonChildSafetyPrivacy {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonChildSafetyPrivacy")
+    }
+}
+
+///Doxxing
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonHarassmentDoxxing;
+impl std::fmt::Display for ReasonHarassmentDoxxing {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonHarassmentDoxxing")
+    }
+}
+
+///Hate speech
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonHarassmentHateSpeech;
+impl std::fmt::Display for ReasonHarassmentHateSpeech {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonHarassmentHateSpeech")
+    }
+}
+
+///Other harassing or hateful content
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonHarassmentOther;
+impl std::fmt::Display for ReasonHarassmentOther {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonHarassmentOther")
+    }
+}
+
+///Targeted harassment
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonHarassmentTargeted;
+impl std::fmt::Display for ReasonHarassmentTargeted {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonHarassmentTargeted")
+    }
+}
+
+///Trolling
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonHarassmentTroll;
+impl std::fmt::Display for ReasonHarassmentTroll {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonHarassmentTroll")
+    }
+}
+
+///Fake account or bot
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonMisleadingBot;
+impl std::fmt::Display for ReasonMisleadingBot {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonMisleadingBot")
+    }
+}
+
+///False information about elections
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonMisleadingElections;
+impl std::fmt::Display for ReasonMisleadingElections {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonMisleadingElections")
+    }
+}
+
+///Impersonation
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonMisleadingImpersonation;
+impl std::fmt::Display for ReasonMisleadingImpersonation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonMisleadingImpersonation")
+    }
+}
+
+///Other misleading content
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonMisleadingOther;
+impl std::fmt::Display for ReasonMisleadingOther {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonMisleadingOther")
+    }
+}
+
+///Scam
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonMisleadingScam;
+impl std::fmt::Display for ReasonMisleadingScam {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonMisleadingScam")
+    }
+}
+
+///Spam
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonMisleadingSpam;
+impl std::fmt::Display for ReasonMisleadingSpam {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonMisleadingSpam")
+    }
+}
+
+///An issue not included in these options
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonOther;
+impl std::fmt::Display for ReasonOther {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonOther")
+    }
+}
+
+///Banned user returning
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonRuleBanEvasion;
+impl std::fmt::Display for ReasonRuleBanEvasion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonRuleBanEvasion")
+    }
+}
+
+///Other
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonRuleOther;
+impl std::fmt::Display for ReasonRuleOther {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonRuleOther")
+    }
+}
+
+///Promoting or selling prohibited items or services
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonRuleProhibitedSales;
+impl std::fmt::Display for ReasonRuleProhibitedSales {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonRuleProhibitedSales")
+    }
+}
+
+///Hacking or system attacks
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonRuleSiteSecurity;
+impl std::fmt::Display for ReasonRuleSiteSecurity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonRuleSiteSecurity")
+    }
+}
+
+///Content promoting or depicting self-harm
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonSelfHarmContent;
+impl std::fmt::Display for ReasonSelfHarmContent {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonSelfHarmContent")
+    }
+}
+
+///Eating disorders
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonSelfHarmEd;
+impl std::fmt::Display for ReasonSelfHarmEd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonSelfHarmED")
+    }
+}
+
+///Other dangerous content
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonSelfHarmOther;
+impl std::fmt::Display for ReasonSelfHarmOther {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonSelfHarmOther")
+    }
+}
+
+///Dangerous challenges or activities
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonSelfHarmStunts;
+impl std::fmt::Display for ReasonSelfHarmStunts {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonSelfHarmStunts")
+    }
+}
+
+///Dangerous substances or drug abuse
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonSelfHarmSubstances;
+impl std::fmt::Display for ReasonSelfHarmSubstances {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonSelfHarmSubstances")
+    }
+}
+
+///Adult sexual abuse content
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonSexualAbuseContent;
+impl std::fmt::Display for ReasonSexualAbuseContent {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonSexualAbuseContent")
+    }
+}
+
+///Animal sexual abuse
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonSexualAnimal;
+impl std::fmt::Display for ReasonSexualAnimal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonSexualAnimal")
+    }
+}
+
+///Deepfake adult content
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonSexualDeepfake;
+impl std::fmt::Display for ReasonSexualDeepfake {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonSexualDeepfake")
+    }
+}
+
+///Non-consensual intimate imagery
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonSexualNcii;
+impl std::fmt::Display for ReasonSexualNcii {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonSexualNCII")
+    }
+}
+
+///Other sexual violence content
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonSexualOther;
+impl std::fmt::Display for ReasonSexualOther {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonSexualOther")
+    }
+}
+
+///Unlabelled adult content
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonSexualUnlabeled;
+impl std::fmt::Display for ReasonSexualUnlabeled {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonSexualUnlabeled")
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReasonType<'a> {
     ToolsOzoneReportDefsReasonAppeal,
@@ -588,5 +1182,131 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
             }
             ReasonType::Other(v) => ReasonType::Other(v.into_static()),
         }
+    }
+}
+
+///Animal welfare violations
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonViolenceAnimal;
+impl std::fmt::Display for ReasonViolenceAnimal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonViolenceAnimal")
+    }
+}
+
+///Extremist content. These reports will be sent only be sent to the application's Moderation Authority.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonViolenceExtremistContent;
+impl std::fmt::Display for ReasonViolenceExtremistContent {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonViolenceExtremistContent")
+    }
+}
+
+///Glorification of violence
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonViolenceGlorification;
+impl std::fmt::Display for ReasonViolenceGlorification {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonViolenceGlorification")
+    }
+}
+
+///Graphic violent content
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonViolenceGraphicContent;
+impl std::fmt::Display for ReasonViolenceGraphicContent {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonViolenceGraphicContent")
+    }
+}
+
+///Other violent content
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonViolenceOther;
+impl std::fmt::Display for ReasonViolenceOther {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonViolenceOther")
+    }
+}
+
+///Threats or incitement
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonViolenceThreats;
+impl std::fmt::Display for ReasonViolenceThreats {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonViolenceThreats")
+    }
+}
+
+///Human trafficking
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct ReasonViolenceTrafficking;
+impl std::fmt::Display for ReasonViolenceTrafficking {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reasonViolenceTrafficking")
     }
 }

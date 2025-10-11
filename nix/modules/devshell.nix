@@ -18,6 +18,7 @@
         bacon
         rust-analyzer
         cargo-release
+        cargo-semver-checks
       ];
     };
   };

@@ -16,6 +16,7 @@ pub struct OutputConfig {
     pub lexicons_dir: PathBuf,
     pub codegen_dir: PathBuf,
     pub root_module: Option<String>,
+    pub cargo_toml_path: Option<PathBuf>,
 }
 
 impl Config {
@@ -58,6 +59,7 @@ fn parse_output(node: &kdl::KdlNode) -> Result<OutputConfig> {
     let mut lexicons_dir: Option<PathBuf> = None;
     let mut codegen_dir: Option<PathBuf> = None;
     let mut root_module: Option<String> = None;
+    let mut cargo_toml_path: Option<PathBuf> = None;
 
     for child in children.nodes() {
         match child.name().value() {
@@ -85,6 +87,14 @@ fn parse_output(node: &kdl::KdlNode) -> Result<OutputConfig> {
                     .ok_or_else(|| miette!("root-module expects a string value"))?;
                 root_module = Some(val.to_string());
             }
+            "cargo-toml" => {
+                let val = child
+                    .entries()
+                    .get(0)
+                    .and_then(|e| e.value().as_string())
+                    .ok_or_else(|| miette!("cargo-toml expects a string value"))?;
+                cargo_toml_path = Some(PathBuf::from(val));
+            }
             other => {
                 return Err(miette!("Unknown output field: {}", other));
             }
@@ -95,6 +105,7 @@ fn parse_output(node: &kdl::KdlNode) -> Result<OutputConfig> {
         lexicons_dir: lexicons_dir.ok_or_else(|| miette!("Missing lexicons directory"))?,
         codegen_dir: codegen_dir.ok_or_else(|| miette!("Missing codegen directory"))?,
         root_module,
+        cargo_toml_path,
     })
 }
 

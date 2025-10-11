@@ -39,3 +39,75 @@ pub struct Member<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
+
+///Admin role. Highest level of access, can perform all actions.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct RoleAdmin;
+impl std::fmt::Display for RoleAdmin {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "roleAdmin")
+    }
+}
+
+///Moderator role. Can perform most actions.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct RoleModerator;
+impl std::fmt::Display for RoleModerator {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "roleModerator")
+    }
+}
+
+///Triage role. Mostly intended for monitoring and escalating issues.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct RoleTriage;
+impl std::fmt::Display for RoleTriage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "roleTriage")
+    }
+}
+
+///Verifier role. Only allowed to issue verifications.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct RoleVerifier;
+impl std::fmt::Display for RoleVerifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "roleVerifier")
+    }
+}

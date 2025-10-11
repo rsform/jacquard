@@ -25,9 +25,9 @@ clap.workspace = true
 glob = "0.3"
 heck.workspace = true
 itertools.workspace = true
-jacquard-api = { version = "0.3.0", path = "../jacquard-api" }
-jacquard-common = { version = "0.3.0", path = "../jacquard-common" }
-jacquard-identity = { version = "0.3.0", path = "../jacquard-identity" }
+jacquard-api = {  version = "*", path = "../jacquard-api" }
+jacquard-common = { version = "*", path = "../jacquard-common" }
+jacquard-identity = { version = "*", path = "../jacquard-identity" }
 kdl = "6"
 miette = { workspace = true, features = ["fancy"] }
 prettyplease.workspace = true

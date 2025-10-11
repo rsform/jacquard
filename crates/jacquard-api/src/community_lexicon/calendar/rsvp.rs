@@ -5,6 +5,42 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+///Going to the event
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Going;
+impl std::fmt::Display for Going {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "going")
+    }
+}
+
+///Interested in the event
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Interested;
+impl std::fmt::Display for Interested {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "interested")
+    }
+}
+
 ///An RSVP for an event.
 #[jacquard_derive::lexicon]
 #[derive(
@@ -26,4 +62,22 @@ pub struct Rsvp<'a> {
 
 impl jacquard_common::types::collection::Collection for Rsvp<'_> {
     const NSID: &'static str = "community.lexicon.calendar.rsvp";
+}
+
+///Not going to the event
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Notgoing;
+impl std::fmt::Display for Notgoing {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "notgoing")
+    }
 }

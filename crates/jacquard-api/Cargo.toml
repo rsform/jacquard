@@ -2,7 +2,7 @@
 name = "jacquard-api"
 description = "Generated AT Protocol API bindings for Jacquard"
 edition.workspace = true
-version.workspace = true
+version = "0.4.0"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -12,78 +12,74 @@ exclude.workspace = true
 license.workspace = true
 
 [package.metadata.docs.rs]
-features = [ "bluesky", "other", "ufos" ]
+features = [ "bluesky", "other", "lexicon_community", "ufos" ]
 
 [dependencies]
 bon.workspace = true
 bytes = { workspace = true, features = ["serde"] }
-jacquard-common = { version = "0.3.0", path = "../jacquard-common" }
-jacquard-derive = { version = "0.3.0", path = "../jacquard-derive" }
+jacquard-common = { version = "*", path = "../jacquard-common" }
+jacquard-derive = { version = "*", path = "../jacquard-derive" }
 miette.workspace = true
 serde.workspace = true
 thiserror.workspace = true
 
 
 [features]
-default = [ "com_atproto", "com_bad_example"]
-bluesky = [ "com_atproto", "app_bsky", "chat_bsky", "tools_ozone"]
-other = ["sh_tangled", "sh_weaver", "pub_leaflet", "net_anisota", "events_smokesignal","network_slices", "tools_smokesignal", "com_whtwnd", "community_lexicon", "place_stream", "blue__2048" ]
-lexicon_community = ["community_lexicon", "my_skylights", "com_whtwnd", "social_psky", "lol_atmo", "blue_linkat"]
-ufos = ["place_artwork", "moe_karashiiro", "dev_regnault", "buzz_bookhive", "place_artwork", "how_bun", "lol_atmo", "inc_toronto", "uk_ewancroft",  "lol_skittr", "win_tomo", "dev_fudgeu", "dev_ocbwoy3", "blog_pckt", "blue_rito", "com_welistskyblue", "net_bnewbold", "club_stellz", "dev_baileytownsend", "net_aftertheinter", "org_devcon","org_robocracy", "garden_lexicon", "social_clippr", "social_grain", "social_pmsky", "com_crabdance", "app_blebbit", "app_ocho", "uk_skyblur", "us_polhem", "blue_atplane", "net_mmatt" ]
-app_bsky = []
-chat_bsky = []
-com_atproto = []
-tools_ozone = []
-sh_tangled = []
-sh_weaver = []
-pub_leaflet = []
-net_anisota = []
-network_slices = []
-place_atwork = []
-tools_smokesignal = []
-uk_ewancroft = []
-place_artwork = []
-moe_karashiiro = []
-buzz_bookhive = []
-dev_regnault = []
-events_smokesignal = []
-dev_baileytownsend = []
+default = [ "minimal"]
+minimal =  [ "com_atproto", "com_bad_example"]
+bluesky = [ "com_atproto", "app_bsky", "chat_bsky", "tools_ozone", "minimal"]
+other = ["sh_tangled", "sh_weaver", "pub_leaflet", "net_anisota", "network_slices", "tools_smokesignal", "com_whtwnd", "community_lexicon", "place_stream", "blue__2048", "minimal" ]
+lexicon_community = ["community_lexicon", "my_skylights", "com_whtwnd", "social_psky", "blue_linkat", "minimal"]
+ufos = [ "moe_karashiiro", "dev_regnault", "buzz_bookhive", "uk_ewancroft",  "win_tomo_x", "dev_fudgeu", "dev_ocbwoy3", "blog_pckt",  "net_bnewbold", "club_stellz", "dev_baileytownsend", "net_aftertheinter", "org_devcon","org_robocracy", "garden_lexicon", "social_clippr", "social_grain", "social_pmsky", "com_crabdance", "app_blebbit", "app_ocho", "uk_skyblur", "us_polhem", "blue_atplane", "net_mmatt", "minimal" ]
+
+# --- generated ---
+# Generated namespace features
+# Each namespace feature automatically enables its dependencies
+app_blebbit = []
+app_bsky = ["com_atproto"]
+app_ocho = []
+beauty_cybernetic = []
+blog_pckt = []
 blue__2048 = []
 blue_atplane = []
-club_stellz = []
-net_mmatt = []
-how_bun = []
-lol_atmo = []
-lol_skittr = []
-win_tomo = []
-inc_toronto = []
-com_bad_example = []
-dev_ocbwoy3 = []
-dev_fudgeu = []
-com_welistskyblue = []
-blog_pckt = []
-blue_rito = []
-net_bnewbold = []
-win_tomo_x = []
-com_shinolabs = []
-fyi_unravel = []
-blue_zio = []
 blue_linkat = []
+blue_zio = []
+buzz_bookhive = []
+chat_bsky = ["app_bsky"]
+club_stellz = []
+com_atproto = []
+com_bad_example = []
+com_crabdance = []
+com_shinolabs = []
 com_whtwnd = []
 community_lexicon = []
-social_psky = []
-place_stream = []
+dev_baileytownsend = []
+dev_fudgeu = []
+dev_ocbwoy3 = []
+dev_regnault = []
+fyi_unravel = []
+garden_lexicon = []
+moe_karashiiro = []
 my_skylights = []
 net_aftertheinter = []
+net_anisota = ["app_bsky", "com_atproto"]
+net_bnewbold = []
+net_mmatt = []
+network_slices = []
 org_devcon = []
 org_robocracy = []
-garden_lexicon = []
+place_atwork = []
+place_stream = []
+pub_leaflet = []
+sh_tangled = []
+sh_weaver = ["app_bsky"]
 social_clippr = []
-social_grain = []
+social_grain = ["com_atproto"]
 social_pmsky = []
-com_crabdance = []
-app_blebbit = []
-beauty_cybernetic = []
-app_ocho = []
+social_psky = []
+tools_ozone = ["chat_bsky", "com_atproto"]
+tools_smokesignal = []
+uk_ewancroft = []
 uk_skyblur = []
 us_polhem = []
+win_tomo_x = []

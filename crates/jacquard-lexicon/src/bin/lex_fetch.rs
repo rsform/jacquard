@@ -78,9 +78,42 @@ async fn main() -> Result<()> {
         codegen.write_to_disk(&config.output.codegen_dir)?;
 
         println!("Generated code to {:?}", config.output.codegen_dir);
+
+        // Update Cargo.toml features if cargo_toml_path is specified
+        if let Some(cargo_toml_path) = &config.output.cargo_toml_path {
+            if args.verbose {
+                println!("Updating Cargo.toml features...");
+            }
+
+            update_cargo_features(&codegen, cargo_toml_path, &config.output.codegen_dir)?;
+            println!("Updated features in {:?}", cargo_toml_path);
+        }
     } else {
         println!("Lexicons written to {:?}", config.output.lexicons_dir);
     }
+
+    Ok(())
+}
+
+fn update_cargo_features(codegen: &CodeGenerator, cargo_toml_path: &PathBuf, codegen_dir: &PathBuf) -> Result<()> {
+    // Read existing Cargo.toml
+    let content = std::fs::read_to_string(cargo_toml_path).into_diagnostic()?;
+
+    // Find the "# --- generated ---" marker
+    const MARKER: &str = "# --- generated ---";
+
+    let (before, _after) = content.split_once(MARKER)
+        .ok_or_else(|| miette::miette!("Cargo.toml missing '{}' marker", MARKER))?;
+
+    // Generate new features, passing lib.rs path to detect existing modules
+    let lib_rs_path = codegen_dir.join("lib.rs");
+    let features = codegen.generate_cargo_features(Some(&lib_rs_path));
+
+    // Reconstruct file
+    let new_content = format!("{}{}\n{}", before, MARKER, features);
+
+    // Write back
+    std::fs::write(cargo_toml_path, new_content).into_diagnostic()?;
 
     Ok(())
 }

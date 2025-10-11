@@ -5,6 +5,60 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+///The event has been cancelled.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Cancelled;
+impl std::fmt::Display for Cancelled {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "cancelled")
+    }
+}
+
+///A hybrid event that takes place both online and offline.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Hybrid;
+impl std::fmt::Display for Hybrid {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "hybrid")
+    }
+}
+
+///An in-person event that takes place offline.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Inperson;
+impl std::fmt::Display for Inperson {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "inperson")
+    }
+}
+
 ///A calendar event.
 #[jacquard_derive::lexicon]
 #[derive(
@@ -165,6 +219,78 @@ impl jacquard_common::IntoStatic for Mode<'_> {
     }
 }
 
+///The event has been created, but not finalized.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Planned;
+impl std::fmt::Display for Planned {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "planned")
+    }
+}
+
+///The event has been postponed and a new start date has not been set.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Postponed;
+impl std::fmt::Display for Postponed {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "postponed")
+    }
+}
+
+///The event has been rescheduled.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Rescheduled;
+impl std::fmt::Display for Rescheduled {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "rescheduled")
+    }
+}
+
+///The event has been created and scheduled.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Scheduled;
+impl std::fmt::Display for Scheduled {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "scheduled")
+    }
+}
+
 ///The status of the event.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Status<'a> {
@@ -316,4 +442,22 @@ pub struct Uri<'a> {
     pub name: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
+}
+
+///A virtual event that takes place online.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Virtual;
+impl std::fmt::Display for Virtual {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "virtual")
+    }
 }

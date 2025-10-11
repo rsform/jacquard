@@ -41,11 +41,11 @@ pub enum RecordWithMediaRecordMedia<'a> {
     #[serde(rename = "sh.weaver.embed.external")]
     External(Box<crate::sh_weaver::embed::external::ExternalRecord<'a>>),
     #[serde(rename = "app.bsky.embed.images")]
-    Images(Box<crate::app_bsky::embed::images::Images<'a>>),
+    BskyImages(Box<crate::app_bsky::embed::images::Images<'a>>),
     #[serde(rename = "app.bsky.embed.video")]
     Video(Box<crate::app_bsky::embed::video::Video<'a>>),
     #[serde(rename = "app.bsky.embed.external")]
-    External(Box<crate::app_bsky::embed::external::ExternalRecord<'a>>),
+    BskyExternal(Box<crate::app_bsky::embed::external::ExternalRecord<'a>>),
 }
 
 #[jacquard_derive::open_union]
@@ -107,7 +107,7 @@ pub enum ViewRecordMedia<'a> {
     #[serde(rename = "app.bsky.embed.video#view")]
     VideoView(Box<crate::app_bsky::embed::video::View<'a>>),
     #[serde(rename = "app.bsky.embed.external#view")]
-    ExternalView(Box<crate::app_bsky::embed::external::View<'a>>),
+    BskyExternalView(Box<crate::app_bsky::embed::external::View<'a>>),
 }
 
 #[jacquard_derive::open_union]

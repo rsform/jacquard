@@ -1,6 +1,7 @@
 output {
     lexicons "crates/jacquard-api/lexicons"
     codegen "crates/jacquard-api/src"
+    cargo-toml "crates/jacquard-api/Cargo.toml"
 }
 
 source "leaflet" type="git" priority=100 {
@@ -59,7 +60,7 @@ source "whitewind" type="git" priority=50 {
     pattern "**/*.json"
 }
 
-source "lexicon-community" type="git" priority=50 {
+source "lexicon-community" type="git" priority=60 {
     repo "https://github.com/lexicon-community/lexicon"
     pattern "**/*.json"
 }

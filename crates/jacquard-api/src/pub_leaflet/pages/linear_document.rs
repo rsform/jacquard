@@ -113,3 +113,54 @@ pub struct Quote<'a> {
     #[serde(borrow)]
     pub start: crate::pub_leaflet::pages::linear_document::Position<'a>,
 }
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct TextAlignCenter;
+impl std::fmt::Display for TextAlignCenter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "textAlignCenter")
+    }
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct TextAlignLeft;
+impl std::fmt::Display for TextAlignLeft {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "textAlignLeft")
+    }
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct TextAlignRight;
+impl std::fmt::Display for TextAlignRight {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "textAlignRight")
+    }
+}

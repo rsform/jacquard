@@ -127,6 +127,24 @@ pub trait XrpcResp {
     type Err<'de>: Error + Deserialize<'de> + IntoStatic;
 }
 
+/// XRPC server endpoint trait
+///
+/// Defines the fully-qualified path and method, as well as request and response types
+/// This exists primarily to work around lifetime issues for crates like Axum
+/// by moving the lifetime from the trait itself into an associated type.
+///
+/// It is implemented by the code generation on a marker struct, like the client-side [XrpcResp] trait.
+pub trait XrpcEndpoint {
+    /// Fully-qualified path ('/xrpc/[nsid]') where this endpoint should live on the server
+    const PATH: &'static str;
+    /// XRPC method (query/GET or procedure/POST)
+    const METHOD: XrpcMethod;
+    /// XRPC Request data type
+    type Request<'de>: XrpcRequest<'de> + IntoStatic;
+    /// XRPC Response data type
+    type Response: XrpcResp;
+}
+
 /// Error type for XRPC endpoints that don't define any errors
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct GenericError<'a>(#[serde(borrow)] Data<'a>);
@@ -481,13 +499,6 @@ where
     builder
         .body(body)
         .map_err(|e| TransportError::InvalidRequest(e.to_string()))
-}
-
-pub trait XrpcEndpoint {
-    const PATH: &'static str;
-    const METHOD: XrpcMethod;
-    type Request<'de>: XrpcRequest<'de> + IntoStatic;
-    type Response: XrpcResp;
 }
 
 /// XRPC response wrapper that owns the response buffer

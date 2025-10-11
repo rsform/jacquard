@@ -2,7 +2,7 @@
 name = "jacquard"
 description.workspace = true
 edition.workspace = true
-version = "0.3.0"
+version.workspace = true
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -12,10 +12,12 @@ exclude.workspace = true
 license.workspace = true
 
 [features]
-default = ["api_all", "dns", "fancy", "loopback"]
+default = ["api_full", "dns", "fancy", "loopback"]
 derive = ["dep:jacquard-derive"]
-api = ["jacquard-api/com_atproto"]
-api_all = ["api", "jacquard-api/app_bsky", "jacquard-api/chat_bsky", "jacquard-api/tools_ozone"]
+api = ["jacquard-api/com_atproto", "jacquard-api/com_bad_example" ]
+api_bluesky = ["api", "jacquard-api/bluesky" ]
+api_full = ["api", "jacquard-api/bluesky", "jacquard-api/other", "jacquard-api/lexicon_community"]
+api_all = ["api_full", "jacquard-api/ufos"]
 dns = ["jacquard-identity/dns"]
 fancy = ["miette/fancy"]
 # Propagate loopback to oauth (server + browser helper)
@@ -31,11 +33,11 @@ path = "src/main.rs"
 
 
 [dependencies]
-jacquard-api = { version = "0.3.0", path = "../jacquard-api" }
-jacquard-common = { version = "0.3.0", path = "../jacquard-common", features = ["reqwest-client"] }
-jacquard-oauth = { version = "0.3.0", path = "../jacquard-oauth" }
-jacquard-derive = { version = "0.3.0", path = "../jacquard-derive", optional = true }
-jacquard-identity = { version = "0.3.0", path = "../jacquard-identity" }
+jacquard-api = { version = "*", path = "../jacquard-api" }
+jacquard-common = { version = "*", path = "../jacquard-common", features = ["reqwest-client"] }
+jacquard-oauth = { version = "*", path = "../jacquard-oauth" }
+jacquard-derive = { version = "*", path = "../jacquard-derive", optional = true }
+jacquard-identity = { version = "*", path = "../jacquard-identity" }
 
 bon.workspace = true
 async-trait.workspace = true
@@ -57,3 +59,6 @@ urlencoding.workspace = true
 jose-jwk = { workspace = true, features = ["p256"] }
 p256 = { workspace = true, features = ["ecdsa"] }
 rand_core.workspace = true
+
+[package.metadata.docs.rs]
+features = [ "api_all", "derive", "dns", "fancy", "loopback" ]

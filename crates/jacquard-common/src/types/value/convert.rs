@@ -1,12 +1,12 @@
+use crate::IntoStatic;
 use crate::types::{
     DataModelType,
     cid::Cid,
     string::AtprotoStr,
     value::{Array, Data, Object, RawData, parsing},
 };
-use crate::{CowStr, IntoStatic};
 use bytes::Bytes;
-use core::{any::TypeId, fmt};
+use core::any::TypeId;
 use smol_str::SmolStr;
 use std::{borrow::ToOwned, boxed::Box, collections::BTreeMap, vec::Vec};
 
@@ -282,17 +282,20 @@ impl<'s> TryFrom<RawData<'s>> for Data<'s> {
                 if let Some(RawData::String(type_str)) = map.get("$type") {
                     if parsing::infer_from_type(type_str) == DataModelType::Blob {
                         // Try to parse as blob
-                        if let (Some(RawData::CidLink(cid)), Some(RawData::String(mime)), Some(size)) = (
-                            map.get("ref"),
-                            map.get("mimeType"),
-                            map.get("size")
-                        ) {
+                        if let (
+                            Some(RawData::CidLink(cid)),
+                            Some(RawData::String(mime)),
+                            Some(size),
+                        ) = (map.get("ref"), map.get("mimeType"), map.get("size"))
+                        {
                             let size_val = match size {
                                 RawData::UnsignedInt(u) => *u as usize,
                                 RawData::SignedInt(i) => *i as usize,
-                                _ => return Err(ConversionError::InvalidRawData {
-                                    message: "blob size must be integer".to_string(),
-                                }),
+                                _ => {
+                                    return Err(ConversionError::InvalidRawData {
+                                        message: "blob size must be integer".to_string(),
+                                    });
+                                }
                             };
                             return Ok(Data::Blob(crate::types::blob::Blob {
                                 r#ref: cid.clone(),

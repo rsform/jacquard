@@ -78,6 +78,9 @@ fn make_ident(s: &str) -> syn::Ident {
 pub struct CodeGenerator<'c> {
     corpus: &'c LexiconCorpus,
     root_module: String,
+    /// Track namespace dependencies (namespace -> set of namespaces it depends on)
+    namespace_deps:
+        std::cell::RefCell<std::collections::HashMap<String, std::collections::HashSet<String>>>,
 }
 
 impl<'c> CodeGenerator<'c> {
@@ -86,6 +89,7 @@ impl<'c> CodeGenerator<'c> {
         Self {
             corpus,
             root_module: root_module.into(),
+            namespace_deps: std::cell::RefCell::new(std::collections::HashMap::new()),
         }
     }
 
@@ -101,11 +105,26 @@ impl<'c> CodeGenerator<'c> {
             LexUserType::Object(obj) => self.generate_object(nsid, def_name, obj),
             LexUserType::XrpcQuery(query) => self.generate_query(nsid, def_name, query),
             LexUserType::XrpcProcedure(proc) => self.generate_procedure(nsid, def_name, proc),
-            LexUserType::Token(_) => {
-                // Token types are marker types used in knownValues enums.
-                // We don't generate anything for them - the knownValues enum
-                // is the actual type that gets used.
-                Ok(quote! {})
+            LexUserType::Token(token) => {
+                // Token types are marker structs that can be used as union refs
+                let type_name = self.def_to_type_name(nsid, def_name);
+                let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
+                let doc = self.generate_doc_comment(token.description.as_ref());
+
+                // Token name for Display impl (just the def name, not the full ref)
+                let token_name = def_name;
+
+                Ok(quote! {
+                    #doc
+                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Hash, jacquard_derive::IntoStatic)]
+                    pub struct #ident;
+
+                    impl std::fmt::Display for #ident {
+                        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                            write!(f, #token_name)
+                        }
+                    }
+                })
             }
             LexUserType::String(s) if s.known_values.is_some() => {
                 self.generate_known_values_enum(nsid, def_name, s)
@@ -220,7 +239,7 @@ impl<'c> CodeGenerator<'c> {
                             // Clone refs to avoid lifetime issues
                             let refs: Vec<_> = union.refs.iter().cloned().collect();
                             let union_def =
-                                self.generate_union(&union_name, &refs, None, union.closed)?;
+                                self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
                             unions.push(union_def);
                         }
                         LexObjectProperty::Object(nested_obj) => {
@@ -287,7 +306,8 @@ impl<'c> CodeGenerator<'c> {
                 LexObjectProperty::Union(union) => {
                     let union_name = format!("{}Record{}", type_name, field_name.to_pascal_case());
                     let refs: Vec<_> = union.refs.iter().cloned().collect();
-                    let union_def = self.generate_union(&union_name, &refs, None, union.closed)?;
+                    let union_def =
+                        self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
                     unions.push(union_def);
                 }
                 LexObjectProperty::Object(nested_obj) => {
@@ -742,7 +762,7 @@ impl<'c> CodeGenerator<'c> {
         }
 
         if let Some(body) = &query.output {
-            let output_struct = self.generate_output_struct(&type_base, body)?;
+            let output_struct = self.generate_output_struct(nsid, &type_base, body)?;
             output.push(output_struct);
         }
 
@@ -805,12 +825,12 @@ impl<'c> CodeGenerator<'c> {
         }
 
         if let Some(body) = &proc.input {
-            let input_struct = self.generate_input_struct(&type_base, body)?;
+            let input_struct = self.generate_input_struct(nsid, &type_base, body)?;
             output.push(input_struct);
         }
 
         if let Some(body) = &proc.output {
-            let output_struct = self.generate_output_struct(&type_base, body)?;
+            let output_struct = self.generate_output_struct(nsid, &type_base, body)?;
             output.push(output_struct);
         }
 
@@ -870,7 +890,7 @@ impl<'c> CodeGenerator<'c> {
 
         if let Some(message) = &sub.message {
             if let Some(schema) = &message.schema {
-                let message_type = self.generate_subscription_message(&type_base, schema)?;
+                let message_type = self.generate_subscription_message(nsid, &type_base, schema)?;
                 output.push(message_type);
             }
         }
@@ -887,6 +907,7 @@ impl<'c> CodeGenerator<'c> {
 
     fn generate_subscription_message(
         &self,
+        nsid: &str,
         type_base: &str,
         schema: &LexXrpcSubscriptionMessageSchema<'static>,
     ) -> Result<TokenStream> {
@@ -992,7 +1013,7 @@ impl<'c> CodeGenerator<'c> {
                             format!("{}Record{}", struct_name, field_name.to_pascal_case());
                         let refs: Vec<_> = union.refs.iter().cloned().collect();
                         let union_def =
-                            self.generate_union(&union_name, &refs, None, union.closed)?;
+                            self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
                         unions.push(union_def);
                     }
                 }
@@ -1545,6 +1566,7 @@ impl<'c> CodeGenerator<'c> {
     /// Generate input struct from XRPC body
     fn generate_input_struct(
         &self,
+        nsid: &str,
         type_base: &str,
         body: &LexXrpcBody<'static>,
     ) -> Result<TokenStream> {
@@ -1604,7 +1626,8 @@ impl<'c> CodeGenerator<'c> {
                 if let LexObjectProperty::Union(union) = field_type {
                     let union_name = format!("{}Record{}", type_base, field_name.to_pascal_case());
                     let refs: Vec<_> = union.refs.iter().cloned().collect();
-                    let union_def = self.generate_union(&union_name, &refs, None, union.closed)?;
+                    let union_def =
+                        self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
                     unions.push(union_def);
                 }
             }
@@ -1648,6 +1671,7 @@ impl<'c> CodeGenerator<'c> {
     /// Generate output struct from XRPC body
     fn generate_output_struct(
         &self,
+        nsid: &str,
         type_base: &str,
         body: &LexXrpcBody<'static>,
     ) -> Result<TokenStream> {
@@ -1682,7 +1706,8 @@ impl<'c> CodeGenerator<'c> {
                     let union_name =
                         format!("{}Record{}", struct_name, field_name.to_pascal_case());
                     let refs: Vec<_> = union.refs.iter().cloned().collect();
-                    let union_def = self.generate_union(&union_name, &refs, None, union.closed)?;
+                    let union_def =
+                        self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
                     unions.push(union_def);
                 }
             }
@@ -2245,6 +2270,7 @@ impl<'c> CodeGenerator<'c> {
     /// Generate a union enum
     pub fn generate_union(
         &self,
+        current_nsid: &str,
         union_name: &str,
         refs: &[jacquard_common::CowStr<'static>],
         description: Option<&str>,
@@ -2252,7 +2278,24 @@ impl<'c> CodeGenerator<'c> {
     ) -> Result<TokenStream> {
         let enum_ident = syn::Ident::new(union_name, proc_macro2::Span::call_site());
 
-        let mut variants = Vec::new();
+        // Extract namespace prefix from current NSID (first two segments: "sh.weaver" from "sh.weaver.embed.recordWithMedia")
+        let parts: Vec<_> = current_nsid.splitn(3, '.').collect();
+        let current_namespace = if parts.len() >= 2 {
+            format!("{}.{}", parts[0], parts[1])
+        } else {
+            current_nsid.to_string()
+        };
+
+        // First pass: collect all variant names and detect collisions
+        #[derive(Debug)]
+        struct VariantInfo<'a> {
+            ref_str: &'a str,
+            ref_nsid: &'a str,
+            simple_name: String,
+            is_current_namespace: bool,
+        }
+
+        let mut variant_infos = Vec::new();
         for ref_str in refs {
             // Parse ref to get NSID and def name
             let (ref_nsid, ref_def) = if let Some((nsid, fragment)) = ref_str.split_once('#') {
@@ -2266,23 +2309,73 @@ impl<'c> CodeGenerator<'c> {
                 continue;
             }
 
-            // Generate variant name from def name (or last NSID segment if main)
-            // For non-main refs, include the last NSID segment to avoid collisions
-            // e.g. app.bsky.embed.images#view -> ImagesView
-            //      app.bsky.embed.video#view -> VideoView
-            let variant_name = if ref_def == "main" {
+            // Check if ref is in current namespace
+            let is_current_namespace = ref_nsid.starts_with(&current_namespace);
+
+            // Generate simple variant name (without namespace prefix)
+            let simple_name = if ref_def == "main" {
                 ref_nsid.split('.').last().unwrap().to_pascal_case()
             } else {
                 let last_segment = ref_nsid.split('.').last().unwrap().to_pascal_case();
                 format!("{}{}", last_segment, ref_def.to_pascal_case())
             };
+
+            variant_infos.push(VariantInfo {
+                ref_str: ref_str.as_ref(),
+                ref_nsid,
+                simple_name,
+                is_current_namespace,
+            });
+        }
+
+        // Second pass: detect collisions and disambiguate
+        use std::collections::HashMap;
+        let mut name_counts: HashMap<String, usize> = HashMap::new();
+        for info in &variant_infos {
+            *name_counts.entry(info.simple_name.clone()).or_insert(0) += 1;
+        }
+
+        let mut variants = Vec::new();
+        for info in variant_infos {
+            let has_collision = name_counts.get(&info.simple_name).copied().unwrap_or(0) > 1;
+
+            // Track namespace dependency for foreign refs
+            if !info.is_current_namespace {
+                let parts: Vec<_> = info.ref_nsid.splitn(3, '.').collect();
+                let foreign_namespace = if parts.len() >= 2 {
+                    format!("{}.{}", parts[0], parts[1])
+                } else {
+                    info.ref_nsid.to_string()
+                };
+                self.namespace_deps
+                    .borrow_mut()
+                    .entry(current_namespace.clone())
+                    .or_default()
+                    .insert(foreign_namespace);
+            }
+
+            // Disambiguate: add second NSID segment prefix only to foreign refs when there's a collision
+            let variant_name = if has_collision && !info.is_current_namespace {
+                // Get second segment (namespace identifier: "bsky" from "app.bsky.embed.images")
+                let segments: Vec<&str> = info.ref_nsid.split('.').collect();
+                let prefix = if segments.len() >= 2 {
+                    segments[1].to_pascal_case()
+                } else {
+                    // Fallback: use first segment if only one exists
+                    segments[0].to_pascal_case()
+                };
+                format!("{}{}", prefix, info.simple_name)
+            } else {
+                info.simple_name.clone()
+            };
+
             let variant_ident = syn::Ident::new(&variant_name, proc_macro2::Span::call_site());
 
             // Get the Rust type for this ref
-            let rust_type = self.ref_to_rust_type(ref_str.as_ref())?;
+            let rust_type = self.ref_to_rust_type(info.ref_str)?;
 
             // Add serde rename for the full NSID
-            let ref_str_literal = ref_str.as_ref();
+            let ref_str_literal = info.ref_str;
             variants.push(quote! {
                 #[serde(rename = #ref_str_literal)]
                 #variant_ident(Box<#rust_type>)
@@ -2481,6 +2574,116 @@ impl<'c> CodeGenerator<'c> {
             }
         }
     }
+
+    /// Get namespace dependencies collected during code generation
+    pub fn get_namespace_dependencies(
+        &self,
+    ) -> std::collections::HashMap<String, std::collections::HashSet<String>> {
+        self.namespace_deps.borrow().clone()
+    }
+
+    /// Generate Cargo.toml features section from namespace dependencies
+    pub fn generate_cargo_features(&self, lib_rs_path: Option<&std::path::Path>) -> String {
+        use std::fmt::Write;
+
+        let deps = self.namespace_deps.borrow();
+        let mut all_namespaces: std::collections::HashSet<String> =
+            std::collections::HashSet::new();
+
+        // Collect all namespaces from the corpus (first two segments of each NSID)
+        for (nsid, _doc) in self.corpus.iter() {
+            let parts: Vec<_> = nsid.as_str().splitn(3, '.').collect();
+            let namespace = if parts.len() >= 2 {
+                format!("{}.{}", parts[0], parts[1])
+            } else {
+                nsid.to_string()
+            };
+            all_namespaces.insert(namespace);
+        }
+
+        // Also collect existing feature names from lib.rs
+        let mut existing_features = std::collections::HashSet::new();
+        if let Some(lib_rs) = lib_rs_path {
+            if let Ok(content) = std::fs::read_to_string(lib_rs) {
+                for line in content.lines() {
+                    if let Some(feature) = line.trim()
+                        .strip_prefix("#[cfg(feature = \"")
+                        .and_then(|s| s.strip_suffix("\")]"))
+                    {
+                        existing_features.insert(feature.to_string());
+                    }
+                }
+            }
+        }
+
+        let mut output = String::new();
+        writeln!(&mut output, "# Generated namespace features").unwrap();
+        writeln!(&mut output, "# Each namespace feature automatically enables its dependencies").unwrap();
+
+        // Convert namespace to feature name (matching module path sanitization)
+        let to_feature_name = |ns: &str| {
+            ns.split('.')
+                .map(|segment| {
+                    // Apply same sanitization as module names
+                    let mut result = segment.replace('-', "_");
+                    // Prefix with underscore if starts with digit
+                    if result.chars().next().map_or(false, |c| c.is_ascii_digit()) {
+                        result.insert(0, '_');
+                    }
+                    result
+                })
+                .collect::<Vec<_>>()
+                .join("_")
+        };
+
+        // Collect all feature names (from corpus + existing lib.rs)
+        let mut all_feature_names = std::collections::HashSet::new();
+        for ns in &all_namespaces {
+            all_feature_names.insert(to_feature_name(ns));
+        }
+        all_feature_names.extend(existing_features);
+
+        // Sort for consistent output
+        let mut feature_names: Vec<_> = all_feature_names.iter().collect();
+        feature_names.sort();
+
+        // Map namespace to feature name for dependency lookup
+        let mut ns_to_feature: std::collections::HashMap<&str, String> = std::collections::HashMap::new();
+        for ns in &all_namespaces {
+            ns_to_feature.insert(ns.as_str(), to_feature_name(ns));
+        }
+
+        for feature_name in feature_names {
+            // Find corresponding namespace for this feature (if any) to look up deps
+            let feature_deps: Vec<String> = all_namespaces
+                .iter()
+                .find(|ns| to_feature_name(ns) == *feature_name)
+                .and_then(|ns| deps.get(ns.as_str()))
+                .map(|ns_deps| {
+                    let mut dep_features: Vec<_> = ns_deps
+                        .iter()
+                        .map(|d| format!("\"{}\"", to_feature_name(d)))
+                        .collect();
+                    dep_features.sort();
+                    dep_features
+                })
+                .unwrap_or_default();
+
+            if !feature_deps.is_empty() {
+                writeln!(
+                    &mut output,
+                    "{} = [{}]",
+                    feature_name,
+                    feature_deps.join(", ")
+                )
+                .unwrap();
+            } else {
+                writeln!(&mut output, "{} = []", feature_name).unwrap();
+            }
+        }
+
+        output
+    }
 }
 
 /// Enum variant kind for IntoStatic generation
@@ -2534,7 +2737,13 @@ mod tests {
         ];
 
         let tokens = codegen
-            .generate_union("RecordEmbed", &refs, Some("Post embed union"), None)
+            .generate_union(
+                "app.bsky.feed.post",
+                "RecordEmbed",
+                &refs,
+                Some("Post embed union"),
+                None,
+            )
             .expect("generate union");
 
         let file: syn::File = syn::parse2(tokens).expect("parse tokens");

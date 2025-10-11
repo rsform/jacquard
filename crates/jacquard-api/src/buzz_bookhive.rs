@@ -12,6 +12,24 @@ pub mod get_profile;
 pub mod hive_book;
 pub mod search_books;
 
+///User has abandoned the book
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Abandoned;
+impl std::fmt::Display for Abandoned {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "abandoned")
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -64,6 +82,42 @@ pub struct Comment<'a> {
     pub parent: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+///User has finished reading the book
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Finished;
+impl std::fmt::Display for Finished {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "finished")
+    }
+}
+
+///User owns the book
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Owned;
+impl std::fmt::Display for Owned {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "owned")
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -88,6 +142,24 @@ pub struct Profile<'a> {
     #[serde(borrow)]
     pub handle: jacquard_common::CowStr<'a>,
     pub reviews: i64,
+}
+
+///User is currently reading the book
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct Reading;
+impl std::fmt::Display for Reading {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "reading")
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -170,4 +242,22 @@ pub struct UserBook<'a> {
     ///The title of the book
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
+}
+
+///User wants to read the book
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct WantToRead;
+impl std::fmt::Display for WantToRead {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "wantToRead")
+    }
 }
