@@ -160,7 +160,6 @@
 
 /// XRPC client traits and basic implementation
 pub mod client;
-/// OAuth usage helpers (discovery, PAR, token exchange)
 
 #[cfg(feature = "api")]
 /// If enabled, re-export the generated api crate
@@ -172,4 +171,6 @@ pub use jacquard_common::*;
 pub use jacquard_derive::*;
 
 pub use jacquard_identity as identity;
+
+/// OAuth usage helpers (discovery, PAR, token exchange)
 pub use jacquard_oauth as oauth;
