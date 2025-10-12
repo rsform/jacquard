@@ -43,7 +43,8 @@ pub struct ResetPassword<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -72,23 +73,6 @@ impl std::fmt::Display for ResetPasswordError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ResetPasswordError<'_> {
-    type Output = ResetPasswordError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ResetPasswordError::ExpiredToken(v) => {
-                ResetPasswordError::ExpiredToken(v.into_static())
-            }
-            ResetPasswordError::InvalidToken(v) => {
-                ResetPasswordError::InvalidToken(v.into_static())
-            }
-            ResetPasswordError::Unknown(v) => {
-                ResetPasswordError::Unknown(v.into_static())
-            }
         }
     }
 }

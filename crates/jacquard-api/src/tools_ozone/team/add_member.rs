@@ -59,7 +59,8 @@ pub struct AddMemberOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -80,18 +81,6 @@ impl std::fmt::Display for AddMemberError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for AddMemberError<'_> {
-    type Output = AddMemberError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            AddMemberError::MemberAlreadyExists(v) => {
-                AddMemberError::MemberAlreadyExists(v.into_static())
-            }
-            AddMemberError::Unknown(v) => AddMemberError::Unknown(v.into_static()),
         }
     }
 }

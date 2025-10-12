@@ -53,9 +53,30 @@ pub struct Link<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Facet<'a> {
     #[serde(borrow)]
-    pub features: Vec<jacquard_common::types::value::Data<'a>>,
+    pub features: Vec<FacetFeaturesItem<'a>>,
     #[serde(borrow)]
     pub index: crate::app_bsky::richtext::facet::ByteSlice<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum FacetFeaturesItem<'a> {
+    #[serde(rename = "app.bsky.richtext.facet#mention")]
+    Mention(Box<crate::app_bsky::richtext::facet::Mention<'a>>),
+    #[serde(rename = "app.bsky.richtext.facet#link")]
+    Link(Box<crate::app_bsky::richtext::facet::Link<'a>>),
+    #[serde(rename = "app.bsky.richtext.facet#tag")]
+    Tag(Box<crate::app_bsky::richtext::facet::Tag<'a>>),
 }
 
 ///Facet feature for mention of another account. The text is usually a handle, including a '@' prefix, but the facet reference is a DID.

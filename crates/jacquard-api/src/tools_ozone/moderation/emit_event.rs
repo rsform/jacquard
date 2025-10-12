@@ -22,7 +22,7 @@ pub struct EmitEvent<'a> {
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
-    pub event: EmitEventRecordEvent<'a>,
+    pub event: EmitEventEvent<'a>,
     ///An optional external ID for the event, used to deduplicate events from external systems. Fails when an event of same type with the same external ID exists for the same subject.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -32,7 +32,7 @@ pub struct EmitEvent<'a> {
     #[serde(borrow)]
     pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
-    pub subject: EmitEventRecordSubject<'a>,
+    pub subject: EmitEventSubject<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub subject_blob_cids: std::option::Option<
@@ -59,73 +59,69 @@ pub struct EmitEvent<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum EmitEventRecordEvent<'a> {
+pub enum EmitEventEvent<'a> {
     #[serde(rename = "tools.ozone.moderation.defs#modEventTakedown")]
-    DefsModEventTakedown(Box<crate::tools_ozone::moderation::ModEventTakedown<'a>>),
+    ModEventTakedown(Box<crate::tools_ozone::moderation::ModEventTakedown<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventAcknowledge")]
-    DefsModEventAcknowledge(
-        Box<crate::tools_ozone::moderation::ModEventAcknowledge<'a>>,
-    ),
+    ModEventAcknowledge(Box<crate::tools_ozone::moderation::ModEventAcknowledge<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventEscalate")]
-    DefsModEventEscalate(Box<crate::tools_ozone::moderation::ModEventEscalate<'a>>),
+    ModEventEscalate(Box<crate::tools_ozone::moderation::ModEventEscalate<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventComment")]
-    DefsModEventComment(Box<crate::tools_ozone::moderation::ModEventComment<'a>>),
+    ModEventComment(Box<crate::tools_ozone::moderation::ModEventComment<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventLabel")]
-    DefsModEventLabel(Box<crate::tools_ozone::moderation::ModEventLabel<'a>>),
+    ModEventLabel(Box<crate::tools_ozone::moderation::ModEventLabel<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventReport")]
-    DefsModEventReport(Box<crate::tools_ozone::moderation::ModEventReport<'a>>),
+    ModEventReport(Box<crate::tools_ozone::moderation::ModEventReport<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventMute")]
-    DefsModEventMute(Box<crate::tools_ozone::moderation::ModEventMute<'a>>),
+    ModEventMute(Box<crate::tools_ozone::moderation::ModEventMute<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventUnmute")]
-    DefsModEventUnmute(Box<crate::tools_ozone::moderation::ModEventUnmute<'a>>),
+    ModEventUnmute(Box<crate::tools_ozone::moderation::ModEventUnmute<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventMuteReporter")]
-    DefsModEventMuteReporter(
-        Box<crate::tools_ozone::moderation::ModEventMuteReporter<'a>>,
-    ),
+    ModEventMuteReporter(Box<crate::tools_ozone::moderation::ModEventMuteReporter<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventUnmuteReporter")]
-    DefsModEventUnmuteReporter(
+    ModEventUnmuteReporter(
         Box<crate::tools_ozone::moderation::ModEventUnmuteReporter<'a>>,
     ),
     #[serde(rename = "tools.ozone.moderation.defs#modEventReverseTakedown")]
-    DefsModEventReverseTakedown(
+    ModEventReverseTakedown(
         Box<crate::tools_ozone::moderation::ModEventReverseTakedown<'a>>,
     ),
     #[serde(rename = "tools.ozone.moderation.defs#modEventResolveAppeal")]
-    DefsModEventResolveAppeal(
+    ModEventResolveAppeal(
         Box<crate::tools_ozone::moderation::ModEventResolveAppeal<'a>>,
     ),
     #[serde(rename = "tools.ozone.moderation.defs#modEventEmail")]
-    DefsModEventEmail(Box<crate::tools_ozone::moderation::ModEventEmail<'a>>),
+    ModEventEmail(Box<crate::tools_ozone::moderation::ModEventEmail<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventDivert")]
-    DefsModEventDivert(Box<crate::tools_ozone::moderation::ModEventDivert<'a>>),
+    ModEventDivert(Box<crate::tools_ozone::moderation::ModEventDivert<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventTag")]
-    DefsModEventTag(Box<crate::tools_ozone::moderation::ModEventTag<'a>>),
+    ModEventTag(Box<crate::tools_ozone::moderation::ModEventTag<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#accountEvent")]
-    DefsAccountEvent(Box<crate::tools_ozone::moderation::AccountEvent<'a>>),
+    AccountEvent(Box<crate::tools_ozone::moderation::AccountEvent<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#identityEvent")]
-    DefsIdentityEvent(Box<crate::tools_ozone::moderation::IdentityEvent<'a>>),
+    IdentityEvent(Box<crate::tools_ozone::moderation::IdentityEvent<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#recordEvent")]
-    DefsRecordEvent(Box<crate::tools_ozone::moderation::RecordEvent<'a>>),
+    RecordEvent(Box<crate::tools_ozone::moderation::RecordEvent<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#modEventPriorityScore")]
-    DefsModEventPriorityScore(
+    ModEventPriorityScore(
         Box<crate::tools_ozone::moderation::ModEventPriorityScore<'a>>,
     ),
     #[serde(rename = "tools.ozone.moderation.defs#ageAssuranceEvent")]
-    DefsAgeAssuranceEvent(Box<crate::tools_ozone::moderation::AgeAssuranceEvent<'a>>),
+    AgeAssuranceEvent(Box<crate::tools_ozone::moderation::AgeAssuranceEvent<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#ageAssuranceOverrideEvent")]
-    DefsAgeAssuranceOverrideEvent(
+    AgeAssuranceOverrideEvent(
         Box<crate::tools_ozone::moderation::AgeAssuranceOverrideEvent<'a>>,
     ),
     #[serde(rename = "tools.ozone.moderation.defs#revokeAccountCredentialsEvent")]
-    DefsRevokeAccountCredentialsEvent(
+    RevokeAccountCredentialsEvent(
         Box<crate::tools_ozone::moderation::RevokeAccountCredentialsEvent<'a>>,
     ),
     #[serde(rename = "tools.ozone.moderation.defs#scheduleTakedownEvent")]
-    DefsScheduleTakedownEvent(
+    ScheduleTakedownEvent(
         Box<crate::tools_ozone::moderation::ScheduleTakedownEvent<'a>>,
     ),
     #[serde(rename = "tools.ozone.moderation.defs#cancelScheduledTakedownEvent")]
-    DefsCancelScheduledTakedownEvent(
+    CancelScheduledTakedownEvent(
         Box<crate::tools_ozone::moderation::CancelScheduledTakedownEvent<'a>>,
     ),
 }
@@ -142,9 +138,9 @@ pub enum EmitEventRecordEvent<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum EmitEventRecordSubject<'a> {
+pub enum EmitEventSubject<'a> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
-    DefsRepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
     StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
 }
@@ -175,7 +171,8 @@ pub struct EmitEventOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -205,21 +202,6 @@ impl std::fmt::Display for EmitEventError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for EmitEventError<'_> {
-    type Output = EmitEventError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            EmitEventError::SubjectHasAction(v) => {
-                EmitEventError::SubjectHasAction(v.into_static())
-            }
-            EmitEventError::DuplicateExternalId(v) => {
-                EmitEventError::DuplicateExternalId(v.into_static())
-            }
-            EmitEventError::Unknown(v) => EmitEventError::Unknown(v.into_static()),
         }
     }
 }

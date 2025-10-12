@@ -44,7 +44,7 @@ pub struct Author<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ProfileDataView<'a> {
     #[serde(borrow)]
-    pub inner: ProfileDataViewRecordInner<'a>,
+    pub inner: ProfileDataViewInner<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -59,11 +59,11 @@ pub struct ProfileDataView<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ProfileDataViewRecordInner<'a> {
+pub enum ProfileDataViewInner<'a> {
     #[serde(rename = "sh.weaver.actor.defs#profileView")]
-    DefsProfileView(Box<crate::sh_weaver::actor::ProfileView<'a>>),
+    ProfileView(Box<crate::sh_weaver::actor::ProfileView<'a>>),
     #[serde(rename = "app.bsky.actor.defs#profileViewDetailed")]
-    DefsProfileViewDetailed(Box<crate::app_bsky::actor::ProfileViewDetailed<'a>>),
+    ProfileViewDetailed(Box<crate::app_bsky::actor::ProfileViewDetailed<'a>>),
 }
 
 #[jacquard_derive::lexicon]

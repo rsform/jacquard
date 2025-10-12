@@ -92,7 +92,8 @@ pub struct UpdateWebhookOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -143,29 +144,6 @@ impl std::fmt::Display for UpdateWebhookError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for UpdateWebhookError<'_> {
-    type Output = UpdateWebhookError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            UpdateWebhookError::WebhookNotFound(v) => {
-                UpdateWebhookError::WebhookNotFound(v.into_static())
-            }
-            UpdateWebhookError::Unauthorized(v) => {
-                UpdateWebhookError::Unauthorized(v.into_static())
-            }
-            UpdateWebhookError::InvalidUrl(v) => {
-                UpdateWebhookError::InvalidUrl(v.into_static())
-            }
-            UpdateWebhookError::DuplicateWebhook(v) => {
-                UpdateWebhookError::DuplicateWebhook(v.into_static())
-            }
-            UpdateWebhookError::Unknown(v) => {
-                UpdateWebhookError::Unknown(v.into_static())
-            }
         }
     }
 }

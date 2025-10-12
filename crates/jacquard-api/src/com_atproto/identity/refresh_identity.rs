@@ -56,7 +56,8 @@ pub struct RefreshIdentityOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -97,26 +98,6 @@ impl std::fmt::Display for RefreshIdentityError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for RefreshIdentityError<'_> {
-    type Output = RefreshIdentityError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            RefreshIdentityError::HandleNotFound(v) => {
-                RefreshIdentityError::HandleNotFound(v.into_static())
-            }
-            RefreshIdentityError::DidNotFound(v) => {
-                RefreshIdentityError::DidNotFound(v.into_static())
-            }
-            RefreshIdentityError::DidDeactivated(v) => {
-                RefreshIdentityError::DidDeactivated(v.into_static())
-            }
-            RefreshIdentityError::Unknown(v) => {
-                RefreshIdentityError::Unknown(v.into_static())
-            }
         }
     }
 }

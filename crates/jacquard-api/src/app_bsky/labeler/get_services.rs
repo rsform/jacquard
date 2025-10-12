@@ -38,7 +38,26 @@ pub struct GetServices<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetServicesOutput<'a> {
     #[serde(borrow)]
-    pub views: Vec<jacquard_common::types::value::Data<'a>>,
+    pub views: Vec<GetServicesOutputViewsItem<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetServicesOutputViewsItem<'a> {
+    #[serde(rename = "app.bsky.labeler.defs#labelerView")]
+    LabelerView(Box<crate::app_bsky::labeler::LabelerView<'a>>),
+    #[serde(rename = "app.bsky.labeler.defs#labelerViewDetailed")]
+    LabelerViewDetailed(Box<crate::app_bsky::labeler::LabelerViewDetailed<'a>>),
 }
 
 ///Response type for

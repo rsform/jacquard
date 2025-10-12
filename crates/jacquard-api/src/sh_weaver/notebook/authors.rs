@@ -22,7 +22,7 @@ pub struct AuthorListItem<'a> {
     pub index: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: std::option::Option<AuthorListItemRecordProfile<'a>>,
+    pub profile: std::option::Option<AuthorListItemProfile<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -37,11 +37,11 @@ pub struct AuthorListItem<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum AuthorListItemRecordProfile<'a> {
+pub enum AuthorListItemProfile<'a> {
     #[serde(rename = "app.bsky.actor.defs#profileViewBasic")]
-    DefsProfileViewBasic(Box<crate::app_bsky::actor::ProfileViewBasic<'a>>),
+    ProfileViewBasic(Box<crate::app_bsky::actor::ProfileViewBasic<'a>>),
     #[serde(rename = "sh.weaver.actor.defs#profileView")]
-    DefsProfileView(Box<crate::sh_weaver::actor::ProfileView<'a>>),
+    ProfileView(Box<crate::sh_weaver::actor::ProfileView<'a>>),
 }
 
 ///Authors of a Weaver notebook.

@@ -86,7 +86,8 @@ pub enum SubscribeLabelsMessage<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -106,20 +107,6 @@ impl std::fmt::Display for SubscribeLabelsError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for SubscribeLabelsError<'_> {
-    type Output = SubscribeLabelsError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SubscribeLabelsError::FutureCursor(v) => {
-                SubscribeLabelsError::FutureCursor(v.into_static())
-            }
-            SubscribeLabelsError::Unknown(v) => {
-                SubscribeLabelsError::Unknown(v.into_static())
-            }
         }
     }
 }

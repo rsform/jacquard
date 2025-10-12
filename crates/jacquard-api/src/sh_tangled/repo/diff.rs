@@ -47,7 +47,8 @@ pub struct DiffOutput<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -88,18 +89,6 @@ impl std::fmt::Display for DiffError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for DiffError<'_> {
-    type Output = DiffError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            DiffError::RepoNotFound(v) => DiffError::RepoNotFound(v.into_static()),
-            DiffError::RefNotFound(v) => DiffError::RefNotFound(v.into_static()),
-            DiffError::InvalidRequest(v) => DiffError::InvalidRequest(v.into_static()),
-            DiffError::Unknown(v) => DiffError::Unknown(v.into_static()),
         }
     }
 }

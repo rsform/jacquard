@@ -35,10 +35,10 @@ pub struct VerificationView<'a> {
     pub issuer: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub issuer_profile: std::option::Option<VerificationViewRecordIssuerProfile<'a>>,
+    pub issuer_profile: std::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub issuer_repo: std::option::Option<VerificationViewRecordIssuerRepo<'a>>,
+    pub issuer_repo: std::option::Option<VerificationViewIssuerRepo<'a>>,
     ///Describes the reason for revocation, also indicating that the verification is no longer valid.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -55,10 +55,10 @@ pub struct VerificationView<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_profile: std::option::Option<VerificationViewRecordSubjectProfile<'a>>,
+    pub subject_profile: std::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_repo: std::option::Option<VerificationViewRecordSubjectRepo<'a>>,
+    pub subject_repo: std::option::Option<VerificationViewSubjectRepo<'a>>,
     ///The AT-URI of the verification record.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
@@ -76,24 +76,11 @@ pub struct VerificationView<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum VerificationViewRecordIssuerProfile<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum VerificationViewRecordIssuerRepo<'a> {
+pub enum VerificationViewIssuerRepo<'a> {
     #[serde(rename = "tools.ozone.moderation.defs#repoViewDetail")]
-    DefsRepoViewDetail(Box<crate::tools_ozone::moderation::RepoViewDetail<'a>>),
+    RepoViewDetail(Box<crate::tools_ozone::moderation::RepoViewDetail<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#repoViewNotFound")]
-    DefsRepoViewNotFound(Box<crate::tools_ozone::moderation::RepoViewNotFound<'a>>),
+    RepoViewNotFound(Box<crate::tools_ozone::moderation::RepoViewNotFound<'a>>),
 }
 
 #[jacquard_derive::open_union]
@@ -108,22 +95,9 @@ pub enum VerificationViewRecordIssuerRepo<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum VerificationViewRecordSubjectProfile<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum VerificationViewRecordSubjectRepo<'a> {
+pub enum VerificationViewSubjectRepo<'a> {
     #[serde(rename = "tools.ozone.moderation.defs#repoViewDetail")]
-    DefsRepoViewDetail(Box<crate::tools_ozone::moderation::RepoViewDetail<'a>>),
+    RepoViewDetail(Box<crate::tools_ozone::moderation::RepoViewDetail<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#repoViewNotFound")]
-    DefsRepoViewNotFound(Box<crate::tools_ozone::moderation::RepoViewNotFound<'a>>),
+    RepoViewNotFound(Box<crate::tools_ozone::moderation::RepoViewNotFound<'a>>),
 }

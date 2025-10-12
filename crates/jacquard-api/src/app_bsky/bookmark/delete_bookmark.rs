@@ -39,7 +39,8 @@ pub struct DeleteBookmark<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -60,20 +61,6 @@ impl std::fmt::Display for DeleteBookmarkError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for DeleteBookmarkError<'_> {
-    type Output = DeleteBookmarkError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            DeleteBookmarkError::UnsupportedCollection(v) => {
-                DeleteBookmarkError::UnsupportedCollection(v.into_static())
-            }
-            DeleteBookmarkError::Unknown(v) => {
-                DeleteBookmarkError::Unknown(v.into_static())
-            }
         }
     }
 }

@@ -48,7 +48,8 @@ pub struct GetLatestCommitOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -95,29 +96,6 @@ impl std::fmt::Display for GetLatestCommitError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetLatestCommitError<'_> {
-    type Output = GetLatestCommitError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetLatestCommitError::RepoNotFound(v) => {
-                GetLatestCommitError::RepoNotFound(v.into_static())
-            }
-            GetLatestCommitError::RepoTakendown(v) => {
-                GetLatestCommitError::RepoTakendown(v.into_static())
-            }
-            GetLatestCommitError::RepoSuspended(v) => {
-                GetLatestCommitError::RepoSuspended(v.into_static())
-            }
-            GetLatestCommitError::RepoDeactivated(v) => {
-                GetLatestCommitError::RepoDeactivated(v.into_static())
-            }
-            GetLatestCommitError::Unknown(v) => {
-                GetLatestCommitError::Unknown(v.into_static())
-            }
         }
     }
 }

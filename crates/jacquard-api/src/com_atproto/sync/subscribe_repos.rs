@@ -166,7 +166,8 @@ pub enum SubscribeReposMessage<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -196,23 +197,6 @@ impl std::fmt::Display for SubscribeReposError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for SubscribeReposError<'_> {
-    type Output = SubscribeReposError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SubscribeReposError::FutureCursor(v) => {
-                SubscribeReposError::FutureCursor(v.into_static())
-            }
-            SubscribeReposError::ConsumerTooSlow(v) => {
-                SubscribeReposError::ConsumerTooSlow(v.into_static())
-            }
-            SubscribeReposError::Unknown(v) => {
-                SubscribeReposError::Unknown(v.into_static())
-            }
         }
     }
 }

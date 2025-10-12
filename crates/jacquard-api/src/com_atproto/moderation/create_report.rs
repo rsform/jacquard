@@ -31,7 +31,7 @@ pub struct CreateReport<'a> {
     #[serde(borrow)]
     pub reason_type: crate::com_atproto::moderation::ReasonType<'a>,
     #[serde(borrow)]
-    pub subject: CreateReportRecordSubject<'a>,
+    pub subject: CreateReportSubject<'a>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
@@ -53,9 +53,9 @@ pub struct CreateReport<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreateReportRecordSubject<'a> {
+pub enum CreateReportSubject<'a> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
-    DefsRepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
     StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
 }
@@ -82,7 +82,7 @@ pub struct CreateReportOutput<'a> {
     #[serde(borrow)]
     pub reported_by: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
-    pub subject: CreateReportOutputRecordSubject<'a>,
+    pub subject: CreateReportOutputSubject<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -97,9 +97,9 @@ pub struct CreateReportOutput<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreateReportOutputRecordSubject<'a> {
+pub enum CreateReportOutputSubject<'a> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
-    DefsRepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
     StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
 }

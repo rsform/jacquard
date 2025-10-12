@@ -123,9 +123,40 @@ pub struct Link<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Facet<'a> {
     #[serde(borrow)]
-    pub features: Vec<jacquard_common::types::value::Data<'a>>,
+    pub features: Vec<FacetFeaturesItem<'a>>,
     #[serde(borrow)]
     pub index: crate::pub_leaflet::richtext::facet::ByteSlice<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum FacetFeaturesItem<'a> {
+    #[serde(rename = "pub.leaflet.richtext.facet#link")]
+    Link(Box<crate::pub_leaflet::richtext::facet::Link<'a>>),
+    #[serde(rename = "pub.leaflet.richtext.facet#code")]
+    Code(Box<crate::pub_leaflet::richtext::facet::Code<'a>>),
+    #[serde(rename = "pub.leaflet.richtext.facet#highlight")]
+    Highlight(Box<crate::pub_leaflet::richtext::facet::Highlight<'a>>),
+    #[serde(rename = "pub.leaflet.richtext.facet#underline")]
+    Underline(Box<crate::pub_leaflet::richtext::facet::Underline<'a>>),
+    #[serde(rename = "pub.leaflet.richtext.facet#strikethrough")]
+    Strikethrough(Box<crate::pub_leaflet::richtext::facet::Strikethrough<'a>>),
+    #[serde(rename = "pub.leaflet.richtext.facet#id")]
+    Id(Box<crate::pub_leaflet::richtext::facet::Id<'a>>),
+    #[serde(rename = "pub.leaflet.richtext.facet#bold")]
+    Bold(Box<crate::pub_leaflet::richtext::facet::Bold<'a>>),
+    #[serde(rename = "pub.leaflet.richtext.facet#italic")]
+    Italic(Box<crate::pub_leaflet::richtext::facet::Italic<'a>>),
 }
 
 ///Facet feature for strikethrough markup

@@ -44,7 +44,7 @@ pub struct CheckHandleAvailabilityOutput<'a> {
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(borrow)]
-    pub result: CheckHandleAvailabilityOutputRecordResult<'a>,
+    pub result: CheckHandleAvailabilityOutputResult<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -59,7 +59,17 @@ pub struct CheckHandleAvailabilityOutput<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum CheckHandleAvailabilityOutputRecordResult<'a> {}
+pub enum CheckHandleAvailabilityOutputResult<'a> {
+    #[serde(rename = "com.atproto.temp.checkHandleAvailability#resultAvailable")]
+    ResultAvailable(
+        Box<crate::com_atproto::temp::check_handle_availability::ResultAvailable<'a>>,
+    ),
+    #[serde(rename = "com.atproto.temp.checkHandleAvailability#resultUnavailable")]
+    ResultUnavailable(
+        Box<crate::com_atproto::temp::check_handle_availability::ResultUnavailable<'a>>,
+    ),
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -69,7 +79,8 @@ pub enum CheckHandleAvailabilityOutputRecordResult<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -90,20 +101,6 @@ impl std::fmt::Display for CheckHandleAvailabilityError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for CheckHandleAvailabilityError<'_> {
-    type Output = CheckHandleAvailabilityError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CheckHandleAvailabilityError::InvalidEmail(v) => {
-                CheckHandleAvailabilityError::InvalidEmail(v.into_static())
-            }
-            CheckHandleAvailabilityError::Unknown(v) => {
-                CheckHandleAvailabilityError::Unknown(v.into_static())
-            }
         }
     }
 }

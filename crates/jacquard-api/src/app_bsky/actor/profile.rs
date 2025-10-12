@@ -43,7 +43,7 @@ pub struct Profile<'a> {
     ///Self-label values, specific to the Bluesky application, on the overall account.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<ProfileRecordLabels<'a>>,
+    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub pinned_post: std::option::Option<
@@ -56,23 +56,6 @@ pub struct Profile<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub website: std::option::Option<jacquard_common::types::string::Uri<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ProfileRecordLabels<'a> {
-    #[serde(rename = "com.atproto.label.defs#selfLabels")]
-    DefsSelfLabels(Box<crate::com_atproto::label::SelfLabels<'a>>),
 }
 
 impl jacquard_common::types::collection::Collection for Profile<'_> {

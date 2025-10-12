@@ -73,7 +73,7 @@ pub struct Event<'a> {
     #[serde(borrow)]
     pub created_by: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    pub details: EventRecordDetails<'a>,
+    pub details: EventDetails<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -88,7 +88,29 @@ pub struct Event<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum EventRecordDetails<'a> {}
+pub enum EventDetails<'a> {
+    #[serde(rename = "tools.ozone.hosting.getAccountHistory#accountCreated")]
+    AccountCreated(
+        Box<crate::tools_ozone::hosting::get_account_history::AccountCreated<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.hosting.getAccountHistory#emailUpdated")]
+    EmailUpdated(
+        Box<crate::tools_ozone::hosting::get_account_history::EmailUpdated<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.hosting.getAccountHistory#emailConfirmed")]
+    EmailConfirmed(
+        Box<crate::tools_ozone::hosting::get_account_history::EmailConfirmed<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.hosting.getAccountHistory#passwordUpdated")]
+    PasswordUpdated(
+        Box<crate::tools_ozone::hosting::get_account_history::PasswordUpdated<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.hosting.getAccountHistory#handleUpdated")]
+    HandleUpdated(
+        Box<crate::tools_ozone::hosting::get_account_history::HandleUpdated<'a>>,
+    ),
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

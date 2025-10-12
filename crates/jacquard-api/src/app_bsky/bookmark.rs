@@ -42,7 +42,7 @@ pub struct BookmarkView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
-    pub item: BookmarkViewRecordItem<'a>,
+    pub item: BookmarkViewItem<'a>,
     ///A strong ref to the bookmarked record.
     #[serde(borrow)]
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
@@ -60,11 +60,11 @@ pub struct BookmarkView<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum BookmarkViewRecordItem<'a> {
+pub enum BookmarkViewItem<'a> {
     #[serde(rename = "app.bsky.feed.defs#blockedPost")]
-    DefsBlockedPost(Box<crate::app_bsky::feed::BlockedPost<'a>>),
+    BlockedPost(Box<crate::app_bsky::feed::BlockedPost<'a>>),
     #[serde(rename = "app.bsky.feed.defs#notFoundPost")]
-    DefsNotFoundPost(Box<crate::app_bsky::feed::NotFoundPost<'a>>),
+    NotFoundPost(Box<crate::app_bsky::feed::NotFoundPost<'a>>),
     #[serde(rename = "app.bsky.feed.defs#postView")]
-    DefsPostView(Box<crate::app_bsky::feed::PostView<'a>>),
+    PostView(Box<crate::app_bsky::feed::PostView<'a>>),
 }

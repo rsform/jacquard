@@ -86,7 +86,8 @@ pub struct PutRecordOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -106,18 +107,6 @@ impl std::fmt::Display for PutRecordError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for PutRecordError<'_> {
-    type Output = PutRecordError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            PutRecordError::InvalidSwap(v) => {
-                PutRecordError::InvalidSwap(v.into_static())
-            }
-            PutRecordError::Unknown(v) => PutRecordError::Unknown(v.into_static()),
         }
     }
 }

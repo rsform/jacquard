@@ -89,7 +89,8 @@ pub struct CreateSessionOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -118,23 +119,6 @@ impl std::fmt::Display for CreateSessionError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for CreateSessionError<'_> {
-    type Output = CreateSessionError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CreateSessionError::AccountTakedown(v) => {
-                CreateSessionError::AccountTakedown(v.into_static())
-            }
-            CreateSessionError::AuthFactorTokenRequired(v) => {
-                CreateSessionError::AuthFactorTokenRequired(v.into_static())
-            }
-            CreateSessionError::Unknown(v) => {
-                CreateSessionError::Unknown(v.into_static())
-            }
         }
     }
 }

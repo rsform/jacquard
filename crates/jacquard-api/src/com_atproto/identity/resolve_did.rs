@@ -48,7 +48,8 @@ pub struct ResolveDidOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -79,21 +80,6 @@ impl std::fmt::Display for ResolveDidError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ResolveDidError<'_> {
-    type Output = ResolveDidError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ResolveDidError::DidNotFound(v) => {
-                ResolveDidError::DidNotFound(v.into_static())
-            }
-            ResolveDidError::DidDeactivated(v) => {
-                ResolveDidError::DidDeactivated(v.into_static())
-            }
-            ResolveDidError::Unknown(v) => ResolveDidError::Unknown(v.into_static()),
         }
     }
 }

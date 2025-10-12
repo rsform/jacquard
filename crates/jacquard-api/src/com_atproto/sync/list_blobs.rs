@@ -59,7 +59,8 @@ pub struct ListBlobsOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -106,27 +107,6 @@ impl std::fmt::Display for ListBlobsError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ListBlobsError<'_> {
-    type Output = ListBlobsError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ListBlobsError::RepoNotFound(v) => {
-                ListBlobsError::RepoNotFound(v.into_static())
-            }
-            ListBlobsError::RepoTakendown(v) => {
-                ListBlobsError::RepoTakendown(v.into_static())
-            }
-            ListBlobsError::RepoSuspended(v) => {
-                ListBlobsError::RepoSuspended(v.into_static())
-            }
-            ListBlobsError::RepoDeactivated(v) => {
-                ListBlobsError::RepoDeactivated(v.into_static())
-            }
-            ListBlobsError::Unknown(v) => ListBlobsError::Unknown(v.into_static()),
         }
     }
 }

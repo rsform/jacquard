@@ -62,7 +62,8 @@ pub struct AddReactionOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -103,24 +104,6 @@ impl std::fmt::Display for AddReactionError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for AddReactionError<'_> {
-    type Output = AddReactionError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            AddReactionError::ReactionMessageDeleted(v) => {
-                AddReactionError::ReactionMessageDeleted(v.into_static())
-            }
-            AddReactionError::ReactionLimitReached(v) => {
-                AddReactionError::ReactionLimitReached(v.into_static())
-            }
-            AddReactionError::ReactionInvalidValue(v) => {
-                AddReactionError::ReactionInvalidValue(v.into_static())
-            }
-            AddReactionError::Unknown(v) => AddReactionError::Unknown(v.into_static()),
         }
     }
 }

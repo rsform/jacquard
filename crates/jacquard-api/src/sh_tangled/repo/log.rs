@@ -59,7 +59,8 @@ pub struct LogOutput<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -110,19 +111,6 @@ impl std::fmt::Display for LogError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for LogError<'_> {
-    type Output = LogError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            LogError::RepoNotFound(v) => LogError::RepoNotFound(v.into_static()),
-            LogError::RefNotFound(v) => LogError::RefNotFound(v.into_static()),
-            LogError::PathNotFound(v) => LogError::PathNotFound(v.into_static()),
-            LogError::InvalidRequest(v) => LogError::InvalidRequest(v.into_static()),
-            LogError::Unknown(v) => LogError::Unknown(v.into_static()),
         }
     }
 }

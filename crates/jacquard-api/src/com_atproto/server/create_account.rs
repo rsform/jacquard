@@ -101,7 +101,8 @@ pub struct CreateAccountOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -175,38 +176,6 @@ impl std::fmt::Display for CreateAccountError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for CreateAccountError<'_> {
-    type Output = CreateAccountError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CreateAccountError::InvalidHandle(v) => {
-                CreateAccountError::InvalidHandle(v.into_static())
-            }
-            CreateAccountError::InvalidPassword(v) => {
-                CreateAccountError::InvalidPassword(v.into_static())
-            }
-            CreateAccountError::InvalidInviteCode(v) => {
-                CreateAccountError::InvalidInviteCode(v.into_static())
-            }
-            CreateAccountError::HandleNotAvailable(v) => {
-                CreateAccountError::HandleNotAvailable(v.into_static())
-            }
-            CreateAccountError::UnsupportedDomain(v) => {
-                CreateAccountError::UnsupportedDomain(v.into_static())
-            }
-            CreateAccountError::UnresolvableDid(v) => {
-                CreateAccountError::UnresolvableDid(v.into_static())
-            }
-            CreateAccountError::IncompatibleDidDoc(v) => {
-                CreateAccountError::IncompatibleDidDoc(v.into_static())
-            }
-            CreateAccountError::Unknown(v) => {
-                CreateAccountError::Unknown(v.into_static())
-            }
         }
     }
 }

@@ -69,6 +69,9 @@ pub mod dev_ocbwoy3;
 #[cfg(feature = "dev_regnault")]
 pub mod dev_regnault;
 
+#[cfg(feature = "events_smokesignal")]
+pub mod events_smokesignal;
+
 #[cfg(feature = "fyi_unravel")]
 pub mod fyi_unravel;
 

@@ -47,7 +47,8 @@ pub struct ResolveHandleOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -68,20 +69,6 @@ impl std::fmt::Display for ResolveHandleError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ResolveHandleError<'_> {
-    type Output = ResolveHandleError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ResolveHandleError::HandleNotFound(v) => {
-                ResolveHandleError::HandleNotFound(v.into_static())
-            }
-            ResolveHandleError::Unknown(v) => {
-                ResolveHandleError::Unknown(v.into_static())
-            }
         }
     }
 }

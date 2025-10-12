@@ -47,7 +47,8 @@ pub struct GetHeadOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -67,16 +68,6 @@ impl std::fmt::Display for GetHeadError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetHeadError<'_> {
-    type Output = GetHeadError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetHeadError::HeadNotFound(v) => GetHeadError::HeadNotFound(v.into_static()),
-            GetHeadError::Unknown(v) => GetHeadError::Unknown(v.into_static()),
         }
     }
 }

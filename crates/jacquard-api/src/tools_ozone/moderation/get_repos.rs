@@ -35,7 +35,26 @@ pub struct GetRepos<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetReposOutput<'a> {
     #[serde(borrow)]
-    pub repos: Vec<jacquard_common::types::value::Data<'a>>,
+    pub repos: Vec<GetReposOutputReposItem<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetReposOutputReposItem<'a> {
+    #[serde(rename = "tools.ozone.moderation.defs#repoViewDetail")]
+    RepoViewDetail(Box<crate::tools_ozone::moderation::RepoViewDetail<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#repoViewNotFound")]
+    RepoViewNotFound(Box<crate::tools_ozone::moderation::RepoViewNotFound<'a>>),
 }
 
 ///Response type for

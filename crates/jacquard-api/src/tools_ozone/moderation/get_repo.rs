@@ -48,7 +48,8 @@ pub struct GetRepoOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -68,16 +69,6 @@ impl std::fmt::Display for GetRepoError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetRepoError<'_> {
-    type Output = GetRepoError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetRepoError::RepoNotFound(v) => GetRepoError::RepoNotFound(v.into_static()),
-            GetRepoError::Unknown(v) => GetRepoError::Unknown(v.into_static()),
         }
     }
 }

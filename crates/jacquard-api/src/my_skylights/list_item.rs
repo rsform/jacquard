@@ -37,7 +37,7 @@ impl std::fmt::Display for Abandoned {
 pub struct Builtin<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#type: std::option::Option<BuiltinRecordType<'a>>,
+    pub r#type: std::option::Option<BuiltinType<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -52,17 +52,17 @@ pub struct Builtin<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum BuiltinRecordType<'a> {
+pub enum BuiltinType<'a> {
     #[serde(rename = "my.skylights.listItem#inProgress")]
-    ListItemInProgress(Box<crate::my_skylights::list_item::InProgress>),
+    InProgress(Box<crate::my_skylights::list_item::InProgress>),
     #[serde(rename = "my.skylights.listItem#queue")]
-    ListItemQueue(Box<crate::my_skylights::list_item::Queue>),
+    Queue(Box<crate::my_skylights::list_item::Queue>),
     #[serde(rename = "my.skylights.listItem#abandoned")]
-    ListItemAbandoned(Box<crate::my_skylights::list_item::Abandoned>),
+    Abandoned(Box<crate::my_skylights::list_item::Abandoned>),
     #[serde(rename = "my.skylights.listItem#owned")]
-    ListItemOwned(Box<crate::my_skylights::list_item::Owned>),
+    Owned(Box<crate::my_skylights::list_item::Owned>),
     #[serde(rename = "my.skylights.listItem#wishlist")]
-    ListItemWishlist(Box<crate::my_skylights::list_item::Wishlist>),
+    Wishlist(Box<crate::my_skylights::list_item::Wishlist>),
 }
 
 ///User is currently reading/watching/... the item
@@ -100,7 +100,7 @@ pub struct ListItem<'a> {
     #[serde(borrow)]
     pub item: std::option::Option<crate::my_skylights::Item<'a>>,
     #[serde(borrow)]
-    pub list: ListItemRecordList<'a>,
+    pub list: ListItemList<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub note: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -120,9 +120,11 @@ pub struct ListItem<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListItemRecordList<'a> {
+pub enum ListItemList<'a> {
     #[serde(rename = "my.skylights.list")]
     List(Box<crate::my_skylights::list::List<'a>>),
+    #[serde(rename = "my.skylights.listItem#builtin")]
+    Builtin(Box<crate::my_skylights::list_item::Builtin<'a>>),
 }
 
 ///User owns the item

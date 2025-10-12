@@ -23,7 +23,7 @@ pub struct ListItem<'a> {
         Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>,
     >,
     #[serde(borrow)]
-    pub content: ListItemRecordContent<'a>,
+    pub content: ListItemContent<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -38,7 +38,7 @@ pub struct ListItem<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListItemRecordContent<'a> {
+pub enum ListItemContent<'a> {
     #[serde(rename = "pub.leaflet.blocks.text")]
     Text(Box<crate::pub_leaflet::blocks::text::Text<'a>>),
     #[serde(rename = "pub.leaflet.blocks.header")]

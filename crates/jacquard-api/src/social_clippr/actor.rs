@@ -13,8 +13,25 @@ pub mod search_clips;
 pub mod search_profiles;
 pub mod search_tags;
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum PreferencesItem<'a> {
+    #[serde(rename = "social.clippr.actor.defs#publishingScopesPref")]
+    PublishingScopesPref(Box<crate::social_clippr::actor::PublishingScopesPref<'a>>),
+}
+
 ///An array of refs to various preferences.
-pub type Preferences<'a> = Vec<jacquard_common::types::value::Data<'a>>;
+pub type Preferences<'a> = Vec<PreferencesItem<'a>>;
 ///A view of an actor's profile.
 #[jacquard_derive::lexicon]
 #[derive(

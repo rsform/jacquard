@@ -18,9 +18,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct RecordWithMedia<'a> {
     #[serde(borrow)]
-    pub media: RecordWithMediaRecordMedia<'a>,
+    pub media: RecordWithMediaMedia<'a>,
     #[serde(borrow)]
-    pub record: RecordWithMediaRecordRecord<'a>,
+    pub record: RecordWithMediaRecord<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -35,7 +35,7 @@ pub struct RecordWithMedia<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum RecordWithMediaRecordMedia<'a> {
+pub enum RecordWithMediaMedia<'a> {
     #[serde(rename = "sh.weaver.embed.images")]
     Images(Box<crate::sh_weaver::embed::images::Images<'a>>),
     #[serde(rename = "sh.weaver.embed.external")]
@@ -60,7 +60,7 @@ pub enum RecordWithMediaRecordMedia<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum RecordWithMediaRecordRecord<'a> {
+pub enum RecordWithMediaRecord<'a> {
     #[serde(rename = "app.bsky.embed.record")]
     Record(Box<crate::app_bsky::embed::record::Record<'a>>),
     #[serde(rename = "sh.weaver.embed.records")]
@@ -80,9 +80,9 @@ pub enum RecordWithMediaRecordRecord<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct View<'a> {
     #[serde(borrow)]
-    pub media: ViewRecordMedia<'a>,
+    pub media: ViewMedia<'a>,
     #[serde(borrow)]
-    pub record: ViewRecordRecord<'a>,
+    pub record: ViewRecord<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -97,7 +97,7 @@ pub struct View<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ViewRecordMedia<'a> {
+pub enum ViewMedia<'a> {
     #[serde(rename = "sh.weaver.embed.images")]
     Images(Box<crate::sh_weaver::embed::images::Images<'a>>),
     #[serde(rename = "sh.weaver.embed.external#view")]
@@ -122,7 +122,7 @@ pub enum ViewRecordMedia<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ViewRecordRecord<'a> {
+pub enum ViewRecord<'a> {
     #[serde(rename = "sh.weaver.embed.records#view")]
     RecordsView(Box<crate::sh_weaver::embed::records::View<'a>>),
     #[serde(rename = "app.bsky.embed.record#view")]

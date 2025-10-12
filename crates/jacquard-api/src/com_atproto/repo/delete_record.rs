@@ -73,7 +73,8 @@ pub struct DeleteRecordOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -93,18 +94,6 @@ impl std::fmt::Display for DeleteRecordError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for DeleteRecordError<'_> {
-    type Output = DeleteRecordError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            DeleteRecordError::InvalidSwap(v) => {
-                DeleteRecordError::InvalidSwap(v.into_static())
-            }
-            DeleteRecordError::Unknown(v) => DeleteRecordError::Unknown(v.into_static()),
         }
     }
 }

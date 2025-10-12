@@ -64,7 +64,7 @@ pub struct Threadgate<'a> {
     ///List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub allow: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub allow: std::option::Option<Vec<ThreadgateAllowItem<'a>>>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///List of hidden reply URIs.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -75,6 +75,29 @@ pub struct Threadgate<'a> {
     ///Reference (AT-URI) to the post record.
     #[serde(borrow)]
     pub post: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ThreadgateAllowItem<'a> {
+    #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
+    MentionRule(Box<crate::app_bsky::feed::threadgate::MentionRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
+    FollowerRule(Box<crate::app_bsky::feed::threadgate::FollowerRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#followingRule")]
+    FollowingRule(Box<crate::app_bsky::feed::threadgate::FollowingRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#listRule")]
+    ListRule(Box<crate::app_bsky::feed::threadgate::ListRule<'a>>),
 }
 
 impl jacquard_common::types::collection::Collection for Threadgate<'_> {

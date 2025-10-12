@@ -71,7 +71,8 @@ pub struct BranchOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -112,22 +113,6 @@ impl std::fmt::Display for BranchError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for BranchError<'_> {
-    type Output = BranchError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            BranchError::RepoNotFound(v) => BranchError::RepoNotFound(v.into_static()),
-            BranchError::BranchNotFound(v) => {
-                BranchError::BranchNotFound(v.into_static())
-            }
-            BranchError::InvalidRequest(v) => {
-                BranchError::InvalidRequest(v.into_static())
-            }
-            BranchError::Unknown(v) => BranchError::Unknown(v.into_static()),
         }
     }
 }

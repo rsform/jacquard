@@ -84,7 +84,7 @@ pub struct Event<'a> {
     ///The locations where the event takes place.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub locations: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub locations: std::option::Option<Vec<EventLocationsItem<'a>>>,
     ///The attendance mode of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -107,6 +107,31 @@ pub struct Event<'a> {
     pub uris: std::option::Option<
         Vec<crate::community_lexicon::calendar::event::Uri<'a>>,
     >,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum EventLocationsItem<'a> {
+    #[serde(rename = "community.lexicon.calendar.event#uri")]
+    Uri(Box<crate::community_lexicon::calendar::event::Uri<'a>>),
+    #[serde(rename = "community.lexicon.location.address")]
+    Address(Box<crate::community_lexicon::location::address::Address<'a>>),
+    #[serde(rename = "community.lexicon.location.fsq")]
+    Fsq(Box<crate::community_lexicon::location::fsq::Fsq<'a>>),
+    #[serde(rename = "community.lexicon.location.geo")]
+    Geo(Box<crate::community_lexicon::location::geo::Geo<'a>>),
+    #[serde(rename = "community.lexicon.location.hthree")]
+    Hthree(Box<crate::community_lexicon::location::hthree::Hthree<'a>>),
 }
 
 impl jacquard_common::types::collection::Collection for Event<'_> {

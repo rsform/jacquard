@@ -37,7 +37,8 @@ pub struct GetConfigOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -66,19 +67,6 @@ impl std::fmt::Display for GetConfigError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetConfigError<'_> {
-    type Output = GetConfigError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetConfigError::InvalidId(v) => GetConfigError::InvalidId(v.into_static()),
-            GetConfigError::InvalidServiceAuth(v) => {
-                GetConfigError::InvalidServiceAuth(v.into_static())
-            }
-            GetConfigError::Unknown(v) => GetConfigError::Unknown(v.into_static()),
         }
     }
 }

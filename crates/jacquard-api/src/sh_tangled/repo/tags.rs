@@ -51,7 +51,8 @@ pub struct TagsOutput<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -82,17 +83,6 @@ impl std::fmt::Display for TagsError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for TagsError<'_> {
-    type Output = TagsError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            TagsError::RepoNotFound(v) => TagsError::RepoNotFound(v.into_static()),
-            TagsError::InvalidRequest(v) => TagsError::InvalidRequest(v.into_static()),
-            TagsError::Unknown(v) => TagsError::Unknown(v.into_static()),
         }
     }
 }

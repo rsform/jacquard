@@ -111,7 +111,7 @@ pub struct ApplyWrites<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub validate: std::option::Option<bool>,
     #[serde(borrow)]
-    pub writes: Vec<jacquard_common::types::value::Data<'a>>,
+    pub writes: Vec<ApplyWritesWritesItem<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
@@ -119,6 +119,26 @@ pub struct ApplyWrites<'a> {
         ::jacquard_common::smol_str::SmolStr,
         ::jacquard_common::types::value::Data<'a>,
     >,
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ApplyWritesWritesItem<'a> {
+    #[serde(rename = "com.atproto.repo.applyWrites#create")]
+    Create(Box<crate::com_atproto::repo::apply_writes::Create<'a>>),
+    #[serde(rename = "com.atproto.repo.applyWrites#update")]
+    Update(Box<crate::com_atproto::repo::apply_writes::Update<'a>>),
+    #[serde(rename = "com.atproto.repo.applyWrites#delete")]
+    Delete(Box<crate::com_atproto::repo::apply_writes::Delete<'a>>),
 }
 
 #[jacquard_derive::lexicon]
@@ -138,7 +158,27 @@ pub struct ApplyWritesOutput<'a> {
     pub commit: std::option::Option<crate::com_atproto::repo::CommitMeta<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub results: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub results: std::option::Option<Vec<ApplyWritesOutputResultsItem<'a>>>,
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ApplyWritesOutputResultsItem<'a> {
+    #[serde(rename = "com.atproto.repo.applyWrites#createResult")]
+    CreateResult(Box<crate::com_atproto::repo::apply_writes::CreateResult<'a>>),
+    #[serde(rename = "com.atproto.repo.applyWrites#updateResult")]
+    UpdateResult(Box<crate::com_atproto::repo::apply_writes::UpdateResult<'a>>),
+    #[serde(rename = "com.atproto.repo.applyWrites#deleteResult")]
+    DeleteResult(Box<crate::com_atproto::repo::apply_writes::DeleteResult<'a>>),
 }
 
 #[jacquard_derive::open_union]
@@ -150,7 +190,8 @@ pub struct ApplyWritesOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -171,18 +212,6 @@ impl std::fmt::Display for ApplyWritesError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ApplyWritesError<'_> {
-    type Output = ApplyWritesError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ApplyWritesError::InvalidSwap(v) => {
-                ApplyWritesError::InvalidSwap(v.into_static())
-            }
-            ApplyWritesError::Unknown(v) => ApplyWritesError::Unknown(v.into_static()),
         }
     }
 }

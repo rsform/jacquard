@@ -22,7 +22,7 @@ pub struct Draft<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: std::option::Option<DraftRecordEmbed<'a>>,
+    pub embed: std::option::Option<DraftEmbed<'a>>,
     ///Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -30,7 +30,7 @@ pub struct Draft<'a> {
     ///Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<DraftRecordLabels<'a>>,
+    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     ///Indicates human language of post primary text content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
@@ -61,7 +61,7 @@ pub struct Draft<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum DraftRecordEmbed<'a> {
+pub enum DraftEmbed<'a> {
     #[serde(rename = "app.bsky.embed.images")]
     Images(Box<crate::app_bsky::embed::images::Images<'a>>),
     #[serde(rename = "app.bsky.embed.video")]
@@ -72,23 +72,6 @@ pub enum DraftRecordEmbed<'a> {
     Record(Box<crate::app_bsky::embed::record::Record<'a>>),
     #[serde(rename = "app.bsky.embed.recordWithMedia")]
     RecordWithMedia(Box<crate::app_bsky::embed::record_with_media::RecordWithMedia<'a>>),
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DraftRecordLabels<'a> {
-    #[serde(rename = "com.atproto.label.defs#selfLabels")]
-    DefsSelfLabels(Box<crate::com_atproto::label::SelfLabels<'a>>),
 }
 
 impl jacquard_common::types::collection::Collection for Draft<'_> {

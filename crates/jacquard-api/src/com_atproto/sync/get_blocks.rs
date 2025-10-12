@@ -45,7 +45,8 @@ pub struct GetBlocksOutput<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -101,30 +102,6 @@ impl std::fmt::Display for GetBlocksError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetBlocksError<'_> {
-    type Output = GetBlocksError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetBlocksError::BlockNotFound(v) => {
-                GetBlocksError::BlockNotFound(v.into_static())
-            }
-            GetBlocksError::RepoNotFound(v) => {
-                GetBlocksError::RepoNotFound(v.into_static())
-            }
-            GetBlocksError::RepoTakendown(v) => {
-                GetBlocksError::RepoTakendown(v.into_static())
-            }
-            GetBlocksError::RepoSuspended(v) => {
-                GetBlocksError::RepoSuspended(v.into_static())
-            }
-            GetBlocksError::RepoDeactivated(v) => {
-                GetBlocksError::RepoDeactivated(v.into_static())
-            }
-            GetBlocksError::Unknown(v) => GetBlocksError::Unknown(v.into_static()),
         }
     }
 }

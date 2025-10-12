@@ -38,7 +38,7 @@ pub struct MessageView<'a> {
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reply_to: std::option::Option<MessageViewRecordReplyTo<'a>>,
+    pub reply_to: std::option::Option<MessageViewReplyTo<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -55,7 +55,7 @@ pub struct MessageView<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum MessageViewRecordReplyTo<'a> {
+pub enum MessageViewReplyTo<'a> {
     #[serde(rename = "place.stream.chat.defs#messageView")]
-    DefsMessageView(Box<crate::place_stream::chat::MessageView<'a>>),
+    MessageView(Box<crate::place_stream::chat::MessageView<'a>>),
 }

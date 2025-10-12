@@ -19,6 +19,7 @@
             },
             "target": {
               "type": "string",
+              "description": "The DID of the target user to whom the notification will be sent.",
               "format": "did"
             }
           }
@@ -30,7 +31,15 @@
           "type": "object",
           "properties": {}
         }
-      }
+      },
+      "errors": [
+        {
+          "name": "ServiceNotAllowedError"
+        },
+        {
+          "name": "DeviceNotFoundError"
+        }
+      ]
     }
   }
 }

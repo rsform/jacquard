@@ -38,7 +38,9 @@ pub struct LinearDocumentQuote<'a> {
 pub struct Comment<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub attachment: std::option::Option<CommentRecordAttachment<'a>>,
+    pub attachment: std::option::Option<
+        crate::pub_leaflet::comment::LinearDocumentQuote<'a>,
+    >,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -52,19 +54,6 @@ pub struct Comment<'a> {
     pub subject: jacquard_common::types::string::AtUri<'a>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CommentRecordAttachment<'a> {}
 impl jacquard_common::types::collection::Collection for Comment<'_> {
     const NSID: &'static str = "pub.leaflet.comment";
 }

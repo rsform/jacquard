@@ -95,7 +95,8 @@ pub struct SearchPostsSkeletonOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -115,20 +116,6 @@ impl std::fmt::Display for SearchPostsSkeletonError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for SearchPostsSkeletonError<'_> {
-    type Output = SearchPostsSkeletonError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SearchPostsSkeletonError::BadQueryString(v) => {
-                SearchPostsSkeletonError::BadQueryString(v.into_static())
-            }
-            SearchPostsSkeletonError::Unknown(v) => {
-                SearchPostsSkeletonError::Unknown(v.into_static())
-            }
         }
     }
 }

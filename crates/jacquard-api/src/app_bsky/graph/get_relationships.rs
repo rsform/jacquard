@@ -43,7 +43,26 @@ pub struct GetRelationshipsOutput<'a> {
     #[serde(borrow)]
     pub actor: std::option::Option<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
-    pub relationships: Vec<jacquard_common::types::value::Data<'a>>,
+    pub relationships: Vec<GetRelationshipsOutputRelationshipsItem<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetRelationshipsOutputRelationshipsItem<'a> {
+    #[serde(rename = "app.bsky.graph.defs#relationship")]
+    Relationship(Box<crate::app_bsky::graph::Relationship<'a>>),
+    #[serde(rename = "app.bsky.graph.defs#notFoundActor")]
+    NotFoundActor(Box<crate::app_bsky::graph::NotFoundActor<'a>>),
 }
 
 #[jacquard_derive::open_union]
@@ -55,7 +74,8 @@ pub struct GetRelationshipsOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -76,20 +96,6 @@ impl std::fmt::Display for GetRelationshipsError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetRelationshipsError<'_> {
-    type Output = GetRelationshipsError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetRelationshipsError::ActorNotFound(v) => {
-                GetRelationshipsError::ActorNotFound(v.into_static())
-            }
-            GetRelationshipsError::Unknown(v) => {
-                GetRelationshipsError::Unknown(v.into_static())
-            }
         }
     }
 }

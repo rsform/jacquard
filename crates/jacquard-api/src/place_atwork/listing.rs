@@ -36,7 +36,9 @@ pub struct Listing<'a> {
     ///Locations that are relevant to the job listing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub locations: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub locations: std::option::Option<
+        Vec<crate::community_lexicon::location::hthree::Hthree<'a>>,
+    >,
     ///Client-declared timestamp when the job listing expires.
     pub not_after: jacquard_common::types::string::Datetime,
     ///Client-declared timestamp when the job listing becomes visible.

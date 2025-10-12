@@ -39,7 +39,8 @@ pub struct DeleteMember<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -70,21 +71,6 @@ impl std::fmt::Display for DeleteMemberError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for DeleteMemberError<'_> {
-    type Output = DeleteMemberError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            DeleteMemberError::MemberNotFound(v) => {
-                DeleteMemberError::MemberNotFound(v.into_static())
-            }
-            DeleteMemberError::CannotDeleteSelf(v) => {
-                DeleteMemberError::CannotDeleteSelf(v.into_static())
-            }
-            DeleteMemberError::Unknown(v) => DeleteMemberError::Unknown(v.into_static()),
         }
     }
 }

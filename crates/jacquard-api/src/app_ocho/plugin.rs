@@ -327,7 +327,26 @@ pub struct ManifestExtra<'a> {
     pub expo_go: crate::app_ocho::plugin::ExpoGo<'a>,
 }
 
-pub type Plugin<'a> = Vec<jacquard_common::types::value::Data<'a>>;
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum PluginItem<'a> {
+    #[serde(rename = "app.ocho.plugin.defs#stringId")]
+    StringId(Box<crate::app_ocho::plugin::StringId<'a>>),
+    #[serde(rename = "app.ocho.plugin.defs#pluginConfig")]
+    PluginConfig(Box<crate::app_ocho::plugin::PluginConfig<'a>>),
+}
+
+pub type Plugin<'a> = Vec<PluginItem<'a>>;
 pub type PluginConfig<'a> = jacquard_common::types::value::Data<'a>;
 ///A string identifier for a plugin, used to reference it in the app.
 pub type StringId<'a> = jacquard_common::CowStr<'a>;

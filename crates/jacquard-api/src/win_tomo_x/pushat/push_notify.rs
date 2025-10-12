@@ -20,7 +20,8 @@
 #[builder(start_fn = new)]
 pub struct PushNotify<'a> {
     #[serde(borrow)]
-    pub body: jacquard_common::types::value::Data<'a>,
+    pub body: crate::win_tomo_x::pushat::NotifyBody<'a>,
+    ///The DID of the target user to whom the notification will be sent.
     #[serde(borrow)]
     pub target: jacquard_common::types::string::Did<'a>,
     #[serde(flatten)]
@@ -44,6 +45,49 @@ pub struct PushNotify<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PushNotifyOutput<'a> {}
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum PushNotifyError<'a> {
+    #[serde(rename = "ServiceNotAllowedError")]
+    ServiceNotAllowedError(std::option::Option<String>),
+    #[serde(rename = "DeviceNotFoundError")]
+    DeviceNotFoundError(std::option::Option<String>),
+}
+
+impl std::fmt::Display for PushNotifyError<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::ServiceNotAllowedError(msg) => {
+                write!(f, "ServiceNotAllowedError")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::DeviceNotFoundError(msg) => {
+                write!(f, "DeviceNotFoundError")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
 ///Response type for
 ///win.tomo-x.pushat.pushNotify
 pub struct PushNotifyResponse;
@@ -51,7 +95,7 @@ impl jacquard_common::xrpc::XrpcResp for PushNotifyResponse {
     const NSID: &'static str = "win.tomo-x.pushat.pushNotify";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = PushNotifyOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Err<'de> = PushNotifyError<'de>;
 }
 
 impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for PushNotify<'de> {

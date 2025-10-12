@@ -51,7 +51,8 @@ pub struct NotifyOfNewEntryOutput<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -60,17 +61,6 @@ impl std::fmt::Display for NotifyOfNewEntryError<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for NotifyOfNewEntryError<'_> {
-    type Output = NotifyOfNewEntryError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            NotifyOfNewEntryError::Unknown(v) => {
-                NotifyOfNewEntryError::Unknown(v.into_static())
-            }
         }
     }
 }

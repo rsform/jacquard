@@ -104,7 +104,7 @@ pub struct ThreadItem<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
-    pub value: ThreadItemRecordValue<'a>,
+    pub value: ThreadItemValue<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -119,15 +119,15 @@ pub struct ThreadItem<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThreadItemRecordValue<'a> {
+pub enum ThreadItemValue<'a> {
     #[serde(rename = "app.bsky.unspecced.defs#threadItemPost")]
-    DefsThreadItemPost(Box<crate::app_bsky::unspecced::ThreadItemPost<'a>>),
+    ThreadItemPost(Box<crate::app_bsky::unspecced::ThreadItemPost<'a>>),
     #[serde(rename = "app.bsky.unspecced.defs#threadItemNoUnauthenticated")]
-    DefsThreadItemNoUnauthenticated(
+    ThreadItemNoUnauthenticated(
         Box<crate::app_bsky::unspecced::ThreadItemNoUnauthenticated<'a>>,
     ),
     #[serde(rename = "app.bsky.unspecced.defs#threadItemNotFound")]
-    DefsThreadItemNotFound(Box<crate::app_bsky::unspecced::ThreadItemNotFound<'a>>),
+    ThreadItemNotFound(Box<crate::app_bsky::unspecced::ThreadItemNotFound<'a>>),
     #[serde(rename = "app.bsky.unspecced.defs#threadItemBlocked")]
-    DefsThreadItemBlocked(Box<crate::app_bsky::unspecced::ThreadItemBlocked<'a>>),
+    ThreadItemBlocked(Box<crate::app_bsky::unspecced::ThreadItemBlocked<'a>>),
 }

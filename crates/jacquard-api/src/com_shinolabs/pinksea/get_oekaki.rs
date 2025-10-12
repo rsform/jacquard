@@ -40,7 +40,7 @@ pub struct GetOekakiOutput<'a> {
     #[serde(borrow)]
     pub children: Vec<crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki<'a>>,
     #[serde(borrow)]
-    pub parent: GetOekakiOutputRecordParent<'a>,
+    pub parent: GetOekakiOutputParent<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -55,7 +55,7 @@ pub struct GetOekakiOutput<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetOekakiOutputRecordParent<'a> {
+pub enum GetOekakiOutputParent<'a> {
     #[serde(rename = "com.shinolabs.pinksea.appViewDefs#hydratedOekaki")]
     AppViewDefsHydratedOekaki(
         Box<crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki<'a>>,

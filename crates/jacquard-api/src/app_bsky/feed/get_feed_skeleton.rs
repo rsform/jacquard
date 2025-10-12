@@ -61,7 +61,8 @@ pub struct GetFeedSkeletonOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -81,20 +82,6 @@ impl std::fmt::Display for GetFeedSkeletonError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetFeedSkeletonError<'_> {
-    type Output = GetFeedSkeletonError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetFeedSkeletonError::UnknownFeed(v) => {
-                GetFeedSkeletonError::UnknownFeed(v.into_static())
-            }
-            GetFeedSkeletonError::Unknown(v) => {
-                GetFeedSkeletonError::Unknown(v.into_static())
-            }
         }
     }
 }

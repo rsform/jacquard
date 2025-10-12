@@ -42,7 +42,7 @@ pub struct Postgate<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub embedding_rules: std::option::Option<
-        Vec<jacquard_common::types::value::Data<'a>>,
+        Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>,
     >,
     ///Reference (AT-URI) to the post record.
     #[serde(borrow)]

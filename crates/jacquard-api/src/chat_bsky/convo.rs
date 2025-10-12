@@ -39,10 +39,12 @@ pub struct ConvoView<'a> {
     pub id: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub last_message: std::option::Option<ConvoViewRecordLastMessage<'a>>,
+    pub last_message: std::option::Option<ConvoViewLastMessage<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub last_reaction: std::option::Option<ConvoViewRecordLastReaction<'a>>,
+    pub last_reaction: std::option::Option<
+        crate::chat_bsky::convo::MessageAndReactionView<'a>,
+    >,
     #[serde(borrow)]
     pub members: Vec<crate::chat_bsky::actor::ProfileViewBasic<'a>>,
     pub muted: bool,
@@ -66,20 +68,13 @@ pub struct ConvoView<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ConvoViewRecordLastMessage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ConvoViewRecordLastReaction<'a> {}
+pub enum ConvoViewLastMessage<'a> {
+    #[serde(rename = "chat.bsky.convo.defs#messageView")]
+    MessageView(Box<crate::chat_bsky::convo::MessageView<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
+    DeletedMessageView(Box<crate::chat_bsky::convo::DeletedMessageView<'a>>),
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -134,7 +129,7 @@ pub struct LogAddReaction<'a> {
     #[serde(borrow)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    pub message: LogAddReactionRecordMessage<'a>,
+    pub message: LogAddReactionMessage<'a>,
     #[serde(borrow)]
     pub reaction: crate::chat_bsky::convo::ReactionView<'a>,
     #[serde(borrow)]
@@ -153,7 +148,13 @@ pub struct LogAddReaction<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum LogAddReactionRecordMessage<'a> {}
+pub enum LogAddReactionMessage<'a> {
+    #[serde(rename = "chat.bsky.convo.defs#messageView")]
+    MessageView(Box<crate::chat_bsky::convo::MessageView<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
+    DeletedMessageView(Box<crate::chat_bsky::convo::DeletedMessageView<'a>>),
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -187,7 +188,7 @@ pub struct LogCreateMessage<'a> {
     #[serde(borrow)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    pub message: LogCreateMessageRecordMessage<'a>,
+    pub message: LogCreateMessageMessage<'a>,
     #[serde(borrow)]
     pub rev: jacquard_common::CowStr<'a>,
 }
@@ -204,7 +205,13 @@ pub struct LogCreateMessage<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum LogCreateMessageRecordMessage<'a> {}
+pub enum LogCreateMessageMessage<'a> {
+    #[serde(rename = "chat.bsky.convo.defs#messageView")]
+    MessageView(Box<crate::chat_bsky::convo::MessageView<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
+    DeletedMessageView(Box<crate::chat_bsky::convo::DeletedMessageView<'a>>),
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -220,7 +227,7 @@ pub struct LogDeleteMessage<'a> {
     #[serde(borrow)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    pub message: LogDeleteMessageRecordMessage<'a>,
+    pub message: LogDeleteMessageMessage<'a>,
     #[serde(borrow)]
     pub rev: jacquard_common::CowStr<'a>,
 }
@@ -237,7 +244,13 @@ pub struct LogDeleteMessage<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum LogDeleteMessageRecordMessage<'a> {}
+pub enum LogDeleteMessageMessage<'a> {
+    #[serde(rename = "chat.bsky.convo.defs#messageView")]
+    MessageView(Box<crate::chat_bsky::convo::MessageView<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
+    DeletedMessageView(Box<crate::chat_bsky::convo::DeletedMessageView<'a>>),
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -289,7 +302,7 @@ pub struct LogReadMessage<'a> {
     #[serde(borrow)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    pub message: LogReadMessageRecordMessage<'a>,
+    pub message: LogReadMessageMessage<'a>,
     #[serde(borrow)]
     pub rev: jacquard_common::CowStr<'a>,
 }
@@ -306,7 +319,13 @@ pub struct LogReadMessage<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum LogReadMessageRecordMessage<'a> {}
+pub enum LogReadMessageMessage<'a> {
+    #[serde(rename = "chat.bsky.convo.defs#messageView")]
+    MessageView(Box<crate::chat_bsky::convo::MessageView<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
+    DeletedMessageView(Box<crate::chat_bsky::convo::DeletedMessageView<'a>>),
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -322,7 +341,7 @@ pub struct LogRemoveReaction<'a> {
     #[serde(borrow)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    pub message: LogRemoveReactionRecordMessage<'a>,
+    pub message: LogRemoveReactionMessage<'a>,
     #[serde(borrow)]
     pub reaction: crate::chat_bsky::convo::ReactionView<'a>,
     #[serde(borrow)]
@@ -341,7 +360,13 @@ pub struct LogRemoveReaction<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum LogRemoveReactionRecordMessage<'a> {}
+pub enum LogRemoveReactionMessage<'a> {
+    #[serde(rename = "chat.bsky.convo.defs#messageView")]
+    MessageView(Box<crate::chat_bsky::convo::MessageView<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
+    DeletedMessageView(Box<crate::chat_bsky::convo::DeletedMessageView<'a>>),
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -392,30 +417,13 @@ pub struct MessageAndReactionView<'a> {
 pub struct MessageInput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: std::option::Option<MessageInputRecordEmbed<'a>>,
+    pub embed: std::option::Option<crate::app_bsky::embed::record::Record<'a>>,
     ///Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum MessageInputRecordEmbed<'a> {
-    #[serde(rename = "app.bsky.embed.record")]
-    Record(Box<crate::app_bsky::embed::record::Record<'a>>),
 }
 
 #[jacquard_derive::lexicon]
@@ -452,7 +460,7 @@ pub struct MessageRef<'a> {
 pub struct MessageView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: std::option::Option<MessageViewRecordEmbed<'a>>,
+    pub embed: std::option::Option<crate::app_bsky::embed::record::View<'a>>,
     ///Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -470,23 +478,6 @@ pub struct MessageView<'a> {
     pub sent_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum MessageViewRecordEmbed<'a> {
-    #[serde(rename = "app.bsky.embed.record#view")]
-    RecordView(Box<crate::app_bsky::embed::record::View<'a>>),
 }
 
 #[jacquard_derive::lexicon]

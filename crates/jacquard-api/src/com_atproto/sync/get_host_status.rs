@@ -57,7 +57,8 @@ pub struct GetHostStatusOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -77,20 +78,6 @@ impl std::fmt::Display for GetHostStatusError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetHostStatusError<'_> {
-    type Output = GetHostStatusError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetHostStatusError::HostNotFound(v) => {
-                GetHostStatusError::HostNotFound(v.into_static())
-            }
-            GetHostStatusError::Unknown(v) => {
-                GetHostStatusError::Unknown(v.into_static())
-            }
         }
     }
 }

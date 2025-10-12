@@ -62,7 +62,8 @@ pub struct UpdateMemberOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -83,18 +84,6 @@ impl std::fmt::Display for UpdateMemberError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for UpdateMemberError<'_> {
-    type Output = UpdateMemberError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            UpdateMemberError::MemberNotFound(v) => {
-                UpdateMemberError::MemberNotFound(v.into_static())
-            }
-            UpdateMemberError::Unknown(v) => UpdateMemberError::Unknown(v.into_static()),
         }
     }
 }

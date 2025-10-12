@@ -21,7 +21,7 @@ pub struct Block<'a> {
     #[serde(borrow)]
     pub alignment: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    pub block: BlockRecordBlock<'a>,
+    pub block: BlockBlock<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -36,7 +36,7 @@ pub struct Block<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum BlockRecordBlock<'a> {
+pub enum BlockBlock<'a> {
     #[serde(rename = "pub.leaflet.blocks.iframe")]
     Iframe(Box<crate::pub_leaflet::blocks::iframe::Iframe<'a>>),
     #[serde(rename = "pub.leaflet.blocks.text")]

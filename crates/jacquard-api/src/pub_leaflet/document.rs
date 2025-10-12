@@ -24,7 +24,7 @@ pub struct Document<'a> {
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    pub pages: Vec<jacquard_common::types::value::Data<'a>>,
+    pub pages: Vec<crate::pub_leaflet::pages::linear_document::LinearDocument<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub post_ref: std::option::Option<

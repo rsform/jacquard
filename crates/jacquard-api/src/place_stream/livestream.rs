@@ -90,7 +90,7 @@ impl jacquard_common::types::collection::Collection for Livestream<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct StreamplaceAnything<'a> {
     #[serde(borrow)]
-    pub livestream: StreamplaceAnythingRecordLivestream<'a>,
+    pub livestream: StreamplaceAnythingLivestream<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -105,15 +105,19 @@ pub struct StreamplaceAnything<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum StreamplaceAnythingRecordLivestream<'a> {
+pub enum StreamplaceAnythingLivestream<'a> {
+    #[serde(rename = "place.stream.livestream#livestreamView")]
+    LivestreamView(Box<crate::place_stream::livestream::LivestreamView<'a>>),
+    #[serde(rename = "place.stream.livestream#viewerCount")]
+    ViewerCount(Box<crate::place_stream::livestream::ViewerCount<'a>>),
     #[serde(rename = "place.stream.defs#blockView")]
-    DefsBlockView(Box<crate::place_stream::BlockView<'a>>),
+    BlockView(Box<crate::place_stream::BlockView<'a>>),
     #[serde(rename = "place.stream.defs#renditions")]
-    DefsRenditions(Box<crate::place_stream::Renditions<'a>>),
+    Renditions(Box<crate::place_stream::Renditions<'a>>),
     #[serde(rename = "place.stream.defs#rendition")]
-    DefsRendition(Box<crate::place_stream::Rendition<'a>>),
+    Rendition(Box<crate::place_stream::Rendition<'a>>),
     #[serde(rename = "place.stream.chat.defs#messageView")]
-    DefsMessageView(Box<crate::place_stream::chat::MessageView<'a>>),
+    MessageView(Box<crate::place_stream::chat::MessageView<'a>>),
 }
 
 #[jacquard_derive::lexicon]

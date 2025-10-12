@@ -40,7 +40,42 @@ pub struct GetLogOutput<'a> {
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    pub logs: Vec<jacquard_common::types::value::Data<'a>>,
+    pub logs: Vec<GetLogOutputLogsItem<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetLogOutputLogsItem<'a> {
+    #[serde(rename = "chat.bsky.convo.defs#logBeginConvo")]
+    LogBeginConvo(Box<crate::chat_bsky::convo::LogBeginConvo<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#logAcceptConvo")]
+    LogAcceptConvo(Box<crate::chat_bsky::convo::LogAcceptConvo<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#logLeaveConvo")]
+    LogLeaveConvo(Box<crate::chat_bsky::convo::LogLeaveConvo<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#logMuteConvo")]
+    LogMuteConvo(Box<crate::chat_bsky::convo::LogMuteConvo<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#logUnmuteConvo")]
+    LogUnmuteConvo(Box<crate::chat_bsky::convo::LogUnmuteConvo<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#logCreateMessage")]
+    LogCreateMessage(Box<crate::chat_bsky::convo::LogCreateMessage<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#logDeleteMessage")]
+    LogDeleteMessage(Box<crate::chat_bsky::convo::LogDeleteMessage<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#logReadMessage")]
+    LogReadMessage(Box<crate::chat_bsky::convo::LogReadMessage<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#logAddReaction")]
+    LogAddReaction(Box<crate::chat_bsky::convo::LogAddReaction<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#logRemoveReaction")]
+    LogRemoveReaction(Box<crate::chat_bsky::convo::LogRemoveReaction<'a>>),
 }
 
 ///Response type for

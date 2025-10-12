@@ -18,7 +18,7 @@
 #[serde(rename_all = "camelCase")]
 pub struct ContainerId<'a> {
     #[serde(borrow)]
-    pub value: ContainerIdRecordValue<'a>,
+    pub value: ContainerIdValue<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -33,7 +33,13 @@ pub struct ContainerId<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ContainerIdRecordValue<'a> {}
+pub enum ContainerIdValue<'a> {
+    #[serde(rename = "sh.weaver.edit.cursor#normalContainerId")]
+    NormalContainerId(Box<crate::sh_weaver::edit::cursor::NormalContainerId<'a>>),
+    #[serde(rename = "sh.weaver.edit.cursor#rootContainerId")]
+    RootContainerId(Box<crate::sh_weaver::edit::cursor::RootContainerId<'a>>),
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

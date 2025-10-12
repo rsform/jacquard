@@ -73,7 +73,8 @@ pub struct UpdateRuleOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -94,18 +95,6 @@ impl std::fmt::Display for UpdateRuleError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for UpdateRuleError<'_> {
-    type Output = UpdateRuleError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            UpdateRuleError::RuleNotFound(v) => {
-                UpdateRuleError::RuleNotFound(v.into_static())
-            }
-            UpdateRuleError::Unknown(v) => UpdateRuleError::Unknown(v.into_static()),
         }
     }
 }

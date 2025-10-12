@@ -62,7 +62,8 @@ pub struct ListWebhooksOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -83,18 +84,6 @@ impl std::fmt::Display for ListWebhooksError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ListWebhooksError<'_> {
-    type Output = ListWebhooksError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ListWebhooksError::InvalidCursor(v) => {
-                ListWebhooksError::InvalidCursor(v.into_static())
-            }
-            ListWebhooksError::Unknown(v) => ListWebhooksError::Unknown(v.into_static()),
         }
     }
 }

@@ -48,7 +48,8 @@ pub struct GetWebhookOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -79,21 +80,6 @@ impl std::fmt::Display for GetWebhookError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetWebhookError<'_> {
-    type Output = GetWebhookError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetWebhookError::WebhookNotFound(v) => {
-                GetWebhookError::WebhookNotFound(v.into_static())
-            }
-            GetWebhookError::Unauthorized(v) => {
-                GetWebhookError::Unauthorized(v.into_static())
-            }
-            GetWebhookError::Unknown(v) => GetWebhookError::Unknown(v.into_static()),
         }
     }
 }

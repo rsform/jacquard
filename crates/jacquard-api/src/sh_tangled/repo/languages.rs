@@ -94,7 +94,8 @@ pub struct LanguagesOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -135,24 +136,6 @@ impl std::fmt::Display for LanguagesError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for LanguagesError<'_> {
-    type Output = LanguagesError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            LanguagesError::RepoNotFound(v) => {
-                LanguagesError::RepoNotFound(v.into_static())
-            }
-            LanguagesError::RefNotFound(v) => {
-                LanguagesError::RefNotFound(v.into_static())
-            }
-            LanguagesError::InvalidRequest(v) => {
-                LanguagesError::InvalidRequest(v.into_static())
-            }
-            LanguagesError::Unknown(v) => LanguagesError::Unknown(v.into_static()),
         }
     }
 }

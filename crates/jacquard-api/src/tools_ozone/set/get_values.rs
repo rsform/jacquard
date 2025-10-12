@@ -60,7 +60,8 @@ pub struct GetValuesOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -81,18 +82,6 @@ impl std::fmt::Display for GetValuesError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetValuesError<'_> {
-    type Output = GetValuesError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetValuesError::SetNotFound(v) => {
-                GetValuesError::SetNotFound(v.into_static())
-            }
-            GetValuesError::Unknown(v) => GetValuesError::Unknown(v.into_static()),
         }
     }
 }

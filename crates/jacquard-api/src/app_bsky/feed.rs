@@ -196,7 +196,7 @@ pub struct FeedViewPost<'a> {
     pub post: crate::app_bsky::feed::PostView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason: std::option::Option<FeedViewPostRecordReason<'a>>,
+    pub reason: std::option::Option<FeedViewPostReason<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub reply: std::option::Option<crate::app_bsky::feed::ReplyRef<'a>>,
@@ -218,7 +218,13 @@ pub struct FeedViewPost<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum FeedViewPostRecordReason<'a> {}
+pub enum FeedViewPostReason<'a> {
+    #[serde(rename = "app.bsky.feed.defs#reasonRepost")]
+    ReasonRepost(Box<crate::app_bsky::feed::ReasonRepost<'a>>),
+    #[serde(rename = "app.bsky.feed.defs#reasonPin")]
+    ReasonPin(Box<crate::app_bsky::feed::ReasonPin<'a>>),
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -458,7 +464,7 @@ pub struct PostView<'a> {
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: std::option::Option<PostViewRecordEmbed<'a>>,
+    pub embed: std::option::Option<PostViewEmbed<'a>>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -495,7 +501,7 @@ pub struct PostView<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum PostViewRecordEmbed<'a> {
+pub enum PostViewEmbed<'a> {
     #[serde(rename = "app.bsky.embed.images#view")]
     ImagesView(Box<crate::app_bsky::embed::images::View<'a>>),
     #[serde(rename = "app.bsky.embed.video#view")]
@@ -562,9 +568,9 @@ pub struct ReplyRef<'a> {
         crate::app_bsky::actor::ProfileViewBasic<'a>,
     >,
     #[serde(borrow)]
-    pub parent: ReplyRefRecordParent<'a>,
+    pub parent: ReplyRefParent<'a>,
     #[serde(borrow)]
-    pub root: ReplyRefRecordRoot<'a>,
+    pub root: ReplyRefRoot<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -579,7 +585,15 @@ pub struct ReplyRef<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ReplyRefRecordParent<'a> {}
+pub enum ReplyRefParent<'a> {
+    #[serde(rename = "app.bsky.feed.defs#postView")]
+    PostView(Box<crate::app_bsky::feed::PostView<'a>>),
+    #[serde(rename = "app.bsky.feed.defs#notFoundPost")]
+    NotFoundPost(Box<crate::app_bsky::feed::NotFoundPost<'a>>),
+    #[serde(rename = "app.bsky.feed.defs#blockedPost")]
+    BlockedPost(Box<crate::app_bsky::feed::BlockedPost<'a>>),
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -592,7 +606,15 @@ pub enum ReplyRefRecordParent<'a> {}
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ReplyRefRecordRoot<'a> {}
+pub enum ReplyRefRoot<'a> {
+    #[serde(rename = "app.bsky.feed.defs#postView")]
+    PostView(Box<crate::app_bsky::feed::PostView<'a>>),
+    #[serde(rename = "app.bsky.feed.defs#notFoundPost")]
+    NotFoundPost(Box<crate::app_bsky::feed::NotFoundPost<'a>>),
+    #[serde(rename = "app.bsky.feed.defs#blockedPost")]
+    BlockedPost(Box<crate::app_bsky::feed::BlockedPost<'a>>),
+}
+
 ///Request that less content like the given feed item be shown in the feed
 #[derive(
     serde::Serialize,
@@ -649,7 +671,7 @@ pub struct SkeletonFeedPost<'a> {
     pub post: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason: std::option::Option<SkeletonFeedPostRecordReason<'a>>,
+    pub reason: std::option::Option<SkeletonFeedPostReason<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -664,7 +686,13 @@ pub struct SkeletonFeedPost<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum SkeletonFeedPostRecordReason<'a> {}
+pub enum SkeletonFeedPostReason<'a> {
+    #[serde(rename = "app.bsky.feed.defs#skeletonReasonRepost")]
+    SkeletonReasonRepost(Box<crate::app_bsky::feed::SkeletonReasonRepost<'a>>),
+    #[serde(rename = "app.bsky.feed.defs#skeletonReasonPin")]
+    SkeletonReasonPin(Box<crate::app_bsky::feed::SkeletonReasonPin<'a>>),
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -725,12 +753,12 @@ pub struct ThreadContext<'a> {
 pub struct ThreadViewPost<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent: std::option::Option<ThreadViewPostRecordParent<'a>>,
+    pub parent: std::option::Option<ThreadViewPostParent<'a>>,
     #[serde(borrow)]
     pub post: crate::app_bsky::feed::PostView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub replies: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub replies: std::option::Option<Vec<ThreadViewPostRepliesItem<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub thread_context: std::option::Option<crate::app_bsky::feed::ThreadContext<'a>>,
@@ -748,7 +776,36 @@ pub struct ThreadViewPost<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThreadViewPostRecordParent<'a> {}
+pub enum ThreadViewPostParent<'a> {
+    #[serde(rename = "app.bsky.feed.defs#threadViewPost")]
+    ThreadViewPost(Box<crate::app_bsky::feed::ThreadViewPost<'a>>),
+    #[serde(rename = "app.bsky.feed.defs#notFoundPost")]
+    NotFoundPost(Box<crate::app_bsky::feed::NotFoundPost<'a>>),
+    #[serde(rename = "app.bsky.feed.defs#blockedPost")]
+    BlockedPost(Box<crate::app_bsky::feed::BlockedPost<'a>>),
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ThreadViewPostRepliesItem<'a> {
+    #[serde(rename = "app.bsky.feed.defs#threadViewPost")]
+    ThreadViewPost(Box<crate::app_bsky::feed::ThreadViewPost<'a>>),
+    #[serde(rename = "app.bsky.feed.defs#notFoundPost")]
+    NotFoundPost(Box<crate::app_bsky::feed::NotFoundPost<'a>>),
+    #[serde(rename = "app.bsky.feed.defs#blockedPost")]
+    BlockedPost(Box<crate::app_bsky::feed::BlockedPost<'a>>),
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

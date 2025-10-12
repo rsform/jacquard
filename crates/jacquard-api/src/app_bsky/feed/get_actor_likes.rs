@@ -57,7 +57,8 @@ pub struct GetActorLikesOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -86,23 +87,6 @@ impl std::fmt::Display for GetActorLikesError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetActorLikesError<'_> {
-    type Output = GetActorLikesError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetActorLikesError::BlockedActor(v) => {
-                GetActorLikesError::BlockedActor(v.into_static())
-            }
-            GetActorLikesError::BlockedByActor(v) => {
-                GetActorLikesError::BlockedByActor(v.into_static())
-            }
-            GetActorLikesError::Unknown(v) => {
-                GetActorLikesError::Unknown(v.into_static())
-            }
         }
     }
 }

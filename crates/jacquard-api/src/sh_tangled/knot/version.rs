@@ -30,7 +30,8 @@ pub struct VersionOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -39,15 +40,6 @@ impl std::fmt::Display for VersionError<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for VersionError<'_> {
-    type Output = VersionError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            VersionError::Unknown(v) => VersionError::Unknown(v.into_static()),
         }
     }
 }

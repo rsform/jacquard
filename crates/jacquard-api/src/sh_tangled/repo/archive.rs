@@ -57,7 +57,8 @@ pub struct ArchiveOutput<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -108,21 +109,6 @@ impl std::fmt::Display for ArchiveError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ArchiveError<'_> {
-    type Output = ArchiveError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ArchiveError::RepoNotFound(v) => ArchiveError::RepoNotFound(v.into_static()),
-            ArchiveError::RefNotFound(v) => ArchiveError::RefNotFound(v.into_static()),
-            ArchiveError::InvalidRequest(v) => {
-                ArchiveError::InvalidRequest(v.into_static())
-            }
-            ArchiveError::ArchiveError(v) => ArchiveError::ArchiveError(v.into_static()),
-            ArchiveError::Unknown(v) => ArchiveError::Unknown(v.into_static()),
         }
     }
 }

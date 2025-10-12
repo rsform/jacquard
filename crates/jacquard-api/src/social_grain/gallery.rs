@@ -26,26 +26,9 @@ pub struct Gallery<'a> {
     ///Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<GalleryRecordLabels<'a>>,
+    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GalleryRecordLabels<'a> {
-    #[serde(rename = "com.atproto.label.defs#selfLabels")]
-    DefsSelfLabels(Box<crate::com_atproto::label::SelfLabels<'a>>),
 }
 
 impl jacquard_common::types::collection::Collection for Gallery<'_> {
@@ -71,7 +54,7 @@ pub struct GalleryView<'a> {
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub items: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub items: std::option::Option<Vec<crate::social_grain::photo::PhotoView<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,

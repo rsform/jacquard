@@ -43,7 +43,8 @@ pub struct ConfirmEmail<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -90,27 +91,6 @@ impl std::fmt::Display for ConfirmEmailError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for ConfirmEmailError<'_> {
-    type Output = ConfirmEmailError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            ConfirmEmailError::AccountNotFound(v) => {
-                ConfirmEmailError::AccountNotFound(v.into_static())
-            }
-            ConfirmEmailError::ExpiredToken(v) => {
-                ConfirmEmailError::ExpiredToken(v.into_static())
-            }
-            ConfirmEmailError::InvalidToken(v) => {
-                ConfirmEmailError::InvalidToken(v.into_static())
-            }
-            ConfirmEmailError::InvalidEmail(v) => {
-                ConfirmEmailError::InvalidEmail(v.into_static())
-            }
-            ConfirmEmailError::Unknown(v) => ConfirmEmailError::Unknown(v.into_static()),
         }
     }
 }

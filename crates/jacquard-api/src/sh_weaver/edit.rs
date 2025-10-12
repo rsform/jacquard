@@ -22,7 +22,7 @@ pub mod root;
 #[serde(rename_all = "camelCase")]
 pub struct DocRef<'a> {
     #[serde(borrow)]
-    pub value: DocRefRecordValue<'a>,
+    pub value: DocRefValue<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -37,7 +37,13 @@ pub struct DocRef<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum DocRefRecordValue<'a> {}
+pub enum DocRefValue<'a> {
+    #[serde(rename = "sh.weaver.edit.defs#notebookRef")]
+    NotebookRef(Box<crate::sh_weaver::edit::NotebookRef<'a>>),
+    #[serde(rename = "sh.weaver.edit.defs#entryRef")]
+    EntryRef(Box<crate::sh_weaver::edit::EntryRef<'a>>),
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

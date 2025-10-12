@@ -18,7 +18,7 @@
 #[serde(rename_all = "camelCase")]
 pub struct RecordWithMedia<'a> {
     #[serde(borrow)]
-    pub media: RecordWithMediaRecordMedia<'a>,
+    pub media: RecordWithMediaMedia<'a>,
     #[serde(borrow)]
     pub record: crate::app_bsky::embed::record::Record<'a>,
 }
@@ -35,7 +35,7 @@ pub struct RecordWithMedia<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum RecordWithMediaRecordMedia<'a> {
+pub enum RecordWithMediaMedia<'a> {
     #[serde(rename = "app.bsky.embed.images")]
     Images(Box<crate::app_bsky::embed::images::Images<'a>>),
     #[serde(rename = "app.bsky.embed.video")]
@@ -57,7 +57,7 @@ pub enum RecordWithMediaRecordMedia<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct View<'a> {
     #[serde(borrow)]
-    pub media: ViewRecordMedia<'a>,
+    pub media: ViewMedia<'a>,
     #[serde(borrow)]
     pub record: crate::app_bsky::embed::record::View<'a>,
 }
@@ -74,7 +74,7 @@ pub struct View<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ViewRecordMedia<'a> {
+pub enum ViewMedia<'a> {
     #[serde(rename = "app.bsky.embed.images#view")]
     ImagesView(Box<crate::app_bsky::embed::images::View<'a>>),
     #[serde(rename = "app.bsky.embed.video#view")]

@@ -43,24 +43,7 @@ pub struct Generator<'a> {
     ///Self-label values
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<GeneratorRecordLabels<'a>>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GeneratorRecordLabels<'a> {
-    #[serde(rename = "com.atproto.label.defs#selfLabels")]
-    DefsSelfLabels(Box<crate::com_atproto::label::SelfLabels<'a>>),
+    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
 }
 
 impl jacquard_common::types::collection::Collection for Generator<'_> {

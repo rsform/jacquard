@@ -34,7 +34,7 @@ pub struct Records<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct View<'a> {
     #[serde(borrow)]
-    pub record: ViewRecordRecord<'a>,
+    pub record: ViewUnionRecord<'a>,
 }
 
 #[jacquard_derive::open_union]
@@ -49,15 +49,23 @@ pub struct View<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ViewRecordRecord<'a> {
+pub enum ViewUnionRecord<'a> {
+    #[serde(rename = "sh.weaver.embed.records#viewRecord")]
+    ViewRecord(Box<crate::sh_weaver::embed::records::ViewRecord<'a>>),
+    #[serde(rename = "sh.weaver.embed.records#viewNotFound")]
+    ViewNotFound(Box<crate::sh_weaver::embed::records::ViewNotFound<'a>>),
+    #[serde(rename = "sh.weaver.embed.records#viewBlocked")]
+    ViewBlocked(Box<crate::sh_weaver::embed::records::ViewBlocked<'a>>),
+    #[serde(rename = "sh.weaver.embed.records#viewDetached")]
+    ViewDetached(Box<crate::sh_weaver::embed::records::ViewDetached<'a>>),
     #[serde(rename = "app.bsky.feed.defs#generatorView")]
-    DefsGeneratorView(Box<crate::app_bsky::feed::GeneratorView<'a>>),
+    GeneratorView(Box<crate::app_bsky::feed::GeneratorView<'a>>),
     #[serde(rename = "app.bsky.graph.defs#listView")]
-    DefsListView(Box<crate::app_bsky::graph::ListView<'a>>),
+    ListView(Box<crate::app_bsky::graph::ListView<'a>>),
     #[serde(rename = "app.bsky.labeler.defs#labelerView")]
-    DefsLabelerView(Box<crate::app_bsky::labeler::LabelerView<'a>>),
+    LabelerView(Box<crate::app_bsky::labeler::LabelerView<'a>>),
     #[serde(rename = "app.bsky.graph.defs#starterPackViewBasic")]
-    DefsStarterPackViewBasic(Box<crate::app_bsky::graph::StarterPackViewBasic<'a>>),
+    StarterPackViewBasic(Box<crate::app_bsky::graph::StarterPackViewBasic<'a>>),
 }
 
 #[jacquard_derive::lexicon]
@@ -126,12 +134,12 @@ pub struct ViewNotFound<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ViewRecord<'a> {
     #[serde(borrow)]
-    pub author: ViewRecordRecordAuthor<'a>,
+    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embeds: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub embeds: std::option::Option<Vec<ViewRecordEmbedsItem<'a>>>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -163,7 +171,17 @@ pub struct ViewRecord<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ViewRecordRecordAuthor<'a> {
-    #[serde(rename = "app.bsky.actor.defs#profileViewBasic")]
-    DefsProfileViewBasic(Box<crate::app_bsky::actor::ProfileViewBasic<'a>>),
+pub enum ViewRecordEmbedsItem<'a> {
+    #[serde(rename = "app.bsky.embed.images#view")]
+    ImagesView(Box<crate::app_bsky::embed::images::View<'a>>),
+    #[serde(rename = "app.bsky.embed.video#view")]
+    VideoView(Box<crate::app_bsky::embed::video::View<'a>>),
+    #[serde(rename = "app.bsky.embed.external#view")]
+    ExternalView(Box<crate::app_bsky::embed::external::View<'a>>),
+    #[serde(rename = "app.bsky.embed.record#view")]
+    RecordView(Box<crate::app_bsky::embed::record::View<'a>>),
+    #[serde(rename = "app.bsky.embed.recordWithMedia#view")]
+    RecordWithMediaView(Box<crate::app_bsky::embed::record_with_media::View<'a>>),
+    #[serde(rename = "sh.weaver.embed.records#view")]
+    View(Box<crate::sh_weaver::embed::records::View<'a>>),
 }

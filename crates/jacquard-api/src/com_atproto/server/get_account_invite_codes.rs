@@ -51,7 +51,8 @@ pub struct GetAccountInviteCodesOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -71,20 +72,6 @@ impl std::fmt::Display for GetAccountInviteCodesError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetAccountInviteCodesError<'_> {
-    type Output = GetAccountInviteCodesError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetAccountInviteCodesError::DuplicateCreate(v) => {
-                GetAccountInviteCodesError::DuplicateCreate(v.into_static())
-            }
-            GetAccountInviteCodesError::Unknown(v) => {
-                GetAccountInviteCodesError::Unknown(v.into_static())
-            }
         }
     }
 }

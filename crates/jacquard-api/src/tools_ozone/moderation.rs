@@ -178,7 +178,7 @@ pub struct BlobView<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub details: std::option::Option<BlobViewRecordDetails<'a>>,
+    pub details: std::option::Option<BlobViewDetails<'a>>,
     #[serde(borrow)]
     pub mime_type: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -199,7 +199,13 @@ pub struct BlobView<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum BlobViewRecordDetails<'a> {}
+pub enum BlobViewDetails<'a> {
+    #[serde(rename = "tools.ozone.moderation.defs#imageDetails")]
+    ImageDetails(Box<crate::tools_ozone::moderation::ImageDetails<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#videoDetails")]
+    VideoDetails(Box<crate::tools_ozone::moderation::VideoDetails<'a>>),
+}
+
 ///Logs cancellation of a scheduled takedown action for an account.
 #[jacquard_derive::lexicon]
 #[derive(
@@ -619,13 +625,13 @@ pub struct ModEventView<'a> {
     #[serde(borrow)]
     pub creator_handle: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    pub event: ModEventViewRecordEvent<'a>,
+    pub event: ModEventViewEvent<'a>,
     pub id: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
-    pub subject: ModEventViewRecordSubject<'a>,
+    pub subject: ModEventViewSubject<'a>,
     #[serde(borrow)]
     pub subject_blob_cids: Vec<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -645,7 +651,73 @@ pub struct ModEventView<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ModEventViewRecordEvent<'a> {}
+pub enum ModEventViewEvent<'a> {
+    #[serde(rename = "tools.ozone.moderation.defs#modEventTakedown")]
+    ModEventTakedown(Box<crate::tools_ozone::moderation::ModEventTakedown<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventReverseTakedown")]
+    ModEventReverseTakedown(
+        Box<crate::tools_ozone::moderation::ModEventReverseTakedown<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventComment")]
+    ModEventComment(Box<crate::tools_ozone::moderation::ModEventComment<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventReport")]
+    ModEventReport(Box<crate::tools_ozone::moderation::ModEventReport<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventLabel")]
+    ModEventLabel(Box<crate::tools_ozone::moderation::ModEventLabel<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventAcknowledge")]
+    ModEventAcknowledge(Box<crate::tools_ozone::moderation::ModEventAcknowledge<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventEscalate")]
+    ModEventEscalate(Box<crate::tools_ozone::moderation::ModEventEscalate<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventMute")]
+    ModEventMute(Box<crate::tools_ozone::moderation::ModEventMute<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventUnmute")]
+    ModEventUnmute(Box<crate::tools_ozone::moderation::ModEventUnmute<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventMuteReporter")]
+    ModEventMuteReporter(Box<crate::tools_ozone::moderation::ModEventMuteReporter<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventUnmuteReporter")]
+    ModEventUnmuteReporter(
+        Box<crate::tools_ozone::moderation::ModEventUnmuteReporter<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventEmail")]
+    ModEventEmail(Box<crate::tools_ozone::moderation::ModEventEmail<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventResolveAppeal")]
+    ModEventResolveAppeal(
+        Box<crate::tools_ozone::moderation::ModEventResolveAppeal<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventDivert")]
+    ModEventDivert(Box<crate::tools_ozone::moderation::ModEventDivert<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventTag")]
+    ModEventTag(Box<crate::tools_ozone::moderation::ModEventTag<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#accountEvent")]
+    AccountEvent(Box<crate::tools_ozone::moderation::AccountEvent<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#identityEvent")]
+    IdentityEvent(Box<crate::tools_ozone::moderation::IdentityEvent<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#recordEvent")]
+    RecordEvent(Box<crate::tools_ozone::moderation::RecordEvent<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventPriorityScore")]
+    ModEventPriorityScore(
+        Box<crate::tools_ozone::moderation::ModEventPriorityScore<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#ageAssuranceEvent")]
+    AgeAssuranceEvent(Box<crate::tools_ozone::moderation::AgeAssuranceEvent<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#ageAssuranceOverrideEvent")]
+    AgeAssuranceOverrideEvent(
+        Box<crate::tools_ozone::moderation::AgeAssuranceOverrideEvent<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#revokeAccountCredentialsEvent")]
+    RevokeAccountCredentialsEvent(
+        Box<crate::tools_ozone::moderation::RevokeAccountCredentialsEvent<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#scheduleTakedownEvent")]
+    ScheduleTakedownEvent(
+        Box<crate::tools_ozone::moderation::ScheduleTakedownEvent<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#cancelScheduledTakedownEvent")]
+    CancelScheduledTakedownEvent(
+        Box<crate::tools_ozone::moderation::CancelScheduledTakedownEvent<'a>>,
+    ),
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -658,13 +730,13 @@ pub enum ModEventViewRecordEvent<'a> {}
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ModEventViewRecordSubject<'a> {
+pub enum ModEventViewSubject<'a> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
-    DefsRepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
     StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
     #[serde(rename = "chat.bsky.convo.defs#messageRef")]
-    DefsMessageRef(Box<crate::chat_bsky::convo::MessageRef<'a>>),
+    MessageRef(Box<crate::chat_bsky::convo::MessageRef<'a>>),
 }
 
 #[jacquard_derive::lexicon]
@@ -683,13 +755,13 @@ pub struct ModEventViewDetail<'a> {
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
-    pub event: ModEventViewDetailRecordEvent<'a>,
+    pub event: ModEventViewDetailEvent<'a>,
     pub id: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
-    pub subject: ModEventViewDetailRecordSubject<'a>,
+    pub subject: ModEventViewDetailSubject<'a>,
     #[serde(borrow)]
     pub subject_blobs: Vec<crate::tools_ozone::moderation::BlobView<'a>>,
 }
@@ -706,7 +778,73 @@ pub struct ModEventViewDetail<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ModEventViewDetailRecordEvent<'a> {}
+pub enum ModEventViewDetailEvent<'a> {
+    #[serde(rename = "tools.ozone.moderation.defs#modEventTakedown")]
+    ModEventTakedown(Box<crate::tools_ozone::moderation::ModEventTakedown<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventReverseTakedown")]
+    ModEventReverseTakedown(
+        Box<crate::tools_ozone::moderation::ModEventReverseTakedown<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventComment")]
+    ModEventComment(Box<crate::tools_ozone::moderation::ModEventComment<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventReport")]
+    ModEventReport(Box<crate::tools_ozone::moderation::ModEventReport<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventLabel")]
+    ModEventLabel(Box<crate::tools_ozone::moderation::ModEventLabel<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventAcknowledge")]
+    ModEventAcknowledge(Box<crate::tools_ozone::moderation::ModEventAcknowledge<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventEscalate")]
+    ModEventEscalate(Box<crate::tools_ozone::moderation::ModEventEscalate<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventMute")]
+    ModEventMute(Box<crate::tools_ozone::moderation::ModEventMute<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventUnmute")]
+    ModEventUnmute(Box<crate::tools_ozone::moderation::ModEventUnmute<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventMuteReporter")]
+    ModEventMuteReporter(Box<crate::tools_ozone::moderation::ModEventMuteReporter<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventUnmuteReporter")]
+    ModEventUnmuteReporter(
+        Box<crate::tools_ozone::moderation::ModEventUnmuteReporter<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventEmail")]
+    ModEventEmail(Box<crate::tools_ozone::moderation::ModEventEmail<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventResolveAppeal")]
+    ModEventResolveAppeal(
+        Box<crate::tools_ozone::moderation::ModEventResolveAppeal<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventDivert")]
+    ModEventDivert(Box<crate::tools_ozone::moderation::ModEventDivert<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventTag")]
+    ModEventTag(Box<crate::tools_ozone::moderation::ModEventTag<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#accountEvent")]
+    AccountEvent(Box<crate::tools_ozone::moderation::AccountEvent<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#identityEvent")]
+    IdentityEvent(Box<crate::tools_ozone::moderation::IdentityEvent<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#recordEvent")]
+    RecordEvent(Box<crate::tools_ozone::moderation::RecordEvent<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#modEventPriorityScore")]
+    ModEventPriorityScore(
+        Box<crate::tools_ozone::moderation::ModEventPriorityScore<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#ageAssuranceEvent")]
+    AgeAssuranceEvent(Box<crate::tools_ozone::moderation::AgeAssuranceEvent<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#ageAssuranceOverrideEvent")]
+    AgeAssuranceOverrideEvent(
+        Box<crate::tools_ozone::moderation::AgeAssuranceOverrideEvent<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#revokeAccountCredentialsEvent")]
+    RevokeAccountCredentialsEvent(
+        Box<crate::tools_ozone::moderation::RevokeAccountCredentialsEvent<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#scheduleTakedownEvent")]
+    ScheduleTakedownEvent(
+        Box<crate::tools_ozone::moderation::ScheduleTakedownEvent<'a>>,
+    ),
+    #[serde(rename = "tools.ozone.moderation.defs#cancelScheduledTakedownEvent")]
+    CancelScheduledTakedownEvent(
+        Box<crate::tools_ozone::moderation::CancelScheduledTakedownEvent<'a>>,
+    ),
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -719,7 +857,17 @@ pub enum ModEventViewDetailRecordEvent<'a> {}
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ModEventViewDetailRecordSubject<'a> {}
+pub enum ModEventViewDetailSubject<'a> {
+    #[serde(rename = "tools.ozone.moderation.defs#repoView")]
+    RepoView(Box<crate::tools_ozone::moderation::RepoView<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#repoViewNotFound")]
+    RepoViewNotFound(Box<crate::tools_ozone::moderation::RepoViewNotFound<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#recordView")]
+    RecordView(Box<crate::tools_ozone::moderation::RecordView<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#recordViewNotFound")]
+    RecordViewNotFound(Box<crate::tools_ozone::moderation::RecordViewNotFound<'a>>),
+}
+
 ///Moderation tool information for tracing the source of the action
 #[jacquard_derive::lexicon]
 #[derive(
@@ -1375,7 +1523,7 @@ pub struct SubjectStatusView<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub hosting: std::option::Option<SubjectStatusViewRecordHosting<'a>>,
+    pub hosting: std::option::Option<SubjectStatusViewHosting<'a>>,
     pub id: i64,
     ///Timestamp referencing when the author of the subject appealed a moderation action
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -1405,7 +1553,7 @@ pub struct SubjectStatusView<'a> {
     #[serde(borrow)]
     pub review_state: crate::tools_ozone::moderation::SubjectReviewState<'a>,
     #[serde(borrow)]
-    pub subject: SubjectStatusViewRecordSubject<'a>,
+    pub subject: SubjectStatusViewSubject<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub subject_blob_cids: std::option::Option<
@@ -1437,7 +1585,13 @@ pub struct SubjectStatusView<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum SubjectStatusViewRecordHosting<'a> {}
+pub enum SubjectStatusViewHosting<'a> {
+    #[serde(rename = "tools.ozone.moderation.defs#accountHosting")]
+    AccountHosting(Box<crate::tools_ozone::moderation::AccountHosting<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#recordHosting")]
+    RecordHosting(Box<crate::tools_ozone::moderation::RecordHosting<'a>>),
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -1450,13 +1604,13 @@ pub enum SubjectStatusViewRecordHosting<'a> {}
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum SubjectStatusViewRecordSubject<'a> {
+pub enum SubjectStatusViewSubject<'a> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
-    DefsRepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
     StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
     #[serde(rename = "chat.bsky.convo.defs#messageRef")]
-    DefsMessageRef(Box<crate::chat_bsky::convo::MessageRef<'a>>),
+    MessageRef(Box<crate::chat_bsky::convo::MessageRef<'a>>),
 }
 
 ///Detailed view of a subject. For record subjects, the author's repo and profile will be returned.
@@ -1474,7 +1628,7 @@ pub enum SubjectStatusViewRecordSubject<'a> {
 pub struct SubjectView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: std::option::Option<SubjectViewRecordProfile<'a>>,
+    pub profile: std::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub record: std::option::Option<
@@ -1494,19 +1648,6 @@ pub struct SubjectView<'a> {
     pub r#type: crate::com_atproto::moderation::SubjectType<'a>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SubjectViewRecordProfile<'a> {}
 ///Moderation event timeline event for a PLC create operation
 #[derive(
     serde::Serialize,

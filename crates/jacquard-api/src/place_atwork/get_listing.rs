@@ -58,7 +58,8 @@ pub struct GetListingOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -99,24 +100,6 @@ impl std::fmt::Display for GetListingError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetListingError<'_> {
-    type Output = GetListingError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetListingError::ListingNotFound(v) => {
-                GetListingError::ListingNotFound(v.into_static())
-            }
-            GetListingError::ListingParseFailed(v) => {
-                GetListingError::ListingParseFailed(v.into_static())
-            }
-            GetListingError::ListingFetchFailed(v) => {
-                GetListingError::ListingFetchFailed(v.into_static())
-            }
-            GetListingError::Unknown(v) => GetListingError::Unknown(v.into_static()),
         }
     }
 }

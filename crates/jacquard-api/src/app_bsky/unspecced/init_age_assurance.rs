@@ -66,7 +66,8 @@ pub struct InitAgeAssuranceOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -104,26 +105,6 @@ impl std::fmt::Display for InitAgeAssuranceError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for InitAgeAssuranceError<'_> {
-    type Output = InitAgeAssuranceError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            InitAgeAssuranceError::InvalidEmail(v) => {
-                InitAgeAssuranceError::InvalidEmail(v.into_static())
-            }
-            InitAgeAssuranceError::DidTooLong(v) => {
-                InitAgeAssuranceError::DidTooLong(v.into_static())
-            }
-            InitAgeAssuranceError::InvalidInitiation(v) => {
-                InitAgeAssuranceError::InvalidInitiation(v.into_static())
-            }
-            InitAgeAssuranceError::Unknown(v) => {
-                InitAgeAssuranceError::Unknown(v.into_static())
-            }
         }
     }
 }

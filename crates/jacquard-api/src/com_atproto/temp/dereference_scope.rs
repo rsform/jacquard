@@ -49,7 +49,8 @@ pub struct DereferenceScopeOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -70,20 +71,6 @@ impl std::fmt::Display for DereferenceScopeError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for DereferenceScopeError<'_> {
-    type Output = DereferenceScopeError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            DereferenceScopeError::InvalidScopeReference(v) => {
-                DereferenceScopeError::InvalidScopeReference(v.into_static())
-            }
-            DereferenceScopeError::Unknown(v) => {
-                DereferenceScopeError::Unknown(v.into_static())
-            }
         }
     }
 }

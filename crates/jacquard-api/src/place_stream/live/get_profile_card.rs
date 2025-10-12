@@ -44,7 +44,8 @@ pub struct GetProfileCardOutput<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -64,20 +65,6 @@ impl std::fmt::Display for GetProfileCardError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetProfileCardError<'_> {
-    type Output = GetProfileCardError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetProfileCardError::RepoNotFound(v) => {
-                GetProfileCardError::RepoNotFound(v.into_static())
-            }
-            GetProfileCardError::Unknown(v) => {
-                GetProfileCardError::Unknown(v.into_static())
-            }
         }
     }
 }

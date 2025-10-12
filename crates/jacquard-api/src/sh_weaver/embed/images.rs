@@ -26,7 +26,7 @@ pub struct Image<'a> {
     pub blurhash: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub dimensions: std::option::Option<ImageRecordDimensions<'a>>,
+    pub dimensions: std::option::Option<ImageDimensions<'a>>,
     #[serde(borrow)]
     pub image: jacquard_common::types::blob::Blob<'a>,
 }
@@ -43,13 +43,13 @@ pub struct Image<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ImageRecordDimensions<'a> {
+pub enum ImageDimensions<'a> {
     #[serde(rename = "app.bsky.embed.defs#aspectRatio")]
-    DefsAspectRatio(Box<crate::app_bsky::embed::AspectRatio<'a>>),
+    AspectRatio(Box<crate::app_bsky::embed::AspectRatio<'a>>),
     #[serde(rename = "sh.weaver.embed.defs#percentSize")]
-    DefsPercentSize(Box<crate::sh_weaver::embed::PercentSize<'a>>),
+    PercentSize(Box<crate::sh_weaver::embed::PercentSize<'a>>),
     #[serde(rename = "sh.weaver.embed.defs#pixelSize")]
-    DefsPixelSize(Box<crate::sh_weaver::embed::PixelSize<'a>>),
+    PixelSize(Box<crate::sh_weaver::embed::PixelSize<'a>>),
 }
 
 #[jacquard_derive::lexicon]

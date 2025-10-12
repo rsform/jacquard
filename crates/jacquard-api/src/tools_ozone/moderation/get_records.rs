@@ -35,7 +35,26 @@ pub struct GetRecords<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetRecordsOutput<'a> {
     #[serde(borrow)]
-    pub records: Vec<jacquard_common::types::value::Data<'a>>,
+    pub records: Vec<GetRecordsOutputRecordsItem<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetRecordsOutputRecordsItem<'a> {
+    #[serde(rename = "tools.ozone.moderation.defs#recordViewDetail")]
+    RecordViewDetail(Box<crate::tools_ozone::moderation::RecordViewDetail<'a>>),
+    #[serde(rename = "tools.ozone.moderation.defs#recordViewNotFound")]
+    RecordViewNotFound(Box<crate::tools_ozone::moderation::RecordViewNotFound<'a>>),
 }
 
 ///Response type for

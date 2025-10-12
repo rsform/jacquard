@@ -47,7 +47,8 @@ pub struct UpdateEmail<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -85,24 +86,6 @@ impl std::fmt::Display for UpdateEmailError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for UpdateEmailError<'_> {
-    type Output = UpdateEmailError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            UpdateEmailError::ExpiredToken(v) => {
-                UpdateEmailError::ExpiredToken(v.into_static())
-            }
-            UpdateEmailError::InvalidToken(v) => {
-                UpdateEmailError::InvalidToken(v.into_static())
-            }
-            UpdateEmailError::TokenRequired(v) => {
-                UpdateEmailError::TokenRequired(v.into_static())
-            }
-            UpdateEmailError::Unknown(v) => UpdateEmailError::Unknown(v.into_static()),
         }
     }
 }

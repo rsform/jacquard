@@ -29,7 +29,9 @@ pub struct Endorsement<'a> {
     ///Verified signatures from endorsement proofs (strong references).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub signatures: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub signatures: std::option::Option<
+        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    >,
     ///The endorsement text content.
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,

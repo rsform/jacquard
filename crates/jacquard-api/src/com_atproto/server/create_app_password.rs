@@ -82,7 +82,8 @@ pub struct CreateAppPasswordOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -102,20 +103,6 @@ impl std::fmt::Display for CreateAppPasswordError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for CreateAppPasswordError<'_> {
-    type Output = CreateAppPasswordError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CreateAppPasswordError::AccountTakedown(v) => {
-                CreateAppPasswordError::AccountTakedown(v.into_static())
-            }
-            CreateAppPasswordError::Unknown(v) => {
-                CreateAppPasswordError::Unknown(v.into_static())
-            }
         }
     }
 }

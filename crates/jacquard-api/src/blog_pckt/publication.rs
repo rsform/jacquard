@@ -42,27 +42,10 @@ pub struct Publication<'a> {
     ///Theme configuration as an open union; accepts blog.pckt.theme and future types.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme: std::option::Option<PublicationRecordTheme<'a>>,
+    pub theme: std::option::Option<crate::blog_pckt::theme::Theme<'a>>,
     ///Timestamp when the publication was last updated (optional)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum PublicationRecordTheme<'a> {
-    #[serde(rename = "blog.pckt.theme")]
-    Theme(Box<crate::blog_pckt::theme::Theme<'a>>),
 }
 
 impl jacquard_common::types::collection::Collection for Publication<'_> {

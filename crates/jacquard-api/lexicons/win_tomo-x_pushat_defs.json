@@ -1,0 +1,63 @@
+{
+  "lexicon": 1,
+  "id": "win.tomo-x.pushat.defs",
+  "defs": {
+    "deviceList": {
+      "type": "array",
+      "items": {
+        "type": "ref",
+        "ref": "#deviceListItem"
+      }
+    },
+    "deviceListItem": {
+      "type": "object",
+      "required": [
+        "name",
+        "id",
+        "current"
+      ],
+      "properties": {
+        "current": {
+          "type": "boolean",
+          "default": false
+        },
+        "id": {
+          "type": "string",
+          "format": "tid"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 300,
+          "maxGraphemes": 30
+        }
+      }
+    },
+    "notifyBody": {
+      "type": "object",
+      "required": [
+        "title",
+        "body"
+      ],
+      "properties": {
+        "body": {
+          "type": "string",
+          "description": "Body text of the notification."
+        },
+        "icon": {
+          "type": "string",
+          "description": "The URI of the icon displayed in the notification.",
+          "format": "uri"
+        },
+        "link": {
+          "type": "string",
+          "description": "Experimental — do not use. The URI to open when the notification is clicked.",
+          "format": "uri"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title text of the notification."
+        }
+      }
+    }
+  }
+}

@@ -75,13 +75,13 @@ pub struct Preferences<'a> {
 pub struct Theme<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub accent_background: std::option::Option<ThemeRecordAccentBackground<'a>>,
+    pub accent_background: std::option::Option<ThemeAccentBackground<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub accent_text: std::option::Option<ThemeRecordAccentText<'a>>,
+    pub accent_text: std::option::Option<ThemeAccentText<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub background_color: std::option::Option<ThemeRecordBackgroundColor<'a>>,
+    pub background_color: std::option::Option<ThemeBackgroundColor<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub background_image: std::option::Option<
@@ -89,10 +89,10 @@ pub struct Theme<'a> {
     >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub page_background: std::option::Option<ThemeRecordPageBackground<'a>>,
+    pub page_background: std::option::Option<ThemePageBackground<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub primary: std::option::Option<ThemeRecordPrimary<'a>>,
+    pub primary: std::option::Option<ThemePrimary<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub show_page_background: std::option::Option<bool>,
 }
@@ -109,7 +109,7 @@ pub struct Theme<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThemeRecordAccentBackground<'a> {
+pub enum ThemeAccentBackground<'a> {
     #[serde(rename = "pub.leaflet.theme.color#rgba")]
     ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
     #[serde(rename = "pub.leaflet.theme.color#rgb")]
@@ -128,7 +128,7 @@ pub enum ThemeRecordAccentBackground<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThemeRecordAccentText<'a> {
+pub enum ThemeAccentText<'a> {
     #[serde(rename = "pub.leaflet.theme.color#rgba")]
     ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
     #[serde(rename = "pub.leaflet.theme.color#rgb")]
@@ -147,7 +147,7 @@ pub enum ThemeRecordAccentText<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThemeRecordBackgroundColor<'a> {
+pub enum ThemeBackgroundColor<'a> {
     #[serde(rename = "pub.leaflet.theme.color#rgba")]
     ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
     #[serde(rename = "pub.leaflet.theme.color#rgb")]
@@ -166,7 +166,7 @@ pub enum ThemeRecordBackgroundColor<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThemeRecordPageBackground<'a> {
+pub enum ThemePageBackground<'a> {
     #[serde(rename = "pub.leaflet.theme.color#rgba")]
     ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
     #[serde(rename = "pub.leaflet.theme.color#rgb")]
@@ -185,7 +185,7 @@ pub enum ThemeRecordPageBackground<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThemeRecordPrimary<'a> {
+pub enum ThemePrimary<'a> {
     #[serde(rename = "pub.leaflet.theme.color#rgba")]
     ColorRgba(Box<crate::pub_leaflet::theme::color::Rgba<'a>>),
     #[serde(rename = "pub.leaflet.theme.color#rgb")]

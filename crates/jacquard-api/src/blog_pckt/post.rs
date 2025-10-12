@@ -18,7 +18,7 @@
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
     #[serde(borrow)]
-    pub blocks: PostRecordBlocks<'a>,
+    pub blocks: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
     pub blog: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -43,19 +43,6 @@ pub struct Post<'a> {
     pub url: jacquard_common::types::string::Uri<'a>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum PostRecordBlocks<'a> {}
 impl jacquard_common::types::collection::Collection for Post<'_> {
     const NSID: &'static str = "blog.pckt.post";
 }

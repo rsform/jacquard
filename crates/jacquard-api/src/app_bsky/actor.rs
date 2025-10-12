@@ -396,17 +396,85 @@ pub struct PostInteractionSettingsPref<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub postgate_embedding_rules: std::option::Option<
-        Vec<jacquard_common::types::value::Data<'a>>,
+        Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>,
     >,
     ///Matches threadgate record. List of rules defining who can reply to this users posts. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub threadgate_allow_rules: std::option::Option<
-        Vec<jacquard_common::types::value::Data<'a>>,
+        Vec<PostInteractionSettingsPrefThreadgateAllowRulesItem<'a>>,
     >,
 }
 
-pub type Preferences<'a> = Vec<jacquard_common::types::value::Data<'a>>;
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum PostInteractionSettingsPrefThreadgateAllowRulesItem<'a> {
+    #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
+    ThreadgateMentionRule(Box<crate::app_bsky::feed::threadgate::MentionRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
+    ThreadgateFollowerRule(Box<crate::app_bsky::feed::threadgate::FollowerRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#followingRule")]
+    ThreadgateFollowingRule(Box<crate::app_bsky::feed::threadgate::FollowingRule<'a>>),
+    #[serde(rename = "app.bsky.feed.threadgate#listRule")]
+    ThreadgateListRule(Box<crate::app_bsky::feed::threadgate::ListRule<'a>>),
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum PreferencesItem<'a> {
+    #[serde(rename = "app.bsky.actor.defs#adultContentPref")]
+    AdultContentPref(Box<crate::app_bsky::actor::AdultContentPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#contentLabelPref")]
+    ContentLabelPref(Box<crate::app_bsky::actor::ContentLabelPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#savedFeedsPref")]
+    SavedFeedsPref(Box<crate::app_bsky::actor::SavedFeedsPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#savedFeedsPrefV2")]
+    SavedFeedsPrefV2(Box<crate::app_bsky::actor::SavedFeedsPrefV2<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#personalDetailsPref")]
+    PersonalDetailsPref(Box<crate::app_bsky::actor::PersonalDetailsPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#feedViewPref")]
+    FeedViewPref(Box<crate::app_bsky::actor::FeedViewPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#threadViewPref")]
+    ThreadViewPref(Box<crate::app_bsky::actor::ThreadViewPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#interestsPref")]
+    InterestsPref(Box<crate::app_bsky::actor::InterestsPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#mutedWordsPref")]
+    MutedWordsPref(Box<crate::app_bsky::actor::MutedWordsPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#hiddenPostsPref")]
+    HiddenPostsPref(Box<crate::app_bsky::actor::HiddenPostsPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#bskyAppStatePref")]
+    BskyAppStatePref(Box<crate::app_bsky::actor::BskyAppStatePref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#labelersPref")]
+    LabelersPref(Box<crate::app_bsky::actor::LabelersPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#postInteractionSettingsPref")]
+    PostInteractionSettingsPref(
+        Box<crate::app_bsky::actor::PostInteractionSettingsPref<'a>>,
+    ),
+    #[serde(rename = "app.bsky.actor.defs#verificationPrefs")]
+    VerificationPrefs(Box<crate::app_bsky::actor::VerificationPrefs<'a>>),
+}
+
+pub type Preferences<'a> = Vec<PreferencesItem<'a>>;
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -705,7 +773,7 @@ pub struct StatusView<'a> {
     ///An optional embed associated with the status.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: std::option::Option<StatusViewRecordEmbed<'a>>,
+    pub embed: std::option::Option<crate::app_bsky::embed::external::View<'a>>,
     ///The date when this status will expire. The application might choose to no longer return the status after expiration.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
@@ -717,23 +785,6 @@ pub struct StatusView<'a> {
     ///The status for the account.
     #[serde(borrow)]
     pub status: jacquard_common::CowStr<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum StatusViewRecordEmbed<'a> {
-    #[serde(rename = "app.bsky.embed.external#view")]
-    ExternalView(Box<crate::app_bsky::embed::external::View<'a>>),
 }
 
 #[jacquard_derive::lexicon]

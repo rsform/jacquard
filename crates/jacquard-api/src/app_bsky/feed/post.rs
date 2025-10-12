@@ -44,7 +44,7 @@ pub struct Post<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: std::option::Option<PostRecordEmbed<'a>>,
+    pub embed: std::option::Option<PostEmbed<'a>>,
     ///DEPRECATED: replaced by app.bsky.richtext.facet.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -56,7 +56,7 @@ pub struct Post<'a> {
     ///Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<PostRecordLabels<'a>>,
+    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     ///Indicates human language of post primary text content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
@@ -84,7 +84,7 @@ pub struct Post<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum PostRecordEmbed<'a> {
+pub enum PostEmbed<'a> {
     #[serde(rename = "app.bsky.embed.images")]
     Images(Box<crate::app_bsky::embed::images::Images<'a>>),
     #[serde(rename = "app.bsky.embed.video")]
@@ -95,23 +95,6 @@ pub enum PostRecordEmbed<'a> {
     Record(Box<crate::app_bsky::embed::record::Record<'a>>),
     #[serde(rename = "app.bsky.embed.recordWithMedia")]
     RecordWithMedia(Box<crate::app_bsky::embed::record_with_media::RecordWithMedia<'a>>),
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum PostRecordLabels<'a> {
-    #[serde(rename = "com.atproto.label.defs#selfLabels")]
-    DefsSelfLabels(Box<crate::com_atproto::label::SelfLabels<'a>>),
 }
 
 impl jacquard_common::types::collection::Collection for Post<'_> {

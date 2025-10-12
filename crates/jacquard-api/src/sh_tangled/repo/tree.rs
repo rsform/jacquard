@@ -93,7 +93,8 @@ pub struct TreeOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -144,19 +145,6 @@ impl std::fmt::Display for TreeError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for TreeError<'_> {
-    type Output = TreeError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            TreeError::RepoNotFound(v) => TreeError::RepoNotFound(v.into_static()),
-            TreeError::RefNotFound(v) => TreeError::RefNotFound(v.into_static()),
-            TreeError::PathNotFound(v) => TreeError::PathNotFound(v.into_static()),
-            TreeError::InvalidRequest(v) => TreeError::InvalidRequest(v.into_static()),
-            TreeError::Unknown(v) => TreeError::Unknown(v.into_static()),
         }
     }
 }

@@ -52,7 +52,8 @@ pub struct GetServiceAuthOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -73,20 +74,6 @@ impl std::fmt::Display for GetServiceAuthError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetServiceAuthError<'_> {
-    type Output = GetServiceAuthError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetServiceAuthError::BadExpiration(v) => {
-                GetServiceAuthError::BadExpiration(v.into_static())
-            }
-            GetServiceAuthError::Unknown(v) => {
-                GetServiceAuthError::Unknown(v.into_static())
-            }
         }
     }
 }

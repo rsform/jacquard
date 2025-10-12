@@ -51,7 +51,8 @@ pub struct CompareOutput<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -102,23 +103,6 @@ impl std::fmt::Display for CompareError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for CompareError<'_> {
-    type Output = CompareError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            CompareError::RepoNotFound(v) => CompareError::RepoNotFound(v.into_static()),
-            CompareError::RevisionNotFound(v) => {
-                CompareError::RevisionNotFound(v.into_static())
-            }
-            CompareError::InvalidRequest(v) => {
-                CompareError::InvalidRequest(v.into_static())
-            }
-            CompareError::CompareError(v) => CompareError::CompareError(v.into_static()),
-            CompareError::Unknown(v) => CompareError::Unknown(v.into_static()),
         }
     }
 }

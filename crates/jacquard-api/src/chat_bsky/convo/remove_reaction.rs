@@ -62,7 +62,8 @@ pub struct RemoveReactionOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -93,23 +94,6 @@ impl std::fmt::Display for RemoveReactionError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for RemoveReactionError<'_> {
-    type Output = RemoveReactionError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            RemoveReactionError::ReactionMessageDeleted(v) => {
-                RemoveReactionError::ReactionMessageDeleted(v.into_static())
-            }
-            RemoveReactionError::ReactionInvalidValue(v) => {
-                RemoveReactionError::ReactionInvalidValue(v.into_static())
-            }
-            RemoveReactionError::Unknown(v) => {
-                RemoveReactionError::Unknown(v.into_static())
-            }
         }
     }
 }

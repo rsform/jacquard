@@ -19,24 +19,7 @@
 #[serde(rename_all = "camelCase")]
 pub struct Preference<'a> {
     #[serde(borrow)]
-    pub my_page: PreferenceRecordMyPage<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum PreferenceRecordMyPage<'a> {
-    #[serde(rename = "uk.skyblur.preference#myPage")]
-    PreferenceMyPage(Box<crate::uk_skyblur::preference::MyPage<'a>>),
+    pub my_page: crate::uk_skyblur::preference::MyPage<'a>,
 }
 
 impl jacquard_common::types::collection::Collection for Preference<'_> {

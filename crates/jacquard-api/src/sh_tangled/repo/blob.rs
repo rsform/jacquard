@@ -110,7 +110,8 @@ pub struct BlobOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -161,19 +162,6 @@ impl std::fmt::Display for BlobError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for BlobError<'_> {
-    type Output = BlobError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            BlobError::RepoNotFound(v) => BlobError::RepoNotFound(v.into_static()),
-            BlobError::RefNotFound(v) => BlobError::RefNotFound(v.into_static()),
-            BlobError::FileNotFound(v) => BlobError::FileNotFound(v.into_static()),
-            BlobError::InvalidRequest(v) => BlobError::InvalidRequest(v.into_static()),
-            BlobError::Unknown(v) => BlobError::Unknown(v.into_static()),
         }
     }
 }

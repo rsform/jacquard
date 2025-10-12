@@ -85,22 +85,5 @@ pub struct ThreadItem<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
-    pub value: ThreadItemRecordValue<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ThreadItemRecordValue<'a> {
-    #[serde(rename = "app.bsky.unspecced.defs#threadItemPost")]
-    DefsThreadItemPost(Box<crate::app_bsky::unspecced::ThreadItemPost<'a>>),
+    pub value: crate::app_bsky::unspecced::ThreadItemPost<'a>,
 }

@@ -73,7 +73,8 @@ pub struct SearchListingsOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -94,20 +95,6 @@ impl std::fmt::Display for SearchListingsError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for SearchListingsError<'_> {
-    type Output = SearchListingsError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            SearchListingsError::SearchFailed(v) => {
-                SearchListingsError::SearchFailed(v.into_static())
-            }
-            SearchListingsError::Unknown(v) => {
-                SearchListingsError::Unknown(v.into_static())
-            }
         }
     }
 }

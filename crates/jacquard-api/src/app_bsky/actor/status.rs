@@ -43,27 +43,10 @@ pub struct Status<'a> {
     ///An optional embed associated with the status.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: std::option::Option<StatusRecordEmbed<'a>>,
+    pub embed: std::option::Option<crate::app_bsky::embed::external::ExternalRecord<'a>>,
     ///The status for the account.
     #[serde(borrow)]
     pub status: jacquard_common::CowStr<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum StatusRecordEmbed<'a> {
-    #[serde(rename = "app.bsky.embed.external")]
-    External(Box<crate::app_bsky::embed::external::ExternalRecord<'a>>),
 }
 
 impl jacquard_common::types::collection::Collection for Status<'_> {

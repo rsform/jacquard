@@ -55,7 +55,8 @@ pub struct GetEntryMetadataByNameOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -76,20 +77,6 @@ impl std::fmt::Display for GetEntryMetadataByNameError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetEntryMetadataByNameError<'_> {
-    type Output = GetEntryMetadataByNameError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetEntryMetadataByNameError::NotFound(v) => {
-                GetEntryMetadataByNameError::NotFound(v.into_static())
-            }
-            GetEntryMetadataByNameError::Unknown(v) => {
-                GetEntryMetadataByNameError::Unknown(v.into_static())
-            }
         }
     }
 }

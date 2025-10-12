@@ -46,7 +46,26 @@ pub struct GetMessageContext<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetMessageContextOutput<'a> {
     #[serde(borrow)]
-    pub messages: Vec<jacquard_common::types::value::Data<'a>>,
+    pub messages: Vec<GetMessageContextOutputMessagesItem<'a>>,
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum GetMessageContextOutputMessagesItem<'a> {
+    #[serde(rename = "chat.bsky.convo.defs#messageView")]
+    MessageView(Box<crate::chat_bsky::convo::MessageView<'a>>),
+    #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
+    DeletedMessageView(Box<crate::chat_bsky::convo::DeletedMessageView<'a>>),
 }
 
 ///Response type for

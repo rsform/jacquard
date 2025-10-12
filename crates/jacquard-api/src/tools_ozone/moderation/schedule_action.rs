@@ -41,7 +41,7 @@ pub struct FailedScheduling<'a> {
 #[builder(start_fn = new)]
 pub struct ScheduleAction<'a> {
     #[serde(borrow)]
-    pub action: ScheduleActionRecordAction<'a>,
+    pub action: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
     ///This will be propagated to the moderation event when it is applied
@@ -62,19 +62,6 @@ pub struct ScheduleAction<'a> {
     >,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ScheduleActionRecordAction<'a> {}
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

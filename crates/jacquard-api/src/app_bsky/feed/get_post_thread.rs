@@ -41,7 +41,7 @@ pub struct GetPostThread<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThreadOutput<'a> {
     #[serde(borrow)]
-    pub thread: GetPostThreadOutputRecordThread<'a>,
+    pub thread: GetPostThreadOutputThread<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub threadgate: std::option::Option<crate::app_bsky::feed::ThreadgateView<'a>>,
@@ -59,13 +59,13 @@ pub struct GetPostThreadOutput<'a> {
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetPostThreadOutputRecordThread<'a> {
+pub enum GetPostThreadOutputThread<'a> {
     #[serde(rename = "app.bsky.feed.defs#threadViewPost")]
-    DefsThreadViewPost(Box<crate::app_bsky::feed::ThreadViewPost<'a>>),
+    ThreadViewPost(Box<crate::app_bsky::feed::ThreadViewPost<'a>>),
     #[serde(rename = "app.bsky.feed.defs#notFoundPost")]
-    DefsNotFoundPost(Box<crate::app_bsky::feed::NotFoundPost<'a>>),
+    NotFoundPost(Box<crate::app_bsky::feed::NotFoundPost<'a>>),
     #[serde(rename = "app.bsky.feed.defs#blockedPost")]
-    DefsBlockedPost(Box<crate::app_bsky::feed::BlockedPost<'a>>),
+    BlockedPost(Box<crate::app_bsky::feed::BlockedPost<'a>>),
 }
 
 #[jacquard_derive::open_union]
@@ -77,7 +77,8 @@ pub enum GetPostThreadOutputRecordThread<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -97,20 +98,6 @@ impl std::fmt::Display for GetPostThreadError<'_> {
                 Ok(())
             }
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
-impl jacquard_common::IntoStatic for GetPostThreadError<'_> {
-    type Output = GetPostThreadError<'static>;
-    fn into_static(self) -> Self::Output {
-        match self {
-            GetPostThreadError::NotFound(v) => {
-                GetPostThreadError::NotFound(v.into_static())
-            }
-            GetPostThreadError::Unknown(v) => {
-                GetPostThreadError::Unknown(v.into_static())
-            }
         }
     }
 }
