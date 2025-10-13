@@ -46,10 +46,10 @@
 //! [`IntoStatic`], avoiding the DeserializeOwned requirement of the Json axum extractor and similar.
 
 use axum::{
-    Router,
+    Json, Router,
     body::Bytes,
     extract::{FromRequest, Request},
-    http::StatusCode,
+    http::{HeaderValue, StatusCode, header},
     response::{IntoResponse, Response},
 };
 use jacquard::{
@@ -88,11 +88,14 @@ where
                         Ok(value) => Ok(ExtractXrpc(*value.into_static())),
                         Err(err) => Err((
                             StatusCode::BAD_REQUEST,
-                            serde_json::to_string(&json!({
+                            [(
+                                header::CONTENT_TYPE,
+                                HeaderValue::from_static("application/json"),
+                            )],
+                            Json(json!({
                                 "error": "InvalidRequest",
                                 "message": format!("failed to decode request: {}", err)
-                            }))
-                            .expect("Failed to serialize error response"),
+                            })),
                         )
                             .into_response()),
                     }
@@ -104,11 +107,14 @@ where
                             serde_html_form::from_str::<R::Request<'_>>(query).map_err(|e| {
                                 (
                                     StatusCode::BAD_REQUEST,
-                                    serde_json::to_string(&json!({
+                                    [(
+                                        header::CONTENT_TYPE,
+                                        HeaderValue::from_static("application/json"),
+                                    )],
+                                    Json(json!({
                                         "error": "InvalidRequest",
                                         "message": format!("failed to decode request: {}", e)
-                                    }))
-                                    .expect("Failed to serialize error response"),
+                                    })),
                                 )
                                     .into_response()
                             })?;
@@ -116,11 +122,14 @@ where
                     } else {
                         Err((
                             StatusCode::BAD_REQUEST,
-                            serde_json::to_string(&json!({
+                            [(
+                                header::CONTENT_TYPE,
+                                HeaderValue::from_static("application/json"),
+                            )],
+                            Json(json!({
                                 "error": "InvalidRequest",
                                 "message": "wrong nsid for wherever this ended up"
-                            }))
-                            .expect("Failed to serialize error response"),
+                            })),
                         )
                             .into_response())
                     }

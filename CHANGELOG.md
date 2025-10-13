@@ -1,5 +1,13 @@
 # Changelog
 
+## `jacquard-axum` [0.4.2] - 2025-10-13
+
+### Fixed
+
+- Axum extractor now sets the correct Content-Type header during error path.
+
+---
+
 ## [0.5.0] - 2025-10-13
 
 ### Added
@@ -51,6 +59,8 @@
 - Minor improvements to derive macros (`jacquard-derive`)
 - Identity resolution refinements (`jacquard-identity`)
 - OAuth client improvements (`jacquard-oauth`)
+
+---
 
 ## [0.4.0] - 2025-10-11
 
