@@ -1,6 +1,6 @@
 # Changelog
 
-## `jacquard-axum` [0.4.2] - 2025-10-13
+## `jacquard-axum` [0.5.1] - 2025-10-13
 
 ### Fixed
 
