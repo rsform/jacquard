@@ -81,6 +81,8 @@ async fn main() -> miette::Result<()> {
 
 ```
 
+If you have `just` installed, you can run the [examples](https://tangled.org/@nonbinary.computer/jacquard/tree/main/examples) using `just example-{example-name} {ARGS}`
+
 ## Component crates
 
 Jacquard is broken up into several crates for modularity. The correct one to use is generally `jacquard` itself, as it re-exports most of the others.
