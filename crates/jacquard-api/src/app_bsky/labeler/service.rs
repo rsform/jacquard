@@ -44,6 +44,44 @@ pub struct Service<'a> {
     >,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ServiceGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Service<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct ServiceRecord;
+impl jacquard_common::xrpc::XrpcResp for ServiceRecord {
+    const NSID: &'static str = "app.bsky.labeler.service";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ServiceGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Service<'_> {
     const NSID: &'static str = "app.bsky.labeler.service";
+    type Record = ServiceRecord;
+}
+
+impl From<ServiceGetRecordOutput<'_>> for Service<'static> {
+    fn from(output: ServiceGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

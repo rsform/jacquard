@@ -23,6 +23,44 @@ pub struct Gate<'a> {
     pub hidden_message: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GateGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Gate<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct GateRecord;
+impl jacquard_common::xrpc::XrpcResp for GateRecord {
+    const NSID: &'static str = "place.stream.chat.gate";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GateGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Gate<'_> {
     const NSID: &'static str = "place.stream.chat.gate";
+    type Record = GateRecord;
+}
+
+impl From<GateGetRecordOutput<'_>> for Gate<'static> {
+    fn from(output: GateGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

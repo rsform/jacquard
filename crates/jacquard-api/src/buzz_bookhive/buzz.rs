@@ -29,6 +29,44 @@ pub struct Buzz<'a> {
     pub parent: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BuzzGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Buzz<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct BuzzRecord;
+impl jacquard_common::xrpc::XrpcResp for BuzzRecord {
+    const NSID: &'static str = "buzz.bookhive.buzz";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = BuzzGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Buzz<'_> {
     const NSID: &'static str = "buzz.bookhive.buzz";
+    type Record = BuzzRecord;
+}
+
+impl From<BuzzGetRecordOutput<'_>> for Buzz<'static> {
+    fn from(output: BuzzGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

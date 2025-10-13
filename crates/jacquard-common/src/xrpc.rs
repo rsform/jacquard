@@ -1,4 +1,4 @@
-//! Stateless XRPC utilities and request/response mapping
+//! # Stateless XRPC utilities and request/response mapping
 //!
 //! Mapping overview:
 //! - Success (2xx): parse body into the endpoint's typed output.
@@ -9,7 +9,6 @@
 //!   can inspect `error="invalid_token"` or `error="use_dpop_nonce"` and refresh/retry.
 //!   If the header is absent, parse the body and map auth errors to
 //!   `AuthError::TokenExpired`/`InvalidToken`.
-//!
 use bytes::Bytes;
 use http::{
     HeaderName, HeaderValue, Request, StatusCode,
@@ -135,7 +134,7 @@ pub trait XrpcResp {
 ///
 /// It is implemented by the code generation on a marker struct, like the client-side [XrpcResp] trait.
 pub trait XrpcEndpoint {
-    /// Fully-qualified path ('/xrpc/[nsid]') where this endpoint should live on the server
+    /// Fully-qualified path ('/xrpc/\[nsid\]') where this endpoint should live on the server
     const PATH: &'static str;
     /// XRPC method (query/GET or procedure/POST)
     const METHOD: XrpcMethod;
@@ -195,29 +194,17 @@ impl IntoStatic for CallOptions<'_> {
 /// Extension for stateless XRPC calls on any `HttpClient`.
 ///
 /// Example
-/// ```ignore
-/// use jacquard::client::XrpcExt;
-/// use jacquard::api::app_bsky::feed::get_author_feed::GetAuthorFeed;
-/// use jacquard::types::ident::AtIdentifier;
-/// use miette::IntoDiagnostic;
+/// ```no_run
+/// # #[tokio::main]
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// use jacquard_common::xrpc::XrpcExt;
+/// use jacquard_common::http_client::HttpClient;
 ///
-/// #[tokio::main]
-/// async fn main() -> miette::Result<()> {
-///     let http = reqwest::Client::new();
-///     let base = url::Url::parse("https://public.api.bsky.app")?;
-///     let resp = http
-///         .xrpc(base)
-///         .send(
-///             GetAuthorFeed::new()
-///                 .actor(AtIdentifier::new_static("pattern.atproto.systems").unwrap())
-///                 .limit(5)
-///                 .build(),
-///         )
-///         .await?;
-///     let out = resp.into_output()?;
-///     println!("author feed:\n{}", serde_json::to_string_pretty(&out).into_diagnostic()?);
-///     Ok(())
-/// }
+/// let http = reqwest::Client::new();
+/// let base = url::Url::parse("https://public.api.bsky.app")?;
+/// // let resp = http.xrpc(base).send(&request).await?;
+/// # Ok(())
+/// # }
 /// ```
 pub trait XrpcExt: HttpClient {
     /// Start building an XRPC call for the given base URL.
@@ -256,33 +243,22 @@ pub trait XrpcClient: HttpClient {
 /// Stateless XRPC call builder.
 ///
 /// Example (per-request overrides)
-/// ```ignore
-/// use jacquard::client::{XrpcExt, AuthorizationToken};
-/// use jacquard::api::app_bsky::feed::get_author_feed::GetAuthorFeed;
-/// use jacquard::types::ident::AtIdentifier;
-/// use jacquard::CowStr;
-/// use miette::IntoDiagnostic;
+/// ```no_run
+/// # #[tokio::main]
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// use jacquard_common::xrpc::XrpcExt;
+/// use jacquard_common::{AuthorizationToken, CowStr};
 ///
-/// #[tokio::main]
-/// async fn main() -> miette::Result<()> {
-///     let http = reqwest::Client::new();
-///     let base = url::Url::parse("https://public.api.bsky.app")?;
-///     let resp = http
-///         .xrpc(base)
-///         .auth(AuthorizationToken::Bearer(CowStr::from("ACCESS_JWT")))
-///         .accept_labelers(vec![CowStr::from("did:plc:labelerid")])
-///         .header(http::header::USER_AGENT, http::HeaderValue::from_static("jacquard-example"))
-///         .send(
-///             GetAuthorFeed::new()
-///                 .actor(AtIdentifier::new_static("pattern.atproto.systems").unwrap())
-///                 .limit(5)
-///                 .build(),
-///         )
-///         .await?;
-///     let out = resp.into_output()?;
-///     println!("{}", serde_json::to_string_pretty(&out).into_diagnostic()?);
-///     Ok(())
-/// }
+/// let http = reqwest::Client::new();
+/// let base = url::Url::parse("https://public.api.bsky.app")?;
+/// let call = http
+///     .xrpc(base)
+///     .auth(AuthorizationToken::Bearer(CowStr::from("ACCESS_JWT")))
+///     .accept_labelers(vec![CowStr::from("did:plc:labelerid")])
+///     .header(http::header::USER_AGENT, http::HeaderValue::from_static("jacquard-example"));
+/// // let resp = call.send(&request).await?;
+/// # Ok(())
+/// # }
 /// ```
 pub struct XrpcCall<'a, C: HttpClient> {
     pub(crate) client: &'a C,
@@ -684,6 +660,25 @@ where
                 }
                 Err(e) => Err(XrpcError::Decode(e)),
             }
+        }
+    }
+
+    /// Reinterpret this response as a different response type.
+    ///
+    /// This transmutes the response by keeping the same buffer and status code,
+    /// but changing the type-level marker. Useful for converting generic XRPC responses
+    /// into collection-specific typed responses.
+    ///
+    /// # Safety
+    ///
+    /// This is safe in the sense that no memory unsafety occurs, but logical correctness
+    /// depends on ensuring the buffer actually contains data that can deserialize to `NEW`.
+    /// Incorrect conversion will cause deserialization errors at runtime.
+    pub fn transmute<NEW: XrpcResp>(self) -> Response<NEW> {
+        Response {
+            buffer: self.buffer,
+            status: self.status,
+            _marker: PhantomData,
         }
     }
 }

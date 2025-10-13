@@ -46,6 +46,44 @@ pub struct Entry<'a> {
     pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EntryGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Entry<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct EntryRecord;
+impl jacquard_common::xrpc::XrpcResp for EntryRecord {
+    const NSID: &'static str = "com.whtwnd.blog.entry";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = EntryGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Entry<'_> {
     const NSID: &'static str = "com.whtwnd.blog.entry";
+    type Record = EntryRecord;
+}
+
+impl From<EntryGetRecordOutput<'_>> for Entry<'static> {
+    fn from(output: EntryGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

@@ -28,6 +28,44 @@ pub struct Root<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RootGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Root<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct RootRecord;
+impl jacquard_common::xrpc::XrpcResp for RootRecord {
+    const NSID: &'static str = "sh.weaver.edit.root";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RootGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Root<'_> {
     const NSID: &'static str = "sh.weaver.edit.root";
+    type Record = RootRecord;
+}
+
+impl From<RootGetRecordOutput<'_>> for Root<'static> {
+    fn from(output: RootGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

@@ -31,8 +31,46 @@ pub struct Photo<'a> {
     pub photo: jacquard_common::types::blob::Blob<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PhotoGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Photo<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct PhotoRecord;
+impl jacquard_common::xrpc::XrpcResp for PhotoRecord {
+    const NSID: &'static str = "social.grain.photo";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PhotoGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Photo<'_> {
     const NSID: &'static str = "social.grain.photo";
+    type Record = PhotoRecord;
+}
+
+impl From<PhotoGetRecordOutput<'_>> for Photo<'static> {
+    fn from(output: PhotoGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }
 
 #[jacquard_derive::lexicon]

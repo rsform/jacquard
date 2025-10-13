@@ -15,10 +15,10 @@ description = "Axum server helpers for Jacquard"
 [lib]
 path = "src/lib.rs"
 
-[[bin]]
-name = "jacquard_axum"
-path = "src/main.rs"
-
+[[example]]
+name = "axum_server"
+path = "../../examples/axum_server.rs"
+required-features = ["jacquard/fancy"]
 
 [dependencies]
 axum = "0.8.6"

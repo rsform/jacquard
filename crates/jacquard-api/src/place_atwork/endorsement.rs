@@ -37,6 +37,44 @@ pub struct Endorsement<'a> {
     pub text: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EndorsementGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Endorsement<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct EndorsementRecord;
+impl jacquard_common::xrpc::XrpcResp for EndorsementRecord {
+    const NSID: &'static str = "place.atwork.endorsement";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = EndorsementGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Endorsement<'_> {
     const NSID: &'static str = "place.atwork.endorsement";
+    type Record = EndorsementRecord;
+}
+
+impl From<EndorsementGetRecordOutput<'_>> for Endorsement<'static> {
+    fn from(output: EndorsementGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

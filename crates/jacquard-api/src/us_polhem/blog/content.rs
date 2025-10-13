@@ -28,6 +28,44 @@ pub struct Content<'a> {
     pub slug: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ContentGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Content<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct ContentRecord;
+impl jacquard_common::xrpc::XrpcResp for ContentRecord {
+    const NSID: &'static str = "us.polhem.blog.content";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ContentGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Content<'_> {
     const NSID: &'static str = "us.polhem.blog.content";
+    type Record = ContentRecord;
+}
+
+impl From<ContentGetRecordOutput<'_>> for Content<'static> {
+    fn from(output: ContentGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

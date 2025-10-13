@@ -40,8 +40,46 @@ pub struct Pack<'a> {
     pub total_opens: i64,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PackGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Pack<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct PackRecord;
+impl jacquard_common::xrpc::XrpcResp for PackRecord {
+    const NSID: &'static str = "net.anisota.beta.game.pack";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PackGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Pack<'_> {
     const NSID: &'static str = "net.anisota.beta.game.pack";
+    type Record = PackRecord;
+}
+
+impl From<PackGetRecordOutput<'_>> for Pack<'static> {
+    fn from(output: PackGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }
 
 ///A single pack opening entry in the history

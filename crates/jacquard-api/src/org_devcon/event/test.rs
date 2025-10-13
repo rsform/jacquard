@@ -40,6 +40,44 @@ pub struct Test<'a> {
     pub url: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TestGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Test<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct TestRecord;
+impl jacquard_common::xrpc::XrpcResp for TestRecord {
+    const NSID: &'static str = "org.devcon.event.test";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = TestGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Test<'_> {
     const NSID: &'static str = "org.devcon.event.test";
+    type Record = TestRecord;
+}
+
+impl From<TestGetRecordOutput<'_>> for Test<'static> {
+    fn from(output: TestGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

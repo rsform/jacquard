@@ -1,4 +1,52 @@
+//! # Axum helpers for jacquard XRPC server implementations
+//!
+//! ## Usage
+//!
+//! ```no_run
+//! use axum::{Router, routing::get, http::StatusCode, response::IntoResponse,  Json};
+//! use jacquard_axum::{ ExtractXrpc, IntoRouter };
+//! use std::collections::BTreeMap;
+//! use miette::{IntoDiagnostic, Result};
+//! use jacquard::api::com_atproto::identity::resolve_handle::{ResolveHandle, ResolveHandleRequest, ResolveHandleOutput};
+//! use jacquard_common::types::string::Did;
+//!
+//! async fn handle_resolve(
+//!     ExtractXrpc(req): ExtractXrpc<ResolveHandleRequest>
+//! ) -> Result<Json<ResolveHandleOutput<'static>>, StatusCode> {
+//!     // req is ResolveHandle<'static>, ready to use
+//!     let handle = req.handle;
+//!     // ... resolve logic
+//! #   let output = ResolveHandleOutput { did: Did::new_static("did:plc:test").unwrap(), extra_data: BTreeMap::new()  };
+//!     Ok(Json(output))
+//! }
+//!
+//! #[tokio::main]
+//! async fn main() -> Result<()> {
+//!     let app = Router::new()
+//!          .route("/", axum::routing::get(|| async { "hello world!" }))
+//!          .merge(ResolveHandleRequest::into_router(handle_resolve));
+//!
+//!     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
+//!         .await
+//!         .into_diagnostic()?;
+//!         axum::serve(listener, app).await.unwrap();
+//!     Ok(())
+//! }
+//! ```
+//!
+//!
+//! The extractor uses the [`XrpcEndpoint`] trait to determine request type:
+//! - **Query**: Deserializes from query string parameters
+//! - **Procedure**: Deserializes from request body (supports custom encodings via `decode_body`)
+//!
+//! Deserialization errors return a 400 Bad Request with a JSON error body matching
+//! the XRPC error format.
+//!
+//! The extractor deserializes to borrowed types first, then converts to `'static` via
+//! [`IntoStatic`], avoiding the DeserializeOwned requirement of the Json axum extractor and similar.
+
 use axum::{
+    Router,
     body::Bytes,
     extract::{FromRequest, Request},
     http::StatusCode,
@@ -9,6 +57,11 @@ use jacquard::{
     xrpc::{XrpcEndpoint, XrpcMethod, XrpcRequest},
 };
 use serde_json::json;
+
+/// Axum extractor for XRPC requests
+///
+/// Deserializes incoming requests based on the endpoint's method type (Query or Procedure)
+/// and returns the owned (`'static`) request type ready for handler logic.
 
 pub struct ExtractXrpc<E: XrpcEndpoint>(pub E::Request<'static>);
 
@@ -85,4 +138,35 @@ pub enum XrpcRequestError {
     JsonDecodeError(serde_json::Error),
     #[error("UTF-8 decode error: {0}")]
     Utf8DecodeError(std::string::FromUtf8Error),
+}
+
+/// Conversion trait to turn an XrpcEndpoint and a handler into an axum Router
+pub trait IntoRouter {
+    fn into_router<T, S, U>(handler: U) -> Router<S>
+    where
+        T: 'static,
+        S: Clone + Send + Sync + 'static,
+        U: axum::handler::Handler<T, S>;
+}
+
+impl<X> IntoRouter for X
+where
+    X: XrpcEndpoint,
+{
+    /// Creates an axum router that will invoke `handler` in response to xrpc
+    /// request `X`.
+    fn into_router<T, S, U>(handler: U) -> Router<S>
+    where
+        T: 'static,
+        S: Clone + Send + Sync + 'static,
+        U: axum::handler::Handler<T, S>,
+    {
+        Router::new().route(
+            X::PATH,
+            (match X::METHOD {
+                XrpcMethod::Query => axum::routing::get,
+                XrpcMethod::Procedure(_) => axum::routing::post,
+            })(handler),
+        )
+    }
 }

@@ -23,6 +23,44 @@ pub struct Settings<'a> {
     pub debug_recording: std::option::Option<bool>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SettingsGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Settings<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct SettingsRecord;
+impl jacquard_common::xrpc::XrpcResp for SettingsRecord {
+    const NSID: &'static str = "place.stream.server.settings";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SettingsGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Settings<'_> {
     const NSID: &'static str = "place.stream.server.settings";
+    type Record = SettingsRecord;
+}
+
+impl From<SettingsGetRecordOutput<'_>> for Settings<'static> {
+    fn from(output: SettingsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

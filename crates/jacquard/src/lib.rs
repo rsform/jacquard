@@ -49,17 +49,8 @@
 //! async fn main() -> miette::Result<()> {
 //!     let args = Args::parse();
 //!
-//!     // File-backed auth store shared by OAuthClient and session registry
-//!     let store = FileAuthStore::new(&args.store);
-//!     let client_data = jacquard_oauth::session::ClientData {
-//!         keyset: None,
-//!         // Default sets normal localhost redirect URIs and "atproto transition:generic" scopes.
-//!         // The localhost helper will ensure you have at least "atproto" and will fix urls
-//!         config: AtprotoClientMetadata::default_localhost(),
-//!     };
-//!
-//!     // Build an OAuth client (this is reusable, and can create multiple sessions)
-//!     let oauth = OAuthClient::new(store, client_data);
+//!     // Build an OAuth client with file-backed auth store and default localhost config
+//!     let oauth = OAuthClient::with_default_config(FileAuthStore::new(&args.store));
 //!     // Authenticate with a PDS, using a loopback server to handle the callback flow
 //! #   #[cfg(feature = "loopback")]
 //!     let session = oauth
@@ -155,16 +146,29 @@
 //!     Ok(())
 //! }
 //! ```
+//!
+//! ## Component Crates
+//!
+//! Jacquard is split into several crates for modularity. The main `jacquard` crate
+//! re-exports most of the others, so you typically only need to depend on it directly.
+//!
+//! - [`jacquard-common`] - AT Protocol types (DIDs, handles, at-URIs, NSIDs, TIDs, CIDs, etc.)
+//! - [`jacquard-api`] - Generated API bindings from 646+ lexicon schemas
+//! - [`jacquard-axum`] - Server-side XRPC handler extractors for Axum framework (not re-exported, depends on jacquard)
+//! - [`jacquard-oauth`] - OAuth/DPoP flow implementation with session management
+//! - [`jacquard-identity`] - Identity resolution (handle→DID, DID→Doc, OAuth metadata)
+//! - [`jacquard-lexicon`] - Lexicon resolution, fetching, parsing and Rust code generation from schemas
+//! - [`jacquard-derive`] - Macros (`#[lexicon]`, `#[open_union]`, `#[derive(IntoStatic)]`)
 
 #![warn(missing_docs)]
 
-/// XRPC client traits and basic implementation
 pub mod client;
 
+pub use common::*;
 #[cfg(feature = "api")]
 /// If enabled, re-export the generated api crate
 pub use jacquard_api as api;
-pub use jacquard_common::*;
+pub use jacquard_common as common;
 
 #[cfg(feature = "derive")]
 /// if enabled, reexport the attribute macros

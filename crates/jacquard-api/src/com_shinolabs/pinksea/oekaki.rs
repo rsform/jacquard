@@ -75,6 +75,44 @@ pub struct Oekaki<'a> {
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct OekakiGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Oekaki<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct OekakiRecord;
+impl jacquard_common::xrpc::XrpcResp for OekakiRecord {
+    const NSID: &'static str = "com.shinolabs.pinksea.oekaki";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = OekakiGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Oekaki<'_> {
     const NSID: &'static str = "com.shinolabs.pinksea.oekaki";
+    type Record = OekakiRecord;
+}
+
+impl From<OekakiGetRecordOutput<'_>> for Oekaki<'static> {
+    fn from(output: OekakiGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

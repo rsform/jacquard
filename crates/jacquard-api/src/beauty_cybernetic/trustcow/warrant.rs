@@ -40,6 +40,44 @@ pub struct Warrant<'a> {
     pub warrant_type: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct WarrantGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Warrant<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct WarrantRecord;
+impl jacquard_common::xrpc::XrpcResp for WarrantRecord {
+    const NSID: &'static str = "beauty.cybernetic.trustcow.warrant";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = WarrantGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Warrant<'_> {
     const NSID: &'static str = "beauty.cybernetic.trustcow.warrant";
+    type Record = WarrantRecord;
+}
+
+impl From<WarrantGetRecordOutput<'_>> for Warrant<'static> {
+    fn from(output: WarrantGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

@@ -26,10 +26,8 @@ struct Args {
 async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
-    // File-backed auth store for testing
+    // File-backed auth store shared by OAuthClient and session registry
     let store = FileAuthStore::new(&args.store);
-
-    // Minimal localhost client metadata (redirect_uris get set by loopback helper)
     let client_data = jacquard_oauth::session::ClientData {
         keyset: None,
         // Default sets normal localhost redirect URIs and "atproto transition:generic" scopes.
@@ -37,7 +35,7 @@ async fn main() -> miette::Result<()> {
         config: AtprotoClientMetadata::default_localhost(),
     };
 
-    // Build an OAuth client
+    // Build an OAuth client (this is reusable, and can create multiple sessions)
     let oauth = OAuthClient::new(store, client_data);
 
     #[cfg(feature = "loopback")]

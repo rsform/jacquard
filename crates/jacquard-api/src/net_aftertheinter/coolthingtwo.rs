@@ -22,6 +22,44 @@ pub struct Coolthingtwo<'a> {
     pub status: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CoolthingtwoGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Coolthingtwo<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct CoolthingtwoRecord;
+impl jacquard_common::xrpc::XrpcResp for CoolthingtwoRecord {
+    const NSID: &'static str = "net.aftertheinter.coolthingtwo";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CoolthingtwoGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Coolthingtwo<'_> {
     const NSID: &'static str = "net.aftertheinter.coolthingtwo";
+    type Record = CoolthingtwoRecord;
+}
+
+impl From<CoolthingtwoGetRecordOutput<'_>> for Coolthingtwo<'static> {
+    fn from(output: CoolthingtwoGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

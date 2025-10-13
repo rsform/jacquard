@@ -358,10 +358,10 @@ pub enum RawData<'s> {
 /// similar to `serde_json::from_value()`.
 ///
 /// # Example
-/// ```ignore
-/// use jacquard_common::types::value::{Data, from_data};
-/// use serde::Deserialize;
-///
+/// ```
+/// # use jacquard_common::types::value::{Data, from_data};
+/// # use serde::Deserialize;
+/// #
 /// #[derive(Deserialize)]
 /// struct Post<'a> {
 ///     #[serde(borrow)]
@@ -370,8 +370,12 @@ pub enum RawData<'s> {
 ///     author: &'a str,
 /// }
 ///
-/// let data: Data = /* ... */;
+/// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+/// # let json = serde_json::json!({"text": "hello", "author": "alice"});
+/// # let data = Data::from_json(&json)?;
 /// let post: Post = from_data(&data)?;
+/// # Ok(())
+/// # }
 /// ```
 pub fn from_data<'de, T>(data: &'de Data<'de>) -> Result<T, DataDeserializerError>
 where
@@ -385,20 +389,22 @@ where
 /// Allows extracting strongly-typed structures from untyped `RawData` values.
 ///
 /// # Example
-/// ```ignore
-/// use jacquard_common::types::value::{RawData, from_raw_data};
-/// use serde::Deserialize;
-///
-/// #[derive(Deserialize)]
-/// struct Post<'a> {
-///     #[serde(borrow)]
-///     text: &'a str,
-///     #[serde(borrow)]
-///     author: &'a str,
+/// ```
+/// # use jacquard_common::types::value::{RawData, from_raw_data, to_raw_data};
+/// # use serde::{Serialize, Deserialize};
+/// #
+/// #[derive(Serialize, Deserialize)]
+/// struct Post {
+///     text: String,
+///     author: String,
 /// }
 ///
-/// let data: RawData = /* ... */;
+/// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+/// # let orig = Post { text: "hello".to_string(), author: "alice".to_string() };
+/// # let data = to_raw_data(&orig)?;
 /// let post: Post = from_raw_data(&data)?;
+/// # Ok(())
+/// # }
 /// ```
 pub fn from_raw_data<'de, T>(data: &'de RawData<'de>) -> Result<T, DataDeserializerError>
 where
@@ -412,18 +418,21 @@ where
 /// Allows converting strongly-typed structures into untyped `RawData` values.
 ///
 /// # Example
-/// ```ignore
-/// use jacquard_common::types::value::{RawData, to_raw_data};
-/// use serde::Serialize;
-///
+/// ```
+/// # use jacquard_common::types::value::{RawData, to_raw_data};
+/// # use serde::Serialize;
+/// #
 /// #[derive(Serialize)]
 /// struct Post {
 ///     text: String,
 ///     likes: i64,
 /// }
 ///
+/// # fn example() -> Result<(), Box<dyn std::error::Error>> {
 /// let post = Post { text: "hello".to_string(), likes: 42 };
 /// let data: RawData = to_raw_data(&post)?;
+/// # Ok(())
+/// # }
 /// ```
 pub fn to_raw_data<T>(value: &T) -> Result<RawData<'static>, serde_impl::RawDataSerializerError>
 where
@@ -437,21 +446,24 @@ where
 /// Combines `to_raw_data()` and validation/type inference in one step.
 ///
 /// # Example
-/// ```ignore
-/// use jacquard_common::types::value::{Data, to_data};
-/// use serde::Serialize;
-///
+/// ```
+/// # use jacquard_common::types::value::{Data, to_data};
+/// # use serde::Serialize;
+/// #
 /// #[derive(Serialize)]
 /// struct Post {
 ///     text: String,
 ///     did: String,  // Will be inferred as Did if valid
 /// }
 ///
+/// # fn example() -> Result<(), Box<dyn std::error::Error>> {
 /// let post = Post {
 ///     text: "hello".to_string(),
 ///     did: "did:plc:abc123".to_string()
 /// };
 /// let data: Data = to_data(&post)?;
+/// # Ok(())
+/// # }
 /// ```
 pub fn to_data<T>(value: &T) -> Result<Data<'static>, convert::ConversionError>
 where

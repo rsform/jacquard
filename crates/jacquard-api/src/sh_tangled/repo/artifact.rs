@@ -32,6 +32,44 @@ pub struct Artifact<'a> {
     pub tag: bytes::Bytes,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ArtifactGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Artifact<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct ArtifactRecord;
+impl jacquard_common::xrpc::XrpcResp for ArtifactRecord {
+    const NSID: &'static str = "sh.tangled.repo.artifact";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ArtifactGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Artifact<'_> {
     const NSID: &'static str = "sh.tangled.repo.artifact";
+    type Record = ArtifactRecord;
+}
+
+impl From<ArtifactGetRecordOutput<'_>> for Artifact<'static> {
+    fn from(output: ArtifactGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

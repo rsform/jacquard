@@ -389,7 +389,8 @@ impl FileAuthStore {
 }
 
 #[async_trait::async_trait]
-impl jacquard_common::session::SessionStore<
+impl
+    jacquard_common::session::SessionStore<
         crate::client::credential_session::SessionKey,
         crate::client::AtpSession,
     > for FileAuthStore
@@ -452,8 +453,8 @@ impl jacquard_common::session::SessionStore<
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::client::credential_session::SessionKey;
     use crate::client::AtpSession;
+    use crate::client::credential_session::SessionKey;
     use jacquard_common::types::string::{Did, Handle};
     use std::fs;
     use std::path::PathBuf;

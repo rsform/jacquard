@@ -35,6 +35,44 @@ pub struct Paste<'a> {
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PasteGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Paste<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct PasteRecord;
+impl jacquard_common::xrpc::XrpcResp for PasteRecord {
+    const NSID: &'static str = "moe.karashiiro.kpaste.paste";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PasteGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Paste<'_> {
     const NSID: &'static str = "moe.karashiiro.kpaste.paste";
+    type Record = PasteRecord;
+}
+
+impl From<PasteGetRecordOutput<'_>> for Paste<'static> {
+    fn from(output: PasteGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

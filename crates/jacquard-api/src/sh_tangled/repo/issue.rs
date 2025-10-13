@@ -30,6 +30,44 @@ pub struct Issue<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct IssueGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Issue<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct IssueRecord;
+impl jacquard_common::xrpc::XrpcResp for IssueRecord {
+    const NSID: &'static str = "sh.tangled.repo.issue";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = IssueGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Issue<'_> {
     const NSID: &'static str = "sh.tangled.repo.issue";
+    type Record = IssueRecord;
+}
+
+impl From<IssueGetRecordOutput<'_>> for Issue<'static> {
+    fn from(output: IssueGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

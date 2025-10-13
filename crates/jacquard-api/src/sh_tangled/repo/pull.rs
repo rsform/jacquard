@@ -35,8 +35,46 @@ pub struct Pull<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PullGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Pull<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct PullRecord;
+impl jacquard_common::xrpc::XrpcResp for PullRecord {
+    const NSID: &'static str = "sh.tangled.repo.pull";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PullGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Pull<'_> {
     const NSID: &'static str = "sh.tangled.repo.pull";
+    type Record = PullRecord;
+}
+
+impl From<PullGetRecordOutput<'_>> for Pull<'static> {
+    fn from(output: PullGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }
 
 #[jacquard_derive::lexicon]

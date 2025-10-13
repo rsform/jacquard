@@ -13,13 +13,13 @@ use jacquard_common::{
     AuthorizationToken, CowStr, IntoStatic,
     error::{AuthError, ClientError, TransportError, XrpcResult},
     http_client::HttpClient,
-    types::did::Did,
+    types::{did::Did, string::Handle},
     xrpc::{
         CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest, XrpcResp, build_http_request,
         process_response,
     },
 };
-use jacquard_identity::JacquardResolver;
+use jacquard_identity::{JacquardResolver, resolver::IdentityResolver};
 use jose_jwk::JwkSet;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -38,6 +38,52 @@ impl<S: ClientAuthStore> OAuthClient<JacquardResolver, S> {
     pub fn new(store: S, client_data: ClientData<'static>) -> Self {
         let client = JacquardResolver::default();
         Self::new_from_resolver(store, client, client_data)
+    }
+
+    /// Create an OAuth client with the provided store and default localhost client metadata.
+    ///
+    /// This is a convenience constructor for quickly setting up an OAuth client
+    /// with default localhost redirect URIs and "atproto transition:generic" scopes.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use jacquard_oauth::client::OAuthClient;
+    /// # use jacquard_oauth::authstore::MemoryAuthStore;
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let store = MemoryAuthStore::new();
+    /// let oauth = OAuthClient::with_default_config(store);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_default_config(store: S) -> Self {
+        let client_data = ClientData {
+            keyset: None,
+            config: crate::atproto::AtprotoClientMetadata::default_localhost(),
+        };
+        Self::new(store, client_data)
+    }
+}
+
+impl OAuthClient<JacquardResolver, crate::authstore::MemoryAuthStore> {
+    /// Create an OAuth client with an in-memory auth store and default localhost client metadata.
+    ///
+    /// This is a convenience constructor for simple testing and development.
+    /// The session will not persist across restarts.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use jacquard_oauth::client::OAuthClient;
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth = OAuthClient::with_memory_store();
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_memory_store() -> Self {
+        Self::with_default_config(crate::authstore::MemoryAuthStore::new())
     }
 }
 
@@ -428,5 +474,36 @@ fn is_invalid_token_response<R: XrpcResp>(response: &XrpcResult<Response<R>>) ->
             _ => false,
         },
         _ => false,
+    }
+}
+
+impl<T, S> IdentityResolver for OAuthSession<T, S>
+where
+    S: ClientAuthStore + Send + Sync + 'static,
+    T: OAuthResolver + IdentityResolver + XrpcExt + Send + Sync + 'static,
+{
+    fn options(&self) -> &jacquard_identity::resolver::ResolverOptions {
+        self.client.options()
+    }
+
+    fn resolve_handle(
+        &self,
+        handle: &Handle<'_>,
+    ) -> impl Future<
+        Output = std::result::Result<Did<'static>, jacquard_identity::resolver::IdentityError>,
+    > {
+        async { self.client.resolve_handle(handle).await }
+    }
+
+    fn resolve_did_doc(
+        &self,
+        did: &Did<'_>,
+    ) -> impl Future<
+        Output = std::result::Result<
+            jacquard_identity::resolver::DidDocResponse,
+            jacquard_identity::resolver::IdentityError,
+        >,
+    > {
+        async { self.client.resolve_did_doc(did).await }
     }
 }

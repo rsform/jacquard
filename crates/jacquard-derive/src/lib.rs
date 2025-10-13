@@ -1,3 +1,59 @@
+//! # Derive macros for jacquard lexicon types
+//!
+//! This crate provides attribute macros that the code generator uses to add lexicon-specific
+//! behavior to generated types. You'll rarely need to use these directly unless you're writing
+//! custom lexicon types by hand. However, deriving IntoStatic will likely be very useful.
+//!
+//! ## Macros
+//!
+//! ### `#[lexicon]`
+//!
+//! Adds an `extra_data` field to structs to capture unknown fields during deserialization.
+//! This makes objects "open" - they'll accept and preserve fields not defined in the schema.
+//!
+//! ```ignore
+//! #[lexicon]
+//! struct Post<'s> {
+//!     text: &'s str,
+//! }
+//! // Expands to add:
+//! // #[serde(flatten)]
+//! // pub extra_data: BTreeMap<SmolStr, Data<'s>>
+//! ```
+//!
+//! ### `#[open_union]`
+//!
+//! Adds an `Unknown(Data)` variant to enums to make them extensible unions. This lets
+//! enums accept variants not defined in your code, storing them as loosely typed atproto `Data`.
+//!
+//! ```ignore
+//! #[open_union]
+//! enum RecordEmbed<'s> {
+//!     #[serde(rename = "app.bsky.embed.images")]
+//!     Images(Images),
+//! }
+//! // Expands to add:
+//! // #[serde(untagged)]
+//! // Unknown(Data<'s>)
+//! ```
+//!
+//! ### `#[derive(IntoStatic)]`
+//!
+//! Derives conversion from borrowed (`'a`) to owned (`'static`) types by recursively calling
+//! `.into_static()` on all fields. Works with structs and enums.
+//!
+//! ```ignore
+//! #[derive(IntoStatic)]
+//! struct Post<'a> {
+//!     text: CowStr<'a>,
+//! }
+//! // Generates:
+//! // impl IntoStatic for Post<'_> {
+//! //     type Output = Post<'static>;
+//! //     fn into_static(self) -> Self::Output { ... }
+//! // }
+//! ```
+
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{Data, DeriveInput, Fields, GenericParam, parse_macro_input};
@@ -160,17 +216,15 @@ pub fn derive_into_static(input: TokenStream) -> TokenStream {
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     // Build the Output type with all lifetimes replaced by 'static
-    let output_generics = generics.params.iter().map(|param| {
-        match param {
-            GenericParam::Lifetime(_) => quote! { 'static },
-            GenericParam::Type(ty) => {
-                let ident = &ty.ident;
-                quote! { #ident }
-            }
-            GenericParam::Const(c) => {
-                let ident = &c.ident;
-                quote! { #ident }
-            }
+    let output_generics = generics.params.iter().map(|param| match param {
+        GenericParam::Lifetime(_) => quote! { 'static },
+        GenericParam::Type(ty) => {
+            let ident = &ty.ident;
+            quote! { #ident }
+        }
+        GenericParam::Const(c) => {
+            let ident = &c.ident;
+            quote! { #ident }
         }
     });
 
@@ -182,19 +236,12 @@ pub fn derive_into_static(input: TokenStream) -> TokenStream {
 
     // Generate the conversion body based on struct/enum
     let conversion = match &input.data {
-        Data::Struct(data_struct) => {
-            generate_struct_conversion(name, &data_struct.fields)
-        }
-        Data::Enum(data_enum) => {
-            generate_enum_conversion(name, data_enum)
-        }
+        Data::Struct(data_struct) => generate_struct_conversion(name, &data_struct.fields),
+        Data::Enum(data_enum) => generate_enum_conversion(name, data_enum),
         Data::Union(_) => {
-            return syn::Error::new_spanned(
-                input,
-                "IntoStatic cannot be derived for unions"
-            )
-            .to_compile_error()
-            .into();
+            return syn::Error::new_spanned(input, "IntoStatic cannot be derived for unions")
+                .to_compile_error()
+                .into();
         }
     };
 
@@ -239,7 +286,10 @@ fn generate_struct_conversion(name: &syn::Ident, fields: &Fields) -> proc_macro2
     }
 }
 
-fn generate_enum_conversion(name: &syn::Ident, data_enum: &syn::DataEnum) -> proc_macro2::TokenStream {
+fn generate_enum_conversion(
+    name: &syn::Ident,
+    data_enum: &syn::DataEnum,
+) -> proc_macro2::TokenStream {
     let variants = data_enum.variants.iter().map(|variant| {
         let variant_name = &variant.ident;
         match &variant.fields {
@@ -258,7 +308,9 @@ fn generate_enum_conversion(name: &syn::Ident, data_enum: &syn::DataEnum) -> pro
             }
             Fields::Unnamed(fields) => {
                 let field_bindings: Vec<_> = (0..fields.unnamed.len())
-                    .map(|i| syn::Ident::new(&format!("field_{}", i), proc_macro2::Span::call_site()))
+                    .map(|i| {
+                        syn::Ident::new(&format!("field_{}", i), proc_macro2::Span::call_site())
+                    })
                     .collect();
                 let field_conversions = field_bindings.iter().map(|binding| {
                     quote! { #binding.into_static() }

@@ -6,8 +6,8 @@ use heck::{ToPascalCase, ToSnakeCase};
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use super::utils::{make_ident, value_to_variant_name};
 use super::CodeGenerator;
+use super::utils::{make_ident, value_to_variant_name};
 
 /// Enum variant kind for IntoStatic generation
 #[derive(Debug, Clone)]
@@ -52,16 +52,26 @@ impl<'c> CodeGenerator<'c> {
                     match field_type {
                         LexObjectProperty::Union(union) => {
                             // Skip empty, single-variant unions unless they're self-referential
-                            if !union.refs.is_empty() && (union.refs.len() > 1 || self.is_self_referential_union(nsid, &type_name, union)) {
-                                let union_name = self.generate_field_type_name(nsid, &type_name, field_name, "");
+                            if !union.refs.is_empty()
+                                && (union.refs.len() > 1
+                                    || self.is_self_referential_union(nsid, &type_name, union))
+                            {
+                                let union_name =
+                                    self.generate_field_type_name(nsid, &type_name, field_name, "");
                                 let refs: Vec<_> = union.refs.iter().cloned().collect();
-                                let union_def =
-                                    self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
+                                let union_def = self.generate_union(
+                                    nsid,
+                                    &union_name,
+                                    &refs,
+                                    None,
+                                    union.closed,
+                                )?;
                                 unions.push(union_def);
                             }
                         }
                         LexObjectProperty::Object(nested_obj) => {
-                            let object_name = self.generate_field_type_name(nsid, &type_name, field_name, "");
+                            let object_name =
+                                self.generate_field_type_name(nsid, &type_name, field_name, "");
                             let obj_def = self.generate_object(nsid, &object_name, nested_obj)?;
                             unions.push(obj_def);
                         }
@@ -69,9 +79,17 @@ impl<'c> CodeGenerator<'c> {
                             if let LexArrayItem::Union(union) = &array.items {
                                 // Skip single-variant array unions
                                 if union.refs.len() > 1 {
-                                    let union_name = self.generate_field_type_name(nsid, &type_name, field_name, "Item");
+                                    let union_name = self.generate_field_type_name(
+                                        nsid, &type_name, field_name, "Item",
+                                    );
                                     let refs: Vec<_> = union.refs.iter().cloned().collect();
-                                    let union_def = self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
+                                    let union_def = self.generate_union(
+                                        nsid,
+                                        &union_name,
+                                        &refs,
+                                        None,
+                                        union.closed,
+                                    )?;
                                     unions.push(union_def);
                                 }
                             }
@@ -80,17 +98,68 @@ impl<'c> CodeGenerator<'c> {
                     }
                 }
 
+                // Generate typed GetRecordOutput wrapper
+                let output_type_name = format!("{}GetRecordOutput", type_name);
+                let output_type_ident =
+                    syn::Ident::new(&output_type_name, proc_macro2::Span::call_site());
+
+                let output_wrapper = quote! {
+                    /// Typed wrapper for GetRecord response with this collection's record type.
+                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                    #[serde(rename_all = "camelCase")]
+                    pub struct #output_type_ident<'a> {
+                        #[serde(skip_serializing_if = "std::option::Option::is_none")]
+                        #[serde(borrow)]
+                        pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+                        #[serde(borrow)]
+                        pub uri: jacquard_common::types::string::AtUri<'a>,
+                        #[serde(borrow)]
+                        pub value: #ident<'a>,
+                    }
+                };
+
+                // Generate marker struct for XrpcResp
+                let record_marker_name = format!("{}Record", type_name);
+                let record_marker_ident =
+                    syn::Ident::new(&record_marker_name, proc_macro2::Span::call_site());
+
+                let record_marker = quote! {
+                    /// Marker type for deserializing records from this collection.
+                    pub struct #record_marker_ident;
+
+                    impl jacquard_common::xrpc::XrpcResp for #record_marker_ident {
+                        const NSID: &'static str = #nsid;
+                        const ENCODING: &'static str = "application/json";
+                        type Output<'de> = #output_type_ident<'de>;
+                        type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+                    }
+
+
+                };
+                let from_impl = quote! {
+                    impl From<#output_type_ident<'_>> for #ident<'static> {
+                        fn from(output: #output_type_ident<'_>) -> Self {
+                            use jacquard_common::IntoStatic;
+                            output.value.into_static()
+                        }
+                    }
+                };
+
                 // Generate Collection trait impl
                 let collection_impl = quote! {
                     impl jacquard_common::types::collection::Collection for #ident<'_> {
                         const NSID: &'static str = #nsid;
+                        type Record = #record_marker_ident;
                     }
                 };
 
                 Ok(quote! {
                     #struct_def
                     #(#unions)*
+                    #output_wrapper
+                    #record_marker
                     #collection_impl
+                    #from_impl
                 })
             }
         }
@@ -127,8 +196,12 @@ impl<'c> CodeGenerator<'c> {
             match field_type {
                 LexObjectProperty::Union(union) => {
                     // Skip empty, single-variant unions unless they're self-referential
-                    if !union.refs.is_empty() && (union.refs.len() > 1 || self.is_self_referential_union(nsid, &type_name, union)) {
-                        let union_name = self.generate_field_type_name(nsid, &type_name, field_name, "");
+                    if !union.refs.is_empty()
+                        && (union.refs.len() > 1
+                            || self.is_self_referential_union(nsid, &type_name, union))
+                    {
+                        let union_name =
+                            self.generate_field_type_name(nsid, &type_name, field_name, "");
                         let refs: Vec<_> = union.refs.iter().cloned().collect();
                         let union_def =
                             self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
@@ -136,7 +209,8 @@ impl<'c> CodeGenerator<'c> {
                     }
                 }
                 LexObjectProperty::Object(nested_obj) => {
-                    let object_name = self.generate_field_type_name(nsid, &type_name, field_name, "");
+                    let object_name =
+                        self.generate_field_type_name(nsid, &type_name, field_name, "");
                     let obj_def = self.generate_object(nsid, &object_name, nested_obj)?;
                     unions.push(obj_def);
                 }
@@ -144,9 +218,11 @@ impl<'c> CodeGenerator<'c> {
                     if let LexArrayItem::Union(union) = &array.items {
                         // Skip single-variant array unions
                         if union.refs.len() > 1 {
-                            let union_name = self.generate_field_type_name(nsid, &type_name, field_name, "Item");
+                            let union_name =
+                                self.generate_field_type_name(nsid, &type_name, field_name, "Item");
                             let refs: Vec<_> = union.refs.iter().cloned().collect();
-                            let union_def = self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
+                            let union_def =
+                                self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
                             unions.push(union_def);
                         }
                     }
@@ -296,11 +372,12 @@ impl<'c> CodeGenerator<'c> {
             };
 
             // Parse ref to get NSID and def name
-            let (ref_nsid_str, ref_def) = if let Some((nsid, fragment)) = normalized_ref.split_once('#') {
-                (nsid, fragment)
-            } else {
-                (normalized_ref.as_str(), "main")
-            };
+            let (ref_nsid_str, ref_def) =
+                if let Some((nsid, fragment)) = normalized_ref.split_once('#') {
+                    (nsid, fragment)
+                } else {
+                    (normalized_ref.as_str(), "main")
+                };
 
             // Skip unknown refs - they'll be handled by Unknown variant
             if !self.corpus.ref_exists(&normalized_ref) {
@@ -329,7 +406,11 @@ impl<'c> CodeGenerator<'c> {
                 // For other fragments, include the last NSID segment to avoid collisions
                 // e.g. app.bsky.embed.images#view -> ImagesView
                 //      app.bsky.embed.video#view -> VideoView
-                format!("{}{}", last_segment.to_pascal_case(), ref_def.to_pascal_case())
+                format!(
+                    "{}{}",
+                    last_segment.to_pascal_case(),
+                    ref_def.to_pascal_case()
+                )
             };
 
             variant_infos.push(VariantInfo {

@@ -27,6 +27,44 @@ pub struct Fungus<'a> {
     pub species: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FungusGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Fungus<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct FungusRecord;
+impl jacquard_common::xrpc::XrpcResp for FungusRecord {
+    const NSID: &'static str = "org.robocracy.demo.fungus";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = FungusGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Fungus<'_> {
     const NSID: &'static str = "org.robocracy.demo.fungus";
+    type Record = FungusRecord;
+}
+
+impl From<FungusGetRecordOutput<'_>> for Fungus<'static> {
+    fn from(output: FungusGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

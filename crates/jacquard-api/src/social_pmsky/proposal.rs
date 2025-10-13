@@ -55,6 +55,44 @@ pub struct Proposal<'a> {
     pub ver: std::option::Option<i64>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ProposalGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Proposal<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct ProposalRecord;
+impl jacquard_common::xrpc::XrpcResp for ProposalRecord {
+    const NSID: &'static str = "social.pmsky.proposal";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ProposalGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Proposal<'_> {
     const NSID: &'static str = "social.pmsky.proposal";
+    type Record = ProposalRecord;
+}
+
+impl From<ProposalGetRecordOutput<'_>> for Proposal<'static> {
+    fn from(output: ProposalGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

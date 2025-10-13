@@ -27,6 +27,44 @@ pub struct Record<'a> {
     pub public: std::option::Option<bool>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Record<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct RecordRecord;
+impl jacquard_common::xrpc::XrpcResp for RecordRecord {
+    const NSID: &'static str = "app.blebbit.authr.folder.record";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RecordGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Record<'_> {
     const NSID: &'static str = "app.blebbit.authr.folder.record";
+    type Record = RecordRecord;
+}
+
+impl From<RecordGetRecordOutput<'_>> for Record<'static> {
+    fn from(output: RecordGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

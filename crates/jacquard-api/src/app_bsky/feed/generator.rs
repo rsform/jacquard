@@ -8,13 +8,7 @@
 ///Record declaring of the existence of a feed generator, and containing metadata about it. The record can exist in any repository.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Generator<'a> {
@@ -33,9 +27,7 @@ pub struct Generator<'a> {
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
-        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
-    >,
+    pub description_facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
@@ -46,6 +38,38 @@ pub struct Generator<'a> {
     pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+)]
+#[serde(rename_all = "camelCase")]
+pub struct GeneratorGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Generator<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct GeneratorRecord;
+impl jacquard_common::xrpc::XrpcResp for GeneratorRecord {
+    const NSID: &'static str = "app.bsky.feed.generator";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = GeneratorGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Generator<'_> {
     const NSID: &'static str = "app.bsky.feed.generator";
+    type Record = GeneratorRecord;
+}
+
+impl From<GeneratorGetRecordOutput<'_>> for Generator<'static> {
+    fn from(output: GeneratorGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

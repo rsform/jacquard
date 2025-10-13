@@ -26,6 +26,44 @@ pub struct Announcement<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AnnouncementGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Announcement<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct AnnouncementRecord;
+impl jacquard_common::xrpc::XrpcResp for AnnouncementRecord {
+    const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.announcement";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = AnnouncementGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Announcement<'_> {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.announcement";
+    type Record = AnnouncementRecord;
+}
+
+impl From<AnnouncementGetRecordOutput<'_>> for Announcement<'static> {
+    fn from(output: AnnouncementGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

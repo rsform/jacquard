@@ -25,6 +25,44 @@ pub struct Collaborator<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CollaboratorGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Collaborator<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct CollaboratorRecord;
+impl jacquard_common::xrpc::XrpcResp for CollaboratorRecord {
+    const NSID: &'static str = "sh.tangled.repo.collaborator";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CollaboratorGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Collaborator<'_> {
     const NSID: &'static str = "sh.tangled.repo.collaborator";
+    type Record = CollaboratorRecord;
+}
+
+impl From<CollaboratorGetRecordOutput<'_>> for Collaborator<'static> {
+    fn from(output: CollaboratorGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

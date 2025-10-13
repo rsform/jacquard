@@ -12,7 +12,7 @@ exclude.workspace = true
 license.workspace = true
 
 [features]
-default = ["api_full", "dns", "fancy", "loopback"]
+default = ["api_full", "dns", "loopback"]
 derive = ["dep:jacquard-derive"]
 api = ["jacquard-api/com_atproto", "jacquard-api/com_bad_example" ]
 api_bluesky = ["api", "jacquard-api/bluesky" ]
@@ -27,10 +27,53 @@ loopback = ["jacquard-oauth/loopback", "jacquard-oauth/browser-open"]
 name = "jacquard"
 path = "src/lib.rs"
 
-[[bin]]
-name = "jacquard"
-path = "src/main.rs"
+[[example]]
+name = "oauth_timeline"
+path = "../../examples/oauth_timeline.rs"
+required-features = ["fancy", "loopback", "api_bluesky"]
 
+[[example]]
+name = "create_post"
+path = "../../examples/create_post.rs"
+required-features = ["fancy", "loopback", "api_bluesky"]
+
+[[example]]
+name = "post_with_image"
+path = "../../examples/post_with_image.rs"
+required-features = ["fancy", "loopback", "api_bluesky"]
+
+[[example]]
+name = "update_profile"
+path = "../../examples/update_profile.rs"
+required-features = ["fancy", "loopback", "api_bluesky"]
+
+[[example]]
+name = "public_atproto_feed"
+path = "../../examples/public_atproto_feed.rs"
+
+[[example]]
+name = "create_whitewind_post"
+path = "../../examples/create_whitewind_post.rs"
+required-features = ["fancy", "loopback", "api_full"]
+
+[[example]]
+name = "read_whitewind_posts"
+path = "../../examples/read_whitewind_posts.rs"
+required-features = ["fancy", "api_full"]
+
+[[example]]
+name = "read_tangled_repo"
+path = "../../examples/read_tangled_repo.rs"
+required-features = ["api_full"]
+
+[[example]]
+name = "resolve_did"
+path = "../../examples/resolve_did.rs"
+
+[[example]]
+name = "update_preferences"
+path = "../../examples/update_preferences.rs"
+required-features = ["fancy", "loopback", "api_full"]
 
 [dependencies]
 jacquard-api = { version = "0.4", path = "../jacquard-api" }

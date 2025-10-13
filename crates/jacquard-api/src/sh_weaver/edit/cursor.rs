@@ -95,8 +95,46 @@ pub struct Cursor<'a> {
     pub side: std::option::Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CursorGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Cursor<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct CursorRecord;
+impl jacquard_common::xrpc::XrpcResp for CursorRecord {
+    const NSID: &'static str = "sh.weaver.edit.cursor";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CursorGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Cursor<'_> {
     const NSID: &'static str = "sh.weaver.edit.cursor";
+    type Record = CursorRecord;
+}
+
+impl From<CursorGetRecordOutput<'_>> for Cursor<'static> {
+    fn from(output: CursorGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }
 
 #[jacquard_derive::lexicon]

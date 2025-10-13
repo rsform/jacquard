@@ -21,6 +21,44 @@ pub struct Steps<'a> {
     pub steps: i64,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct StepsGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Steps<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct StepsRecord;
+impl jacquard_common::xrpc::XrpcResp for StepsRecord {
+    const NSID: &'static str = "dev.baileytownsend.health.steps";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = StepsGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Steps<'_> {
     const NSID: &'static str = "dev.baileytownsend.health.steps";
+    type Record = StepsRecord;
+}
+
+impl From<StepsGetRecordOutput<'_>> for Steps<'static> {
+    fn from(output: StepsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

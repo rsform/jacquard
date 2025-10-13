@@ -22,6 +22,44 @@ pub struct Follow<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct FollowGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Follow<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct FollowRecord;
+impl jacquard_common::xrpc::XrpcResp for FollowRecord {
+    const NSID: &'static str = "sh.tangled.graph.follow";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = FollowGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Follow<'_> {
     const NSID: &'static str = "sh.tangled.graph.follow";
+    type Record = FollowRecord;
+}
+
+impl From<FollowGetRecordOutput<'_>> for Follow<'static> {
+    fn from(output: FollowGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

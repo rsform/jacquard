@@ -15,17 +15,29 @@ use url::Url;
 /// pattern as lexicon structs.
 ///
 /// Example
-/// ```ignore
+/// ```
 /// use jacquard_common::types::did_doc::DidDocument;
-/// use serde_json::json;
-/// let doc: DidDocument<'_> = serde_json::from_value(json!({
+///
+/// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+/// let json = r##"{
 ///   "id": "did:plc:alice",
 ///   "alsoKnownAs": ["at://alice.example"],
-///   "service": [{"id":"#pds","type":"AtprotoPersonalDataServer","serviceEndpoint":"https://pds.example"}],
-///   "verificationMethod":[{"id":"#k","type":"Multikey","publicKeyMultibase":"z6Mki..."}]
-/// })).unwrap();
+///   "service": [{
+///     "id": "#pds",
+///     "type": "AtprotoPersonalDataServer",
+///     "serviceEndpoint": "https://pds.example"
+///   }],
+///   "verificationMethod": [{
+///     "id": "#k",
+///     "type": "Multikey",
+///     "publicKeyMultibase": "z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"
+///   }]
+/// }"##;
+/// let doc: DidDocument<'_> = serde_json::from_str(json)?;
 /// assert_eq!(doc.id.as_str(), "did:plc:alice");
 /// assert!(doc.pds_endpoint().is_some());
+/// # Ok(())
+/// # }
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Builder)]
 #[builder(start_fn = new)]

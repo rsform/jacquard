@@ -29,6 +29,44 @@ pub struct Board<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BoardGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Board<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct BoardRecord;
+impl jacquard_common::xrpc::XrpcResp for BoardRecord {
+    const NSID: &'static str = "dev.ocbwoy3.blueboard.board";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = BoardGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Board<'_> {
     const NSID: &'static str = "dev.ocbwoy3.blueboard.board";
+    type Record = BoardRecord;
+}
+
+impl From<BoardGetRecordOutput<'_>> for Board<'static> {
+    fn from(output: BoardGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

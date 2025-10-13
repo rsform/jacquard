@@ -81,8 +81,46 @@ pub struct Collection<'a> {
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CollectionGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Collection<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct CollectionRecord;
+impl jacquard_common::xrpc::XrpcResp for CollectionRecord {
+    const NSID: &'static str = "net.anisota.beta.game.collection";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = CollectionGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Collection<'_> {
     const NSID: &'static str = "net.anisota.beta.game.collection";
+    type Record = CollectionRecord;
+}
+
+impl From<CollectionGetRecordOutput<'_>> for Collection<'static> {
+    fn from(output: CollectionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }
 
 ///Additional details about how the specimen was acquired

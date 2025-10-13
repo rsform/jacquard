@@ -100,8 +100,46 @@ pub enum ThreadgateAllowItem<'a> {
     ListRule(Box<crate::app_bsky::feed::threadgate::ListRule<'a>>),
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ThreadgateGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Threadgate<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct ThreadgateRecord;
+impl jacquard_common::xrpc::XrpcResp for ThreadgateRecord {
+    const NSID: &'static str = "app.bsky.feed.threadgate";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ThreadgateGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Threadgate<'_> {
     const NSID: &'static str = "app.bsky.feed.threadgate";
+    type Record = ThreadgateRecord;
+}
+
+impl From<ThreadgateGetRecordOutput<'_>> for Threadgate<'static> {
+    fn from(output: ThreadgateGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }
 
 ///Allow replies from actors mentioned in your post.

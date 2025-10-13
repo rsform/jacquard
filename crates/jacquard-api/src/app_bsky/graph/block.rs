@@ -24,6 +24,44 @@ pub struct Block<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BlockGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Block<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct BlockRecord;
+impl jacquard_common::xrpc::XrpcResp for BlockRecord {
+    const NSID: &'static str = "app.bsky.graph.block";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = BlockGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Block<'_> {
     const NSID: &'static str = "app.bsky.graph.block";
+    type Record = BlockRecord;
+}
+
+impl From<BlockGetRecordOutput<'_>> for Block<'static> {
+    fn from(output: BlockGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

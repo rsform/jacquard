@@ -144,8 +144,46 @@ pub struct Session<'a> {
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SessionGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Session<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct SessionRecord;
+impl jacquard_common::xrpc::XrpcResp for SessionRecord {
+    const NSID: &'static str = "net.anisota.beta.game.session";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SessionGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Session<'_> {
     const NSID: &'static str = "net.anisota.beta.game.session";
+    type Record = SessionRecord;
+}
+
+impl From<SessionGetRecordOutput<'_>> for Session<'static> {
+    fn from(output: SessionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }
 
 ///Additional session metadata

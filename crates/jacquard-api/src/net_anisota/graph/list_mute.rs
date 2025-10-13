@@ -71,6 +71,44 @@ pub struct ListMute<'a> {
     >,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ListMuteGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: ListMute<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct ListMuteRecord;
+impl jacquard_common::xrpc::XrpcResp for ListMuteRecord {
+    const NSID: &'static str = "net.anisota.graph.listMute";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = ListMuteGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for ListMute<'_> {
     const NSID: &'static str = "net.anisota.graph.listMute";
+    type Record = ListMuteRecord;
+}
+
+impl From<ListMuteGetRecordOutput<'_>> for ListMute<'static> {
+    fn from(output: ListMuteGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

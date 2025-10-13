@@ -29,8 +29,46 @@ pub struct Rel<'a> {
     pub rating: std::option::Option<crate::my_skylights::rel::Rating<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RelGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Rel<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct RelRecord;
+impl jacquard_common::xrpc::XrpcResp for RelRecord {
+    const NSID: &'static str = "my.skylights.rel";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = RelGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Rel<'_> {
     const NSID: &'static str = "my.skylights.rel";
+    type Record = RelRecord;
+}
+
+impl From<RelGetRecordOutput<'_>> for Rel<'static> {
+    fn from(output: RelGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }
 
 #[jacquard_derive::lexicon]

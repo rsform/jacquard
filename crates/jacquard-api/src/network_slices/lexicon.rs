@@ -40,6 +40,44 @@ pub struct Lexicon<'a> {
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LexiconGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Lexicon<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct LexiconRecord;
+impl jacquard_common::xrpc::XrpcResp for LexiconRecord {
+    const NSID: &'static str = "network.slices.lexicon";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LexiconGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Lexicon<'_> {
     const NSID: &'static str = "network.slices.lexicon";
+    type Record = LexiconRecord;
+}
+
+impl From<LexiconGetRecordOutput<'_>> for Lexicon<'static> {
+    fn from(output: LexiconGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

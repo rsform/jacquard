@@ -1,12 +1,15 @@
 use core::fmt;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
+use crate::IntoStatic;
+use crate::types::value::Data;
 use crate::types::{
     aturi::RepoPath,
     nsid::Nsid,
     recordkey::{RecordKey, RecordKeyType, Rkey},
 };
+use crate::xrpc::XrpcResp;
 
 /// Trait for a collection of records that can be stored in a repository.
 ///
@@ -16,6 +19,10 @@ use crate::types::{
 pub trait Collection: fmt::Debug + Serialize {
     /// The NSID for the Lexicon that defines the schema of records in this collection.
     const NSID: &'static str;
+
+    /// A marker type implementing [`XrpcResp`] that allows typed deserialization of records
+    /// from this collection. Used by [`Agent::get_record`] to return properly typed responses.
+    type Record: XrpcResp;
 
     /// Returns the [`Nsid`] for the Lexicon that defines the schema of records in this
     /// collection.
@@ -46,6 +53,36 @@ pub trait Collection: fmt::Debug + Serialize {
         RepoPath {
             collection: Self::nsid(),
             rkey: Some(RecordKey::from(Rkey::raw(rkey.as_ref()))),
+        }
+    }
+}
+
+/// Generic error type for record retrieval operations.
+///
+/// Used by generated collection marker types as their error type.
+#[derive(
+    Debug, Clone, PartialEq, Eq, Serialize, Deserialize, thiserror::Error, miette::Diagnostic,
+)]
+#[serde(tag = "error", content = "message")]
+pub enum RecordError<'a> {
+    /// The requested record was not found
+    #[error("RecordNotFound")]
+    #[serde(rename = "RecordNotFound")]
+    RecordNotFound(Option<String>),
+    /// An unknown error occurred
+    #[error("Unknown")]
+    #[serde(rename = "Unknown")]
+    #[serde(borrow)]
+    Unknown(Data<'a>),
+}
+
+impl IntoStatic for RecordError<'_> {
+    type Output = RecordError<'static>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            RecordError::RecordNotFound(msg) => RecordError::RecordNotFound(msg),
+            RecordError::Unknown(data) => RecordError::Unknown(data.into_static()),
         }
     }
 }

@@ -1,15 +1,69 @@
-//! Identity resolution utilities: DID and handle resolution, DID document fetch,
-//! and helpers for PDS endpoint discovery. See `identity::resolver` for details.
-//! Identity resolution: handle → DID and DID → document, with smart fallbacks.
+//! Identity resolution for the AT Protocol
 //!
-//! Fallback order (default):
-//! - Handle → DID: DNS TXT (if `dns` feature) → HTTPS well-known → PDS XRPC
-//!   `resolveHandle` (when `pds_fallback` is configured) → public API fallback → Slingshot `resolveHandle` (if configured).
-//! - DID → Doc: did:web well-known → PLC/Slingshot HTTP → PDS XRPC `resolveDid` (when configured),
-//!   then Slingshot mini‑doc (partial) if configured.
+//! Jacquard's handle-to-DID and DID-to-document resolution with configurable
+//! fallback chains.
 //!
-//! Parsing returns a `DidDocResponse` so callers can borrow from the response buffer
-//! and optionally validate the document `id` against the requested DID.
+//! ## Quick start
+//!
+//! ```no_run
+//! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+//! use jacquard_identity::{PublicResolver, resolver::IdentityResolver};
+//! use jacquard_common::types::string::Handle;
+//!
+//! let resolver = PublicResolver::default();
+//!
+//! // Resolve handle to DID
+//! let did = resolver.resolve_handle(&Handle::new("alice.bsky.social")?).await?;
+//!
+//! // Fetch DID document
+//! let doc_response = resolver.resolve_did_doc(&did).await?;
+//! let doc = doc_response.parse()?;  // Borrow from response buffer
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Resolution fallback order
+//!
+//! **Handle → DID** (configurable via [`resolver::HandleStep`]):
+//! 1. DNS TXT record at `_atproto.{handle}` (if `dns` feature enabled)
+//! 2. HTTPS well-known at `https://{handle}/.well-known/atproto-did`
+//! 3. PDS XRPC `com.atproto.identity.resolveHandle` (if PDS configured)
+//! 4. Public API fallback (`https://public.api.bsky.app`)
+//! 5. Slingshot `resolveHandle` (if configured)
+//!
+//! **DID → Document** (configurable via [`resolver::DidStep`]):
+//! 1. `did:web` HTTPS well-known
+//! 2. PLC directory HTTP (for `did:plc`)
+//! 3. PDS XRPC `com.atproto.identity.resolveDid` (if PDS configured)
+//! 4. Slingshot mini-doc (partial document)
+//!
+//! ## Customization
+//!
+//! ```
+//! use jacquard_identity::JacquardResolver;
+//! use jacquard_identity::resolver::{ResolverOptions, PlcSource};
+//!
+//! let opts = ResolverOptions {
+//!     plc_source: PlcSource::slingshot_default(),
+//!     public_fallback_for_handle: true,
+//!     validate_doc_id: true,
+//!     ..Default::default()
+//! };
+//!
+//! let resolver = JacquardResolver::new(reqwest::Client::new(), opts);
+//! #[cfg(feature = "dns")]
+//! let resolver = resolver.with_system_dns();  // Enable DNS TXT resolution
+//! ```
+//!
+//! ## Response types
+//!
+//! Resolution methods return wrapper types that own the response buffer, allowing
+//! zero-copy parsing:
+//!
+//! - [`resolver::DidDocResponse`] - Full DID document response
+//! - [`MiniDocResponse`] - Slingshot mini-doc response (partial)
+//!
+//! Both support `.parse()` for borrowing and validation.
 
 // use crate::CowStr; // not currently needed directly here
 pub mod resolver;
@@ -387,7 +441,6 @@ impl IdentityResolver for JacquardResolver {
                         }
                         PlcSource::Slingshot { base } => base.join(did.as_str())?,
                     };
-                    println!("Fetching DID document from {}", url);
                     if let Ok((buf, status)) = self.get_json_bytes(url).await {
                         return Ok(DidDocResponse {
                             buffer: buf,

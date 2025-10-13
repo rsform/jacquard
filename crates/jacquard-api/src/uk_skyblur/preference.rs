@@ -22,8 +22,46 @@ pub struct Preference<'a> {
     pub my_page: crate::uk_skyblur::preference::MyPage<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PreferenceGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Preference<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct PreferenceRecord;
+impl jacquard_common::xrpc::XrpcResp for PreferenceRecord {
+    const NSID: &'static str = "uk.skyblur.preference";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PreferenceGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Preference<'_> {
     const NSID: &'static str = "uk.skyblur.preference";
+    type Record = PreferenceRecord;
+}
+
+impl From<PreferenceGetRecordOutput<'_>> for Preference<'static> {
+    fn from(output: PreferenceGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }
 
 #[jacquard_derive::lexicon]

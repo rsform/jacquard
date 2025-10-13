@@ -8,7 +8,7 @@ use jacquard_common::{
     error::{AuthError, ClientError, TransportError, XrpcResult},
     http_client::HttpClient,
     session::SessionStore,
-    types::did::Did,
+    types::{did::Did, string::Handle},
     xrpc::{CallOptions, Response, XrpcClient, XrpcError, XrpcExt, XrpcRequest, XrpcResp},
 };
 use tokio::sync::RwLock;
@@ -449,5 +449,35 @@ fn is_expired<R: XrpcResp>(response: &XrpcResult<Response<R>>) -> bool {
             _ => false,
         },
         _ => false,
+    }
+}
+
+impl<S, T> IdentityResolver for CredentialSession<S, T>
+where
+    S: SessionStore<SessionKey, AtpSession> + Send + Sync + 'static,
+    T: HttpClient + IdentityResolver + Send + Sync + 'static,
+{
+    fn options(&self) -> &jacquard_identity::resolver::ResolverOptions {
+        self.client.options()
+    }
+
+    fn resolve_handle(
+        &self,
+        handle: &Handle<'_>,
+    ) -> impl Future<Output = Result<Did<'static>, jacquard_identity::resolver::IdentityError>>
+    {
+        async { self.client.resolve_handle(handle).await }
+    }
+
+    fn resolve_did_doc(
+        &self,
+        did: &Did<'_>,
+    ) -> impl Future<
+        Output = Result<
+            jacquard_identity::resolver::DidDocResponse,
+            jacquard_identity::resolver::IdentityError,
+        >,
+    > {
+        async { self.client.resolve_did_doc(did).await }
     }
 }

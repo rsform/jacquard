@@ -33,6 +33,44 @@ pub struct Book<'a> {
     pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct BookGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Book<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct BookRecord;
+impl jacquard_common::xrpc::XrpcResp for BookRecord {
+    const NSID: &'static str = "sh.weaver.notebook.book";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = BookGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Book<'_> {
     const NSID: &'static str = "sh.weaver.notebook.book";
+    type Record = BookRecord;
+}
+
+impl From<BookGetRecordOutput<'_>> for Book<'static> {
+    fn from(output: BookGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }

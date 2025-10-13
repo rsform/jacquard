@@ -27,8 +27,46 @@ pub struct Op<'a> {
     pub subject: jacquard_common::types::string::AtUri<'a>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct OpGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Op<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct OpRecord;
+impl jacquard_common::xrpc::XrpcResp for OpRecord {
+    const NSID: &'static str = "sh.tangled.label.op";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = OpGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Op<'_> {
     const NSID: &'static str = "sh.tangled.label.op";
+    type Record = OpRecord;
+}
+
+impl From<OpGetRecordOutput<'_>> for Op<'static> {
+    fn from(output: OpGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }
 
 #[jacquard_derive::lexicon]

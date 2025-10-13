@@ -22,6 +22,44 @@ pub struct Lock<'a> {
     pub lock: std::option::Option<bool>,
 }
 
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct LockGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Lock<'a>,
+}
+
+/// Marker type for deserializing records from this collection.
+pub struct LockRecord;
+impl jacquard_common::xrpc::XrpcResp for LockRecord {
+    const NSID: &'static str = "blue.zio.atfile.lock";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = LockGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
 impl jacquard_common::types::collection::Collection for Lock<'_> {
     const NSID: &'static str = "blue.zio.atfile.lock";
+    type Record = LockRecord;
+}
+
+impl From<LockGetRecordOutput<'_>> for Lock<'static> {
+    fn from(output: LockGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }
