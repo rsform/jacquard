@@ -34,7 +34,7 @@ use jacquard_common::error::TransportError;
 pub use jacquard_common::error::{ClientError, XrpcResult};
 use jacquard_common::http_client::HttpClient;
 pub use jacquard_common::session::{MemorySessionStore, SessionStore, SessionStoreError};
-use jacquard_common::types::blob::{BlobRef, MimeType};
+use jacquard_common::types::blob::{Blob, MimeType};
 use jacquard_common::types::collection::Collection;
 use jacquard_common::types::recordkey::{RecordKey, Rkey};
 use jacquard_common::types::string::AtUri;
@@ -395,13 +395,12 @@ impl<A: AgentSession> Agent<A> {
     ///
     /// The collection is inferred from the type parameter.
     /// The repo is automatically filled from the session info.
-    pub async fn delete_record<R, K>(
+    pub async fn delete_record<R>(
         &self,
-        rkey: K,
+        rkey: RecordKey<Rkey<'_>>,
     ) -> Result<DeleteRecordOutput<'static>, AgentError>
     where
         R: Collection,
-        K: Into<RecordKey<Rkey<'static>>>,
     {
         use jacquard_api::com_atproto::repo::delete_record::DeleteRecord;
         use jacquard_common::types::ident::AtIdentifier;
@@ -411,7 +410,7 @@ impl<A: AgentSession> Agent<A> {
         let request = DeleteRecord::new()
             .repo(AtIdentifier::Did(did))
             .collection(R::nsid())
-            .rkey(rkey.into())
+            .rkey(rkey)
             .build();
 
         let response = self.send(request).await?;
@@ -491,7 +490,7 @@ impl<A: AgentSession> Agent<A> {
         &self,
         data: impl Into<bytes::Bytes>,
         mime_type: MimeType<'_>,
-    ) -> Result<BlobRef<'static>, AgentError> {
+    ) -> Result<Blob<'static>, AgentError> {
         use http::header::CONTENT_TYPE;
         use jacquard_api::com_atproto::repo::upload_blob::UploadBlob;
 
@@ -522,7 +521,7 @@ impl<A: AgentSession> Agent<A> {
                 error: Box::new(typed),
             },
         })?;
-        Ok(BlobRef::Blob(output.blob.into_static()))
+        Ok(output.blob.into_static())
     }
 
     /// Update a vec-based data structure with a fetch-modify-put pattern.

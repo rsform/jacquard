@@ -317,27 +317,7 @@ impl<'a, C: HttpClient> XrpcCall<'a, C> {
             .await
             .map_err(|e| crate::error::TransportError::Other(Box::new(e)))?;
 
-        let status = http_response.status();
-        // If the server returned 401 with a WWW-Authenticate header, expose it so higher layers
-        // (e.g., DPoP handling) can detect `error="invalid_token"` and trigger refresh.
-        if status.as_u16() == 401 {
-            if let Some(hv) = http_response.headers().get(http::header::WWW_AUTHENTICATE) {
-                return Err(crate::error::ClientError::Auth(
-                    crate::error::AuthError::Other(hv.clone()),
-                ));
-            }
-        }
-        let buffer = Bytes::from(http_response.into_body());
-
-        if !status.is_success() && !matches!(status.as_u16(), 400 | 401) {
-            return Err(crate::error::HttpError {
-                status,
-                body: Some(buffer),
-            }
-            .into());
-        }
-
-        Ok(Response::new(buffer, status))
+        process_response(http_response)
     }
 }
 

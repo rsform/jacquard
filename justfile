@@ -39,11 +39,11 @@ example-whitewind-create *ARGS:
 
 # Read a WhiteWind blog post
 example-whitewind-read *ARGS:
-    cargo run -p jacquard --example read_whitewind_posts --features fancy,api_full -- {{ARGS}}
+    cargo run -p jacquard --example read_whitewind_posts --features fancy -- {{ARGS}}
 
 # Read info about a Tangled git repository
 example-tangled-repo *ARGS:
-    cargo run -p jacquard --example read_tangled_repo --features fancy,api_full -- {{ARGS}}
+    cargo run -p jacquard --example read_tangled_repo --features fancy -- {{ARGS}}
 
 # Resolve a handle to its DID document
 example-resolve-did *ARGS:

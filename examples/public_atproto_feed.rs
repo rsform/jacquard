@@ -21,7 +21,7 @@ async fn main() -> miette::Result<()> {
     let response = http.xrpc(base).send(&request).await?;
     let output = response.into_output()?;
 
-    println!("📰 Latest posts from the AT Protocol feed:\n");
+    println!("Latest posts from the AT Protocol feed:\n");
     for (i, item) in output.feed.iter().enumerate() {
         // Deserialize the post record from the Data type
         let post: Post = from_data(&item.post.record).into_diagnostic()?;

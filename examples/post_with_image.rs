@@ -1,4 +1,5 @@
 use clap::Parser;
+use jacquard::CowStr;
 use jacquard::api::app_bsky::embed::images::{Image, Images};
 use jacquard::api::app_bsky::feed::post::{Post, PostEmbed};
 use jacquard::client::{Agent, FileAuthStore};
@@ -8,7 +9,6 @@ use jacquard::oauth::loopback::LoopbackConfig;
 use jacquard::types::blob::MimeType;
 use jacquard::types::string::Datetime;
 use jacquard::xrpc::XrpcClient;
-use jacquard::CowStr;
 use miette::IntoDiagnostic;
 use std::path::PathBuf;
 
@@ -59,14 +59,8 @@ async fn main() -> miette::Result<()> {
     };
     let mime_type = MimeType::new_static(mime_str);
 
-    println!("📤 Uploading image...");
-    let blob_ref = agent.upload_blob(image_data, mime_type).await?;
-
-    // Extract the Blob from the BlobRef
-    let blob = match blob_ref {
-        jacquard::types::blob::BlobRef::Blob(b) => b,
-        _ => miette::bail!("Expected Blob, got LegacyBlob"),
-    };
+    println!("Uploading image...");
+    let blob = agent.upload_blob(image_data, mime_type).await?;
 
     // Create post with image embed
     let post = Post {
@@ -91,7 +85,7 @@ async fn main() -> miette::Result<()> {
     };
 
     let output = agent.create_record(post, None).await?;
-    println!("✓ Created post with image: {}", output.uri);
+    println!("Created post with image: {}", output.uri);
 
     Ok(())
 }

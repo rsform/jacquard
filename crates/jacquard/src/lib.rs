@@ -25,9 +25,7 @@
 //! # use clap::Parser;
 //! # use jacquard::CowStr;
 //! use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
-//! use jacquard::client::credential_session::{CredentialSession, SessionKey};
 //! use jacquard::client::{Agent, FileAuthStore};
-//! use jacquard::oauth::atproto::AtprotoClientMetadata;
 //! use jacquard::oauth::client::OAuthClient;
 //! use jacquard::xrpc::XrpcClient;
 //! # #[cfg(feature = "loopback")]

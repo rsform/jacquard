@@ -24,10 +24,8 @@ use clap::Parser;
 use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
 use jacquard::client::{Agent, FileAuthStore};
-use jacquard::oauth::atproto::AtprotoClientMetadata;
 use jacquard::oauth::client::OAuthClient;
 use jacquard::oauth::loopback::LoopbackConfig;
-use jacquard::oauth::scopes::Scope;
 use jacquard::types::xrpc::XrpcClient;
 use miette::IntoDiagnostic;
 
@@ -46,17 +44,8 @@ struct Args {
 async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
-    // File-backed auth store for testing
-    let store = FileAuthStore::new(&args.store);
-    let client_data = jacquard_oauth::session::ClientData {
-        keyset: None,
-        // Default sets normal localhost redirect URIs and "atproto transition:generic" scopes.
-        // The localhost helper will ensure you have at least "atproto" and will fix urls
-        config: AtprotoClientMetadata::default_localhost()
-    };
-
-    // Build an OAuth client
-    let oauth = OAuthClient::new(store, client_data);
+    // Build an OAuth client with file-backed auth store and default localhost config
+    let oauth = OAuthClient::with_default_config(FileAuthStore::new(&args.store));
     // Authenticate with a PDS, using a loopback server to handle the callback flow
     let session = oauth
         .login_with_local_server(

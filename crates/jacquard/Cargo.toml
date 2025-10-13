@@ -12,40 +12,42 @@ exclude.workspace = true
 license.workspace = true
 
 [features]
-default = ["api_full", "dns", "loopback"]
+default = ["api_full", "dns", "loopback", "derive"]
 derive = ["dep:jacquard-derive"]
+# Minimal API bindings
 api = ["jacquard-api/com_atproto", "jacquard-api/com_bad_example" ]
+# Bluesky API bindings
 api_bluesky = ["api", "jacquard-api/bluesky" ]
+# Bluesky API bindings, plus a curated selection of community lexicons
 api_full = ["api", "jacquard-api/bluesky", "jacquard-api/other", "jacquard-api/lexicon_community"]
+# All captured generated lexicon API bindings
 api_all = ["api_full", "jacquard-api/ufos"]
 dns = ["jacquard-identity/dns"]
+# Pretty debug prints for examples
 fancy = ["miette/fancy"]
 # Propagate loopback to oauth (server + browser helper)
 loopback = ["jacquard-oauth/loopback", "jacquard-oauth/browser-open"]
 
-[lib]
-name = "jacquard"
-path = "src/lib.rs"
 
 [[example]]
 name = "oauth_timeline"
 path = "../../examples/oauth_timeline.rs"
-required-features = ["fancy", "loopback", "api_bluesky"]
+required-features = ["fancy"]
 
 [[example]]
 name = "create_post"
 path = "../../examples/create_post.rs"
-required-features = ["fancy", "loopback", "api_bluesky"]
+required-features = ["fancy"]
 
 [[example]]
 name = "post_with_image"
 path = "../../examples/post_with_image.rs"
-required-features = ["fancy", "loopback", "api_bluesky"]
+required-features = ["fancy"]
 
 [[example]]
 name = "update_profile"
 path = "../../examples/update_profile.rs"
-required-features = ["fancy", "loopback", "api_bluesky"]
+required-features = ["fancy"]
 
 [[example]]
 name = "public_atproto_feed"
@@ -54,26 +56,27 @@ path = "../../examples/public_atproto_feed.rs"
 [[example]]
 name = "create_whitewind_post"
 path = "../../examples/create_whitewind_post.rs"
-required-features = ["fancy", "loopback", "api_full"]
+required-features = ["fancy", ]
 
 [[example]]
-name = "read_whitewind_posts"
-path = "../../examples/read_whitewind_posts.rs"
-required-features = ["fancy", "api_full"]
+name = "read_whitewind_post"
+path = "../../examples/read_whitewind_post.rs"
+required-features = ["fancy"]
 
 [[example]]
 name = "read_tangled_repo"
 path = "../../examples/read_tangled_repo.rs"
-required-features = ["api_full"]
+required-features = ["fancy"]
 
 [[example]]
 name = "resolve_did"
 path = "../../examples/resolve_did.rs"
+required-features = ["fancy"]
 
 [[example]]
 name = "update_preferences"
 path = "../../examples/update_preferences.rs"
-required-features = ["fancy", "loopback", "api_full"]
+required-features = ["fancy"]
 
 [dependencies]
 jacquard-api = { version = "0.4", path = "../jacquard-api" }

@@ -13,7 +13,7 @@
     PartialEq,
     Eq,
     bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -33,13 +33,7 @@ pub struct GetTimeline<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetTimelineOutput<'a> {
