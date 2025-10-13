@@ -60,7 +60,7 @@ impl jacquard_common::types::collection::Collection for Group<'_> {
     type Record = GroupRecord;
 }
 
-impl From<GroupGetRecordOutput<'_>> for Group<'static> {
+impl From<GroupGetRecordOutput<'_>> for Group<'_> {
     fn from(output: GroupGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

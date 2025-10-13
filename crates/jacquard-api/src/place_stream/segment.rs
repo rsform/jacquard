@@ -111,7 +111,7 @@ impl jacquard_common::types::collection::Collection for Segment<'_> {
     type Record = SegmentRecord;
 }
 
-impl From<SegmentGetRecordOutput<'_>> for Segment<'static> {
+impl From<SegmentGetRecordOutput<'_>> for Segment<'_> {
     fn from(output: SegmentGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

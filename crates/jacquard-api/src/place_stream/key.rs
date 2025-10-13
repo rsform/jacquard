@@ -64,7 +64,7 @@ impl jacquard_common::types::collection::Collection for Key<'_> {
     type Record = KeyRecord;
 }
 
-impl From<KeyGetRecordOutput<'_>> for Key<'static> {
+impl From<KeyGetRecordOutput<'_>> for Key<'_> {
     fn from(output: KeyGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

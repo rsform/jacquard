@@ -67,7 +67,7 @@ impl jacquard_common::types::collection::Collection for Message<'_> {
     type Record = MessageRecord;
 }
 
-impl From<MessageGetRecordOutput<'_>> for Message<'static> {
+impl From<MessageGetRecordOutput<'_>> for Message<'_> {
     fn from(output: MessageGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

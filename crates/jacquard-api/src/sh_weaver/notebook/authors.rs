@@ -98,7 +98,7 @@ impl jacquard_common::types::collection::Collection for Authors<'_> {
     type Record = AuthorsRecord;
 }
 
-impl From<AuthorsGetRecordOutput<'_>> for Authors<'static> {
+impl From<AuthorsGetRecordOutput<'_>> for Authors<'_> {
     fn from(output: AuthorsGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

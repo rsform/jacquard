@@ -137,7 +137,7 @@ impl<'c> CodeGenerator<'c> {
 
                 };
                 let from_impl = quote! {
-                    impl From<#output_type_ident<'_>> for #ident<'static> {
+                    impl From<#output_type_ident<'_>> for #ident<'_> {
                         fn from(output: #output_type_ident<'_>) -> Self {
                             use jacquard_common::IntoStatic;
                             output.value.into_static()

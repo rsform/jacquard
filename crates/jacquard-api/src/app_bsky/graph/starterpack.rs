@@ -91,7 +91,7 @@ impl jacquard_common::types::collection::Collection for Starterpack<'_> {
     type Record = StarterpackRecord;
 }
 
-impl From<StarterpackGetRecordOutput<'_>> for Starterpack<'static> {
+impl From<StarterpackGetRecordOutput<'_>> for Starterpack<'_> {
     fn from(output: StarterpackGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

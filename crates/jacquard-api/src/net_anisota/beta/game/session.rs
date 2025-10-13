@@ -179,7 +179,7 @@ impl jacquard_common::types::collection::Collection for Session<'_> {
     type Record = SessionRecord;
 }
 
-impl From<SessionGetRecordOutput<'_>> for Session<'static> {
+impl From<SessionGetRecordOutput<'_>> for Session<'_> {
     fn from(output: SessionGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

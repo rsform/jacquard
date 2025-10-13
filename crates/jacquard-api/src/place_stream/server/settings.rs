@@ -58,7 +58,7 @@ impl jacquard_common::types::collection::Collection for Settings<'_> {
     type Record = SettingsRecord;
 }
 
-impl From<SettingsGetRecordOutput<'_>> for Settings<'static> {
+impl From<SettingsGetRecordOutput<'_>> for Settings<'_> {
     fn from(output: SettingsGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

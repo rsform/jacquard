@@ -57,7 +57,7 @@ impl jacquard_common::types::collection::Collection for Follow<'_> {
     type Record = FollowRecord;
 }
 
-impl From<FollowGetRecordOutput<'_>> for Follow<'static> {
+impl From<FollowGetRecordOutput<'_>> for Follow<'_> {
     fn from(output: FollowGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

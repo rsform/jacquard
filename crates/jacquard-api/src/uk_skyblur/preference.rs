@@ -57,7 +57,7 @@ impl jacquard_common::types::collection::Collection for Preference<'_> {
     type Record = PreferenceRecord;
 }
 
-impl From<PreferenceGetRecordOutput<'_>> for Preference<'static> {
+impl From<PreferenceGetRecordOutput<'_>> for Preference<'_> {
     fn from(output: PreferenceGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

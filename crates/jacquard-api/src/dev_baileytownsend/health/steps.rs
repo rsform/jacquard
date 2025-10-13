@@ -56,7 +56,7 @@ impl jacquard_common::types::collection::Collection for Steps<'_> {
     type Record = StepsRecord;
 }
 
-impl From<StepsGetRecordOutput<'_>> for Steps<'static> {
+impl From<StepsGetRecordOutput<'_>> for Steps<'_> {
     fn from(output: StepsGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

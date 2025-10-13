@@ -58,7 +58,7 @@ impl jacquard_common::types::collection::Collection for Gate<'_> {
     type Record = GateRecord;
 }
 
-impl From<GateGetRecordOutput<'_>> for Gate<'static> {
+impl From<GateGetRecordOutput<'_>> for Gate<'_> {
     fn from(output: GateGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

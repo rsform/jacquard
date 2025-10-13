@@ -57,7 +57,7 @@ impl jacquard_common::types::collection::Collection for Declaration<'_> {
     type Record = DeclarationRecord;
 }
 
-impl From<DeclarationGetRecordOutput<'_>> for Declaration<'static> {
+impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
     fn from(output: DeclarationGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

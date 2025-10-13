@@ -65,7 +65,7 @@ impl jacquard_common::types::collection::Collection for Theme<'_> {
     type Record = ThemeRecord;
 }
 
-impl From<ThemeGetRecordOutput<'_>> for Theme<'static> {
+impl From<ThemeGetRecordOutput<'_>> for Theme<'_> {
     fn from(output: ThemeGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

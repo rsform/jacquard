@@ -67,7 +67,7 @@ impl jacquard_common::types::collection::Collection for Artifact<'_> {
     type Record = ArtifactRecord;
 }
 
-impl From<ArtifactGetRecordOutput<'_>> for Artifact<'static> {
+impl From<ArtifactGetRecordOutput<'_>> for Artifact<'_> {
     fn from(output: ArtifactGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

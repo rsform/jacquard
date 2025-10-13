@@ -106,7 +106,7 @@ impl jacquard_common::types::collection::Collection for ListMute<'_> {
     type Record = ListMuteRecord;
 }
 
-impl From<ListMuteGetRecordOutput<'_>> for ListMute<'static> {
+impl From<ListMuteGetRecordOutput<'_>> for ListMute<'_> {
     fn from(output: ListMuteGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

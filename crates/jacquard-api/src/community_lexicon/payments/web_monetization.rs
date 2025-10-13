@@ -62,7 +62,7 @@ impl jacquard_common::types::collection::Collection for WebMonetization<'_> {
     type Record = WebMonetizationRecord;
 }
 
-impl From<WebMonetizationGetRecordOutput<'_>> for WebMonetization<'static> {
+impl From<WebMonetizationGetRecordOutput<'_>> for WebMonetization<'_> {
     fn from(output: WebMonetizationGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

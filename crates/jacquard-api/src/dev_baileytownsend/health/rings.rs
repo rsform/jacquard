@@ -68,7 +68,7 @@ impl jacquard_common::types::collection::Collection for Rings<'_> {
     type Record = RingsRecord;
 }
 
-impl From<RingsGetRecordOutput<'_>> for Rings<'static> {
+impl From<RingsGetRecordOutput<'_>> for Rings<'_> {
     fn from(output: RingsGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

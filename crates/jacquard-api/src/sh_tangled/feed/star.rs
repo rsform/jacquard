@@ -57,7 +57,7 @@ impl jacquard_common::types::collection::Collection for Star<'_> {
     type Record = StarRecord;
 }
 
-impl From<StarGetRecordOutput<'_>> for Star<'static> {
+impl From<StarGetRecordOutput<'_>> for Star<'_> {
     fn from(output: StarGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

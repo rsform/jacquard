@@ -71,7 +71,7 @@ impl jacquard_common::types::collection::Collection for Definition<'_> {
     type Record = DefinitionRecord;
 }
 
-impl From<DefinitionGetRecordOutput<'_>> for Definition<'static> {
+impl From<DefinitionGetRecordOutput<'_>> for Definition<'_> {
     fn from(output: DefinitionGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

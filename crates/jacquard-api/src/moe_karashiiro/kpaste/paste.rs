@@ -70,7 +70,7 @@ impl jacquard_common::types::collection::Collection for Paste<'_> {
     type Record = PasteRecord;
 }
 
-impl From<PasteGetRecordOutput<'_>> for Paste<'static> {
+impl From<PasteGetRecordOutput<'_>> for Paste<'_> {
     fn from(output: PasteGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

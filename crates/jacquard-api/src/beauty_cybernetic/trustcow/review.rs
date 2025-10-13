@@ -74,7 +74,7 @@ impl jacquard_common::types::collection::Collection for Review<'_> {
     type Record = ReviewRecord;
 }
 
-impl From<ReviewGetRecordOutput<'_>> for Review<'static> {
+impl From<ReviewGetRecordOutput<'_>> for Review<'_> {
     fn from(output: ReviewGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

@@ -62,7 +62,7 @@ impl jacquard_common::types::collection::Collection for Tag<'_> {
     type Record = TagRecord;
 }
 
-impl From<TagGetRecordOutput<'_>> for Tag<'static> {
+impl From<TagGetRecordOutput<'_>> for Tag<'_> {
     fn from(output: TagGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

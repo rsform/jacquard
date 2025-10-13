@@ -77,7 +77,7 @@ impl jacquard_common::types::collection::Collection for Pipeline<'_> {
     type Record = PipelineRecord;
 }
 
-impl From<PipelineGetRecordOutput<'_>> for Pipeline<'static> {
+impl From<PipelineGetRecordOutput<'_>> for Pipeline<'_> {
     fn from(output: PipelineGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

@@ -58,7 +58,7 @@ impl jacquard_common::types::collection::Collection for Blob<'_> {
     type Record = BlobRecord;
 }
 
-impl From<BlobGetRecordOutput<'_>> for Blob<'static> {
+impl From<BlobGetRecordOutput<'_>> for Blob<'_> {
     fn from(output: BlobGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

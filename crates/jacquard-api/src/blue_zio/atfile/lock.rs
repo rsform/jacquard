@@ -57,7 +57,7 @@ impl jacquard_common::types::collection::Collection for Lock<'_> {
     type Record = LockRecord;
 }
 
-impl From<LockGetRecordOutput<'_>> for Lock<'static> {
+impl From<LockGetRecordOutput<'_>> for Lock<'_> {
     fn from(output: LockGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

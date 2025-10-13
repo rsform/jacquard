@@ -57,7 +57,7 @@ impl jacquard_common::types::collection::Collection for Spindle<'_> {
     type Record = SpindleRecord;
 }
 
-impl From<SpindleGetRecordOutput<'_>> for Spindle<'static> {
+impl From<SpindleGetRecordOutput<'_>> for Spindle<'_> {
     fn from(output: SpindleGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

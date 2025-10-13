@@ -63,7 +63,7 @@ impl jacquard_common::types::collection::Collection for Root<'_> {
     type Record = RootRecord;
 }
 
-impl From<RootGetRecordOutput<'_>> for Root<'static> {
+impl From<RootGetRecordOutput<'_>> for Root<'_> {
     fn from(output: RootGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

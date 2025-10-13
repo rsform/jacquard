@@ -60,7 +60,7 @@ impl jacquard_common::types::collection::Collection for Collaborator<'_> {
     type Record = CollaboratorRecord;
 }
 
-impl From<CollaboratorGetRecordOutput<'_>> for Collaborator<'static> {
+impl From<CollaboratorGetRecordOutput<'_>> for Collaborator<'_> {
     fn from(output: CollaboratorGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

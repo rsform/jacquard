@@ -147,7 +147,7 @@ impl jacquard_common::types::collection::Collection for RefUpdate<'_> {
     type Record = RefUpdateRecord;
 }
 
-impl From<RefUpdateGetRecordOutput<'_>> for RefUpdate<'static> {
+impl From<RefUpdateGetRecordOutput<'_>> for RefUpdate<'_> {
     fn from(output: RefUpdateGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

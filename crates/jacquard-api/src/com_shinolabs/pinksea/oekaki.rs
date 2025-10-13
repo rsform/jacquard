@@ -110,7 +110,7 @@ impl jacquard_common::types::collection::Collection for Oekaki<'_> {
     type Record = OekakiRecord;
 }
 
-impl From<OekakiGetRecordOutput<'_>> for Oekaki<'static> {
+impl From<OekakiGetRecordOutput<'_>> for Oekaki<'_> {
     fn from(output: OekakiGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

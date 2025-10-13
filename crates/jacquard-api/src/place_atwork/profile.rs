@@ -123,7 +123,7 @@ impl jacquard_common::types::collection::Collection for Profile<'_> {
     type Record = ProfileRecord;
 }
 
-impl From<ProfileGetRecordOutput<'_>> for Profile<'static> {
+impl From<ProfileGetRecordOutput<'_>> for Profile<'_> {
     fn from(output: ProfileGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

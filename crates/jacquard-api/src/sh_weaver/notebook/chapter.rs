@@ -69,7 +69,7 @@ impl jacquard_common::types::collection::Collection for Chapter<'_> {
     type Record = ChapterRecord;
 }
 
-impl From<ChapterGetRecordOutput<'_>> for Chapter<'static> {
+impl From<ChapterGetRecordOutput<'_>> for Chapter<'_> {
     fn from(output: ChapterGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

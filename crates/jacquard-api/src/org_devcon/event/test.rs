@@ -75,7 +75,7 @@ impl jacquard_common::types::collection::Collection for Test<'_> {
     type Record = TestRecord;
 }
 
-impl From<TestGetRecordOutput<'_>> for Test<'static> {
+impl From<TestGetRecordOutput<'_>> for Test<'_> {
     fn from(output: TestGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

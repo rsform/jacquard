@@ -108,7 +108,7 @@ impl jacquard_common::types::collection::Collection for Livestream<'_> {
     type Record = LivestreamRecord;
 }
 
-impl From<LivestreamGetRecordOutput<'_>> for Livestream<'static> {
+impl From<LivestreamGetRecordOutput<'_>> for Livestream<'_> {
     fn from(output: LivestreamGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

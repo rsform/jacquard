@@ -63,7 +63,7 @@ impl jacquard_common::types::collection::Collection for Identity<'_> {
     type Record = IdentityRecord;
 }
 
-impl From<IdentityGetRecordOutput<'_>> for Identity<'static> {
+impl From<IdentityGetRecordOutput<'_>> for Identity<'_> {
     fn from(output: IdentityGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

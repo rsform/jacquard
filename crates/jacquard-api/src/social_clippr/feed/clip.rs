@@ -84,7 +84,7 @@ impl jacquard_common::types::collection::Collection for Clip<'_> {
     type Record = ClipRecord;
 }
 
-impl From<ClipGetRecordOutput<'_>> for Clip<'static> {
+impl From<ClipGetRecordOutput<'_>> for Clip<'_> {
     fn from(output: ClipGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

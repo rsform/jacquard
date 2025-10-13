@@ -90,7 +90,7 @@ impl jacquard_common::types::collection::Collection for Proposal<'_> {
     type Record = ProposalRecord;
 }
 
-impl From<ProposalGetRecordOutput<'_>> for Proposal<'static> {
+impl From<ProposalGetRecordOutput<'_>> for Proposal<'_> {
     fn from(output: ProposalGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

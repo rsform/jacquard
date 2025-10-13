@@ -75,7 +75,7 @@ impl jacquard_common::types::collection::Collection for Lexicon<'_> {
     type Record = LexiconRecord;
 }
 
-impl From<LexiconGetRecordOutput<'_>> for Lexicon<'static> {
+impl From<LexiconGetRecordOutput<'_>> for Lexicon<'_> {
     fn from(output: LexiconGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

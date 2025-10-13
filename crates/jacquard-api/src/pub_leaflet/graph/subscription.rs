@@ -57,7 +57,7 @@ impl jacquard_common::types::collection::Collection for Subscription<'_> {
     type Record = SubscriptionRecord;
 }
 
-impl From<SubscriptionGetRecordOutput<'_>> for Subscription<'static> {
+impl From<SubscriptionGetRecordOutput<'_>> for Subscription<'_> {
     fn from(output: SubscriptionGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

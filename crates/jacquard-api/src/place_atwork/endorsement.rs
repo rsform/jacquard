@@ -72,7 +72,7 @@ impl jacquard_common::types::collection::Collection for Endorsement<'_> {
     type Record = EndorsementRecord;
 }
 
-impl From<EndorsementGetRecordOutput<'_>> for Endorsement<'static> {
+impl From<EndorsementGetRecordOutput<'_>> for Endorsement<'_> {
     fn from(output: EndorsementGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

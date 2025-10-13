@@ -104,7 +104,7 @@ impl jacquard_common::types::collection::Collection for Progress<'_> {
     type Record = ProgressRecord;
 }
 
-impl From<ProgressGetRecordOutput<'_>> for Progress<'static> {
+impl From<ProgressGetRecordOutput<'_>> for Progress<'_> {
     fn from(output: ProgressGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

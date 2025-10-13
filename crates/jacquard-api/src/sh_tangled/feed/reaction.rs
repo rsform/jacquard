@@ -59,7 +59,7 @@ impl jacquard_common::types::collection::Collection for Reaction<'_> {
     type Record = ReactionRecord;
 }
 
-impl From<ReactionGetRecordOutput<'_>> for Reaction<'static> {
+impl From<ReactionGetRecordOutput<'_>> for Reaction<'_> {
     fn from(output: ReactionGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

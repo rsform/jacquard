@@ -61,7 +61,7 @@ impl jacquard_common::types::collection::Collection for Diff<'_> {
     type Record = DiffRecord;
 }
 
-impl From<DiffGetRecordOutput<'_>> for Diff<'static> {
+impl From<DiffGetRecordOutput<'_>> for Diff<'_> {
     fn from(output: DiffGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

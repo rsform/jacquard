@@ -169,7 +169,7 @@ impl jacquard_common::types::collection::Collection for Event<'_> {
     type Record = EventRecord;
 }
 
-impl From<EventGetRecordOutput<'_>> for Event<'static> {
+impl From<EventGetRecordOutput<'_>> for Event<'_> {
     fn from(output: EventGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

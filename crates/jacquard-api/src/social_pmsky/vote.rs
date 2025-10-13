@@ -79,7 +79,7 @@ impl jacquard_common::types::collection::Collection for Vote<'_> {
     type Record = VoteRecord;
 }
 
-impl From<VoteGetRecordOutput<'_>> for Vote<'static> {
+impl From<VoteGetRecordOutput<'_>> for Vote<'_> {
     fn from(output: VoteGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

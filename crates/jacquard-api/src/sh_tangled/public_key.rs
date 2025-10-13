@@ -62,7 +62,7 @@ impl jacquard_common::types::collection::Collection for PublicKey<'_> {
     type Record = PublicKeyRecord;
 }
 
-impl From<PublicKeyGetRecordOutput<'_>> for PublicKey<'static> {
+impl From<PublicKeyGetRecordOutput<'_>> for PublicKey<'_> {
     fn from(output: PublicKeyGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

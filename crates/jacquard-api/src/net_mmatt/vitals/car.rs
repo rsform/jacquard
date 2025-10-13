@@ -77,7 +77,7 @@ impl jacquard_common::types::collection::Collection for Car<'_> {
     type Record = CarRecord;
 }
 
-impl From<CarGetRecordOutput<'_>> for Car<'static> {
+impl From<CarGetRecordOutput<'_>> for Car<'_> {
     fn from(output: CarGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

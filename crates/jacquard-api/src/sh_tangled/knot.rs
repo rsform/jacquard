@@ -59,7 +59,7 @@ impl jacquard_common::types::collection::Collection for Knot<'_> {
     type Record = KnotRecord;
 }
 
-impl From<KnotGetRecordOutput<'_>> for Knot<'static> {
+impl From<KnotGetRecordOutput<'_>> for Knot<'_> {
     fn from(output: KnotGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

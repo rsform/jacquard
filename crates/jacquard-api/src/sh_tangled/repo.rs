@@ -104,7 +104,7 @@ impl jacquard_common::types::collection::Collection for Repo<'_> {
     type Record = RepoRecord;
 }
 
-impl From<RepoGetRecordOutput<'_>> for Repo<'static> {
+impl From<RepoGetRecordOutput<'_>> for Repo<'_> {
     fn from(output: RepoGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

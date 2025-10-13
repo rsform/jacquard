@@ -61,7 +61,7 @@ impl jacquard_common::types::collection::Collection for Repost<'_> {
     type Record = RepostRecord;
 }
 
-impl From<RepostGetRecordOutput<'_>> for Repost<'static> {
+impl From<RepostGetRecordOutput<'_>> for Repost<'_> {
     fn from(output: RepostGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

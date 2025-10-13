@@ -89,7 +89,7 @@ impl jacquard_common::types::collection::Collection for Comment<'_> {
     type Record = CommentRecord;
 }
 
-impl From<CommentGetRecordOutput<'_>> for Comment<'static> {
+impl From<CommentGetRecordOutput<'_>> for Comment<'_> {
     fn from(output: CommentGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

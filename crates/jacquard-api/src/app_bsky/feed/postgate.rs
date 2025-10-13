@@ -84,7 +84,7 @@ impl jacquard_common::types::collection::Collection for Postgate<'_> {
     type Record = PostgateRecord;
 }
 
-impl From<PostgateGetRecordOutput<'_>> for Postgate<'static> {
+impl From<PostgateGetRecordOutput<'_>> for Postgate<'_> {
     fn from(output: PostgateGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

@@ -79,7 +79,7 @@ impl jacquard_common::types::collection::Collection for Slice<'_> {
     type Record = SliceRecord;
 }
 
-impl From<SliceGetRecordOutput<'_>> for Slice<'static> {
+impl From<SliceGetRecordOutput<'_>> for Slice<'_> {
     fn from(output: SliceGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

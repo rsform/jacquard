@@ -682,7 +682,7 @@ impl<A: AgentSession + IdentityResolver> Agent<A> {
     ///
     /// This fetches the record using an at:// URI, converts it to owned data, applies
     /// the modification function, and puts it back. The modification function receives
-    /// a mutable reference to the owned record.
+    /// a mutable reference to the record data.
     ///
     /// # Example
     ///
@@ -696,9 +696,9 @@ impl<A: AgentSession + IdentityResolver> Agent<A> {
     /// # let agent: BasicClient = todo!();
     /// let uri = AtUri::new_static("at://did:plc:xyz/app.bsky.actor.profile/self").unwrap();
     /// // Update profile record in-place
-    /// agent.update_record::<Profile>(uri, |output| {
-    ///     output.value.display_name = Some(CowStr::from("New Name"));
-    ///     output.value.description = Some(CowStr::from("Updated bio"));
+    /// agent.update_record::<Profile>(uri, |profile| {
+    ///     profile.display_name = Some(CowStr::from("New Name"));
+    ///     profile.description = Some(CowStr::from("Updated bio"));
     /// }).await?;
     /// # Ok(())
     /// # }
@@ -706,14 +706,11 @@ impl<A: AgentSession + IdentityResolver> Agent<A> {
     pub async fn update_record<R>(
         &self,
         uri: AtUri<'_>,
-        f: impl FnOnce(&mut <<<R as Collection>::Record as XrpcResp>::Output<'_> as IntoStatic>::Output),
+        f: impl FnOnce(&mut R),
     ) -> Result<PutRecordOutput<'static>, AgentError>
     where
         R: Collection + Serialize,
-        R: From<<R as Collection>::Record>,
-        R: for<'a> From<
-            <<<R as Collection>::Record as XrpcResp>::Output<'a> as IntoStatic>::Output,
-        >,
+        R: for<'a> From<<<R as Collection>::Record as XrpcResp>::Output<'a>>,
     {
         // Fetch the record - Response<R::Record> where R::Record::Output<'de> = R<'de>
         let response = self.get_record::<R>(uri.clone()).await?;
@@ -730,7 +727,7 @@ impl<A: AgentSession + IdentityResolver> Agent<A> {
         })?;
 
         // Convert to owned
-        let mut owned = record.into_static();
+        let mut owned = R::from(record);
 
         // Apply modification
         f(&mut owned);
@@ -744,7 +741,7 @@ impl<A: AgentSession + IdentityResolver> Agent<A> {
             })?
             .clone()
             .into_static();
-        self.put_record::<R>(rkey, R::from(owned)).await
+        self.put_record::<R>(rkey, owned).await
     }
 }
 

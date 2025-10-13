@@ -59,7 +59,7 @@ impl jacquard_common::types::collection::Collection for Block<'_> {
     type Record = BlockRecord;
 }
 
-impl From<BlockGetRecordOutput<'_>> for Block<'static> {
+impl From<BlockGetRecordOutput<'_>> for Block<'_> {
     fn from(output: BlockGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

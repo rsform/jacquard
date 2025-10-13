@@ -58,7 +58,7 @@ impl jacquard_common::types::collection::Collection for Calories<'_> {
     type Record = CaloriesRecord;
 }
 
-impl From<CaloriesGetRecordOutput<'_>> for Calories<'static> {
+impl From<CaloriesGetRecordOutput<'_>> for Calories<'_> {
     fn from(output: CaloriesGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

@@ -84,7 +84,7 @@ impl jacquard_common::types::collection::Collection for Board<'_> {
     type Record = BoardRecord;
 }
 
-impl From<BoardGetRecordOutput<'_>> for Board<'static> {
+impl From<BoardGetRecordOutput<'_>> for Board<'_> {
     fn from(output: BoardGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

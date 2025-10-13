@@ -58,7 +58,7 @@ impl jacquard_common::types::collection::Collection for EndorsementProof<'_> {
     type Record = EndorsementProofRecord;
 }
 
-impl From<EndorsementProofGetRecordOutput<'_>> for EndorsementProof<'static> {
+impl From<EndorsementProofGetRecordOutput<'_>> for EndorsementProof<'_> {
     fn from(output: EndorsementProofGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

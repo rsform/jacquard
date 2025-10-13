@@ -66,7 +66,7 @@ impl jacquard_common::types::collection::Collection for Verification<'_> {
     type Record = VerificationRecord;
 }
 
-impl From<VerificationGetRecordOutput<'_>> for Verification<'static> {
+impl From<VerificationGetRecordOutput<'_>> for Verification<'_> {
     fn from(output: VerificationGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

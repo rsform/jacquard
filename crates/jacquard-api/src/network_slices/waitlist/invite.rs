@@ -66,7 +66,7 @@ impl jacquard_common::types::collection::Collection for Invite<'_> {
     type Record = InviteRecord;
 }
 
-impl From<InviteGetRecordOutput<'_>> for Invite<'static> {
+impl From<InviteGetRecordOutput<'_>> for Invite<'_> {
     fn from(output: InviteGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

@@ -95,7 +95,7 @@ impl jacquard_common::types::collection::Collection for Rsvp<'_> {
     type Record = RsvpRecord;
 }
 
-impl From<RsvpGetRecordOutput<'_>> for Rsvp<'static> {
+impl From<RsvpGetRecordOutput<'_>> for Rsvp<'_> {
     fn from(output: RsvpGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

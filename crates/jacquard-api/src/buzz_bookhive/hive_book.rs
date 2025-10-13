@@ -95,7 +95,7 @@ impl jacquard_common::types::collection::Collection for HiveBook<'_> {
     type Record = HiveBookRecord;
 }
 
-impl From<HiveBookGetRecordOutput<'_>> for HiveBook<'static> {
+impl From<HiveBookGetRecordOutput<'_>> for HiveBook<'_> {
     fn from(output: HiveBookGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

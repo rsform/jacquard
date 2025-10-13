@@ -85,7 +85,7 @@ impl jacquard_common::types::collection::Collection for Exif<'_> {
     type Record = ExifRecord;
 }
 
-impl From<ExifGetRecordOutput<'_>> for Exif<'static> {
+impl From<ExifGetRecordOutput<'_>> for Exif<'_> {
     fn from(output: ExifGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

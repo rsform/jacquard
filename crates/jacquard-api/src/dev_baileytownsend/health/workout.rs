@@ -69,7 +69,7 @@ impl jacquard_common::types::collection::Collection for Workout<'_> {
     type Record = WorkoutRecord;
 }
 
-impl From<WorkoutGetRecordOutput<'_>> for Workout<'static> {
+impl From<WorkoutGetRecordOutput<'_>> for Workout<'_> {
     fn from(output: WorkoutGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

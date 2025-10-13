@@ -62,7 +62,7 @@ impl jacquard_common::types::collection::Collection for Mushies<'_> {
     type Record = MushiesRecord;
 }
 
-impl From<MushiesGetRecordOutput<'_>> for Mushies<'static> {
+impl From<MushiesGetRecordOutput<'_>> for Mushies<'_> {
     fn from(output: MushiesGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

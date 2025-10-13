@@ -105,7 +105,7 @@ impl jacquard_common::types::collection::Collection for Inventory<'_> {
     type Record = InventoryRecord;
 }
 
-impl From<InventoryGetRecordOutput<'_>> for Inventory<'static> {
+impl From<InventoryGetRecordOutput<'_>> for Inventory<'_> {
     fn from(output: InventoryGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

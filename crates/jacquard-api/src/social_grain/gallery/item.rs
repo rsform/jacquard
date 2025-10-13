@@ -61,7 +61,7 @@ impl jacquard_common::types::collection::Collection for Item<'_> {
     type Record = ItemRecord;
 }
 
-impl From<ItemGetRecordOutput<'_>> for Item<'static> {
+impl From<ItemGetRecordOutput<'_>> for Item<'_> {
     fn from(output: ItemGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

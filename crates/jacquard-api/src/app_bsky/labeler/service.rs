@@ -79,7 +79,7 @@ impl jacquard_common::types::collection::Collection for Service<'_> {
     type Record = ServiceRecord;
 }
 
-impl From<ServiceGetRecordOutput<'_>> for Service<'static> {
+impl From<ServiceGetRecordOutput<'_>> for Service<'_> {
     fn from(output: ServiceGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

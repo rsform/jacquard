@@ -78,7 +78,7 @@ impl jacquard_common::types::collection::Collection for Transaction<'_> {
     type Record = TransactionRecord;
 }
 
-impl From<TransactionGetRecordOutput<'_>> for Transaction<'static> {
+impl From<TransactionGetRecordOutput<'_>> for Transaction<'_> {
     fn from(output: TransactionGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

@@ -130,7 +130,7 @@ impl jacquard_common::types::collection::Collection for Cursor<'_> {
     type Record = CursorRecord;
 }
 
-impl From<CursorGetRecordOutput<'_>> for Cursor<'static> {
+impl From<CursorGetRecordOutput<'_>> for Cursor<'_> {
     fn from(output: CursorGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

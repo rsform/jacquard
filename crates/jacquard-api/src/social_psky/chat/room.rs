@@ -74,7 +74,7 @@ impl jacquard_common::types::collection::Collection for Room<'_> {
     type Record = RoomRecord;
 }
 
-impl From<RoomGetRecordOutput<'_>> for Room<'static> {
+impl From<RoomGetRecordOutput<'_>> for Room<'_> {
     fn from(output: RoomGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

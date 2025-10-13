@@ -62,7 +62,7 @@ impl jacquard_common::types::collection::Collection for Bookmark<'_> {
     type Record = BookmarkRecord;
 }
 
-impl From<BookmarkGetRecordOutput<'_>> for Bookmark<'static> {
+impl From<BookmarkGetRecordOutput<'_>> for Bookmark<'_> {
     fn from(output: BookmarkGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

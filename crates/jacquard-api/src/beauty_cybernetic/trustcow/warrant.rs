@@ -75,7 +75,7 @@ impl jacquard_common::types::collection::Collection for Warrant<'_> {
     type Record = WarrantRecord;
 }
 
-impl From<WarrantGetRecordOutput<'_>> for Warrant<'static> {
+impl From<WarrantGetRecordOutput<'_>> for Warrant<'_> {
     fn from(output: WarrantGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

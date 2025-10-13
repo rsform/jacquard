@@ -57,7 +57,7 @@ impl jacquard_common::types::collection::Collection for Favorite<'_> {
     type Record = FavoriteRecord;
 }
 
-impl From<FavoriteGetRecordOutput<'_>> for Favorite<'static> {
+impl From<FavoriteGetRecordOutput<'_>> for Favorite<'_> {
     fn from(output: FavoriteGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

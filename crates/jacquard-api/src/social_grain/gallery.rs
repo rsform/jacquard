@@ -66,7 +66,7 @@ impl jacquard_common::types::collection::Collection for Gallery<'_> {
     type Record = GalleryRecord;
 }
 
-impl From<GalleryGetRecordOutput<'_>> for Gallery<'static> {
+impl From<GalleryGetRecordOutput<'_>> for Gallery<'_> {
     fn from(output: GalleryGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

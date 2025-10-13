@@ -58,7 +58,7 @@ impl jacquard_common::types::collection::Collection for FavClient<'_> {
     type Record = FavClientRecord;
 }
 
-impl From<FavClientGetRecordOutput<'_>> for FavClient<'static> {
+impl From<FavClientGetRecordOutput<'_>> for FavClient<'_> {
     fn from(output: FavClientGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()

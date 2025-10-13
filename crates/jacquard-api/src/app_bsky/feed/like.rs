@@ -61,7 +61,7 @@ impl jacquard_common::types::collection::Collection for Like<'_> {
     type Record = LikeRecord;
 }
 
-impl From<LikeGetRecordOutput<'_>> for Like<'static> {
+impl From<LikeGetRecordOutput<'_>> for Like<'_> {
     fn from(output: LikeGetRecordOutput<'_>) -> Self {
         use jacquard_common::IntoStatic;
         output.value.into_static()
