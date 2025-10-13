@@ -4,7 +4,7 @@
 //!
 //! Jacquard has a couple of `.send()` methods. One is stateless. it's the output of a method that creates a request builder, implemented as an extension trait, `XrpcExt`, on any http client which implements a very simple HttpClient trait. You can use a bare `reqwest::Client` to make XRPC requests. You call `.xrpc(base_url)` and get an `XrpcCall` struct. `XrpcCall` is a builder, which allows you to pass authentication, atproto proxy settings, labeler headings, and set other options for the final request. There's also a similar trait `DpopExt` in the `jacquard-oauth` crate, which handles that form of authenticated request in a similar way. For basic stuff, this works great, and it's a useful building block for more complex logic, or when one size does **not** in fact fit all.
 //!
-//! ```rust
+//! ```ignore
 //! use jacquard_common::xrpc::XrpcExt;
 //! use jacquard_common::http_client::HttpClient;
 //! // ...
@@ -18,7 +18,7 @@
 //!
 //! Here is the entire text of `XrpcCall::send()`. [`build_http_request()`](https://tangled.org/@nonbinary.computer/jacquard/blob/main/crates/jacquard-common/src/xrpc.rs#L400) and [`process_response()`](https://tangled.org/@nonbinary.computer/jacquard/blob/main/crates/jacquard-common/src/xrpc.rs#L344) are public functions and can be used in other crates. The first does more or less what it says on the tin. The second does less than you might think. It mostly surfaces authentication errors at an earlier level so you don't have to fully parse the response to know if there was an error or not.
 //!
-//! ```rust
+//! ```ignore
 //! pub async fn send<'s, R>(
 //!         self,
 //!         request: &R,
@@ -44,7 +44,7 @@
 //!
 //! So how does this work? How does `send()` and its helper functions know what to do? The answer shouldn't be surprising to anyone familiar with Rust. It's traits! Specifically, the following traits, which have generated implementations for every lexicon type ingested by Jacquard's API code generation, but which honestly aren't hard to just implement yourself (more tedious than anything). XrpcResp is always implemented on a unit/marker struct with no fields. They provide all the request-specific instructions to the functions.
 //!
-//! ```rust
+//! ```ignore
 //! pub trait XrpcRequest<'de>: Serialize + Deserialize<'de> {
 //!     const NSID: &'static str;
 //!     /// XRPC method (query/GET or procedure/POST)
@@ -70,7 +70,7 @@
 //! ```
 //! Here are the implementations for [`GetTimeline`](https://tangled.org/@nonbinary.computer/jacquard/blob/main/crates/jacquard-api/src/app_bsky/feed/get_timeline.rs). You'll also note that `send()` doesn't return the fully decoded response on success. It returns a Response struct which has a generic parameter that must implement the XrpcResp trait above. Here's its definition. It's essentially just a cheaply cloneable byte buffer and a type marker.
 //!
-//! ```rust
+//! ```ignore
 //! pub struct Response<R: XrpcResp> {
 //!     buffer: Bytes,
 //!     status: StatusCode,
