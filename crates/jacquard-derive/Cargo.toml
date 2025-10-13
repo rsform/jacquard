@@ -28,4 +28,4 @@ syn.workspace = true
 
 
 [dev-dependencies]
-jacquard-common = { version = "0.4", path = "../jacquard-common" }
+jacquard-common = { version = "0.5", path = "../jacquard-common" }

@@ -1,5 +1,89 @@
 # Changelog
 
+## [0.5.0] - 2025-10-13
+
+### Breaking Changes
+
+**AgentSession trait** (`jacquard`)
+- Removed `async fn` in favour of `impl Future` return types for better trait object compatibility
+- Methods now return `impl Future` instead of being marked `async fn`
+
+**XRPC improvements** (`jacquard-common`)
+- Simplified response transmutation for typed record retrieval
+- `Response::transmute()` added for zero-cost response type conversion
+
+**jacquard-axum**
+- Removed binary target (`main.rs`), now library-only
+
+### Added
+
+**Agent convenience methods** (`jacquard`)
+- New `AgentSessionExt` trait automatically implemented for `AgentSession + IdentityResolver`
+- **Basic CRUD**: `create_record()`, `get_record()`, `put_record()`, `delete_record()`
+- **Update patterns**: `update_record()` (fetch-modify-put), `update_vec()`, `update_vec_item()`
+- **Blob operations**: `upload_blob()`
+- All methods auto-fill repo from session and collection from type's `Collection::NSID`
+- Simplified bounds on `update_record` - no HRTB issues, works with all record types
+
+**VecUpdate trait** (`jacquard`)
+- `VecUpdate` trait for fetch-modify-put patterns on array-based endpoints
+- `PreferencesUpdate` implementation for updating user preferences
+- Enables type-safe updates to preferences, saved feeds, and other array endpoints
+
+**Typed record retrieval** (`jacquard-api`, `jacquard-common`)
+- Each collection generates `{Type}Record` marker struct implementing `XrpcResp`
+- `Collection::Record` associated type points to the marker
+- `get_record::<R>()` returns `Response<R::Record>` with zero-copy `.parse()`
+- Response transmutation enables type-safe record operations
+
+**Examples**
+- `create_post.rs`: Creating posts with Agent convenience methods
+- `update_profile.rs`: Updating profile with fetch-modify-put
+- `post_with_image.rs`: Uploading images and creating posts with embeds
+- `update_preferences.rs`: Using VecUpdate for preferences
+- `create_whitewind_post.rs`, `read_whitewind_post.rs`: Third-party lexicons
+- `read_tangled_repo.rs`: Reading git repo metadata from tangled.sh
+- `resolve_did.rs`: Identity resolution examples
+- `public_atproto_feed.rs`: Unauthenticated feed access
+- `axum_server.rs`: Server-side XRPC handler
+
+### Changed
+
+**Code organization** (`jacquard-lexicon`)
+- Refactored monolithic `codegen.rs` into focused modules:
+  - `codegen/structs.rs`: Record and object generation
+  - `codegen/xrpc.rs`: XRPC request/response generation
+  - `codegen/types.rs`: Type alias and union generation
+  - `codegen/names.rs`: Identifier sanitization and naming
+  - `codegen/lifetime.rs`: Lifetime propagation logic
+  - `codegen/output.rs`: Module and feature generation
+  - `codegen/utils.rs`: Shared utilities
+- Improved code navigation and maintainability
+
+**Documentation** (`jacquard`)
+- Added comprehensive trait-level docs for `AgentSessionExt`
+- Updated examples to use new convenience methods
+
+### Fixed
+
+- `update_record` now works with all record types without lifetime issues
+- Proper `IdentityResolver` bounds on `AgentSessionExt`
+
+## [0.4.1] - 2025-10-13
+
+### Added
+
+**Collection trait improvements** (`jacquard-api`)
+- Generated `{Type}Record` marker structs for all record types
+- Each implements `XrpcResp` with `Output<'de> = {Type}<'de>` and `Err<'de> = RecordError<'de>`
+- Enables typed `get_record` returning `Response<R::Record>`
+
+### Changed
+
+- Minor improvements to derive macros (`jacquard-derive`)
+- Identity resolution refinements (`jacquard-identity`)
+- OAuth client improvements (`jacquard-oauth`)
+
 ## [0.4.0] - 2025-10-11
 
 ### Breaking Changes

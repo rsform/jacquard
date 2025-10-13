@@ -27,7 +27,9 @@ use core::future::Future;
 
 use jacquard_api::com_atproto::repo::create_record::CreateRecordOutput;
 use jacquard_api::com_atproto::repo::delete_record::DeleteRecordOutput;
+use jacquard_api::com_atproto::repo::get_record::GetRecordResponse;
 use jacquard_api::com_atproto::repo::put_record::PutRecordOutput;
+use jacquard_api::com_atproto::repo::upload_blob::UploadBlobResponse;
 use jacquard_api::com_atproto::server::create_session::CreateSessionOutput;
 use jacquard_api::com_atproto::server::refresh_session::RefreshSessionOutput;
 use jacquard_common::error::TransportError;
@@ -318,9 +320,51 @@ impl<A: AgentSession> Agent<A> {
     pub async fn refresh(&self) -> Result<AuthorizationToken<'static>, ClientError> {
         self.inner.refresh().await
     }
+}
 
-    // Convenience methods for repository operations
-
+/// Extension trait providing convenience methods for common repository operations.
+///
+/// This trait is automatically implemented for any type that implements both
+/// [`AgentSession`] and [`IdentityResolver`]. It provides higher-level methods
+/// that handle common patterns like fetch-modify-put, with automatic repo resolution
+/// for at:// uris, and typed record operations.
+///
+/// # Available Operations
+///
+/// - **Basic CRUD**: [`create_record`](Self::create_record), [`get_record`](Self::get_record),
+///   [`put_record`](Self::put_record), [`delete_record`](Self::delete_record)
+/// - **Update patterns**: [`update_record`](Self::update_record) (fetch-modify-put for records),
+///   [`update_vec`](Self::update_vec) and [`update_vec_item`](Self::update_vec_item) (for array endpoints)
+/// - **Blob operations**: [`upload_blob`](Self::upload_blob)
+///
+/// # Example
+///
+/// ```no_run
+/// # use jacquard::client::BasicClient;
+/// # use jacquard_api::app_bsky::feed::post::Post;
+/// # use jacquard_common::types::string::{AtUri, Datetime};
+/// # use jacquard_common::CowStr;
+/// use jacquard::client::AgentSessionExt;
+/// # #[tokio::main]
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// # let agent: BasicClient = todo!();
+/// // Create a post
+/// let post = Post {
+///     text: CowStr::from("Hello from Jacquard!"),
+///     created_at: Datetime::now(),
+///     # embed: None, entities: None, facets: None, labels: None,
+///     # langs: None, reply: None, tags: None, extra_data: Default::default(),
+/// };
+/// let output = agent.create_record(post, None).await?;
+///
+/// // Read it back
+/// let response = agent.get_record::<Post>(output.uri).await?;
+/// let record = response.parse()?;
+/// println!("Post: {}", record.value.text);
+/// # Ok(())
+/// # }
+/// ```
+pub trait AgentSessionExt: AgentSession + IdentityResolver {
     /// Create a new record in the repository.
     ///
     /// The collection is inferred from the record type's `Collection::NSID`.
@@ -333,6 +377,7 @@ impl<A: AgentSession> Agent<A> {
     /// # use jacquard_api::app_bsky::feed::post::Post;
     /// # use jacquard_common::types::string::Datetime;
     /// # use jacquard_common::CowStr;
+    /// use jacquard::client::AgentSessionExt;
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// # let agent: BasicClient = todo!();
@@ -353,253 +398,46 @@ impl<A: AgentSession> Agent<A> {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn create_record<R>(
+    fn create_record<R>(
         &self,
         record: R,
         rkey: Option<RecordKey<Rkey<'_>>>,
-    ) -> Result<CreateRecordOutput<'static>, AgentError>
+    ) -> impl std::future::Future<Output = Result<CreateRecordOutput<'static>, AgentError>>
     where
         R: Collection + serde::Serialize,
     {
-        use jacquard_api::com_atproto::repo::create_record::CreateRecord;
-        use jacquard_common::types::ident::AtIdentifier;
-        use jacquard_common::types::value::to_data;
+        async move {
+            use jacquard_api::com_atproto::repo::create_record::CreateRecord;
+            use jacquard_common::types::ident::AtIdentifier;
+            use jacquard_common::types::value::to_data;
 
-        let (did, _) = self.info().await.ok_or(AgentError::NoSession)?;
+            let (did, _) = self.session_info().await.ok_or(AgentError::NoSession)?;
 
-        let data = to_data(&record).map_err(|e| AgentError::SubOperation {
-            step: "serialize record",
-            error: Box::new(e),
-        })?;
+            let data = to_data(&record).map_err(|e| AgentError::SubOperation {
+                step: "serialize record",
+                error: Box::new(e),
+            })?;
 
-        let request = CreateRecord::new()
-            .repo(AtIdentifier::Did(did))
-            .collection(R::nsid())
-            .record(data)
-            .maybe_rkey(rkey)
-            .build();
+            let request = CreateRecord::new()
+                .repo(AtIdentifier::Did(did))
+                .collection(R::nsid())
+                .record(data)
+                .maybe_rkey(rkey)
+                .build();
 
-        let response = self.send(request).await?;
-        response.into_output().map_err(|e| match e {
-            XrpcError::Auth(auth) => AgentError::Auth(auth),
-            XrpcError::Generic(g) => AgentError::Generic(g),
-            XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
-            XrpcError::Xrpc(typed) => AgentError::SubOperation {
-                step: "create record",
-                error: Box::new(typed),
-            },
-        })
+            let response = self.send(request).await?;
+            response.into_output().map_err(|e| match e {
+                XrpcError::Auth(auth) => AgentError::Auth(auth),
+                XrpcError::Generic(g) => AgentError::Generic(g),
+                XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
+                XrpcError::Xrpc(typed) => AgentError::SubOperation {
+                    step: "create record",
+                    error: Box::new(typed),
+                },
+            })
+        }
     }
 
-    /// Delete a record from the repository.
-    ///
-    /// The collection is inferred from the type parameter.
-    /// The repo is automatically filled from the session info.
-    pub async fn delete_record<R>(
-        &self,
-        rkey: RecordKey<Rkey<'_>>,
-    ) -> Result<DeleteRecordOutput<'static>, AgentError>
-    where
-        R: Collection,
-    {
-        use jacquard_api::com_atproto::repo::delete_record::DeleteRecord;
-        use jacquard_common::types::ident::AtIdentifier;
-
-        let (did, _) = self.info().await.ok_or(AgentError::NoSession)?;
-
-        let request = DeleteRecord::new()
-            .repo(AtIdentifier::Did(did))
-            .collection(R::nsid())
-            .rkey(rkey)
-            .build();
-
-        let response = self.send(request).await?;
-        response.into_output().map_err(|e| match e {
-            XrpcError::Auth(auth) => AgentError::Auth(auth),
-            XrpcError::Generic(g) => AgentError::Generic(g),
-            XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
-            XrpcError::Xrpc(typed) => AgentError::SubOperation {
-                step: "delete record",
-                error: Box::new(typed),
-            },
-        })
-    }
-
-    /// Put (upsert) a record in the repository.
-    ///
-    /// The collection is inferred from the record type's `Collection::NSID`.
-    /// The repo is automatically filled from the session info.
-    pub async fn put_record<R>(
-        &self,
-        rkey: RecordKey<Rkey<'static>>,
-        record: R,
-    ) -> Result<PutRecordOutput<'static>, AgentError>
-    where
-        R: Collection + serde::Serialize,
-    {
-        use jacquard_api::com_atproto::repo::put_record::PutRecord;
-        use jacquard_common::types::ident::AtIdentifier;
-        use jacquard_common::types::value::to_data;
-
-        let (did, _) = self.info().await.ok_or(AgentError::NoSession)?;
-
-        let data = to_data(&record).map_err(|e| AgentError::SubOperation {
-            step: "serialize record",
-            error: Box::new(e),
-        })?;
-
-        let request = PutRecord::new()
-            .repo(AtIdentifier::Did(did))
-            .collection(R::nsid())
-            .rkey(rkey)
-            .record(data)
-            .build();
-
-        let response = self.send(request).await?;
-        response.into_output().map_err(|e| match e {
-            XrpcError::Auth(auth) => AgentError::Auth(auth),
-            XrpcError::Generic(g) => AgentError::Generic(g),
-            XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
-            XrpcError::Xrpc(typed) => AgentError::SubOperation {
-                step: "put record",
-                error: Box::new(typed),
-            },
-        })
-    }
-
-    /// Upload a blob to the repository.
-    ///
-    /// The mime type is sent as a Content-Type header hint, though the server also performs
-    /// its own inference.
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// # use jacquard::client::BasicClient;
-    /// # use jacquard_common::types::blob::MimeType;
-    /// # #[tokio::main]
-    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let agent: BasicClient = todo!();
-    /// let data = std::fs::read("image.png")?;
-    /// let mime_type = MimeType::new_static("image/png");
-    /// let blob_ref = agent.upload_blob(data, mime_type).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub async fn upload_blob(
-        &self,
-        data: impl Into<bytes::Bytes>,
-        mime_type: MimeType<'_>,
-    ) -> Result<Blob<'static>, AgentError> {
-        use http::header::CONTENT_TYPE;
-        use jacquard_api::com_atproto::repo::upload_blob::UploadBlob;
-
-        let bytes = data.into();
-        let request = UploadBlob::new().body(bytes).build();
-
-        // Override Content-Type header with actual mime type instead of */*
-        let base = self.base_uri();
-        let mut opts = self.opts().await;
-        opts.extra_headers.push((
-            CONTENT_TYPE,
-            http::HeaderValue::from_str(mime_type.as_str()).map_err(|e| {
-                AgentError::SubOperation {
-                    step: "set Content-Type header",
-                    error: Box::new(e),
-                }
-            })?,
-        ));
-
-        let response = self.xrpc(base).with_options(opts).send(&request).await?;
-
-        let output = response.into_output().map_err(|e| match e {
-            XrpcError::Auth(auth) => AgentError::Auth(auth),
-            XrpcError::Generic(g) => AgentError::Generic(g),
-            XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
-            XrpcError::Xrpc(typed) => AgentError::SubOperation {
-                step: "upload blob",
-                error: Box::new(typed),
-            },
-        })?;
-        Ok(output.blob.into_static())
-    }
-
-    /// Update a vec-based data structure with a fetch-modify-put pattern.
-    ///
-    /// This is useful for endpoints like preferences that return arrays requiring
-    /// fetch-modify-put operations.
-    ///
-    /// # Example
-    ///
-    /// ```ignore
-    /// agent.update_vec::<PreferencesUpdate>(|prefs| {
-    ///     prefs.push(AdultContentPref::new().enabled(true).build().into());
-    ///     prefs.retain(|p| !matches!(p, Preference::Hidden(_)));
-    /// }).await?;
-    /// ```
-    pub async fn update_vec<'s, U>(
-        &'s self,
-        modify: impl FnOnce(&mut Vec<<U as vec_update::VecUpdate>::Item>),
-    ) -> Result<xrpc::Response<<U::PutRequest<'s> as XrpcRequest<'s>>::Response>, AgentError>
-    where
-        U: vec_update::VecUpdate + 's,
-    {
-        // Fetch current data
-        let get_request = U::build_get();
-        let response = self.send(get_request).await?;
-        let output = response.parse().map_err(|e| match e {
-            XrpcError::Auth(auth) => AgentError::Auth(auth),
-            XrpcError::Generic(g) => AgentError::Generic(g),
-            XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
-            XrpcError::Xrpc(_) => AgentError::SubOperation {
-                step: "get vec",
-                error: format!("{:?}", e).into(),
-            },
-        })?;
-
-        // Extract vec (converts to owned via IntoStatic)
-        let mut items = U::extract_vec(output);
-
-        // Apply modification
-        modify(&mut items);
-
-        // Build put request
-        let put_request = U::build_put(items);
-
-        // Send it
-        Ok(self.send(put_request).await?)
-    }
-
-    /// Update a single item in a vec-based data structure.
-    ///
-    /// This is a convenience wrapper around `update_vec` that finds and replaces
-    /// a single matching item, or appends it if not found.
-    ///
-    /// # Example
-    ///
-    /// ```ignore
-    /// let pref = AdultContentPref::new().enabled(true).build();
-    /// agent.update_vec_item::<PreferencesUpdate>(pref.into()).await?;
-    /// ```
-    pub async fn update_vec_item<'s, U>(
-        &'s self,
-        item: <U as vec_update::VecUpdate>::Item,
-    ) -> Result<xrpc::Response<<U::PutRequest<'s> as XrpcRequest<'s>>::Response>, AgentError>
-    where
-        U: vec_update::VecUpdate + 's,
-    {
-        self.update_vec::<U>(|vec| {
-            if let Some(pos) = vec.iter().position(|i| U::matches(i, &item)) {
-                vec[pos] = item;
-            } else {
-                vec.push(item);
-            }
-        })
-        .await
-    }
-}
-
-impl<A: AgentSession + IdentityResolver> Agent<A> {
     /// Get a record from the repository using an at:// URI.
     ///
     /// Returns a typed `Response` that deserializes directly to the record type.
@@ -612,6 +450,7 @@ impl<A: AgentSession + IdentityResolver> Agent<A> {
     /// # use jacquard_api::app_bsky::feed::post::Post;
     /// # use jacquard_common::types::string::AtUri;
     /// # use jacquard_common::IntoStatic;
+    /// use jacquard::client::AgentSessionExt;
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// # let agent: BasicClient = todo!();
@@ -625,14 +464,18 @@ impl<A: AgentSession + IdentityResolver> Agent<A> {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn get_record<R>(&self, uri: AtUri<'_>) -> Result<Response<R::Record>, ClientError>
+    fn get_record<R>(
+        &self,
+        uri: AtUri<'_>,
+    ) -> impl std::future::Future<Output = Result<Response<R::Record>, ClientError>>
     where
         R: Collection,
     {
-        // Validate that URI's collection matches the expected type
-        if let Some(uri_collection) = uri.collection() {
-            if uri_collection.as_str() != R::nsid().as_str() {
-                return Err(ClientError::Transport(TransportError::Other(
+        async move {
+            // Validate that URI's collection matches the expected type
+            if let Some(uri_collection) = uri.collection() {
+                if uri_collection.as_str() != R::nsid().as_str() {
+                    return Err(ClientError::Transport(TransportError::Other(
                     format!(
                         "Collection mismatch: URI contains '{}' but type parameter expects '{}'",
                         uri_collection,
@@ -640,41 +483,52 @@ impl<A: AgentSession + IdentityResolver> Agent<A> {
                     )
                     .into(),
                 )));
+                }
             }
-        }
 
-        let rkey = uri.rkey().ok_or_else(|| {
-            ClientError::Transport(TransportError::Other("AtUri missing rkey".into()))
-        })?;
+            let rkey = uri.rkey().ok_or_else(|| {
+                ClientError::Transport(TransportError::Other("AtUri missing rkey".into()))
+            })?;
 
-        // Resolve authority (DID or handle) to get DID and PDS
-        use jacquard_common::types::ident::AtIdentifier;
-        let (repo_did, pds_url) = match uri.authority() {
-            AtIdentifier::Did(did) => {
-                let pds = self.pds_for_did(did).await.map_err(|e| {
+            // Resolve authority (DID or handle) to get DID and PDS
+            use jacquard_common::types::ident::AtIdentifier;
+            let (repo_did, pds_url) = match uri.authority() {
+                AtIdentifier::Did(did) => {
+                    let pds = self.pds_for_did(did).await.map_err(|e| {
+                        ClientError::Transport(TransportError::Other(
+                            format!("Failed to resolve PDS for {}: {}", did, e).into(),
+                        ))
+                    })?;
+                    (did.clone(), pds)
+                }
+                AtIdentifier::Handle(handle) => self.pds_for_handle(handle).await.map_err(|e| {
                     ClientError::Transport(TransportError::Other(
-                        format!("Failed to resolve PDS for {}: {}", did, e).into(),
+                        format!("Failed to resolve handle {}: {}", handle, e).into(),
                     ))
-                })?;
-                (did.clone(), pds)
-            }
-            AtIdentifier::Handle(handle) => self.pds_for_handle(handle).await.map_err(|e| {
-                ClientError::Transport(TransportError::Other(
-                    format!("Failed to resolve handle {}: {}", handle, e).into(),
-                ))
-            })?,
-        };
+                })?,
+            };
 
-        // Make stateless XRPC call to that PDS (no auth required for public records)
-        use jacquard_api::com_atproto::repo::get_record::GetRecord;
-        let request = GetRecord::new()
-            .repo(AtIdentifier::Did(repo_did))
-            .collection(R::nsid())
-            .rkey(rkey.clone())
-            .build();
+            // Make stateless XRPC call to that PDS (no auth required for public records)
+            use jacquard_api::com_atproto::repo::get_record::GetRecord;
+            let request = GetRecord::new()
+                .repo(AtIdentifier::Did(repo_did))
+                .collection(R::nsid())
+                .rkey(rkey.clone())
+                .build();
 
-        let response = self.xrpc(pds_url).send(&request).await?;
-        Ok(response.transmute())
+            let response: Response<GetRecordResponse> = {
+                let http_request = xrpc::build_http_request(&pds_url, &request, &self.opts().await)
+                    .map_err(|e| ClientError::Transport(TransportError::from(e)))?;
+
+                let http_response = self
+                    .send_http(http_request)
+                    .await
+                    .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
+
+                xrpc::process_response(http_response)
+            }?;
+            Ok(response.transmute())
+        }
     }
 
     /// Update a record in-place with a fetch-modify-put pattern.
@@ -690,6 +544,7 @@ impl<A: AgentSession + IdentityResolver> Agent<A> {
     /// # use jacquard_api::app_bsky::actor::profile::Profile;
     /// # use jacquard_common::CowStr;
     /// # use jacquard_common::types::string::AtUri;
+    /// use jacquard::client::AgentSessionExt;
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// # let agent: BasicClient = todo!();
@@ -702,47 +557,290 @@ impl<A: AgentSession + IdentityResolver> Agent<A> {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn update_record<R>(
+    fn update_record<R>(
         &self,
         uri: AtUri<'_>,
         f: impl FnOnce(&mut R),
-    ) -> Result<PutRecordOutput<'static>, AgentError>
+    ) -> impl std::future::Future<Output = Result<PutRecordOutput<'static>, AgentError>>
     where
         R: Collection + Serialize,
         R: for<'a> From<<<R as Collection>::Record as XrpcResp>::Output<'a>>,
     {
-        // Fetch the record - Response<R::Record> where R::Record::Output<'de> = R<'de>
-        let response = self.get_record::<R>(uri.clone()).await?;
+        async move {
+            // Fetch the record - Response<R::Record> where R::Record::Output<'de> = R<'de>
+            let response = self.get_record::<R>(uri.clone()).await?;
 
-        // Parse to get R<'_> borrowing from response buffer
-        let record = response.parse().map_err(|e| match e {
-            XrpcError::Auth(auth) => AgentError::Auth(auth),
-            XrpcError::Generic(g) => AgentError::Generic(g),
-            XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
-            XrpcError::Xrpc(typed) => AgentError::SubOperation {
-                step: "get record",
-                error: format!("{:?}", typed).into(),
-            },
-        })?;
+            // Parse to get R<'_> borrowing from response buffer
+            let record = response.parse().map_err(|e| match e {
+                XrpcError::Auth(auth) => AgentError::Auth(auth),
+                XrpcError::Generic(g) => AgentError::Generic(g),
+                XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
+                XrpcError::Xrpc(typed) => AgentError::SubOperation {
+                    step: "get record",
+                    error: format!("{:?}", typed).into(),
+                },
+            })?;
 
-        // Convert to owned
-        let mut owned = R::from(record);
+            // Convert to owned
+            let mut owned = R::from(record);
 
-        // Apply modification
-        f(&mut owned);
+            // Apply modification
+            f(&mut owned);
 
-        // Put it back
-        let rkey = uri
-            .rkey()
-            .ok_or(AgentError::SubOperation {
-                step: "extract rkey",
-                error: "AtUri missing rkey".into(),
-            })?
-            .clone()
-            .into_static();
-        self.put_record::<R>(rkey, owned).await
+            // Put it back
+            let rkey = uri
+                .rkey()
+                .ok_or(AgentError::SubOperation {
+                    step: "extract rkey",
+                    error: "AtUri missing rkey".into(),
+                })?
+                .clone()
+                .into_static();
+            self.put_record::<R>(rkey, owned).await
+        }
+    }
+
+    /// Delete a record from the repository.
+    ///
+    /// The collection is inferred from the type parameter.
+    /// The repo is automatically filled from the session info.
+    fn delete_record<R>(
+        &self,
+        rkey: RecordKey<Rkey<'_>>,
+    ) -> impl std::future::Future<Output = Result<DeleteRecordOutput<'static>, AgentError>>
+    where
+        R: Collection,
+    {
+        async {
+            use jacquard_api::com_atproto::repo::delete_record::DeleteRecord;
+            use jacquard_common::types::ident::AtIdentifier;
+
+            let (did, _) = self.session_info().await.ok_or(AgentError::NoSession)?;
+
+            let request = DeleteRecord::new()
+                .repo(AtIdentifier::Did(did))
+                .collection(R::nsid())
+                .rkey(rkey)
+                .build();
+
+            let response = self.send(request).await?;
+            response.into_output().map_err(|e| match e {
+                XrpcError::Auth(auth) => AgentError::Auth(auth),
+                XrpcError::Generic(g) => AgentError::Generic(g),
+                XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
+                XrpcError::Xrpc(typed) => AgentError::SubOperation {
+                    step: "delete record",
+                    error: Box::new(typed),
+                },
+            })
+        }
+    }
+
+    /// Put (upsert) a record in the repository.
+    ///
+    /// The collection is inferred from the record type's `Collection::NSID`.
+    /// The repo is automatically filled from the session info.
+    fn put_record<R>(
+        &self,
+        rkey: RecordKey<Rkey<'static>>,
+        record: R,
+    ) -> impl std::future::Future<Output = Result<PutRecordOutput<'static>, AgentError>>
+    where
+        R: Collection + serde::Serialize,
+    {
+        async move {
+            use jacquard_api::com_atproto::repo::put_record::PutRecord;
+            use jacquard_common::types::ident::AtIdentifier;
+            use jacquard_common::types::value::to_data;
+
+            let (did, _) = self.session_info().await.ok_or(AgentError::NoSession)?;
+
+            let data = to_data(&record).map_err(|e| AgentError::SubOperation {
+                step: "serialize record",
+                error: Box::new(e),
+            })?;
+
+            let request = PutRecord::new()
+                .repo(AtIdentifier::Did(did))
+                .collection(R::nsid())
+                .rkey(rkey)
+                .record(data)
+                .build();
+
+            let response = self.send(request).await?;
+            response.into_output().map_err(|e| match e {
+                XrpcError::Auth(auth) => AgentError::Auth(auth),
+                XrpcError::Generic(g) => AgentError::Generic(g),
+                XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
+                XrpcError::Xrpc(typed) => AgentError::SubOperation {
+                    step: "put record",
+                    error: Box::new(typed),
+                },
+            })
+        }
+    }
+
+    /// Upload a blob to the repository.
+    ///
+    /// The mime type is sent as a Content-Type header hint, though the server also performs
+    /// its own inference.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use jacquard::client::BasicClient;
+    /// # use jacquard_common::types::blob::MimeType;
+    /// use jacquard::client::AgentSessionExt;
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let agent: BasicClient = todo!();
+    /// let data = std::fs::read("image.png")?;
+    /// let mime_type = MimeType::new_static("image/png");
+    /// let blob_ref = agent.upload_blob(data, mime_type).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn upload_blob(
+        &self,
+        data: impl Into<bytes::Bytes>,
+        mime_type: MimeType<'_>,
+    ) -> impl std::future::Future<Output = Result<Blob<'static>, AgentError>> {
+        async move {
+            use http::header::CONTENT_TYPE;
+            use jacquard_api::com_atproto::repo::upload_blob::UploadBlob;
+
+            let bytes = data.into();
+            let request = UploadBlob::new().body(bytes).build();
+
+            // Override Content-Type header with actual mime type instead of */*
+            let base = self.base_uri();
+            let mut opts = self.opts().await;
+            opts.extra_headers.push((
+                CONTENT_TYPE,
+                http::HeaderValue::from_str(mime_type.as_str()).map_err(|e| {
+                    AgentError::SubOperation {
+                        step: "set Content-Type header",
+                        error: Box::new(e),
+                    }
+                })?,
+            ));
+
+            let response: Response<UploadBlobResponse> = {
+                let http_request =
+                    xrpc::build_http_request(&base, &request, &opts).map_err(|e| {
+                        AgentError::Client(ClientError::Transport(TransportError::from(e)))
+                    })?;
+
+                let http_response = self.send_http(http_request).await.map_err(|e| {
+                    AgentError::Client(ClientError::Transport(TransportError::Other(Box::new(e))))
+                })?;
+
+                xrpc::process_response(http_response)
+            }?;
+
+            let output = response.into_output().map_err(|e| match e {
+                XrpcError::Auth(auth) => AgentError::Auth(auth),
+                XrpcError::Generic(g) => AgentError::Generic(g),
+                XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
+                XrpcError::Xrpc(typed) => AgentError::SubOperation {
+                    step: "upload blob",
+                    error: Box::new(typed),
+                },
+            })?;
+            Ok(output.blob.into_static())
+        }
+    }
+
+    /// Update a vec-based data structure with a fetch-modify-put pattern.
+    ///
+    /// This is useful for endpoints like preferences that return arrays requiring
+    /// fetch-modify-put operations.
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// agent.update_vec::<PreferencesUpdate>(|prefs| {
+    ///     prefs.push(AdultContentPref::new().enabled(true).build().into());
+    ///     prefs.retain(|p| !matches!(p, Preference::Hidden(_)));
+    /// }).await?;
+    /// ```
+    fn update_vec<'s, U>(
+        &'s self,
+        modify: impl FnOnce(&mut Vec<<U as vec_update::VecUpdate>::Item>),
+    ) -> impl std::future::Future<
+        Output = Result<
+            xrpc::Response<<U::PutRequest<'s> as XrpcRequest<'s>>::Response>,
+            AgentError,
+        >,
+    >
+    where
+        U: vec_update::VecUpdate + 's,
+    {
+        async {
+            // Fetch current data
+            let get_request = U::build_get();
+            let response = self.send(get_request).await?;
+            let output = response.parse().map_err(|e| match e {
+                XrpcError::Auth(auth) => AgentError::Auth(auth),
+                XrpcError::Generic(g) => AgentError::Generic(g),
+                XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
+                XrpcError::Xrpc(_) => AgentError::SubOperation {
+                    step: "get vec",
+                    error: format!("{:?}", e).into(),
+                },
+            })?;
+
+            // Extract vec (converts to owned via IntoStatic)
+            let mut items = U::extract_vec(output);
+
+            // Apply modification
+            modify(&mut items);
+
+            // Build put request
+            let put_request = U::build_put(items);
+
+            // Send it
+            Ok(self.send(put_request).await?)
+        }
+    }
+
+    /// Update a single item in a vec-based data structure.
+    ///
+    /// This is a convenience wrapper around `update_vec` that finds and replaces
+    /// a single matching item, or appends it if not found.
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// let pref = AdultContentPref::new().enabled(true).build();
+    /// agent.update_vec_item::<PreferencesUpdate>(pref.into()).await?;
+    /// ```
+    fn update_vec_item<'s, U>(
+        &'s self,
+        item: <U as vec_update::VecUpdate>::Item,
+    ) -> impl std::future::Future<
+        Output = Result<
+            xrpc::Response<<U::PutRequest<'s> as XrpcRequest<'s>>::Response>,
+            AgentError,
+        >,
+    >
+    where
+        U: vec_update::VecUpdate + 's,
+    {
+        async {
+            self.update_vec::<U>(|vec| {
+                if let Some(pos) = vec.iter().position(|i| U::matches(i, &item)) {
+                    vec[pos] = item;
+                } else {
+                    vec.push(item);
+                }
+            })
+            .await
+        }
     }
 }
+
+impl<T: AgentSession + IdentityResolver> AgentSessionExt for T {}
 
 impl<A: AgentSession> HttpClient for Agent<A> {
     type Error = <A as HttpClient>::Error;
@@ -800,6 +898,30 @@ impl<A: AgentSession + IdentityResolver> IdentityResolver for Agent<A> {
     }
 }
 
+impl<A: AgentSession> AgentSession for Agent<A> {
+    fn session_kind(&self) -> AgentKind {
+        self.kind()
+    }
+
+    fn session_info(
+        &self,
+    ) -> impl Future<Output = Option<(Did<'static>, Option<CowStr<'static>>)>> {
+        async { self.info().await }
+    }
+
+    fn endpoint(&self) -> impl Future<Output = url::Url> {
+        async { self.endpoint().await }
+    }
+
+    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
+        async { self.set_options(opts).await }
+    }
+
+    fn refresh(&self) -> impl Future<Output = Result<AuthorizationToken<'static>, ClientError>> {
+        async { self.refresh().await }
+    }
+}
+
 impl<A: AgentSession> From<A> for Agent<A> {
     fn from(inner: A) -> Self {
         Self::new(inner)
@@ -831,6 +953,7 @@ impl BasicClient {
     /// # use jacquard::client::BasicClient;
     /// # use jacquard::types::string::AtUri;
     /// # use jacquard_api::app_bsky::feed::post::Post;
+    /// use crate::jacquard::client::AgentSessionExt;
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let client = BasicClient::unauthenticated();
