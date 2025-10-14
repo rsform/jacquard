@@ -1,4 +1,4 @@
-use serde::{Deserialize, Deserializer, Serialize};
+use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 use std::{
     borrow::Cow,
@@ -9,12 +9,13 @@ use std::{
 
 use crate::IntoStatic;
 
-/// Shamelessly copied from [](https://github.com/bearcove/merde)
 /// A copy-on-write immutable string type that uses [`SmolStr`] for
 /// the "owned" variant.
 ///
 /// The standard [`Cow`] type cannot be used, since
 /// `<str as ToOwned>::Owned` is `String`, and not `SmolStr`.
+///
+/// Shamelessly ported from [merde](https://github.com/bearcove/merde)
 #[derive(Clone)]
 pub enum CowStr<'s> {
     /// &str varaiant
@@ -330,16 +331,6 @@ where
     {
         deserializer.deserialize_str(CowStrVisitor)
     }
-}
-
-/// Serde helper for deserializing stuff when you want an owned version
-pub fn deserialize_owned<'de, T, D>(deserializer: D) -> Result<<T as IntoStatic>::Output, D::Error>
-where
-    T: Deserialize<'de> + IntoStatic,
-    D: Deserializer<'de>,
-{
-    let value = T::deserialize(deserializer)?;
-    Ok(value.into_static())
 }
 
 /// Convert to a CowStr.

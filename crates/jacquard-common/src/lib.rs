@@ -211,11 +211,11 @@ pub mod error;
 /// HTTP client abstraction used by jacquard crates.
 pub mod http_client;
 pub mod macros;
-/// Generic session storage traits and utilities.
-pub mod session;
 /// Service authentication JWT parsing and verification.
 #[cfg(feature = "service-auth")]
 pub mod service_auth;
+/// Generic session storage traits and utilities.
+pub mod session;
 /// Baseline fundamental AT Protocol data types.
 pub mod types;
 // XRPC protocol types and traits
@@ -238,4 +238,14 @@ impl<'s> IntoStatic for AuthorizationToken<'s> {
             AuthorizationToken::Dpop(token) => AuthorizationToken::Dpop(token.into_static()),
         }
     }
+}
+
+/// Serde helper for deserializing stuff when you want an owned version
+pub fn deserialize_owned<'de, T, D>(deserializer: D) -> Result<<T as IntoStatic>::Output, D::Error>
+where
+    T: serde::Deserialize<'de> + IntoStatic,
+    D: serde::Deserializer<'de>,
+{
+    let value = T::deserialize(deserializer)?;
+    Ok(value.into_static())
 }

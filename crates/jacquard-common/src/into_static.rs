@@ -7,11 +7,12 @@ use std::hash::BuildHasher;
 use std::hash::Hash;
 use std::sync::Arc;
 
-/// Shamelessly copied from [](https://github.com/bearcove/merde)
 /// Allow turning a value into an "owned" variant, which can then be
 /// returned, moved, etc.
 ///
 /// This usually involves allocating buffers for `Cow<'a, str>`, etc.
+///
+/// Shamelessly copied from [merde](https://github.com/bearcove/merde)
 pub trait IntoStatic: Sized {
     /// The "owned" variant of the type. For `Cow<'a, str>`, this is `Cow<'static, str>`, for example.
     type Output: 'static;

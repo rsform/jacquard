@@ -249,7 +249,7 @@ pub enum ServiceAuthError {
     #[error("missing Authorization header")]
     MissingAuthHeader,
 
-    /// Authorization header is malformed (not "Bearer <token>")
+    /// Authorization header is malformed (not "Bearer `token`")
     #[error("invalid Authorization header format")]
     InvalidAuthHeader,
 

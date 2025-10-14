@@ -21,7 +21,7 @@ pub trait Collection: fmt::Debug + Serialize {
     const NSID: &'static str;
 
     /// A marker type implementing [`XrpcResp`] that allows typed deserialization of records
-    /// from this collection. Used by [`Agent::get_record`] to return properly typed responses.
+    /// from this collection. Used by [`AgentSessionExt::get_record`](https://docs.rs/jacquard/latest/jacquard/client/trait.AgentSessionExt.html) to return properly typed responses.
     type Record: XrpcResp;
 
     /// Returns the [`Nsid`] for the Lexicon that defines the schema of records in this
