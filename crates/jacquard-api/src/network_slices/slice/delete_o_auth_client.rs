@@ -13,23 +13,14 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct DeleteOAuthClient<'a> {
     /// OAuth client ID to delete
     #[serde(borrow)]
-    #[builder(into)]
     pub client_id: jacquard_common::CowStr<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
 }
 
 #[jacquard_derive::lexicon]
@@ -40,7 +31,8 @@ pub struct DeleteOAuthClient<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteOAuthClientOutput<'a> {

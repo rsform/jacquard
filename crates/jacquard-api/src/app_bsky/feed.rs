@@ -299,14 +299,13 @@ pub struct GeneratorView<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GeneratorViewerState<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub like: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -318,28 +317,24 @@ pub struct GeneratorViewerState<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Interaction<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub event: Option<jacquard_common::CowStr<'a>>,
+    pub event: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Context on a feed item that was originally supplied by the feed generator on getFeedSkeleton.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub feed_context: Option<jacquard_common::CowStr<'a>>,
+    pub feed_context: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub item: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub item: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
     /// Unique identifier per request that may be passed back alongside interactions.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub req_id: Option<jacquard_common::CowStr<'a>>,
+    pub req_id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// User liked the feed item
@@ -557,7 +552,7 @@ pub enum PostViewEmbed<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReasonPin<'a> {}
@@ -743,7 +738,7 @@ pub enum SkeletonFeedPostReason<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonReasonPin<'a> {}
@@ -774,14 +769,13 @@ pub struct SkeletonReasonRepost<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadContext<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub root_author_like: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub root_author_like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -864,26 +858,22 @@ pub enum ThreadViewPostRepliesItem<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadgateView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub cid: Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub lists: Option<Vec<crate::app_bsky::graph::ListViewBasic<'a>>>,
+    pub lists: std::option::Option<Vec<crate::app_bsky::graph::ListViewBasic<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub record: Option<jacquard_common::types::value::Data<'a>>,
+    pub record: std::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub uri: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 /// Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests.
@@ -896,31 +886,24 @@ pub struct ThreadgateView<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ViewerState<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub bookmarked: Option<bool>,
+    pub bookmarked: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub embedding_disabled: Option<bool>,
+    pub embedding_disabled: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub like: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub pinned: Option<bool>,
+    pub pinned: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub reply_disabled: Option<bool>,
+    pub reply_disabled: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub repost: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub repost: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub thread_muted: Option<bool>,
+    pub thread_muted: std::option::Option<bool>,
 }

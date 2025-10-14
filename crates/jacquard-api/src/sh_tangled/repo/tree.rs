@@ -187,17 +187,15 @@ impl jacquard_common::xrpc::XrpcEndpoint for TreeRequest {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Readme<'a> {
     /// Contents of the readme file
     #[serde(borrow)]
-    #[builder(into)]
     pub contents: jacquard_common::CowStr<'a>,
     /// Name of the readme file
     #[serde(borrow)]
-    #[builder(into)]
     pub filename: jacquard_common::CowStr<'a>,
 }
 

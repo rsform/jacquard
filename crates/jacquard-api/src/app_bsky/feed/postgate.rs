@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DisableRule<'a> {}

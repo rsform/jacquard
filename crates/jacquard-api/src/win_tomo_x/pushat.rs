@@ -38,26 +38,22 @@ pub struct DeviceListItem<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NotifyBody<'a> {
     /// Body text of the notification.
     #[serde(borrow)]
-    #[builder(into)]
     pub body: jacquard_common::CowStr<'a>,
     /// The URI of the icon displayed in the notification.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub icon: Option<jacquard_common::types::string::Uri<'a>>,
+    pub icon: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// Experimental — do not use. The URI to open when the notification is clicked.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub link: Option<jacquard_common::types::string::Uri<'a>>,
+    pub link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// Title text of the notification.
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
 }

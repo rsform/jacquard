@@ -14,19 +14,16 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Code<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub language: Option<jacquard_common::CowStr<'a>>,
+    pub language: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub plaintext: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub syntax_highlighting_theme: Option<jacquard_common::CowStr<'a>>,
+    pub syntax_highlighting_theme: std::option::Option<jacquard_common::CowStr<'a>>,
 }

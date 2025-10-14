@@ -89,17 +89,15 @@ pub struct AgeAssuranceEvent<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AgeAssuranceState<'a> {
     /// The timestamp when this state was last updated.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub last_initiated_at: Option<jacquard_common::types::string::Datetime>,
+    pub last_initiated_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The status of the age assurance process.
     #[serde(borrow)]
-    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
 }
 
@@ -216,7 +214,7 @@ pub struct ThreadItemBlocked<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItemNoUnauthenticated<'a> {}
@@ -229,7 +227,7 @@ pub struct ThreadItemNoUnauthenticated<'a> {}
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItemNotFound<'a> {}
@@ -305,22 +303,18 @@ pub struct TrendView<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TrendingTopic<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub display_name: Option<jacquard_common::CowStr<'a>>,
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub link: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub topic: jacquard_common::CowStr<'a>,
 }

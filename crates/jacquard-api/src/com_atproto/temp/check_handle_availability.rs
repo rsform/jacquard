@@ -141,7 +141,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CheckHandleAvailabilityRequest {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResultAvailable<'a> {}

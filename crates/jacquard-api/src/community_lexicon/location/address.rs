@@ -15,37 +15,31 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Address<'a> {
     /// The ISO 3166 country code. Preferably the 2-letter code.
     #[serde(borrow)]
-    #[builder(into)]
     pub country: jacquard_common::CowStr<'a>,
     /// The locality of the region. For example, a city in the USA.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub locality: Option<jacquard_common::CowStr<'a>>,
+    pub locality: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The name of the location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub name: Option<jacquard_common::CowStr<'a>>,
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The postal code of the location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub postal_code: Option<jacquard_common::CowStr<'a>>,
+    pub postal_code: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The administrative region of the country. For example, a state in the USA.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub region: Option<jacquard_common::CowStr<'a>>,
+    pub region: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The street address.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub street: Option<jacquard_common::CowStr<'a>>,
+    pub street: std::option::Option<jacquard_common::CowStr<'a>>,
 }

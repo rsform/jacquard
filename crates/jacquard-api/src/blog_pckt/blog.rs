@@ -97,30 +97,25 @@ impl From<BlogGetRecordOutput<'_>> for Blog<'_> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Palette<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub accent: Option<jacquard_common::CowStr<'a>>,
+    pub accent: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub background: Option<jacquard_common::CowStr<'a>>,
+    pub background: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub link: Option<jacquard_common::CowStr<'a>>,
+    pub link: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub surface_hover: Option<jacquard_common::CowStr<'a>>,
+    pub surface_hover: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub text: Option<jacquard_common::CowStr<'a>>,
+    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -132,20 +127,17 @@ pub struct Palette<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Theme<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub dark: Option<crate::blog_pckt::blog::Palette<'a>>,
+    pub dark: std::option::Option<crate::blog_pckt::blog::Palette<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub font: Option<jacquard_common::CowStr<'a>>,
+    pub font: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub light: Option<crate::blog_pckt::blog::Palette<'a>>,
+    pub light: std::option::Option<crate::blog_pckt::blog::Palette<'a>>,
 }

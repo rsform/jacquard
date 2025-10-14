@@ -15,12 +15,11 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Unknown<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub reason: Option<jacquard_common::CowStr<'a>>,
+    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
 }

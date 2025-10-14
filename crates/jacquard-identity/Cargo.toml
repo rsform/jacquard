@@ -14,6 +14,7 @@ description = "ATProto identity resolution utilities for Jacquard"
 
 [features]
 dns = ["dep:hickory-resolver"]
+tracing = ["dep:tracing"]
 
 [dependencies]
 async-trait.workspace = true
@@ -33,3 +34,4 @@ miette.workspace = true
 http.workspace = true
 serde_html_form.workspace = true
 urlencoding.workspace = true
+tracing = { workspace = true, optional = true }

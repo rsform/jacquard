@@ -408,6 +408,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         R: Collection + serde::Serialize,
     {
         async move {
+            #[cfg(feature = "tracing")]
+            let _span = tracing::debug_span!("create_record", collection = %R::nsid()).entered();
+
             use jacquard_api::com_atproto::repo::create_record::CreateRecord;
             use jacquard_common::types::ident::AtIdentifier;
             use jacquard_common::types::value::to_data;
@@ -473,6 +476,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         R: Collection,
     {
         async move {
+            #[cfg(feature = "tracing")]
+            let _span = tracing::debug_span!("get_record", collection = %R::nsid(), uri = %uri).entered();
+
             // Validate that URI's collection matches the expected type
             if let Some(uri_collection) = uri.collection() {
                 if uri_collection.as_str() != R::nsid().as_str() {
@@ -568,6 +574,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         R: for<'a> From<<<R as Collection>::Record as XrpcResp>::Output<'a>>,
     {
         async move {
+            #[cfg(feature = "tracing")]
+            let _span = tracing::debug_span!("update_record", collection = %R::nsid(), uri = %uri).entered();
+
             // Fetch the record - Response<R::Record> where R::Record::Output<'de> = R<'de>
             let response = self.get_record::<R>(uri.clone()).await?;
 
@@ -613,6 +622,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         R: Collection,
     {
         async {
+            #[cfg(feature = "tracing")]
+            let _span = tracing::debug_span!("delete_record", collection = %R::nsid()).entered();
+
             use jacquard_api::com_atproto::repo::delete_record::DeleteRecord;
             use jacquard_common::types::ident::AtIdentifier;
 
@@ -650,6 +662,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         R: Collection + serde::Serialize,
     {
         async move {
+            #[cfg(feature = "tracing")]
+            let _span = tracing::debug_span!("put_record", collection = %R::nsid()).entered();
+
             use jacquard_api::com_atproto::repo::put_record::PutRecord;
             use jacquard_common::types::ident::AtIdentifier;
             use jacquard_common::types::value::to_data;
@@ -707,6 +722,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         mime_type: MimeType<'_>,
     ) -> impl std::future::Future<Output = Result<Blob<'static>, AgentError>> {
         async move {
+            #[cfg(feature = "tracing")]
+            let _span = tracing::debug_span!("upload_blob", mime_type = %mime_type).entered();
+
             use http::header::CONTENT_TYPE;
             use jacquard_api::com_atproto::repo::upload_blob::UploadBlob;
 

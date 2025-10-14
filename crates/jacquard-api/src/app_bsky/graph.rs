@@ -259,17 +259,15 @@ pub struct ListViewBasic<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListViewerState<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub blocked: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub blocked: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub muted: Option<bool>,
+    pub muted: std::option::Option<bool>,
 }
 
 /// A list of actors to apply an aggregate moderation action (mute/block) on.

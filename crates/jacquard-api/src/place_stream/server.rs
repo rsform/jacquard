@@ -21,17 +21,15 @@ pub mod update_webhook;
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RewriteRule<'a> {
     /// Text to search for and replace.
     #[serde(borrow)]
-    #[builder(into)]
     pub from: jacquard_common::CowStr<'a>,
     /// Text to replace with.
     #[serde(borrow)]
-    #[builder(into)]
     pub to: jacquard_common::CowStr<'a>,
 }
 

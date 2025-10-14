@@ -15,17 +15,15 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Hthree<'a> {
     /// The name of the location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub name: Option<jacquard_common::CowStr<'a>>,
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The h3 encoded location.
     #[serde(borrow)]
-    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
 }

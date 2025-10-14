@@ -14,25 +14,21 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Host<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub account_count: Option<i64>,
+    pub account_count: std::option::Option<i64>,
     /// hostname of server; not a URL (no scheme)
     #[serde(borrow)]
-    #[builder(into)]
     pub hostname: jacquard_common::CowStr<'a>,
     /// Recent repo stream event sequence number. May be delayed from actual stream processing (eg, persisted cursor not in-memory cursor).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub seq: Option<i64>,
+    pub seq: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub status: Option<crate::com_atproto::sync::HostStatus<'a>>,
+    pub status: std::option::Option<crate::com_atproto::sync::HostStatus<'a>>,
 }
 
 #[derive(

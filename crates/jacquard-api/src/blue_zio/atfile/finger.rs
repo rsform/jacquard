@@ -15,18 +15,16 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Browser<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub id: Option<jacquard_common::CowStr<'a>>,
+    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub user_agent: Option<jacquard_common::CowStr<'a>>,
+    pub user_agent: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// A fingerprint of a machine upload.
@@ -39,24 +37,20 @@ pub struct Browser<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Machine<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub app: Option<jacquard_common::CowStr<'a>>,
+    pub app: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub host: Option<jacquard_common::CowStr<'a>>,
+    pub host: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub id: Option<jacquard_common::CowStr<'a>>,
+    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub os: Option<jacquard_common::CowStr<'a>>,
+    pub os: std::option::Option<jacquard_common::CowStr<'a>>,
 }

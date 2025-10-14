@@ -13,73 +13,70 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct PutPreferencesV2<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub chat: Option<crate::app_bsky::notification::ChatPreference<'a>>,
+    pub chat: std::option::Option<crate::app_bsky::notification::ChatPreference<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub follow: Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    #[serde(borrow)]
-    pub like: Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    #[serde(borrow)]
-    pub like_via_repost: Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    #[serde(borrow)]
-    pub mention: Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    #[serde(borrow)]
-    pub quote: Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    #[serde(borrow)]
-    pub reply: Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    #[serde(borrow)]
-    pub repost: Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    #[serde(borrow)]
-    pub repost_via_repost: Option<
+    pub follow: std::option::Option<
         crate::app_bsky::notification::FilterablePreference<'a>,
     >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub starterpack_joined: Option<crate::app_bsky::notification::Preference<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    #[serde(borrow)]
-    pub subscribed_post: Option<crate::app_bsky::notification::Preference<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    #[serde(borrow)]
-    pub unverified: Option<crate::app_bsky::notification::Preference<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    #[serde(borrow)]
-    pub verified: Option<crate::app_bsky::notification::Preference<'a>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
+    pub like: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
     >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub like_via_repost: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mention: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub quote: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub reply: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub repost: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub repost_via_repost: std::option::Option<
+        crate::app_bsky::notification::FilterablePreference<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub starterpack_joined: std::option::Option<
+        crate::app_bsky::notification::Preference<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub subscribed_post: std::option::Option<
+        crate::app_bsky::notification::Preference<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub unverified: std::option::Option<crate::app_bsky::notification::Preference<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub verified: std::option::Option<crate::app_bsky::notification::Preference<'a>>,
 }
 
 #[jacquard_derive::lexicon]

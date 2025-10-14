@@ -91,21 +91,18 @@ impl From<DefinitionGetRecordOutput<'_>> for Definition<'_> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ValueType<'a> {
     /// Closed set of values that this label can take.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub r#enum: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub r#enum: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// An optional constraint that can be applied on string concrete types.
     #[serde(borrow)]
-    #[builder(into)]
     pub format: jacquard_common::CowStr<'a>,
     /// The concrete type of this label's value.
     #[serde(borrow)]
-    #[builder(into)]
     pub r#type: jacquard_common::CowStr<'a>,
 }

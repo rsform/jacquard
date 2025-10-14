@@ -91,19 +91,16 @@ impl From<PullGetRecordOutput<'_>> for Pull<'_> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Source<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub branch: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub repo: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub repo: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub sha: jacquard_common::CowStr<'a>,
 }
 

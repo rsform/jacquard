@@ -13,58 +13,42 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct UpdateOAuthClient<'a> {
     /// OAuth client ID to update
     #[serde(borrow)]
-    #[builder(into)]
     pub client_id: jacquard_common::CowStr<'a>,
     /// New human-readable name of the OAuth client
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub client_name: Option<jacquard_common::CowStr<'a>>,
+    pub client_name: std::option::Option<jacquard_common::CowStr<'a>>,
     /// New URI of the client application
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub client_uri: Option<jacquard_common::types::string::Uri<'a>>,
+    pub client_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// New URI of the client logo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub logo_uri: Option<jacquard_common::types::string::Uri<'a>>,
+    pub logo_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// New URI of the privacy policy
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub policy_uri: Option<jacquard_common::types::string::Uri<'a>>,
+    pub policy_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// New allowed redirect URIs for OAuth flow
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub redirect_uris: Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+    pub redirect_uris: std::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
     /// New OAuth scope
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub scope: Option<jacquard_common::CowStr<'a>>,
+    pub scope: std::option::Option<jacquard_common::CowStr<'a>>,
     /// New URI of the terms of service
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub tos_uri: Option<jacquard_common::types::string::Uri<'a>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+    pub tos_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 #[jacquard_derive::lexicon]

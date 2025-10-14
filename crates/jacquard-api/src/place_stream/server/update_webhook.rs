@@ -13,67 +13,49 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct UpdateWebhook<'a> {
     /// Whether this webhook should be active.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub active: Option<bool>,
+    pub active: std::option::Option<bool>,
     /// A description of what this webhook is used for.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The types of events this webhook should receive.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub events: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub events: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// The ID of the webhook to update.
     #[serde(borrow)]
-    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
     /// Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub mute_words: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub mute_words: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// A user-friendly name for this webhook.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub name: Option<jacquard_common::CowStr<'a>>,
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Text to prepend to webhook messages.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub prefix: Option<jacquard_common::CowStr<'a>>,
+    pub prefix: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Text replacement rules for webhook messages.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub rewrite: Option<Vec<crate::place_stream::server::RewriteRule<'a>>>,
+    pub rewrite: std::option::Option<Vec<crate::place_stream::server::RewriteRule<'a>>>,
     /// Text to append to webhook messages.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub suffix: Option<jacquard_common::CowStr<'a>>,
+    pub suffix: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The webhook URL where events will be sent.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub url: Option<jacquard_common::types::string::Uri<'a>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+    pub url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 #[jacquard_derive::lexicon]

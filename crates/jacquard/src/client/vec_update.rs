@@ -1,6 +1,7 @@
 /// Bluesky actor preferences implementation
+#[cfg(feature = "api_bluesky")]
 pub mod preferences;
-
+#[cfg(feature = "api_bluesky")]
 pub use preferences::PreferencesUpdate;
 
 use jacquard_common::IntoStatic;

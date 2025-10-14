@@ -14,11 +14,10 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Math<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub tex: jacquard_common::CowStr<'a>,
 }

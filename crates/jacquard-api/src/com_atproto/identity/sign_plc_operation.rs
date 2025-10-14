@@ -13,39 +13,28 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct SignPlcOperation<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub also_known_as: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub also_known_as: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub rotation_keys: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub rotation_keys: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub services: Option<jacquard_common::types::value::Data<'a>>,
+    pub services: std::option::Option<jacquard_common::types::value::Data<'a>>,
     /// A token received through com.atproto.identity.requestPlcOperationSignature
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub token: Option<jacquard_common::CowStr<'a>>,
+    pub token: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub verification_methods: Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
+    pub verification_methods: std::option::Option<
+        jacquard_common::types::value::Data<'a>,
     >,
 }
 

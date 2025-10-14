@@ -14,17 +14,15 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConflictInfo<'a> {
     /// Name of the conflicted file
     #[serde(borrow)]
-    #[builder(into)]
     pub filename: jacquard_common::CowStr<'a>,
     /// Reason for the conflict
     #[serde(borrow)]
-    #[builder(into)]
     pub reason: jacquard_common::CowStr<'a>,
 }
 

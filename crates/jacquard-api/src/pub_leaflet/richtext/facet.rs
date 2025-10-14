@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Bold<'a> {}
@@ -47,7 +47,7 @@ pub struct ByteSlice<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Code<'a> {}
@@ -61,7 +61,7 @@ pub struct Code<'a> {}
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Highlight<'a> {}
@@ -75,14 +75,13 @@ pub struct Highlight<'a> {}
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Id<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub id: Option<jacquard_common::CowStr<'a>>,
+    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Facet feature for italic text
@@ -95,7 +94,7 @@ pub struct Id<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Italic<'a> {}
@@ -178,7 +177,7 @@ pub enum FacetFeaturesItem<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Strikethrough<'a> {}
@@ -192,7 +191,7 @@ pub struct Strikethrough<'a> {}
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Underline<'a> {}

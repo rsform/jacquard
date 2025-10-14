@@ -93,6 +93,14 @@ where
     S: ClientAuthStore,
 {
     pub fn new_from_resolver(store: S, client: T, client_data: ClientData<'static>) -> Self {
+        #[cfg(feature = "tracing")]
+        tracing::info!(
+            redirect_uris = ?client_data.config.redirect_uris,
+            scopes = ?client_data.config.scopes,
+            has_keyset = client_data.keyset.is_some(),
+            "oauth client created"
+        );
+
         let client = Arc::new(client);
         let registry = Arc::new(SessionRegistry::new(store, client.clone(), client_data));
         Self { registry, client }
@@ -125,6 +133,7 @@ where
             .map(|keyset| keyset.public_jwks())
             .unwrap_or_default()
     }
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self, input), fields(input = input.as_ref())))]
     pub async fn start_auth(
         &self,
         input: impl AsRef<str>,
@@ -168,6 +177,7 @@ where
             .unwrap())
     }
 
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "info", skip_all, fields(state = params.state.as_ref().map(|s| s.as_ref()))))]
     pub async fn callback(&self, params: CallbackParams<'_>) -> Result<OAuthSession<T, S>> {
         let Some(state_key) = params.state else {
             return Err(CallbackError::MissingState.into());
@@ -372,6 +382,7 @@ where
     S: ClientAuthStore + Send + Sync + 'static,
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
 {
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all))]
     pub async fn refresh(&self) -> Result<AuthorizationToken<'_>> {
         // Read identifiers without holding the lock across await
         let (did, sid) = {

@@ -13,34 +13,22 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct CreateSession<'a> {
     /// When true, instead of throwing error for takendown accounts, a valid response with a narrow scoped token will be returned
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub allow_takendown: Option<bool>,
+    pub allow_takendown: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub auth_factor_token: Option<jacquard_common::CowStr<'a>>,
+    pub auth_factor_token: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Handle or other identifier supported by the server for the authenticating user.
     #[serde(borrow)]
-    #[builder(into)]
     pub identifier: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub password: jacquard_common::CowStr<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
 }
 
 #[jacquard_derive::lexicon]

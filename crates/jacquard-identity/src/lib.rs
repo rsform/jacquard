@@ -102,6 +102,14 @@ pub struct JacquardResolver {
 impl JacquardResolver {
     /// Create a new instance of the default resolver with all options (except DNS) up front
     pub fn new(http: reqwest::Client, opts: ResolverOptions) -> Self {
+        #[cfg(feature = "tracing")]
+        tracing::info!(
+            public_fallback = opts.public_fallback_for_handle,
+            validate_doc_id = opts.validate_doc_id,
+            plc_source = ?opts.plc_source,
+            "jacquard resolver created"
+        );
+
         Self {
             http,
             opts,
@@ -333,6 +341,7 @@ impl IdentityResolver for JacquardResolver {
     fn options(&self) -> &ResolverOptions {
         &self.opts
     }
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self), fields(handle = %handle)))]
     async fn resolve_handle(&self, handle: &Handle<'_>) -> Result<Did<'static>, IdentityError> {
         let host = handle.as_str();
         for step in &self.opts.handle_order {
@@ -421,6 +430,7 @@ impl IdentityResolver for JacquardResolver {
         Err(IdentityError::InvalidWellKnown)
     }
 
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self), fields(did = %did)))]
     async fn resolve_did_doc(&self, did: &Did<'_>) -> Result<DidDocResponse, IdentityError> {
         let s = did.as_str();
         for step in &self.opts.did_order {

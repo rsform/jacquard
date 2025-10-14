@@ -167,6 +167,9 @@ where
     where
         S: Any + 'static,
     {
+        #[cfg(feature = "tracing")]
+        let _span = tracing::info_span!("credential_session_login", identifier = %identifier).entered();
+
         // Resolve PDS base
         let pds = if identifier.as_ref().starts_with("http://")
             || identifier.as_ref().starts_with("https://")
@@ -268,6 +271,9 @@ where
     where
         S: Any + 'static,
     {
+        #[cfg(feature = "tracing")]
+        let _span = tracing::info_span!("credential_session_restore", did = %did, session_id = %session_id).entered();
+
         let key = (did.clone().into_static(), session_id.clone().into_static());
         let Some(sess) = self.store.get(&key).await else {
             return Err(ClientError::Auth(AuthError::NotAuthenticated));

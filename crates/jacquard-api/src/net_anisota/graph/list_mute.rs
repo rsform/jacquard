@@ -15,26 +15,22 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContentTypes<'a> {
     /// Mute regular posts from accounts on this list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub posts: Option<bool>,
+    pub posts: std::option::Option<bool>,
     /// Mute quote posts from accounts on this list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub quotes: Option<bool>,
+    pub quotes: std::option::Option<bool>,
     /// Mute replies from accounts on this list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub replies: Option<bool>,
+    pub replies: std::option::Option<bool>,
     /// Mute reposts from accounts on this list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub reposts: Option<bool>,
+    pub reposts: std::option::Option<bool>,
 }
 
 /// A record for muting content from all accounts on a list with fine-grained control over content types, duration, and feed targeting

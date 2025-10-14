@@ -13,43 +13,30 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct QueryEvents<'a> {
     /// Cursor for pagination
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub cursor: Option<jacquard_common::CowStr<'a>>,
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Maximum number of results to return
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub limit: Option<i64>,
+    pub limit: std::option::Option<i64>,
     /// Filter by pattern type
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub pattern_type: Option<jacquard_common::CowStr<'a>>,
+    pub pattern_type: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Sort direction
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub sort_direction: Option<jacquard_common::CowStr<'a>>,
+    pub sort_direction: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Filter by specific URLs or domains
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub urls: Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+    pub urls: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 #[jacquard_derive::lexicon]

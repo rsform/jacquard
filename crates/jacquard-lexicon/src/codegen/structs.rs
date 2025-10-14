@@ -21,8 +21,37 @@ pub(super) enum EnumVariantKind {
 /// Check if a type name conflicts with types referenced by bon::Builder macro.
 /// bon::Builder generates code that uses unqualified `Option` and `Result`,
 /// so structs with these names cause compilation errors.
-fn conflicts_with_builder_macro(type_name: &str) -> bool {
+pub(crate) fn conflicts_with_builder_macro(type_name: &str) -> bool {
     matches!(type_name, "Option" | "Result")
+}
+
+/// Count the number of required fields in a lexicon object.
+/// Used to determine whether to generate builders or Default impls.
+pub(crate) fn count_required_fields(obj: &LexObject<'static>) -> usize {
+    let required = obj.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
+    required.len()
+}
+
+/// Check if a field property is a plain string that can default to empty.
+/// Returns true for bare CowStr fields (no format constraints).
+fn is_defaultable_string(prop: &LexObjectProperty<'static>) -> bool {
+    matches!(prop, LexObjectProperty::String(s) if s.format.is_none())
+}
+
+/// Check if all required fields in an object are defaultable strings.
+pub(crate) fn all_required_are_defaultable_strings(obj: &LexObject<'static>) -> bool {
+    let required = obj.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
+
+    if required.is_empty() {
+        return false; // Handled separately by count check
+    }
+
+    required.iter().all(|field_name| {
+        let field_name_str: &str = field_name.as_ref();
+        obj.properties.get(field_name_str)
+            .map(is_defaultable_string)
+            .unwrap_or(false)
+    })
 }
 
 impl<'c> CodeGenerator<'c> {
@@ -199,8 +228,14 @@ impl<'c> CodeGenerator<'c> {
 
         // Objects always get a lifetime since they have the #[lexicon] attribute
         // which adds extra_data: BTreeMap<..., Data<'a>>
-        // Skip bon::Builder for types that conflict with the macro's unqualified type references
-        let has_builder = !conflicts_with_builder_macro(&type_name);
+
+        // Smart heuristics for builder generation:
+        // - 0 required fields: Default instead of builder
+        // - All required fields are bare strings: Default instead of builder
+        // - 1+ required fields (not all strings): bon::Builder (but not if name conflicts)
+        let required_count = count_required_fields(obj);
+        let has_default = required_count == 0 || all_required_are_defaultable_strings(obj);
+        let has_builder = required_count >= 1 && !has_default && !conflicts_with_builder_macro(&type_name);
 
         let fields = self.generate_object_fields(nsid, &type_name, obj, has_builder)?;
         let doc = self.generate_doc_comment(obj.description.as_ref());
@@ -210,6 +245,16 @@ impl<'c> CodeGenerator<'c> {
                 #doc
                 #[jacquard_derive::lexicon]
                 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic, bon::Builder)]
+                #[serde(rename_all = "camelCase")]
+                pub struct #ident<'a> {
+                    #fields
+                }
+            }
+        } else if has_default {
+            quote! {
+                #doc
+                #[jacquard_derive::lexicon]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic, Default)]
                 #[serde(rename_all = "camelCase")]
                 pub struct #ident<'a> {
                     #fields

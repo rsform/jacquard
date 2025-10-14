@@ -13,58 +13,42 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct QueryRules<'a> {
     /// Filter by action types
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub actions: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub actions: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Filter by rule creator
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub created_by: Option<jacquard_common::types::string::Did<'a>>,
+    pub created_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
     /// Cursor for pagination
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub cursor: Option<jacquard_common::CowStr<'a>>,
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Maximum number of results to return
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub limit: Option<i64>,
+    pub limit: std::option::Option<i64>,
     /// Filter by pattern type
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub pattern_type: Option<jacquard_common::CowStr<'a>>,
+    pub pattern_type: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Filter by reason type
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub reason: Option<jacquard_common::CowStr<'a>>,
+    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Sort direction
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub sort_direction: Option<jacquard_common::CowStr<'a>>,
+    pub sort_direction: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Filter by specific URLs or domains
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub urls: Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+    pub urls: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 #[jacquard_derive::lexicon]

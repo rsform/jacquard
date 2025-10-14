@@ -110,11 +110,10 @@ pub struct Mention<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tag<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub tag: jacquard_common::CowStr<'a>,
 }

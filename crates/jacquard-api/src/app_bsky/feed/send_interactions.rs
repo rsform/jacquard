@@ -38,7 +38,8 @@ pub struct SendInteractions<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SendInteractionsOutput<'a> {}

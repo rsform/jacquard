@@ -13,27 +13,17 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct SyncUserCollections<'a> {
     /// AT-URI of the slice to sync user data into
     #[serde(borrow)]
-    #[builder(into)]
     pub slice: jacquard_common::CowStr<'a>,
     /// Timeout in seconds for the sync operation
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub timeout_seconds: Option<i64>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+    pub timeout_seconds: std::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]

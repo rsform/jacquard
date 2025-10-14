@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FollowerRule<'a> {}
@@ -29,7 +29,7 @@ pub struct FollowerRule<'a> {}
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FollowingRule<'a> {}
@@ -156,7 +156,7 @@ impl From<ThreadgateGetRecordOutput<'_>> for Threadgate<'_> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MentionRule<'a> {}

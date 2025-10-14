@@ -13,40 +13,27 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct CreateTemplate<'a> {
     /// Content of the template, markdown supported, can contain variable placeholders.
     #[serde(borrow)]
-    #[builder(into)]
     pub content_markdown: jacquard_common::CowStr<'a>,
     /// DID of the user who is creating the template.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub created_by: Option<jacquard_common::types::string::Did<'a>>,
+    pub created_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
     /// Message language.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub lang: Option<jacquard_common::types::string::Language>,
+    pub lang: std::option::Option<jacquard_common::types::string::Language>,
     /// Name of the template.
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// Subject of the message, used in emails.
     #[serde(borrow)]
-    #[builder(into)]
     pub subject: jacquard_common::CowStr<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
 }
 
 #[jacquard_derive::lexicon]

@@ -1757,6 +1757,7 @@ dependencies = [
  "smol_str",
  "thiserror 2.0.17",
  "tokio",
+ "tracing",
  "url",
 ]
 
@@ -1882,6 +1883,7 @@ dependencies = [
  "smol_str",
  "thiserror 2.0.17",
  "tokio",
+ "tracing",
  "url",
 ]
 
@@ -1956,6 +1958,7 @@ dependencies = [
  "serde_json",
  "thiserror 2.0.17",
  "tokio",
+ "tracing",
  "url",
  "urlencoding",
 ]
@@ -2017,6 +2020,7 @@ dependencies = [
  "smol_str",
  "thiserror 2.0.17",
  "tokio",
+ "tracing",
  "trait-variant",
  "url",
  "webbrowser",

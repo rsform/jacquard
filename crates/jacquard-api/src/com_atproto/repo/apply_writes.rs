@@ -88,7 +88,7 @@ pub struct Delete<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteResult<'a> {}
@@ -157,7 +157,8 @@ pub enum ApplyWritesWritesItem<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ApplyWritesOutput<'a> {

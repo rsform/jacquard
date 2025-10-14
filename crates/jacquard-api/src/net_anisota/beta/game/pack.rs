@@ -96,25 +96,22 @@ impl From<PackGetRecordOutput<'_>> for Pack<'_> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PackHistoryEntry<'a> {
     /// Items received from this pack
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub items_received: Option<
+    pub items_received: std::option::Option<
         Vec<crate::net_anisota::beta::game::pack::ReceivedItem<'a>>,
     >,
     /// When this pack was opened
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub open_time: Option<jacquard_common::types::string::Datetime>,
+    pub open_time: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Streak count at time of opening
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub streak_count: Option<i64>,
+    pub streak_count: std::option::Option<i64>,
 }
 
 /// An item received from a pack opening
@@ -127,22 +124,19 @@ pub struct PackHistoryEntry<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReceivedItem<'a> {
     /// ID of the item received
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub item_id: Option<jacquard_common::CowStr<'a>>,
+    pub item_id: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Quantity received
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub quantity: Option<i64>,
+    pub quantity: std::option::Option<i64>,
     /// Rarity of the item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub rarity: Option<jacquard_common::CowStr<'a>>,
+    pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
 }

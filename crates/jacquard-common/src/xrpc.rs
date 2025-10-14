@@ -305,6 +305,7 @@ impl<'a, C: HttpClient> XrpcCall<'a, C> {
     ///   inspect the header for `error="invalid_token"` or `error="use_dpop_nonce"` and react
     ///   (refresh/retry). If the header is absent, the 401 body flows through to `Response` and
     ///   can be parsed/mapped to `AuthError` as appropriate.
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self, request), fields(nsid = R::NSID)))]
     pub async fn send<R>(self, request: &R) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
     where
         R: XrpcRequest + Send + Sync,

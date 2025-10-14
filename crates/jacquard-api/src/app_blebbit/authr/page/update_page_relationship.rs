@@ -13,28 +13,17 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct UpdatePageRelationship<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub relation: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub resource: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub subject: jacquard_common::CowStr<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
 }
 
 ///Response type for

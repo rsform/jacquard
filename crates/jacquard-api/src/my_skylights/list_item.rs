@@ -32,14 +32,13 @@ impl std::fmt::Display for Abandoned {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Builtin<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub r#type: Option<BuiltinType<'a>>,
+    pub r#type: std::option::Option<BuiltinType<'a>>,
 }
 
 #[jacquard_derive::open_union]

@@ -125,12 +125,11 @@ pub struct LabelerViewDetailed<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerViewerState<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub like: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }

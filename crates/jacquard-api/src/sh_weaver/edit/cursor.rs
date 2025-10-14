@@ -172,14 +172,12 @@ pub struct NormalContainerId<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RootContainerId<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub container_type: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
 }

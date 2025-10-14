@@ -253,13 +253,12 @@ pub struct LabelValueDefinitionStrings<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SelfLabel<'a> {
     /// The short string name of the value or type of this label.
     #[serde(borrow)]
-    #[builder(into)]
     pub val: jacquard_common::CowStr<'a>,
 }
 

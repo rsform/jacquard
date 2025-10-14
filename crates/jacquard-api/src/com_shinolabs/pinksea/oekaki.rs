@@ -35,15 +35,14 @@ pub struct Image<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ImageLink<'a> {
     /// Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub alt: Option<jacquard_common::CowStr<'a>>,
+    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// An oekaki post.

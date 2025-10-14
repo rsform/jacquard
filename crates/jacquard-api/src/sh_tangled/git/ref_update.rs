@@ -14,14 +14,13 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CommitCountBreakdown<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub by_email: Option<
+    pub by_email: std::option::Option<
         Vec<crate::sh_tangled::git::ref_update::IndividualEmailCommitCount<'a>>,
     >,
 }
@@ -73,14 +72,13 @@ pub struct IndividualLanguageSize<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LangBreakdown<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub inputs: Option<
+    pub inputs: std::option::Option<
         Vec<crate::sh_tangled::git::ref_update::IndividualLanguageSize<'a>>,
     >,
 }

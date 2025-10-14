@@ -95,14 +95,13 @@ impl From<PipelineGetRecordOutput<'_>> for Pipeline<'_> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ManualTriggerData<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub inputs: Option<Vec<crate::sh_tangled::pipeline::Pair<'a>>>,
+    pub inputs: std::option::Option<Vec<crate::sh_tangled::pipeline::Pair<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -114,15 +113,13 @@ pub struct ManualTriggerData<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Pair<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub key: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
 }
 
@@ -135,21 +132,17 @@ pub struct Pair<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PullRequestTriggerData<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub action: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub source_branch: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub source_sha: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub target_branch: jacquard_common::CowStr<'a>,
 }
 
@@ -162,18 +155,15 @@ pub struct PullRequestTriggerData<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PushTriggerData<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub new_sha: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub old_sha: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub r#ref: jacquard_common::CowStr<'a>,
 }
 

@@ -13,30 +13,19 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct UpdateEmail<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub email: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub email_auth_factor: Option<bool>,
+    pub email_auth_factor: std::option::Option<bool>,
     /// Requires a token from com.atproto.sever.requestEmailUpdate if the account's email has been confirmed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub token: Option<jacquard_common::CowStr<'a>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+    pub token: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::open_union]

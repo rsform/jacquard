@@ -72,14 +72,15 @@ pub enum BlockBlock<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LinearDocument<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub blocks: Option<Vec<crate::pub_leaflet::pages::linear_document::Block<'a>>>,
+    pub blocks: std::option::Option<
+        Vec<crate::pub_leaflet::pages::linear_document::Block<'a>>,
+    >,
 }
 
 #[jacquard_derive::lexicon]

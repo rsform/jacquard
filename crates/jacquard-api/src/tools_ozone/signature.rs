@@ -18,14 +18,12 @@ pub mod search_accounts;
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SigDetail<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub property: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
 }

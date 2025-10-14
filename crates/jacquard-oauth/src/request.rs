@@ -180,6 +180,7 @@ impl OAuthMetadata {
     }
 }
 
+#[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all, fields(login_hint = login_hint.as_ref().map(|h| h.as_ref()))))]
 pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
     client: &T,
     login_hint: Option<CowStr<'r>>,
@@ -207,7 +208,6 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
         login_hint: login_hint,
         prompt: prompt.map(CowStr::from),
     };
-    println!("Parameters: {:?}", parameters);
     if metadata
         .server_metadata
         .pushed_authorization_request_endpoint
@@ -255,6 +255,7 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
     }
 }
 
+#[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all, fields(did = %session_data.account_did)))]
 pub async fn refresh<'r, T>(
     client: &T,
     mut session_data: ClientSessionData<'r>,
@@ -313,6 +314,7 @@ where
     Ok(session_data)
 }
 
+#[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all))]
 pub async fn exchange_code<'r, T, D>(
     client: &T,
     data_source: &'r mut D,
@@ -371,6 +373,7 @@ where
     })
 }
 
+#[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all))]
 pub async fn revoke<'r, T, D>(
     client: &T,
     data_source: &'r mut D,

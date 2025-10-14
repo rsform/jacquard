@@ -145,17 +145,15 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateReportRequest {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModTool<'a> {
     /// Additional arbitrary metadata about the source
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub meta: Option<jacquard_common::types::value::Data<'a>>,
+    pub meta: std::option::Option<jacquard_common::types::value::Data<'a>>,
     /// Name/identifier of the source (e.g., 'bsky-app/android', 'bsky-web/chrome')
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
 }

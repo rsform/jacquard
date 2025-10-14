@@ -14,18 +14,15 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Header<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub facets: Option<Vec<crate::pub_leaflet::richtext::facet::Facet<'a>>>,
+    pub facets: std::option::Option<Vec<crate::pub_leaflet::richtext::facet::Facet<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub level: Option<i64>,
+    pub level: std::option::Option<i64>,
     #[serde(borrow)]
-    #[builder(into)]
     pub plaintext: jacquard_common::CowStr<'a>,
 }

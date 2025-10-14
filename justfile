@@ -51,7 +51,7 @@ example NAME *ARGS:
         cargo run -p jacquard --example {{NAME}} -- {{ARGS}}
     elif cargo metadata --format-version=1 --no-deps | \
          jq -e '.packages[] | select(.name == "jacquard-axum") | .targets[] | select(.kind[] == "example" and .name == "{{NAME}}")' > /dev/null; then
-        cargo run -p jacquard-axum --example {{NAME}} -- {{ARGS}}
+        cargo run -p jacquard-axum --example {{NAME}} --features api_bluesky -- {{ARGS}}
     else
         echo "Example '{{NAME}}' not found."
         echo ""

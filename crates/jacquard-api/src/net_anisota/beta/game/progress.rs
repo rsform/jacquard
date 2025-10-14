@@ -131,20 +131,18 @@ impl From<ProgressGetRecordOutput<'_>> for Progress<'_> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Metadata<'a> {
     /// Version of the client when this progress was recorded
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub client_version: Option<jacquard_common::CowStr<'a>>,
+    pub client_version: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Platform where the level up occurred (web, mobile, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub platform: Option<jacquard_common::CowStr<'a>>,
+    pub platform: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Game-specific statistics and metrics
@@ -157,40 +155,34 @@ pub struct Metadata<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Stats<'a> {
     /// Total daily rewards claimed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub daily_rewards_claimed: Option<i64>,
+    pub daily_rewards_claimed: std::option::Option<i64>,
     /// Total items collected
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub items_collected: Option<i64>,
+    pub items_collected: std::option::Option<i64>,
     /// Date when posts read today was last updated (for daily reset tracking)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub last_post_read_date: Option<jacquard_common::types::string::Datetime>,
+    pub last_post_read_date: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
     /// Posts read today (resets daily)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub posts_read_today: Option<i64>,
+    pub posts_read_today: std::option::Option<i64>,
     /// Total posts read (all time, cumulative)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub posts_read_total: Option<i64>,
+    pub posts_read_total: std::option::Option<i64>,
     /// Total posts viewed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub posts_viewed: Option<i64>,
+    pub posts_viewed: std::option::Option<i64>,
     /// Total shuffles performed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub shuffles_performed: Option<i64>,
+    pub shuffles_performed: std::option::Option<i64>,
     /// Total specimens collected
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub specimens_collected: Option<i64>,
+    pub specimens_collected: std::option::Option<i64>,
 }

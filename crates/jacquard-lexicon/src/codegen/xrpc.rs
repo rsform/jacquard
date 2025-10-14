@@ -410,8 +410,22 @@ impl<'c> CodeGenerator<'c> {
         // Check if this is a binary body (no schema, just raw bytes)
         let is_binary_body = body.schema.is_none();
 
+        // Determine if we should derive Default or bon::Builder
+        // Binary bodies always get builder, schema-based inputs use heuristics
+        let (has_default, has_builder) = if is_binary_body {
+            (false, true)
+        } else if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
+            use crate::codegen::structs::{count_required_fields, all_required_are_defaultable_strings, conflicts_with_builder_macro};
+            let required_count = count_required_fields(obj);
+            let can_default = required_count == 0 || all_required_are_defaultable_strings(obj);
+            let can_builder = required_count >= 1 && !can_default && !conflicts_with_builder_macro(type_base);
+            (can_default, can_builder)
+        } else {
+            (false, false)
+        };
+
         let fields = if let Some(schema) = &body.schema {
-            self.generate_body_fields("", type_base, schema, true)?
+            self.generate_body_fields("", type_base, schema, has_builder)?
         } else {
             // Binary body: just a bytes field
             quote! {
@@ -432,8 +446,8 @@ impl<'c> CodeGenerator<'c> {
                     #fields
                 }
             }
-        } else {
-            // Input structs with schemas: manually add extra_data field with #[builder(default)]
+        } else if has_builder {
+            // Input structs with schemas and builders: manually add extra_data field with #[builder(default)]
             // for bon compatibility. The #[lexicon] macro will see it exists and skip adding it.
             quote! {
                 #doc
@@ -450,6 +464,26 @@ impl<'c> CodeGenerator<'c> {
                         ::jacquard_common::smol_str::SmolStr,
                         ::jacquard_common::types::value::Data<'a>
                     >,
+                }
+            }
+        } else if has_default {
+            quote! {
+                #doc
+                #[jacquard_derive::lexicon]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic, Default)]
+                #[serde(rename_all = "camelCase")]
+                pub struct #ident<'a> {
+                    #fields
+                }
+            }
+        } else {
+            quote! {
+                #doc
+                #[jacquard_derive::lexicon]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                #[serde(rename_all = "camelCase")]
+                pub struct #ident<'a> {
+                    #fields
                 }
             }
         };
@@ -509,15 +543,37 @@ impl<'c> CodeGenerator<'c> {
 
         let doc = self.generate_doc_comment(body.description.as_ref());
 
+        // Determine if we should derive Default
+        // Check if schema is an Object and apply heuristics
+        let has_default = if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
+            use crate::codegen::structs::{count_required_fields, all_required_are_defaultable_strings};
+            let required_count = count_required_fields(obj);
+            required_count == 0 || all_required_are_defaultable_strings(obj)
+        } else {
+            false
+        };
+
         // Output structs always get a lifetime since they have the #[lexicon] attribute
         // which adds extra_data: BTreeMap<..., Data<'a>>
-        let struct_def = quote! {
-            #doc
-            #[jacquard_derive::lexicon]
-            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
-            #[serde(rename_all = "camelCase")]
-            pub struct #ident<'a> {
-                #fields
+        let struct_def = if has_default {
+            quote! {
+                #doc
+                #[jacquard_derive::lexicon]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic, Default)]
+                #[serde(rename_all = "camelCase")]
+                pub struct #ident<'a> {
+                    #fields
+                }
+            }
+        } else {
+            quote! {
+                #doc
+                #[jacquard_derive::lexicon]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                #[serde(rename_all = "camelCase")]
+                pub struct #ident<'a> {
+                    #fields
+                }
             }
         };
 

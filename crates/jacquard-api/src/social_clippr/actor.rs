@@ -82,12 +82,11 @@ pub struct ProfileView<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublishingScopesPref<'a> {
     /// What publishing scope to mark a clip as by default
     #[serde(borrow)]
-    #[builder(into)]
     pub default_scope: jacquard_common::CowStr<'a>,
 }

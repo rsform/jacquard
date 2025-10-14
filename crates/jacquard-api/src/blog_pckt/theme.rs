@@ -84,28 +84,23 @@ impl From<ThemeGetRecordOutput<'_>> for Theme<'_> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Palette<'a> {
     /// Accent color (hex value)
     #[serde(borrow)]
-    #[builder(into)]
     pub accent: jacquard_common::CowStr<'a>,
     /// Background color (hex value)
     #[serde(borrow)]
-    #[builder(into)]
     pub background: jacquard_common::CowStr<'a>,
     /// Link color (hex value)
     #[serde(borrow)]
-    #[builder(into)]
     pub link: jacquard_common::CowStr<'a>,
     /// Surface hover color (hex value)
     #[serde(borrow)]
-    #[builder(into)]
     pub surface_hover: jacquard_common::CowStr<'a>,
     /// Primary text color (hex value)
     #[serde(borrow)]
-    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
 }

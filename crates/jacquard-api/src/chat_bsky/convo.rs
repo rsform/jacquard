@@ -112,15 +112,13 @@ pub struct DeletedMessageView<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogAcceptConvo<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -177,15 +175,13 @@ pub enum LogAddReactionMessage<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogBeginConvo<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -282,15 +278,13 @@ pub enum LogDeleteMessageMessage<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogLeaveConvo<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -303,15 +297,13 @@ pub struct LogLeaveConvo<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogMuteConvo<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -410,15 +402,13 @@ pub enum LogRemoveReactionMessage<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogUnmuteConvo<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -450,21 +440,18 @@ pub struct MessageAndReactionView<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageInput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub embed: Option<crate::app_bsky::embed::record::Record<'a>>,
+    pub embed: std::option::Option<crate::app_bsky::embed::record::Record<'a>>,
     /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
 }
 

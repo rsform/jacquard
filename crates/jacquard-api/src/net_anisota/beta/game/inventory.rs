@@ -135,22 +135,19 @@ impl From<InventoryGetRecordOutput<'_>> for Inventory<'_> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SourceDetails<'a> {
     /// URI of the game card that provided this item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub game_card_uri: Option<jacquard_common::CowStr<'a>>,
+    pub game_card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
     /// ID of the quest that rewarded this item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub quest_id: Option<jacquard_common::CowStr<'a>>,
+    pub quest_id: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Daily reward streak when item was acquired
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
-    pub reward_streak: Option<i64>,
+    pub reward_streak: std::option::Option<i64>,
 }
