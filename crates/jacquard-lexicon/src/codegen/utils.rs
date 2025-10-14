@@ -60,11 +60,17 @@ pub(super) fn make_ident(s: &str) -> syn::Ident {
 
     // Try to parse as ident, fall back to raw ident if needed
     syn::parse_str::<syn::Ident>(&sanitized).unwrap_or_else(|_| {
-        eprintln!(
-            "Warning: Invalid identifier '{}' sanitized to '{}'",
-            s, sanitized
-        );
-        syn::Ident::new_raw(&sanitized, proc_macro2::Span::call_site())
+        // only print if the sanitization actually changed the name
+        // for types where the name is a keyword, will prepend 'r#'
+        if s != sanitized {
+            eprintln!(
+                "Warning: Invalid identifier '{}' sanitized to '{}'",
+                s, sanitized
+            );
+            syn::Ident::new(&sanitized, proc_macro2::Span::call_site())
+        } else {
+            syn::Ident::new_raw(&sanitized, proc_macro2::Span::call_site())
+        }
     })
 }
 
