@@ -108,6 +108,34 @@ impl<'h> Handle<'h> {
             Ok(Self(CowStr::new_static(handle)))
         }
     }
+
+    /// Fallible constructor, validates, borrows from input if possible
+    ///
+    /// May allocate for a long handle with an at:// or @ prefix, otherwise borrows.
+    /// Accepts (and strips) preceding '@' or 'at://' if present
+    pub fn new_cow(handle: CowStr<'h>) -> Result<Self, AtStrError> {
+        let handle = if let Some(stripped) = handle.strip_prefix("at://") {
+            CowStr::copy_from_str(stripped)
+        } else if let Some(stripped) = handle.strip_prefix('@') {
+            CowStr::copy_from_str(stripped)
+        } else {
+            handle
+        };
+        if handle.len() > 253 {
+            Err(AtStrError::too_long("handle", &handle, 253, handle.len()))
+        } else if !HANDLE_REGEX.is_match(&handle) {
+            Err(AtStrError::regex(
+                "handle",
+                &handle,
+                SmolStr::new_static("invalid"),
+            ))
+        } else if ends_with(&handle, DISALLOWED_TLDS) {
+            Err(AtStrError::disallowed("handle", &handle, DISALLOWED_TLDS))
+        } else {
+            Ok(Self(handle))
+        }
+    }
+
     /// Infallible constructor for when you *know* the string is a valid handle.
     /// Will panic on invalid handles. If you're manually decoding atproto records
     /// or API values you know are valid (rather than using serde), this is the one to use.
@@ -179,7 +207,7 @@ where
         D: Deserializer<'de>,
     {
         let value = Deserialize::deserialize(deserializer)?;
-        Self::new(value).map_err(D::Error::custom)
+        Self::new_cow(value).map_err(D::Error::custom)
     }
 }
 

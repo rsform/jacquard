@@ -213,6 +213,9 @@ pub mod http_client;
 pub mod macros;
 /// Generic session storage traits and utilities.
 pub mod session;
+/// Service authentication JWT parsing and verification.
+#[cfg(feature = "service-auth")]
+pub mod service_auth;
 /// Baseline fundamental AT Protocol data types.
 pub mod types;
 // XRPC protocol types and traits

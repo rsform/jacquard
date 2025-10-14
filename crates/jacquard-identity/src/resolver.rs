@@ -10,6 +10,7 @@
 //! and optionally validate the document `id` against the requested DID.
 
 use std::collections::BTreeMap;
+use std::marker::Sync;
 use std::str::FromStr;
 
 use bon::Builder;
@@ -333,19 +334,26 @@ pub trait IdentityResolver {
     fn resolve_handle(
         &self,
         handle: &Handle<'_>,
-    ) -> impl Future<Output = Result<Did<'static>, IdentityError>>;
+    ) -> impl Future<Output = Result<Did<'static>, IdentityError>> + Send
+    where
+        Self: Sync;
 
     /// Resolve DID document
     fn resolve_did_doc(
         &self,
         did: &Did<'_>,
-    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>>;
+    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>> + Send
+    where
+        Self: Sync;
 
     /// Resolve DID doc from an identifier
     fn resolve_ident(
         &self,
         actor: &AtIdentifier<'_>,
-    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>> {
+    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>> + Send
+    where
+        Self: Sync,
+    {
         async move {
             match actor {
                 AtIdentifier::Did(did) => self.resolve_did_doc(&did).await,
@@ -361,7 +369,10 @@ pub trait IdentityResolver {
     fn resolve_ident_owned(
         &self,
         actor: &AtIdentifier<'_>,
-    ) -> impl Future<Output = Result<DidDocument<'static>, IdentityError>> {
+    ) -> impl Future<Output = Result<DidDocument<'static>, IdentityError>> + Send
+    where
+        Self: Sync,
+    {
         async move {
             match actor {
                 AtIdentifier::Did(did) => self.resolve_did_doc_owned(&did).await,
@@ -377,11 +388,17 @@ pub trait IdentityResolver {
     fn resolve_did_doc_owned(
         &self,
         did: &Did<'_>,
-    ) -> impl Future<Output = Result<DidDocument<'static>, IdentityError>> {
+    ) -> impl Future<Output = Result<DidDocument<'static>, IdentityError>> + Send
+    where
+        Self: Sync,
+    {
         async { self.resolve_did_doc(did).await?.into_owned() }
     }
     /// Return the PDS url for a DID
-    fn pds_for_did(&self, did: &Did<'_>) -> impl Future<Output = Result<Url, IdentityError>> {
+    fn pds_for_did(&self, did: &Did<'_>) -> impl Future<Output = Result<Url, IdentityError>> + Send
+    where
+        Self: Sync,
+    {
         async {
             let resp = self.resolve_did_doc(did).await?;
             let doc = resp.parse()?;
@@ -401,7 +418,10 @@ pub trait IdentityResolver {
     fn pds_for_handle(
         &self,
         handle: &Handle<'_>,
-    ) -> impl Future<Output = Result<(Did<'static>, Url), IdentityError>> {
+    ) -> impl Future<Output = Result<(Did<'static>, Url), IdentityError>> + Send
+    where
+        Self: Sync,
+    {
         async {
             let did = self.resolve_handle(handle).await?;
             let pds = self.pds_for_did(&did).await?;
@@ -410,7 +430,7 @@ pub trait IdentityResolver {
     }
 }
 
-impl<T: IdentityResolver> IdentityResolver for std::sync::Arc<T> {
+impl<T: IdentityResolver + Sync> IdentityResolver for std::sync::Arc<T> {
     fn options(&self) -> &ResolverOptions {
         self.as_ref().options()
     }

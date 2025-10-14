@@ -330,6 +330,11 @@ impl<'u> AtUri<'u> {
             .as_ref()
             .and_then(|p| p.rkey.as_ref())
     }
+
+    /// Fallible constructor, validates, borrows from input if possible
+    pub fn new_cow(uri: CowStr<'u>) -> Result<Self, AtStrError> {
+        Self::try_from(uri)
+    }
 }
 
 impl AtUri<'static> {
@@ -615,7 +620,7 @@ where
         D: Deserializer<'de>,
     {
         let value = Deserialize::deserialize(deserializer)?;
-        Self::new(value).map_err(D::Error::custom)
+        Self::new_cow(value).map_err(D::Error::custom)
     }
 }
 

@@ -26,7 +26,10 @@ axum-macros = "0.5.0"
 bytes.workspace = true
 jacquard = { version = "0.5", path = "../jacquard" }
 jacquard-common = { version = "0.5", path = "../jacquard-common", features = ["reqwest-client"] }
+jacquard-derive = { version = "0.5.1", path = "../jacquard-derive" }
+jacquard-identity = { version = "0.5", path = "../jacquard-identity", optional = true }
 miette.workspace = true
+multibase = { version = "0.9.1", optional = true }
 serde.workspace = true
 serde_html_form.workspace = true
 serde_ipld_dagcbor.workspace = true
@@ -36,7 +39,19 @@ tokio.workspace = true
 tower-http = { version = "0.6.6", features = ["trace", "tracing"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.20", features = ["env-filter", "time"] }
+urlencoding.workspace = true
+
+[features]
+default = ["service-auth"]
+service-auth = ["jacquard-common/service-auth", "dep:jacquard-identity", "dep:multibase"]
 
 [dev-dependencies]
 axum-test = "18.1.0"
+base64.workspace = true
+chrono.workspace = true
+k256 = { version = "0.13", features = ["ecdsa"] }
+rand = "0.8"
+reqwest.workspace = true
+serde_json.workspace = true
 tokio-test = "0.4.4"
+tower = { version = "0.5", features = ["util"] }

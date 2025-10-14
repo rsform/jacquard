@@ -149,7 +149,7 @@ where
 impl<S, T> CredentialSession<S, T>
 where
     S: SessionStore<SessionKey, AtpSession>,
-    T: HttpClient + IdentityResolver + XrpcExt,
+    T: HttpClient + IdentityResolver + XrpcExt + Sync + Send,
 {
     /// Resolve the user's PDS and create an app-password session.
     ///

@@ -120,7 +120,10 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         &self,
         server_metadata: &OAuthAuthorizationServerMetadata<'_>,
         sub: &Did<'_>,
-    ) -> impl std::future::Future<Output = Result<Url, ResolverError>> {
+    ) -> impl std::future::Future<Output = Result<Url, ResolverError>> + Send
+    where
+        Self: Sync,
+    {
         async {
             let (metadata, identity) = self.resolve_from_identity(sub).await?;
             if !issuer_equivalent(&metadata.issuer, &server_metadata.issuer) {
@@ -144,7 +147,10 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
             ),
             ResolverError,
         >,
-    > {
+    > + Send
+    where
+        Self: Sync,
+    {
         // Allow using an entryway, or PDS url, directly as login input (e.g.
         // when the user forgot their handle, or when the handle does not
         // resolve to a DID)
@@ -161,7 +167,9 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn resolve_from_service(
         &self,
         input: &Url,
-    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>>
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>> + Send
+    where
+        Self: Sync,
     {
         async {
             // Assume first that input is a PDS URL (as required by ATPROTO)
@@ -183,7 +191,10 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
             ),
             ResolverError,
         >,
-    > {
+    > + Send
+    where
+        Self: Sync,
+    {
         async {
             let actor = AtIdentifier::new(input)
                 .map_err(|e| ResolverError::AtIdentifier(format!("{:?}", e)))?;
@@ -199,7 +210,9 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn get_authorization_server_metadata(
         &self,
         issuer: &Url,
-    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>>
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>> + Send
+    where
+        Self: Sync,
     {
         async {
             let mut md = resolve_authorization_server(self, issuer).await?;
@@ -211,7 +224,9 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn get_resource_server_metadata(
         &self,
         pds: &Url,
-    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>>
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>> + Send
+    where
+        Self: Sync,
     {
         async move {
             let rs_metadata = resolve_protected_resource_info(self, pds).await?;

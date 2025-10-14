@@ -45,6 +45,10 @@
 //! The extractor deserializes to borrowed types first, then converts to `'static` via
 //! [`IntoStatic`], avoiding the DeserializeOwned requirement of the Json axum extractor and similar.
 
+pub mod did_web;
+#[cfg(feature = "service-auth")]
+pub mod service_auth;
+
 use axum::{
     Json, Router,
     body::Bytes,
@@ -102,9 +106,9 @@ where
                 }
                 XrpcMethod::Query => {
                     if let Some(path_query) = req.uri().path_and_query() {
-                        let query = path_query.query().unwrap_or("");
-                        let value: R::Request<'_> =
-                            serde_html_form::from_str::<R::Request<'_>>(query).map_err(|e| {
+                        // TODO: see if we can eliminate this now that we've fixed the deserialize impls for string types
+                        let query =
+                            urlencoding::decode(path_query.query().unwrap_or("")).map_err(|e| {
                                 (
                                     StatusCode::BAD_REQUEST,
                                     [(
@@ -118,6 +122,23 @@ where
                                 )
                                     .into_response()
                             })?;
+                        let value: R::Request<'_> = serde_html_form::from_str::<R::Request<'_>>(
+                            query.as_ref(),
+                        )
+                        .map_err(|e| {
+                            (
+                                StatusCode::BAD_REQUEST,
+                                [(
+                                    header::CONTENT_TYPE,
+                                    HeaderValue::from_static("application/json"),
+                                )],
+                                Json(json!({
+                                    "error": "InvalidRequest",
+                                    "message": format!("failed to decode request: {}", e)
+                                })),
+                            )
+                                .into_response()
+                        })?;
                         Ok(ExtractXrpc(value.into_static()))
                     } else {
                         Err((

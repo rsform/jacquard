@@ -39,13 +39,15 @@ tokio = { workspace = true, features = ["sync"] }
 reqwest = { workspace = true, optional = true, features = ["charset", "http2", "json", "system-proxy", "gzip", "rustls-tls"] }
 serde_ipld_dagcbor.workspace = true
 trait-variant.workspace = true
+signature = { version = "2", optional = true }
 
 [features]
-default = []
+default = ["service-auth", "reqwest-client", "crypto"]
 crypto = []
 crypto-ed25519 = ["crypto", "dep:ed25519-dalek"]
-crypto-k256 = ["crypto", "dep:k256"]
-crypto-p256 = ["crypto", "dep:p256"]
+crypto-k256 = ["crypto", "dep:k256", "k256/ecdsa"]
+crypto-p256 = ["crypto", "dep:p256", "p256/ecdsa"]
+service-auth = ["crypto-k256", "crypto-p256", "dep:signature"]
 reqwest-client = ["dep:reqwest"]
 
 [dependencies.ed25519-dalek]

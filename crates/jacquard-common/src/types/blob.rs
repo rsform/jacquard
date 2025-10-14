@@ -150,6 +150,11 @@ impl<'m> MimeType<'m> {
         Ok(Self(mime_type))
     }
 
+    /// Fallible constructor, validates, borrows from input if possible
+    pub fn new_cow(mime_type: CowStr<'m>) -> Result<MimeType<'m>, &'static str> {
+        Self::from_cowstr(mime_type)
+    }
+
     /// Infallible constructor for trusted MIME type strings
     pub fn raw(mime_type: &'m str) -> Self {
         Self(CowStr::Borrowed(mime_type))
@@ -190,7 +195,7 @@ where
         D: Deserializer<'de>,
     {
         let value = Deserialize::deserialize(deserializer)?;
-        Self::new(value).map_err(D::Error::custom)
+        Self::new_cow(value).map_err(D::Error::custom)
     }
 }
 

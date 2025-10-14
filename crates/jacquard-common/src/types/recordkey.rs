@@ -137,6 +137,21 @@ impl<'r> Rkey<'r> {
         }
     }
 
+    /// Fallible constructor, validates, borrows from input if possible
+    pub fn new_cow(rkey: CowStr<'r>) -> Result<Self, AtStrError> {
+        if [".", ".."].contains(&rkey.as_ref()) {
+            Err(AtStrError::disallowed("record-key", &rkey, &[".", ".."]))
+        } else if !RKEY_REGEX.is_match(&rkey) {
+            Err(AtStrError::regex(
+                "record-key",
+                &rkey,
+                SmolStr::new_static("doesn't match 'any' schema"),
+            ))
+        } else {
+            Ok(Self(rkey))
+        }
+    }
+
     /// Infallible constructor for when you *know* the string is a valid rkey.
     /// Will panic on invalid rkeys. If you're manually decoding atproto records
     /// or API values you know are valid (rather than using serde), this is the one to use.
@@ -200,8 +215,8 @@ where
     where
         D: Deserializer<'de>,
     {
-        let value: &str = Deserialize::deserialize(deserializer)?;
-        Self::new(value).map_err(D::Error::custom)
+        let value = Deserialize::deserialize(deserializer)?;
+        Self::new_cow(value).map_err(D::Error::custom)
     }
 }
 

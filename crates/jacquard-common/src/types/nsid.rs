@@ -81,6 +81,21 @@ impl<'n> Nsid<'n> {
         }
     }
 
+    /// Fallible constructor, validates, borrows from input if possible
+    pub fn new_cow(nsid: CowStr<'n>) -> Result<Self, AtStrError> {
+        if nsid.len() > 317 {
+            Err(AtStrError::too_long("nsid", &nsid, 317, nsid.len()))
+        } else if !NSID_REGEX.is_match(&nsid) {
+            Err(AtStrError::regex(
+                "nsid",
+                &nsid,
+                SmolStr::new_static("invalid"),
+            ))
+        } else {
+            Ok(Self(nsid))
+        }
+    }
+
     /// Infallible constructor for when you *know* the string is a valid NSID.
     /// Will panic on invalid NSIDs. If you're manually decoding atproto records
     /// or API values you know are valid (rather than using serde), this is the one to use.
@@ -148,8 +163,8 @@ where
     where
         D: Deserializer<'de>,
     {
-        let value: &str = Deserialize::deserialize(deserializer)?;
-        Self::new(value).map_err(D::Error::custom)
+        let value = Deserialize::deserialize(deserializer)?;
+        Self::new_cow(value).map_err(D::Error::custom)
     }
 }
 

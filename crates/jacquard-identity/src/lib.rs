@@ -84,17 +84,19 @@ use jacquard_common::xrpc::XrpcExt;
 use jacquard_common::{IntoStatic, types::string::Handle};
 use percent_encoding::percent_decode_str;
 use reqwest::StatusCode;
+use std::sync::Arc;
 use url::{ParseError, Url};
 
 #[cfg(feature = "dns")]
 use hickory_resolver::{TokioAsyncResolver, config::ResolverConfig};
 
 /// Default resolver implementation with configurable fallback order.
+#[derive(Clone)]
 pub struct JacquardResolver {
     http: reqwest::Client,
     opts: ResolverOptions,
     #[cfg(feature = "dns")]
-    dns: Option<TokioAsyncResolver>,
+    dns: Option<Arc<TokioAsyncResolver>>,
 }
 
 impl JacquardResolver {
@@ -114,20 +116,20 @@ impl JacquardResolver {
         Self {
             http,
             opts,
-            dns: Some(TokioAsyncResolver::tokio(
+            dns: Some(Arc::new(TokioAsyncResolver::tokio(
                 ResolverConfig::default(),
                 Default::default(),
-            )),
+            ))),
         }
     }
 
     #[cfg(feature = "dns")]
     /// Add default DNS resolution to the resolver
     pub fn with_system_dns(mut self) -> Self {
-        self.dns = Some(TokioAsyncResolver::tokio(
+        self.dns = Some(Arc::new(TokioAsyncResolver::tokio(
             ResolverConfig::default(),
             Default::default(),
-        ));
+        )));
         self
     }
 

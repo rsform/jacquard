@@ -54,6 +54,28 @@ impl<'d> Did<'d> {
         }
     }
 
+    /// Fallible constructor, validates, borrows from input if possible
+    ///
+    /// May allocate for a long DID with an at:// prefix, otherwise borrows.
+    pub fn new_cow(did: CowStr<'d>) -> Result<Self, AtStrError> {
+        let did = if let Some(did) = did.strip_prefix("at://") {
+            CowStr::copy_from_str(did)
+        } else {
+            did
+        };
+        if did.len() > 2048 {
+            Err(AtStrError::too_long("did", &did, 2048, did.len()))
+        } else if !DID_REGEX.is_match(&did) {
+            Err(AtStrError::regex(
+                "did",
+                &did,
+                SmolStr::new_static("invalid"),
+            ))
+        } else {
+            Ok(Self(did))
+        }
+    }
+
     /// Fallible constructor, validates, takes ownership
     pub fn new_owned(did: impl AsRef<str>) -> Result<Self, AtStrError> {
         let did = did.as_ref();
@@ -144,7 +166,7 @@ where
         D: Deserializer<'de>,
     {
         let value = Deserialize::deserialize(deserializer)?;
-        Self::new(value).map_err(D::Error::custom)
+        Self::new_cow(value).map_err(D::Error::custom)
     }
 }
 

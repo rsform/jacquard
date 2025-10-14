@@ -238,7 +238,7 @@ pub trait XrpcClient: HttpClient {
     fn send<R>(
         &self,
         request: R,
-    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest>::Response>>>
+    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest>::Response>>> + Send
     where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync;

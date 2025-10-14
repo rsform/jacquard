@@ -1,11 +1,11 @@
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use smol_str::ToSmolStr;
-use url::Url;
-
 use crate::{
     CowStr, IntoStatic,
     types::{aturi::AtUri, cid::Cid, did::Did, string::AtStrError},
 };
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use smol_str::ToSmolStr;
+use std::str::FromStr;
+use url::Url;
 
 /// Generic URI with type-specific parsing
 ///
@@ -55,7 +55,9 @@ impl<'u> Uri<'u> {
         } else if uri.starts_with("wss://") {
             Ok(Uri::Https(Url::parse(uri)?))
         } else if uri.starts_with("ipld://") {
-            Ok(Uri::Cid(Cid::new(uri.as_bytes())?))
+            Ok(Uri::Cid(
+                Cid::from_str(uri.strip_prefix("ipld://").unwrap_or(uri.as_ref())).unwrap(),
+            ))
         } else {
             Ok(Uri::Any(CowStr::Borrowed(uri)))
         }
@@ -73,9 +75,30 @@ impl<'u> Uri<'u> {
         } else if uri.starts_with("wss://") {
             Ok(Uri::Https(Url::parse(uri)?))
         } else if uri.starts_with("ipld://") {
-            Ok(Uri::Cid(Cid::new_owned(uri.as_bytes())?))
+            Ok(Uri::Cid(
+                Cid::from_str(uri.strip_prefix("ipld://").unwrap_or(uri.as_ref())).unwrap(),
+            ))
         } else {
             Ok(Uri::Any(CowStr::Owned(uri.to_smolstr())))
+        }
+    }
+
+    /// Parse a URI from a CowStr, borrowing where possible
+    pub fn new_cow(uri: CowStr<'u>) -> Result<Self, UriParseError> {
+        if uri.starts_with("did:") {
+            Ok(Uri::Did(Did::new_cow(uri)?))
+        } else if uri.starts_with("at://") {
+            Ok(Uri::At(AtUri::new_cow(uri)?))
+        } else if uri.starts_with("https://") {
+            Ok(Uri::Https(Url::parse(uri.as_ref())?))
+        } else if uri.starts_with("wss://") {
+            Ok(Uri::Https(Url::parse(uri.as_ref())?))
+        } else if uri.starts_with("ipld://") {
+            Ok(Uri::Cid(
+                Cid::from_str(uri.strip_prefix("ipld://").unwrap_or(uri.as_str())).unwrap(),
+            ))
+        } else {
+            Ok(Uri::Any(uri))
         }
     }
 
@@ -111,7 +134,7 @@ where
     {
         use serde::de::Error;
         let value = Deserialize::deserialize(deserializer)?;
-        Self::new(value).map_err(D::Error::custom)
+        Self::new_cow(value).map_err(D::Error::custom)
     }
 }
 

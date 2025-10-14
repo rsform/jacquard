@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use smol_str::SmolStr;
 use std::{
     borrow::Cow,
@@ -283,6 +283,42 @@ impl Serialize for CowStr<'_> {
     }
 }
 
+/// Deserialization helper for things that wrap a CowStr
+pub struct CowStrVisitor;
+
+impl<'de> serde::de::Visitor<'de> for CowStrVisitor {
+    type Value = CowStr<'de>;
+
+    #[inline]
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "a string")
+    }
+
+    #[inline]
+    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(CowStr::copy_from_str(v))
+    }
+
+    #[inline]
+    fn visit_borrowed_str<E>(self, v: &'de str) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(CowStr::Borrowed(v))
+    }
+
+    #[inline]
+    fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ok(v.into())
+    }
+}
+
 impl<'de, 'a> Deserialize<'de> for CowStr<'a>
 where
     'de: 'a,
@@ -292,43 +328,18 @@ where
     where
         D: serde::Deserializer<'de>,
     {
-        struct CowStrVisitor;
-
-        impl<'de> serde::de::Visitor<'de> for CowStrVisitor {
-            type Value = CowStr<'de>;
-
-            #[inline]
-            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                write!(formatter, "a string")
-            }
-
-            #[inline]
-            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                Ok(CowStr::copy_from_str(v))
-            }
-
-            #[inline]
-            fn visit_borrowed_str<E>(self, v: &'de str) -> Result<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                Ok(CowStr::Borrowed(v))
-            }
-
-            #[inline]
-            fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                Ok(v.into())
-            }
-        }
-
         deserializer.deserialize_str(CowStrVisitor)
     }
+}
+
+/// Serde helper for deserializing stuff when you want an owned version
+pub fn deserialize_owned<'de, T, D>(deserializer: D) -> Result<<T as IntoStatic>::Output, D::Error>
+where
+    T: Deserialize<'de> + IntoStatic,
+    D: Deserializer<'de>,
+{
+    let value = T::deserialize(deserializer)?;
+    Ok(value.into_static())
 }
 
 /// Convert to a CowStr.

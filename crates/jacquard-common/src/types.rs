@@ -24,8 +24,6 @@ pub mod ident;
 pub mod integer;
 /// Language tag types per BCP 47
 pub mod language;
-/// CID link wrapper for JSON serialization
-pub mod link;
 /// Namespaced Identifier (NSID) types and validation
 pub mod nsid;
 /// Record key types and validation

@@ -54,6 +54,15 @@ impl<'i> AtIdentifier<'i> {
         }
     }
 
+    /// Fallible constructor, validates, borrows from input if possible
+    pub fn new_cow(ident: CowStr<'i>) -> Result<Self, AtStrError> {
+        if let Ok(did) = Did::new_cow(ident.clone()) {
+            Ok(AtIdentifier::Did(did))
+        } else {
+            Ok(AtIdentifier::Handle(Handle::new_cow(ident)?))
+        }
+    }
+
     /// Infallible constructor for when you *know* the string is a valid identifier.
     /// Will panic on invalid identifiers. If you're manually decoding atproto records
     /// or API values you know are valid (rather than using serde), this is the one to use.

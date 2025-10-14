@@ -1817,10 +1817,18 @@ dependencies = [
  "axum",
  "axum-macros",
  "axum-test",
+ "base64 0.22.1",
  "bytes",
+ "chrono",
  "jacquard",
  "jacquard-common 0.5.1",
+ "jacquard-derive 0.5.1",
+ "jacquard-identity 0.5.1",
+ "k256",
  "miette",
+ "multibase",
+ "rand 0.8.5",
+ "reqwest",
  "serde",
  "serde_html_form",
  "serde_ipld_dagcbor",
@@ -1828,9 +1836,11 @@ dependencies = [
  "thiserror 2.0.17",
  "tokio",
  "tokio-test",
+ "tower",
  "tower-http",
  "tracing",
  "tracing-subscriber",
+ "urlencoding",
 ]
 
 [[package]]
@@ -1861,6 +1871,7 @@ dependencies = [
  "serde_ipld_dagcbor",
  "serde_json",
  "serde_with",
+ "signature",
  "smol_str",
  "thiserror 2.0.17",
  "tokio",
@@ -2120,7 +2131,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f6e3919bbaa2945715f0bb6d3934a173d1e9a59ac23767fbaaef277265a7411b"
 dependencies = [
  "cfg-if",
+ "ecdsa",
  "elliptic-curve",
+ "once_cell",
+ "sha2",
+ "signature",
 ]
 
 [[package]]

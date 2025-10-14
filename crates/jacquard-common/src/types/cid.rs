@@ -2,7 +2,7 @@ use crate::{CowStr, IntoStatic};
 pub use cid::Cid as IpldCid;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Visitor};
 use smol_str::ToSmolStr;
-use std::{convert::Infallible, fmt, marker::PhantomData, ops::Deref, str::FromStr};
+use std::{convert::Infallible, fmt, ops::Deref, str::FromStr};
 
 /// CID codec for AT Protocol (raw)
 pub const ATP_CID_CODEC: u64 = 0x55;
@@ -19,7 +19,14 @@ pub const ATP_CID_BASE: multibase::Base = multibase::Base::Base32Lower;
 /// This type supports both string and parsed IPLD forms, with string caching
 /// for the parsed form to optimize serialization.
 ///
-/// Deserialization automatically detects the format (bytes trigger IPLD parsing).
+/// # Validation
+///
+/// String deserialization does NOT validate CIDs. This is intentional for performance:
+/// CID strings from AT Protocol endpoints are generally trustworthy, so validation
+/// is deferred until needed. Use `to_ipld()` to parse and validate, or `is_valid()`
+/// to check without parsing.
+///
+/// Byte deserialization (CBOR) parses immediately since the data is already in binary form.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Cid<'c> {
     /// Parsed IPLD CID with cached string representation
@@ -100,6 +107,17 @@ impl<'c> Cid<'c> {
             Cid::Str(cow_str) => cow_str.as_ref(),
         }
     }
+
+    /// Check if the CID string is valid without parsing
+    ///
+    /// Returns `true` if the CID is already parsed (`Ipld` variant) or if
+    /// the string can be successfully parsed as an IPLD CID.
+    pub fn is_valid(&self) -> bool {
+        match self {
+            Cid::Ipld { .. } => true,
+            Cid::Str(s) => IpldCid::try_from(s.as_ref()).is_ok(),
+        }
+    }
 }
 
 impl std::fmt::Display for Cid<'_> {
@@ -155,16 +173,20 @@ where
     where
         D: Deserializer<'de>,
     {
-        struct StringOrBytes<T>(PhantomData<fn() -> T>);
+        struct CidVisitor;
 
-        impl<'de, T> Visitor<'de> for StringOrBytes<T>
-        where
-            T: Deserialize<'de> + FromStr<Err = Infallible> + From<IpldCid>,
-        {
-            type Value = T;
+        impl<'de> Visitor<'de> for CidVisitor {
+            type Value = Cid<'de>;
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
                 formatter.write_str("either valid IPLD CID bytes or a str")
+            }
+
+            fn visit_borrowed_str<E>(self, v: &'de str) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                Ok(Cid::str(v))
             }
 
             fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
@@ -179,11 +201,11 @@ where
                 E: serde::de::Error,
             {
                 let hash = cid::multihash::Multihash::from_bytes(v).map_err(|e| E::custom(e))?;
-                Ok(T::from(IpldCid::new_v1(ATP_CID_CODEC, hash)))
+                Ok(Cid::ipld(IpldCid::new_v1(ATP_CID_CODEC, hash)))
             }
         }
 
-        deserializer.deserialize_any(StringOrBytes(PhantomData))
+        deserializer.deserialize_any(CidVisitor)
     }
 }
 
