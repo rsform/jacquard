@@ -48,7 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for GetLaunchAssetResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetLaunchAsset<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetLaunchAsset<'a> {
     const NSID: &'static str = "app.ocho.plugin.getLaunchAsset";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLaunchAssetResponse;

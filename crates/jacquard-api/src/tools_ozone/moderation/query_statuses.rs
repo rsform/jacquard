@@ -156,7 +156,7 @@ impl jacquard_common::xrpc::XrpcResp for QueryStatusesResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for QueryStatuses<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for QueryStatuses<'a> {
     const NSID: &'static str = "tools.ozone.moderation.queryStatuses";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = QueryStatusesResponse;

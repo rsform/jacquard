@@ -52,7 +52,7 @@ impl jacquard_common::xrpc::XrpcResp for CheckAccountStatusResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CheckAccountStatus {
+impl jacquard_common::xrpc::XrpcRequest for CheckAccountStatus {
     const NSID: &'static str = "com.atproto.server.checkAccountStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = CheckAccountStatusResponse;

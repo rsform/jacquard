@@ -39,7 +39,7 @@ impl jacquard_common::xrpc::XrpcResp for UpdateSeenResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateSeen<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateSeen<'a> {
     const NSID: &'static str = "app.bsky.notification.updateSeen";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

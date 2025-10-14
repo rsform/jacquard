@@ -48,7 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for GetProfilesResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetProfiles<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfiles<'a> {
     const NSID: &'static str = "app.bsky.actor.getProfiles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetProfilesResponse;

@@ -123,7 +123,7 @@ impl jacquard_common::xrpc::XrpcResp for ArchiveResponse {
     type Err<'de> = ArchiveError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Archive<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for Archive<'a> {
     const NSID: &'static str = "sh.tangled.repo.archive";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ArchiveResponse;

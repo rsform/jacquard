@@ -98,7 +98,7 @@ impl jacquard_common::xrpc::XrpcResp for PushNotifyResponse {
     type Err<'de> = PushNotifyError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for PushNotify<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for PushNotify<'a> {
     const NSID: &'static str = "win.tomo-x.pushat.pushNotify";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

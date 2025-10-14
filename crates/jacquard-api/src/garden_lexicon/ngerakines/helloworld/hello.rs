@@ -51,7 +51,7 @@ impl jacquard_common::xrpc::XrpcResp for HelloResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Hello<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for Hello<'a> {
     const NSID: &'static str = "garden.lexicon.ngerakines.helloworld.Hello";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = HelloResponse;

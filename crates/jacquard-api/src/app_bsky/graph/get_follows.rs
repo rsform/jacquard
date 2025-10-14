@@ -60,7 +60,7 @@ impl jacquard_common::xrpc::XrpcResp for GetFollowsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetFollows<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetFollows<'a> {
     const NSID: &'static str = "app.bsky.graph.getFollows";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetFollowsResponse;

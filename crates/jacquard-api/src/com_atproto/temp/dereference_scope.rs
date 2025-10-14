@@ -85,7 +85,7 @@ impl jacquard_common::xrpc::XrpcResp for DereferenceScopeResponse {
     type Err<'de> = DereferenceScopeError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DereferenceScope<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for DereferenceScope<'a> {
     const NSID: &'static str = "com.atproto.temp.dereferenceScope";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = DereferenceScopeResponse;

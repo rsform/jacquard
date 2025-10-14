@@ -58,7 +58,7 @@ impl jacquard_common::xrpc::XrpcResp for UpsertSetResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpsertSet<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpsertSet<'a> {
     const NSID: &'static str = "tools.ozone.set.upsertSet";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

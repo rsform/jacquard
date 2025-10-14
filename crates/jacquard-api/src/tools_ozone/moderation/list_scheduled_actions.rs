@@ -79,7 +79,7 @@ impl jacquard_common::xrpc::XrpcResp for ListScheduledActionsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListScheduledActions<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListScheduledActions<'a> {
     const NSID: &'static str = "tools.ozone.moderation.listScheduledActions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

@@ -56,7 +56,7 @@ impl jacquard_common::xrpc::XrpcResp for GetBlocksResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetBlocks<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetBlocks<'a> {
     const NSID: &'static str = "app.bsky.graph.getBlocks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBlocksResponse;

@@ -82,7 +82,7 @@ impl XrpcMethod {
 /// HTTP method, encoding, and associated output type.
 ///
 /// The trait is implemented on the request parameters/input type itself.
-pub trait XrpcRequest<'de>: Serialize + Deserialize<'de> {
+pub trait XrpcRequest: Serialize {
     /// The NSID for this XRPC method
     const NSID: &'static str;
 
@@ -102,7 +102,10 @@ pub trait XrpcRequest<'de>: Serialize + Deserialize<'de> {
     /// Decode the request body for procedures.
     ///
     /// Default implementation deserializes from JSON. Override for non-JSON encodings.
-    fn decode_body(body: &'de [u8]) -> Result<Box<Self>, DecodeError> {
+    fn decode_body<'de>(body: &'de [u8]) -> Result<Box<Self>, DecodeError>
+    where
+        Self: Deserialize<'de>,
+    {
         let body: Self = serde_json::from_slice(body).map_err(|e| DecodeError::Json(e))?;
 
         Ok(Box::new(body))
@@ -139,7 +142,7 @@ pub trait XrpcEndpoint {
     /// XRPC method (query/GET or procedure/POST)
     const METHOD: XrpcMethod;
     /// XRPC Request data type
-    type Request<'de>: XrpcRequest<'de> + IntoStatic;
+    type Request<'de>: XrpcRequest + Deserialize<'de> + IntoStatic;
     /// XRPC Response data type
     type Response: XrpcResp;
 }
@@ -232,12 +235,13 @@ pub trait XrpcClient: HttpClient {
         async { CallOptions::default() }
     }
     /// Send an XRPC request and parse the response
-    fn send<'s, R>(
+    fn send<R>(
         &self,
         request: R,
-    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest<'s>>::Response>>>
+    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest>::Response>>>
     where
-        R: XrpcRequest<'s>;
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync;
 }
 
 /// Stateless XRPC call builder.
@@ -301,12 +305,10 @@ impl<'a, C: HttpClient> XrpcCall<'a, C> {
     ///   inspect the header for `error="invalid_token"` or `error="use_dpop_nonce"` and react
     ///   (refresh/retry). If the header is absent, the 401 body flows through to `Response` and
     ///   can be parsed/mapped to `AuthError` as appropriate.
-    pub async fn send<'s, R>(
-        self,
-        request: &R,
-    ) -> XrpcResult<Response<<R as XrpcRequest<'s>>::Response>>
+    pub async fn send<R>(self, request: &R) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
     where
-        R: XrpcRequest<'s>,
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
     {
         let http_request = build_http_request(&self.base, request, &self.opts)
             .map_err(crate::error::TransportError::from)?;
@@ -384,15 +386,15 @@ pub fn build_http_request<'s, R>(
     opts: &CallOptions<'_>,
 ) -> core::result::Result<Request<Vec<u8>>, crate::error::TransportError>
 where
-    R: XrpcRequest<'s>,
+    R: XrpcRequest,
 {
     let mut url = base.clone();
     let mut path = url.path().trim_end_matches('/').to_owned();
     path.push_str("/xrpc/");
-    path.push_str(<R as XrpcRequest<'s>>::NSID);
+    path.push_str(<R as XrpcRequest>::NSID);
     url.set_path(&path);
 
-    if let XrpcMethod::Query = <R as XrpcRequest<'s>>::METHOD {
+    if let XrpcMethod::Query = <R as XrpcRequest>::METHOD {
         let qs = serde_html_form::to_string(&req)
             .map_err(|e| crate::error::TransportError::InvalidRequest(e.to_string()))?;
         if !qs.is_empty() {
@@ -402,14 +404,14 @@ where
         }
     }
 
-    let method = match <R as XrpcRequest<'_>>::METHOD {
+    let method = match <R as XrpcRequest>::METHOD {
         XrpcMethod::Query => http::Method::GET,
         XrpcMethod::Procedure(_) => http::Method::POST,
     };
 
     let mut builder = Request::builder().method(method).uri(url.as_str());
 
-    if let XrpcMethod::Procedure(encoding) = <R as XrpcRequest<'_>>::METHOD {
+    if let XrpcMethod::Procedure(encoding) = <R as XrpcRequest>::METHOD {
         builder = builder.header(Header::ContentType, encoding);
     }
     let output_encoding = <R::Response as XrpcResp>::ENCODING;
@@ -862,7 +864,7 @@ mod tests {
         type Err<'de> = DummyErr<'de>;
     }
 
-    impl<'de> XrpcRequest<'de> for DummyReq {
+    impl XrpcRequest for DummyReq {
         const NSID: &'static str = "test.dummy";
         const METHOD: XrpcMethod = XrpcMethod::Procedure("application/json");
         type Response = DummyResp;
@@ -925,7 +927,7 @@ mod tests {
             type Output<'de> = ();
             type Err<'de> = Err<'de>;
         }
-        impl<'de> XrpcRequest<'de> for Req {
+        impl XrpcRequest for Req {
             const NSID: &'static str = "com.example.test";
             const METHOD: XrpcMethod = XrpcMethod::Query;
             type Response = Resp;

@@ -82,7 +82,7 @@ impl jacquard_common::xrpc::XrpcResp for GetHeadResponse {
     type Err<'de> = GetHeadError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetHead<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetHead<'a> {
     const NSID: &'static str = "com.atproto.sync.getHead";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetHeadResponse;

@@ -101,7 +101,7 @@ impl jacquard_common::xrpc::XrpcResp for GetActorLikesResponse {
     type Err<'de> = GetActorLikesError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetActorLikes<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorLikes<'a> {
     const NSID: &'static str = "app.bsky.feed.getActorLikes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetActorLikesResponse;

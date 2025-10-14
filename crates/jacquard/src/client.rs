@@ -58,6 +58,7 @@ use serde::Serialize;
 pub use token::FileAuthStore;
 
 use crate::client::credential_session::{CredentialSession, SessionKey};
+use crate::client::vec_update::VecUpdate;
 
 use jacquard_common::error::{AuthError, DecodeError};
 use jacquard_common::types::nsid::Nsid;
@@ -764,17 +765,21 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     ///     prefs.retain(|p| !matches!(p, Preference::Hidden(_)));
     /// }).await?;
     /// ```
-    fn update_vec<'s, U>(
-        &'s self,
-        modify: impl FnOnce(&mut Vec<<U as vec_update::VecUpdate>::Item>),
+    fn update_vec<U>(
+        &self,
+        modify: impl FnOnce(&mut Vec<<U as VecUpdate>::Item>),
     ) -> impl std::future::Future<
         Output = Result<
-            xrpc::Response<<U::PutRequest<'s> as XrpcRequest<'s>>::Response>,
+            xrpc::Response<<<U as VecUpdate>::PutRequest as XrpcRequest>::Response>,
             AgentError,
         >,
     >
     where
-        U: vec_update::VecUpdate + 's,
+        U: VecUpdate,
+        <U as VecUpdate>::PutRequest: Send + Sync,
+        <U as VecUpdate>::GetRequest: Send + Sync,
+        <<U as VecUpdate>::GetRequest as XrpcRequest>::Response: Send + Sync,
+        <<U as VecUpdate>::PutRequest as XrpcRequest>::Response: Send + Sync,
     {
         async {
             // Fetch current data
@@ -815,17 +820,21 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     /// let pref = AdultContentPref::new().enabled(true).build();
     /// agent.update_vec_item::<PreferencesUpdate>(pref.into()).await?;
     /// ```
-    fn update_vec_item<'s, U>(
-        &'s self,
-        item: <U as vec_update::VecUpdate>::Item,
+    fn update_vec_item<U>(
+        &self,
+        item: <U as VecUpdate>::Item,
     ) -> impl std::future::Future<
         Output = Result<
-            xrpc::Response<<U::PutRequest<'s> as XrpcRequest<'s>>::Response>,
+            xrpc::Response<<<U as VecUpdate>::PutRequest as XrpcRequest>::Response>,
             AgentError,
         >,
     >
     where
-        U: vec_update::VecUpdate + 's,
+        U: VecUpdate,
+        <U as VecUpdate>::PutRequest: Send + Sync,
+        <U as VecUpdate>::GetRequest: Send + Sync,
+        <<U as VecUpdate>::GetRequest as XrpcRequest>::Response: Send + Sync,
+        <<U as VecUpdate>::PutRequest as XrpcRequest>::Response: Send + Sync,
     {
         async {
             self.update_vec::<U>(|vec| {
@@ -861,12 +870,13 @@ impl<A: AgentSession> XrpcClient for Agent<A> {
     fn opts(&self) -> impl Future<Output = CallOptions<'_>> {
         self.inner.opts()
     }
-    fn send<'s, R>(
+    fn send<R>(
         &self,
         request: R,
-    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest<'s>>::Response>>>
+    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest>::Response>>>
     where
-        R: XrpcRequest<'s>,
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
     {
         async move { self.inner.send(request).await }
     }

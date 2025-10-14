@@ -68,7 +68,7 @@ impl jacquard_common::xrpc::XrpcResp for ListOptionsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListOptions<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListOptions<'a> {
     const NSID: &'static str = "tools.ozone.setting.listOptions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListOptionsResponse;

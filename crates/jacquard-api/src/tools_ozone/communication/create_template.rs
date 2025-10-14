@@ -108,7 +108,7 @@ impl jacquard_common::xrpc::XrpcResp for CreateTemplateResponse {
     type Err<'de> = CreateTemplateError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateTemplate<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateTemplate<'a> {
     const NSID: &'static str = "tools.ozone.communication.createTemplate";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

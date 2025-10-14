@@ -58,7 +58,7 @@ impl jacquard_common::xrpc::XrpcResp for ListReposByCollectionResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListReposByCollection<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListReposByCollection<'a> {
     const NSID: &'static str = "com.atproto.sync.listReposByCollection";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListReposByCollectionResponse;

@@ -107,7 +107,7 @@ impl jacquard_common::xrpc::XrpcResp for GetRepoResponse {
     type Err<'de> = GetRepoError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRepo<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepo<'a> {
     const NSID: &'static str = "com.atproto.sync.getRepo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRepoResponse;

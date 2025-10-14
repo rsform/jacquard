@@ -92,7 +92,7 @@ impl jacquard_common::xrpc::XrpcResp for GetListFeedResponse {
     type Err<'de> = GetListFeedError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetListFeed<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetListFeed<'a> {
     const NSID: &'static str = "app.bsky.feed.getListFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetListFeedResponse;

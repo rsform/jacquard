@@ -49,7 +49,7 @@ impl jacquard_common::xrpc::XrpcResp for GetSuggestedStarterPacksResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSuggestedStarterPacks {
+impl jacquard_common::xrpc::XrpcRequest for GetSuggestedStarterPacks {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedStarterPacks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSuggestedStarterPacksResponse;

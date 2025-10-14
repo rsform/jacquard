@@ -59,7 +59,7 @@ impl jacquard_common::xrpc::XrpcResp for ClearSliceRecordsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ClearSliceRecords<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ClearSliceRecords<'a> {
     const NSID: &'static str = "network.slices.slice.clearSliceRecords";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

@@ -50,7 +50,7 @@ impl jacquard_common::xrpc::XrpcResp for GetConvoAvailabilityResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetConvoAvailability<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetConvoAvailability<'a> {
     const NSID: &'static str = "chat.bsky.convo.getConvoAvailability";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetConvoAvailabilityResponse;

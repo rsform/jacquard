@@ -78,7 +78,7 @@ impl jacquard_common::xrpc::XrpcResp for GetMessagesResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetMessages<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetMessages<'a> {
     const NSID: &'static str = "chat.bsky.convo.getMessages";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetMessagesResponse;

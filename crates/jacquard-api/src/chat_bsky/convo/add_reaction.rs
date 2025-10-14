@@ -118,7 +118,7 @@ impl jacquard_common::xrpc::XrpcResp for AddReactionResponse {
     type Err<'de> = AddReactionError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AddReaction<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for AddReaction<'a> {
     const NSID: &'static str = "chat.bsky.convo.addReaction";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

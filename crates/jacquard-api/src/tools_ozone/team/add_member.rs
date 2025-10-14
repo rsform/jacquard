@@ -95,7 +95,7 @@ impl jacquard_common::xrpc::XrpcResp for AddMemberResponse {
     type Err<'de> = AddMemberError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AddMember<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for AddMember<'a> {
     const NSID: &'static str = "tools.ozone.team.addMember";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

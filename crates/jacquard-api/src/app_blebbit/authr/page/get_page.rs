@@ -58,7 +58,7 @@ impl jacquard_common::xrpc::XrpcResp for GetPageResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetPage<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPage<'a> {
     const NSID: &'static str = "app.blebbit.authr.page.getPage";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPageResponse;

@@ -125,7 +125,7 @@ impl jacquard_common::xrpc::XrpcResp for LogResponse {
     type Err<'de> = LogError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Log<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for Log<'a> {
     const NSID: &'static str = "sh.tangled.repo.log";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = LogResponse;

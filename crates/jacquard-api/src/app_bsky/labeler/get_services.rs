@@ -70,7 +70,7 @@ impl jacquard_common::xrpc::XrpcResp for GetServicesResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetServices<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetServices<'a> {
     const NSID: &'static str = "app.bsky.labeler.getServices";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetServicesResponse;

@@ -121,7 +121,7 @@ impl jacquard_common::xrpc::XrpcResp for ListBlobsResponse {
     type Err<'de> = ListBlobsError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListBlobs<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListBlobs<'a> {
     const NSID: &'static str = "com.atproto.sync.listBlobs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListBlobsResponse;

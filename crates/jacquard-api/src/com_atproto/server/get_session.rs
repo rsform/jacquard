@@ -61,7 +61,7 @@ impl jacquard_common::xrpc::XrpcResp for GetSessionResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSession {
+impl jacquard_common::xrpc::XrpcRequest for GetSession {
     const NSID: &'static str = "com.atproto.server.getSession";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSessionResponse;

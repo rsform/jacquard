@@ -34,11 +34,11 @@ use jacquard_common::IntoStatic;
 pub struct PreferencesUpdate;
 
 impl super::VecUpdate for PreferencesUpdate {
-    type GetRequest<'de> = GetPreferences;
-    type PutRequest<'de> = PutPreferences<'de>;
+    type GetRequest = GetPreferences;
+    type PutRequest = PutPreferences<'static>;
     type Item = PreferencesItem<'static>;
 
-    fn build_get<'s>() -> Self::GetRequest<'s> {
+    fn build_get() -> Self::GetRequest {
         GetPreferences::new().build()
     }
 
@@ -52,7 +52,7 @@ impl super::VecUpdate for PreferencesUpdate {
             .collect()
     }
 
-    fn build_put<'s>(items: Vec<<Self::Item as IntoStatic>::Output>) -> Self::PutRequest<'s> {
+    fn build_put(items: Vec<<Self::Item as IntoStatic>::Output>) -> Self::PutRequest {
         PutPreferences::new().preferences(items).build()
     }
 

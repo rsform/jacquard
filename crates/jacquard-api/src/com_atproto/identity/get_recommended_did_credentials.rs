@@ -56,7 +56,7 @@ impl jacquard_common::xrpc::XrpcResp for GetRecommendedDidCredentialsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRecommendedDidCredentials {
+impl jacquard_common::xrpc::XrpcRequest for GetRecommendedDidCredentials {
     const NSID: &'static str = "com.atproto.identity.getRecommendedDidCredentials";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRecommendedDidCredentialsResponse;

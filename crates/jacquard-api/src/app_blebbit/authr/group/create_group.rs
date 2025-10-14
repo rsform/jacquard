@@ -79,7 +79,7 @@ impl jacquard_common::xrpc::XrpcResp for CreateGroupResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateGroup<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateGroup<'a> {
     const NSID: &'static str = "app.blebbit.authr.group.createGroup";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

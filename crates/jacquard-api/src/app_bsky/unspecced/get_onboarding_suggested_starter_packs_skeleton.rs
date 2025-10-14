@@ -53,8 +53,8 @@ for GetOnboardingSuggestedStarterPacksSkeletonResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de>
-for GetOnboardingSuggestedStarterPacksSkeleton<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest
+for GetOnboardingSuggestedStarterPacksSkeleton<'a> {
     const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedStarterPacksSkeleton";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetOnboardingSuggestedStarterPacksSkeletonResponse;

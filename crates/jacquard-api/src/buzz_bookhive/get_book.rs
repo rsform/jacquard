@@ -78,7 +78,7 @@ impl jacquard_common::xrpc::XrpcResp for GetBookResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetBook<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetBook<'a> {
     const NSID: &'static str = "buzz.bookhive.getBook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBookResponse;

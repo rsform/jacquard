@@ -150,7 +150,7 @@ impl jacquard_common::xrpc::XrpcResp for LanguagesResponse {
     type Err<'de> = LanguagesError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Languages<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for Languages<'a> {
     const NSID: &'static str = "sh.tangled.repo.languages";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = LanguagesResponse;

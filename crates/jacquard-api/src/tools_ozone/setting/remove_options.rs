@@ -55,7 +55,7 @@ impl jacquard_common::xrpc::XrpcResp for RemoveOptionsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RemoveOptions<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveOptions<'a> {
     const NSID: &'static str = "tools.ozone.setting.removeOptions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

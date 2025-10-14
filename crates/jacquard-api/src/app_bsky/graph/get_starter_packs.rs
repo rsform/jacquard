@@ -48,7 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for GetStarterPacksResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetStarterPacks<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetStarterPacks<'a> {
     const NSID: &'static str = "app.bsky.graph.getStarterPacks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetStarterPacksResponse;

@@ -83,7 +83,7 @@ impl jacquard_common::xrpc::XrpcResp for ResolveHandleResponse {
     type Err<'de> = ResolveHandleError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ResolveHandle<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveHandle<'a> {
     const NSID: &'static str = "com.atproto.identity.resolveHandle";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveHandleResponse;

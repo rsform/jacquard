@@ -119,7 +119,7 @@ impl jacquard_common::xrpc::XrpcResp for AddRuleResponse {
     type Err<'de> = AddRuleError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AddRule<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for AddRule<'a> {
     const NSID: &'static str = "tools.ozone.safelink.addRule";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

@@ -101,7 +101,7 @@ impl jacquard_common::xrpc::XrpcResp for MergeCheckResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for MergeCheck<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for MergeCheck<'a> {
     const NSID: &'static str = "sh.tangled.repo.mergeCheck";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

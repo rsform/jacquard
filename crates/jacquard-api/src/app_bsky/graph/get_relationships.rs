@@ -110,7 +110,7 @@ impl jacquard_common::xrpc::XrpcResp for GetRelationshipsResponse {
     type Err<'de> = GetRelationshipsError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRelationships<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetRelationships<'a> {
     const NSID: &'static str = "app.bsky.graph.getRelationships";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRelationshipsResponse;

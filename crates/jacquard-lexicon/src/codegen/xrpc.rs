@@ -923,9 +923,12 @@ impl<'c> CodeGenerator<'c> {
         // Generate decode_body() method for binary inputs
         let decode_body_method = if is_binary_input {
             quote! {
-                fn decode_body(
+                fn decode_body<'de>(
                     body: &'de [u8],
-                ) -> Result<Box<Self>, jacquard_common::error::DecodeError> {
+                ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
+                where
+                    Self: serde::Deserialize<'de>,
+                {
                     Ok(Box::new(Self {
                         body: bytes::Bytes::copy_from_slice(body),
                     }))
@@ -940,16 +943,25 @@ impl<'c> CodeGenerator<'c> {
         if has_params {
             // Implement on the params/input struct itself
             let request_ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
-            let impl_target = if params_has_lifetime {
-                quote! { #request_ident<'de> }
+
+            let (impl_generics, impl_target, endpoint_request_type) = if params_has_lifetime {
+                (
+                    quote! { <'a> },
+                    quote! { #request_ident<'a> },
+                    quote! { #request_ident<'de> },
+                )
             } else {
-                quote! { #request_ident }
+                (
+                    quote! {},
+                    quote! { #request_ident },
+                    quote! { #request_ident },
+                )
             };
 
             Ok(quote! {
                 #response_type
 
-                impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for #impl_target {
+                impl #impl_generics jacquard_common::xrpc::XrpcRequest for #impl_target {
                     const NSID: &'static str = #nsid;
                     const METHOD: jacquard_common::xrpc::XrpcMethod = #method;
 
@@ -967,7 +979,7 @@ impl<'c> CodeGenerator<'c> {
                     const PATH: &'static str = #endpoint_path;
                     const METHOD: jacquard_common::xrpc::XrpcMethod = #method;
 
-                    type Request<'de> = #impl_target;
+                    type Request<'de> = #endpoint_request_type;
                     type Response = #response_ident;
                 }
             })
@@ -982,7 +994,7 @@ impl<'c> CodeGenerator<'c> {
 
                 #response_type
 
-                impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for #request_ident {
+                impl jacquard_common::xrpc::XrpcRequest for #request_ident {
                     const NSID: &'static str = #nsid;
                     const METHOD: jacquard_common::xrpc::XrpcMethod = #method;
 

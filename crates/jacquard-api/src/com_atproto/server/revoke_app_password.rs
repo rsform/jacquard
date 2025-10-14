@@ -41,7 +41,7 @@ impl jacquard_common::xrpc::XrpcResp for RevokeAppPasswordResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RevokeAppPassword<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for RevokeAppPassword<'a> {
     const NSID: &'static str = "com.atproto.server.revokeAppPassword";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

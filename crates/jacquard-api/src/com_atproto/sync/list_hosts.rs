@@ -82,7 +82,7 @@ impl jacquard_common::xrpc::XrpcResp for ListHostsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListHosts<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListHosts<'a> {
     const NSID: &'static str = "com.atproto.sync.listHosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListHostsResponse;

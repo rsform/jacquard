@@ -73,7 +73,7 @@ impl jacquard_common::xrpc::XrpcResp for ListVerificationsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListVerifications<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListVerifications<'a> {
     const NSID: &'static str = "tools.ozone.verification.listVerifications";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListVerificationsResponse;

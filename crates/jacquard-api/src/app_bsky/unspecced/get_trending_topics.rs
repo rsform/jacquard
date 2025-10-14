@@ -54,7 +54,7 @@ impl jacquard_common::xrpc::XrpcResp for GetTrendingTopicsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetTrendingTopics<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetTrendingTopics<'a> {
     const NSID: &'static str = "app.bsky.unspecced.getTrendingTopics";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTrendingTopicsResponse;

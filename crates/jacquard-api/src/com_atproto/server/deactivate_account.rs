@@ -41,7 +41,7 @@ impl jacquard_common::xrpc::XrpcResp for DeactivateAccountResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeactivateAccount<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeactivateAccount<'a> {
     const NSID: &'static str = "com.atproto.server.deactivateAccount";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

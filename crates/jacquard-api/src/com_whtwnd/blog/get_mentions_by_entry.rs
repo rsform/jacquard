@@ -48,7 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for GetMentionsByEntryResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetMentionsByEntry<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetMentionsByEntry<'a> {
     const NSID: &'static str = "com.whtwnd.blog.getMentionsByEntry";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetMentionsByEntryResponse;

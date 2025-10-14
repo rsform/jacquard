@@ -109,7 +109,7 @@ impl jacquard_common::xrpc::XrpcResp for UpdateRuleResponse {
     type Err<'de> = UpdateRuleError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateRule<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateRule<'a> {
     const NSID: &'static str = "tools.ozone.safelink.updateRule";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

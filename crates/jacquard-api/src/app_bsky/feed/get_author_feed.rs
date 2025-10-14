@@ -109,7 +109,7 @@ impl jacquard_common::xrpc::XrpcResp for GetAuthorFeedResponse {
     type Err<'de> = GetAuthorFeedError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAuthorFeed<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetAuthorFeed<'a> {
     const NSID: &'static str = "app.bsky.feed.getAuthorFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAuthorFeedResponse;

@@ -59,7 +59,7 @@ impl jacquard_common::xrpc::XrpcResp for GetActorBookmarksResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetActorBookmarks<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorBookmarks<'a> {
     const NSID: &'static str = "community.lexicon.bookmarks.getActorBookmarks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetActorBookmarksResponse;

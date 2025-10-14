@@ -100,7 +100,7 @@ impl jacquard_common::xrpc::XrpcResp for UpdateEmailResponse {
     type Err<'de> = UpdateEmailError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateEmail<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateEmail<'a> {
     const NSID: &'static str = "com.atproto.server.updateEmail";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

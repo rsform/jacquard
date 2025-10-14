@@ -59,7 +59,7 @@ impl jacquard_common::xrpc::XrpcResp for ReserveSigningKeyResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ReserveSigningKey<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ReserveSigningKey<'a> {
     const NSID: &'static str = "com.atproto.server.reserveSigningKey";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

@@ -176,7 +176,7 @@ impl jacquard_common::xrpc::XrpcResp for BlobResponse {
     type Err<'de> = BlobError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Blob<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for Blob<'a> {
     const NSID: &'static str = "sh.tangled.repo.blob";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = BlobResponse;

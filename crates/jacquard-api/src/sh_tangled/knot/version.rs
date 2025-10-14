@@ -66,7 +66,7 @@ impl jacquard_common::xrpc::XrpcResp for VersionResponse {
     type Err<'de> = VersionError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Version {
+impl jacquard_common::xrpc::XrpcRequest for Version {
     const NSID: &'static str = "sh.tangled.knot.version";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = VersionResponse;

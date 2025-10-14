@@ -66,7 +66,7 @@ impl jacquard_common::xrpc::XrpcResp for RevokeVerificationsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RevokeVerifications<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for RevokeVerifications<'a> {
     const NSID: &'static str = "tools.ozone.verification.revokeVerifications";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

@@ -27,7 +27,7 @@ impl jacquard_common::xrpc::XrpcResp for DeleteSessionResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteSession {
+impl jacquard_common::xrpc::XrpcRequest for DeleteSession {
     const NSID: &'static str = "com.atproto.server.deleteSession";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

@@ -47,7 +47,7 @@ impl jacquard_common::xrpc::XrpcResp for UpdateFolderRelationshipResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateFolderRelationship<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateFolderRelationship<'a> {
     const NSID: &'static str = "app.blebbit.authr.folder.updateFolderRelationship";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

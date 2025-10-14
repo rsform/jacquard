@@ -64,7 +64,7 @@ impl jacquard_common::xrpc::XrpcResp for SearchTagsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SearchTags<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchTags<'a> {
     const NSID: &'static str = "social.clippr.actor.searchTags";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchTagsResponse;

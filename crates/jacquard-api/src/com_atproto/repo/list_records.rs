@@ -62,7 +62,7 @@ impl jacquard_common::xrpc::XrpcResp for ListRecordsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListRecords<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListRecords<'a> {
     const NSID: &'static str = "com.atproto.repo.listRecords";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListRecordsResponse;

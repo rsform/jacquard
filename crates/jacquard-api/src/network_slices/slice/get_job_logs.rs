@@ -95,7 +95,7 @@ impl jacquard_common::xrpc::XrpcResp for GetJobLogsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetJobLogs<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetJobLogs<'a> {
     const NSID: &'static str = "network.slices.slice.getJobLogs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetJobLogsResponse;

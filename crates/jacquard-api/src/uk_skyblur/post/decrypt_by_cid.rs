@@ -70,7 +70,7 @@ impl jacquard_common::xrpc::XrpcResp for DecryptByCidResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DecryptByCid<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for DecryptByCid<'a> {
     const NSID: &'static str = "uk.skyblur.post.decryptByCid";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

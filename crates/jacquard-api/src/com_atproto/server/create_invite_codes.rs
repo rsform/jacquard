@@ -77,7 +77,7 @@ impl jacquard_common::xrpc::XrpcResp for CreateInviteCodesResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateInviteCodes<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateInviteCodes<'a> {
     const NSID: &'static str = "com.atproto.server.createInviteCodes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

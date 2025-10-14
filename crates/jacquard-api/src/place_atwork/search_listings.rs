@@ -109,7 +109,7 @@ impl jacquard_common::xrpc::XrpcResp for SearchListingsResponse {
     type Err<'de> = SearchListingsError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SearchListings<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchListings<'a> {
     const NSID: &'static str = "place.atwork.searchListings";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchListingsResponse;

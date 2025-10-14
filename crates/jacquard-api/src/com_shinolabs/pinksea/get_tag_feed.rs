@@ -54,7 +54,7 @@ impl jacquard_common::xrpc::XrpcResp for GetTagFeedResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetTagFeed<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetTagFeed<'a> {
     const NSID: &'static str = "com.shinolabs.pinksea.getTagFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTagFeedResponse;

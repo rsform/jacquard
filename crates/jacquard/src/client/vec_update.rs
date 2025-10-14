@@ -40,24 +40,24 @@ use jacquard_common::xrpc::{XrpcRequest, XrpcResp};
 /// ```
 pub trait VecUpdate {
     /// The XRPC request type for fetching the data
-    type GetRequest<'de>: XrpcRequest<'de>;
+    type GetRequest: XrpcRequest;
 
     /// The XRPC request type for putting the data back
-    type PutRequest<'de>: XrpcRequest<'de>;
+    type PutRequest: XrpcRequest;
 
     /// The item type contained in the vec (must be owned/static)
     type Item: IntoStatic;
 
     /// Build the get request
-    fn build_get<'s>() -> Self::GetRequest<'s>;
+    fn build_get() -> Self::GetRequest;
 
     /// Extract the vec from the get response output
     fn extract_vec<'s>(
-        output: <<Self::GetRequest<'s> as XrpcRequest<'s>>::Response as XrpcResp>::Output<'s>,
+        output: <<Self::GetRequest as XrpcRequest>::Response as XrpcResp>::Output<'s>,
     ) -> Vec<Self::Item>;
 
     /// Build the put request from the modified vec
-    fn build_put<'s>(items: Vec<Self::Item>) -> Self::PutRequest<'s>;
+    fn build_put(items: Vec<Self::Item>) -> Self::PutRequest;
 
     /// Check if two items match (for single-item update operations)
     ///

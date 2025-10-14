@@ -226,7 +226,7 @@ impl jacquard_common::xrpc::XrpcResp for ApplyWritesResponse {
     type Err<'de> = ApplyWritesError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ApplyWrites<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ApplyWrites<'a> {
     const NSID: &'static str = "com.atproto.repo.applyWrites";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

@@ -76,7 +76,7 @@ impl jacquard_common::xrpc::XrpcResp for RequestCrawlResponse {
     type Err<'de> = RequestCrawlError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RequestCrawl<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for RequestCrawl<'a> {
     const NSID: &'static str = "com.atproto.sync.requestCrawl";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

@@ -53,7 +53,7 @@ impl jacquard_common::xrpc::XrpcResp for GetSuggestedUsersResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSuggestedUsers<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedUsers<'a> {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedUsers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSuggestedUsersResponse;

@@ -105,7 +105,7 @@ impl jacquard_common::xrpc::XrpcResp for RemoveRuleResponse {
     type Err<'de> = RemoveRuleError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RemoveRule<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveRule<'a> {
     const NSID: &'static str = "tools.ozone.safelink.removeRule";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

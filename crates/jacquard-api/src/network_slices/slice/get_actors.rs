@@ -100,7 +100,7 @@ impl jacquard_common::xrpc::XrpcResp for GetActorsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetActors<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetActors<'a> {
     const NSID: &'static str = "network.slices.slice.getActors";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

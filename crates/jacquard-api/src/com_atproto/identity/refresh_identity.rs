@@ -112,7 +112,7 @@ impl jacquard_common::xrpc::XrpcResp for RefreshIdentityResponse {
     type Err<'de> = RefreshIdentityError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RefreshIdentity<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for RefreshIdentity<'a> {
     const NSID: &'static str = "com.atproto.identity.refreshIdentity";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

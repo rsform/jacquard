@@ -41,7 +41,7 @@ impl jacquard_common::xrpc::XrpcResp for DeleteTemplateResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteTemplate<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteTemplate<'a> {
     const NSID: &'static str = "tools.ozone.communication.deleteTemplate";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

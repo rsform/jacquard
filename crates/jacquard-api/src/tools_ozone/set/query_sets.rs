@@ -70,7 +70,7 @@ impl jacquard_common::xrpc::XrpcResp for QuerySetsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for QuerySets<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for QuerySets<'a> {
     const NSID: &'static str = "tools.ozone.set.querySets";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = QuerySetsResponse;

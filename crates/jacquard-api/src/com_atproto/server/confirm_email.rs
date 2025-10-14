@@ -105,7 +105,7 @@ impl jacquard_common::xrpc::XrpcResp for ConfirmEmailResponse {
     type Err<'de> = ConfirmEmailError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ConfirmEmail<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ConfirmEmail<'a> {
     const NSID: &'static str = "com.atproto.server.confirmEmail";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

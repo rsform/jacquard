@@ -47,7 +47,7 @@ impl jacquard_common::xrpc::XrpcResp for CreateFolderRelationshipResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateFolderRelationship<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateFolderRelationship<'a> {
     const NSID: &'static str = "app.blebbit.authr.folder.createFolderRelationship";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

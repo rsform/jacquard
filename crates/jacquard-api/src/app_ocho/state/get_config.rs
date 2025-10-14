@@ -93,7 +93,7 @@ impl jacquard_common::xrpc::XrpcResp for GetConfigResponse {
     type Err<'de> = GetConfigError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetConfig {
+impl jacquard_common::xrpc::XrpcRequest for GetConfig {
     const NSID: &'static str = "app.ocho.state.getConfig";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetConfigResponse;

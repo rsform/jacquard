@@ -59,7 +59,7 @@ impl jacquard_common::xrpc::XrpcResp for AcceptConvoResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AcceptConvo<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for AcceptConvo<'a> {
     const NSID: &'static str = "chat.bsky.convo.acceptConvo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

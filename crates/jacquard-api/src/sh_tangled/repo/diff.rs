@@ -103,7 +103,7 @@ impl jacquard_common::xrpc::XrpcResp for DiffResponse {
     type Err<'de> = DiffError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Diff<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for Diff<'a> {
     const NSID: &'static str = "sh.tangled.repo.diff";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = DiffResponse;

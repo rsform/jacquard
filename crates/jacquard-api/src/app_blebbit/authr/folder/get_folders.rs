@@ -55,7 +55,7 @@ impl jacquard_common::xrpc::XrpcResp for GetFoldersResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetFolders<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetFolders<'a> {
     const NSID: &'static str = "app.blebbit.authr.folder.getFolders";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetFoldersResponse;

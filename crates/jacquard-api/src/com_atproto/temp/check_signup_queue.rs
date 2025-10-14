@@ -46,7 +46,7 @@ impl jacquard_common::xrpc::XrpcResp for CheckSignupQueueResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CheckSignupQueue {
+impl jacquard_common::xrpc::XrpcRequest for CheckSignupQueue {
     const NSID: &'static str = "com.atproto.temp.checkSignupQueue";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = CheckSignupQueueResponse;

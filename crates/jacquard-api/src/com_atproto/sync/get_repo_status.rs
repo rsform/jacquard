@@ -90,7 +90,7 @@ impl jacquard_common::xrpc::XrpcResp for GetRepoStatusResponse {
     type Err<'de> = GetRepoStatusError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRepoStatus<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepoStatus<'a> {
     const NSID: &'static str = "com.atproto.sync.getRepoStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRepoStatusResponse;

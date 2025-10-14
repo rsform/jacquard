@@ -97,7 +97,7 @@ impl jacquard_common::xrpc::XrpcResp for BranchesResponse {
     type Err<'de> = BranchesError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Branches<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for Branches<'a> {
     const NSID: &'static str = "sh.tangled.repo.branches";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = BranchesResponse;

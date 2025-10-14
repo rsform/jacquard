@@ -31,7 +31,7 @@ impl jacquard_common::xrpc::XrpcResp for ImportRepoResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ImportRepo {
+impl jacquard_common::xrpc::XrpcRequest for ImportRepo {
     const NSID: &'static str = "com.atproto.repo.importRepo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/vnd.ipld.car",
@@ -40,9 +40,12 @@ impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ImportRepo {
     fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
         Ok(self.body.to_vec())
     }
-    fn decode_body(
+    fn decode_body<'de>(
         body: &'de [u8],
-    ) -> Result<Box<Self>, jacquard_common::error::DecodeError> {
+    ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
+    where
+        Self: serde::Deserialize<'de>,
+    {
         Ok(
             Box::new(Self {
                 body: bytes::Bytes::copy_from_slice(body),

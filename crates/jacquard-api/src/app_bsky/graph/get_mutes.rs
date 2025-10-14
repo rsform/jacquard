@@ -56,7 +56,7 @@ impl jacquard_common::xrpc::XrpcResp for GetMutesResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetMutes<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetMutes<'a> {
     const NSID: &'static str = "app.bsky.graph.getMutes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetMutesResponse;

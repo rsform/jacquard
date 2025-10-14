@@ -63,7 +63,7 @@ impl jacquard_common::xrpc::XrpcResp for PutActivitySubscriptionResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for PutActivitySubscription<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for PutActivitySubscription<'a> {
     const NSID: &'static str = "app.bsky.notification.putActivitySubscription";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

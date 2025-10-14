@@ -80,7 +80,7 @@ impl jacquard_common::xrpc::XrpcResp for DeleteValuesResponse {
     type Err<'de> = DeleteValuesError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteValues<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteValues<'a> {
     const NSID: &'static str = "tools.ozone.set.deleteValues";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

@@ -56,7 +56,7 @@ impl jacquard_common::xrpc::XrpcResp for GetBookmarksResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetBookmarks<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetBookmarks<'a> {
     const NSID: &'static str = "app.bsky.bookmark.getBookmarks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBookmarksResponse;

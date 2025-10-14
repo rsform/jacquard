@@ -216,7 +216,7 @@ impl jacquard_common::xrpc::XrpcResp for EmitEventResponse {
     type Err<'de> = EmitEventError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for EmitEvent<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for EmitEvent<'a> {
     const NSID: &'static str = "tools.ozone.moderation.emitEvent";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

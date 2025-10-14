@@ -49,7 +49,7 @@ impl jacquard_common::xrpc::XrpcResp for UnregisterPushResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UnregisterPush<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for UnregisterPush<'a> {
     const NSID: &'static str = "app.bsky.notification.unregisterPush";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

@@ -43,7 +43,7 @@ impl jacquard_common::xrpc::XrpcResp for UpdateAccountPasswordResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateAccountPassword<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountPassword<'a> {
     const NSID: &'static str = "com.atproto.admin.updateAccountPassword";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

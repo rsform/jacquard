@@ -94,7 +94,7 @@ impl jacquard_common::xrpc::XrpcResp for ResolveDidResponse {
     type Err<'de> = ResolveDidError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ResolveDid<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveDid<'a> {
     const NSID: &'static str = "com.atproto.identity.resolveDid";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveDidResponse;

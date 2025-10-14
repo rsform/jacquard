@@ -69,7 +69,7 @@ impl jacquard_common::xrpc::XrpcResp for SendEmailResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SendEmail<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for SendEmail<'a> {
     const NSID: &'static str = "com.atproto.admin.sendEmail";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

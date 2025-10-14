@@ -56,7 +56,7 @@ impl jacquard_common::xrpc::XrpcResp for GetSegmentsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSegments<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSegments<'a> {
     const NSID: &'static str = "place.stream.live.getSegments";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSegmentsResponse;

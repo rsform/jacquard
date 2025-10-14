@@ -48,7 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for GetReporterStatsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetReporterStats<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetReporterStats<'a> {
     const NSID: &'static str = "tools.ozone.moderation.getReporterStats";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetReporterStatsResponse;

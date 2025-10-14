@@ -48,7 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for DeleteGroupRelationshipResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteGroupRelationship<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteGroupRelationship<'a> {
     const NSID: &'static str = "app.blebbit.authr.group.deleteGroupRelationship";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

@@ -48,7 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for FindCorrelationResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for FindCorrelation<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for FindCorrelation<'a> {
     const NSID: &'static str = "tools.ozone.signature.findCorrelation";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = FindCorrelationResponse;

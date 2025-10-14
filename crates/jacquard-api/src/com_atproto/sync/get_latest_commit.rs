@@ -110,7 +110,7 @@ impl jacquard_common::xrpc::XrpcResp for GetLatestCommitResponse {
     type Err<'de> = GetLatestCommitError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetLatestCommit<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetLatestCommit<'a> {
     const NSID: &'static str = "com.atproto.sync.getLatestCommit";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLatestCommitResponse;

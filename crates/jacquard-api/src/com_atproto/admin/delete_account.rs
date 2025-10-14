@@ -40,7 +40,7 @@ impl jacquard_common::xrpc::XrpcResp for DeleteAccountResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteAccount<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteAccount<'a> {
     const NSID: &'static str = "com.atproto.admin.deleteAccount";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

@@ -97,7 +97,7 @@ impl jacquard_common::xrpc::XrpcResp for DescribeServerResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DescribeServer {
+impl jacquard_common::xrpc::XrpcRequest for DescribeServer {
     const NSID: &'static str = "com.atproto.server.describeServer";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = DescribeServerResponse;

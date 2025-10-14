@@ -49,7 +49,7 @@ impl jacquard_common::xrpc::XrpcResp for IsVerifiedResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for IsVerified<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for IsVerified<'a> {
     const NSID: &'static str = "app.ocho.edu.isVerified";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = IsVerifiedResponse;

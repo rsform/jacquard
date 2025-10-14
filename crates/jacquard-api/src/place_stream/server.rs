@@ -65,6 +65,10 @@ pub struct Webhook<'a> {
     ///When this webhook was last triggered.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub last_triggered: std::option::Option<jacquard_common::types::string::Datetime>,
+    ///Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mute_words: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///A user-friendly name for this webhook.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]

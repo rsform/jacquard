@@ -114,7 +114,7 @@ impl jacquard_common::xrpc::XrpcResp for GetListingResponse {
     type Err<'de> = GetListingError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetListing<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetListing<'a> {
     const NSID: &'static str = "place.atwork.getListing";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetListingResponse;

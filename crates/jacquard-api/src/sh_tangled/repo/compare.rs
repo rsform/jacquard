@@ -117,7 +117,7 @@ impl jacquard_common::xrpc::XrpcResp for CompareResponse {
     type Err<'de> = CompareError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Compare<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for Compare<'a> {
     const NSID: &'static str = "sh.tangled.repo.compare";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = CompareResponse;

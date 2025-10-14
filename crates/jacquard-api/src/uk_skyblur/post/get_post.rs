@@ -68,7 +68,7 @@ impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetPost<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPost<'a> {
     const NSID: &'static str = "uk.skyblur.post.getPost";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

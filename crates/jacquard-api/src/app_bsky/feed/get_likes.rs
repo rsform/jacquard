@@ -84,7 +84,7 @@ impl jacquard_common::xrpc::XrpcResp for GetLikesResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetLikes<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetLikes<'a> {
     const NSID: &'static str = "app.bsky.feed.getLikes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLikesResponse;

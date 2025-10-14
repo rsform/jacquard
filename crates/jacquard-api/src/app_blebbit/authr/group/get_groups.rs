@@ -55,7 +55,7 @@ impl jacquard_common::xrpc::XrpcResp for GetGroupsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetGroups<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetGroups<'a> {
     const NSID: &'static str = "app.blebbit.authr.group.getGroups";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetGroupsResponse;

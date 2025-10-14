@@ -13,7 +13,7 @@
     PartialEq,
     Eq,
     bon::Builder,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -33,7 +33,13 @@ pub struct GetTimeline<'a> {
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetTimelineOutput<'a> {
@@ -54,7 +60,7 @@ impl jacquard_common::xrpc::XrpcResp for GetTimelineResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetTimeline<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetTimeline<'a> {
     const NSID: &'static str = "app.bsky.feed.getTimeline";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTimelineResponse;

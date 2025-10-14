@@ -43,7 +43,7 @@ impl jacquard_common::xrpc::XrpcResp for UpdateAccountSigningKeyResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateAccountSigningKey<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountSigningKey<'a> {
     const NSID: &'static str = "com.atproto.admin.updateAccountSigningKey";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

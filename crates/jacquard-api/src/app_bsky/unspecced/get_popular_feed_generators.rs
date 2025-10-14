@@ -60,7 +60,7 @@ impl jacquard_common::xrpc::XrpcResp for GetPopularFeedGeneratorsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetPopularFeedGenerators<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPopularFeedGenerators<'a> {
     const NSID: &'static str = "app.bsky.unspecced.getPopularFeedGenerators";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPopularFeedGeneratorsResponse;

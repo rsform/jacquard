@@ -39,7 +39,7 @@ impl jacquard_common::xrpc::XrpcResp for ExportAccountDataResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ExportAccountData {
+impl jacquard_common::xrpc::XrpcRequest for ExportAccountData {
     const NSID: &'static str = "chat.bsky.actor.exportAccountData";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ExportAccountDataResponse;

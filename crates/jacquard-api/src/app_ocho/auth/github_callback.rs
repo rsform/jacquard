@@ -36,7 +36,7 @@ impl jacquard_common::xrpc::XrpcResp for GithubCallbackResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GithubCallback<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GithubCallback<'a> {
     const NSID: &'static str = "app.ocho.auth.githubCallback";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GithubCallbackResponse;

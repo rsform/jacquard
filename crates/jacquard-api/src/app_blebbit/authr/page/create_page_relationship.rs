@@ -47,7 +47,7 @@ impl jacquard_common::xrpc::XrpcResp for CreatePageRelationshipResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreatePageRelationship<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreatePageRelationship<'a> {
     const NSID: &'static str = "app.blebbit.authr.page.createPageRelationship";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

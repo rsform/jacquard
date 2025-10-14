@@ -121,7 +121,7 @@ impl jacquard_common::xrpc::XrpcResp for PutRecordResponse {
     type Err<'de> = PutRecordError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for PutRecord<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for PutRecord<'a> {
     const NSID: &'static str = "com.atproto.repo.putRecord";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

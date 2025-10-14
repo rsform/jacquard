@@ -57,7 +57,7 @@ impl jacquard_common::xrpc::XrpcResp for MuteConvoResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for MuteConvo<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for MuteConvo<'a> {
     const NSID: &'static str = "chat.bsky.convo.muteConvo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

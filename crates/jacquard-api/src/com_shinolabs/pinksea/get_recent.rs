@@ -51,7 +51,7 @@ impl jacquard_common::xrpc::XrpcResp for GetRecentResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRecent {
+impl jacquard_common::xrpc::XrpcRequest for GetRecent {
     const NSID: &'static str = "com.shinolabs.pinksea.getRecent";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRecentResponse;

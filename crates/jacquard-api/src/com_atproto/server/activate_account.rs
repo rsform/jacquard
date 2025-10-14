@@ -27,7 +27,7 @@ impl jacquard_common::xrpc::XrpcResp for ActivateAccountResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ActivateAccount {
+impl jacquard_common::xrpc::XrpcRequest for ActivateAccount {
     const NSID: &'static str = "com.atproto.server.activateAccount";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

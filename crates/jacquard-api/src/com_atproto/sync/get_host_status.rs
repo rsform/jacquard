@@ -92,7 +92,7 @@ impl jacquard_common::xrpc::XrpcResp for GetHostStatusResponse {
     type Err<'de> = GetHostStatusError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetHostStatus<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetHostStatus<'a> {
     const NSID: &'static str = "com.atproto.sync.getHostStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetHostStatusResponse;

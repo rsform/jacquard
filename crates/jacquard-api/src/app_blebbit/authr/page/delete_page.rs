@@ -46,7 +46,7 @@ impl jacquard_common::xrpc::XrpcResp for DeletePageResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeletePage {
+impl jacquard_common::xrpc::XrpcRequest for DeletePage {
     const NSID: &'static str = "app.blebbit.authr.page.deletePage";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

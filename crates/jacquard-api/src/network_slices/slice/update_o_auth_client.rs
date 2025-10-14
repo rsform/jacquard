@@ -89,7 +89,7 @@ impl jacquard_common::xrpc::XrpcResp for UpdateOAuthClientResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateOAuthClient<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateOAuthClient<'a> {
     const NSID: &'static str = "network.slices.slice.updateOAuthClient";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

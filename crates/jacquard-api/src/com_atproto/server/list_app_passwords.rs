@@ -96,7 +96,7 @@ impl jacquard_common::xrpc::XrpcResp for ListAppPasswordsResponse {
     type Err<'de> = ListAppPasswordsError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListAppPasswords {
+impl jacquard_common::xrpc::XrpcRequest for ListAppPasswords {
     const NSID: &'static str = "com.atproto.server.listAppPasswords";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListAppPasswordsResponse;

@@ -48,7 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for DeleteFolderRelationshipResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteFolderRelationship<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteFolderRelationship<'a> {
     const NSID: &'static str = "app.blebbit.authr.folder.deleteFolderRelationship";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

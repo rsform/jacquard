@@ -44,7 +44,7 @@ impl jacquard_common::xrpc::XrpcResp for GetCheckoutResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetCheckout<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetCheckout<'a> {
     const NSID: &'static str = "com.atproto.sync.getCheckout";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetCheckoutResponse;

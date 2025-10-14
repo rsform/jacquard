@@ -56,7 +56,7 @@ impl jacquard_common::xrpc::XrpcResp for GetSuggestedFeedsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSuggestedFeeds<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedFeeds<'a> {
     const NSID: &'static str = "app.bsky.feed.getSuggestedFeeds";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSuggestedFeedsResponse;

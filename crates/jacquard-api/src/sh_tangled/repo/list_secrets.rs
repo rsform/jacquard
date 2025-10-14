@@ -48,7 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for ListSecretsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListSecrets<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListSecrets<'a> {
     const NSID: &'static str = "sh.tangled.repo.listSecrets";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListSecretsResponse;

@@ -120,7 +120,7 @@ impl jacquard_common::xrpc::XrpcResp for GetRecordResponse {
     type Err<'de> = GetRecordError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetRecord<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecord<'a> {
     const NSID: &'static str = "com.atproto.sync.getRecord";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRecordResponse;

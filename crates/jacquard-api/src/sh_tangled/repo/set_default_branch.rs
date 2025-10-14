@@ -43,7 +43,7 @@ impl jacquard_common::xrpc::XrpcResp for SetDefaultBranchResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SetDefaultBranch<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for SetDefaultBranch<'a> {
     const NSID: &'static str = "sh.tangled.repo.setDefaultBranch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

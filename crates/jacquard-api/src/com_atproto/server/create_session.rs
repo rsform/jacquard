@@ -133,7 +133,7 @@ impl jacquard_common::xrpc::XrpcResp for CreateSessionResponse {
     type Err<'de> = CreateSessionError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateSession<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateSession<'a> {
     const NSID: &'static str = "com.atproto.server.createSession";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

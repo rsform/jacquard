@@ -56,7 +56,7 @@ impl jacquard_common::xrpc::XrpcResp for ListActivitySubscriptionsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListActivitySubscriptions<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListActivitySubscriptions<'a> {
     const NSID: &'static str = "app.bsky.notification.listActivitySubscriptions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListActivitySubscriptionsResponse;

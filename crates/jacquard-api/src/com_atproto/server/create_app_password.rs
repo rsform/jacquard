@@ -117,7 +117,7 @@ impl jacquard_common::xrpc::XrpcResp for CreateAppPasswordResponse {
     type Err<'de> = CreateAppPasswordError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateAppPassword<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateAppPassword<'a> {
     const NSID: &'static str = "com.atproto.server.createAppPassword";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

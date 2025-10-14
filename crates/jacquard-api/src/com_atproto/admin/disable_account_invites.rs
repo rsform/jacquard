@@ -45,7 +45,7 @@ impl jacquard_common::xrpc::XrpcResp for DisableAccountInvitesResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DisableAccountInvites<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for DisableAccountInvites<'a> {
     const NSID: &'static str = "com.atproto.admin.disableAccountInvites";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

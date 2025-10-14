@@ -108,7 +108,7 @@ impl jacquard_common::xrpc::XrpcResp for DeleteRecordResponse {
     type Err<'de> = DeleteRecordError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteRecord<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteRecord<'a> {
     const NSID: &'static str = "com.atproto.repo.deleteRecord";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

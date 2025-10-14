@@ -78,7 +78,7 @@ impl jacquard_common::xrpc::XrpcResp for OwnerResponse {
     type Err<'de> = OwnerError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Owner {
+impl jacquard_common::xrpc::XrpcRequest for Owner {
     const NSID: &'static str = "sh.tangled.owner";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = OwnerResponse;

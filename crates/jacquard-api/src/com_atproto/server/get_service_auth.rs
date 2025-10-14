@@ -88,7 +88,7 @@ impl jacquard_common::xrpc::XrpcResp for GetServiceAuthResponse {
     type Err<'de> = GetServiceAuthError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetServiceAuth<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetServiceAuth<'a> {
     const NSID: &'static str = "com.atproto.server.getServiceAuth";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetServiceAuthResponse;

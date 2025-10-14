@@ -41,7 +41,7 @@ impl jacquard_common::xrpc::XrpcResp for RequestPhoneVerificationResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RequestPhoneVerification<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for RequestPhoneVerification<'a> {
     const NSID: &'static str = "com.atproto.temp.requestPhoneVerification";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

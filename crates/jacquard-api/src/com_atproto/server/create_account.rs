@@ -190,7 +190,7 @@ impl jacquard_common::xrpc::XrpcResp for CreateAccountResponse {
     type Err<'de> = CreateAccountError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateAccount<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateAccount<'a> {
     const NSID: &'static str = "com.atproto.server.createAccount";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

@@ -49,7 +49,7 @@ impl jacquard_common::xrpc::XrpcResp for GetHandleFromDidResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetHandleFromDid<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetHandleFromDid<'a> {
     const NSID: &'static str = "com.shinolabs.pinksea.getHandleFromDid";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetHandleFromDidResponse;

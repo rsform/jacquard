@@ -45,7 +45,7 @@ impl jacquard_common::xrpc::XrpcResp for AddValuesResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AddValues<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for AddValues<'a> {
     const NSID: &'static str = "tools.ozone.set.addValues";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

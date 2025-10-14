@@ -114,7 +114,7 @@ impl jacquard_common::xrpc::XrpcResp for CreateReportResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateReport<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateReport<'a> {
     const NSID: &'static str = "com.atproto.moderation.createReport";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

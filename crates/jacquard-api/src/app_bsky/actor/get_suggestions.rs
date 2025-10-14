@@ -59,7 +59,7 @@ impl jacquard_common::xrpc::XrpcResp for GetSuggestionsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSuggestions<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestions<'a> {
     const NSID: &'static str = "app.bsky.actor.getSuggestions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSuggestionsResponse;

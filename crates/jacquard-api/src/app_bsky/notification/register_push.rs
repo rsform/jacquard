@@ -52,7 +52,7 @@ impl jacquard_common::xrpc::XrpcResp for RegisterPushResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RegisterPush<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for RegisterPush<'a> {
     const NSID: &'static str = "app.bsky.notification.registerPush";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

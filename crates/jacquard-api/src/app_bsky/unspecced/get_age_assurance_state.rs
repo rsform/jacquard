@@ -44,7 +44,7 @@ impl jacquard_common::xrpc::XrpcResp for GetAgeAssuranceStateResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAgeAssuranceState {
+impl jacquard_common::xrpc::XrpcRequest for GetAgeAssuranceState {
     const NSID: &'static str = "app.bsky.unspecced.getAgeAssuranceState";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAgeAssuranceStateResponse;

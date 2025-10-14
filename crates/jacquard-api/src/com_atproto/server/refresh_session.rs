@@ -92,7 +92,7 @@ impl jacquard_common::xrpc::XrpcResp for RefreshSessionResponse {
     type Err<'de> = RefreshSessionError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for RefreshSession {
+impl jacquard_common::xrpc::XrpcRequest for RefreshSession {
     const NSID: &'static str = "com.atproto.server.refreshSession";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

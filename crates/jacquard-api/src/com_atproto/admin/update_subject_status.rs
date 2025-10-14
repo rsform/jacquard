@@ -107,7 +107,7 @@ impl jacquard_common::xrpc::XrpcResp for UpdateSubjectStatusResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateSubjectStatus<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateSubjectStatus<'a> {
     const NSID: &'static str = "com.atproto.admin.updateSubjectStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

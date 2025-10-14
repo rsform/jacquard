@@ -44,7 +44,7 @@ impl jacquard_common::xrpc::XrpcResp for LoginResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Login {
+impl jacquard_common::xrpc::XrpcRequest for Login {
     const NSID: &'static str = "app.ocho.state.login";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = LoginResponse;

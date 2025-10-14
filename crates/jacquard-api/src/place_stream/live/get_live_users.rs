@@ -54,7 +54,7 @@ impl jacquard_common::xrpc::XrpcResp for GetLiveUsersResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetLiveUsers {
+impl jacquard_common::xrpc::XrpcRequest for GetLiveUsers {
     const NSID: &'static str = "place.stream.live.getLiveUsers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLiveUsersResponse;

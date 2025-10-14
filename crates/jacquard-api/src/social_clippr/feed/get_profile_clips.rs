@@ -63,7 +63,7 @@ impl jacquard_common::xrpc::XrpcResp for GetProfileClipsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetProfileClips<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfileClips<'a> {
     const NSID: &'static str = "social.clippr.feed.getProfileClips";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetProfileClipsResponse;

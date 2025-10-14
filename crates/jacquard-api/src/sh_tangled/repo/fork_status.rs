@@ -73,7 +73,7 @@ impl jacquard_common::xrpc::XrpcResp for ForkStatusResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ForkStatus<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ForkStatus<'a> {
     const NSID: &'static str = "sh.tangled.repo.forkStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

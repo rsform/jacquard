@@ -39,6 +39,14 @@
               "type": "string",
               "description": "The ID of the webhook to update."
             },
+            "muteWords": {
+              "type": "array",
+              "description": "Words to filter out from chat messages. Messages containing any of these words will not be forwarded.",
+              "items": {
+                "type": "string",
+                "maxLength": 100
+              }
+            },
             "name": {
               "type": "string",
               "description": "A user-friendly name for this webhook.",

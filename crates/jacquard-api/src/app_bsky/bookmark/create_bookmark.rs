@@ -77,7 +77,7 @@ impl jacquard_common::xrpc::XrpcResp for CreateBookmarkResponse {
     type Err<'de> = CreateBookmarkError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateBookmark<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateBookmark<'a> {
     const NSID: &'static str = "app.bsky.bookmark.createBookmark";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

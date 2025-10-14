@@ -61,7 +61,7 @@ impl jacquard_common::xrpc::XrpcResp for SearchBooksResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for SearchBooks<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for SearchBooks<'a> {
     const NSID: &'static str = "buzz.bookhive.searchBooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchBooksResponse;

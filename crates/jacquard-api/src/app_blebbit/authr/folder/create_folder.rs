@@ -66,7 +66,7 @@ impl jacquard_common::xrpc::XrpcResp for CreateFolderResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateFolder<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateFolder<'a> {
     const NSID: &'static str = "app.blebbit.authr.folder.createFolder";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

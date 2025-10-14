@@ -409,12 +409,10 @@ where
         }
     }
 
-    async fn send<'s, R>(
-        &self,
-        request: R,
-    ) -> XrpcResult<Response<<R as XrpcRequest<'s>>::Response>>
+    async fn send<R>(&self, request: R) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
     where
-        R: XrpcRequest<'s>,
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
     {
         let base_uri = self.base_uri();
         let auth = self.access_token().await;

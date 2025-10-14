@@ -39,7 +39,7 @@ impl jacquard_common::xrpc::XrpcResp for AtProtoCallbackResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for AtProtoCallback<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for AtProtoCallback<'a> {
     const NSID: &'static str = "app.ocho.auth.atProtoCallback";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = AtProtoCallbackResponse;

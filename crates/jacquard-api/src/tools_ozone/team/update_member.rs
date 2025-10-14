@@ -98,7 +98,7 @@ impl jacquard_common::xrpc::XrpcResp for UpdateMemberResponse {
     type Err<'de> = UpdateMemberError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateMember<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateMember<'a> {
     const NSID: &'static str = "tools.ozone.team.updateMember";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

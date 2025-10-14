@@ -48,7 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for GetEventResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetEvent {
+impl jacquard_common::xrpc::XrpcRequest for GetEvent {
     const NSID: &'static str = "tools.ozone.moderation.getEvent";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEventResponse;

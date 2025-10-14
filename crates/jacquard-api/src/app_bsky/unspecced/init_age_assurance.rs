@@ -119,7 +119,7 @@ impl jacquard_common::xrpc::XrpcResp for InitAgeAssuranceResponse {
     type Err<'de> = InitAgeAssuranceError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for InitAgeAssurance<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for InitAgeAssurance<'a> {
     const NSID: &'static str = "app.bsky.unspecced.initAgeAssurance";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

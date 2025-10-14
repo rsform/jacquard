@@ -35,6 +35,10 @@ pub struct UpdateWebhook<'a> {
     #[serde(borrow)]
     #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
+    ///Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mute_words: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///A user-friendly name for this webhook.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -158,7 +162,7 @@ impl jacquard_common::xrpc::XrpcResp for UpdateWebhookResponse {
     type Err<'de> = UpdateWebhookError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateWebhook<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateWebhook<'a> {
     const NSID: &'static str = "place.stream.server.updateWebhook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

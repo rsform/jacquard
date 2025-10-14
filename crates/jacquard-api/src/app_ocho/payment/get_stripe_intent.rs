@@ -70,7 +70,7 @@ impl jacquard_common::xrpc::XrpcResp for GetStripeIntentResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetStripeIntent<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetStripeIntent<'a> {
     const NSID: &'static str = "app.ocho.payment.getStripeIntent";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetStripeIntentResponse;

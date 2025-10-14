@@ -50,7 +50,7 @@ impl jacquard_common::xrpc::XrpcResp for GetVerificationUrlResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetVerificationUrl<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetVerificationUrl<'a> {
     const NSID: &'static str = "app.ocho.edu.getVerificationUrl";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetVerificationUrlResponse;

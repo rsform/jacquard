@@ -94,7 +94,7 @@ impl jacquard_common::xrpc::XrpcResp for GetWebhookResponse {
     type Err<'de> = GetWebhookError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetWebhook<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetWebhook<'a> {
     const NSID: &'static str = "place.stream.server.getWebhook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetWebhookResponse;

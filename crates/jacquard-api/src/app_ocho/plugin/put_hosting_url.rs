@@ -57,7 +57,7 @@ impl jacquard_common::xrpc::XrpcResp for PutHostingUrlResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for PutHostingUrl<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for PutHostingUrl<'a> {
     const NSID: &'static str = "app.ocho.plugin.putHostingUrl";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

@@ -98,7 +98,7 @@ impl jacquard_common::xrpc::XrpcResp for ListWebhooksResponse {
     type Err<'de> = ListWebhooksError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListWebhooks<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListWebhooks<'a> {
     const NSID: &'static str = "place.stream.server.listWebhooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListWebhooksResponse;

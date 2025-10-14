@@ -69,7 +69,7 @@ impl jacquard_common::xrpc::XrpcResp for UpsertOptionResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpsertOption<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpsertOption<'a> {
     const NSID: &'static str = "tools.ozone.setting.upsertOption";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

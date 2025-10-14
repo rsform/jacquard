@@ -58,7 +58,7 @@ impl jacquard_common::xrpc::XrpcResp for FindRelatedAccountsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for FindRelatedAccounts<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for FindRelatedAccounts<'a> {
     const NSID: &'static str = "tools.ozone.signature.findRelatedAccounts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = FindRelatedAccountsResponse;

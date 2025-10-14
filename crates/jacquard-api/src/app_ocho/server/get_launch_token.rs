@@ -48,7 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for GetLaunchTokenResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetLaunchToken<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetLaunchToken<'a> {
     const NSID: &'static str = "app.ocho.server.getLaunchToken";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLaunchTokenResponse;

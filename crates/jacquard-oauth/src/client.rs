@@ -422,12 +422,12 @@ where
         self.options.read().await.clone()
     }
 
-    async fn send<'s, R>(
+    async fn send<R>(
         &self,
         request: R,
-    ) -> XrpcResult<Response<<R as XrpcRequest<'s>>::Response>>
+    ) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
     where
-        R: XrpcRequest<'s>,
+        R: XrpcRequest,
     {
         let base_uri = self.base_uri();
         let mut opts = self.options.read().await.clone();

@@ -48,7 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for WhoamiResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Whoami {
+impl jacquard_common::xrpc::XrpcRequest for Whoami {
     const NSID: &'static str = "app.ocho.auth.whoami";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = WhoamiResponse;

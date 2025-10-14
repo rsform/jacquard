@@ -98,7 +98,7 @@ impl jacquard_common::xrpc::XrpcResp for UpdateGroupResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for UpdateGroup<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateGroup<'a> {
     const NSID: &'static str = "app.blebbit.authr.group.updateGroup";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

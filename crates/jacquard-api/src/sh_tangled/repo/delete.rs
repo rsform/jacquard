@@ -49,7 +49,7 @@ impl jacquard_common::xrpc::XrpcResp for DeleteResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Delete<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for Delete<'a> {
     const NSID: &'static str = "sh.tangled.repo.delete";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

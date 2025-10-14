@@ -49,7 +49,7 @@ impl jacquard_common::xrpc::XrpcResp for GetUnreadCountResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetUnreadCount {
+impl jacquard_common::xrpc::XrpcRequest for GetUnreadCount {
     const NSID: &'static str = "app.bsky.notification.getUnreadCount";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetUnreadCountResponse;

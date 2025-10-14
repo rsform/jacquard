@@ -50,7 +50,7 @@ impl jacquard_common::xrpc::XrpcResp for GetTagListResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetTagList<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetTagList<'a> {
     const NSID: &'static str = "social.clippr.feed.getTagList";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTagListResponse;

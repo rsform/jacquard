@@ -92,7 +92,7 @@ impl jacquard_common::xrpc::XrpcResp for ListKeysResponse {
     type Err<'de> = ListKeysError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListKeys<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListKeys<'a> {
     const NSID: &'static str = "sh.tangled.knot.listKeys";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListKeysResponse;

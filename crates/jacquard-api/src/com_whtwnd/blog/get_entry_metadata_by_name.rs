@@ -91,7 +91,7 @@ impl jacquard_common::xrpc::XrpcResp for GetEntryMetadataByNameResponse {
     type Err<'de> = GetEntryMetadataByNameError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetEntryMetadataByName<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryMetadataByName<'a> {
     const NSID: &'static str = "com.whtwnd.blog.getEntryMetadataByName";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEntryMetadataByNameResponse;

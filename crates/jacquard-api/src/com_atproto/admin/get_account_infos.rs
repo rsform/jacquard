@@ -48,7 +48,7 @@ impl jacquard_common::xrpc::XrpcResp for GetAccountInfosResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAccountInfos<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetAccountInfos<'a> {
     const NSID: &'static str = "com.atproto.admin.getAccountInfos";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAccountInfosResponse;

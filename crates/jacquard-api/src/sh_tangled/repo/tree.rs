@@ -159,7 +159,7 @@ impl jacquard_common::xrpc::XrpcResp for TreeResponse {
     type Err<'de> = TreeError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for Tree<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for Tree<'a> {
     const NSID: &'static str = "sh.tangled.repo.tree";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = TreeResponse;

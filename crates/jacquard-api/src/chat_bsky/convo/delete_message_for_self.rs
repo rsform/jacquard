@@ -61,7 +61,7 @@ impl jacquard_common::xrpc::XrpcResp for DeleteMessageForSelfResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteMessageForSelf<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteMessageForSelf<'a> {
     const NSID: &'static str = "chat.bsky.convo.deleteMessageForSelf";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

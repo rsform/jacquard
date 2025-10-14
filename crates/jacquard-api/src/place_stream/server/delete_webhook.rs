@@ -103,7 +103,7 @@ impl jacquard_common::xrpc::XrpcResp for DeleteWebhookResponse {
     type Err<'de> = DeleteWebhookError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for DeleteWebhook<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteWebhook<'a> {
     const NSID: &'static str = "place.stream.server.deleteWebhook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

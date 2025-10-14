@@ -58,7 +58,7 @@ impl jacquard_common::xrpc::XrpcResp for GetProfileTagsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetProfileTags<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfileTags<'a> {
     const NSID: &'static str = "social.clippr.feed.getProfileTags";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetProfileTagsResponse;

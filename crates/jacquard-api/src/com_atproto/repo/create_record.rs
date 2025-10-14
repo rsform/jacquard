@@ -121,7 +121,7 @@ impl jacquard_common::xrpc::XrpcResp for CreateRecordResponse {
     type Err<'de> = CreateRecordError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateRecord<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateRecord<'a> {
     const NSID: &'static str = "com.atproto.repo.createRecord";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

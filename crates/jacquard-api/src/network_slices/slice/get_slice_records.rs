@@ -109,7 +109,7 @@ impl jacquard_common::xrpc::XrpcResp for GetSliceRecordsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetSliceRecords<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetSliceRecords<'a> {
     const NSID: &'static str = "network.slices.slice.getSliceRecords";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

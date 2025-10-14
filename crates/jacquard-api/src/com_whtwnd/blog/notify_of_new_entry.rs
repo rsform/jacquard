@@ -75,7 +75,7 @@ impl jacquard_common::xrpc::XrpcResp for NotifyOfNewEntryResponse {
     type Err<'de> = NotifyOfNewEntryError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for NotifyOfNewEntry<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for NotifyOfNewEntry<'a> {
     const NSID: &'static str = "com.whtwnd.blog.notifyOfNewEntry";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

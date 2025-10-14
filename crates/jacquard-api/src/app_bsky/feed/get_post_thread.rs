@@ -112,7 +112,7 @@ impl jacquard_common::xrpc::XrpcResp for GetPostThreadResponse {
     type Err<'de> = GetPostThreadError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetPostThread<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetPostThread<'a> {
     const NSID: &'static str = "app.bsky.feed.getPostThread";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPostThreadResponse;

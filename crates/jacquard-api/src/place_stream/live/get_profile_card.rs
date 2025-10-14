@@ -79,7 +79,7 @@ impl jacquard_common::xrpc::XrpcResp for GetProfileCardResponse {
     type Err<'de> = GetProfileCardError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetProfileCard<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfileCard<'a> {
     const NSID: &'static str = "place.stream.live.getProfileCard";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetProfileCardResponse;

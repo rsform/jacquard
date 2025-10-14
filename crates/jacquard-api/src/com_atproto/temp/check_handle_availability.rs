@@ -115,7 +115,7 @@ impl jacquard_common::xrpc::XrpcResp for CheckHandleAvailabilityResponse {
     type Err<'de> = CheckHandleAvailabilityError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CheckHandleAvailability<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for CheckHandleAvailability<'a> {
     const NSID: &'static str = "com.atproto.temp.checkHandleAvailability";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = CheckHandleAvailabilityResponse;

@@ -86,7 +86,7 @@ impl jacquard_common::xrpc::XrpcResp for GetAccountInviteCodesResponse {
     type Err<'de> = GetAccountInviteCodesError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetAccountInviteCodes {
+impl jacquard_common::xrpc::XrpcRequest for GetAccountInviteCodes {
     const NSID: &'static str = "com.atproto.server.getAccountInviteCodes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAccountInviteCodesResponse;

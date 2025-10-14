@@ -56,7 +56,7 @@ impl jacquard_common::xrpc::XrpcResp for ListMissingBlobsResponse {
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ListMissingBlobs<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ListMissingBlobs<'a> {
     const NSID: &'static str = "com.atproto.repo.listMissingBlobs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListMissingBlobsResponse;

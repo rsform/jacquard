@@ -30,6 +30,10 @@ pub struct CreateWebhook<'a> {
     ///The types of events this webhook should receive.
     #[serde(borrow)]
     pub events: Vec<jacquard_common::CowStr<'a>>,
+    ///Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mute_words: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///A user-friendly name for this webhook.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -142,7 +146,7 @@ impl jacquard_common::xrpc::XrpcResp for CreateWebhookResponse {
     type Err<'de> = CreateWebhookError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for CreateWebhook<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for CreateWebhook<'a> {
     const NSID: &'static str = "place.stream.server.createWebhook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",

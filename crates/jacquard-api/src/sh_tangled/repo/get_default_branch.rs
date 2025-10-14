@@ -111,7 +111,7 @@ impl jacquard_common::xrpc::XrpcResp for GetDefaultBranchResponse {
     type Err<'de> = GetDefaultBranchError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for GetDefaultBranch<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for GetDefaultBranch<'a> {
     const NSID: &'static str = "sh.tangled.repo.getDefaultBranch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetDefaultBranchResponse;

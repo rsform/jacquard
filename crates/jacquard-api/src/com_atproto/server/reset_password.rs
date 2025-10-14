@@ -87,7 +87,7 @@ impl jacquard_common::xrpc::XrpcResp for ResetPasswordResponse {
     type Err<'de> = ResetPasswordError<'de>;
 }
 
-impl<'de> jacquard_common::xrpc::XrpcRequest<'de> for ResetPassword<'de> {
+impl<'a> jacquard_common::xrpc::XrpcRequest for ResetPassword<'a> {
     const NSID: &'static str = "com.atproto.server.resetPassword";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
