@@ -19,12 +19,12 @@
 //! Here is the entire text of `XrpcCall::send()`. [`build_http_request()`](https://tangled.org/@nonbinary.computer/jacquard/blob/main/crates/jacquard-common/src/xrpc.rs#L400) and [`process_response()`](https://tangled.org/@nonbinary.computer/jacquard/blob/main/crates/jacquard-common/src/xrpc.rs#L344) are public functions and can be used in other crates. The first does more or less what it says on the tin. The second does less than you might think. It mostly surfaces authentication errors at an earlier level so you don't have to fully parse the response to know if there was an error or not.
 //!
 //! ```ignore
-//! pub async fn send<'s, R>(
+//! pub async fn send<R>(
 //!         self,
 //!         request: &R,
-//!     ) -> XrpcResult<Response<<R as XrpcRequest<'s>>::Response>>
+//!     ) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
 //!     where
-//!         R: XrpcRequest<'s>,
+//!         R: XrpcRequest,
 //!     {
 //!         let http_request = build_http_request(&self.base, request, &self.opts)
 //!             .map_err(TransportError::from)?;
@@ -45,7 +45,7 @@
 //! So how does this work? How does `send()` and its helper functions know what to do? The answer shouldn't be surprising to anyone familiar with Rust. It's traits! Specifically, the following traits, which have generated implementations for every lexicon type ingested by Jacquard's API code generation, but which honestly aren't hard to just implement yourself (more tedious than anything). XrpcResp is always implemented on a unit/marker struct with no fields. They provide all the request-specific instructions to the functions.
 //!
 //! ```ignore
-//! pub trait XrpcRequest<'de>: Serialize + Deserialize<'de> {
+//! pub trait XrpcRequest: Serialize {
 //!     const NSID: &'static str;
 //!     /// XRPC method (query/GET or procedure/POST)
 //!     const METHOD: XrpcMethod;
@@ -55,7 +55,10 @@
 //!         Ok(serde_json::to_vec(self)?)
 //!     }
 //!     /// Decode the request body for procedures. (Used server-side)
-//!     fn decode_body(body: &'de [u8]) -> Result<Box<Self>, DecodeError> {
+//!     fn decode_body<'de>(body: &'de [u8]) -> Result<Box<Self>, DecodeError>
+//!     where
+//!         Self: Deserialize<'de>
+//!     {
 //!         let body: Self = serde_json::from_slice(body).map_err(|e| DecodeError::Json(e))?;
 //!         Ok(Box::new(body))
 //!     }
@@ -99,10 +102,7 @@
 //! The naive approach would be to put a lifetime parameter on the trait itself:
 //!
 //!```ignore
-//!// Note: I actually DO do this for XrpcRequest as you can see above,
-//!// because it is implemented on the request parameter struct, which has this
-//!// sort of lifetime bound inherently, and we need it to implement Deserialize
-//!// for server-side handling.
+//!// This looks reasonable but creates problems in generic/async contexts
 //!trait NaiveXrpcRequest<'de> {
 //!    type Output: Deserialize<'de>;
 //!    // ...
@@ -160,13 +160,13 @@
 //!// .update_vec() with a modifier function or .update_vec_item() with a single item you want to set.
 //
 //!pub trait VecUpdate {
-//!    type GetRequest<'de>: XrpcRequest<'de>;  //GAT
-//!    type PutRequest<'de>: XrpcRequest<'de>;  //GAT
+//!    type GetRequest: XrpcRequest;
+//!    type PutRequest: XrpcRequest;
 //!    //... more stuff
 //
-//!    //Method-level lifetime, not trait-level
+//!    //Method-level lifetime, GAT on response type
 //!    fn extract_vec<'s>(
-//!        output: <Self::GetRequest<'s> as XrpcRequest<'s>>::Output<'s>
+//!        output: <<Self::GetRequest as XrpcRequest>::Response as XrpcResp>::Output<'s>
 //!    ) -> Vec<Self::Item>;
 //!    //... more stuff
 //!}

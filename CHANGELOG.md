@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.5.1] - 2025-10-13
+
+### Fixed
+
+**Trait bounds** (`jacquard-common`)
+- Removed lifetime parameter from `XrpcRequest` trait, simplifying trait bounds
+- Lifetime now only appears on `XrpcEndpoint::Request<'de>` associated type
+- Fixes issues with using XRPC types in async contexts like Axum extractors
+
+### Changed
+
+- Updated all workspace crates to 0.5.1 for consistency
+- `jacquard-axum` remains at 0.5.1 (unchanged)
+
+---
+
 ## `jacquard-axum` [0.5.1] - 2025-10-13
 
 ### Fixed
