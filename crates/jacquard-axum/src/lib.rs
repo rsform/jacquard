@@ -106,24 +106,9 @@ where
                 }
                 XrpcMethod::Query => {
                     if let Some(path_query) = req.uri().path_and_query() {
-                        // TODO: see if we can eliminate this now that we've fixed the deserialize impls for string types
-                        let query =
-                            urlencoding::decode(path_query.query().unwrap_or("")).map_err(|e| {
-                                (
-                                    StatusCode::BAD_REQUEST,
-                                    [(
-                                        header::CONTENT_TYPE,
-                                        HeaderValue::from_static("application/json"),
-                                    )],
-                                    Json(json!({
-                                        "error": "InvalidRequest",
-                                        "message": format!("failed to decode request: {}", e)
-                                    })),
-                                )
-                                    .into_response()
-                            })?;
+                        let query = path_query.query().unwrap_or("");
                         let value: R::Request<'_> = serde_html_form::from_str::<R::Request<'_>>(
-                            query.as_ref(),
+                            query,
                         )
                         .map_err(|e| {
                             (
