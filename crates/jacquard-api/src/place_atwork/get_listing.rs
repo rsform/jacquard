@@ -37,14 +37,14 @@ pub struct GetListing<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetListingOutput<'a> {
-    ///CID of the listing record
+    /// CID of the listing record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    ///AT-URI of the listing
+    /// AT-URI of the listing
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    ///The job listing record
+    /// The job listing record
     #[serde(borrow)]
     pub value: crate::place_atwork::listing::Listing<'a>,
 }
@@ -64,13 +64,13 @@ pub struct GetListingOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetListingError<'a> {
-    ///The requested listing does not exist
+    /// The requested listing does not exist
     #[serde(rename = "ListingNotFound")]
     ListingNotFound(std::option::Option<String>),
-    ///Failed to parse the listing data
+    /// Failed to parse the listing data
     #[serde(rename = "ListingParseFailed")]
     ListingParseFailed(std::option::Option<String>),
-    ///Failed to fetch the listing from storage
+    /// Failed to fetch the listing from storage
     #[serde(rename = "ListingFetchFailed")]
     ListingFetchFailed(std::option::Option<String>),
 }

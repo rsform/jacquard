@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record containing a Frontpage comment.
+/// Record containing a Frontpage comment.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,18 +14,21 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Comment<'a> {
-    ///The content of the comment.
+    /// The content of the comment.
     #[serde(borrow)]
+    #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
-    ///Client-declared timestamp when this comment was originally created.
+    /// Client-declared timestamp when this comment was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub parent: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub parent: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     #[serde(borrow)]
     pub post: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }

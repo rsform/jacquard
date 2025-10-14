@@ -14,7 +14,7 @@
     PartialEq,
     Eq,
     bon::Builder,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
@@ -40,12 +40,12 @@ pub struct DeleteBookmark<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteBookmarkError<'a> {
-    ///The URI to be bookmarked is for an unsupported collection.
+    /// The URI to be bookmarked is for an unsupported collection.
     #[serde(rename = "UnsupportedCollection")]
     UnsupportedCollection(std::option::Option<String>),
 }
@@ -77,8 +77,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteBookmarkResponse {
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBookmark<'a> {
     const NSID: &'static str = "app.bsky.bookmark.deleteBookmark";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteBookmarkResponse;
 }
 
@@ -87,8 +88,9 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBookmark<'a> {
 pub struct DeleteBookmarkRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteBookmarkRequest {
     const PATH: &'static str = "/xrpc/app.bsky.bookmark.deleteBookmark";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<'de> = DeleteBookmark<'de>;
     type Response = DeleteBookmarkResponse;
 }

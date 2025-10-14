@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A declaration of a Bluesky chat account.
+/// A declaration of a Bluesky chat account.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,11 +14,13 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Declaration<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub allow_incoming: jacquard_common::CowStr<'a>,
 }
 

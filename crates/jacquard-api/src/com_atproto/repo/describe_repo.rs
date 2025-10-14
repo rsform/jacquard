@@ -34,17 +34,17 @@ pub struct DescribeRepo<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DescribeRepoOutput<'a> {
-    ///List of all the collections (NSIDs) for which this repo contains at least one record.
+    /// List of all the collections (NSIDs) for which this repo contains at least one record.
     #[serde(borrow)]
     pub collections: Vec<jacquard_common::types::string::Nsid<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///The complete DID document for this account.
+    /// The complete DID document for this account.
     #[serde(borrow)]
     pub did_doc: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
-    ///Indicates if handle is currently valid (resolves bi-directionally)
+    /// Indicates if handle is currently valid (resolves bi-directionally)
     pub handle_is_correct: bool,
 }
 

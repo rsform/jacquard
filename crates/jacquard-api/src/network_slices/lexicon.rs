@@ -13,31 +13,37 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Lexicon<'a> {
-    ///When the lexicon was created
+    /// When the lexicon was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The lexicon schema definitions as JSON
+    /// The lexicon schema definitions as JSON
     #[serde(borrow)]
+    #[builder(into)]
     pub definitions: jacquard_common::CowStr<'a>,
-    ///Human-readable description of the lexicon
+    /// Human-readable description of the lexicon
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether this lexicon should be excluded from sync operations
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// Whether this lexicon should be excluded from sync operations
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub excluded_from_sync: std::option::Option<bool>,
-    ///Namespaced identifier for the lexicon
+    #[builder(into)]
+    pub excluded_from_sync: Option<bool>,
+    /// Namespaced identifier for the lexicon
     #[serde(borrow)]
+    #[builder(into)]
     pub nsid: jacquard_common::CowStr<'a>,
-    ///AT-URI reference to the slice this lexicon belongs to
+    /// AT-URI reference to the slice this lexicon belongs to
     #[serde(borrow)]
     pub slice: jacquard_common::types::string::AtUri<'a>,
-    ///When the lexicon was last updated
+    /// When the lexicon was last updated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub updated_at: Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

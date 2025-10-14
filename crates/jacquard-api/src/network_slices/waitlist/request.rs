@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A request to join the waitlist
+/// A request to join the waitlist
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,13 +14,14 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Request<'a> {
-    ///When the user joined the waitlist
+    /// When the user joined the waitlist
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The AT URI of the slice being requested access to
+    /// The AT URI of the slice being requested access to
     #[serde(borrow)]
     pub slice: jacquard_common::types::string::AtUri<'a>,
 }

@@ -15,19 +15,23 @@ pub mod item;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Gallery<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Self-label values for this post. Effectively content warnings.
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
 }
 
@@ -81,7 +85,8 @@ impl From<GalleryGetRecordOutput<'_>> for Gallery<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GalleryView<'a> {
@@ -91,11 +96,13 @@ pub struct GalleryView<'a> {
     pub creator: crate::social_grain::actor::ProfileView<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub items: std::option::Option<Vec<crate::social_grain::photo::PhotoView<'a>>>,
+    pub items: Option<Vec<crate::social_grain::photo::PhotoView<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]

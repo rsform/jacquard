@@ -19,15 +19,15 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct HiddenRef<'a> {
-    ///Fork reference name
+    /// Fork reference name
     #[serde(borrow)]
     #[builder(into)]
     pub fork_ref: jacquard_common::CowStr<'a>,
-    ///Remote reference name
+    /// Remote reference name
     #[serde(borrow)]
     #[builder(into)]
     pub remote_ref: jacquard_common::CowStr<'a>,
-    ///AT-URI of the repository
+    /// AT-URI of the repository
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,
     #[serde(flatten)]
@@ -51,15 +51,15 @@ pub struct HiddenRef<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HiddenRefOutput<'a> {
-    ///Error message if creation failed
+    /// Error message if creation failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub error: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The created hidden ref name
+    /// The created hidden ref name
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether the hidden ref was created successfully
+    /// Whether the hidden ref was created successfully
     pub success: bool,
 }
 

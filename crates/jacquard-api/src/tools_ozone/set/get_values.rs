@@ -66,7 +66,7 @@ pub struct GetValuesOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetValuesError<'a> {
-    ///set with the given name does not exist
+    /// set with the given name does not exist
     #[serde(rename = "SetNotFound")]
     SetNotFound(std::option::Option<String>),
 }

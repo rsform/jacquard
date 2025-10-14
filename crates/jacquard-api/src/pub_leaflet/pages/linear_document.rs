@@ -13,13 +13,15 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Block<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub alignment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub alignment: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub block: BlockBlock<'a>,
 }
@@ -69,15 +71,15 @@ pub enum BlockBlock<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LinearDocument<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub blocks: std::option::Option<
-        Vec<crate::pub_leaflet::pages::linear_document::Block<'a>>,
-    >,
+    pub blocks: Option<Vec<crate::pub_leaflet::pages::linear_document::Block<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -88,7 +90,8 @@ pub struct LinearDocument<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Position<'a> {
@@ -104,7 +107,8 @@ pub struct Position<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Quote<'a> {

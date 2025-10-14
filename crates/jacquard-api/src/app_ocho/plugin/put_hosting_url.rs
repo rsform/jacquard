@@ -19,7 +19,7 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct PutHostingUrl<'a> {
-    ///The expo push token
+    /// The expo push token
     #[serde(borrow)]
     #[builder(into)]
     pub url: jacquard_common::CowStr<'a>,

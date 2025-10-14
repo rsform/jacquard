@@ -53,7 +53,7 @@ pub struct ResolveHandleOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ResolveHandleError<'a> {
-    ///The resolution process confirmed that the handle does not resolve to any DID.
+    /// The resolution process confirmed that the handle does not resolve to any DID.
     #[serde(rename = "HandleNotFound")]
     HandleNotFound(std::option::Option<String>),
 }

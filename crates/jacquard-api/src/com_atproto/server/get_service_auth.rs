@@ -58,7 +58,7 @@ pub struct GetServiceAuthOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetServiceAuthError<'a> {
-    ///Indicates that the requested expiration date is not a valid. May be in the past or may be reliant on the requested scopes.
+    /// Indicates that the requested expiration date is not a valid. May be in the past or may be reliant on the requested scopes.
     #[serde(rename = "BadExpiration")]
     BadExpiration(std::option::Option<String>),
 }

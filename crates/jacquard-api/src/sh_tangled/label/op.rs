@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Op<'a> {
@@ -22,7 +23,7 @@ pub struct Op<'a> {
     #[serde(borrow)]
     pub delete: Vec<crate::sh_tangled::label::op::Operand<'a>>,
     pub performed_at: jacquard_common::types::string::Datetime,
-    ///The subject (task, pull or discussion) of this label. Appviews may apply a `scope` check and refuse this op.
+    /// The subject (task, pull or discussion) of this label. Appviews may apply a `scope` check and refuse this op.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,
 }
@@ -77,14 +78,16 @@ impl From<OpGetRecordOutput<'_>> for Op<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Operand<'a> {
-    ///ATURI to the label definition
+    /// ATURI to the label definition
     #[serde(borrow)]
     pub key: jacquard_common::types::string::AtUri<'a>,
-    ///Stringified value of the label. This is first unstringed by appviews and then interpreted as a concrete value.
+    /// Stringified value of the label. This is first unstringed by appviews and then interpreted as a concrete value.
     #[serde(borrow)]
+    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
 }

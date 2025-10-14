@@ -15,7 +15,8 @@ pub mod status;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CloneOpts<'a> {
@@ -32,7 +33,8 @@ pub struct CloneOpts<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Pipeline<'a> {
@@ -92,13 +94,15 @@ impl From<PipelineGetRecordOutput<'_>> for Pipeline<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ManualTriggerData<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub inputs: std::option::Option<Vec<crate::sh_tangled::pipeline::Pair<'a>>>,
+    pub inputs: Option<Vec<crate::sh_tangled::pipeline::Pair<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -109,13 +113,16 @@ pub struct ManualTriggerData<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Pair<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub key: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
 }
 
@@ -127,17 +134,22 @@ pub struct Pair<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PullRequestTriggerData<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub action: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub source_branch: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub source_sha: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub target_branch: jacquard_common::CowStr<'a>,
 }
 
@@ -149,15 +161,19 @@ pub struct PullRequestTriggerData<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PushTriggerData<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub new_sha: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub old_sha: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub r#ref: jacquard_common::CowStr<'a>,
 }
 
@@ -169,23 +185,26 @@ pub struct PushTriggerData<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TriggerMetadata<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub kind: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub manual: std::option::Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>,
+    pub manual: Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub pull_request: std::option::Option<
-        crate::sh_tangled::pipeline::PullRequestTriggerData<'a>,
-    >,
+    pub pull_request: Option<crate::sh_tangled::pipeline::PullRequestTriggerData<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub push: std::option::Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>,
+    pub push: Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>,
     #[serde(borrow)]
     pub repo: crate::sh_tangled::pipeline::TriggerRepo<'a>,
 }
@@ -198,17 +217,21 @@ pub struct TriggerMetadata<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TriggerRepo<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub default_branch: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub knot: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub repo: jacquard_common::CowStr<'a>,
 }
 
@@ -220,16 +243,20 @@ pub struct TriggerRepo<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Workflow<'a> {
     #[serde(borrow)]
     pub clone: crate::sh_tangled::pipeline::CloneOpts<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub engine: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub raw: jacquard_common::CowStr<'a>,
 }

@@ -48,7 +48,7 @@ pub struct SearchStarterPacksSkeletonOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
+    /// Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub hits_total: std::option::Option<i64>,
     #[serde(borrow)]

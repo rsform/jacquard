@@ -23,7 +23,7 @@ pub struct IsVerified<'a> {
     pub domain: jacquard_common::CowStr<'a>,
 }
 
-///Whether the user is verified on that domain
+/// Whether the user is verified on that domain
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

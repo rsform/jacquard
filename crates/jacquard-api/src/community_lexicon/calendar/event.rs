@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///The event has been cancelled.
+/// The event has been cancelled.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -23,7 +23,7 @@ impl std::fmt::Display for Cancelled {
     }
 }
 
-///A hybrid event that takes place both online and offline.
+/// A hybrid event that takes place both online and offline.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -41,7 +41,7 @@ impl std::fmt::Display for Hybrid {
     }
 }
 
-///An in-person event that takes place offline.
+/// An in-person event that takes place offline.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -59,7 +59,7 @@ impl std::fmt::Display for Inperson {
     }
 }
 
-///A calendar event.
+/// A calendar event.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -68,45 +68,50 @@ impl std::fmt::Display for Inperson {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
-    ///Client-declared timestamp when the event was created.
+    /// Client-declared timestamp when the event was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The description of the event.
+    /// The description of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Client-declared timestamp when the event ends.
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// Client-declared timestamp when the event ends.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ends_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The locations where the event takes place.
+    #[builder(into)]
+    pub ends_at: Option<jacquard_common::types::string::Datetime>,
+    /// The locations where the event takes place.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub locations: std::option::Option<Vec<EventLocationsItem<'a>>>,
-    ///The attendance mode of the event.
+    pub locations: Option<Vec<EventLocationsItem<'a>>>,
+    /// The attendance mode of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub mode: std::option::Option<crate::community_lexicon::calendar::event::Mode<'a>>,
-    ///The name of the event.
+    pub mode: Option<crate::community_lexicon::calendar::event::Mode<'a>>,
+    /// The name of the event.
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Client-declared timestamp when the event starts.
+    /// Client-declared timestamp when the event starts.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub starts_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The status of the event.
+    #[builder(into)]
+    pub starts_at: Option<jacquard_common::types::string::Datetime>,
+    /// The status of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub status: std::option::Option<
-        crate::community_lexicon::calendar::event::Status<'a>,
-    >,
-    ///URIs associated with the event.
+    pub status: Option<crate::community_lexicon::calendar::event::Status<'a>>,
+    /// URIs associated with the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub uris: std::option::Option<
-        Vec<crate::community_lexicon::calendar::event::Uri<'a>>,
-    >,
+    pub uris: Option<Vec<crate::community_lexicon::calendar::event::Uri<'a>>>,
 }
 
 #[jacquard_derive::open_union]
@@ -176,7 +181,7 @@ impl From<EventGetRecordOutput<'_>> for Event<'_> {
     }
 }
 
-///The mode of the event.
+/// The mode of the event.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Mode<'a> {
     CommunityLexiconCalendarEventHybrid,
@@ -282,7 +287,7 @@ impl jacquard_common::IntoStatic for Mode<'_> {
     }
 }
 
-///The event has been created, but not finalized.
+/// The event has been created, but not finalized.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -300,7 +305,7 @@ impl std::fmt::Display for Planned {
     }
 }
 
-///The event has been postponed and a new start date has not been set.
+/// The event has been postponed and a new start date has not been set.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -318,7 +323,7 @@ impl std::fmt::Display for Postponed {
     }
 }
 
-///The event has been rescheduled.
+/// The event has been rescheduled.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -336,7 +341,7 @@ impl std::fmt::Display for Rescheduled {
     }
 }
 
-///The event has been created and scheduled.
+/// The event has been created and scheduled.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -354,7 +359,7 @@ impl std::fmt::Display for Scheduled {
     }
 }
 
-///The status of the event.
+/// The status of the event.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Status<'a> {
     CommunityLexiconCalendarEventCancelled,
@@ -486,7 +491,7 @@ impl jacquard_common::IntoStatic for Status<'_> {
     }
 }
 
-///A URI associated with the event.
+/// A URI associated with the event.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -495,19 +500,21 @@ impl jacquard_common::IntoStatic for Status<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Uri<'a> {
-    ///The display name of the URI.
+    /// The display name of the URI.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
 }
 
-///A virtual event that takes place online.
+/// A virtual event that takes place online.
 #[derive(
     serde::Serialize,
     serde::Deserialize,

@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FeedItem<'a> {
@@ -21,7 +22,7 @@ pub struct FeedItem<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-///Record defining a starter pack of actors and feeds for new users.
+/// Record defining a starter pack of actors and feeds for new users.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -30,29 +31,30 @@ pub struct FeedItem<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Starterpack<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
-        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
-    >,
+    pub description_facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub feeds: std::option::Option<
-        Vec<crate::app_bsky::graph::starterpack::FeedItem<'a>>,
-    >,
-    ///Reference (AT-URI) to the list record.
+    pub feeds: Option<Vec<crate::app_bsky::graph::starterpack::FeedItem<'a>>>,
+    /// Reference (AT-URI) to the list record.
     #[serde(borrow)]
     pub list: jacquard_common::types::string::AtUri<'a>,
-    ///Display name for starter pack; can not be empty.
+    /// Display name for starter pack; can not be empty.
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
 }
 

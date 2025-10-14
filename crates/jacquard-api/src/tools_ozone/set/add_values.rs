@@ -19,11 +19,11 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct AddValues<'a> {
-    ///Name of the set to add values to
+    /// Name of the set to add values to
     #[serde(borrow)]
     #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Array of string values to add to the set
+    /// Array of string values to add to the set
     #[serde(borrow)]
     pub values: Vec<jacquard_common::CowStr<'a>>,
     #[serde(flatten)]

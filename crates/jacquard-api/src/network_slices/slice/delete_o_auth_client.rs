@@ -19,7 +19,7 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct DeleteOAuthClient<'a> {
-    ///OAuth client ID to delete
+    /// OAuth client ID to delete
     #[serde(borrow)]
     #[builder(into)]
     pub client_id: jacquard_common::CowStr<'a>,
@@ -44,7 +44,7 @@ pub struct DeleteOAuthClient<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteOAuthClientOutput<'a> {
-    ///Success confirmation message
+    /// Success confirmation message
     #[serde(borrow)]
     pub message: jacquard_common::CowStr<'a>,
 }

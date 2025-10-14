@@ -19,43 +19,45 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct CreateAccount<'a> {
-    ///Pre-existing atproto DID, being imported to a new account.
+    /// Pre-existing atproto DID, being imported to a new account.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Requested handle for the account.
+    #[serde(borrow)]
+    pub did: Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub email: Option<jacquard_common::CowStr<'a>>,
+    /// Requested handle for the account.
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub invite_code: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Initial account password. May need to meet instance-specific password strength requirements.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    pub invite_code: Option<jacquard_common::CowStr<'a>>,
+    /// Initial account password. May need to meet instance-specific password strength requirements.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
-    pub password: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///A signed DID PLC operation to be submitted as part of importing an existing account to this instance. NOTE: this optional field may be updated when full account migration is implemented.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub plc_op: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///DID PLC rotation key (aka, recovery key) to be included in PLC creation operation.
+    pub password: Option<jacquard_common::CowStr<'a>>,
+    /// A signed DID PLC operation to be submitted as part of importing an existing account to this instance. NOTE: this optional field may be updated when full account migration is implemented.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub recovery_key: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
-    pub verification_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub plc_op: Option<jacquard_common::types::value::Data<'a>>,
+    /// DID PLC rotation key (aka, recovery key) to be included in PLC creation operation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub verification_phone: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub recovery_key: Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub verification_code: Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub verification_phone: Option<jacquard_common::CowStr<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
@@ -79,10 +81,10 @@ pub struct CreateAccount<'a> {
 pub struct CreateAccountOutput<'a> {
     #[serde(borrow)]
     pub access_jwt: jacquard_common::CowStr<'a>,
-    ///The DID of the new account.
+    /// The DID of the new account.
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///Complete DID document.
+    /// Complete DID document.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub did_doc: std::option::Option<jacquard_common::types::value::Data<'a>>,

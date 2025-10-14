@@ -16,17 +16,20 @@ pub mod state;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Issue<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub body: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub body: Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
 }
 

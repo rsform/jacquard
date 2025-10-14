@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Theme configuration for a blog publication
+/// Theme configuration for a blog publication
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,18 +14,20 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Theme<'a> {
-    ///Dark mode color palette
+    /// Dark mode color palette
     #[serde(borrow)]
     pub dark: crate::blog_pckt::theme::Palette<'a>,
-    ///Font family name (optional)
+    /// Font family name (optional)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub font: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Light mode color palette
+    pub font: Option<jacquard_common::CowStr<'a>>,
+    /// Light mode color palette
     #[serde(borrow)]
     pub light: crate::blog_pckt::theme::Palette<'a>,
 }
@@ -72,7 +74,7 @@ impl From<ThemeGetRecordOutput<'_>> for Theme<'_> {
     }
 }
 
-///Color palette with CSS hex values
+/// Color palette with CSS hex values
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -81,23 +83,29 @@ impl From<ThemeGetRecordOutput<'_>> for Theme<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Palette<'a> {
-    ///Accent color (hex value)
+    /// Accent color (hex value)
     #[serde(borrow)]
+    #[builder(into)]
     pub accent: jacquard_common::CowStr<'a>,
-    ///Background color (hex value)
+    /// Background color (hex value)
     #[serde(borrow)]
+    #[builder(into)]
     pub background: jacquard_common::CowStr<'a>,
-    ///Link color (hex value)
+    /// Link color (hex value)
     #[serde(borrow)]
+    #[builder(into)]
     pub link: jacquard_common::CowStr<'a>,
-    ///Surface hover color (hex value)
+    /// Surface hover color (hex value)
     #[serde(borrow)]
+    #[builder(into)]
     pub surface_hover: jacquard_common::CowStr<'a>,
-    ///Primary text color (hex value)
+    /// Primary text color (hex value)
     #[serde(borrow)]
+    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
 }

@@ -45,7 +45,7 @@ pub struct ListWebhooks<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListWebhooksOutput<'a> {
-    ///A cursor for pagination, if there are more results.
+    /// A cursor for pagination, if there are more results.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -68,7 +68,7 @@ pub struct ListWebhooksOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ListWebhooksError<'a> {
-    ///The provided cursor is invalid or expired.
+    /// The provided cursor is invalid or expired.
     #[serde(rename = "InvalidCursor")]
     InvalidCursor(std::option::Option<String>),
 }

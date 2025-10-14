@@ -13,11 +13,13 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BatchItem<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub message: crate::chat_bsky::convo::MessageInput<'a>,

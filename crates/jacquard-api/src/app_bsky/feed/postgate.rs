@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Disables embedding of this post.
+/// Disables embedding of this post.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,11 +14,12 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DisableRule<'a> {}
-///Record defining interaction rules for a post. The record key (rkey) of the postgate record must match the record key of the post, and that record must be in the same repository.
+/// Record defining interaction rules for a post. The record key (rkey) of the postgate record must match the record key of the post, and that record must be in the same repository.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -27,24 +28,23 @@ pub struct DisableRule<'a> {}
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Postgate<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    ///List of AT-URIs embedding this post that the author has detached from.
+    /// List of AT-URIs embedding this post that the author has detached from.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub detached_embedding_uris: std::option::Option<
-        Vec<jacquard_common::types::string::AtUri<'a>>,
-    >,
-    ///List of rules defining who can embed this post. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
+    pub detached_embedding_uris: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    /// List of rules defining who can embed this post. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub embedding_rules: std::option::Option<
-        Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>,
-    >,
-    ///Reference (AT-URI) to the post record.
+    pub embedding_rules: Option<Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>>,
+    /// Reference (AT-URI) to the post record.
     #[serde(borrow)]
     pub post: jacquard_common::types::string::AtUri<'a>,
 }

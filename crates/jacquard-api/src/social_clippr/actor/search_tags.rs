@@ -45,11 +45,11 @@ pub struct SearchTags<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchTagsOutput<'a> {
-    ///A parameter to paginate results
+    /// A parameter to paginate results
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///A list of tags and their associated details
+    /// A list of tags and their associated details
     #[serde(borrow)]
     pub tags: Vec<crate::social_clippr::feed::TagView<'a>>,
 }

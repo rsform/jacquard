@@ -20,13 +20,15 @@
 #[builder(start_fn = new)]
 pub struct UpdateSubjectStatus<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub deactivated: std::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    pub deactivated: Option<crate::com_atproto::admin::StatusAttr<'a>>,
     #[serde(borrow)]
     pub subject: UpdateSubjectStatusSubject<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub takedown: std::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    pub takedown: Option<crate::com_atproto::admin::StatusAttr<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]

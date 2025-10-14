@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Represents a change to an account's status on a host (eg, PDS or Relay). The semantics of this event are that the status is at the host which emitted the event, not necessarily that at the currently active PDS. Eg, a Relay takedown would emit a takedown with active=false, even if the PDS is still active.
+/// Represents a change to an account's status on a host (eg, PDS or Relay). The semantics of this event are that the status is at the host which emitted the event, not necessarily that at the currently active PDS. Eg, a Relay takedown would emit a takedown with active=false, even if the PDS is still active.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,23 +14,25 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Account<'a> {
-    ///Indicates that the account has a repository which can be fetched from the host that emitted this event.
+    /// Indicates that the account has a repository which can be fetched from the host that emitted this event.
     pub active: bool,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     pub seq: i64,
-    ///If active=false, this optional field indicates a reason for why the account is not active.
+    /// If active=false, this optional field indicates a reason for why the account is not active.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: Option<jacquard_common::CowStr<'a>>,
     pub time: jacquard_common::types::string::Datetime,
 }
 
-///Represents an update of repository state. Note that empty commits are allowed, which include no repo data changes, but an update to rev and signature.
+/// Represents an update of repository state. Note that empty commits are allowed, which include no repo data changes, but an update to rev and signature.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -39,41 +41,43 @@ pub struct Account<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Commit<'a> {
     #[serde(borrow)]
     pub blobs: Vec<jacquard_common::types::cid::CidLink<'a>>,
-    ///CAR file containing relevant blocks, as a diff since the previous repo state. The commit must be included as a block, and the commit block CID must be the first entry in the CAR header 'roots' list.
+    /// CAR file containing relevant blocks, as a diff since the previous repo state. The commit must be included as a block, and the commit block CID must be the first entry in the CAR header 'roots' list.
     pub blocks: bytes::Bytes,
-    ///Repo commit object CID.
+    /// Repo commit object CID.
     #[serde(borrow)]
     pub commit: jacquard_common::types::cid::CidLink<'a>,
     #[serde(borrow)]
     pub ops: Vec<crate::com_atproto::sync::subscribe_repos::RepoOp<'a>>,
-    ///The root CID of the MST tree for the previous commit from this repo (indicated by the 'since' revision field in this message). Corresponds to the 'data' field in the repo commit object. NOTE: this field is effectively required for the 'inductive' version of firehose.
+    /// The root CID of the MST tree for the previous commit from this repo (indicated by the 'since' revision field in this message). Corresponds to the 'data' field in the repo commit object. NOTE: this field is effectively required for the 'inductive' version of firehose.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub prev_data: std::option::Option<jacquard_common::types::cid::CidLink<'a>>,
-    ///DEPRECATED -- unused
+    pub prev_data: Option<jacquard_common::types::cid::CidLink<'a>>,
+    /// DEPRECATED -- unused
     pub rebase: bool,
-    ///The repo this event comes from. Note that all other message types name this field 'did'.
+    /// The repo this event comes from. Note that all other message types name this field 'did'.
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::Did<'a>,
-    ///The rev of the emitted commit. Note that this information is also in the commit object included in blocks, unless this is a tooBig event.
+    /// The rev of the emitted commit. Note that this information is also in the commit object included in blocks, unless this is a tooBig event.
     pub rev: jacquard_common::types::string::Tid,
-    ///The stream sequence number of this message.
+    /// The stream sequence number of this message.
     pub seq: i64,
-    ///The rev of the last emitted commit from this repo (if any).
+    /// The rev of the last emitted commit from this repo (if any).
     pub since: jacquard_common::types::string::Tid,
-    ///Timestamp of when this message was originally broadcast.
+    /// Timestamp of when this message was originally broadcast.
     pub time: jacquard_common::types::string::Datetime,
-    ///DEPRECATED -- replaced by #sync event and data limits. Indicates that this commit contained too many ops, or data size was too large. Consumers will need to make a separate request to get missing data.
+    /// DEPRECATED -- replaced by #sync event and data limits. Indicates that this commit contained too many ops, or data size was too large. Consumers will need to make a separate request to get missing data.
     pub too_big: bool,
 }
 
-///Represents a change to an account's identity. Could be an updated handle, signing key, or pds hosting endpoint. Serves as a prod to all downstream services to refresh their identity cache.
+/// Represents a change to an account's identity. Could be an updated handle, signing key, or pds hosting endpoint. Serves as a prod to all downstream services to refresh their identity cache.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -82,16 +86,18 @@ pub struct Commit<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Identity<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///The current handle for the account, or 'handle.invalid' if validation fails. This field is optional, might have been validated or passed-through from an upstream source. Semantics and behaviors for PDS vs Relay may evolve in the future; see atproto specs for more details.
+    /// The current handle for the account, or 'handle.invalid' if validation fails. This field is optional, might have been validated or passed-through from an upstream source. Semantics and behaviors for PDS vs Relay may evolve in the future; see atproto specs for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
+    pub handle: Option<jacquard_common::types::string::Handle<'a>>,
     pub seq: i64,
     pub time: jacquard_common::types::string::Datetime,
 }
@@ -104,14 +110,17 @@ pub struct Identity<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Info<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
 }
 
@@ -174,7 +183,7 @@ pub enum SubscribeReposMessage<'a> {
 pub enum SubscribeReposError<'a> {
     #[serde(rename = "FutureCursor")]
     FutureCursor(std::option::Option<String>),
-    ///If the consumer of the stream can not keep up with events, and a backlog gets too large, the server will drop the connection.
+    /// If the consumer of the stream can not keep up with events, and a backlog gets too large, the server will drop the connection.
     #[serde(rename = "ConsumerTooSlow")]
     ConsumerTooSlow(std::option::Option<String>),
 }
@@ -201,7 +210,7 @@ impl std::fmt::Display for SubscribeReposError<'_> {
     }
 }
 
-///A repo operation, ie a mutation of a single record.
+/// A repo operation, ie a mutation of a single record.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -210,24 +219,28 @@ impl std::fmt::Display for SubscribeReposError<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoOp<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub action: jacquard_common::CowStr<'a>,
-    ///For creates and updates, the new record CID. For deletions, null.
+    /// For creates and updates, the new record CID. For deletions, null.
     #[serde(borrow)]
     pub cid: jacquard_common::types::cid::CidLink<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub path: jacquard_common::CowStr<'a>,
-    ///For updates and deletes, the previous record CID (required for inductive firehose). For creations, field should not be defined.
+    /// For updates and deletes, the previous record CID (required for inductive firehose). For creations, field should not be defined.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub prev: std::option::Option<jacquard_common::types::cid::CidLink<'a>>,
+    pub prev: Option<jacquard_common::types::cid::CidLink<'a>>,
 }
 
-///Updates the repo to a new state, without necessarily including that state on the firehose. Used to recover from broken commit streams, data loss incidents, or in situations where upstream host does not know recent state of the repository.
+/// Updates the repo to a new state, without necessarily including that state on the firehose. Used to recover from broken commit streams, data loss incidents, or in situations where upstream host does not know recent state of the repository.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -236,20 +249,22 @@ pub struct RepoOp<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Sync<'a> {
-    ///CAR file containing the commit, as a block. The CAR header must include the commit block CID as the first 'root'.
+    /// CAR file containing the commit, as a block. The CAR header must include the commit block CID as the first 'root'.
     pub blocks: bytes::Bytes,
-    ///The account this repo event corresponds to. Must match that in the commit object.
+    /// The account this repo event corresponds to. Must match that in the commit object.
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///The rev of the commit. This value must match that in the commit object.
+    /// The rev of the commit. This value must match that in the commit object.
     #[serde(borrow)]
+    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
-    ///The stream sequence number of this message.
+    /// The stream sequence number of this message.
     pub seq: i64,
-    ///Timestamp of when this message was originally broadcast.
+    /// Timestamp of when this message was originally broadcast.
     pub time: jacquard_common::types::string::Datetime,
 }

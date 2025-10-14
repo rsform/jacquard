@@ -77,7 +77,7 @@ pub(super) fn make_ident(s: &str) -> syn::Ident {
 /// Generate doc comment from optional description
 pub(super) fn generate_doc_comment(desc: Option<&CowStr>) -> TokenStream {
     if let Some(description) = desc {
-        let desc_str = description.as_ref();
+        let desc_str = format!(" {description}");
         quote! {
             #[doc = #desc_str]
         }

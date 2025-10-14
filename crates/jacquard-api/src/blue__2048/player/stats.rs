@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A declaration of a at://2048 player's stats over the course of their playtime
+/// A declaration of a at://2048 player's stats over the course of their playtime
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,27 +14,28 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Stats<'a> {
-    ///Average score across all games
+    /// Average score across all games
     pub average_score: i64,
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Total numbers of games the user has played
+    /// Total numbers of games the user has played
     pub games_played: i64,
-    ///The highest number block the player has fround. example 128, 256, etc
+    /// The highest number block the player has fround. example 128, 256, etc
     pub highest_number_block: i64,
-    ///The highest score the user has gotten in a game
+    /// The highest score the user has gotten in a game
     pub highest_score: i64,
-    ///The smallest number of moves to get the 2048 block
+    /// The smallest number of moves to get the 2048 block
     pub least_moves_to_find_twenty_forty_eight: i64,
-    ///The sync status of this record with the users AT Protocol repo.
+    /// The sync status of this record with the users AT Protocol repo.
     #[serde(borrow)]
     pub sync_status: crate::blue__2048::SyncStatus<'a>,
-    ///Times the 2048 block has been found also count as wins
+    /// Times the 2048 block has been found also count as wins
     pub times_twenty_forty_eight_been_found: i64,
-    ///Total score across all games
+    /// Total score across all games
     pub total_score: i64,
 }
 

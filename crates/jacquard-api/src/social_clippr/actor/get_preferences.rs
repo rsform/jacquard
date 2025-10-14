@@ -30,7 +30,7 @@ pub struct GetPreferences {}
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPreferencesOutput<'a> {
-    ///A ref to the user's preferences
+    /// A ref to the user's preferences
     #[serde(borrow)]
     pub preferences: crate::social_clippr::actor::Preferences<'a>,
 }

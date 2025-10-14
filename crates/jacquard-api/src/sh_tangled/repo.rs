@@ -41,32 +41,39 @@ pub mod tree;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Repo<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///knot where the repo was created
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// knot where the repo was created
     #[serde(borrow)]
+    #[builder(into)]
     pub knot: jacquard_common::CowStr<'a>,
-    ///List of labels that this repo subscribes to
+    /// List of labels that this repo subscribes to
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ///name of the repo
+    pub labels: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    /// name of the repo
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///source of the repo
+    /// source of the repo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::types::string::Uri<'a>>,
-    ///CI runner to send jobs to and receive results from
+    pub source: Option<jacquard_common::types::string::Uri<'a>>,
+    /// CI runner to send jobs to and receive results from
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub spindle: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub spindle: Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

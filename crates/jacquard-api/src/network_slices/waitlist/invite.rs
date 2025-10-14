@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///An invite granting a DID access, created by the slice owner
+/// An invite granting a DID access, created by the slice owner
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,19 +14,21 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Invite<'a> {
-    ///When this invitation was created
+    /// When this invitation was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The DID being invited
+    /// The DID being invited
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///Optional expiration date for this invitation
+    /// Optional expiration date for this invitation
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The AT URI of the slice this invite is for
+    #[builder(into)]
+    pub expires_at: Option<jacquard_common::types::string::Datetime>,
+    /// The AT URI of the slice this invite is for
     #[serde(borrow)]
     pub slice: jacquard_common::types::string::AtUri<'a>,
 }

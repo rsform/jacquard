@@ -17,33 +17,41 @@ pub mod export_account_data;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileViewBasic<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    pub associated: Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
-    ///Set to true when the actor cannot actively participate in conversations
+    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
+    /// Set to true when the actor cannot actively participate in conversations
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub chat_disabled: std::option::Option<bool>,
+    #[builder(into)]
+    pub chat_disabled: Option<bool>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
+    pub verification: Option<crate::app_bsky::actor::VerificationState<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
+    pub viewer: Option<crate::app_bsky::actor::ViewerState<'a>>,
 }

@@ -13,25 +13,29 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Definition<'a> {
-    ///The hex value for the background color for the label. Appviews may choose to respect this.
+    /// The hex value for the background color for the label. Appviews may choose to respect this.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub color: Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Whether this label can be repeated for a given entity, eg.: [reviewer:foo, reviewer:bar]
+    /// Whether this label can be repeated for a given entity, eg.: [reviewer:foo, reviewer:bar]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub multiple: std::option::Option<bool>,
-    ///The display name of this label.
+    #[builder(into)]
+    pub multiple: Option<bool>,
+    /// The display name of this label.
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///The areas of the repo this label may apply to, eg.: sh.tangled.repo.issue. Appviews may choose to respect this.
+    /// The areas of the repo this label may apply to, eg.: sh.tangled.repo.issue. Appviews may choose to respect this.
     #[serde(borrow)]
     pub scope: Vec<jacquard_common::types::string::Nsid<'a>>,
-    ///The type definition of this label. Appviews may allow sorting for certain types.
+    /// The type definition of this label. Appviews may allow sorting for certain types.
     #[serde(borrow)]
     pub value_type: crate::sh_tangled::label::definition::ValueType<'a>,
 }
@@ -86,18 +90,22 @@ impl From<DefinitionGetRecordOutput<'_>> for Definition<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ValueType<'a> {
-    ///Closed set of values that this label can take.
+    /// Closed set of values that this label can take.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub r#enum: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///An optional constraint that can be applied on string concrete types.
+    pub r#enum: Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// An optional constraint that can be applied on string concrete types.
     #[serde(borrow)]
+    #[builder(into)]
     pub format: jacquard_common::CowStr<'a>,
-    ///The concrete type of this label's value.
+    /// The concrete type of this label's value.
     #[serde(borrow)]
+    #[builder(into)]
     pub r#type: jacquard_common::CowStr<'a>,
 }

@@ -13,12 +13,14 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Iframe<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: std::option::Option<i64>,
+    #[builder(into)]
+    pub height: Option<i64>,
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
 }

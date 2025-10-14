@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A book in the user's library
+/// A book in the user's library
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,39 +14,49 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Book<'a> {
-    ///The authors of the book (tab separated)
+    /// The authors of the book (tab separated)
     #[serde(borrow)]
+    #[builder(into)]
     pub authors: jacquard_common::CowStr<'a>,
-    ///Cover image of the book
+    /// Cover image of the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub cover: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
+    pub cover: Option<jacquard_common::types::blob::Blob<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The date the user finished reading the book
+    /// The date the user finished reading the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub finished_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The book's hive id, used to correlate user's books with the hive
+    #[builder(into)]
+    pub finished_at: Option<jacquard_common::types::string::Datetime>,
+    /// The book's hive id, used to correlate user's books with the hive
     #[serde(borrow)]
+    #[builder(into)]
     pub hive_id: jacquard_common::CowStr<'a>,
-    ///The book's review
+    /// The book's review
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub review: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Number of stars given to the book (1-10) which will be mapped to 1-5 stars
+    pub review: Option<jacquard_common::CowStr<'a>>,
+    /// Number of stars given to the book (1-10) which will be mapped to 1-5 stars
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stars: std::option::Option<i64>,
-    ///The date the user started reading the book
+    #[builder(into)]
+    pub stars: Option<i64>,
+    /// The date the user started reading the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub started_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub started_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The title of the book
+    pub status: Option<jacquard_common::CowStr<'a>>,
+    /// The title of the book
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
 }
 

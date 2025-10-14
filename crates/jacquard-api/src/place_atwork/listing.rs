@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A job listing
+/// A job listing
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,37 +14,42 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Listing<'a> {
-    ///URL where applicants can apply for the job.
+    /// URL where applicants can apply for the job.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub apply_link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
-    ///Larger horizontal image to display behind job listing view.
+    pub apply_link: Option<jacquard_common::types::string::Uri<'a>>,
+    /// Larger horizontal image to display behind job listing view.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub banner: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
-    ///The description of the job listing.
+    pub banner: Option<jacquard_common::types::blob::Blob<'a>>,
+    /// The description of the job listing.
     #[serde(borrow)]
+    #[builder(into)]
     pub description: jacquard_common::CowStr<'a>,
-    ///Annotations of text (mentions, URLs, hashtags, etc).
+    /// Annotations of text (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    ///Locations that are relevant to the job listing.
+    pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    /// Locations that are relevant to the job listing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub locations: std::option::Option<
-        Vec<crate::community_lexicon::location::hthree::Hthree<'a>>,
-    >,
-    ///Client-declared timestamp when the job listing expires.
+    pub locations: Option<Vec<crate::community_lexicon::location::hthree::Hthree<'a>>>,
+    /// Client-declared timestamp when the job listing expires.
     pub not_after: jacquard_common::types::string::Datetime,
-    ///Client-declared timestamp when the job listing becomes visible.
+    /// Client-declared timestamp when the job listing becomes visible.
     pub not_before: jacquard_common::types::string::Datetime,
-    ///The title of the job listing.
+    /// The title of the job listing.
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
 }
 

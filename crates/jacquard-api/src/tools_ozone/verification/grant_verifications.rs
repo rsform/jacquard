@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Error object for failed verifications.
+/// Error object for failed verifications.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,14 +14,16 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GrantError<'a> {
-    ///Error message describing the reason for failure.
+    /// Error message describing the reason for failure.
     #[serde(borrow)]
+    #[builder(into)]
     pub error: jacquard_common::CowStr<'a>,
-    ///The did of the subject being verified
+    /// The did of the subject being verified
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }
@@ -40,7 +42,7 @@ pub struct GrantError<'a> {
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct GrantVerifications<'a> {
-    ///Array of verification requests to process
+    /// Array of verification requests to process
     #[serde(borrow)]
     pub verifications: Vec<jacquard_common::types::value::Data<'a>>,
     #[serde(flatten)]
@@ -108,20 +110,23 @@ impl jacquard_common::xrpc::XrpcEndpoint for GrantVerificationsRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VerificationInput<'a> {
-    ///Timestamp for verification record. Defaults to current time when not specified.
+    /// Timestamp for verification record. Defaults to current time when not specified.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Display name of the subject the verification applies to at the moment of verifying.
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    /// Display name of the subject the verification applies to at the moment of verifying.
     #[serde(borrow)]
+    #[builder(into)]
     pub display_name: jacquard_common::CowStr<'a>,
-    ///Handle of the subject the verification applies to at the moment of verifying.
+    /// Handle of the subject the verification applies to at the moment of verifying.
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
-    ///The did of the subject being verified
+    /// The did of the subject being verified
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }

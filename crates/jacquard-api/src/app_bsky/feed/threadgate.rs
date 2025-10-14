@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Allow replies from actors who follow you.
+/// Allow replies from actors who follow you.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,11 +14,12 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FollowerRule<'a> {}
-///Allow replies from actors you follow.
+/// Allow replies from actors you follow.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -27,11 +28,12 @@ pub struct FollowerRule<'a> {}
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FollowingRule<'a> {}
-///Allow replies from actors on a list.
+/// Allow replies from actors on a list.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -40,7 +42,8 @@ pub struct FollowingRule<'a> {}
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListRule<'a> {
@@ -48,7 +51,7 @@ pub struct ListRule<'a> {
     pub list: jacquard_common::types::string::AtUri<'a>,
 }
 
-///Record defining interaction gating rules for a thread (aka, reply controls). The record key (rkey) of the threadgate record must match the record key of the thread's root post, and that record must be in the same repository.
+/// Record defining interaction gating rules for a thread (aka, reply controls). The record key (rkey) of the threadgate record must match the record key of the thread's root post, and that record must be in the same repository.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -57,22 +60,23 @@ pub struct ListRule<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Threadgate<'a> {
-    ///List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
+    /// List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub allow: std::option::Option<Vec<ThreadgateAllowItem<'a>>>,
+    pub allow: Option<Vec<ThreadgateAllowItem<'a>>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    ///List of hidden reply URIs.
+    /// List of hidden reply URIs.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub hidden_replies: std::option::Option<
-        Vec<jacquard_common::types::string::AtUri<'a>>,
-    >,
-    ///Reference (AT-URI) to the post record.
+    pub hidden_replies: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    /// Reference (AT-URI) to the post record.
     #[serde(borrow)]
     pub post: jacquard_common::types::string::AtUri<'a>,
 }
@@ -142,7 +146,7 @@ impl From<ThreadgateGetRecordOutput<'_>> for Threadgate<'_> {
     }
 }
 
-///Allow replies from actors mentioned in your post.
+/// Allow replies from actors mentioned in your post.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -151,7 +155,8 @@ impl From<ThreadgateGetRecordOutput<'_>> for Threadgate<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MentionRule<'a> {}

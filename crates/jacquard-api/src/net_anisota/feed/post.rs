@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A post that can be created on the Anisota network
+/// A post that can be created on the Anisota network
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,35 +14,43 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
-    ///Client-declared timestamp when this post was created.
+    /// Client-declared timestamp when this post was created.
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub embed: std::option::Option<PostEmbed<'a>>,
-    ///Annotations of text (mentions, URLs, hashtags, etc)
+    pub embed: Option<PostEmbed<'a>>,
+    /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    ///Self-label values for this post. Effectively content warnings.
+    pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    /// Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
-    ///Indicates human language of post primary text content.
+    pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
+    /// Indicates human language of post primary text content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    #[builder(into)]
+    pub langs: Option<Vec<jacquard_common::types::string::Language>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reply: std::option::Option<crate::net_anisota::feed::post::ReplyRef<'a>>,
-    ///Additional hashtags, in addition to any included in post text and facets.
+    pub reply: Option<crate::net_anisota::feed::post::ReplyRef<'a>>,
+    /// Additional hashtags, in addition to any included in post text and facets.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///The primary post content. May be an empty string, if there are embeds.
+    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// The primary post content. May be an empty string, if there are embeds.
     #[serde(borrow)]
+    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
 }
 
@@ -121,7 +129,8 @@ impl From<PostGetRecordOutput<'_>> for Post<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReplyRef<'a> {

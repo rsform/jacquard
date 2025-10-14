@@ -8,7 +8,7 @@
 pub mod get_profile;
 pub mod profile;
 
-///A single author in a Weaver notebook.
+/// A single author in a Weaver notebook.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -17,18 +17,21 @@ pub mod profile;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Author<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
+    pub handle: Option<jacquard_common::types::string::Handle<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -39,7 +42,8 @@ pub struct Author<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileDataView<'a> {
@@ -74,43 +78,51 @@ pub enum ProfileDataViewInner<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub indexed_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub links: std::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
-    ///Free-form location text.
+    pub links: Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+    /// Free-form location text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub location: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Pronouns to use in user-generated content.
+    pub location: Option<jacquard_common::CowStr<'a>>,
+    /// Pronouns to use in user-generated content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub pronouns: std::option::Option<
-        crate::sh_weaver::actor::profile::PronounsList<'a>,
-    >,
+    pub pronouns: Option<crate::sh_weaver::actor::profile::PronounsList<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -121,34 +133,38 @@ pub struct ProfileView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TangledProfileView<'a> {
-    ///Include link to this account on Bluesky.
+    /// Include link to this account on Bluesky.
     pub bluesky: bool,
-    ///Free-form profile description text.
+    /// Free-form profile description text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub links: std::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
-    ///Free-form location text.
+    pub links: Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+    /// Free-form location text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub location: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Any ATURI, it is up to appviews to validate these fields.
+    pub location: Option<jacquard_common::CowStr<'a>>,
+    /// Any ATURI, it is up to appviews to validate these fields.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub pinned_repositories: std::option::Option<
-        Vec<jacquard_common::types::string::AtUri<'a>>,
-    >,
+    pub pinned_repositories: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub stats: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub stats: Option<Vec<jacquard_common::CowStr<'a>>>,
 }

@@ -82,15 +82,15 @@ impl jacquard_common::xrpc::XrpcEndpoint for FindRelatedAccountsRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RelatedAccount<'a> {
     #[serde(borrow)]
     pub account: crate::com_atproto::admin::AccountView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub similarities: std::option::Option<
-        Vec<crate::tools_ozone::signature::SigDetail<'a>>,
-    >,
+    pub similarities: Option<Vec<crate::tools_ozone::signature::SigDetail<'a>>>,
 }

@@ -38,21 +38,21 @@ pub struct GetDefaultBranchOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub author: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///Latest commit hash on default branch
+    /// Latest commit hash on default branch
     #[serde(borrow)]
     pub hash: jacquard_common::CowStr<'a>,
-    ///Latest commit message
+    /// Latest commit message
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub message: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Default branch name
+    /// Default branch name
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Short commit hash
+    /// Short commit hash
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub short_hash: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Timestamp of latest commit
+    /// Timestamp of latest commit
     pub when: jacquard_common::types::string::Datetime,
 }
 
@@ -71,10 +71,10 @@ pub struct GetDefaultBranchOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetDefaultBranchError<'a> {
-    ///Repository not found or access denied
+    /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
     RepoNotFound(std::option::Option<String>),
-    ///Invalid request parameters
+    /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
     InvalidRequest(std::option::Option<String>),
 }
@@ -135,16 +135,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetDefaultBranchRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Signature<'a> {
-    ///Author email
+    /// Author email
     #[serde(borrow)]
+    #[builder(into)]
     pub email: jacquard_common::CowStr<'a>,
-    ///Author name
+    /// Author name
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Author timestamp
+    /// Author timestamp
     pub when: jacquard_common::types::string::Datetime,
 }

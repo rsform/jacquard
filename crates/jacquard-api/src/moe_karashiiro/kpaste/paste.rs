@@ -13,26 +13,30 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Paste<'a> {
-    ///Blob reference to the paste content
+    /// Blob reference to the paste content
     #[serde(borrow)]
     pub content: jacquard_common::types::blob::Blob<'a>,
-    ///When the paste was created
+    /// When the paste was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Programming language for syntax highlighting
+    /// Programming language for syntax highlighting
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub language: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Optional title for the paste
+    pub language: Option<jacquard_common::CowStr<'a>>,
+    /// Optional title for the paste
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///When the paste was last modified (optional, defaults to createdAt)
+    pub title: Option<jacquard_common::CowStr<'a>>,
+    /// When the paste was last modified (optional, defaults to createdAt)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub updated_at: Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

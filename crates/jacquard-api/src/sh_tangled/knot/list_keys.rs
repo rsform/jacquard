@@ -39,7 +39,7 @@ pub struct ListKeys<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListKeysOutput<'a> {
-    ///Pagination cursor for next page
+    /// Pagination cursor for next page
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
@@ -62,7 +62,7 @@ pub struct ListKeysOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ListKeysError<'a> {
-    ///Failed to retrieve public keys
+    /// Failed to retrieve public keys
     #[serde(rename = "InternalServerError")]
     InternalServerError(std::option::Option<String>),
 }
@@ -116,16 +116,18 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListKeysRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublicKey<'a> {
-    ///Key upload timestamp
+    /// Key upload timestamp
     pub created_at: jacquard_common::types::string::Datetime,
-    ///DID associated with the public key
+    /// DID associated with the public key
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///Public key contents
+    /// Public key contents
     #[serde(borrow)]
+    #[builder(into)]
     pub key: jacquard_common::CowStr<'a>,
 }

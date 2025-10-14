@@ -9,7 +9,7 @@ pub mod decrypt_by_cid;
 pub mod encrypt;
 pub mod get_post;
 
-///Record containing a Skyblur post.
+/// Record containing a Skyblur post.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -18,27 +18,32 @@ pub mod get_post;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
-    ///The post additional contents.
+    /// The post additional contents.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub additional: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Created date assigned by client
+    pub additional: Option<jacquard_common::CowStr<'a>>,
+    /// Created date assigned by client
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Encrypted post body. It shoud be decrypted by the client with AES-256.
+    /// Encrypted post body. It shoud be decrypted by the client with AES-256.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub encrypt_body: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
-    ///The post main contents. Blurred text must be enclosed in brackets [].
+    pub encrypt_body: Option<jacquard_common::types::blob::Blob<'a>>,
+    /// The post main contents. Blurred text must be enclosed in brackets [].
     #[serde(borrow)]
+    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    ///For 'password', the text only contains blurred text, and additional is always empty. The unblurred text and additional are included in the encryptBody.
+    /// For 'password', the text only contains blurred text, and additional is always empty. The unblurred text and additional are included in the encryptBody.
     #[serde(borrow)]
+    #[builder(into)]
     pub visibility: jacquard_common::CowStr<'a>,
 }
 

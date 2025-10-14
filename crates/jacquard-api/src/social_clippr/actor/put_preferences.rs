@@ -19,7 +19,7 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct PutPreferences<'a> {
-    ///A ref to the user's preferences
+    /// A ref to the user's preferences
     #[serde(borrow)]
     pub preferences: crate::social_clippr::actor::Preferences<'a>,
     #[serde(flatten)]

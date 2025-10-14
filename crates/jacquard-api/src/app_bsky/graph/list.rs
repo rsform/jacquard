@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record representing a list of accounts (actors). Scope includes both moderation-oriented lists and curration-oriented lists.
+/// Record representing a list of accounts (actors). Scope includes both moderation-oriented lists and curration-oriented lists.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,29 +14,33 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct List<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
+    pub avatar: Option<jacquard_common::types::blob::Blob<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
-        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
-    >,
+    pub description_facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
-    ///Display name for list; can not be empty.
+    pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
+    /// Display name for list; can not be empty.
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Defines the purpose of the list (aka, moderation-oriented or curration-oriented)
+    /// Defines the purpose of the list (aka, moderation-oriented or curration-oriented)
     #[serde(borrow)]
     pub purpose: crate::app_bsky::graph::ListPurpose<'a>,
 }

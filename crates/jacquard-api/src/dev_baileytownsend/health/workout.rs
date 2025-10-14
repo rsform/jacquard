@@ -13,22 +13,26 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Workout<'a> {
-    ///Type of activity. Walking, running, weights, etc.
+    /// Type of activity. Walking, running, weights, etc.
     #[serde(borrow)]
+    #[builder(into)]
     pub activity: jacquard_common::CowStr<'a>,
-    ///Active calories burned during the workout.
+    /// Active calories burned during the workout.
     pub calories_burned: i64,
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Distance covered during the workout (optional).
+    /// Distance covered during the workout (optional).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub distance: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///How long the workout lasted in minutes.
+    pub distance: Option<jacquard_common::CowStr<'a>>,
+    /// How long the workout lasted in minutes.
     #[serde(borrow)]
+    #[builder(into)]
     pub duration: jacquard_common::CowStr<'a>,
     pub end_time: jacquard_common::types::string::Datetime,
     pub start_time: jacquard_common::types::string::Datetime,

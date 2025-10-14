@@ -13,22 +13,24 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Artifact<'a> {
-    ///the artifact
+    /// the artifact
     #[serde(borrow)]
     pub artifact: jacquard_common::types::blob::Blob<'a>,
-    ///time of creation of this artifact
+    /// time of creation of this artifact
     pub created_at: jacquard_common::types::string::Datetime,
-    ///name of the artifact
+    /// name of the artifact
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///repo that this artifact is being uploaded to
+    /// repo that this artifact is being uploaded to
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,
-    ///hash of the tag object that this artifact is attached to (only annotated tags are supported)
+    /// hash of the tag object that this artifact is attached to (only annotated tags are supported)
     pub tag: bytes::Bytes,
 }
 

@@ -16,17 +16,19 @@ pub mod service;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerPolicies<'a> {
-    ///Label values created by this labeler and scoped exclusively to it. Labels defined here will override global label definitions for this labeler.
+    /// Label values created by this labeler and scoped exclusively to it. Labels defined here will override global label definitions for this labeler.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub label_value_definitions: std::option::Option<
+    pub label_value_definitions: Option<
         Vec<crate::com_atproto::label::LabelValueDefinition<'a>>,
     >,
-    ///The label values which this labeler publishes. May include global or custom labels.
+    /// The label values which this labeler publishes. May include global or custom labels.
     #[serde(borrow)]
     pub label_values: Vec<crate::com_atproto::label::LabelValue<'a>>,
 }
@@ -39,7 +41,8 @@ pub struct LabelerPolicies<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerView<'a> {
@@ -49,15 +52,18 @@ pub struct LabelerView<'a> {
     pub creator: crate::app_bsky::actor::ProfileView<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub like_count: std::option::Option<i64>,
+    #[builder(into)]
+    pub like_count: Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::labeler::LabelerViewerState<'a>>,
+    pub viewer: Option<crate::app_bsky::labeler::LabelerViewerState<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -68,7 +74,8 @@ pub struct LabelerView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerViewDetailed<'a> {
@@ -78,35 +85,35 @@ pub struct LabelerViewDetailed<'a> {
     pub creator: crate::app_bsky::actor::ProfileView<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub like_count: std::option::Option<i64>,
+    #[builder(into)]
+    pub like_count: Option<i64>,
     #[serde(borrow)]
     pub policies: crate::app_bsky::labeler::LabelerPolicies<'a>,
-    ///The set of report reason 'codes' which are in-scope for this service to review and action. These usually align to policy categories. If not defined (distinct from empty array), all reason types are allowed.
+    /// The set of report reason 'codes' which are in-scope for this service to review and action. These usually align to policy categories. If not defined (distinct from empty array), all reason types are allowed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reason_types: std::option::Option<
-        Vec<crate::com_atproto::moderation::ReasonType<'a>>,
-    >,
-    ///Set of record types (collection NSIDs) which can be reported to this service. If not defined (distinct from empty array), default is any record type.
+    pub reason_types: Option<Vec<crate::com_atproto::moderation::ReasonType<'a>>>,
+    /// Set of record types (collection NSIDs) which can be reported to this service. If not defined (distinct from empty array), default is any record type.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub subject_collections: std::option::Option<
-        Vec<jacquard_common::types::string::Nsid<'a>>,
-    >,
-    ///The set of subject types (account, record, etc) this service accepts reports on.
+    pub subject_collections: Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    /// The set of subject types (account, record, etc) this service accepts reports on.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub subject_types: std::option::Option<
-        Vec<crate::com_atproto::moderation::SubjectType<'a>>,
-    >,
+    pub subject_types: Option<Vec<crate::com_atproto::moderation::SubjectType<'a>>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::labeler::LabelerViewerState<'a>>,
+    pub viewer: Option<crate::app_bsky::labeler::LabelerViewerState<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -117,11 +124,13 @@ pub struct LabelerViewDetailed<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerViewerState<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub like: Option<jacquard_common::types::string::AtUri<'a>>,
 }

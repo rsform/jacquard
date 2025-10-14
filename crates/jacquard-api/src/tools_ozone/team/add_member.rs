@@ -65,7 +65,7 @@ pub struct AddMemberOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum AddMemberError<'a> {
-    ///Member already exists in the team.
+    /// Member already exists in the team.
     #[serde(rename = "MemberAlreadyExists")]
     MemberAlreadyExists(std::option::Option<String>),
 }

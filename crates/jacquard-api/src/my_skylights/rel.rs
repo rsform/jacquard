@@ -13,20 +13,24 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Rel<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub finished_at: std::option::Option<Vec<jacquard_common::types::string::Datetime>>,
+    #[builder(into)]
+    pub finished_at: Option<Vec<jacquard_common::types::string::Datetime>>,
     #[serde(borrow)]
     pub item: crate::my_skylights::Item<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub note: std::option::Option<crate::my_skylights::rel::Note<'a>>,
+    pub note: Option<crate::my_skylights::rel::Note<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub rating: std::option::Option<crate::my_skylights::rel::Rating<'a>>,
+    pub rating: Option<crate::my_skylights::rel::Rating<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -79,13 +83,15 @@ impl From<RelGetRecordOutput<'_>> for Rel<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Note<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     pub updated_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
+    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
 }
 
@@ -97,7 +103,8 @@ pub struct Note<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Rating<'a> {

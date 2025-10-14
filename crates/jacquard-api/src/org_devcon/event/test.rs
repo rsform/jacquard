@@ -13,31 +13,37 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Test<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Description of the event
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    /// Description of the event
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///End time of the event
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// End time of the event
     pub end: jacquard_common::types::string::Datetime,
-    ///Location of the event
+    /// Location of the event
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub location: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Start time of the event
+    pub location: Option<jacquard_common::CowStr<'a>>,
+    /// Start time of the event
     pub start: jacquard_common::types::string::Datetime,
-    ///Title of the event
+    /// Title of the event
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
-    ///URL of the event
+    /// URL of the event
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub url: Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

@@ -68,13 +68,13 @@ pub struct AddReactionOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum AddReactionError<'a> {
-    ///Indicates that the message has been deleted and reactions can no longer be added/removed.
+    /// Indicates that the message has been deleted and reactions can no longer be added/removed.
     #[serde(rename = "ReactionMessageDeleted")]
     ReactionMessageDeleted(std::option::Option<String>),
-    ///Indicates that the message has the maximum number of reactions allowed for a single user, and the requested reaction wasn't yet present. If it was already present, the request will not fail since it is idempotent.
+    /// Indicates that the message has the maximum number of reactions allowed for a single user, and the requested reaction wasn't yet present. If it was already present, the request will not fail since it is idempotent.
     #[serde(rename = "ReactionLimitReached")]
     ReactionLimitReached(std::option::Option<String>),
-    ///Indicates the value for the reaction is not acceptable. In general, this means it is not an emoji.
+    /// Indicates the value for the reaction is not acceptable. In general, this means it is not an emoji.
     #[serde(rename = "ReactionInvalidValue")]
     ReactionInvalidValue(std::option::Option<String>),
 }

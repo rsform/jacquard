@@ -19,27 +19,30 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct StartSync<'a> {
-    ///List of collection NSIDs to sync (primary collections matching slice domain)
+    /// List of collection NSIDs to sync (primary collections matching slice domain)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub collections: std::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
-    ///List of external collection NSIDs to sync (collections outside slice domain)
+    pub collections: Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    /// List of external collection NSIDs to sync (collections outside slice domain)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub external_collections: std::option::Option<
-        Vec<jacquard_common::types::string::Nsid<'a>>,
-    >,
-    ///Maximum number of records to sync per repository
+    pub external_collections: Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    /// Maximum number of records to sync per repository
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit_per_repo: std::option::Option<i64>,
-    ///List of specific repository DIDs to sync from
+    #[builder(into)]
+    pub limit_per_repo: Option<i64>,
+    /// List of specific repository DIDs to sync from
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub repos: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
-    ///Skip lexicon validation during sync
+    pub repos: Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    /// Skip lexicon validation during sync
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub skip_validation: std::option::Option<bool>,
-    ///AT-URI of the slice to sync data into
+    #[builder(into)]
+    pub skip_validation: Option<bool>,
+    /// AT-URI of the slice to sync data into
     #[serde(borrow)]
     #[builder(into)]
     pub slice: jacquard_common::CowStr<'a>,
@@ -64,10 +67,10 @@ pub struct StartSync<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StartSyncOutput<'a> {
-    ///UUID of the enqueued sync job
+    /// UUID of the enqueued sync job
     #[serde(borrow)]
     pub job_id: jacquard_common::CowStr<'a>,
-    ///Success message confirming job enqueue
+    /// Success message confirming job enqueue
     #[serde(borrow)]
     pub message: jacquard_common::CowStr<'a>,
 }

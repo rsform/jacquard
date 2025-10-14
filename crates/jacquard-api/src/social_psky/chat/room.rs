@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A Picosky room belonging to the user.
+/// A Picosky room belonging to the user.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,29 +14,36 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Room<'a> {
-    ///List of users allowed to send messages in the room.
+    /// List of users allowed to send messages in the room.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub allowlist: std::option::Option<crate::social_psky::chat::room::ModlistRef<'a>>,
-    ///List of users disallowed to send messages in the room.
+    pub allowlist: Option<crate::social_psky::chat::room::ModlistRef<'a>>,
+    /// List of users disallowed to send messages in the room.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub denylist: std::option::Option<crate::social_psky::chat::room::ModlistRef<'a>>,
+    pub denylist: Option<crate::social_psky::chat::room::ModlistRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub languages: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    #[builder(into)]
+    pub languages: Option<Vec<jacquard_common::types::string::Language>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///Topic title of the room.
+    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// Topic title of the room.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub topic: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub topic: Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -89,7 +96,8 @@ impl From<RoomGetRecordOutput<'_>> for Room<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModlistRef<'a> {

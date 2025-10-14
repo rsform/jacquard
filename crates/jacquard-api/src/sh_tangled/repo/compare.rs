@@ -29,7 +29,7 @@ pub struct Compare<'a> {
     pub rev2: jacquard_common::CowStr<'a>,
 }
 
-///Compare output in application/json
+/// Compare output in application/json
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -57,16 +57,16 @@ pub struct CompareOutput<'a> {}
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CompareError<'a> {
-    ///Repository not found or access denied
+    /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
     RepoNotFound(std::option::Option<String>),
-    ///One or both revisions not found
+    /// One or both revisions not found
     #[serde(rename = "RevisionNotFound")]
     RevisionNotFound(std::option::Option<String>),
-    ///Invalid request parameters
+    /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
     InvalidRequest(std::option::Option<String>),
-    ///Failed to compare revisions
+    /// Failed to compare revisions
     #[serde(rename = "CompareError")]
     CompareError(std::option::Option<String>),
 }

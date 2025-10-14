@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A simple record referencing a file hosted on a PDS
+/// A simple record referencing a file hosted on a PDS
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,11 +14,12 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Blob<'a> {
-    ///Reference to the uploaded file
+    /// Reference to the uploaded file
     #[serde(borrow)]
     pub upload: jacquard_common::types::blob::Blob<'a>,
 }

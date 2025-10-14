@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A declaration of a Tangled account profile.
+/// A declaration of a Tangled account profile.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,32 +14,36 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
-    ///Include link to this account on Bluesky.
+    /// Include link to this account on Bluesky.
     pub bluesky: bool,
-    ///Free-form profile description text.
+    /// Free-form profile description text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub links: std::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
-    ///Free-form location text.
+    pub links: Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+    /// Free-form location text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub location: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Any ATURI, it is up to appviews to validate these fields.
+    pub location: Option<jacquard_common::CowStr<'a>>,
+    /// Any ATURI, it is up to appviews to validate these fields.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub pinned_repositories: std::option::Option<
-        Vec<jacquard_common::types::string::AtUri<'a>>,
-    >,
+    pub pinned_repositories: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub stats: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub stats: Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

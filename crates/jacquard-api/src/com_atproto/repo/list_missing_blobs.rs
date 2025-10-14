@@ -80,7 +80,8 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListMissingBlobsRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecordBlob<'a> {

@@ -19,18 +19,18 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct ForkSync<'a> {
-    ///Branch to sync
+    /// Branch to sync
     #[serde(borrow)]
     #[builder(into)]
     pub branch: jacquard_common::CowStr<'a>,
-    ///DID of the fork owner
+    /// DID of the fork owner
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///Name of the forked repository
+    /// Name of the forked repository
     #[serde(borrow)]
     #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///AT-URI of the source repository
+    /// AT-URI of the source repository
     #[serde(borrow)]
     pub source: jacquard_common::types::string::AtUri<'a>,
     #[serde(flatten)]

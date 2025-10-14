@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Annotation of a sub-string within rich text.
+/// Annotation of a sub-string within rich text.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,7 +14,8 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Facet<'a> {

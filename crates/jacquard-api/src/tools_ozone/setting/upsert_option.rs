@@ -20,15 +20,15 @@
 #[builder(start_fn = new)]
 pub struct UpsertOption<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub key: jacquard_common::types::string::Nsid<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub manager_role: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub manager_role: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     #[builder(into)]
     pub scope: jacquard_common::CowStr<'a>,

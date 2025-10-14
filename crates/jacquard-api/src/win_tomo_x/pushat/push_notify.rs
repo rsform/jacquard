@@ -21,7 +21,7 @@
 pub struct PushNotify<'a> {
     #[serde(borrow)]
     pub body: crate::win_tomo_x::pushat::NotifyBody<'a>,
-    ///The DID of the target user to whom the notification will be sent.
+    /// The DID of the target user to whom the notification will be sent.
     #[serde(borrow)]
     pub target: jacquard_common::types::string::Did<'a>,
     #[serde(flatten)]

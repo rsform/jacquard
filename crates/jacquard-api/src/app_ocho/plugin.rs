@@ -18,23 +18,25 @@ pub mod service;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AdaptiveIcon<'a> {
-    ///The background color of the adaptive icon.
+    /// The background color of the adaptive icon.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub background_color: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The URL to the foreground image of the adaptive icon.
+    pub background_color: Option<jacquard_common::CowStr<'a>>,
+    /// The URL to the foreground image of the adaptive icon.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub foreground_image: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub foreground_image: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub foreground_image_blob: std::option::Option<
-        jacquard_common::types::blob::Blob<'a>,
-    >,
+    pub foreground_image_blob: Option<jacquard_common::types::blob::Blob<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -45,20 +47,23 @@ pub struct AdaptiveIcon<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Android<'a> {
-    ///Configuration for the adaptive icon on Android.
+    /// Configuration for the adaptive icon on Android.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub adaptive_icon: std::option::Option<crate::app_ocho::plugin::AdaptiveIcon<'a>>,
-    ///Whether edge-to-edge mode is enabled for the app.
+    pub adaptive_icon: Option<crate::app_ocho::plugin::AdaptiveIcon<'a>>,
+    /// Whether edge-to-edge mode is enabled for the app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub edge_to_edge_enabled: std::option::Option<bool>,
+    #[builder(into)]
+    pub edge_to_edge_enabled: Option<bool>,
 }
 
-///Android status bar configuration.
+/// Android status bar configuration.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -67,14 +72,16 @@ pub struct Android<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AndroidStatusBar<'a> {
-    ///The background color of the Android status bar.
+    /// The background color of the Android status bar.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub background_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub background_color: Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -85,22 +92,26 @@ pub struct AndroidStatusBar<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Asset<'a> {
-    ///The blob of the asset
+    /// The blob of the asset
     #[serde(borrow)]
     pub blob: jacquard_common::types::blob::Blob<'a>,
-    ///The hash of the asset
+    /// The hash of the asset
     #[serde(borrow)]
+    #[builder(into)]
     pub hash: jacquard_common::CowStr<'a>,
-    ///The type of the asset
+    /// The type of the asset
     #[serde(borrow)]
+    #[builder(into)]
     pub r#type: jacquard_common::CowStr<'a>,
-    ///The date and time when this asset was last updated. Used to reset the jetstream cache, among other things.
+    /// The date and time when this asset was last updated. Used to reset the jetstream cache, among other things.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub updated_at: Option<jacquard_common::types::string::Datetime>,
 }
 
 #[jacquard_derive::lexicon]
@@ -111,12 +122,14 @@ pub struct Asset<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Db<'a> {
-    ///The ID of the database.
+    /// The ID of the database.
     #[serde(borrow)]
+    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
 }
 
@@ -128,12 +141,14 @@ pub struct Db<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Developer<'a> {
-    ///The tool used for development, e.g., 'expo-cli'.
+    /// The tool used for development, e.g., 'expo-cli'.
     #[serde(borrow)]
+    #[builder(into)]
     pub tool: jacquard_common::CowStr<'a>,
 }
 
@@ -145,81 +160,98 @@ pub struct Developer<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ExpoClient<'a> {
-    ///Android-specific configuration for the app.
+    /// Android-specific configuration for the app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub android: std::option::Option<crate::app_ocho::plugin::Android<'a>>,
-    ///Configuration for the Android status bar.
+    pub android: Option<crate::app_ocho::plugin::Android<'a>>,
+    /// Configuration for the Android status bar.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub android_status_bar: std::option::Option<
-        crate::app_ocho::plugin::AndroidStatusBar<'a>,
-    >,
-    ///Experimental features enabled for the app.
+    pub android_status_bar: Option<crate::app_ocho::plugin::AndroidStatusBar<'a>>,
+    /// Experimental features enabled for the app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub expirements: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///Additional configuration for the app.
+    pub expirements: Option<jacquard_common::types::value::Data<'a>>,
+    /// Additional configuration for the app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub extra: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///The URL to the app icon.
+    pub extra: Option<jacquard_common::types::value::Data<'a>>,
+    /// The URL to the app icon.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///ios-specific configuration for the app.
+    pub icon: Option<jacquard_common::CowStr<'a>>,
+    /// ios-specific configuration for the app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub ios: std::option::Option<crate::app_ocho::plugin::Ios<'a>>,
-    ///Localization settings for the app.
+    pub ios: Option<crate::app_ocho::plugin::Ios<'a>>,
+    /// Localization settings for the app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub locales: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///The name of the Expo client application.
+    pub locales: Option<jacquard_common::types::value::Data<'a>>,
+    /// The name of the Expo client application.
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Whether the new architecture is enabled for the app.
+    /// Whether the new architecture is enabled for the app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub new_arch_enabled: std::option::Option<bool>,
-    ///The default orientation of the app.
+    #[builder(into)]
+    pub new_arch_enabled: Option<bool>,
+    /// The default orientation of the app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub orientation: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The platforms supported by the app.
+    pub orientation: Option<jacquard_common::CowStr<'a>>,
+    /// The platforms supported by the app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub platforms: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///A list of plugins used by the app.
+    pub platforms: Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// A list of plugins used by the app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub plugins: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///The custom URI scheme for deep linking.
+    pub plugins: Option<jacquard_common::types::value::Data<'a>>,
+    /// The custom URI scheme for deep linking.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub scheme: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The SDK version of the Expo client.
+    pub scheme: Option<jacquard_common::CowStr<'a>>,
+    /// The SDK version of the Expo client.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub sdk_version: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///A URL-friendly identifier for the app.
+    pub sdk_version: Option<jacquard_common::CowStr<'a>>,
+    /// A URL-friendly identifier for the app.
     #[serde(borrow)]
+    #[builder(into)]
     pub slug: jacquard_common::CowStr<'a>,
-    ///The default user interface style.
+    /// The default user interface style.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub user_interface_style: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The version of the app.
+    pub user_interface_style: Option<jacquard_common::CowStr<'a>>,
+    /// The version of the app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub version: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Web-specific configuration for the app.
+    pub version: Option<jacquard_common::CowStr<'a>>,
+    /// Web-specific configuration for the app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub web: std::option::Option<crate::app_ocho::plugin::Web<'a>>,
+    pub web: Option<crate::app_ocho::plugin::Web<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -230,11 +262,12 @@ pub struct ExpoClient<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ExpoGo<'a> {
-    ///Developer-specific configuration for the Expo Go app.
+    /// Developer-specific configuration for the Expo Go app.
     #[serde(borrow)]
     pub developer: crate::app_ocho::plugin::Developer<'a>,
 }
@@ -247,13 +280,15 @@ pub struct ExpoGo<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Ios<'a> {
-    ///Whether the app supports iPad.
+    /// Whether the app supports iPad.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub supports_tablet: std::option::Option<bool>,
+    #[builder(into)]
+    pub supports_tablet: Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -264,17 +299,20 @@ pub struct Ios<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LaunchAsset<'a> {
-    ///The MIME type of the asset, e.g., 'image/png'.
+    /// The MIME type of the asset, e.g., 'image/png'.
     #[serde(borrow)]
+    #[builder(into)]
     pub content_type: jacquard_common::CowStr<'a>,
-    ///The unique key for this asset, used to reference it in the plugin.
+    /// The unique key for this asset, used to reference it in the plugin.
     #[serde(borrow)]
+    #[builder(into)]
     pub key: jacquard_common::CowStr<'a>,
-    ///The URL where the asset can be accessed.
+    /// The URL where the asset can be accessed.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
 }
@@ -287,25 +325,28 @@ pub struct LaunchAsset<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Manifest<'a> {
-    ///The date and time when this plugin manifest was created.
+    /// The date and time when this plugin manifest was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Additional metadata for the plugin, including Expo client and Go configurations.
+    /// Additional metadata for the plugin, including Expo client and Go configurations.
     #[serde(borrow)]
     pub extra: crate::app_ocho::plugin::ManifestExtra<'a>,
-    ///The unique identifier for this plugin manifest.
+    /// The unique identifier for this plugin manifest.
     #[serde(borrow)]
+    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
-    ///The launch asset for the plugin (the main javascipt bundle).
+    /// The launch asset for the plugin (the main javascipt bundle).
     #[serde(borrow)]
     pub launch_asset: crate::app_ocho::plugin::LaunchAsset<'a>,
     #[serde(borrow)]
     pub metadata: jacquard_common::types::value::Data<'a>,
-    ///The version of the Expo runtime this plugin is compatible with.
+    /// The version of the Expo runtime this plugin is compatible with.
     #[serde(borrow)]
+    #[builder(into)]
     pub runtime_version: jacquard_common::CowStr<'a>,
 }
 
@@ -317,7 +358,8 @@ pub struct Manifest<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ManifestExtra<'a> {
@@ -348,7 +390,7 @@ pub enum PluginItem<'a> {
 
 pub type Plugin<'a> = Vec<PluginItem<'a>>;
 pub type PluginConfig<'a> = jacquard_common::types::value::Data<'a>;
-///A string identifier for a plugin, used to reference it in the app.
+/// A string identifier for a plugin, used to reference it in the app.
 pub type StringId<'a> = jacquard_common::CowStr<'a>;
 #[jacquard_derive::lexicon]
 #[derive(
@@ -358,23 +400,28 @@ pub type StringId<'a> = jacquard_common::CowStr<'a>;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Web<'a> {
-    ///The bundler used for the web app.
+    /// The bundler used for the web app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub bundler: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The URL to the favicon for the web app.
+    pub bundler: Option<jacquard_common::CowStr<'a>>,
+    /// The URL to the favicon for the web app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub favicon: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub favicon: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub favicon_blob: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
-    ///The output directory for the web app.
+    pub favicon_blob: Option<jacquard_common::types::blob::Blob<'a>>,
+    /// The output directory for the web app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub output: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub output: Option<jacquard_common::CowStr<'a>>,
 }

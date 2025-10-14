@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record declaring a verification relationship between an account and a .edu domain. Verifications are only considered valid by an app if issued by an account the app considers trusted.
+/// Record declaring a verification relationship between an account and a .edu domain. Verifications are only considered valid by an app if issued by an account the app considers trusted.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,16 +14,18 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Verification<'a> {
-    ///Date of when the verification was created.
+    /// Date of when the verification was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The domain the subject is verified under.
+    /// The domain the subject is verified under.
     #[serde(borrow)]
+    #[builder(into)]
     pub domain: jacquard_common::CowStr<'a>,
-    ///DID of the subject the verification applies to.
+    /// DID of the subject the verification applies to.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }

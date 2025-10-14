@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Beta version: Record tracking daily pack openings and streak information
+/// Beta version: Record tracking daily pack openings and streak information
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,29 +14,33 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Pack<'a> {
-    ///When the record was created
+    /// When the record was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///When the record was last modified
+    /// When the record was last modified
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_modified: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///When daily pack was last opened
+    #[builder(into)]
+    pub last_modified: Option<jacquard_common::types::string::Datetime>,
+    /// When daily pack was last opened
     pub last_open_time: jacquard_common::types::string::Datetime,
-    ///Longest daily pack opening streak achieved
+    /// Longest daily pack opening streak achieved
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub longest_streak: std::option::Option<i64>,
-    ///History of the last few pack openings
+    #[builder(into)]
+    pub longest_streak: Option<i64>,
+    /// History of the last few pack openings
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub pack_history: std::option::Option<
+    pub pack_history: Option<
         Vec<crate::net_anisota::beta::game::pack::PackHistoryEntry<'a>>,
     >,
-    ///Current daily pack opening streak count
+    /// Current daily pack opening streak count
     pub streak: i64,
-    ///Total number of times daily packs have been opened
+    /// Total number of times daily packs have been opened
     pub total_opens: i64,
 }
 
@@ -82,7 +86,7 @@ impl From<PackGetRecordOutput<'_>> for Pack<'_> {
     }
 }
 
-///A single pack opening entry in the history
+/// A single pack opening entry in the history
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -91,25 +95,29 @@ impl From<PackGetRecordOutput<'_>> for Pack<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PackHistoryEntry<'a> {
-    ///Items received from this pack
+    /// Items received from this pack
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub items_received: std::option::Option<
+    pub items_received: Option<
         Vec<crate::net_anisota::beta::game::pack::ReceivedItem<'a>>,
     >,
-    ///When this pack was opened
+    /// When this pack was opened
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub open_time: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Streak count at time of opening
+    #[builder(into)]
+    pub open_time: Option<jacquard_common::types::string::Datetime>,
+    /// Streak count at time of opening
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub streak_count: std::option::Option<i64>,
+    #[builder(into)]
+    pub streak_count: Option<i64>,
 }
 
-///An item received from a pack opening
+/// An item received from a pack opening
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -118,19 +126,23 @@ pub struct PackHistoryEntry<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReceivedItem<'a> {
-    ///ID of the item received
+    /// ID of the item received
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub item_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Quantity received
+    pub item_id: Option<jacquard_common::CowStr<'a>>,
+    /// Quantity received
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quantity: std::option::Option<i64>,
-    ///Rarity of the item
+    #[builder(into)]
+    pub quantity: Option<i64>,
+    /// Rarity of the item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rarity: Option<jacquard_common::CowStr<'a>>,
 }

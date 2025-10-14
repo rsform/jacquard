@@ -17,13 +17,13 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetConfigOutput<'a> {
-    ///The token for the InstantDB account
+    /// The token for the InstantDB account
     #[serde(borrow)]
     pub account_token: jacquard_common::CowStr<'a>,
-    ///The InstantDB admin token
+    /// The InstantDB admin token
     #[serde(borrow)]
     pub admin_token: jacquard_common::CowStr<'a>,
-    ///The App ID
+    /// The App ID
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
 }

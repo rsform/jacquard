@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///open pull request
+/// open pull request
 #[derive(
     serde::Serialize,
     serde::Deserialize,

@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record representing a block relationship against an entire an entire list of accounts (actors).
+/// Record representing a block relationship against an entire an entire list of accounts (actors).
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,12 +14,13 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Listblock<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Reference (AT-URI) to the mod list record.
+    /// Reference (AT-URI) to the mod list record.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,
 }

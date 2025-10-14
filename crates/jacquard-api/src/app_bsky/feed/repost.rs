@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record representing a 'repost' of an existing Bluesky post.
+/// Record representing a 'repost' of an existing Bluesky post.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,7 +14,8 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Repost<'a> {
@@ -22,8 +23,9 @@ pub struct Repost<'a> {
     #[serde(borrow)]
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub via: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub via: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

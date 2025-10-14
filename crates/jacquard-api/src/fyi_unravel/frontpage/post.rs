@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record containing a Frontpage post.
+/// Record containing a Frontpage post.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,16 +14,18 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
-    ///Client-declared timestamp when this post was originally created.
+    /// Client-declared timestamp when this post was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The title of the post.
+    /// The title of the post.
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
-    ///The URL of the post.
+    /// The URL of the post.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
 }

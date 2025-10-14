@@ -13,25 +13,29 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Card<'a> {
-    ///Emoji of the card
+    /// Emoji of the card
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub emoji: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Text of the card
+    pub emoji: Option<jacquard_common::CowStr<'a>>,
+    /// Text of the card
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URL of the link
+    pub text: Option<jacquard_common::CowStr<'a>>,
+    /// URL of the link
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub url: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Record containing a cards of your profile.
+/// Record containing a cards of your profile.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -40,11 +44,12 @@ pub struct Card<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Board<'a> {
-    ///List of cards in the board.
+    /// List of cards in the board.
     #[serde(borrow)]
     pub cards: Vec<crate::blue_linkat::board::Card<'a>>,
 }

@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A record that holds a did:key for verifying a players game. This is intended to be written at a verification authorities repo
+/// A record that holds a did:key for verifying a players game. This is intended to be written at a verification authorities repo
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,12 +14,13 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Game<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    ///A did:key that is used to verify an at://2048 authority has verified this game to a certain degree
+    /// A did:key that is used to verify an at://2048 authority has verified this game to a certain degree
     #[serde(borrow)]
     pub key: crate::blue__2048::key::Key<'a>,
 }

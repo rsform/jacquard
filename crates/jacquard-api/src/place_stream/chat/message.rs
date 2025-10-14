@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record containing a Streamplace chat message.
+/// Record containing a Streamplace chat message.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,26 +14,28 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Message<'a> {
-    ///Client-declared timestamp when this message was originally created.
+    /// Client-declared timestamp when this message was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Annotations of text (mentions, URLs, etc)
+    /// Annotations of text (mentions, URLs, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub facets: std::option::Option<
-        Vec<crate::place_stream::richtext::facet::Facet<'a>>,
-    >,
+    pub facets: Option<Vec<crate::place_stream::richtext::facet::Facet<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reply: std::option::Option<crate::place_stream::chat::message::ReplyRef<'a>>,
-    ///The DID of the streamer whose chat this is.
+    pub reply: Option<crate::place_stream::chat::message::ReplyRef<'a>>,
+    /// The DID of the streamer whose chat this is.
     #[serde(borrow)]
     pub streamer: jacquard_common::types::string::Did<'a>,
-    ///The primary message content. May be an empty string, if there are embeds.
+    /// The primary message content. May be an empty string, if there are embeds.
     #[serde(borrow)]
+    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
 }
 
@@ -87,7 +89,8 @@ impl From<MessageGetRecordOutput<'_>> for Message<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReplyRef<'a> {

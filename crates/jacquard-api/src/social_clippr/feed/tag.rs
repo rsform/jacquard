@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A record containing a bookmark tag for organization.
+/// A record containing a bookmark tag for organization.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,22 +14,26 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tag<'a> {
-    ///A hexadecimal color code
+    /// A hexadecimal color code
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub color: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///A client-defined timestamp for the creation of the tag
+    pub color: Option<jacquard_common::CowStr<'a>>,
+    /// A client-defined timestamp for the creation of the tag
     pub created_at: jacquard_common::types::string::Datetime,
-    ///A description of the tag for additional context
+    /// A description of the tag for additional context
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///A de-duplicated string containing the name of the tag
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// A de-duplicated string containing the name of the tag
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
 }
 

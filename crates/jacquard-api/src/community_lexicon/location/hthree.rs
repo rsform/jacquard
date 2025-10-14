@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A physical location in the form of a H3 encoded location.
+/// A physical location in the form of a H3 encoded location.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,15 +14,18 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Hthree<'a> {
-    ///The name of the location.
+    /// The name of the location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The h3 encoded location.
+    pub name: Option<jacquard_common::CowStr<'a>>,
+    /// The h3 encoded location.
     #[serde(borrow)]
+    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
 }

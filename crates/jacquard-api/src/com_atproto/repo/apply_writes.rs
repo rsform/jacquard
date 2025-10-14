@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Operation which creates a new record.
+/// Operation which creates a new record.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,16 +14,18 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Create<'a> {
     #[serde(borrow)]
     pub collection: jacquard_common::types::string::Nsid<'a>,
-    ///NOTE: maxLength is redundant with record-key format. Keeping it temporarily to ensure backwards compatibility.
+    /// NOTE: maxLength is redundant with record-key format. Keeping it temporarily to ensure backwards compatibility.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub rkey: std::option::Option<
+    pub rkey: Option<
         jacquard_common::types::string::RecordKey<
             jacquard_common::types::string::Rkey<'a>,
         >,
@@ -40,7 +42,8 @@ pub struct Create<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateResult<'a> {
@@ -49,11 +52,12 @@ pub struct CreateResult<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub validation_status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub validation_status: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Operation which deletes an existing record.
+/// Operation which deletes an existing record.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -62,7 +66,8 @@ pub struct CreateResult<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Delete<'a> {
@@ -82,7 +87,8 @@ pub struct Delete<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteResult<'a> {}
@@ -100,16 +106,18 @@ pub struct DeleteResult<'a> {}
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct ApplyWrites<'a> {
-    ///The handle or DID of the repo (aka, current account).
+    /// The handle or DID of the repo (aka, current account).
     #[serde(borrow)]
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
-    ///If provided, the entire operation will fail if the current repo commit CID does not match this value. Used to prevent conflicting repo mutations.
+    /// If provided, the entire operation will fail if the current repo commit CID does not match this value. Used to prevent conflicting repo mutations.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub swap_commit: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    ///Can be set to 'false' to skip Lexicon schema validation of record data across all operations, 'true' to require it, or leave unset to validate only for known Lexicons.
+    pub swap_commit: Option<jacquard_common::types::string::Cid<'a>>,
+    /// Can be set to 'false' to skip Lexicon schema validation of record data across all operations, 'true' to require it, or leave unset to validate only for known Lexicons.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub validate: std::option::Option<bool>,
+    #[builder(into)]
+    pub validate: Option<bool>,
     #[serde(borrow)]
     pub writes: Vec<ApplyWritesWritesItem<'a>>,
     #[serde(flatten)]
@@ -196,7 +204,7 @@ pub enum ApplyWritesOutputResultsItem<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ApplyWritesError<'a> {
-    ///Indicates that the 'swapCommit' parameter did not match current commit.
+    /// Indicates that the 'swapCommit' parameter did not match current commit.
     #[serde(rename = "InvalidSwap")]
     InvalidSwap(std::option::Option<String>),
 }
@@ -246,7 +254,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ApplyWritesRequest {
     type Response = ApplyWritesResponse;
 }
 
-///Operation which updates an existing record.
+/// Operation which updates an existing record.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -255,7 +263,8 @@ impl jacquard_common::xrpc::XrpcEndpoint for ApplyWritesRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Update<'a> {
@@ -277,7 +286,8 @@ pub struct Update<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateResult<'a> {
@@ -286,6 +296,7 @@ pub struct UpdateResult<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub validation_status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub validation_status: Option<jacquard_common::CowStr<'a>>,
 }

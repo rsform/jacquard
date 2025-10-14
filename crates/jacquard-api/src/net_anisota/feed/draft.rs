@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record containing a draft post that can be edited and later published as app.bsky.feed.post
+/// Record containing a draft post that can be edited and later published as app.bsky.feed.post
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,39 +14,48 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Draft<'a> {
-    ///Client-declared timestamp when this draft was originally created.
+    /// Client-declared timestamp when this draft was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub embed: std::option::Option<DraftEmbed<'a>>,
-    ///Annotations of text (mentions, URLs, hashtags, etc)
+    pub embed: Option<DraftEmbed<'a>>,
+    /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    ///Self-label values for this post. Effectively content warnings.
+    pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    /// Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
-    ///Indicates human language of post primary text content.
+    pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
+    /// Indicates human language of post primary text content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    #[builder(into)]
+    pub langs: Option<Vec<jacquard_common::types::string::Language>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reply: std::option::Option<crate::net_anisota::feed::draft::ReplyRef<'a>>,
-    ///Additional hashtags, in addition to any included in post text and facets.
+    pub reply: Option<crate::net_anisota::feed::draft::ReplyRef<'a>>,
+    /// Additional hashtags, in addition to any included in post text and facets.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///The primary post content. May be an empty string, if there are embeds.
+    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// The primary post content. May be an empty string, if there are embeds.
     #[serde(borrow)]
+    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
-    ///Client-declared timestamp when this draft was last updated.
+    /// Client-declared timestamp when this draft was last updated.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub updated_at: Option<jacquard_common::types::string::Datetime>,
 }
 
 #[jacquard_derive::open_union]
@@ -124,7 +133,8 @@ impl From<DraftGetRecordOutput<'_>> for Draft<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReplyRef<'a> {

@@ -106,11 +106,13 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetAccountTimelineRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TimelineItem<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub day: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub summary: Vec<
@@ -126,13 +128,16 @@ pub struct TimelineItem<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TimelineItemSummary<'a> {
     pub count: i64,
     #[serde(borrow)]
+    #[builder(into)]
     pub event_subject_type: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub event_type: jacquard_common::CowStr<'a>,
 }

@@ -13,15 +13,18 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConflictInfo<'a> {
-    ///Name of the conflicted file
+    /// Name of the conflicted file
     #[serde(borrow)]
+    #[builder(into)]
     pub filename: jacquard_common::CowStr<'a>,
-    ///Reason for the conflict
+    /// Reason for the conflict
     #[serde(borrow)]
+    #[builder(into)]
     pub reason: jacquard_common::CowStr<'a>,
 }
 
@@ -39,18 +42,18 @@ pub struct ConflictInfo<'a> {
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct MergeCheck<'a> {
-    ///Target branch to merge into
+    /// Target branch to merge into
     #[serde(borrow)]
     #[builder(into)]
     pub branch: jacquard_common::CowStr<'a>,
-    ///DID of the repository owner
+    /// DID of the repository owner
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///Name of the repository
+    /// Name of the repository
     #[serde(borrow)]
     #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Patch or pull request to check for merge conflicts
+    /// Patch or pull request to check for merge conflicts
     #[serde(borrow)]
     #[builder(into)]
     pub patch: jacquard_common::CowStr<'a>,
@@ -75,17 +78,17 @@ pub struct MergeCheck<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MergeCheckOutput<'a> {
-    ///List of files with merge conflicts
+    /// List of files with merge conflicts
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub conflicts: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-    ///Error message if check failed
+    /// Error message if check failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub error: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether the merge has conflicts
+    /// Whether the merge has conflicts
     pub is_conflicted: bool,
-    ///Additional message about the merge check
+    /// Additional message about the merge check
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub message: std::option::Option<jacquard_common::CowStr<'a>>,

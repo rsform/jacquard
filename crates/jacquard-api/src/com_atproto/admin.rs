@@ -29,45 +29,49 @@ pub mod update_subject_status;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AccountView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub deactivated_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub email: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub email_confirmed_at: std::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
+    #[builder(into)]
+    pub email_confirmed_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub invite_note: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub invite_note: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub invited_by: std::option::Option<crate::com_atproto::server::InviteCode<'a>>,
+    pub invited_by: Option<crate::com_atproto::server::InviteCode<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub invites: std::option::Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
+    pub invites: Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub invites_disabled: std::option::Option<bool>,
+    #[builder(into)]
+    pub invites_disabled: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub related_records: std::option::Option<
-        Vec<jacquard_common::types::value::Data<'a>>,
-    >,
+    pub related_records: Option<Vec<jacquard_common::types::value::Data<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub threat_signatures: std::option::Option<
-        Vec<crate::com_atproto::admin::ThreatSignature<'a>>,
-    >,
+    pub threat_signatures: Option<Vec<crate::com_atproto::admin::ThreatSignature<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -78,7 +82,8 @@ pub struct AccountView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoBlobRef<'a> {
@@ -87,8 +92,9 @@ pub struct RepoBlobRef<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub record_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub record_uri: Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -99,7 +105,8 @@ pub struct RepoBlobRef<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoRef<'a> {
@@ -115,14 +122,16 @@ pub struct RepoRef<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StatusAttr<'a> {
     pub applied: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#ref: Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -133,12 +142,15 @@ pub struct StatusAttr<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreatSignature<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub property: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
 }

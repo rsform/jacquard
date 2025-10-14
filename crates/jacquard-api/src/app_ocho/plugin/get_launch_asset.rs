@@ -25,7 +25,7 @@ pub struct GetLaunchAsset<'a> {
     pub platform: jacquard_common::CowStr<'a>,
 }
 
-///The launch asset for the plugin, which is the main JavaScript bundle.
+/// The launch asset for the plugin, which is the main JavaScript bundle.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

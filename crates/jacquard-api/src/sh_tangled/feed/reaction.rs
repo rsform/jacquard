@@ -13,12 +13,14 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Reaction<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
+    #[builder(into)]
     pub reaction: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,

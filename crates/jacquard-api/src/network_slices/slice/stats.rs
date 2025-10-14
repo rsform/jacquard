@@ -13,16 +13,17 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionStats<'a> {
-    ///Collection NSID
+    /// Collection NSID
     #[serde(borrow)]
     pub collection: jacquard_common::types::string::Nsid<'a>,
-    ///Number of records in this collection
+    /// Number of records in this collection
     pub record_count: i64,
-    ///Number of unique actors with records in this collection
+    /// Number of unique actors with records in this collection
     pub unique_actors: i64,
 }
 
@@ -56,17 +57,17 @@ pub struct Stats<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StatsOutput<'a> {
-    ///Per-collection statistics
+    /// Per-collection statistics
     #[serde(borrow)]
     pub collection_stats: Vec<jacquard_common::types::value::Data<'a>>,
-    ///List of collection NSIDs indexed in this slice
+    /// List of collection NSIDs indexed in this slice
     #[serde(borrow)]
     pub collections: Vec<jacquard_common::types::string::Nsid<'a>>,
-    ///Total number of unique actors indexed in this slice
+    /// Total number of unique actors indexed in this slice
     pub total_actors: i64,
-    ///Total number of lexicons defined for this slice
+    /// Total number of lexicons defined for this slice
     pub total_lexicons: i64,
-    ///Total number of records indexed in this slice
+    /// Total number of records indexed in this slice
     pub total_records: i64,
 }
 

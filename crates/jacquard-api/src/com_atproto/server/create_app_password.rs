@@ -13,17 +13,21 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AppPassword<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub password: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub privileged: std::option::Option<bool>,
+    #[builder(into)]
+    pub privileged: Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -40,13 +44,14 @@ pub struct AppPassword<'a> {
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct CreateAppPassword<'a> {
-    ///A short name for the App Password, to help distinguish them.
+    /// A short name for the App Password, to help distinguish them.
     #[serde(borrow)]
     #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///If an app password has 'privileged' access to possibly sensitive account state. Meant for use with trusted clients.
+    /// If an app password has 'privileged' access to possibly sensitive account state. Meant for use with trusted clients.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub privileged: std::option::Option<bool>,
+    #[builder(into)]
+    pub privileged: Option<bool>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]

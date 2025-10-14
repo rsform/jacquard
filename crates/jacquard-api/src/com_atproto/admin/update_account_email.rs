@@ -19,7 +19,7 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct UpdateAccountEmail<'a> {
-    ///The handle or DID of the repo.
+    /// The handle or DID of the repo.
     #[serde(borrow)]
     pub account: jacquard_common::types::ident::AtIdentifier<'a>,
     #[serde(borrow)]

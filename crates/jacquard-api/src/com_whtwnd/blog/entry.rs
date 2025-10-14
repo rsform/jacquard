@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A declaration of a post.
+/// A declaration of a post.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,36 +14,46 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub blobs: std::option::Option<Vec<crate::com_whtwnd::blog::BlobMetadata<'a>>>,
+    pub blobs: Option<Vec<crate::com_whtwnd::blog::BlobMetadata<'a>>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///(DEPRECATED) Marks this entry as draft to tell AppViews not to show it to anyone except for the author
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    /// (DEPRECATED) Marks this entry as draft to tell AppViews not to show it to anyone except for the author
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_draft: std::option::Option<bool>,
+    #[builder(into)]
+    pub is_draft: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub ogp: std::option::Option<crate::com_whtwnd::blog::Ogp<'a>>,
+    pub ogp: Option<crate::com_whtwnd::blog::Ogp<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub subtitle: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub subtitle: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub theme: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub theme: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Tells the visibility of the article to AppView.
+    pub title: Option<jacquard_common::CowStr<'a>>,
+    /// Tells the visibility of the article to AppView.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub visibility: Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

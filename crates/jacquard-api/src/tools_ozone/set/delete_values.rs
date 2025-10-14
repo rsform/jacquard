@@ -19,11 +19,11 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct DeleteValues<'a> {
-    ///Name of the set to delete values from
+    /// Name of the set to delete values from
     #[serde(borrow)]
     #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Array of string values to delete from the set
+    /// Array of string values to delete from the set
     #[serde(borrow)]
     pub values: Vec<jacquard_common::CowStr<'a>>,
     #[serde(flatten)]
@@ -50,7 +50,7 @@ pub struct DeleteValues<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteValuesError<'a> {
-    ///set with the given name does not exist
+    /// set with the given name does not exist
     #[serde(rename = "SetNotFound")]
     SetNotFound(std::option::Option<String>),
 }

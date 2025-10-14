@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A fingerprint of a browser upload.
+/// A fingerprint of a browser upload.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,19 +14,22 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Browser<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub user_agent: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub user_agent: Option<jacquard_common::CowStr<'a>>,
 }
 
-///A fingerprint of a machine upload.
+/// A fingerprint of a machine upload.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -35,20 +38,25 @@ pub struct Browser<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Machine<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub app: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub app: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub host: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub host: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub os: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub os: Option<jacquard_common::CowStr<'a>>,
 }

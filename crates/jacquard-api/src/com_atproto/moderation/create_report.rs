@@ -20,14 +20,15 @@
 #[builder(start_fn = new)]
 pub struct CreateReport<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub mod_tool: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///Additional context about the content and violation.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Indicates the broad category of violation the report is for.
+    #[serde(borrow)]
+    pub mod_tool: Option<jacquard_common::types::value::Data<'a>>,
+    /// Additional context about the content and violation.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub reason: Option<jacquard_common::CowStr<'a>>,
+    /// Indicates the broad category of violation the report is for.
     #[serde(borrow)]
     pub reason_type: crate::com_atproto::moderation::ReasonType<'a>,
     #[serde(borrow)]
@@ -134,7 +135,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateReportRequest {
     type Response = CreateReportResponse;
 }
 
-///Moderation tool information for tracing the source of the action
+/// Moderation tool information for tracing the source of the action
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -143,15 +144,18 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateReportRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModTool<'a> {
-    ///Additional arbitrary metadata about the source
+    /// Additional arbitrary metadata about the source
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub meta: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///Name/identifier of the source (e.g., 'bsky-app/android', 'bsky-web/chrome')
+    pub meta: Option<jacquard_common::types::value::Data<'a>>,
+    /// Name/identifier of the source (e.g., 'bsky-app/android', 'bsky-web/chrome')
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
 }

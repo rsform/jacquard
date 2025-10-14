@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///An author for an oekaki post
+/// An author for an oekaki post
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,19 +14,20 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Author<'a> {
-    ///The DID of the author
+    /// The DID of the author
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///The handle of the author.
+    /// The handle of the author.
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
-///A hydrated oekaki post returned from the PinkSea app view.
+/// A hydrated oekaki post returned from the PinkSea app view.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -35,36 +36,39 @@ pub struct Author<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HydratedOekaki<'a> {
-    ///Alt text description of the image, for accessibility.
+    /// Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The AT protocol link.
+    pub alt: Option<jacquard_common::CowStr<'a>>,
+    /// The AT protocol link.
     #[serde(borrow)]
     pub at: jacquard_common::types::string::Uri<'a>,
     #[serde(borrow)]
     pub author: crate::com_shinolabs::pinksea::app_view_defs::Author<'a>,
-    ///The oekaki CID.
+    /// The oekaki CID.
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    ///The creation time.
+    /// The creation time.
     pub creation_time: jacquard_common::types::string::Datetime,
-    ///The image link.
+    /// The image link.
     #[serde(borrow)]
     pub image: jacquard_common::types::string::Uri<'a>,
-    ///Is this oekaki NSFW?
+    /// Is this oekaki NSFW?
     pub nsfw: bool,
-    ///An array of tags this image had.
+    /// An array of tags this image had.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-///A tombstone for a missing oekaki.
+/// A tombstone for a missing oekaki.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -73,11 +77,12 @@ pub struct HydratedOekaki<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct OekakiTombstone<'a> {
-    ///The AT uri of the former oekaki.
+    /// The AT uri of the former oekaki.
     #[serde(borrow)]
     pub former_at: jacquard_common::types::string::AtUri<'a>,
 }

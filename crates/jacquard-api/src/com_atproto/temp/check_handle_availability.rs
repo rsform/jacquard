@@ -40,7 +40,7 @@ pub struct CheckHandleAvailability<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CheckHandleAvailabilityOutput<'a> {
-    ///Echo of the input handle.
+    /// Echo of the input handle.
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(borrow)]
@@ -85,7 +85,7 @@ pub enum CheckHandleAvailabilityOutputResult<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CheckHandleAvailabilityError<'a> {
-    ///An invalid email was provided.
+    /// An invalid email was provided.
     #[serde(rename = "InvalidEmail")]
     InvalidEmail(std::option::Option<String>),
 }
@@ -131,7 +131,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CheckHandleAvailabilityRequest {
     type Response = CheckHandleAvailabilityResponse;
 }
 
-///Indicates the provided handle is available.
+/// Indicates the provided handle is available.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -140,11 +140,12 @@ impl jacquard_common::xrpc::XrpcEndpoint for CheckHandleAvailabilityRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResultAvailable<'a> {}
-///Indicates the provided handle is unavailable and gives suggestions of available handles.
+/// Indicates the provided handle is unavailable and gives suggestions of available handles.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -153,11 +154,12 @@ pub struct ResultAvailable<'a> {}
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResultUnavailable<'a> {
-    ///List of suggested handles based on the provided inputs.
+    /// List of suggested handles based on the provided inputs.
     #[serde(borrow)]
     pub suggestions: Vec<
         crate::com_atproto::temp::check_handle_availability::Suggestion<'a>,
@@ -172,13 +174,15 @@ pub struct ResultUnavailable<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Suggestion<'a> {
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
-    ///Method used to build this suggestion. Should be considered opaque to clients. Can be used for metrics.
+    /// Method used to build this suggestion. Should be considered opaque to clients. Can be used for metrics.
     #[serde(borrow)]
+    #[builder(into)]
     pub method: jacquard_common::CowStr<'a>,
 }

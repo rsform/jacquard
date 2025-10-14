@@ -21,7 +21,7 @@ pub mod query_statuses;
 pub mod schedule_action;
 pub mod search_repos;
 
-///Logs account status related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
+/// Logs account status related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -30,18 +30,21 @@ pub mod search_repos;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AccountEvent<'a> {
-    ///Indicates that the account has a repository which can be fetched from the host that emitted this event.
+    /// Indicates that the account has a repository which can be fetched from the host that emitted this event.
     pub active: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: Option<jacquard_common::CowStr<'a>>,
     pub timestamp: jacquard_common::types::string::Datetime,
 }
 
@@ -53,25 +56,32 @@ pub struct AccountEvent<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AccountHosting<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub deactivated_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deleted_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub deleted_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub reactivated_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
+    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub updated_at: Option<jacquard_common::types::string::Datetime>,
 }
 
-///Statistics about a particular account subject
+/// Statistics about a particular account subject
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -80,28 +90,34 @@ pub struct AccountHosting<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AccountStats<'a> {
-    ///Total number of appeals against a moderation action on the account
+    /// Total number of appeals against a moderation action on the account
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub appeal_count: std::option::Option<i64>,
-    ///Number of times the account was escalated
+    #[builder(into)]
+    pub appeal_count: Option<i64>,
+    /// Number of times the account was escalated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub escalate_count: std::option::Option<i64>,
-    ///Total number of reports on the account
+    #[builder(into)]
+    pub escalate_count: Option<i64>,
+    /// Total number of reports on the account
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub report_count: std::option::Option<i64>,
-    ///Number of times the account was suspended
+    #[builder(into)]
+    pub report_count: Option<i64>,
+    /// Number of times the account was suspended
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub suspend_count: std::option::Option<i64>,
-    ///Number of times the account was taken down
+    #[builder(into)]
+    pub suspend_count: Option<i64>,
+    /// Number of times the account was taken down
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub takedown_count: std::option::Option<i64>,
+    #[builder(into)]
+    pub takedown_count: Option<i64>,
 }
 
-///Age assurance info coming directly from users. Only works on DID subjects.
+/// Age assurance info coming directly from users. Only works on DID subjects.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -110,37 +126,44 @@ pub struct AccountStats<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AgeAssuranceEvent<'a> {
-    ///The unique identifier for this instance of the age assurance flow, in UUID format.
+    /// The unique identifier for this instance of the age assurance flow, in UUID format.
     #[serde(borrow)]
+    #[builder(into)]
     pub attempt_id: jacquard_common::CowStr<'a>,
-    ///The IP address used when completing the AA flow.
+    /// The IP address used when completing the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub complete_ip: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The user agent used when completing the AA flow.
+    pub complete_ip: Option<jacquard_common::CowStr<'a>>,
+    /// The user agent used when completing the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub complete_ua: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The date and time of this write operation.
+    pub complete_ua: Option<jacquard_common::CowStr<'a>>,
+    /// The date and time of this write operation.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The IP address used when initiating the AA flow.
+    /// The IP address used when initiating the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub init_ip: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The user agent used when initiating the AA flow.
+    pub init_ip: Option<jacquard_common::CowStr<'a>>,
+    /// The user agent used when initiating the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub init_ua: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The status of the age assurance process.
+    pub init_ua: Option<jacquard_common::CowStr<'a>>,
+    /// The status of the age assurance process.
     #[serde(borrow)]
+    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
 }
 
-///Age assurance status override by moderators. Only works on DID subjects.
+/// Age assurance status override by moderators. Only works on DID subjects.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -149,15 +172,18 @@ pub struct AgeAssuranceEvent<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AgeAssuranceOverrideEvent<'a> {
-    ///Comment describing the reason for the override.
+    /// Comment describing the reason for the override.
     #[serde(borrow)]
+    #[builder(into)]
     pub comment: jacquard_common::CowStr<'a>,
-    ///The status to be set for the user decided by a moderator, overriding whatever value the user had previously. Use reset to default to original state.
+    /// The status to be set for the user decided by a moderator, overriding whatever value the user had previously. Use reset to default to original state.
     #[serde(borrow)]
+    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
 }
 
@@ -169,7 +195,8 @@ pub struct AgeAssuranceOverrideEvent<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlobView<'a> {
@@ -177,13 +204,16 @@ pub struct BlobView<'a> {
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub details: std::option::Option<BlobViewDetails<'a>>,
+    pub details: Option<BlobViewDetails<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub mime_type: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub moderation: std::option::Option<crate::tools_ozone::moderation::Moderation<'a>>,
+    pub moderation: Option<crate::tools_ozone::moderation::Moderation<'a>>,
     pub size: i64,
 }
 
@@ -206,7 +236,7 @@ pub enum BlobViewDetails<'a> {
     VideoDetails(Box<crate::tools_ozone::moderation::VideoDetails<'a>>),
 }
 
-///Logs cancellation of a scheduled takedown action for an account.
+/// Logs cancellation of a scheduled takedown action for an account.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -215,16 +245,18 @@ pub enum BlobViewDetails<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CancelScheduledTakedownEvent<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Logs identity related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
+/// Logs identity related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -233,22 +265,27 @@ pub struct CancelScheduledTakedownEvent<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct IdentityEvent<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
+    pub handle: Option<jacquard_common::types::string::Handle<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub pds_host: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub pds_host: Option<jacquard_common::types::string::Uri<'a>>,
     pub timestamp: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub tombstone: std::option::Option<bool>,
+    #[builder(into)]
+    pub tombstone: Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -259,7 +296,8 @@ pub struct IdentityEvent<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ImageDetails<'a> {
@@ -275,19 +313,22 @@ pub struct ImageDetails<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventAcknowledge<'a> {
-    ///If true, all other reports on content authored by this account will be resolved (acknowledged).
+    /// If true, all other reports on content authored by this account will be resolved (acknowledged).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub acknowledge_account_subjects: std::option::Option<bool>,
+    #[builder(into)]
+    pub acknowledge_account_subjects: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Add a comment to a subject. An empty comment will clear any previously set sticky comment.
+/// Add a comment to a subject. An empty comment will clear any previously set sticky comment.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -296,19 +337,22 @@ pub struct ModEventAcknowledge<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventComment<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Make the comment persistent on the subject
+    pub comment: Option<jacquard_common::CowStr<'a>>,
+    /// Make the comment persistent on the subject
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sticky: std::option::Option<bool>,
+    #[builder(into)]
+    pub sticky: Option<bool>,
 }
 
-///Divert a record's blobs to a 3rd party service for further scanning/tagging
+/// Divert a record's blobs to a 3rd party service for further scanning/tagging
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -317,16 +361,18 @@ pub struct ModEventComment<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventDivert<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Keep a log of outgoing email to a user
+/// Keep a log of outgoing email to a user
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -335,20 +381,24 @@ pub struct ModEventDivert<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventEmail<'a> {
-    ///Additional comment about the outgoing comm.
+    /// Additional comment about the outgoing comm.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The content of the email sent to the user.
+    pub comment: Option<jacquard_common::CowStr<'a>>,
+    /// The content of the email sent to the user.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub content: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The subject line of the email sent to the user.
+    pub content: Option<jacquard_common::CowStr<'a>>,
+    /// The subject line of the email sent to the user.
     #[serde(borrow)]
+    #[builder(into)]
     pub subject_line: jacquard_common::CowStr<'a>,
 }
 
@@ -360,16 +410,18 @@ pub struct ModEventEmail<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventEscalate<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Apply/Negate labels on a subject
+/// Apply/Negate labels on a subject
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -378,23 +430,26 @@ pub struct ModEventEscalate<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventLabel<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub create_label_vals: Vec<jacquard_common::CowStr<'a>>,
-    ///Indicates how long the label will remain on the subject. Only applies on labels that are being added.
+    /// Indicates how long the label will remain on the subject. Only applies on labels that are being added.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration_in_hours: std::option::Option<i64>,
+    #[builder(into)]
+    pub duration_in_hours: Option<i64>,
     #[serde(borrow)]
     pub negate_label_vals: Vec<jacquard_common::CowStr<'a>>,
 }
 
-///Mute incoming reports on a subject
+/// Mute incoming reports on a subject
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -403,18 +458,20 @@ pub struct ModEventLabel<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventMute<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Indicates how long the subject should remain muted.
+    pub comment: Option<jacquard_common::CowStr<'a>>,
+    /// Indicates how long the subject should remain muted.
     pub duration_in_hours: i64,
 }
 
-///Mute incoming reports from an account
+/// Mute incoming reports from an account
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -423,19 +480,22 @@ pub struct ModEventMute<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventMuteReporter<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Indicates how long the account should remain muted. Falsy value here means a permanent mute.
+    pub comment: Option<jacquard_common::CowStr<'a>>,
+    /// Indicates how long the account should remain muted. Falsy value here means a permanent mute.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration_in_hours: std::option::Option<i64>,
+    #[builder(into)]
+    pub duration_in_hours: Option<i64>,
 }
 
-///Set priority score of the subject. Higher score means higher priority.
+/// Set priority score of the subject. Higher score means higher priority.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -444,17 +504,19 @@ pub struct ModEventMuteReporter<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventPriorityScore<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
     pub score: i64,
 }
 
-///Report a subject
+/// Report a subject
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -463,21 +525,24 @@ pub struct ModEventPriorityScore<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventReport<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Set to true if the reporter was muted from reporting at the time of the event. These reports won't impact the reviewState of the subject.
+    pub comment: Option<jacquard_common::CowStr<'a>>,
+    /// Set to true if the reporter was muted from reporting at the time of the event. These reports won't impact the reviewState of the subject.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_reporter_muted: std::option::Option<bool>,
+    #[builder(into)]
+    pub is_reporter_muted: Option<bool>,
     #[serde(borrow)]
     pub report_type: crate::com_atproto::moderation::ReasonType<'a>,
 }
 
-///Resolve appeal on a subject
+/// Resolve appeal on a subject
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -486,17 +551,19 @@ pub struct ModEventReport<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventResolveAppeal<'a> {
-    ///Describe resolution.
+    /// Describe resolution.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Revert take down action on a subject
+/// Revert take down action on a subject
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -505,17 +572,19 @@ pub struct ModEventResolveAppeal<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventReverseTakedown<'a> {
-    ///Describe reasoning behind the reversal.
+    /// Describe reasoning behind the reversal.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Add/Remove a tag on a subject
+/// Add/Remove a tag on a subject
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -524,23 +593,25 @@ pub struct ModEventReverseTakedown<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventTag<'a> {
-    ///Tags to be added to the subject. If already exists, won't be duplicated.
+    /// Tags to be added to the subject. If already exists, won't be duplicated.
     #[serde(borrow)]
     pub add: Vec<jacquard_common::CowStr<'a>>,
-    ///Additional comment about added/removed tags.
+    /// Additional comment about added/removed tags.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Tags to be removed to the subject. Ignores a tag If it doesn't exist, won't be duplicated.
+    pub comment: Option<jacquard_common::CowStr<'a>>,
+    /// Tags to be removed to the subject. Ignores a tag If it doesn't exist, won't be duplicated.
     #[serde(borrow)]
     pub remove: Vec<jacquard_common::CowStr<'a>>,
 }
 
-///Take down a subject permanently or temporarily
+/// Take down a subject permanently or temporarily
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -549,26 +620,31 @@ pub struct ModEventTag<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventTakedown<'a> {
-    ///If true, all other reports on content authored by this account will be resolved (acknowledged).
+    /// If true, all other reports on content authored by this account will be resolved (acknowledged).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub acknowledge_account_subjects: std::option::Option<bool>,
+    #[builder(into)]
+    pub acknowledge_account_subjects: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Indicates how long the takedown should be in effect before automatically expiring.
+    pub comment: Option<jacquard_common::CowStr<'a>>,
+    /// Indicates how long the takedown should be in effect before automatically expiring.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration_in_hours: std::option::Option<i64>,
-    ///Names/Keywords of the policies that drove the decision.
+    #[builder(into)]
+    pub duration_in_hours: Option<i64>,
+    /// Names/Keywords of the policies that drove the decision.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub policies: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub policies: Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-///Unmute action on a subject
+/// Unmute action on a subject
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -577,17 +653,19 @@ pub struct ModEventTakedown<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventUnmute<'a> {
-    ///Describe reasoning behind the reversal.
+    /// Describe reasoning behind the reversal.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Unmute incoming reports from an account
+/// Unmute incoming reports from an account
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -596,14 +674,16 @@ pub struct ModEventUnmute<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventUnmuteReporter<'a> {
-    ///Describe reasoning behind the reversal.
+    /// Describe reasoning behind the reversal.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -614,7 +694,8 @@ pub struct ModEventUnmuteReporter<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventView<'a> {
@@ -622,21 +703,24 @@ pub struct ModEventView<'a> {
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub creator_handle: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub creator_handle: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub event: ModEventViewEvent<'a>,
     pub id: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    pub mod_tool: Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
     pub subject: ModEventViewSubject<'a>,
     #[serde(borrow)]
     pub subject_blob_cids: Vec<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub subject_handle: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub subject_handle: Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -747,7 +831,8 @@ pub enum ModEventViewSubject<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventViewDetail<'a> {
@@ -758,8 +843,9 @@ pub struct ModEventViewDetail<'a> {
     pub event: ModEventViewDetailEvent<'a>,
     pub id: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    pub mod_tool: Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
     pub subject: ModEventViewDetailSubject<'a>,
     #[serde(borrow)]
@@ -868,7 +954,7 @@ pub enum ModEventViewDetailSubject<'a> {
     RecordViewNotFound(Box<crate::tools_ozone::moderation::RecordViewNotFound<'a>>),
 }
 
-///Moderation tool information for tracing the source of the action
+/// Moderation tool information for tracing the source of the action
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -877,16 +963,19 @@ pub enum ModEventViewDetailSubject<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModTool<'a> {
-    ///Additional arbitrary metadata about the source
+    /// Additional arbitrary metadata about the source
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub meta: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///Name/identifier of the source (e.g., 'automod', 'ozone/workspace')
+    pub meta: Option<jacquard_common::types::value::Data<'a>>,
+    /// Name/identifier of the source (e.g., 'automod', 'ozone/workspace')
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
 }
 
@@ -898,15 +987,15 @@ pub struct ModTool<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Moderation<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub subject_status: std::option::Option<
-        crate::tools_ozone::moderation::SubjectStatusView<'a>,
-    >,
+    pub subject_status: Option<crate::tools_ozone::moderation::SubjectStatusView<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -917,18 +1006,18 @@ pub struct Moderation<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModerationDetail<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub subject_status: std::option::Option<
-        crate::tools_ozone::moderation::SubjectStatusView<'a>,
-    >,
+    pub subject_status: Option<crate::tools_ozone::moderation::SubjectStatusView<'a>>,
 }
 
-///Logs lifecycle event on a record subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
+/// Logs lifecycle event on a record subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -937,17 +1026,21 @@ pub struct ModerationDetail<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecordEvent<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub op: jacquard_common::CowStr<'a>,
     pub timestamp: jacquard_common::types::string::Datetime,
 }
@@ -960,18 +1053,23 @@ pub struct RecordEvent<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecordHosting<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deleted_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub deleted_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
+    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub updated_at: Option<jacquard_common::types::string::Datetime>,
 }
 
 #[jacquard_derive::lexicon]
@@ -982,7 +1080,8 @@ pub struct RecordHosting<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecordView<'a> {
@@ -1009,7 +1108,8 @@ pub struct RecordView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecordViewDetail<'a> {
@@ -1019,8 +1119,9 @@ pub struct RecordViewDetail<'a> {
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(borrow)]
     pub moderation: crate::tools_ozone::moderation::ModerationDetail<'a>,
     #[serde(borrow)]
@@ -1039,7 +1140,8 @@ pub struct RecordViewDetail<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecordViewNotFound<'a> {
@@ -1047,7 +1149,7 @@ pub struct RecordViewNotFound<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-///Statistics about a set of record subject items
+/// Statistics about a set of record subject items
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -1056,34 +1158,43 @@ pub struct RecordViewNotFound<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecordsStats<'a> {
-    ///Number of items that were appealed at least once
+    /// Number of items that were appealed at least once
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub appealed_count: std::option::Option<i64>,
-    ///Number of items that were escalated at least once
+    #[builder(into)]
+    pub appealed_count: Option<i64>,
+    /// Number of items that were escalated at least once
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub escalated_count: std::option::Option<i64>,
-    ///Number of item currently in "reviewOpen" or "reviewEscalated" state
+    #[builder(into)]
+    pub escalated_count: Option<i64>,
+    /// Number of item currently in "reviewOpen" or "reviewEscalated" state
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub pending_count: std::option::Option<i64>,
-    ///Number of item currently in "reviewNone" or "reviewClosed" state
+    #[builder(into)]
+    pub pending_count: Option<i64>,
+    /// Number of item currently in "reviewNone" or "reviewClosed" state
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub processed_count: std::option::Option<i64>,
-    ///Number of items that were reported at least once
+    #[builder(into)]
+    pub processed_count: Option<i64>,
+    /// Number of items that were reported at least once
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reported_count: std::option::Option<i64>,
-    ///Total number of item in the set
+    #[builder(into)]
+    pub reported_count: Option<i64>,
+    /// Total number of item in the set
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub subject_count: std::option::Option<i64>,
-    ///Number of item currently taken down
+    #[builder(into)]
+    pub subject_count: Option<i64>,
+    /// Number of item currently taken down
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub takendown_count: std::option::Option<i64>,
-    ///Cumulative sum of the number of reports on the items in the set
+    #[builder(into)]
+    pub takendown_count: Option<i64>,
+    /// Cumulative sum of the number of reports on the items in the set
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total_reports: std::option::Option<i64>,
+    #[builder(into)]
+    pub total_reports: Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -1094,37 +1205,42 @@ pub struct RecordsStats<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub deactivated_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub email: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub invite_note: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub invite_note: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub invited_by: std::option::Option<crate::com_atproto::server::InviteCode<'a>>,
+    pub invited_by: Option<crate::com_atproto::server::InviteCode<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub invites_disabled: std::option::Option<bool>,
+    #[builder(into)]
+    pub invites_disabled: Option<bool>,
     #[serde(borrow)]
     pub moderation: crate::tools_ozone::moderation::Moderation<'a>,
     #[serde(borrow)]
     pub related_records: Vec<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub threat_signatures: std::option::Option<
-        Vec<crate::com_atproto::admin::ThreatSignature<'a>>,
-    >,
+    pub threat_signatures: Option<Vec<crate::com_atproto::admin::ThreatSignature<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -1135,47 +1251,53 @@ pub struct RepoView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoViewDetail<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub deactivated_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub email: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub email_confirmed_at: std::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
+    #[builder(into)]
+    pub email_confirmed_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub invite_note: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub invite_note: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub invited_by: std::option::Option<crate::com_atproto::server::InviteCode<'a>>,
+    pub invited_by: Option<crate::com_atproto::server::InviteCode<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub invites: std::option::Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
+    pub invites: Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub invites_disabled: std::option::Option<bool>,
+    #[builder(into)]
+    pub invites_disabled: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(borrow)]
     pub moderation: crate::tools_ozone::moderation::ModerationDetail<'a>,
     #[serde(borrow)]
     pub related_records: Vec<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub threat_signatures: std::option::Option<
-        Vec<crate::com_atproto::admin::ThreatSignature<'a>>,
-    >,
+    pub threat_signatures: Option<Vec<crate::com_atproto::admin::ThreatSignature<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -1186,7 +1308,8 @@ pub struct RepoViewDetail<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoViewNotFound<'a> {
@@ -1202,31 +1325,32 @@ pub struct RepoViewNotFound<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReporterStats<'a> {
-    ///The total number of reports made by the user on accounts.
+    /// The total number of reports made by the user on accounts.
     pub account_report_count: i64,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///The total number of accounts labeled as a result of the user's reports.
+    /// The total number of accounts labeled as a result of the user's reports.
     pub labeled_account_count: i64,
-    ///The total number of records labeled as a result of the user's reports.
+    /// The total number of records labeled as a result of the user's reports.
     pub labeled_record_count: i64,
-    ///The total number of reports made by the user on records.
+    /// The total number of reports made by the user on records.
     pub record_report_count: i64,
-    ///The total number of accounts reported by the user.
+    /// The total number of accounts reported by the user.
     pub reported_account_count: i64,
-    ///The total number of records reported by the user.
+    /// The total number of records reported by the user.
     pub reported_record_count: i64,
-    ///The total number of accounts taken down as a result of the user's reports.
+    /// The total number of accounts taken down as a result of the user's reports.
     pub takendown_account_count: i64,
-    ///The total number of records taken down as a result of the user's reports.
+    /// The total number of records taken down as a result of the user's reports.
     pub takendown_record_count: i64,
 }
 
-///Moderator review status of a subject: Closed. Indicates that the subject was already reviewed and resolved by a moderator
+/// Moderator review status of a subject: Closed. Indicates that the subject was already reviewed and resolved by a moderator
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -1244,7 +1368,7 @@ impl std::fmt::Display for ReviewClosed {
     }
 }
 
-///Moderator review status of a subject: Escalated. Indicates that the subject was escalated for review by a moderator
+/// Moderator review status of a subject: Escalated. Indicates that the subject was escalated for review by a moderator
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -1262,7 +1386,7 @@ impl std::fmt::Display for ReviewEscalated {
     }
 }
 
-///Moderator review status of a subject: Unnecessary. Indicates that the subject does not need a review at the moment but there is probably some moderation related metadata available for it
+/// Moderator review status of a subject: Unnecessary. Indicates that the subject does not need a review at the moment but there is probably some moderation related metadata available for it
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -1280,7 +1404,7 @@ impl std::fmt::Display for ReviewNone {
     }
 }
 
-///Moderator review status of a subject: Open. Indicates that the subject needs to be reviewed by a moderator
+/// Moderator review status of a subject: Open. Indicates that the subject needs to be reviewed by a moderator
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -1298,7 +1422,7 @@ impl std::fmt::Display for ReviewOpen {
     }
 }
 
-///Account credentials revocation by moderators. Only works on DID subjects.
+/// Account credentials revocation by moderators. Only works on DID subjects.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -1307,16 +1431,18 @@ impl std::fmt::Display for ReviewOpen {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RevokeAccountCredentialsEvent<'a> {
-    ///Comment describing the reason for the revocation.
+    /// Comment describing the reason for the revocation.
     #[serde(borrow)]
+    #[builder(into)]
     pub comment: jacquard_common::CowStr<'a>,
 }
 
-///Logs a scheduled takedown action for an account.
+/// Logs a scheduled takedown action for an account.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -1325,22 +1451,27 @@ pub struct RevokeAccountCredentialsEvent<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ScheduleTakedownEvent<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_after: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub execute_after: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub execute_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_until: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub execute_until: Option<jacquard_common::types::string::Datetime>,
 }
 
-///View of a scheduled moderation action
+/// View of a scheduled moderation action
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -1349,55 +1480,67 @@ pub struct ScheduleTakedownEvent<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ScheduledActionView<'a> {
-    ///Type of action to be executed
+    /// Type of action to be executed
     #[serde(borrow)]
+    #[builder(into)]
     pub action: jacquard_common::CowStr<'a>,
-    ///When the scheduled action was created
+    /// When the scheduled action was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///DID of the user who created this scheduled action
+    /// DID of the user who created this scheduled action
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
-    ///Subject DID for the action
+    /// Subject DID for the action
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///Serialized event object that will be propagated to the event when performed
+    /// Serialized event object that will be propagated to the event when performed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub event_data: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///Earliest time to execute the action (for randomized scheduling)
+    pub event_data: Option<jacquard_common::types::value::Data<'a>>,
+    /// Earliest time to execute the action (for randomized scheduling)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_after: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Exact time to execute the action
+    #[builder(into)]
+    pub execute_after: Option<jacquard_common::types::string::Datetime>,
+    /// Exact time to execute the action
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Latest time to execute the action (for randomized scheduling)
+    #[builder(into)]
+    pub execute_at: Option<jacquard_common::types::string::Datetime>,
+    /// Latest time to execute the action (for randomized scheduling)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_until: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///ID of the moderation event created when action was successfully executed
+    #[builder(into)]
+    pub execute_until: Option<jacquard_common::types::string::Datetime>,
+    /// ID of the moderation event created when action was successfully executed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execution_event_id: std::option::Option<i64>,
-    ///Auto-incrementing row ID
+    #[builder(into)]
+    pub execution_event_id: Option<i64>,
+    /// Auto-incrementing row ID
     pub id: i64,
-    ///When the action was last attempted to be executed
+    /// When the action was last attempted to be executed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_executed_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Reason for the last execution failure
+    #[builder(into)]
+    pub last_executed_at: Option<jacquard_common::types::string::Datetime>,
+    /// Reason for the last execution failure
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub last_failure_reason: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether execution time should be randomized within the specified range
+    pub last_failure_reason: Option<jacquard_common::CowStr<'a>>,
+    /// Whether execution time should be randomized within the specified range
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub randomize_execution: std::option::Option<bool>,
-    ///Current status of the scheduled action
+    #[builder(into)]
+    pub randomize_execution: Option<bool>,
+    /// Current status of the scheduled action
     #[serde(borrow)]
+    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
-    ///When the scheduled action was last updated
+    /// When the scheduled action was last updated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub updated_at: Option<jacquard_common::types::string::Datetime>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1494,82 +1637,94 @@ impl jacquard_common::IntoStatic for SubjectReviewState<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubjectStatusView<'a> {
-    ///Statistics related to the account subject
+    /// Statistics related to the account subject
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub account_stats: std::option::Option<
-        crate::tools_ozone::moderation::AccountStats<'a>,
-    >,
-    ///Current age assurance state of the subject.
+    pub account_stats: Option<crate::tools_ozone::moderation::AccountStats<'a>>,
+    /// Current age assurance state of the subject.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub age_assurance_state: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether or not the last successful update to age assurance was made by the user or admin.
+    pub age_assurance_state: Option<jacquard_common::CowStr<'a>>,
+    /// Whether or not the last successful update to age assurance was made by the user or admin.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub age_assurance_updated_by: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///True indicates that the a previously taken moderator action was appealed against, by the author of the content. False indicates last appeal was resolved by moderators.
+    pub age_assurance_updated_by: Option<jacquard_common::CowStr<'a>>,
+    /// True indicates that the a previously taken moderator action was appealed against, by the author of the content. False indicates last appeal was resolved by moderators.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub appealed: std::option::Option<bool>,
-    ///Sticky comment on the subject.
+    #[builder(into)]
+    pub appealed: Option<bool>,
+    /// Sticky comment on the subject.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Timestamp referencing the first moderation status impacting event was emitted on the subject
+    pub comment: Option<jacquard_common::CowStr<'a>>,
+    /// Timestamp referencing the first moderation status impacting event was emitted on the subject
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub hosting: std::option::Option<SubjectStatusViewHosting<'a>>,
+    pub hosting: Option<SubjectStatusViewHosting<'a>>,
     pub id: i64,
-    ///Timestamp referencing when the author of the subject appealed a moderation action
+    /// Timestamp referencing when the author of the subject appealed a moderation action
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_appealed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub last_appealed_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_reported_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub last_reported_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_reviewed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub last_reviewed_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub last_reviewed_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub last_reviewed_by: Option<jacquard_common::types::string::Did<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mute_reporting_until: std::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
+    #[builder(into)]
+    pub mute_reporting_until: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mute_until: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Numeric value representing the level of priority. Higher score means higher priority.
+    #[builder(into)]
+    pub mute_until: Option<jacquard_common::types::string::Datetime>,
+    /// Numeric value representing the level of priority. Higher score means higher priority.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub priority_score: std::option::Option<i64>,
-    ///Statistics related to the record subjects authored by the subject's account
+    #[builder(into)]
+    pub priority_score: Option<i64>,
+    /// Statistics related to the record subjects authored by the subject's account
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub records_stats: std::option::Option<
-        crate::tools_ozone::moderation::RecordsStats<'a>,
-    >,
+    pub records_stats: Option<crate::tools_ozone::moderation::RecordsStats<'a>>,
     #[serde(borrow)]
     pub review_state: crate::tools_ozone::moderation::SubjectReviewState<'a>,
     #[serde(borrow)]
     pub subject: SubjectStatusViewSubject<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub subject_blob_cids: std::option::Option<
-        Vec<jacquard_common::types::string::Cid<'a>>,
-    >,
+    pub subject_blob_cids: Option<Vec<jacquard_common::types::string::Cid<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub subject_repo_handle: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub subject_repo_handle: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub suspend_until: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub suspend_until: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub takendown: std::option::Option<bool>,
-    ///Timestamp referencing when the last update was made to the moderation status of the subject
+    #[builder(into)]
+    pub takendown: Option<bool>,
+    /// Timestamp referencing when the last update was made to the moderation status of the subject
     pub updated_at: jacquard_common::types::string::Datetime,
 }
 
@@ -1613,7 +1768,7 @@ pub enum SubjectStatusViewSubject<'a> {
     MessageRef(Box<crate::chat_bsky::convo::MessageRef<'a>>),
 }
 
-///Detailed view of a subject. For record subjects, the author's repo and profile will be returned.
+/// Detailed view of a subject. For record subjects, the author's repo and profile will be returned.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -1622,33 +1777,35 @@ pub enum SubjectStatusViewSubject<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubjectView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub profile: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub profile: Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub record: std::option::Option<
-        crate::tools_ozone::moderation::RecordViewDetail<'a>,
-    >,
+    pub record: Option<crate::tools_ozone::moderation::RecordViewDetail<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub repo: std::option::Option<crate::tools_ozone::moderation::RepoViewDetail<'a>>,
+    pub repo: Option<crate::tools_ozone::moderation::RepoViewDetail<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub status: std::option::Option<
-        crate::tools_ozone::moderation::SubjectStatusView<'a>,
-    >,
+    pub status: Option<crate::tools_ozone::moderation::SubjectStatusView<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub subject: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub r#type: crate::com_atproto::moderation::SubjectType<'a>,
 }
 
-///Moderation event timeline event for a PLC create operation
+/// Moderation event timeline event for a PLC create operation
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -1666,7 +1823,7 @@ impl std::fmt::Display for TimelineEventPlcCreate {
     }
 }
 
-///Moderation event timeline event for generic PLC operation
+/// Moderation event timeline event for generic PLC operation
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -1684,7 +1841,7 @@ impl std::fmt::Display for TimelineEventPlcOperation {
     }
 }
 
-///Moderation event timeline event for a PLC tombstone operation
+/// Moderation event timeline event for a PLC tombstone operation
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -1710,7 +1867,8 @@ impl std::fmt::Display for TimelineEventPlcTombstone {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VideoDetails<'a> {

@@ -34,7 +34,7 @@ pub struct GetClips<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetClipsOutput<'a> {
-    ///An array of hydrated clip views
+    /// An array of hydrated clip views
     #[serde(borrow)]
     pub clips: Vec<crate::social_clippr::feed::ClipView<'a>>,
 }

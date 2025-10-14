@@ -1,5 +1,63 @@
 # Changelog
 
+## [0.5.2] - 2025-10-14
+
+### Added
+
+**Service Auth** (`jacquard-axum`, `jacquard-common`)
+- Full service authentication implementation for inter-service JWT verification
+- `ExtractServiceAuth` Axum extractor for validating service auth tokens
+- JWT parsing and signature verification (ES256, ES256K)
+- Service auth claims validation (issuer, audience, expiration, method binding)
+- DID document resolution for signing key verification
+- Optional replay protection via `ReplayTracker` trait
+- See CLAUDE.md for detailed implementation notes
+
+**XrpcRequest derive macro** (`jacquard-derive`)
+- `#[derive(XrpcRequest)]` for custom XRPC endpoints
+- Automatically generates response marker struct and trait implementations
+- Supports both client-side (`XrpcRequest`) and server-side (`XrpcEndpoint`) with `server` flag
+- Simplifies defining custom XRPC endpoints outside of generated API
+
+**Builder integration** (`jacquard-derive`)
+- `#[lexicon]` macro now detects `bon::Builder` derive
+- Automatically adds `#[builder(default)]` to `extra_data` field when Builder is present
+- Makes `extra_data` optional in generated builders
+
+### Fixed
+
+**String deserialization** (`jacquard-common`)
+- All string types (Did, Handle, Nsid, etc.) now properly handle URL-encoded values
+- `serde_html_form` correctly decodes percent-encoded characters during deserialization
+- Fixes issues with DIDs and other identifiers containing colons in query parameters
+
+**Axum extractor** (`jacquard-axum`)
+- Removed unnecessary URL-decoding workaround (now handled by improved string deserialization)
+- Added comprehensive tests for URL-encoded query parameters
+- Cleaner implementation with proper delegation to serde
+
+### Changed
+
+**Dependencies**
+- Moved `clap` to dev-dependencies in `jacquard` (only used in examples)
+- Moved `axum-macros` and `tracing-subscriber` to dev-dependencies in `jacquard-axum` (only used in examples)
+- Removed unused dependencies: `urlencoding` (jacquard, jacquard-axum), `uuid` (jacquard-oauth), `serde_with` (jacquard-common)
+- Removed `fancy` feature from `jacquard` (design smell for library crates)
+- Moved various proc-macro crate dependencies to dev-dependencies in `jacquard-derive`
+
+**Development tooling**
+- Improved justfile with dynamic example discovery
+- `just examples` now auto-discovers all examples
+- `just example <name>` auto-detects package without manual configuration
+- Better error messages when examples not found
+
+**Documentation** (`jacquard`, `jacquard-common`)
+- Improved lifetime pattern explanations
+- Better documentation of zero-copy deserialization approach
+- Links to docs.rs for generated documentation
+
+---
+
 ## [0.5.1] - 2025-10-13
 
 ### Fixed

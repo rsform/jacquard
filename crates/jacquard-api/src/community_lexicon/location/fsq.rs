@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A physical location contained in the Foursquare Open Source Places dataset.
+/// A physical location contained in the Foursquare Open Source Places dataset.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,21 +14,26 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Fsq<'a> {
-    ///The unique identifier of a Foursquare POI.
+    /// The unique identifier of a Foursquare POI.
     #[serde(borrow)]
+    #[builder(into)]
     pub fsq_place_id: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub latitude: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub latitude: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub longitude: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The name of the location.
+    pub longitude: Option<jacquard_common::CowStr<'a>>,
+    /// The name of the location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: Option<jacquard_common::CowStr<'a>>,
 }

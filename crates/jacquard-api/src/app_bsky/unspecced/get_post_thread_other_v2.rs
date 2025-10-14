@@ -37,7 +37,7 @@ pub struct GetPostThreadOtherV2<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThreadOtherV2Output<'a> {
-    ///A flat list of other thread items. The depth of each item is indicated by the depth property inside the item.
+    /// A flat list of other thread items. The depth of each item is indicated by the depth property inside the item.
     #[serde(borrow)]
     pub thread: Vec<jacquard_common::types::value::Data<'a>>,
 }
@@ -76,11 +76,12 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadOtherV2Request {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItem<'a> {
-    ///The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
+    /// The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
     pub depth: i64,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,

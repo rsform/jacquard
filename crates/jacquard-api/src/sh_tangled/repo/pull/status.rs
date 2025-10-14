@@ -17,14 +17,16 @@ pub mod open;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Status<'a> {
     #[serde(borrow)]
     pub pull: jacquard_common::types::string::AtUri<'a>,
-    ///status of the pull request
+    /// status of the pull request
     #[serde(borrow)]
+    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
 }
 

@@ -20,24 +20,26 @@
 #[builder(start_fn = new)]
 pub struct SignPlcOperation<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub also_known_as: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub rotation_keys: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub services: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///A token received through com.atproto.identity.requestPlcOperationSignature
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub token: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub verification_methods: std::option::Option<
-        jacquard_common::types::value::Data<'a>,
-    >,
+    pub also_known_as: Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub rotation_keys: Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub services: Option<jacquard_common::types::value::Data<'a>>,
+    /// A token received through com.atproto.identity.requestPlcOperationSignature
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub token: Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub verification_methods: Option<jacquard_common::types::value::Data<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
@@ -59,7 +61,7 @@ pub struct SignPlcOperation<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SignPlcOperationOutput<'a> {
-    ///A signed DID PLC operation.
+    /// A signed DID PLC operation.
     #[serde(borrow)]
     pub operation: jacquard_common::types::value::Data<'a>,
 }

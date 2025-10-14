@@ -13,16 +13,20 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct External<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub description: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub thumb: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
+    pub thumb: Option<jacquard_common::types::blob::Blob<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
@@ -36,7 +40,8 @@ pub struct External<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ExternalRecord<'a> {
@@ -52,7 +57,8 @@ pub struct ExternalRecord<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct View<'a> {
@@ -68,16 +74,20 @@ pub struct View<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ViewExternal<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub description: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub thumb: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub thumb: Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,

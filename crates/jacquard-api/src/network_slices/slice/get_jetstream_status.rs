@@ -30,7 +30,7 @@ pub struct GetJetstreamStatus {}
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetJetstreamStatusOutput<'a> {
-    ///Whether Jetstream is currently connected and receiving events
+    /// Whether Jetstream is currently connected and receiving events
     pub connected: bool,
 }
 

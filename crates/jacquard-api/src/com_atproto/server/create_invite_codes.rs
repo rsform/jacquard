@@ -13,11 +13,13 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AccountCodes<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub account: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub codes: Vec<jacquard_common::CowStr<'a>>,
@@ -39,8 +41,9 @@ pub struct AccountCodes<'a> {
 pub struct CreateInviteCodes<'a> {
     pub code_count: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub for_accounts: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    pub for_accounts: Option<Vec<jacquard_common::types::string::Did<'a>>>,
     pub use_count: i64,
     #[serde(flatten)]
     #[serde(borrow)]

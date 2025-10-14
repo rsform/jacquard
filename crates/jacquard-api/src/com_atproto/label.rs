@@ -8,7 +8,7 @@
 pub mod query_labels;
 pub mod subscribe_labels;
 
-///Metadata tag on an atproto resource (eg, repo or record).
+/// Metadata tag on an atproto resource (eg, repo or record).
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -17,37 +17,44 @@ pub mod subscribe_labels;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Label<'a> {
-    ///Optionally, CID specifying the specific version of 'uri' resource this label applies to.
+    /// Optionally, CID specifying the specific version of 'uri' resource this label applies to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    ///Timestamp when this label was created.
+    pub cid: Option<jacquard_common::types::string::Cid<'a>>,
+    /// Timestamp when this label was created.
     pub cts: jacquard_common::types::string::Datetime,
-    ///Timestamp at which this label expires (no longer applies).
+    /// Timestamp at which this label expires (no longer applies).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub exp: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///If true, this is a negation label, overwriting a previous label.
+    #[builder(into)]
+    pub exp: Option<jacquard_common::types::string::Datetime>,
+    /// If true, this is a negation label, overwriting a previous label.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub neg: std::option::Option<bool>,
-    ///Signature of dag-cbor encoded label.
+    #[builder(into)]
+    pub neg: Option<bool>,
+    /// Signature of dag-cbor encoded label.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sig: std::option::Option<bytes::Bytes>,
-    ///DID of the actor who created this label.
+    #[builder(into)]
+    pub sig: Option<bytes::Bytes>,
+    /// DID of the actor who created this label.
     #[serde(borrow)]
     pub src: jacquard_common::types::string::Did<'a>,
-    ///AT URI of the record, repository (account), or other resource that this label applies to.
+    /// AT URI of the record, repository (account), or other resource that this label applies to.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
-    ///The short string name of the value or type of this label.
+    /// The short string name of the value or type of this label.
     #[serde(borrow)]
+    #[builder(into)]
     pub val: jacquard_common::CowStr<'a>,
-    ///The AT Protocol version of the label object.
+    /// The AT Protocol version of the label object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ver: std::option::Option<i64>,
+    #[builder(into)]
+    pub ver: Option<i64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -171,7 +178,7 @@ impl jacquard_common::IntoStatic for LabelValue<'_> {
     }
 }
 
-///Declares a label value and its expected interpretations and behaviors.
+/// Declares a label value and its expected interpretations and behaviors.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -180,31 +187,37 @@ impl jacquard_common::IntoStatic for LabelValue<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelValueDefinition<'a> {
-    ///Does the user need to have adult content enabled in order to configure this label?
+    /// Does the user need to have adult content enabled in order to configure this label?
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub adult_only: std::option::Option<bool>,
-    ///What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing.
+    #[builder(into)]
+    pub adult_only: Option<bool>,
+    /// What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing.
     #[serde(borrow)]
+    #[builder(into)]
     pub blurs: jacquard_common::CowStr<'a>,
-    ///The default setting for this label.
+    /// The default setting for this label.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub default_setting: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The value of the label being defined. Must only include lowercase ascii and the '-' character ([a-z-]+).
+    pub default_setting: Option<jacquard_common::CowStr<'a>>,
+    /// The value of the label being defined. Must only include lowercase ascii and the '-' character ([a-z-]+).
     #[serde(borrow)]
+    #[builder(into)]
     pub identifier: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub locales: Vec<crate::com_atproto::label::LabelValueDefinitionStrings<'a>>,
-    ///How should a client visually convey this label? 'inform' means neutral and informational; 'alert' means negative and warning; 'none' means show nothing.
+    /// How should a client visually convey this label? 'inform' means neutral and informational; 'alert' means negative and warning; 'none' means show nothing.
     #[serde(borrow)]
+    #[builder(into)]
     pub severity: jacquard_common::CowStr<'a>,
 }
 
-///Strings which describe the label in the UI, localized into a specific language.
+/// Strings which describe the label in the UI, localized into a specific language.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -213,21 +226,24 @@ pub struct LabelValueDefinition<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelValueDefinitionStrings<'a> {
-    ///A longer description of what the label means and why it might be applied.
+    /// A longer description of what the label means and why it might be applied.
     #[serde(borrow)]
+    #[builder(into)]
     pub description: jacquard_common::CowStr<'a>,
-    ///The code of the language these strings are written in.
+    /// The code of the language these strings are written in.
     pub lang: jacquard_common::types::string::Language,
-    ///A short human-readable name for the label.
+    /// A short human-readable name for the label.
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
 }
 
-///Metadata tag on an atproto record, published by the author within the record. Note that schemas should use #selfLabels, not #selfLabel.
+/// Metadata tag on an atproto record, published by the author within the record. Note that schemas should use #selfLabels, not #selfLabel.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -236,16 +252,18 @@ pub struct LabelValueDefinitionStrings<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SelfLabel<'a> {
-    ///The short string name of the value or type of this label.
+    /// The short string name of the value or type of this label.
     #[serde(borrow)]
+    #[builder(into)]
     pub val: jacquard_common::CowStr<'a>,
 }
 
-///Metadata tags on an atproto record, published by the author within the record.
+/// Metadata tags on an atproto record, published by the author within the record.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -254,7 +272,8 @@ pub struct SelfLabel<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SelfLabels<'a> {

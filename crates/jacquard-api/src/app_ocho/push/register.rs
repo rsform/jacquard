@@ -19,7 +19,7 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct Register<'a> {
-    ///The expo push token
+    /// The expo push token
     #[serde(borrow)]
     #[builder(into)]
     pub push_token: jacquard_common::CowStr<'a>,
@@ -44,7 +44,7 @@ pub struct Register<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RegisterOutput<'a> {
-    ///Whether the token was successfully registered.
+    /// Whether the token was successfully registered.
     pub success: bool,
 }
 

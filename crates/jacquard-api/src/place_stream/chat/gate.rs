@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record defining a single gated chat message.
+/// Record defining a single gated chat message.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,11 +14,12 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Gate<'a> {
-    ///URI of the hidden chat message.
+    /// URI of the hidden chat message.
     #[serde(borrow)]
     pub hidden_message: jacquard_common::types::string::AtUri<'a>,
 }

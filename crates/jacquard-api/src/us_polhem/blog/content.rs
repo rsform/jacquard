@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record describing a page content block.
+/// Record describing a page content block.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,17 +14,21 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Content<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub images: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub images: Option<Vec<jacquard_common::types::value::Data<'a>>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub slug: jacquard_common::CowStr<'a>,
 }
 

@@ -31,28 +31,32 @@ pub mod update_read;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConvoView<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub last_message: std::option::Option<ConvoViewLastMessage<'a>>,
+    pub last_message: Option<ConvoViewLastMessage<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub last_reaction: std::option::Option<
-        crate::chat_bsky::convo::MessageAndReactionView<'a>,
-    >,
+    pub last_reaction: Option<crate::chat_bsky::convo::MessageAndReactionView<'a>>,
     #[serde(borrow)]
     pub members: Vec<crate::chat_bsky::actor::ProfileViewBasic<'a>>,
     pub muted: bool,
     #[serde(borrow)]
+    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: Option<jacquard_common::CowStr<'a>>,
     pub unread_count: i64,
 }
 
@@ -83,13 +87,16 @@ pub enum ConvoViewLastMessage<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeletedMessageView<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub sender: crate::chat_bsky::convo::MessageViewSender<'a>,
@@ -104,13 +111,16 @@ pub struct DeletedMessageView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogAcceptConvo<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -122,17 +132,20 @@ pub struct LogAcceptConvo<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogAddReaction<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub message: LogAddReactionMessage<'a>,
     #[serde(borrow)]
     pub reaction: crate::chat_bsky::convo::ReactionView<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -163,13 +176,16 @@ pub enum LogAddReactionMessage<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogBeginConvo<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -181,15 +197,18 @@ pub struct LogBeginConvo<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogCreateMessage<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub message: LogCreateMessageMessage<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -220,15 +239,18 @@ pub enum LogCreateMessageMessage<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogDeleteMessage<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub message: LogDeleteMessageMessage<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -259,13 +281,16 @@ pub enum LogDeleteMessageMessage<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogLeaveConvo<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -277,13 +302,16 @@ pub struct LogLeaveConvo<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogMuteConvo<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -295,15 +323,18 @@ pub struct LogMuteConvo<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogReadMessage<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub message: LogReadMessageMessage<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -334,17 +365,20 @@ pub enum LogReadMessageMessage<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogRemoveReaction<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub message: LogRemoveReactionMessage<'a>,
     #[serde(borrow)]
     pub reaction: crate::chat_bsky::convo::ReactionView<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -375,13 +409,16 @@ pub enum LogRemoveReactionMessage<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogUnmuteConvo<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
 }
 
@@ -393,7 +430,8 @@ pub struct LogUnmuteConvo<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageAndReactionView<'a> {
@@ -411,18 +449,22 @@ pub struct MessageAndReactionView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageInput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub embed: std::option::Option<crate::app_bsky::embed::record::Record<'a>>,
-    ///Annotations of text (mentions, URLs, hashtags, etc)
+    pub embed: Option<crate::app_bsky::embed::record::Record<'a>>,
+    /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
 }
 
@@ -434,15 +476,18 @@ pub struct MessageInput<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageRef<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub message_id: jacquard_common::CowStr<'a>,
 }
 
@@ -454,29 +499,36 @@ pub struct MessageRef<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub embed: std::option::Option<crate::app_bsky::embed::record::View<'a>>,
-    ///Annotations of text (mentions, URLs, hashtags, etc)
+    pub embed: Option<crate::app_bsky::embed::record::View<'a>>,
+    /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
-    ///Reactions to this message, in ascending order of creation time.
+    /// Reactions to this message, in ascending order of creation time.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reactions: std::option::Option<Vec<crate::chat_bsky::convo::ReactionView<'a>>>,
+    pub reactions: Option<Vec<crate::chat_bsky::convo::ReactionView<'a>>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub sender: crate::chat_bsky::convo::MessageViewSender<'a>,
     pub sent_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
+    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
 }
 
@@ -488,7 +540,8 @@ pub struct MessageView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageViewSender<'a> {
@@ -504,7 +557,8 @@ pub struct MessageViewSender<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReactionView<'a> {
@@ -512,6 +566,7 @@ pub struct ReactionView<'a> {
     #[serde(borrow)]
     pub sender: crate::chat_bsky::convo::ReactionViewSender<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
 }
 
@@ -523,7 +578,8 @@ pub struct ReactionView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReactionViewSender<'a> {

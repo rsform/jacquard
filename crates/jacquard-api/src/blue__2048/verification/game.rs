@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A record that holds a verification of a game record saying the owner of the repo has verified that it is a valid game played.
+/// A record that holds a verification of a game record saying the owner of the repo has verified that it is a valid game played.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,18 +14,19 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Game<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///This is the record that holds the publicly verifiable signature of a game record
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    /// This is the record that holds the publicly verifiable signature of a game record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub verified_ref: std::option::Option<
-        crate::blue__2048::verification::VerificationRef<'a>,
-    >,
+    pub verified_ref: Option<crate::blue__2048::verification::VerificationRef<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

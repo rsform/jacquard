@@ -25,7 +25,8 @@ pub mod update_seen;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ActivitySubscription<'a> {
@@ -41,11 +42,13 @@ pub struct ActivitySubscription<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ChatPreference<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub include: jacquard_common::CowStr<'a>,
     pub push: bool,
 }
@@ -58,11 +61,13 @@ pub struct ChatPreference<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FilterablePreference<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub include: jacquard_common::CowStr<'a>,
     pub list: bool,
     pub push: bool,
@@ -76,7 +81,8 @@ pub struct FilterablePreference<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Preference<'a> {
@@ -92,7 +98,8 @@ pub struct Preference<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Preferences<'a> {
@@ -132,11 +139,12 @@ pub struct Preferences<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecordDeleted<'a> {}
-///Object used to store activity subscription data in stash.
+/// Object used to store activity subscription data in stash.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -145,7 +153,8 @@ pub struct RecordDeleted<'a> {}
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubjectActivitySubscription<'a> {

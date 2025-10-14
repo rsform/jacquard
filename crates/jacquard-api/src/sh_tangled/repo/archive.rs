@@ -35,7 +35,7 @@ pub struct Archive<'a> {
     pub repo: jacquard_common::CowStr<'a>,
 }
 
-///Binary archive data
+/// Binary archive data
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -63,16 +63,16 @@ pub struct ArchiveOutput<'a> {}
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ArchiveError<'a> {
-    ///Repository not found or access denied
+    /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
     RepoNotFound(std::option::Option<String>),
-    ///Git reference not found
+    /// Git reference not found
     #[serde(rename = "RefNotFound")]
     RefNotFound(std::option::Option<String>),
-    ///Invalid request parameters
+    /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
     InvalidRequest(std::option::Option<String>),
-    ///Failed to create archive
+    /// Failed to create archive
     #[serde(rename = "ArchiveError")]
     ArchiveError(std::option::Option<String>),
 }

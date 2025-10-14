@@ -51,9 +51,9 @@ pub struct GetPostThreadV2<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThreadV2Output<'a> {
-    ///Whether this thread has additional replies. If true, a call can be made to the `getPostThreadOtherV2` endpoint to retrieve them.
+    /// Whether this thread has additional replies. If true, a call can be made to the `getPostThreadOtherV2` endpoint to retrieve them.
     pub has_other_replies: bool,
-    ///A flat list of thread items. The depth of each item is indicated by the depth property inside the item.
+    /// A flat list of thread items. The depth of each item is indicated by the depth property inside the item.
     #[serde(borrow)]
     pub thread: Vec<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -95,11 +95,12 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadV2Request {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItem<'a> {
-    ///The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
+    /// The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
     pub depth: i64,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,

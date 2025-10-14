@@ -13,24 +13,29 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LastCommit<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub author: std::option::Option<crate::sh_tangled::repo::blob::Signature<'a>>,
-    ///Commit hash
+    pub author: Option<crate::sh_tangled::repo::blob::Signature<'a>>,
+    /// Commit hash
     #[serde(borrow)]
+    #[builder(into)]
     pub hash: jacquard_common::CowStr<'a>,
-    ///Commit message
+    /// Commit message
     #[serde(borrow)]
+    #[builder(into)]
     pub message: jacquard_common::CowStr<'a>,
-    ///Short commit hash
+    /// Short commit hash
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub short_hash: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Commit timestamp
+    pub short_hash: Option<jacquard_common::CowStr<'a>>,
+    /// Commit timestamp
     pub when: jacquard_common::types::string::Datetime,
 }
 
@@ -73,30 +78,30 @@ pub struct Blob<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlobOutput<'a> {
-    ///File content (base64 encoded for binary files)
+    /// File content (base64 encoded for binary files)
     #[serde(borrow)]
     pub content: jacquard_common::CowStr<'a>,
-    ///Content encoding
+    /// Content encoding
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub encoding: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether the file is binary
+    /// Whether the file is binary
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub is_binary: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub last_commit: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///MIME type of the file
+    /// MIME type of the file
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub mime_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The file path
+    /// The file path
     #[serde(borrow)]
     pub path: jacquard_common::CowStr<'a>,
-    ///The git reference used
+    /// The git reference used
     #[serde(borrow)]
     pub r#ref: jacquard_common::CowStr<'a>,
-    ///File size in bytes
+    /// File size in bytes
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub size: std::option::Option<i64>,
 }
@@ -116,16 +121,16 @@ pub struct BlobOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum BlobError<'a> {
-    ///Repository not found or access denied
+    /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
     RepoNotFound(std::option::Option<String>),
-    ///Git reference not found
+    /// Git reference not found
     #[serde(rename = "RefNotFound")]
     RefNotFound(std::option::Option<String>),
-    ///File not found at the specified path
+    /// File not found at the specified path
     #[serde(rename = "FileNotFound")]
     FileNotFound(std::option::Option<String>),
-    ///Invalid request parameters
+    /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
     InvalidRequest(std::option::Option<String>),
 }
@@ -200,16 +205,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for BlobRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Signature<'a> {
-    ///Author email
+    /// Author email
     #[serde(borrow)]
+    #[builder(into)]
     pub email: jacquard_common::CowStr<'a>,
-    ///Author name
+    /// Author name
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Author timestamp
+    /// Author timestamp
     pub when: jacquard_common::types::string::Datetime,
 }

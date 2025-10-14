@@ -61,7 +61,7 @@ pub struct GetEntryMetadataByNameOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetEntryMetadataByNameError<'a> {
-    ///If the associated name isn't registered in the author's repo, this error is returned
+    /// If the associated name isn't registered in the author's repo, this error is returned
     #[serde(rename = "NotFound")]
     NotFound(std::option::Option<String>),
 }

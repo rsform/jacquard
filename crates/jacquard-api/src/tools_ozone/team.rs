@@ -18,29 +18,36 @@ pub mod update_member;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Member<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disabled: std::option::Option<bool>,
+    #[builder(into)]
+    pub disabled: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub last_updated_by: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub last_updated_by: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub profile: std::option::Option<crate::app_bsky::actor::ProfileViewDetailed<'a>>,
+    pub profile: Option<crate::app_bsky::actor::ProfileViewDetailed<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub role: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub updated_at: Option<jacquard_common::types::string::Datetime>,
 }
 
-///Admin role. Highest level of access, can perform all actions.
+/// Admin role. Highest level of access, can perform all actions.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -58,7 +65,7 @@ impl std::fmt::Display for RoleAdmin {
     }
 }
 
-///Moderator role. Can perform most actions.
+/// Moderator role. Can perform most actions.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -76,7 +83,7 @@ impl std::fmt::Display for RoleModerator {
     }
 }
 
-///Triage role. Mostly intended for monitoring and escalating issues.
+/// Triage role. Mostly intended for monitoring and escalating issues.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -94,7 +101,7 @@ impl std::fmt::Display for RoleTriage {
     }
 }
 
-///Verifier role. Only allowed to issue verifications.
+/// Verifier role. Only allowed to issue verifications.
 #[derive(
     serde::Serialize,
     serde::Deserialize,

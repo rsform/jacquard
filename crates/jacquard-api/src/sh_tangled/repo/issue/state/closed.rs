@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///closed issue
+/// closed issue
 #[derive(
     serde::Serialize,
     serde::Deserialize,

@@ -17,28 +17,30 @@ pub mod profile;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageView<'a> {
     #[serde(borrow)]
     pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub chat_profile: std::option::Option<
-        crate::place_stream::chat::profile::Profile<'a>,
-    >,
+    pub chat_profile: Option<crate::place_stream::chat::profile::Profile<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    ///If true, this message has been deleted or labeled and should be cleared from the cache
+    /// If true, this message has been deleted or labeled and should be cleared from the cache
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deleted: std::option::Option<bool>,
+    #[builder(into)]
+    pub deleted: Option<bool>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reply_to: std::option::Option<MessageViewReplyTo<'a>>,
+    pub reply_to: Option<MessageViewReplyTo<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }

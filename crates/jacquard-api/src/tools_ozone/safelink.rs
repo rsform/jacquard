@@ -92,7 +92,7 @@ impl jacquard_common::IntoStatic for ActionType<'_> {
     }
 }
 
-///An event for URL safety decisions
+/// An event for URL safety decisions
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -101,30 +101,33 @@ impl jacquard_common::IntoStatic for ActionType<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
     #[serde(borrow)]
     pub action: crate::tools_ozone::safelink::ActionType<'a>,
-    ///Optional comment about the decision
+    /// Optional comment about the decision
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    ///DID of the user who created this rule
+    /// DID of the user who created this rule
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
     pub event_type: crate::tools_ozone::safelink::EventType<'a>,
-    ///Auto-incrementing row ID
+    /// Auto-incrementing row ID
     pub id: i64,
     #[serde(borrow)]
     pub pattern: crate::tools_ozone::safelink::PatternType<'a>,
     #[serde(borrow)]
     pub reason: crate::tools_ozone::safelink::ReasonType<'a>,
-    ///The URL that this rule applies to
+    /// The URL that this rule applies to
     #[serde(borrow)]
+    #[builder(into)]
     pub url: jacquard_common::CowStr<'a>,
 }
 
@@ -371,7 +374,7 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
     }
 }
 
-///Input for creating a URL safety rule
+/// Input for creating a URL safety rule
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -380,28 +383,31 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UrlRule<'a> {
     #[serde(borrow)]
     pub action: crate::tools_ozone::safelink::ActionType<'a>,
-    ///Optional comment about the decision
+    /// Optional comment about the decision
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Timestamp when the rule was created
+    pub comment: Option<jacquard_common::CowStr<'a>>,
+    /// Timestamp when the rule was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///DID of the user added the rule.
+    /// DID of the user added the rule.
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
     pub pattern: crate::tools_ozone::safelink::PatternType<'a>,
     #[serde(borrow)]
     pub reason: crate::tools_ozone::safelink::ReasonType<'a>,
-    ///Timestamp when the rule was last updated
+    /// Timestamp when the rule was last updated
     pub updated_at: jacquard_common::types::string::Datetime,
-    ///The URL or domain to apply the rule to
+    /// The URL or domain to apply the rule to
     #[serde(borrow)]
+    #[builder(into)]
     pub url: jacquard_common::CowStr<'a>,
 }

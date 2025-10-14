@@ -7,7 +7,7 @@
 
 pub mod create_report;
 
-///Appeal a previously taken moderation action
+/// Appeal a previously taken moderation action
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -25,7 +25,7 @@ impl std::fmt::Display for ReasonAppeal {
     }
 }
 
-///Misleading identity, affiliation, or content. Prefer new lexicon definition `tools.ozone.report.defs#reasonMisleadingOther`.
+/// Misleading identity, affiliation, or content. Prefer new lexicon definition `tools.ozone.report.defs#reasonMisleadingOther`.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -43,7 +43,7 @@ impl std::fmt::Display for ReasonMisleading {
     }
 }
 
-///Reports not falling under another report category. Prefer new lexicon definition `tools.ozone.report.defs#reasonOther`.
+/// Reports not falling under another report category. Prefer new lexicon definition `tools.ozone.report.defs#reasonOther`.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -61,7 +61,7 @@ impl std::fmt::Display for ReasonOther {
     }
 }
 
-///Rude, harassing, explicit, or otherwise unwelcoming behavior. Prefer new lexicon definition `tools.ozone.report.defs#reasonHarassmentOther`.
+/// Rude, harassing, explicit, or otherwise unwelcoming behavior. Prefer new lexicon definition `tools.ozone.report.defs#reasonHarassmentOther`.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -79,7 +79,7 @@ impl std::fmt::Display for ReasonRude {
     }
 }
 
-///Unwanted or mislabeled sexual content. Prefer new lexicon definition `tools.ozone.report.defs#reasonSexualUnlabeled`.
+/// Unwanted or mislabeled sexual content. Prefer new lexicon definition `tools.ozone.report.defs#reasonSexualUnlabeled`.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -97,7 +97,7 @@ impl std::fmt::Display for ReasonSexual {
     }
 }
 
-///Spam: frequent unwanted promotion, replies, mentions. Prefer new lexicon definition `tools.ozone.report.defs#reasonMisleadingSpam`.
+/// Spam: frequent unwanted promotion, replies, mentions. Prefer new lexicon definition `tools.ozone.report.defs#reasonMisleadingSpam`.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -792,7 +792,7 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
     }
 }
 
-///Direct violation of server rules, laws, terms of service. Prefer new lexicon definition `tools.ozone.report.defs#reasonRuleOther`.
+/// Direct violation of server rules, laws, terms of service. Prefer new lexicon definition `tools.ozone.report.defs#reasonRuleOther`.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -810,7 +810,7 @@ impl std::fmt::Display for ReasonViolation {
     }
 }
 
-///Tag describing a type of subject that might be reported.
+/// Tag describing a type of subject that might be reported.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SubjectType<'a> {
     Account,

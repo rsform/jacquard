@@ -19,7 +19,7 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct RequestCrawl<'a> {
-    ///Hostname of the current service (eg, PDS) that is requesting to be crawled.
+    /// Hostname of the current service (eg, PDS) that is requesting to be crawled.
     #[serde(borrow)]
     #[builder(into)]
     pub hostname: jacquard_common::CowStr<'a>,

@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A forum-wide announcement
+/// A forum-wide announcement
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,15 +14,18 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Announcement<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub body: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     pub expires_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
 }
 

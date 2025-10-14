@@ -78,11 +78,39 @@
 //! ```
 
 use proc_macro::TokenStream;
-use quote::{quote, format_ident};
-use syn::{
-    Data, DeriveInput, Fields, GenericParam, parse_macro_input,
-    Attribute, Ident, LitStr,
-};
+use quote::{format_ident, quote};
+use syn::{Attribute, Data, DeriveInput, Fields, GenericParam, Ident, LitStr, parse_macro_input};
+
+/// Helper function to check if a struct derives bon::Builder or Builder
+fn has_derive_builder(attrs: &[Attribute]) -> bool {
+    attrs.iter().any(|attr| {
+        if !attr.path().is_ident("derive") {
+            return false;
+        }
+
+        // Parse the derive attribute to check its contents
+        if let Ok(list) = attr.parse_args_with(
+            syn::punctuated::Punctuated::<syn::Path, syn::Token![,]>::parse_terminated,
+        ) {
+            list.iter().any(|path| {
+                // Check for "Builder" or "bon::Builder"
+                path.segments
+                    .last()
+                    .map(|seg| seg.ident == "Builder")
+                    .unwrap_or(false)
+            })
+        } else {
+            false
+        }
+    })
+}
+
+/// Check if struct name conflicts with types referenced by bon::Builder macro.
+/// bon::Builder generates code that uses unqualified `Option` and `Result`,
+/// so structs with these names cause compilation errors.
+fn conflicts_with_builder_macro(ident: &Ident) -> bool {
+    matches!(ident.to_string().as_str(), "Option" | "Result")
+}
 
 /// Attribute macro that adds an `extra_data` field to structs to capture unknown fields
 /// during deserialization.
@@ -114,6 +142,10 @@ pub fn lexicon(_attr: TokenStream, item: TokenStream) -> TokenStream {
                     .any(|f| f.ident.as_ref().map(|i| i == "extra_data").unwrap_or(false));
 
                 if !has_extra_data {
+                    // Check if the struct derives bon::Builder and doesn't conflict with builder macro
+                    let has_bon_builder = has_derive_builder(&input.attrs)
+                        && !conflicts_with_builder_macro(&input.ident);
+
                     // Determine the lifetime parameter to use
                     let lifetime = if let Some(lt) = input.generics.lifetimes().next() {
                         quote! { #lt }
@@ -123,24 +155,49 @@ pub fn lexicon(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
                     // Add the extra_data field with serde(borrow) if there's a lifetime
                     let new_field: syn::Field = if input.generics.lifetimes().next().is_some() {
-                        syn::parse_quote! {
-                            #[serde(flatten)]
-                            #[serde(borrow)]
-                            pub extra_data: ::std::collections::BTreeMap<
-                                ::jacquard_common::smol_str::SmolStr,
-                                ::jacquard_common::types::value::Data<#lifetime>
-                            >
+                        if has_bon_builder {
+                            syn::parse_quote! {
+                                #[serde(flatten)]
+                                #[serde(borrow)]
+                                #[builder(default)]
+                                pub extra_data: ::std::collections::BTreeMap<
+                                    ::jacquard_common::smol_str::SmolStr,
+                                    ::jacquard_common::types::value::Data<#lifetime>
+                                >
+                            }
+                        } else {
+                            syn::parse_quote! {
+                                #[serde(flatten)]
+                                #[serde(borrow)]
+                                pub extra_data: ::std::collections::BTreeMap<
+                                    ::jacquard_common::smol_str::SmolStr,
+                                    ::jacquard_common::types::value::Data<#lifetime>
+                                >
+                            }
                         }
                     } else {
                         // For types without lifetimes, make it optional to avoid lifetime conflicts
-                        syn::parse_quote! {
-                            #[serde(flatten)]
-                            #[serde(skip_serializing_if = "std::option::Option::is_none")]
-                            #[serde(default)]
-                            pub extra_data: std::option::Option<::std::collections::BTreeMap<
-                                ::jacquard_common::smol_str::SmolStr,
-                                ::jacquard_common::types::value::Data<'static>
-                            >>
+                        if has_bon_builder {
+                            syn::parse_quote! {
+                                #[serde(flatten)]
+                                #[serde(skip_serializing_if = "std::option::Option::is_none")]
+                                #[serde(default)]
+                                #[builder(default)]
+                                pub extra_data: Option<::std::collections::BTreeMap<
+                                    ::jacquard_common::smol_str::SmolStr,
+                                    ::jacquard_common::types::value::Data<'static>
+                                >>
+                            }
+                        } else {
+                            syn::parse_quote! {
+                                #[serde(flatten)]
+                                #[serde(skip_serializing_if = "std::option::Option::is_none")]
+                                #[serde(default)]
+                                pub extra_data:Option<::std::collections::BTreeMap<
+                                    ::jacquard_common::smol_str::SmolStr,
+                                    ::jacquard_common::types::value::Data<'static>
+                                >>
+                            }
                         }
                     };
                     fields.named.push(new_field);
@@ -421,7 +478,9 @@ fn xrpc_request_impl(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStrea
     let nsid = &attrs.nsid;
     let method = method_expr(&attrs.method);
     let output_ty = &attrs.output;
-    let error_ty = attrs.error.as_ref()
+    let error_ty = attrs
+        .error
+        .as_ref()
         .map(|e| quote! { #e })
         .unwrap_or_else(|| quote! { ::jacquard_common::xrpc::GenericError });
 
@@ -520,7 +579,10 @@ fn parse_xrpc_attrs(attrs: &[Attribute]) -> syn::Result<XrpcAttrs> {
                         method = Some(XrpcMethod::Procedure);
                         Ok(())
                     }
-                    other => Err(meta.error(format!("unknown method: {}, use Query or Procedure", other)))
+                    other => {
+                        Err(meta
+                            .error(format!("unknown method: {}, use Query or Procedure", other)))
+                    }
                 }
             } else if meta.path.is_ident("output") {
                 let value = meta.value()?;
@@ -539,18 +601,24 @@ fn parse_xrpc_attrs(attrs: &[Attribute]) -> syn::Result<XrpcAttrs> {
         })?;
     }
 
-    let nsid = nsid.ok_or_else(|| syn::Error::new(
-        proc_macro2::Span::call_site(),
-        "missing required `nsid` attribute"
-    ))?;
-    let method = method.ok_or_else(|| syn::Error::new(
-        proc_macro2::Span::call_site(),
-        "missing required `method` attribute"
-    ))?;
-    let output = output.ok_or_else(|| syn::Error::new(
-        proc_macro2::Span::call_site(),
-        "missing required `output` attribute"
-    ))?;
+    let nsid = nsid.ok_or_else(|| {
+        syn::Error::new(
+            proc_macro2::Span::call_site(),
+            "missing required `nsid` attribute",
+        )
+    })?;
+    let method = method.ok_or_else(|| {
+        syn::Error::new(
+            proc_macro2::Span::call_site(),
+            "missing required `method` attribute",
+        )
+    })?;
+    let output = output.ok_or_else(|| {
+        syn::Error::new(
+            proc_macro2::Span::call_site(),
+            "missing required `output` attribute",
+        )
+    })?;
 
     Ok(XrpcAttrs {
         nsid,
@@ -564,6 +632,8 @@ fn parse_xrpc_attrs(attrs: &[Attribute]) -> syn::Result<XrpcAttrs> {
 fn method_expr(method: &XrpcMethod) -> proc_macro2::TokenStream {
     match method {
         XrpcMethod::Query => quote! { ::jacquard_common::xrpc::XrpcMethod::Query },
-        XrpcMethod::Procedure => quote! { ::jacquard_common::xrpc::XrpcMethod::Procedure("application/json") },
+        XrpcMethod::Procedure => {
+            quote! { ::jacquard_common::xrpc::XrpcMethod::Procedure("application/json") }
+        }
     }
 }

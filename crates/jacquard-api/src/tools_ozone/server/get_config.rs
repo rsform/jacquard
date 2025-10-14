@@ -29,7 +29,7 @@ pub struct GetConfigOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub pds: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///The did of the verifier used for verification.
+    /// The did of the verifier used for verification.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub verifier_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
@@ -84,13 +84,15 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetConfigRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ServiceConfig<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub url: Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -101,11 +103,13 @@ pub struct ServiceConfig<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ViewerConfig<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub role: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub role: Option<jacquard_common::CowStr<'a>>,
 }

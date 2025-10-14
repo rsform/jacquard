@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Item<'a> {
@@ -23,7 +24,8 @@ pub struct Item<'a> {
     #[serde(borrow)]
     pub item: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub position: std::option::Option<i64>,
+    #[builder(into)]
+    pub position: Option<i64>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

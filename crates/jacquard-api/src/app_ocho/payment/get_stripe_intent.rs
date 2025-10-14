@@ -30,7 +30,7 @@ pub struct GetStripeIntent<'a> {
     pub token: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///The intent data
+/// The intent data
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -43,19 +43,19 @@ pub struct GetStripeIntent<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetStripeIntentOutput<'a> {
-    ///The customer ID for the payment intent
+    /// The customer ID for the payment intent
     #[serde(borrow)]
     pub customer: jacquard_common::CowStr<'a>,
-    ///The customer session ID for the payment intent
+    /// The customer session ID for the payment intent
     #[serde(borrow)]
     pub customer_session: jacquard_common::CowStr<'a>,
-    ///The ephemeral key for the payment intent
+    /// The ephemeral key for the payment intent
     #[serde(borrow)]
     pub ephemeral_key: jacquard_common::CowStr<'a>,
-    ///The payment intent ID
+    /// The payment intent ID
     #[serde(borrow)]
     pub payment_intent: jacquard_common::CowStr<'a>,
-    ///The publishable key for the payment intent
+    /// The publishable key for the payment intent
     #[serde(borrow)]
     pub publishable_key: jacquard_common::CowStr<'a>,
 }

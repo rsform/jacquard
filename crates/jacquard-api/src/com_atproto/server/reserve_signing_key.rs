@@ -19,10 +19,11 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct ReserveSigningKey<'a> {
-    ///The DID to reserve a key for.
+    /// The DID to reserve a key for.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub did: Option<jacquard_common::types::string::Did<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
@@ -44,7 +45,7 @@ pub struct ReserveSigningKey<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReserveSigningKeyOutput<'a> {
-    ///The public key for the reserved signing key, in did:key serialization.
+    /// The public key for the reserved signing key, in did:key serialization.
     #[serde(borrow)]
     pub signing_key: jacquard_common::CowStr<'a>,
 }

@@ -17,13 +17,15 @@ pub type DeviceList<'a> = Vec<crate::win_tomo_x::pushat::DeviceListItem<'a>>;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeviceListItem<'a> {
     pub current: bool,
     pub id: jacquard_common::types::string::Tid,
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
 }
 
@@ -35,22 +37,27 @@ pub struct DeviceListItem<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NotifyBody<'a> {
-    ///Body text of the notification.
+    /// Body text of the notification.
     #[serde(borrow)]
+    #[builder(into)]
     pub body: jacquard_common::CowStr<'a>,
-    ///The URI of the icon displayed in the notification.
+    /// The URI of the icon displayed in the notification.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::types::string::Uri<'a>>,
-    ///Experimental — do not use. The URI to open when the notification is clicked.
+    pub icon: Option<jacquard_common::types::string::Uri<'a>>,
+    /// Experimental — do not use. The URI to open when the notification is clicked.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
-    ///Title text of the notification.
+    pub link: Option<jacquard_common::types::string::Uri<'a>>,
+    /// Title text of the notification.
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
 }

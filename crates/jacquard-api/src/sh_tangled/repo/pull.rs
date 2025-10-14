@@ -16,22 +16,27 @@ pub mod status;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Pull<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub body: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub body: Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
+    #[builder(into)]
     pub patch: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub source: std::option::Option<crate::sh_tangled::repo::pull::Source<'a>>,
+    pub source: Option<crate::sh_tangled::repo::pull::Source<'a>>,
     #[serde(borrow)]
     pub target: crate::sh_tangled::repo::pull::Target<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
 }
 
@@ -85,16 +90,20 @@ impl From<PullGetRecordOutput<'_>> for Pull<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Source<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub branch: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub repo: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub repo: Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub sha: jacquard_common::CowStr<'a>,
 }
 
@@ -106,11 +115,13 @@ pub struct Source<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Target<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub branch: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,

@@ -23,14 +23,15 @@ pub mod status;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AdultContentPref<'a> {
     pub enabled: bool,
 }
 
-///If set, an active progress guide. Once completed, can be set to undefined. Should have unspecced fields tracking progress.
+/// If set, an active progress guide. Once completed, can be set to undefined. Should have unspecced fields tracking progress.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -39,15 +40,17 @@ pub struct AdultContentPref<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BskyAppProgressGuide<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub guide: jacquard_common::CowStr<'a>,
 }
 
-///A grab bag of state that's specific to the bsky.app program. Third-party apps shouldn't use this.
+/// A grab bag of state that's specific to the bsky.app program. Third-party apps shouldn't use this.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -56,23 +59,25 @@ pub struct BskyAppProgressGuide<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BskyAppStatePref<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub active_progress_guide: std::option::Option<
-        crate::app_bsky::actor::BskyAppProgressGuide<'a>,
-    >,
-    ///Storage for NUXs the user has encountered.
+    pub active_progress_guide: Option<crate::app_bsky::actor::BskyAppProgressGuide<'a>>,
+    /// Storage for NUXs the user has encountered.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub nuxs: std::option::Option<Vec<crate::app_bsky::actor::Nux<'a>>>,
-    ///An array of tokens which identify nudges (modals, popups, tours, highlight dots) that should be shown to the user.
+    pub nuxs: Option<Vec<crate::app_bsky::actor::Nux<'a>>>,
+    /// An array of tokens which identify nudges (modals, popups, tours, highlight dots) that should be shown to the user.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub queued_nudges: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub queued_nudges: Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -83,17 +88,21 @@ pub struct BskyAppStatePref<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContentLabelPref<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub label: jacquard_common::CowStr<'a>,
-    ///Which labeler does this preference apply to? If undefined, applies globally.
+    /// Which labeler does this preference apply to? If undefined, applies globally.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labeler_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub labeler_did: Option<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub visibility: jacquard_common::CowStr<'a>,
 }
 
@@ -105,28 +114,35 @@ pub struct ContentLabelPref<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FeedViewPref<'a> {
-    ///The URI of the feed, or an identifier which describes the feed.
+    /// The URI of the feed, or an identifier which describes the feed.
     #[serde(borrow)]
+    #[builder(into)]
     pub feed: jacquard_common::CowStr<'a>,
-    ///Hide quote posts in the feed.
+    /// Hide quote posts in the feed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_quote_posts: std::option::Option<bool>,
-    ///Hide replies in the feed.
+    #[builder(into)]
+    pub hide_quote_posts: Option<bool>,
+    /// Hide replies in the feed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_replies: std::option::Option<bool>,
-    ///Hide replies in the feed if they do not have this number of likes.
+    #[builder(into)]
+    pub hide_replies: Option<bool>,
+    /// Hide replies in the feed if they do not have this number of likes.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_replies_by_like_count: std::option::Option<i64>,
-    ///Hide replies in the feed if they are not by followed users.
+    #[builder(into)]
+    pub hide_replies_by_like_count: Option<i64>,
+    /// Hide replies in the feed if they are not by followed users.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_replies_by_unfollowed: std::option::Option<bool>,
-    ///Hide reposts in the feed.
+    #[builder(into)]
+    pub hide_replies_by_unfollowed: Option<bool>,
+    /// Hide reposts in the feed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_reposts: std::option::Option<bool>,
+    #[builder(into)]
+    pub hide_reposts: Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -137,11 +153,12 @@ pub struct FeedViewPref<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HiddenPostsPref<'a> {
-    ///A list of URIs of posts the account owner has hidden.
+    /// A list of URIs of posts the account owner has hidden.
     #[serde(borrow)]
     pub items: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
@@ -154,16 +171,17 @@ pub struct HiddenPostsPref<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InterestsPref<'a> {
-    ///A list of tags which describe the account owner's interests gathered during onboarding.
+    /// A list of tags which describe the account owner's interests gathered during onboarding.
     #[serde(borrow)]
     pub tags: Vec<jacquard_common::CowStr<'a>>,
 }
 
-///The subject's followers whom you also follow
+/// The subject's followers whom you also follow
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -172,7 +190,8 @@ pub struct InterestsPref<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct KnownFollowers<'a> {
@@ -189,7 +208,8 @@ pub struct KnownFollowers<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerPrefItem<'a> {
@@ -205,7 +225,8 @@ pub struct LabelerPrefItem<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelersPref<'a> {
@@ -213,7 +234,7 @@ pub struct LabelersPref<'a> {
     pub labelers: Vec<crate::app_bsky::actor::LabelerPrefItem<'a>>,
 }
 
-///A word that the account owner has muted.
+/// A word that the account owner has muted.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -222,25 +243,30 @@ pub struct LabelersPref<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MutedWord<'a> {
-    ///Groups of users to apply the muted word to. If undefined, applies to all users.
+    /// Groups of users to apply the muted word to. If undefined, applies to all users.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub actor_target: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The date and time at which the muted word will expire and no longer be applied.
+    pub actor_target: Option<jacquard_common::CowStr<'a>>,
+    /// The date and time at which the muted word will expire and no longer be applied.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub expires_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The intended targets of the muted word.
+    pub id: Option<jacquard_common::CowStr<'a>>,
+    /// The intended targets of the muted word.
     #[serde(borrow)]
     pub targets: Vec<crate::app_bsky::actor::MutedWordTarget<'a>>,
-    ///The muted word itself.
+    /// The muted word itself.
     #[serde(borrow)]
+    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
 }
 
@@ -328,16 +354,17 @@ impl jacquard_common::IntoStatic for MutedWordTarget<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MutedWordsPref<'a> {
-    ///A list of words the account owner has muted.
+    /// A list of words the account owner has muted.
     #[serde(borrow)]
     pub items: Vec<crate::app_bsky::actor::MutedWord<'a>>,
 }
 
-///A new user experiences (NUX) storage object
+/// A new user experiences (NUX) storage object
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -346,19 +373,23 @@ pub struct MutedWordsPref<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Nux<'a> {
     pub completed: bool,
-    ///Arbitrary data for the NUX. The structure is defined by the NUX itself. Limited to 300 characters.
+    /// Arbitrary data for the NUX. The structure is defined by the NUX itself. Limited to 300 characters.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub data: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The date and time at which the NUX will expire and should be considered completed.
+    pub data: Option<jacquard_common::CowStr<'a>>,
+    /// The date and time at which the NUX will expire and should be considered completed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub expires_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
+    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
 }
 
@@ -370,16 +401,18 @@ pub struct Nux<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PersonalDetailsPref<'a> {
-    ///The birth date of account owner.
+    /// The birth date of account owner.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub birth_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub birth_date: Option<jacquard_common::types::string::Datetime>,
 }
 
-///Default post interaction settings for the account. These values should be applied as default values when creating new posts. These refs should mirror the threadgate and postgate records exactly.
+/// Default post interaction settings for the account. These values should be applied as default values when creating new posts. These refs should mirror the threadgate and postgate records exactly.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -388,20 +421,23 @@ pub struct PersonalDetailsPref<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostInteractionSettingsPref<'a> {
-    ///Matches postgate record. List of rules defining who can embed this users posts. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
+    /// Matches postgate record. List of rules defining who can embed this users posts. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub postgate_embedding_rules: std::option::Option<
+    pub postgate_embedding_rules: Option<
         Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>,
     >,
-    ///Matches threadgate record. List of rules defining who can reply to this users posts. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
+    /// Matches threadgate record. List of rules defining who can reply to this users posts. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub threadgate_allow_rules: std::option::Option<
+    pub threadgate_allow_rules: Option<
         Vec<PostInteractionSettingsPrefThreadgateAllowRulesItem<'a>>,
     >,
 }
@@ -483,26 +519,33 @@ pub type Preferences<'a> = Vec<PreferencesItem<'a>>;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileAssociated<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub activity_subscription: std::option::Option<
+    pub activity_subscription: Option<
         crate::app_bsky::actor::ProfileAssociatedActivitySubscription<'a>,
     >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub chat: std::option::Option<crate::app_bsky::actor::ProfileAssociatedChat<'a>>,
+    pub chat: Option<crate::app_bsky::actor::ProfileAssociatedChat<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub feedgens: std::option::Option<i64>,
+    #[builder(into)]
+    pub feedgens: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub labeler: std::option::Option<bool>,
+    #[builder(into)]
+    pub labeler: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub lists: std::option::Option<i64>,
+    #[builder(into)]
+    pub lists: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub starter_packs: std::option::Option<i64>,
+    #[builder(into)]
+    pub starter_packs: Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -513,11 +556,13 @@ pub struct ProfileAssociated<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileAssociatedActivitySubscription<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub allow_subscriptions: jacquard_common::CowStr<'a>,
 }
 
@@ -529,11 +574,13 @@ pub struct ProfileAssociatedActivitySubscription<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileAssociatedChat<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub allow_incoming: jacquard_common::CowStr<'a>,
 }
 
@@ -545,45 +592,57 @@ pub struct ProfileAssociatedChat<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    pub associated: Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub indexed_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub pronouns: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
+    pub status: Option<crate::app_bsky::actor::StatusView<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
+    pub verification: Option<crate::app_bsky::actor::VerificationState<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
+    pub viewer: Option<crate::app_bsky::actor::ViewerState<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -594,40 +653,50 @@ pub struct ProfileView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileViewBasic<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    pub associated: Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub pronouns: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
+    pub status: Option<crate::app_bsky::actor::StatusView<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
+    pub verification: Option<crate::app_bsky::actor::VerificationState<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
+    pub viewer: Option<crate::app_bsky::actor::ViewerState<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -638,67 +707,84 @@ pub struct ProfileViewBasic<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileViewDetailed<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    pub associated: Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub banner: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub banner: Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub followers_count: std::option::Option<i64>,
+    #[builder(into)]
+    pub followers_count: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub follows_count: std::option::Option<i64>,
+    #[builder(into)]
+    pub follows_count: Option<i64>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub indexed_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub joined_via_starter_pack: std::option::Option<
+    pub joined_via_starter_pack: Option<
         crate::app_bsky::graph::StarterPackViewBasic<'a>,
     >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub pinned_post: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub pinned_post: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts_count: std::option::Option<i64>,
+    #[builder(into)]
+    pub posts_count: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub pronouns: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
+    pub status: Option<crate::app_bsky::actor::StatusView<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
+    pub verification: Option<crate::app_bsky::actor::VerificationState<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
+    pub viewer: Option<crate::app_bsky::actor::ViewerState<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub website: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub website: Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -709,16 +795,20 @@ pub struct ProfileViewDetailed<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SavedFeed<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
     pub pinned: bool,
     #[serde(borrow)]
+    #[builder(into)]
     pub r#type: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
 }
 
@@ -730,7 +820,8 @@ pub struct SavedFeed<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SavedFeedsPref<'a> {
@@ -739,7 +830,8 @@ pub struct SavedFeedsPref<'a> {
     #[serde(borrow)]
     pub saved: Vec<jacquard_common::types::string::AtUri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub timeline_index: std::option::Option<i64>,
+    #[builder(into)]
+    pub timeline_index: Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -750,7 +842,8 @@ pub struct SavedFeedsPref<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SavedFeedsPrefV2<'a> {
@@ -766,24 +859,29 @@ pub struct SavedFeedsPrefV2<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StatusView<'a> {
-    ///An optional embed associated with the status.
+    /// An optional embed associated with the status.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub embed: std::option::Option<crate::app_bsky::embed::external::View<'a>>,
-    ///The date when this status will expire. The application might choose to no longer return the status after expiration.
+    pub embed: Option<crate::app_bsky::embed::external::View<'a>>,
+    /// The date when this status will expire. The application might choose to no longer return the status after expiration.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///True if the status is not expired, false if it is expired. Only present if expiration was set.
+    #[builder(into)]
+    pub expires_at: Option<jacquard_common::types::string::Datetime>,
+    /// True if the status is not expired, false if it is expired. Only present if expiration was set.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_active: std::option::Option<bool>,
+    #[builder(into)]
+    pub is_active: Option<bool>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
-    ///The status for the account.
+    /// The status for the account.
     #[serde(borrow)]
+    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
 }
 
@@ -795,20 +893,23 @@ pub struct StatusView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadViewPref<'a> {
-    ///Show followed users at the top of all replies.
+    /// Show followed users at the top of all replies.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub prioritize_followed_users: std::option::Option<bool>,
-    ///Sorting mode for threads.
+    #[builder(into)]
+    pub prioritize_followed_users: Option<bool>,
+    /// Sorting mode for threads.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sort: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Preferences for how verified accounts appear in the app.
+/// Preferences for how verified accounts appear in the app.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -817,16 +918,18 @@ pub struct ThreadViewPref<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VerificationPrefs<'a> {
-    ///Hide the blue check badges for verified accounts and trusted verifiers.
+    /// Hide the blue check badges for verified accounts and trusted verifiers.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_badges: std::option::Option<bool>,
+    #[builder(into)]
+    pub hide_badges: Option<bool>,
 }
 
-///Represents the verification information about the user this object is attached to.
+/// Represents the verification information about the user this object is attached to.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -835,22 +938,25 @@ pub struct VerificationPrefs<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VerificationState<'a> {
-    ///The user's status as a trusted verifier.
+    /// The user's status as a trusted verifier.
     #[serde(borrow)]
+    #[builder(into)]
     pub trusted_verifier_status: jacquard_common::CowStr<'a>,
-    ///All verifications issued by trusted verifiers on behalf of this user. Verifications by untrusted verifiers are not included.
+    /// All verifications issued by trusted verifiers on behalf of this user. Verifications by untrusted verifiers are not included.
     #[serde(borrow)]
     pub verifications: Vec<crate::app_bsky::actor::VerificationView<'a>>,
-    ///The user's status as a verified account.
+    /// The user's status as a verified account.
     #[serde(borrow)]
+    #[builder(into)]
     pub verified_status: jacquard_common::CowStr<'a>,
 }
 
-///An individual verification for an associated subject.
+/// An individual verification for an associated subject.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -859,23 +965,24 @@ pub struct VerificationState<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VerificationView<'a> {
-    ///Timestamp when the verification was created.
+    /// Timestamp when the verification was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///True if the verification passes validation, otherwise false.
+    /// True if the verification passes validation, otherwise false.
     pub is_valid: bool,
-    ///The user who issued this verification.
+    /// The user who issued this verification.
     #[serde(borrow)]
     pub issuer: jacquard_common::types::string::Did<'a>,
-    ///The AT-URI of the verification record.
+    /// The AT-URI of the verification record.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-///Metadata about the requesting account's relationship with the subject account. Only has meaningful content for authed requests.
+/// Metadata about the requesting account's relationship with the subject account. Only has meaningful content for authed requests.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -884,37 +991,47 @@ pub struct VerificationView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ViewerState<'a> {
-    ///This property is present only in selected cases, as an optimization.
+    /// This property is present only in selected cases, as an optimization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub activity_subscription: std::option::Option<
+    pub activity_subscription: Option<
         crate::app_bsky::notification::ActivitySubscription<'a>,
     >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub blocked_by: std::option::Option<bool>,
+    #[builder(into)]
+    pub blocked_by: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub blocking: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub blocking: Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub blocking_by_list: std::option::Option<crate::app_bsky::graph::ListViewBasic<'a>>,
+    pub blocking_by_list: Option<crate::app_bsky::graph::ListViewBasic<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub followed_by: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub followed_by: Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub following: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ///This property is present only in selected cases, as an optimization.
+    pub following: Option<jacquard_common::types::string::AtUri<'a>>,
+    /// This property is present only in selected cases, as an optimization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub known_followers: std::option::Option<crate::app_bsky::actor::KnownFollowers<'a>>,
+    pub known_followers: Option<crate::app_bsky::actor::KnownFollowers<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub muted: std::option::Option<bool>,
+    #[builder(into)]
+    pub muted: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub muted_by_list: std::option::Option<crate::app_bsky::graph::ListViewBasic<'a>>,
+    pub muted_by_list: Option<crate::app_bsky::graph::ListViewBasic<'a>>,
 }

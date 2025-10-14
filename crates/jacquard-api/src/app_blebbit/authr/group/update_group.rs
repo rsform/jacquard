@@ -39,18 +39,19 @@ pub struct UpdateGroupParams<'a> {
 #[builder(start_fn = new)]
 pub struct UpdateGroup<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub display: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub display: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub public: std::option::Option<bool>,
+    #[builder(into)]
+    pub public: Option<bool>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]

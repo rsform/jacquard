@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Deprecated: use facets instead.
+/// Deprecated: use facets instead.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,20 +14,23 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Entity<'a> {
     #[serde(borrow)]
     pub index: crate::app_bsky::feed::post::TextSlice<'a>,
-    ///Expected values are 'mention' and 'link'.
+    /// Expected values are 'mention' and 'link'.
     #[serde(borrow)]
+    #[builder(into)]
     pub r#type: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
 }
 
-///Record containing a Bluesky post.
+/// Record containing a Bluesky post.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -36,39 +39,48 @@ pub struct Entity<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
-    ///Client-declared timestamp when this post was originally created.
+    /// Client-declared timestamp when this post was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub embed: std::option::Option<PostEmbed<'a>>,
-    ///DEPRECATED: replaced by app.bsky.richtext.facet.
+    pub embed: Option<PostEmbed<'a>>,
+    /// DEPRECATED: replaced by app.bsky.richtext.facet.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub entities: std::option::Option<Vec<crate::app_bsky::feed::post::Entity<'a>>>,
-    ///Annotations of text (mentions, URLs, hashtags, etc)
+    pub entities: Option<Vec<crate::app_bsky::feed::post::Entity<'a>>>,
+    /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    ///Self-label values for this post. Effectively content warnings.
+    pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    /// Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
-    ///Indicates human language of post primary text content.
+    pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
+    /// Indicates human language of post primary text content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    #[builder(into)]
+    pub langs: Option<Vec<jacquard_common::types::string::Language>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reply: std::option::Option<crate::app_bsky::feed::post::ReplyRef<'a>>,
-    ///Additional hashtags, in addition to any included in post text and facets.
+    pub reply: Option<crate::app_bsky::feed::post::ReplyRef<'a>>,
+    /// Additional hashtags, in addition to any included in post text and facets.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///The primary post content. May be an empty string, if there are embeds.
+    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// The primary post content. May be an empty string, if there are embeds.
     #[serde(borrow)]
+    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
 }
 
@@ -147,7 +159,8 @@ impl From<PostGetRecordOutput<'_>> for Post<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReplyRef<'a> {
@@ -157,7 +170,7 @@ pub struct ReplyRef<'a> {
     pub root: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
-///Deprecated. Use app.bsky.richtext instead -- A text segment. Start is inclusive, end is exclusive. Indices are for utf16-encoded strings.
+/// Deprecated. Use app.bsky.richtext instead -- A text segment. Start is inclusive, end is exclusive. Indices are for utf16-encoded strings.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -166,7 +179,8 @@ pub struct ReplyRef<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TextSlice<'a> {

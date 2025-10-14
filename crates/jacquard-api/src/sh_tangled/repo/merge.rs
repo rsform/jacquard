@@ -19,38 +19,38 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct Merge<'a> {
-    ///Author email for the merge commit
+    /// Author email for the merge commit
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub author_email: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Author name for the merge commit
+    #[serde(borrow)]
+    pub author_email: Option<jacquard_common::CowStr<'a>>,
+    /// Author name for the merge commit
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub author_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Target branch to merge into
+    #[serde(borrow)]
+    pub author_name: Option<jacquard_common::CowStr<'a>>,
+    /// Target branch to merge into
     #[serde(borrow)]
     #[builder(into)]
     pub branch: jacquard_common::CowStr<'a>,
-    ///Additional commit message body
+    /// Additional commit message body
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub commit_body: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Merge commit message
+    #[serde(borrow)]
+    pub commit_body: Option<jacquard_common::CowStr<'a>>,
+    /// Merge commit message
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub commit_message: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///DID of the repository owner
+    #[serde(borrow)]
+    pub commit_message: Option<jacquard_common::CowStr<'a>>,
+    /// DID of the repository owner
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///Name of the repository
+    /// Name of the repository
     #[serde(borrow)]
     #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Patch content to merge
+    /// Patch content to merge
     #[serde(borrow)]
     #[builder(into)]
     pub patch: jacquard_common::CowStr<'a>,

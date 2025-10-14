@@ -8,7 +8,7 @@
 pub mod game;
 pub mod player;
 
-///A record that holds a did:key used to verify records. Use the collection to know the type of verification. Example blue.2048.key.game is for blue.2048.game records
+/// A record that holds a did:key used to verify records. Use the collection to know the type of verification. Example blue.2048.key.game is for blue.2048.game records
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -17,17 +17,19 @@ pub mod player;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Key<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    ///A did:key used to verify records came from an at://2048 authority
+    /// A did:key used to verify records came from an at://2048 authority
     #[serde(borrow)]
+    #[builder(into)]
     pub key: jacquard_common::CowStr<'a>,
 }
 
-///a signature for an at://2048 record meaning it has been verified by a service. Most likely @2048.blue
+/// a signature for an at://2048 record meaning it has been verified by a service. Most likely @2048.blue
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -36,15 +38,18 @@ pub struct Key<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SignatureRef<'a> {
-    ///The at://uri for the public did:key to verify this record. This also counts as the authority of the verification (example @2048.blue). As well as the type of verification by the collection name (blue.2048.key.game).
+    /// The at://uri for the public did:key to verify this record. This also counts as the authority of the verification (example @2048.blue). As well as the type of verification by the collection name (blue.2048.key.game).
     #[serde(borrow)]
+    #[builder(into)]
     pub at_uri: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The public verifiable signature of the record. Serialization of the records value minus the signature field
+    /// The public verifiable signature of the record. Serialization of the records value minus the signature field
     #[serde(borrow)]
+    #[builder(into)]
     pub signature: jacquard_common::CowStr<'a>,
 }

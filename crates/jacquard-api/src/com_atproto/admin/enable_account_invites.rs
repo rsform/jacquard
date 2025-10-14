@@ -21,11 +21,11 @@
 pub struct EnableAccountInvites<'a> {
     #[serde(borrow)]
     pub account: jacquard_common::types::string::Did<'a>,
-    ///Optional reason for enabled invites.
+    /// Optional reason for enabled invites.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub note: Option<jacquard_common::CowStr<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]

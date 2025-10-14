@@ -47,7 +47,7 @@ pub struct CreateBookmark<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateBookmarkError<'a> {
-    ///The URI to be bookmarked is for an unsupported collection.
+    /// The URI to be bookmarked is for an unsupported collection.
     #[serde(rename = "UnsupportedCollection")]
     UnsupportedCollection(std::option::Option<String>),
 }

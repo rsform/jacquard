@@ -19,11 +19,11 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct SendEmail<'a> {
-    ///Additional comment by the sender that won't be used in the email itself but helpful to provide more context for moderators/reviewers
+    /// Additional comment by the sender that won't be used in the email itself but helpful to provide more context for moderators/reviewers
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub comment: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
@@ -32,9 +32,9 @@ pub struct SendEmail<'a> {
     #[serde(borrow)]
     pub sender_did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub subject: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub subject: Option<jacquard_common::CowStr<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]

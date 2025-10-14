@@ -34,10 +34,10 @@ pub struct GetSuggestedFollowsByActor<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedFollowsByActorOutput<'a> {
-    ///If true, response has fallen-back to generic results, and is not scoped using relativeToDid
+    /// If true, response has fallen-back to generic results, and is not scoped using relativeToDid
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub is_fallback: std::option::Option<bool>,
-    ///Snowflake for this recommendation, use when submitting recommendation events.
+    /// Snowflake for this recommendation, use when submitting recommendation events.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub rec_id: std::option::Option<i64>,
     #[serde(borrow)]

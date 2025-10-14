@@ -39,11 +39,12 @@ pub struct UpdateFolderParams<'a> {
 #[builder(start_fn = new)]
 pub struct UpdateFolder<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub name: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub public: std::option::Option<bool>,
+    #[builder(into)]
+    pub public: Option<bool>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]

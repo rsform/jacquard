@@ -20,9 +20,9 @@
 #[builder(start_fn = new)]
 pub struct DeleteFolderRelationship<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub relation: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub relation: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     #[builder(into)]
     pub resource: jacquard_common::CowStr<'a>,

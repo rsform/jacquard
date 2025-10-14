@@ -34,9 +34,9 @@ pub struct GetFeedGenerator<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedGeneratorOutput<'a> {
-    ///Indicates whether the feed generator service has been online recently, or else seems to be inactive.
+    /// Indicates whether the feed generator service has been online recently, or else seems to be inactive.
     pub is_online: bool,
-    ///Indicates whether the feed generator service is compatible with the record declaration.
+    /// Indicates whether the feed generator service is compatible with the record declaration.
     pub is_valid: bool,
     #[serde(borrow)]
     pub view: crate::app_bsky::feed::GeneratorView<'a>,

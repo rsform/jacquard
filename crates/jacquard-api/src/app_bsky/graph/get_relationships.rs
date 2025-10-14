@@ -80,7 +80,7 @@ pub enum GetRelationshipsOutputRelationshipsItem<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetRelationshipsError<'a> {
-    ///the primary actor at-identifier could not be resolved
+    /// the primary actor at-identifier could not be resolved
     #[serde(rename = "ActorNotFound")]
     ActorNotFound(std::option::Option<String>),
 }

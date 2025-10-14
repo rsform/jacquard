@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///User gave up on finishing the item
+/// User gave up on finishing the item
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -31,13 +31,15 @@ impl std::fmt::Display for Abandoned {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Builtin<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub r#type: std::option::Option<BuiltinType<'a>>,
+    pub r#type: Option<BuiltinType<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -65,7 +67,7 @@ pub enum BuiltinType<'a> {
     Wishlist(Box<crate::my_skylights::list_item::Wishlist>),
 }
 
-///User is currently reading/watching/... the item
+/// User is currently reading/watching/... the item
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -91,20 +93,24 @@ impl std::fmt::Display for InProgress {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListItem<'a> {
     pub added_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub item: std::option::Option<crate::my_skylights::Item<'a>>,
+    pub item: Option<crate::my_skylights::Item<'a>>,
     #[serde(borrow)]
     pub list: ListItemList<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub note: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub position: jacquard_common::CowStr<'a>,
 }
 
@@ -127,7 +133,7 @@ pub enum ListItemList<'a> {
     Builtin(Box<crate::my_skylights::list_item::Builtin<'a>>),
 }
 
-///User owns the item
+/// User owns the item
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -145,7 +151,7 @@ impl std::fmt::Display for Owned {
     }
 }
 
-///User plans to read/watch/... the item
+/// User plans to read/watch/... the item
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -163,7 +169,7 @@ impl std::fmt::Display for Queue {
     }
 }
 
-///User wants to own the item
+/// User wants to own the item
 #[derive(
     serde::Serialize,
     serde::Deserialize,

@@ -9,7 +9,7 @@ pub mod create_bookmark;
 pub mod delete_bookmark;
 pub mod get_bookmarks;
 
-///Object used to store bookmark data in stash.
+/// Object used to store bookmark data in stash.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -18,11 +18,12 @@ pub mod get_bookmarks;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Bookmark<'a> {
-    ///A strong ref to the record to be bookmarked. Currently, only `app.bsky.feed.post` records are supported.
+    /// A strong ref to the record to be bookmarked. Currently, only `app.bsky.feed.post` records are supported.
     #[serde(borrow)]
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
@@ -35,15 +36,17 @@ pub struct Bookmark<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BookmarkView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub item: BookmarkViewItem<'a>,
-    ///A strong ref to the bookmarked record.
+    /// A strong ref to the bookmarked record.
     #[serde(borrow)]
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }

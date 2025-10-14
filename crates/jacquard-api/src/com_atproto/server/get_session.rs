@@ -33,7 +33,7 @@ pub struct GetSessionOutput<'a> {
     pub email_confirmed: std::option::Option<bool>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
-    ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+    /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,

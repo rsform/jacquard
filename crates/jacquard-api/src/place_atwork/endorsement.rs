@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A cryptographically-verified professional endorsement between two identities.
+/// A cryptographically-verified professional endorsement between two identities.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,26 +14,27 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Endorsement<'a> {
-    ///Timestamp when the endorsement was created.
+    /// Timestamp when the endorsement was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The DID of the identity giving the endorsement.
+    /// The DID of the identity giving the endorsement.
     #[serde(borrow)]
     pub giver: jacquard_common::types::string::Did<'a>,
-    ///The DID of the identity receiving the endorsement.
+    /// The DID of the identity receiving the endorsement.
     #[serde(borrow)]
     pub receiver: jacquard_common::types::string::Did<'a>,
-    ///Verified signatures from endorsement proofs (strong references).
+    /// Verified signatures from endorsement proofs (strong references).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub signatures: std::option::Option<
-        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    >,
-    ///The endorsement text content.
+    pub signatures: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    /// The endorsement text content.
     #[serde(borrow)]
+    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
 }
 

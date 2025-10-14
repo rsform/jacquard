@@ -13,15 +13,15 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListItem<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub children: std::option::Option<
-        Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>,
-    >,
+    pub children: Option<Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>>,
     #[serde(borrow)]
     pub content: ListItemContent<'a>,
 }
@@ -55,7 +55,8 @@ pub enum ListItemContent<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UnorderedList<'a> {

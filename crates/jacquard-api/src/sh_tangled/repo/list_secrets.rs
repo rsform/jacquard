@@ -72,7 +72,8 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListSecretsRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Secret<'a> {
@@ -80,6 +81,7 @@ pub struct Secret<'a> {
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub key: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,

@@ -20,8 +20,9 @@
 #[builder(start_fn = new)]
 pub struct CreateInviteCode<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub for_account: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub for_account: Option<jacquard_common::types::string::Did<'a>>,
     pub use_count: i64,
     #[serde(flatten)]
     #[serde(borrow)]

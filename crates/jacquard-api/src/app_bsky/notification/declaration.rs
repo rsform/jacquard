@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A declaration of the user's choices related to notifications that can be produced by them.
+/// A declaration of the user's choices related to notifications that can be produced by them.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,12 +14,14 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Declaration<'a> {
-    ///A declaration of the user's preference for allowing activity subscriptions from other users. Absence of a record implies 'followers'.
+    /// A declaration of the user's preference for allowing activity subscriptions from other users. Absence of a record implies 'followers'.
     #[serde(borrow)]
+    #[builder(into)]
     pub allow_subscriptions: jacquard_common::CowStr<'a>,
 }
 

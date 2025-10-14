@@ -13,18 +13,19 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Image<'a> {
-    ///The actual atproto image blob.
+    /// The actual atproto image blob.
     #[serde(borrow)]
     pub blob: jacquard_common::types::blob::Blob<'a>,
     #[serde(borrow)]
     pub image_link: crate::com_shinolabs::pinksea::oekaki::ImageLink<'a>,
 }
 
-///A link to the image, it can be either directly to the PDS or to a CDN.
+/// A link to the image, it can be either directly to the PDS or to a CDN.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -33,17 +34,19 @@ pub struct Image<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ImageLink<'a> {
-    ///Alt text description of the image, for accessibility.
+    /// Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub alt: Option<jacquard_common::CowStr<'a>>,
 }
 
-///An oekaki post.
+/// An oekaki post.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -52,27 +55,29 @@ pub struct ImageLink<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Oekaki<'a> {
-    ///The timestamp of creation.
+    /// The timestamp of creation.
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub image: crate::com_shinolabs::pinksea::oekaki::Image<'a>,
-    ///What this oekaki post is a response to.
+    /// What this oekaki post is a response to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub in_response_to: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
-    ///Is this oekaki NSFW?
+    pub in_response_to: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    /// Is this oekaki NSFW?
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub nsfw: std::option::Option<bool>,
-    ///An array of tags this image had.
+    #[builder(into)]
+    pub nsfw: Option<bool>,
+    /// An array of tags this image had.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

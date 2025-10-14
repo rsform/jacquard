@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AspectRatio<'a> {
@@ -29,14 +30,16 @@ pub struct AspectRatio<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Image<'a> {
-    ///Alt text description of the image, for accessibility.
+    /// Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub alt: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub aspect_ratio: crate::pub_leaflet::blocks::image::AspectRatio<'a>,
     #[serde(borrow)]

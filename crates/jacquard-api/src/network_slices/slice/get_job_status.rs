@@ -13,35 +13,40 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct JobStatus<'a> {
-    ///When the job completed
+    /// When the job completed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub completed_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///When the job was created
+    #[builder(into)]
+    pub completed_at: Option<jacquard_common::types::string::Datetime>,
+    /// When the job was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Error message if job failed
+    /// Error message if job failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub error: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///UUID of the job
+    pub error: Option<jacquard_common::CowStr<'a>>,
+    /// UUID of the job
     #[serde(borrow)]
+    #[builder(into)]
     pub job_id: jacquard_common::CowStr<'a>,
-    ///Job result if completed successfully
+    /// Job result if completed successfully
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub result: std::option::Option<
-        crate::network_slices::slice::get_job_status::SyncJobResult<'a>,
-    >,
-    ///Number of times the job has been retried
+    pub result: Option<crate::network_slices::slice::get_job_status::SyncJobResult<'a>>,
+    /// Number of times the job has been retried
     pub retry_count: i64,
-    ///When the job started executing
+    /// When the job started executing
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub started_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Current status of the job
+    #[builder(into)]
+    pub started_at: Option<jacquard_common::types::string::Datetime>,
+    /// Current status of the job
     #[serde(borrow)]
+    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
 }
 
@@ -114,20 +119,22 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetJobStatusRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SyncJobResult<'a> {
-    ///List of collection NSIDs that were synced
+    /// List of collection NSIDs that were synced
     #[serde(borrow)]
     pub collections_synced: Vec<jacquard_common::types::string::Nsid<'a>>,
-    ///Human-readable message about the job completion
+    /// Human-readable message about the job completion
     #[serde(borrow)]
+    #[builder(into)]
     pub message: jacquard_common::CowStr<'a>,
-    ///Number of repositories processed
+    /// Number of repositories processed
     pub repos_processed: i64,
-    ///Whether the sync job completed successfully
+    /// Whether the sync job completed successfully
     pub success: bool,
-    ///Total number of records synced
+    /// Total number of records synced
     pub total_records: i64,
 }

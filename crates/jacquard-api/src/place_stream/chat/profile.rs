@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Customizations for the color of a user's name in chat
+/// Customizations for the color of a user's name in chat
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,7 +14,8 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Color<'a> {
@@ -23,7 +24,7 @@ pub struct Color<'a> {
     pub red: i64,
 }
 
-///Record containing customizations for a user's chat profile.
+/// Record containing customizations for a user's chat profile.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -32,13 +33,15 @@ pub struct Color<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub color: std::option::Option<crate::place_stream::chat::profile::Color<'a>>,
+    pub color: Option<crate::place_stream::chat::profile::Color<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

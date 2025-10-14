@@ -13,16 +13,19 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Image<'a> {
-    ///Alt text description of the image, for accessibility.
+    /// Alt text description of the image, for accessibility.
     #[serde(borrow)]
+    #[builder(into)]
     pub alt: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
+    pub aspect_ratio: Option<crate::app_bsky::embed::AspectRatio<'a>>,
     #[serde(borrow)]
     pub image: jacquard_common::types::blob::Blob<'a>,
 }
@@ -35,7 +38,8 @@ pub struct Image<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Images<'a> {
@@ -51,7 +55,8 @@ pub struct Images<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct View<'a> {
@@ -67,20 +72,23 @@ pub struct View<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ViewImage<'a> {
-    ///Alt text description of the image, for accessibility.
+    /// Alt text description of the image, for accessibility.
     #[serde(borrow)]
+    #[builder(into)]
     pub alt: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
-    ///Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.
+    pub aspect_ratio: Option<crate::app_bsky::embed::AspectRatio<'a>>,
+    /// Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.
     #[serde(borrow)]
     pub fullsize: jacquard_common::types::string::Uri<'a>,
-    ///Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.
+    /// Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.
     #[serde(borrow)]
     pub thumb: jacquard_common::types::string::Uri<'a>,
 }

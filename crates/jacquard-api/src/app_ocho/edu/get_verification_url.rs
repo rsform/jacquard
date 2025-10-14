@@ -23,7 +23,7 @@ pub struct GetVerificationUrl<'a> {
     pub domain: jacquard_common::CowStr<'a>,
 }
 
-///The intent data
+/// The intent data
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

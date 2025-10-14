@@ -13,13 +13,15 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Member<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    ///domain that this member now belongs to
+    /// domain that this member now belongs to
     #[serde(borrow)]
+    #[builder(into)]
     pub domain: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,

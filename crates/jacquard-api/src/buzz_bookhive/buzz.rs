@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record containing a Bookhive comment.
+/// Record containing a Bookhive comment.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,16 +14,18 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Buzz<'a> {
     #[serde(borrow)]
     pub book: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    ///The content of the comment.
+    /// The content of the comment.
     #[serde(borrow)]
+    #[builder(into)]
     pub comment: jacquard_common::CowStr<'a>,
-    ///Client-declared timestamp when this comment was originally created.
+    /// Client-declared timestamp when this comment was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub parent: crate::com_atproto::repo::strong_ref::StrongRef<'a>,

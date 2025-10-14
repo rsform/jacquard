@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Details about item/specimen collection
+/// Details about item/specimen collection
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,38 +14,46 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionData<'a> {
-    ///Catch probability for specimens (decimal string between 0.0 and 1.0)
+    /// Catch probability for specimens (decimal string between 0.0 and 1.0)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub catch_probability: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URI of the created inventory record
+    pub catch_probability: Option<jacquard_common::CowStr<'a>>,
+    /// URI of the created inventory record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub inventory_record_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///How the item was obtained
+    pub inventory_record_uri: Option<jacquard_common::CowStr<'a>>,
+    /// How the item was obtained
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub method: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URI of the created specimen record
+    pub method: Option<jacquard_common::CowStr<'a>>,
+    /// URI of the created specimen record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub specimen_record_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether collection was successful
+    pub specimen_record_uri: Option<jacquard_common::CowStr<'a>>,
+    /// Whether collection was successful
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub success: std::option::Option<bool>,
-    ///Milliseconds between card generation and collection
+    #[builder(into)]
+    pub success: Option<bool>,
+    /// Milliseconds between card generation and collection
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub time_since_generation: std::option::Option<i64>,
-    ///Milliseconds between card being viewed and collected
+    #[builder(into)]
+    pub time_since_generation: Option<i64>,
+    /// Milliseconds between card being viewed and collected
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub time_since_viewed: std::option::Option<i64>,
+    #[builder(into)]
+    pub time_since_viewed: Option<i64>,
 }
 
-///Details about daily rewards claim
+/// Details about daily rewards claim
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -54,27 +62,30 @@ pub struct CollectionData<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DailyRewardsData<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reward_items: std::option::Option<
-        Vec<crate::net_anisota::beta::game::log::RewardItem<'a>>,
-    >,
-    ///Number of rewards claimed
+    pub reward_items: Option<Vec<crate::net_anisota::beta::game::log::RewardItem<'a>>>,
+    /// Number of rewards claimed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rewards_count: std::option::Option<i64>,
-    ///Current daily reward streak
+    #[builder(into)]
+    pub rewards_count: Option<i64>,
+    /// Current daily reward streak
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub streak: std::option::Option<i64>,
-    ///Milliseconds since last claim
+    #[builder(into)]
+    pub streak: Option<i64>,
+    /// Milliseconds since last claim
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub time_since_last_claim: std::option::Option<i64>,
+    #[builder(into)]
+    pub time_since_last_claim: Option<i64>,
 }
 
-///Context about the feed when event occurred
+/// Context about the feed when event occurred
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -83,26 +94,31 @@ pub struct DailyRewardsData<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FeedContext<'a> {
-    ///URI of the feed being viewed
+    /// URI of the feed being viewed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub feed_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Number of game cards injected
+    pub feed_uri: Option<jacquard_common::CowStr<'a>>,
+    /// Number of game cards injected
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub game_card_count: std::option::Option<i64>,
-    ///Number of posts in the feed
+    #[builder(into)]
+    pub game_card_count: Option<i64>,
+    /// Number of posts in the feed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub post_count: std::option::Option<i64>,
-    ///User's scroll position or card index
+    #[builder(into)]
+    pub post_count: Option<i64>,
+    /// User's scroll position or card index
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub scroll_position: std::option::Option<i64>,
+    #[builder(into)]
+    pub scroll_position: Option<i64>,
 }
 
-///Details about game cards generated or interacted with
+/// Details about game cards generated or interacted with
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -111,39 +127,47 @@ pub struct FeedContext<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GameCardData<'a> {
-    ///Type of game card
+    /// Type of game card
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub card_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Unique identifier for the game card
+    pub card_type: Option<jacquard_common::CowStr<'a>>,
+    /// Unique identifier for the game card
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Random seed used for generation (for verification)
+    pub card_uri: Option<jacquard_common::CowStr<'a>>,
+    /// Random seed used for generation (for verification)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub generation_seed: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Position where card was injected in feed
+    pub generation_seed: Option<jacquard_common::CowStr<'a>>,
+    /// Position where card was injected in feed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub injection_position: std::option::Option<i64>,
-    ///ID of the item/specimen
+    #[builder(into)]
+    pub injection_position: Option<i64>,
+    /// ID of the item/specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub item_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Quantity of items
+    pub item_id: Option<jacquard_common::CowStr<'a>>,
+    /// Quantity of items
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quantity: std::option::Option<i64>,
-    ///Rarity of the item/specimen
+    #[builder(into)]
+    pub quantity: Option<i64>,
+    /// Rarity of the item/specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rarity: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Details about item usage
+/// Details about item usage
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -152,31 +176,37 @@ pub struct GameCardData<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ItemUsageData<'a> {
-    ///Effect that was applied
+    /// Effect that was applied
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub effect_applied: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URI of the modified inventory record
+    pub effect_applied: Option<jacquard_common::CowStr<'a>>,
+    /// URI of the modified inventory record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub inventory_record_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///ID of the item used
+    pub inventory_record_uri: Option<jacquard_common::CowStr<'a>>,
+    /// ID of the item used
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub item_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Quantity of the item used
+    pub item_id: Option<jacquard_common::CowStr<'a>>,
+    /// Quantity of the item used
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quantity_used: std::option::Option<i64>,
-    ///Remaining quantity after use
+    #[builder(into)]
+    pub quantity_used: Option<i64>,
+    /// Remaining quantity after use
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub remaining_quantity: std::option::Option<i64>,
+    #[builder(into)]
+    pub remaining_quantity: Option<i64>,
 }
 
-///A log record for tracking game events and user actions for provenance and anti-bot analysis
+/// A log record for tracking game events and user actions for provenance and anti-bot analysis
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -185,64 +215,70 @@ pub struct ItemUsageData<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Log<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub collection_data: std::option::Option<
-        crate::net_anisota::beta::game::log::CollectionData<'a>,
-    >,
-    ///When the log record was created
+    pub collection_data: Option<crate::net_anisota::beta::game::log::CollectionData<'a>>,
+    /// When the log record was created
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub daily_rewards_data: std::option::Option<
+    pub daily_rewards_data: Option<
         crate::net_anisota::beta::game::log::DailyRewardsData<'a>,
     >,
-    ///Type of event being logged
+    /// Type of event being logged
     #[serde(borrow)]
+    #[builder(into)]
     pub event_type: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub feed_context: std::option::Option<
-        crate::net_anisota::beta::game::log::FeedContext<'a>,
-    >,
+    pub feed_context: Option<crate::net_anisota::beta::game::log::FeedContext<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub game_card_data: std::option::Option<
-        crate::net_anisota::beta::game::log::GameCardData<'a>,
-    >,
-    ///Unique ID of the game card this event relates to
+    pub game_card_data: Option<crate::net_anisota::beta::game::log::GameCardData<'a>>,
+    /// Unique ID of the game card this event relates to
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub game_card_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub game_card_id: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub item_usage_data: std::option::Option<
-        crate::net_anisota::beta::game::log::ItemUsageData<'a>,
-    >,
+    pub item_usage_data: Option<crate::net_anisota::beta::game::log::ItemUsageData<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub metadata: std::option::Option<crate::net_anisota::beta::game::log::Metadata<'a>>,
-    ///URI of the parent log record that triggered this event
+    pub metadata: Option<crate::net_anisota::beta::game::log::Metadata<'a>>,
+    /// URI of the parent log record that triggered this event
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub parent_log_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URI of the root log record in this event chain
+    pub parent_log_uri: Option<jacquard_common::CowStr<'a>>,
+    /// URI of the root log record in this event chain
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub root_log_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Unique session identifier to group related events
+    pub root_log_uri: Option<jacquard_common::CowStr<'a>>,
+    /// Unique session identifier to group related events
     #[serde(borrow)]
+    #[builder(into)]
     pub session_id: jacquard_common::CowStr<'a>,
-    ///URI of the session record this event belongs to (at://did/collection/rkey)
+    /// URI of the session record this event belongs to (at://did/collection/rkey)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub session_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///When the event occurred (ISO 8601)
+    pub session_uri: Option<jacquard_common::CowStr<'a>>,
+    /// When the event occurred (ISO 8601)
     pub timestamp: jacquard_common::types::string::Datetime,
 }
 
@@ -288,7 +324,7 @@ impl From<LogGetRecordOutput<'_>> for Log<'_> {
     }
 }
 
-///Additional event-specific metadata
+/// Additional event-specific metadata
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -297,30 +333,33 @@ impl From<LogGetRecordOutput<'_>> for Log<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Metadata<'a> {
-    ///Version of the client application
+    /// Version of the client application
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub client_version: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Network latency in milliseconds
+    pub client_version: Option<jacquard_common::CowStr<'a>>,
+    /// Network latency in milliseconds
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub network_latency: std::option::Option<i64>,
-    ///Performance timing data
+    #[builder(into)]
+    pub network_latency: Option<i64>,
+    /// Performance timing data
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub performance_timings: std::option::Option<
-        jacquard_common::types::value::Data<'a>,
-    >,
-    ///Platform (web, mobile, etc.)
+    pub performance_timings: Option<jacquard_common::types::value::Data<'a>>,
+    /// Platform (web, mobile, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub platform: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub platform: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Item received as a reward
+/// Item received as a reward
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -329,16 +368,20 @@ pub struct Metadata<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RewardItem<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub item_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub item_id: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quantity: std::option::Option<i64>,
+    #[builder(into)]
+    pub quantity: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rarity: Option<jacquard_common::CowStr<'a>>,
 }

@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A grouping of entries in a notebook, intended to be displayed as a single page.
+/// A grouping of entries in a notebook, intended to be displayed as a single page.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,24 +14,28 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Chapter<'a> {
-    ///Client-declared timestamp when this was originally created.
+    /// Client-declared timestamp when this was originally created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub entry_list: Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ///The notebook this page belongs to.
+    /// The notebook this page belongs to.
     #[serde(borrow)]
     pub notebook: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
+    pub tags: Option<crate::sh_weaver::notebook::Tags<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
+    pub title: Option<crate::sh_weaver::notebook::Title<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

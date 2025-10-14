@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Configuration for which types of content to mute
+/// Configuration for which types of content to mute
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,25 +14,30 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContentTypes<'a> {
-    ///Mute regular posts from accounts on this list
+    /// Mute regular posts from accounts on this list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts: std::option::Option<bool>,
-    ///Mute quote posts from accounts on this list
+    #[builder(into)]
+    pub posts: Option<bool>,
+    /// Mute quote posts from accounts on this list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quotes: std::option::Option<bool>,
-    ///Mute replies from accounts on this list
+    #[builder(into)]
+    pub quotes: Option<bool>,
+    /// Mute replies from accounts on this list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub replies: std::option::Option<bool>,
-    ///Mute reposts from accounts on this list
+    #[builder(into)]
+    pub replies: Option<bool>,
+    /// Mute reposts from accounts on this list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reposts: std::option::Option<bool>,
+    #[builder(into)]
+    pub reposts: Option<bool>,
 }
 
-///A record for muting content from all accounts on a list with fine-grained control over content types, duration, and feed targeting
+/// A record for muting content from all accounts on a list with fine-grained control over content types, duration, and feed targeting
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -41,34 +46,35 @@ pub struct ContentTypes<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListMute<'a> {
-    ///Types of content to mute from accounts on this list
+    /// Types of content to mute from accounts on this list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub content_types: std::option::Option<
-        crate::net_anisota::graph::list_mute::ContentTypes<'a>,
-    >,
-    ///When the mute was created
+    pub content_types: Option<crate::net_anisota::graph::list_mute::ContentTypes<'a>>,
+    /// When the mute was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///When this mute expires. If not set, mute is permanent
+    /// When this mute expires. If not set, mute is permanent
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Optional reason for muting this list
+    #[builder(into)]
+    pub expires_at: Option<jacquard_common::types::string::Datetime>,
+    /// Optional reason for muting this list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///AT-URI of the list to mute (app.bsky.graph.list record)
+    pub reason: Option<jacquard_common::CowStr<'a>>,
+    /// AT-URI of the list to mute (app.bsky.graph.list record)
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,
-    ///Specific feeds where this mute should apply. If empty, applies to all feeds
+    /// Specific feeds where this mute should apply. If empty, applies to all feeds
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub target_feeds: std::option::Option<
-        Vec<jacquard_common::types::string::AtUri<'a>>,
-    >,
+    pub target_feeds: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

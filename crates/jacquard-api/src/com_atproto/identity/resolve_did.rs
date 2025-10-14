@@ -34,7 +34,7 @@ pub struct ResolveDid<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveDidOutput<'a> {
-    ///The complete DID document for the identity.
+    /// The complete DID document for the identity.
     #[serde(borrow)]
     pub did_doc: jacquard_common::types::value::Data<'a>,
 }
@@ -54,10 +54,10 @@ pub struct ResolveDidOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ResolveDidError<'a> {
-    ///The DID resolution process confirmed that there is no current DID.
+    /// The DID resolution process confirmed that there is no current DID.
     #[serde(rename = "DidNotFound")]
     DidNotFound(std::option::Option<String>),
-    ///The DID previously existed, but has been deactivated.
+    /// The DID previously existed, but has been deactivated.
     #[serde(rename = "DidDeactivated")]
     DidDeactivated(std::option::Option<String>),
 }

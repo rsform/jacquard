@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record bookmarking a link to come back to later.
+/// Record bookmarking a link to come back to later.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,17 +14,19 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Bookmark<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Uri<'a>,
-    ///Tags for content the bookmark may be related to, for example 'news' or 'funny videos'
+    /// Tags for content the bookmark may be related to, for example 'news' or 'funny videos'
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

@@ -19,17 +19,17 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct GetSparklines<'a> {
-    ///Time range to fetch data for
+    /// Time range to fetch data for
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub duration: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Time interval for data points
+    #[serde(borrow)]
+    pub duration: Option<jacquard_common::CowStr<'a>>,
+    /// Time interval for data points
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub interval: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Array of slice AT-URIs to get sparkline data for
+    #[serde(borrow)]
+    pub interval: Option<jacquard_common::CowStr<'a>>,
+    /// Array of slice AT-URIs to get sparkline data for
     #[serde(borrow)]
     pub slices: Vec<jacquard_common::CowStr<'a>>,
     #[serde(flatten)]
@@ -53,7 +53,7 @@ pub struct GetSparklines<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSparklinesOutput<'a> {
-    ///Array of slice sparkline data entries
+    /// Array of slice sparkline data entries
     #[serde(borrow)]
     pub sparklines: Vec<jacquard_common::types::value::Data<'a>>,
 }
@@ -96,14 +96,16 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSparklinesRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SparklineEntry<'a> {
-    ///Array of sparkline data points
+    /// Array of sparkline data points
     #[serde(borrow)]
     pub points: Vec<crate::network_slices::slice::SparklinePoint<'a>>,
-    ///AT-URI of the slice
+    /// AT-URI of the slice
     #[serde(borrow)]
+    #[builder(into)]
     pub slice_uri: jacquard_common::CowStr<'a>,
 }

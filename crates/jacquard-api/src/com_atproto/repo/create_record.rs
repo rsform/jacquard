@@ -19,30 +19,33 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct CreateRecord<'a> {
-    ///The NSID of the record collection.
+    /// The NSID of the record collection.
     #[serde(borrow)]
     pub collection: jacquard_common::types::string::Nsid<'a>,
-    ///The record itself. Must contain a $type field.
+    /// The record itself. Must contain a $type field.
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
-    ///The handle or DID of the repo (aka, current account).
+    /// The handle or DID of the repo (aka, current account).
     #[serde(borrow)]
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
-    ///The Record Key.
+    /// The Record Key.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub rkey: std::option::Option<
+    pub rkey: Option<
         jacquard_common::types::string::RecordKey<
             jacquard_common::types::string::Rkey<'a>,
         >,
     >,
-    ///Compare and swap with the previous commit by CID.
+    /// Compare and swap with the previous commit by CID.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub swap_commit: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    ///Can be set to 'false' to skip Lexicon schema validation of record data, 'true' to require it, or leave unset to validate only for known Lexicons.
+    pub swap_commit: Option<jacquard_common::types::string::Cid<'a>>,
+    /// Can be set to 'false' to skip Lexicon schema validation of record data, 'true' to require it, or leave unset to validate only for known Lexicons.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub validate: std::option::Option<bool>,
+    #[builder(into)]
+    pub validate: Option<bool>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
@@ -91,7 +94,7 @@ pub struct CreateRecordOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateRecordError<'a> {
-    ///Indicates that 'swapCommit' didn't match current repo commit.
+    /// Indicates that 'swapCommit' didn't match current repo commit.
     #[serde(rename = "InvalidSwap")]
     InvalidSwap(std::option::Option<String>),
 }

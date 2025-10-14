@@ -17,7 +17,7 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LoginOutput<'a> {
-    ///The code used to login on the InstantDB website
+    /// The code used to login on the InstantDB website
     #[serde(borrow)]
     pub code: jacquard_common::CowStr<'a>,
 }

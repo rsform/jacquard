@@ -13,39 +13,47 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogEntry<'a> {
-    ///When the log entry was created
+    /// When the log entry was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Log entry ID
+    /// Log entry ID
     pub id: i64,
-    ///UUID of related job if applicable
+    /// UUID of related job if applicable
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub job_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Log level
+    pub job_id: Option<jacquard_common::CowStr<'a>>,
+    /// Log level
     #[serde(borrow)]
+    #[builder(into)]
     pub level: jacquard_common::CowStr<'a>,
-    ///Type of log entry
+    /// Type of log entry
     #[serde(borrow)]
+    #[builder(into)]
     pub log_type: jacquard_common::CowStr<'a>,
-    ///Log message
+    /// Log message
     #[serde(borrow)]
+    #[builder(into)]
     pub message: jacquard_common::CowStr<'a>,
-    ///Additional metadata associated with the log entry
+    /// Additional metadata associated with the log entry
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub metadata: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///AT-URI of related slice if applicable
+    pub metadata: Option<jacquard_common::types::value::Data<'a>>,
+    /// AT-URI of related slice if applicable
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub slice_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///DID of related user if applicable
+    pub slice_uri: Option<jacquard_common::CowStr<'a>>,
+    /// DID of related user if applicable
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub user_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub user_did: Option<jacquard_common::types::string::Did<'a>>,
 }
 
 #[derive(

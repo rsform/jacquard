@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A list and an optional list item indicating membership of a target user to that list.
+/// A list and an optional list item indicating membership of a target user to that list.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,15 +14,17 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListWithMembership<'a> {
     #[serde(borrow)]
     pub list: crate::app_bsky::graph::ListView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub list_item: std::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
+    pub list_item: Option<crate::app_bsky::graph::ListItemView<'a>>,
 }
 
 #[derive(

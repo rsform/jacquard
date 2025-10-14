@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A review connected to a verified transaction, can only be created by one of the transaction parties
+/// A review connected to a verified transaction, can only be created by one of the transaction parties
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,28 +14,33 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Review<'a> {
-    ///When the review was created
+    /// When the review was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The detailed review text
+    /// The detailed review text
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Rating score from 1 to 5
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// Rating score from 1 to 5
     pub rating: i64,
-    ///Whether this review is from the service provider or consumer
+    /// Whether this review is from the service provider or consumer
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reviewer_role: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The title of the review
+    pub reviewer_role: Option<jacquard_common::CowStr<'a>>,
+    /// The title of the review
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///AT URI reference to the transaction record (at://did/beauty.cybernetic.trustcow.transaction/rkey)
+    pub title: Option<jacquard_common::CowStr<'a>>,
+    /// AT URI reference to the transaction record (at://did/beauty.cybernetic.trustcow.transaction/rkey)
     #[serde(borrow)]
+    #[builder(into)]
     pub transaction: jacquard_common::CowStr<'a>,
 }
 

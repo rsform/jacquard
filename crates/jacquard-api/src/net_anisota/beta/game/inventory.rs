@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Beta version: Record representing an item in a player's game inventory
+/// Beta version: Record representing an item in a player's game inventory
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,60 +14,73 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Inventory<'a> {
-    ///When the item was acquired
+    /// When the item was acquired
     pub acquired_at: jacquard_common::types::string::Datetime,
-    ///When the record was created
+    /// When the record was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Unique identifier for the item from gameItems.json
+    /// Unique identifier for the item from gameItems.json
     #[serde(borrow)]
+    #[builder(into)]
     pub item_id: jacquard_common::CowStr<'a>,
-    ///Display name of the item
+    /// Display name of the item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub item_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Type category of the item (consumable, tool, equipment, etc.)
+    pub item_name: Option<jacquard_common::CowStr<'a>>,
+    /// Type category of the item (consumable, tool, equipment, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub item_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Base value of the item in game currency
+    pub item_type: Option<jacquard_common::CowStr<'a>>,
+    /// Base value of the item in game currency
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub item_value: std::option::Option<i64>,
-    ///When the record was last modified
+    #[builder(into)]
+    pub item_value: Option<i64>,
+    /// When the record was last modified
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_modified: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///URI of the game.log record that documents the acquisition of this item
+    #[builder(into)]
+    pub last_modified: Option<jacquard_common::types::string::Datetime>,
+    /// URI of the game.log record that documents the acquisition of this item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub log_record_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Maximum stack size for this item
+    pub log_record_uri: Option<jacquard_common::CowStr<'a>>,
+    /// Maximum stack size for this item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_stack: std::option::Option<i64>,
-    ///Additional item-specific data (stats, attributes, enchantments, etc.)
+    #[builder(into)]
+    pub max_stack: Option<i64>,
+    /// Additional item-specific data (stats, attributes, enchantments, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub metadata: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///Number of items in the stack
+    pub metadata: Option<jacquard_common::types::value::Data<'a>>,
+    /// Number of items in the stack
     pub quantity: i64,
-    ///Rarity level of the item
+    /// Rarity level of the item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///How the item was acquired
+    pub rarity: Option<jacquard_common::CowStr<'a>>,
+    /// How the item was acquired
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub source: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub source_details: std::option::Option<
+    pub source_details: Option<
         crate::net_anisota::beta::game::inventory::SourceDetails<'a>,
     >,
-    ///Whether this item can be stacked with others of the same type
+    /// Whether this item can be stacked with others of the same type
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stackable: std::option::Option<bool>,
+    #[builder(into)]
+    pub stackable: Option<bool>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -112,7 +125,7 @@ impl From<InventoryGetRecordOutput<'_>> for Inventory<'_> {
     }
 }
 
-///Additional details about how the item was acquired
+/// Additional details about how the item was acquired
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -121,19 +134,23 @@ impl From<InventoryGetRecordOutput<'_>> for Inventory<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SourceDetails<'a> {
-    ///URI of the game card that provided this item
+    /// URI of the game card that provided this item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub game_card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///ID of the quest that rewarded this item
+    pub game_card_uri: Option<jacquard_common::CowStr<'a>>,
+    /// ID of the quest that rewarded this item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub quest_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Daily reward streak when item was acquired
+    pub quest_id: Option<jacquard_common::CowStr<'a>>,
+    /// Daily reward streak when item was acquired
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reward_streak: std::option::Option<i64>,
+    #[builder(into)]
+    pub reward_streak: Option<i64>,
 }

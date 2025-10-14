@@ -39,18 +39,22 @@ pub mod update_email;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InviteCode<'a> {
     pub available: i64,
     #[serde(borrow)]
+    #[builder(into)]
     pub code: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
+    #[builder(into)]
     pub created_by: jacquard_common::CowStr<'a>,
     pub disabled: bool,
     #[serde(borrow)]
+    #[builder(into)]
     pub for_account: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub uses: Vec<crate::com_atproto::server::InviteCodeUse<'a>>,
@@ -64,7 +68,8 @@ pub struct InviteCode<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InviteCodeUse<'a> {

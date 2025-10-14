@@ -13,14 +13,16 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Now<'a> {
-    ///The ISO 8601 date and time when the status was created.
+    /// The ISO 8601 date and time when the status was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The status text formatted as plain text.
+    /// The status text formatted as plain text.
     #[serde(borrow)]
+    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
 }
 

@@ -13,16 +13,19 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AccountCreated<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub email: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
+    pub handle: Option<jacquard_common::types::string::Handle<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -33,11 +36,13 @@ pub struct AccountCreated<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EmailConfirmed<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub email: jacquard_common::CowStr<'a>,
 }
 
@@ -49,11 +54,13 @@ pub struct EmailConfirmed<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EmailUpdated<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub email: jacquard_common::CowStr<'a>,
 }
 
@@ -65,12 +72,14 @@ pub struct EmailUpdated<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
+    #[builder(into)]
     pub created_by: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub details: EventDetails<'a>,
@@ -119,7 +128,8 @@ pub enum EventDetails<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HandleUpdated<'a> {
@@ -207,7 +217,8 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetAccountHistoryRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PasswordUpdated<'a> {}

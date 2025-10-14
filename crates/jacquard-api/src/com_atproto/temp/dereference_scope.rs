@@ -35,7 +35,7 @@ pub struct DereferenceScope<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DereferenceScopeOutput<'a> {
-    ///The full oauth permission scope
+    /// The full oauth permission scope
     #[serde(borrow)]
     pub scope: jacquard_common::CowStr<'a>,
 }
@@ -55,7 +55,7 @@ pub struct DereferenceScopeOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DereferenceScopeError<'a> {
-    ///An invalid scope reference was provided.
+    /// An invalid scope reference was provided.
     #[serde(rename = "InvalidScopeReference")]
     InvalidScopeReference(std::option::Option<String>),
 }

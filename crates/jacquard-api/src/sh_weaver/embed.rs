@@ -11,7 +11,7 @@ pub mod record_with_media;
 pub mod records;
 pub mod video;
 
-///Proportional size of the embed relative to the viewport in larger windows. The dimensions are percentage out of 100. Could we use more granularity? Maybe, but come on.
+/// Proportional size of the embed relative to the viewport in larger windows. The dimensions are percentage out of 100. Could we use more granularity? Maybe, but come on.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -20,7 +20,8 @@ pub mod video;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PercentSize<'a> {
@@ -28,7 +29,7 @@ pub struct PercentSize<'a> {
     pub width: i64,
 }
 
-///Pixel-exact embed size. The dimensions are logical pixels, subject to scaling, so 200px at X2 scale is 400px.
+/// Pixel-exact embed size. The dimensions are logical pixels, subject to scaling, so 200px at X2 scale is 400px.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -37,7 +38,8 @@ pub struct PercentSize<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PixelSize<'a> {

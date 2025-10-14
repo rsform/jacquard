@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A personal lexicon for mmatt's statuslog.
+/// A personal lexicon for mmatt's statuslog.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,18 +14,21 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Now<'a> {
-    ///The unix timestamp of when the status was recorded
+    /// The unix timestamp of when the status was recorded
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The emoji of the status update
+    /// The emoji of the status update
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub emoji: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The text of the status update
+    pub emoji: Option<jacquard_common::CowStr<'a>>,
+    /// The text of the status update
     #[serde(borrow)]
+    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
 }
 

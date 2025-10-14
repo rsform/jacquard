@@ -13,15 +13,18 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FailedScheduling<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub error: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub error_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub error_code: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }
@@ -44,13 +47,14 @@ pub struct ScheduleAction<'a> {
     pub action: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
-    ///This will be propagated to the moderation event when it is applied
+    /// This will be propagated to the moderation event when it is applied
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    pub mod_tool: Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
     pub scheduling: jacquard_common::types::value::Data<'a>,
-    ///Array of DID subjects to schedule the action for
+    /// Array of DID subjects to schedule the action for
     #[serde(borrow)]
     pub subjects: Vec<jacquard_common::types::string::Did<'a>>,
     #[serde(flatten)]
@@ -117,7 +121,8 @@ impl jacquard_common::xrpc::XrpcEndpoint for ScheduleActionRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ScheduledActionResults<'a> {
@@ -129,7 +134,7 @@ pub struct ScheduledActionResults<'a> {
     pub succeeded: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
-///Configuration for when the action should be executed
+/// Configuration for when the action should be executed
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -138,22 +143,26 @@ pub struct ScheduledActionResults<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SchedulingConfig<'a> {
-    ///Earliest time to execute the action (for randomized scheduling)
+    /// Earliest time to execute the action (for randomized scheduling)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_after: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Exact time to execute the action
+    #[builder(into)]
+    pub execute_after: Option<jacquard_common::types::string::Datetime>,
+    /// Exact time to execute the action
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Latest time to execute the action (for randomized scheduling)
+    #[builder(into)]
+    pub execute_at: Option<jacquard_common::types::string::Datetime>,
+    /// Latest time to execute the action (for randomized scheduling)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_until: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub execute_until: Option<jacquard_common::types::string::Datetime>,
 }
 
-///Schedule a takedown action
+/// Schedule a takedown action
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -162,21 +171,26 @@ pub struct SchedulingConfig<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Takedown<'a> {
-    ///If true, all other reports on content authored by this account will be resolved (acknowledged).
+    /// If true, all other reports on content authored by this account will be resolved (acknowledged).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub acknowledge_account_subjects: std::option::Option<bool>,
+    #[builder(into)]
+    pub acknowledge_account_subjects: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Indicates how long the takedown should be in effect before automatically expiring.
+    pub comment: Option<jacquard_common::CowStr<'a>>,
+    /// Indicates how long the takedown should be in effect before automatically expiring.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration_in_hours: std::option::Option<i64>,
-    ///Names/Keywords of the policies that drove the decision.
+    #[builder(into)]
+    pub duration_in_hours: Option<i64>,
+    /// Names/Keywords of the policies that drove the decision.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub policies: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub policies: Option<Vec<jacquard_common::CowStr<'a>>>,
 }

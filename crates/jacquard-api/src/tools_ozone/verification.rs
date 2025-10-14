@@ -9,7 +9,7 @@ pub mod grant_verifications;
 pub mod list_verifications;
 pub mod revoke_verifications;
 
-///Verification data for the associated subject.
+/// Verification data for the associated subject.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -18,48 +18,57 @@ pub mod revoke_verifications;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VerificationView<'a> {
-    ///Timestamp when the verification was created.
+    /// Timestamp when the verification was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Display name of the subject the verification applies to at the moment of verifying, which might not be the same at the time of viewing. The verification is only valid if the current displayName matches the one at the time of verifying.
+    /// Display name of the subject the verification applies to at the moment of verifying, which might not be the same at the time of viewing. The verification is only valid if the current displayName matches the one at the time of verifying.
     #[serde(borrow)]
+    #[builder(into)]
     pub display_name: jacquard_common::CowStr<'a>,
-    ///Handle of the subject the verification applies to at the moment of verifying, which might not be the same at the time of viewing. The verification is only valid if the current handle matches the one at the time of verifying.
+    /// Handle of the subject the verification applies to at the moment of verifying, which might not be the same at the time of viewing. The verification is only valid if the current handle matches the one at the time of verifying.
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
-    ///The user who issued this verification.
+    /// The user who issued this verification.
     #[serde(borrow)]
     pub issuer: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub issuer_profile: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub issuer_profile: Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub issuer_repo: std::option::Option<VerificationViewIssuerRepo<'a>>,
-    ///Describes the reason for revocation, also indicating that the verification is no longer valid.
+    pub issuer_repo: Option<VerificationViewIssuerRepo<'a>>,
+    /// Describes the reason for revocation, also indicating that the verification is no longer valid.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub revoke_reason: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Timestamp when the verification was revoked.
+    pub revoke_reason: Option<jacquard_common::CowStr<'a>>,
+    /// Timestamp when the verification was revoked.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub revoked_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The user who revoked this verification.
+    #[builder(into)]
+    pub revoked_at: Option<jacquard_common::types::string::Datetime>,
+    /// The user who revoked this verification.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub revoked_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    ///The subject of the verification.
+    pub revoked_by: Option<jacquard_common::types::string::Did<'a>>,
+    /// The subject of the verification.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub subject_profile: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub subject_profile: Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub subject_repo: std::option::Option<VerificationViewSubjectRepo<'a>>,
-    ///The AT-URI of the verification record.
+    pub subject_repo: Option<VerificationViewSubjectRepo<'a>>,
+    /// The AT-URI of the verification record.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }

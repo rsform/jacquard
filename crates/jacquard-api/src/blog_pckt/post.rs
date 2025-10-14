@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
@@ -22,23 +23,30 @@ pub struct Post<'a> {
     #[serde(borrow)]
     pub blog: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub body_plain: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub body_plain: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub cover: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
+    pub cover: Option<jacquard_common::types::blob::Blob<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub images: std::option::Option<Vec<jacquard_common::types::blob::Blob<'a>>>,
+    pub images: Option<Vec<jacquard_common::types::blob::Blob<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub published_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub published_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub updated_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
 }

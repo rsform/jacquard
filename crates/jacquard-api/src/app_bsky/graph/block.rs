@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record declaring a 'block' relationship against another account. NOTE: blocks are public in Bluesky; see blog posts for details.
+/// Record declaring a 'block' relationship against another account. NOTE: blocks are public in Bluesky; see blog posts for details.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,12 +14,13 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Block<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    ///DID of the account to be blocked.
+    /// DID of the account to be blocked.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }

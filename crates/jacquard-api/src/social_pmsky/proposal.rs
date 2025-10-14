@@ -13,46 +13,55 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Proposal<'a> {
-    ///The persistent, anonymous identifier for the user creating the proposal.
+    /// The persistent, anonymous identifier for the user creating the proposal.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub aid: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Optionally, CID specifying the specific version of 'uri' resource this proposal applies to.
+    pub aid: Option<jacquard_common::CowStr<'a>>,
+    /// Optionally, CID specifying the specific version of 'uri' resource this proposal applies to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    ///Timestamp when this proposal was created.
+    pub cid: Option<jacquard_common::types::string::Cid<'a>>,
+    /// Timestamp when this proposal was created.
     pub cts: jacquard_common::types::string::Datetime,
-    ///For 'label' proposals where 'val' is 'needs-context', the full text of any proposed annotation (e.g. community note) to be shown below the post.
+    /// For 'label' proposals where 'val' is 'needs-context', the full text of any proposed annotation (e.g. community note) to be shown below the post.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///An optional array of predefined reasons justifying the moderation action.
+    pub note: Option<jacquard_common::CowStr<'a>>,
+    /// An optional array of predefined reasons justifying the moderation action.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reasons: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///Signature of dag-cbor encoded proposal.
+    pub reasons: Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// Signature of dag-cbor encoded proposal.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sig: std::option::Option<bytes::Bytes>,
-    ///DID of the actor who created this proposal.
+    #[builder(into)]
+    pub sig: Option<bytes::Bytes>,
+    /// DID of the actor who created this proposal.
     #[serde(borrow)]
     pub src: jacquard_common::types::string::Did<'a>,
-    ///The type of moderation action being proposed. Currently expected values are 'allowed_user' or 'label'
+    /// The type of moderation action being proposed. Currently expected values are 'allowed_user' or 'label'
     #[serde(borrow)]
+    #[builder(into)]
     pub typ: jacquard_common::CowStr<'a>,
-    ///AT URI of the record, repository (account), or other resource that this proposal applies to.
+    /// AT URI of the record, repository (account), or other resource that this proposal applies to.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
-    ///For 'label' proposals, the short string name of the value of the proposed label.
+    /// For 'label' proposals, the short string name of the value of the proposed label.
     #[serde(borrow)]
+    #[builder(into)]
     pub val: jacquard_common::CowStr<'a>,
-    ///The AT Protocol version of the proposal object.
+    /// The AT Protocol version of the proposal object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ver: std::option::Option<i64>,
+    #[builder(into)]
+    pub ver: Option<i64>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

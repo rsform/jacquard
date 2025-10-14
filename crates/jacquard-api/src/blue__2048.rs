@@ -10,7 +10,7 @@ pub mod key;
 pub mod player;
 pub mod verification;
 
-///The sync status for a record used to help sync between your ATProto record and local record.
+/// The sync status for a record used to help sync between your ATProto record and local record.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -19,15 +19,17 @@ pub mod verification;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SyncStatus<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    ///A XXH3 hash of the record to tell if anything has changed
+    /// A XXH3 hash of the record to tell if anything has changed
     #[serde(borrow)]
+    #[builder(into)]
     pub hash: jacquard_common::CowStr<'a>,
-    ///A flag to know if it has been synced with the AT repo. Used mostly client side to filter what records need syncing
+    /// A flag to know if it has been synced with the AT repo. Used mostly client side to filter what records need syncing
     pub synced_with_at_repo: bool,
     pub updated_at: jacquard_common::types::string::Datetime,
 }

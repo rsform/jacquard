@@ -34,7 +34,7 @@ pub struct Encrypt<'a> {
     >,
 }
 
-///Returns the encrypted result.
+/// Returns the encrypted result.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

@@ -13,17 +13,20 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LastCommit<'a> {
-    ///Commit hash
+    /// Commit hash
     #[serde(borrow)]
+    #[builder(into)]
     pub hash: jacquard_common::CowStr<'a>,
-    ///Commit message
+    /// Commit message
     #[serde(borrow)]
+    #[builder(into)]
     pub message: jacquard_common::CowStr<'a>,
-    ///Commit timestamp
+    /// Commit timestamp
     pub when: jacquard_common::types::string::Datetime,
 }
 
@@ -65,21 +68,21 @@ pub struct Tree<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TreeOutput<'a> {
-    ///Parent directory path
+    /// Parent directory path
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub dotdot: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub files: Vec<jacquard_common::types::value::Data<'a>>,
-    ///The parent path in the tree
+    /// The parent path in the tree
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub parent: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Readme for this file tree
+    /// Readme for this file tree
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub readme: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///The git reference used
+    /// The git reference used
     #[serde(borrow)]
     pub r#ref: jacquard_common::CowStr<'a>,
 }
@@ -99,16 +102,16 @@ pub struct TreeOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TreeError<'a> {
-    ///Repository not found or access denied
+    /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
     RepoNotFound(std::option::Option<String>),
-    ///Git reference not found
+    /// Git reference not found
     #[serde(rename = "RefNotFound")]
     RefNotFound(std::option::Option<String>),
-    ///Path not found in repository tree
+    /// Path not found in repository tree
     #[serde(rename = "PathNotFound")]
     PathNotFound(std::option::Option<String>),
-    ///Invalid request parameters
+    /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
     InvalidRequest(std::option::Option<String>),
 }
@@ -183,15 +186,18 @@ impl jacquard_common::xrpc::XrpcEndpoint for TreeRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Readme<'a> {
-    ///Contents of the readme file
+    /// Contents of the readme file
     #[serde(borrow)]
+    #[builder(into)]
     pub contents: jacquard_common::CowStr<'a>,
-    ///Name of the readme file
+    /// Name of the readme file
     #[serde(borrow)]
+    #[builder(into)]
     pub filename: jacquard_common::CowStr<'a>,
 }
 
@@ -203,23 +209,27 @@ pub struct Readme<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TreeEntry<'a> {
-    ///Whether this entry is a file
+    /// Whether this entry is a file
     pub is_file: bool,
-    ///Whether this entry is a directory/subtree
+    /// Whether this entry is a directory/subtree
     pub is_subtree: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub last_commit: std::option::Option<crate::sh_tangled::repo::tree::LastCommit<'a>>,
-    ///File mode
+    pub last_commit: Option<crate::sh_tangled::repo::tree::LastCommit<'a>>,
+    /// File mode
     #[serde(borrow)]
+    #[builder(into)]
     pub mode: jacquard_common::CowStr<'a>,
-    ///Relative file or directory name
+    /// Relative file or directory name
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///File size in bytes
+    /// File size in bytes
     pub size: i64,
 }

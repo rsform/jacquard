@@ -13,18 +13,21 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Comment<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub body: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub issue: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reply_to: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub reply_to: Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A physical location in the form of a WGS84 coordinate.
+/// A physical location in the form of a WGS84 coordinate.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,19 +14,24 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Geo<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub altitude: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub altitude: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub latitude: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub longitude: jacquard_common::CowStr<'a>,
-    ///The name of the location.
+    /// The name of the location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: Option<jacquard_common::CowStr<'a>>,
 }

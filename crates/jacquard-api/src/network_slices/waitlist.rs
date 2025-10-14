@@ -8,7 +8,7 @@
 pub mod invite;
 pub mod request;
 
-///An invite granting a DID access with profile information
+/// An invite granting a DID access with profile information
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -17,32 +17,36 @@ pub mod request;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InviteView<'a> {
-    ///When this invitation was created
+    /// When this invitation was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The DID being invited
+    /// The DID being invited
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///Optional expiration date for this invitation
+    /// Optional expiration date for this invitation
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Profile of the invitee
+    #[builder(into)]
+    pub expires_at: Option<jacquard_common::types::string::Datetime>,
+    /// Profile of the invitee
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub profile: std::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
-    ///The AT URI of the slice this invite is for
+    pub profile: Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    /// The AT URI of the slice this invite is for
     #[serde(borrow)]
     pub slice: jacquard_common::types::string::AtUri<'a>,
-    ///The AT URI of this invite record
+    /// The AT URI of this invite record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
-///A request to join the waitlist with profile information
+/// A request to join the waitlist with profile information
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -51,17 +55,19 @@ pub struct InviteView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestView<'a> {
-    ///When the user joined the waitlist
+    /// When the user joined the waitlist
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Profile of the requester
+    /// Profile of the requester
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub profile: std::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
-    ///The AT URI of the slice being requested access to
+    pub profile: Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    /// The AT URI of the slice being requested access to
     #[serde(borrow)]
     pub slice: jacquard_common::types::string::AtUri<'a>,
 }

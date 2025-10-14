@@ -19,12 +19,12 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct RevokeVerifications<'a> {
-    ///Reason for revoking the verification. This is optional and can be omitted if not needed.
+    /// Reason for revoking the verification. This is optional and can be omitted if not needed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub revoke_reason: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Array of verification record uris to revoke
+    #[serde(borrow)]
+    pub revoke_reason: Option<jacquard_common::CowStr<'a>>,
+    /// Array of verification record uris to revoke
     #[serde(borrow)]
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
     #[serde(flatten)]
@@ -48,10 +48,10 @@ pub struct RevokeVerifications<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RevokeVerificationsOutput<'a> {
-    ///List of verification uris that couldn't be revoked, including failure reasons
+    /// List of verification uris that couldn't be revoked, including failure reasons
     #[serde(borrow)]
     pub failed_revocations: Vec<jacquard_common::types::value::Data<'a>>,
-    ///List of verification uris successfully revoked
+    /// List of verification uris successfully revoked
     #[serde(borrow)]
     pub revoked_verifications: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
@@ -86,7 +86,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for RevokeVerificationsRequest {
     type Response = RevokeVerificationsResponse;
 }
 
-///Error object for failed revocations
+/// Error object for failed revocations
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -95,14 +95,16 @@ impl jacquard_common::xrpc::XrpcEndpoint for RevokeVerificationsRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RevokeError<'a> {
-    ///Description of the error that occurred during revocation.
+    /// Description of the error that occurred during revocation.
     #[serde(borrow)]
+    #[builder(into)]
     pub error: jacquard_common::CowStr<'a>,
-    ///The AT-URI of the verification record that failed to revoke.
+    /// The AT-URI of the verification record that failed to revoke.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }

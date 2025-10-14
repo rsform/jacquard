@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record declaring a 'like' of a piece of content published in the Anisota feed. The target of the like is the 'subject' of the record.
+/// Record declaring a 'like' of a piece of content published in the Anisota feed. The target of the like is the 'subject' of the record.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,13 +14,14 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Like<'a> {
-    ///Client-declared timestamp when this like was created.
+    /// Client-declared timestamp when this like was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The subject of the like.
+    /// The subject of the like.
     #[serde(borrow)]
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }

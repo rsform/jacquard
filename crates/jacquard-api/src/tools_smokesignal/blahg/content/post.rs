@@ -13,19 +13,21 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Attachment<'a> {
-    ///Alt text description of the content, for accessibility.
+    /// Alt text description of the content, for accessibility.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub alt: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub content: jacquard_common::types::blob::Blob<'a>,
 }
 
-///A blagh post
+/// A blagh post
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -34,27 +36,33 @@ pub struct Attachment<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub attachments: std::option::Option<
+    pub attachments: Option<
         Vec<crate::tools_smokesignal::blahg::content::post::Attachment<'a>>,
     >,
-    ///The content of the post
+    /// The content of the post
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub content: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
-    ///Indicates human language of text content.
+    pub content: Option<jacquard_common::types::blob::Blob<'a>>,
+    /// Indicates human language of text content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    #[builder(into)]
+    pub langs: Option<Vec<jacquard_common::types::string::Language>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub published_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub published_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

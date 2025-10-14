@@ -65,16 +65,16 @@ pub struct LogOutput<'a> {}
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LogError<'a> {
-    ///Repository not found or access denied
+    /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
     RepoNotFound(std::option::Option<String>),
-    ///Git reference not found
+    /// Git reference not found
     #[serde(rename = "RefNotFound")]
     RefNotFound(std::option::Option<String>),
-    ///Path not found in repository
+    /// Path not found in repository
     #[serde(rename = "PathNotFound")]
     PathNotFound(std::option::Option<String>),
-    ///Invalid request parameters
+    /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
     InvalidRequest(std::option::Option<String>),
 }

@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///The starting point for edit history on a notebook.
+/// The starting point for edit history on a notebook.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,7 +14,8 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Root<'a> {

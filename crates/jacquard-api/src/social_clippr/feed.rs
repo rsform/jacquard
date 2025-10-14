@@ -13,7 +13,7 @@ pub mod get_tag_list;
 pub mod get_tags;
 pub mod tag;
 
-///A view of a single bookmark (or 'clip').
+/// A view of a single bookmark (or 'clip').
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -22,27 +22,28 @@ pub mod tag;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ClipView<'a> {
-    ///A reference to the actor's profile
+    /// A reference to the actor's profile
     #[serde(borrow)]
     pub author: crate::social_clippr::actor::ProfileView<'a>,
-    ///The CID of the clip
+    /// The CID of the clip
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    ///When the tag was first indexed by the AppView
+    /// When the tag was first indexed by the AppView
     pub indexed_at: jacquard_common::types::string::Datetime,
-    ///The raw record of the clip
+    /// The raw record of the clip
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
-    ///The AT-URI of the clip
+    /// The AT-URI of the clip
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-///A view of a single tag.
+/// A view of a single tag.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -51,22 +52,23 @@ pub struct ClipView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TagView<'a> {
-    ///A reference to the actor's profile
+    /// A reference to the actor's profile
     #[serde(borrow)]
     pub author: crate::social_clippr::actor::ProfileView<'a>,
-    ///The CID of the tag
+    /// The CID of the tag
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    ///When the tag was first indexed by the AppView
+    /// When the tag was first indexed by the AppView
     pub indexed_at: jacquard_common::types::string::Datetime,
-    ///The raw record of the tag
+    /// The raw record of the tag
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
-    ///The AT-URI to the tag
+    /// The AT-URI to the tag
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }

@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record representing a player's level progression and game statistics
+/// Record representing a player's level progression and game statistics
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,58 +14,68 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Progress<'a> {
-    ///URI of the card that was advanced when triggerSource is card_advance
+    /// URI of the card that was advanced when triggerSource is card_advance
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///When the progress record was created
+    pub card_uri: Option<jacquard_common::CowStr<'a>>,
+    /// When the progress record was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Current stamina level when this progress was recorded (decimal string, e.g. '85.5')
+    /// Current stamina level when this progress was recorded (decimal string, e.g. '85.5')
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub current_stamina: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Current player level
+    pub current_stamina: Option<jacquard_common::CowStr<'a>>,
+    /// Current player level
     pub level: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub metadata: std::option::Option<
-        crate::net_anisota::beta::game::progress::Metadata<'a>,
-    >,
-    ///Previous level before this update (for tracking level progression)
+    pub metadata: Option<crate::net_anisota::beta::game::progress::Metadata<'a>>,
+    /// Previous level before this update (for tracking level progression)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub previous_level: std::option::Option<i64>,
-    ///Progress percentage to the next level (decimal string, e.g. '75.5')
+    #[builder(into)]
+    pub previous_level: Option<i64>,
+    /// Progress percentage to the next level (decimal string, e.g. '75.5')
     #[serde(borrow)]
+    #[builder(into)]
     pub progress_percentage: jacquard_common::CowStr<'a>,
-    ///URIs of related game log records that contributed to this progress
+    /// URIs of related game log records that contributed to this progress
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub related_log_uris: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///Session ID when this progress was recorded (for linking with log records)
+    pub related_log_uris: Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// Session ID when this progress was recorded (for linking with log records)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub session_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URI of the session record when this progress was recorded
+    pub session_id: Option<jacquard_common::CowStr<'a>>,
+    /// URI of the session record when this progress was recorded
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub session_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub session_uri: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub stats: std::option::Option<crate::net_anisota::beta::game::progress::Stats<'a>>,
-    ///Total experience points accumulated
+    pub stats: Option<crate::net_anisota::beta::game::progress::Stats<'a>>,
+    /// Total experience points accumulated
     pub total_xp: i64,
-    ///What action triggered this progress save
+    /// What action triggered this progress save
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub trigger_source: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Experience points gained since the last progress save
+    pub trigger_source: Option<jacquard_common::CowStr<'a>>,
+    /// Experience points gained since the last progress save
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub xp_gained_since_last_save: std::option::Option<i64>,
-    ///Experience points needed to reach the next level
+    #[builder(into)]
+    pub xp_gained_since_last_save: Option<i64>,
+    /// Experience points needed to reach the next level
     pub xp_to_next_level: i64,
 }
 
@@ -111,7 +121,7 @@ impl From<ProgressGetRecordOutput<'_>> for Progress<'_> {
     }
 }
 
-///Additional metadata about this progress update
+/// Additional metadata about this progress update
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -120,21 +130,24 @@ impl From<ProgressGetRecordOutput<'_>> for Progress<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Metadata<'a> {
-    ///Version of the client when this progress was recorded
+    /// Version of the client when this progress was recorded
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub client_version: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Platform where the level up occurred (web, mobile, etc.)
+    pub client_version: Option<jacquard_common::CowStr<'a>>,
+    /// Platform where the level up occurred (web, mobile, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub platform: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub platform: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Game-specific statistics and metrics
+/// Game-specific statistics and metrics
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -143,34 +156,41 @@ pub struct Metadata<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Stats<'a> {
-    ///Total daily rewards claimed
+    /// Total daily rewards claimed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub daily_rewards_claimed: std::option::Option<i64>,
-    ///Total items collected
+    #[builder(into)]
+    pub daily_rewards_claimed: Option<i64>,
+    /// Total items collected
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub items_collected: std::option::Option<i64>,
-    ///Date when posts read today was last updated (for daily reset tracking)
+    #[builder(into)]
+    pub items_collected: Option<i64>,
+    /// Date when posts read today was last updated (for daily reset tracking)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_post_read_date: std::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
-    ///Posts read today (resets daily)
+    #[builder(into)]
+    pub last_post_read_date: Option<jacquard_common::types::string::Datetime>,
+    /// Posts read today (resets daily)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts_read_today: std::option::Option<i64>,
-    ///Total posts read (all time, cumulative)
+    #[builder(into)]
+    pub posts_read_today: Option<i64>,
+    /// Total posts read (all time, cumulative)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts_read_total: std::option::Option<i64>,
-    ///Total posts viewed
+    #[builder(into)]
+    pub posts_read_total: Option<i64>,
+    /// Total posts viewed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts_viewed: std::option::Option<i64>,
-    ///Total shuffles performed
+    #[builder(into)]
+    pub posts_viewed: Option<i64>,
+    /// Total shuffles performed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub shuffles_performed: std::option::Option<i64>,
-    ///Total specimens collected
+    #[builder(into)]
+    pub shuffles_performed: Option<i64>,
+    /// Total specimens collected
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub specimens_collected: std::option::Option<i64>,
+    #[builder(into)]
+    pub specimens_collected: Option<i64>,
 }

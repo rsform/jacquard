@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A reference to a locked file.
+/// A reference to a locked file.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,12 +14,14 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Lock<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub lock: std::option::Option<bool>,
+    #[builder(into)]
+    pub lock: Option<bool>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

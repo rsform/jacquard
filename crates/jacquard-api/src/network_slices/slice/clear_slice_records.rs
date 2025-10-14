@@ -19,7 +19,7 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct ClearSliceRecords<'a> {
-    ///AT-URI of the slice to clear
+    /// AT-URI of the slice to clear
     #[serde(borrow)]
     #[builder(into)]
     pub slice: jacquard_common::CowStr<'a>,
@@ -44,7 +44,7 @@ pub struct ClearSliceRecords<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ClearSliceRecordsOutput<'a> {
-    ///Success message
+    /// Success message
     #[serde(borrow)]
     pub message: jacquard_common::CowStr<'a>,
 }

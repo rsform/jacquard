@@ -13,19 +13,22 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Board<'a> {
-    ///The date and time when the board was created
+    /// The date and time when the board was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///A short description of the board
+    /// A short description of the board
     #[serde(borrow)]
+    #[builder(into)]
     pub description: jacquard_common::CowStr<'a>,
-    ///Whether the board is NSFW
+    /// Whether the board is NSFW
     pub nsfw: bool,
-    ///The title of the board (e.g. /at/)
+    /// The title of the board (e.g. /at/)
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
 }
 

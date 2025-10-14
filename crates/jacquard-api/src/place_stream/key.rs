@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record linking an atproto identity with a stream signing key
+/// Record linking an atproto identity with a stream signing key
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,18 +14,21 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Key<'a> {
-    ///Client-declared timestamp when this key was created.
+    /// Client-declared timestamp when this key was created.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The name of the client that created this key.
+    /// The name of the client that created this key.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub created_by: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The did:key signing key for the stream.
+    pub created_by: Option<jacquard_common::CowStr<'a>>,
+    /// The did:key signing key for the stream.
     #[serde(borrow)]
+    #[builder(into)]
     pub signing_key: jacquard_common::CowStr<'a>,
 }
 

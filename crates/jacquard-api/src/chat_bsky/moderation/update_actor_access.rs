@@ -23,9 +23,9 @@ pub struct UpdateActorAccess<'a> {
     pub actor: jacquard_common::types::string::Did<'a>,
     pub allow_access: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub r#ref: Option<jacquard_common::CowStr<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]

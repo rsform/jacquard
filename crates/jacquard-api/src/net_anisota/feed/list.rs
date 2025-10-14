@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A list of posts for curation, bookmarking, or organization
+/// A list of posts for curation, bookmarking, or organization
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,27 +14,32 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct List<'a> {
-    ///Optional avatar image for the list
+    /// Optional avatar image for the list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
-    ///When the list was created
+    pub avatar: Option<jacquard_common::types::blob::Blob<'a>>,
+    /// When the list was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Optional description of the list
+    /// Optional description of the list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Display name for the list
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// Display name for the list
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Tags for categorizing the list
+    /// Tags for categorizing the list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

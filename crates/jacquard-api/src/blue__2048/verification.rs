@@ -8,7 +8,7 @@
 pub mod game;
 pub mod stats;
 
-///Holds the signature for another record showing it has verified it to the best of it's ability and it should be trusted if the signatures match.
+/// Holds the signature for another record showing it has verified it to the best of it's ability and it should be trusted if the signatures match.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -17,21 +17,23 @@ pub mod stats;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VerificationRef<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The at://uri for the public did:key to verify the remote record. This also counts as the authority of the verification (example @2048.blue). As well as the type of verification by the collection name (blue.2048.key.game).
+    /// The at://uri for the public did:key to verify the remote record. This also counts as the authority of the verification (example @2048.blue). As well as the type of verification by the collection name (blue.2048.key.game).
     #[serde(borrow)]
     pub key_ref: jacquard_common::types::string::AtUri<'a>,
-    ///The at://uri for the record that is being verified.
+    /// The at://uri for the record that is being verified.
     #[serde(borrow)]
     pub record_ref: jacquard_common::types::string::AtUri<'a>,
-    ///The public verifiable signature of the record. Serialization of the records valued
+    /// The public verifiable signature of the record. Serialization of the records valued
     #[serde(borrow)]
+    #[builder(into)]
     pub signature: jacquard_common::CowStr<'a>,
-    ///DID of the subject the verification applies to.
+    /// DID of the subject the verification applies to.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }

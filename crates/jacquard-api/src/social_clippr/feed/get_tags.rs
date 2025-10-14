@@ -34,7 +34,7 @@ pub struct GetTags<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetTagsOutput<'a> {
-    ///An array of hydrated tag views
+    /// An array of hydrated tag views
     #[serde(borrow)]
     pub tags: Vec<crate::social_clippr::feed::TagView<'a>>,
 }

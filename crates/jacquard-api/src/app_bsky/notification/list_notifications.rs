@@ -91,7 +91,8 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListNotificationsRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Notification<'a> {
@@ -102,14 +103,17 @@ pub struct Notification<'a> {
     pub indexed_at: jacquard_common::types::string::Datetime,
     pub is_read: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
-    ///The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.
+    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    /// The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.
     #[serde(borrow)]
+    #[builder(into)]
     pub reason: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reason_subject: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub reason_subject: Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]

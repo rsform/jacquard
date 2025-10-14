@@ -18,20 +18,24 @@ pub mod entry;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorListView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<jacquard_common::types::string::Cid<'a>>,
     pub index: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub record: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub record: Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -42,7 +46,8 @@ pub struct AuthorListView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BookEntryRef<'a> {
@@ -50,7 +55,7 @@ pub struct BookEntryRef<'a> {
     pub entry: crate::sh_weaver::notebook::EntryView<'a>,
 }
 
-///An ordered entry in a Weaver notebook.
+/// An ordered entry in a Weaver notebook.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -59,7 +64,8 @@ pub struct BookEntryRef<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BookEntryView<'a> {
@@ -67,14 +73,16 @@ pub struct BookEntryView<'a> {
     pub entry: crate::sh_weaver::notebook::EntryView<'a>,
     pub index: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub next: std::option::Option<crate::sh_weaver::notebook::BookEntryRef<'a>>,
+    pub next: Option<crate::sh_weaver::notebook::BookEntryRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub prev: std::option::Option<crate::sh_weaver::notebook::BookEntryRef<'a>>,
+    pub prev: Option<crate::sh_weaver::notebook::BookEntryRef<'a>>,
 }
 
-///The format of the content. This is used to determine how to render the content.
+/// The format of the content. This is used to determine how to render the content.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -83,14 +91,16 @@ pub struct BookEntryView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContentFormat<'a> {
-    ///The format of the content. This is used to determine how to render the content.
+    /// The format of the content. This is used to determine how to render the content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub markdown: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub markdown: Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -101,27 +111,32 @@ pub struct ContentFormat<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EntryView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub authors: std::option::Option<crate::sh_weaver::notebook::AuthorListView<'a>>,
+    pub authors: Option<crate::sh_weaver::notebook::AuthorListView<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub rendered_view: std::option::Option<crate::sh_weaver::notebook::RenderedView<'a>>,
+    pub rendered_view: Option<crate::sh_weaver::notebook::RenderedView<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
+    pub tags: Option<crate::sh_weaver::notebook::Tags<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
+    pub title: Option<crate::sh_weaver::notebook::Title<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -134,29 +149,33 @@ pub struct EntryView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NotebookView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub authors: std::option::Option<crate::sh_weaver::notebook::AuthorListView<'a>>,
+    pub authors: Option<crate::sh_weaver::notebook::AuthorListView<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
+    pub tags: Option<crate::sh_weaver::notebook::Tags<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
+    pub title: Option<crate::sh_weaver::notebook::Title<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-///View of a rendered and cached notebook entry
+/// View of a rendered and cached notebook entry
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -165,18 +184,20 @@ pub struct NotebookView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RenderedView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub css: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
+    pub css: Option<jacquard_common::types::blob::Blob<'a>>,
     #[serde(borrow)]
     pub html: jacquard_common::types::blob::Blob<'a>,
 }
 
-///An array of tags associated with the notebook entry. Tags can help categorize and organize entries.
+/// An array of tags associated with the notebook entry. Tags can help categorize and organize entries.
 pub type Tags<'a> = Vec<jacquard_common::CowStr<'a>>;
-///The title of the notebook entry.
+/// The title of the notebook entry.
 pub type Title<'a> = jacquard_common::CowStr<'a>;

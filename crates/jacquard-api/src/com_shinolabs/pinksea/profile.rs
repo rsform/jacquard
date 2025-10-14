@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A profile of a PinkSea user.
+/// A profile of a PinkSea user.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,28 +14,31 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
-    ///The oekaki image that's the avatar of this profile.
+    /// The oekaki image that's the avatar of this profile.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ///The bio of the user.
+    pub avatar: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    /// The bio of the user.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub bio: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The links to outside platforms for this user
+    pub bio: Option<jacquard_common::CowStr<'a>>,
+    /// The links to outside platforms for this user
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub links: std::option::Option<
-        Vec<crate::com_shinolabs::pinksea::profile::ProfileLink<'a>>,
-    >,
-    ///The display name of the user.
+    pub links: Option<Vec<crate::com_shinolabs::pinksea::profile::ProfileLink<'a>>>,
+    /// The display name of the user.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub nickname: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub nickname: Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -88,14 +91,16 @@ impl From<ProfileGetRecordOutput<'_>> for Profile<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileLink<'a> {
-    ///The URL of the link.
+    /// The URL of the link.
     #[serde(borrow)]
     pub link: jacquard_common::types::string::Uri<'a>,
-    ///The name of the link.
+    /// The name of the link.
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
 }

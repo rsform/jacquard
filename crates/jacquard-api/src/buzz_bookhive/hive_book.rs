@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A book within the hive
+/// A book within the hive
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,48 +14,60 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HiveBook<'a> {
-    ///The authors of the book (tab separated)
+    /// The authors of the book (tab separated)
     #[serde(borrow)]
+    #[builder(into)]
     pub authors: jacquard_common::CowStr<'a>,
-    ///URL to full-size cover image
+    /// URL to full-size cover image
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub cover: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cover: Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Book description/summary
+    /// Book description/summary
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The book's hive id, used to correlate user's books with the hive
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// The book's hive id, used to correlate user's books with the hive
     #[serde(borrow)]
+    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
-    ///Average rating (0-1000)
+    /// Average rating (0-1000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rating: std::option::Option<i64>,
-    ///Number of ratings
+    #[builder(into)]
+    pub rating: Option<i64>,
+    /// Number of ratings
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ratings_count: std::option::Option<i64>,
-    ///The source service name (e.g. Goodreads)
+    #[builder(into)]
+    pub ratings_count: Option<i64>,
+    /// The source service name (e.g. Goodreads)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///ID of the book in the source service
+    pub source: Option<jacquard_common::CowStr<'a>>,
+    /// ID of the book in the source service
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub source_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URL to the book on the source service
+    pub source_id: Option<jacquard_common::CowStr<'a>>,
+    /// URL to the book on the source service
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub source_url: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URL to thumbnail image
+    pub source_url: Option<jacquard_common::CowStr<'a>>,
+    /// URL to thumbnail image
     #[serde(borrow)]
+    #[builder(into)]
     pub thumbnail: jacquard_common::CowStr<'a>,
-    ///The title of the book
+    /// The title of the book
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
     pub updated_at: jacquard_common::types::string::Datetime,
 }

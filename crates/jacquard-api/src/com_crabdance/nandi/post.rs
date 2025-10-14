@@ -13,30 +13,37 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
-    ///The main content of the blog post in markdown
+    /// The main content of the blog post in markdown
     #[serde(borrow)]
+    #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Whether the post is published or draft
+    /// Whether the post is published or draft
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub published: std::option::Option<bool>,
-    ///Optional summary/excerpt of the post
+    #[builder(into)]
+    pub published: Option<bool>,
+    /// Optional summary/excerpt of the post
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Tags for categorizing the post
+    pub summary: Option<jacquard_common::CowStr<'a>>,
+    /// Tags for categorizing the post
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///The title of the blog post
+    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// The title of the blog post
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub updated_at: Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

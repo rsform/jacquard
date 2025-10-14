@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A declaration of an instance of a at://2048 game
+/// A declaration of an instance of a at://2048 game
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,22 +14,24 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Game<'a> {
-    ///The player no longer has any moves left
+    /// The player no longer has any moves left
     pub completed: bool,
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The game's current score
+    /// The game's current score
     pub current_score: i64,
-    ///This is the recording of the game. Like chess notation, but for 2048
+    /// This is the recording of the game. Like chess notation, but for 2048
     #[serde(borrow)]
+    #[builder(into)]
     pub seeded_recording: jacquard_common::CowStr<'a>,
-    ///The sync status of this record with the users AT Protocol repo.
+    /// The sync status of this record with the users AT Protocol repo.
     #[serde(borrow)]
     pub sync_status: crate::blue__2048::SyncStatus<'a>,
-    ///The player has found a 2048 tile (they have won)
+    /// The player has found a 2048 tile (they have won)
     pub won: bool,
 }
 

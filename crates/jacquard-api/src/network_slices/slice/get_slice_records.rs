@@ -13,25 +13,26 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct IndexedRecord<'a> {
-    ///Content identifier of the record
+    /// Content identifier of the record
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    ///NSID of the collection this record belongs to
+    /// NSID of the collection this record belongs to
     #[serde(borrow)]
     pub collection: jacquard_common::types::string::Nsid<'a>,
-    ///DID of the record creator
+    /// DID of the record creator
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///When this record was indexed
+    /// When this record was indexed
     pub indexed_at: jacquard_common::types::string::Datetime,
-    ///AT-URI of the record
+    /// AT-URI of the record
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    ///The record value/content
+    /// The record value/content
     #[serde(borrow)]
     pub value: jacquard_common::types::value::Data<'a>,
 }
@@ -50,26 +51,29 @@ pub struct IndexedRecord<'a> {
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct GetSliceRecords<'a> {
-    ///Pagination cursor from previous response
+    /// Pagination cursor from previous response
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Maximum number of records to return
+    #[serde(borrow)]
+    pub cursor: Option<jacquard_common::CowStr<'a>>,
+    /// Maximum number of records to return
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    ///AT-URI of the slice to query
+    #[builder(into)]
+    pub limit: Option<i64>,
+    /// AT-URI of the slice to query
     #[serde(borrow)]
     #[builder(into)]
     pub slice: jacquard_common::CowStr<'a>,
-    ///Sorting configuration for result ordering
+    /// Sorting configuration for result ordering
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub sort_by: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///Flexible filtering conditions for querying records
+    pub sort_by: Option<jacquard_common::types::value::Data<'a>>,
+    /// Flexible filtering conditions for querying records
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub r#where: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub r#where: Option<jacquard_common::types::value::Data<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
@@ -91,7 +95,7 @@ pub struct GetSliceRecords<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSliceRecordsOutput<'a> {
-    ///Pagination cursor for next page
+    /// Pagination cursor for next page
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,

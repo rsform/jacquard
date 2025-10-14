@@ -23,21 +23,21 @@ pub struct EmitEvent<'a> {
     pub created_by: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
     pub event: EmitEventEvent<'a>,
-    ///An optional external ID for the event, used to deduplicate events from external systems. Fails when an event of same type with the same external ID exists for the same subject.
+    /// An optional external ID for the event, used to deduplicate events from external systems. Fails when an event of same type with the same external ID exists for the same subject.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub external_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    pub external_id: Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub mod_tool: Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
     pub subject: EmitEventSubject<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub subject_blob_cids: std::option::Option<
-        Vec<jacquard_common::types::string::Cid<'a>>,
-    >,
+    pub subject_blob_cids: Option<Vec<jacquard_common::types::string::Cid<'a>>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
@@ -179,7 +179,7 @@ pub struct EmitEventOutput<'a> {
 pub enum EmitEventError<'a> {
     #[serde(rename = "SubjectHasAction")]
     SubjectHasAction(std::option::Option<String>),
-    ///An event with the same external ID already exists for the subject.
+    /// An event with the same external ID already exists for the subject.
     #[serde(rename = "DuplicateExternalId")]
     DuplicateExternalId(std::option::Option<String>),
 }

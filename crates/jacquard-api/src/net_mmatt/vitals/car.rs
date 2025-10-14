@@ -13,32 +13,38 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Car<'a> {
-    ///The car fuel amount remaining value (floating point string)
+    /// The car fuel amount remaining value (floating point string)
     #[serde(borrow)]
+    #[builder(into)]
     pub amount_remaining: jacquard_common::CowStr<'a>,
-    ///The car fuel range value in miles
+    /// The car fuel range value in miles
     pub car_fuel_range: i64,
-    ///The car make value
+    /// The car make value
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub car_make: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The car model value
+    pub car_make: Option<jacquard_common::CowStr<'a>>,
+    /// The car model value
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub car_model: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The car fuel level value in percentage (floating point string)
+    pub car_model: Option<jacquard_common::CowStr<'a>>,
+    /// The car fuel level value in percentage (floating point string)
     #[serde(borrow)]
+    #[builder(into)]
     pub car_percent_fuel_remaining: jacquard_common::CowStr<'a>,
-    ///The car traveled distance value
+    /// The car traveled distance value
     pub car_traveled_distance: i64,
-    ///The car year value
+    /// The car year value
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub car_year: std::option::Option<i64>,
-    ///The unix timestamp of when the vital was recorded
+    #[builder(into)]
+    pub car_year: Option<i64>,
+    /// The unix timestamp of when the vital was recorded
     pub created_at: jacquard_common::types::string::Datetime,
 }
 

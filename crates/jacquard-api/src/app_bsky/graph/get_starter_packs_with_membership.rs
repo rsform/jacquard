@@ -74,7 +74,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksWithMembershipReques
     type Response = GetStarterPacksWithMembershipResponse;
 }
 
-///A starter pack and an optional list item indicating membership of a target user to that starter pack.
+/// A starter pack and an optional list item indicating membership of a target user to that starter pack.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -83,13 +83,15 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksWithMembershipReques
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StarterPackWithMembership<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub list_item: std::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
+    pub list_item: Option<crate::app_bsky::graph::ListItemView<'a>>,
     #[serde(borrow)]
     pub starter_pack: crate::app_bsky::graph::StarterPackView<'a>,
 }

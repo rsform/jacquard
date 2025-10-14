@@ -23,16 +23,17 @@ pub mod update_handle;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct IdentityInfo<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///The complete DID document for the identity.
+    /// The complete DID document for the identity.
     #[serde(borrow)]
     pub did_doc: jacquard_common::types::value::Data<'a>,
-    ///The validated handle of the account; or 'handle.invalid' if the handle did not bi-directionally match the DID document.
+    /// The validated handle of the account; or 'handle.invalid' if the handle did not bi-directionally match the DID document.
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
 }

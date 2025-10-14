@@ -19,22 +19,22 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct ForkStatus<'a> {
-    ///Branch to check status for
+    /// Branch to check status for
     #[serde(borrow)]
     #[builder(into)]
     pub branch: jacquard_common::CowStr<'a>,
-    ///DID of the fork owner
+    /// DID of the fork owner
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///Hidden ref to use for comparison
+    /// Hidden ref to use for comparison
     #[serde(borrow)]
     #[builder(into)]
     pub hidden_ref: jacquard_common::CowStr<'a>,
-    ///Name of the forked repository
+    /// Name of the forked repository
     #[serde(borrow)]
     #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Source repository URL
+    /// Source repository URL
     #[serde(borrow)]
     #[builder(into)]
     pub source: jacquard_common::CowStr<'a>,
@@ -59,7 +59,7 @@ pub struct ForkStatus<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ForkStatusOutput<'a> {
-    ///Fork status: 0=UpToDate, 1=FastForwardable, 2=Conflict, 3=MissingBranch
+    /// Fork status: 0=UpToDate, 1=FastForwardable, 2=Conflict, 3=MissingBranch
     pub status: i64,
 }
 

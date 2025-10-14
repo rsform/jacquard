@@ -30,7 +30,7 @@ pub struct RefreshSessionOutput<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(borrow)]
     pub refresh_jwt: jacquard_common::CowStr<'a>,
-    ///Hosting status of the account. If not specified, then assume 'active'.
+    /// Hosting status of the account. If not specified, then assume 'active'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,

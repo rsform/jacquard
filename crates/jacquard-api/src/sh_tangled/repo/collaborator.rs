@@ -13,12 +13,13 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Collaborator<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    ///repo to add this user to
+    /// repo to add this user to
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]

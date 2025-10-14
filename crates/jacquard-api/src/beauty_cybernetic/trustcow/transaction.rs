@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A verified transaction between two ATProto identities that must be stored in both parties' PDS
+/// A verified transaction between two ATProto identities that must be stored in both parties' PDS
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,32 +14,39 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Transaction<'a> {
-    ///Transaction amount (optional, in whatever currency applies)
+    /// Transaction amount (optional, in whatever currency applies)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub amount: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///When the transaction occurred
+    pub amount: Option<jacquard_common::CowStr<'a>>,
+    /// When the transaction occurred
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Currency code (optional, e.g. USD, EUR, BTC)
+    /// Currency code (optional, e.g. USD, EUR, BTC)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub currency: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Description of the service or product transacted
+    pub currency: Option<jacquard_common::CowStr<'a>>,
+    /// Description of the service or product transacted
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///DID of the service consumer identity
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// DID of the service consumer identity
     #[serde(borrow)]
+    #[builder(into)]
     pub service_consumer: jacquard_common::CowStr<'a>,
-    ///DID of the service provider identity
+    /// DID of the service provider identity
     #[serde(borrow)]
+    #[builder(into)]
     pub service_provider: jacquard_common::CowStr<'a>,
-    ///Unique identifier for this transaction, must be identical in both parties' records
+    /// Unique identifier for this transaction, must be identical in both parties' records
     #[serde(borrow)]
+    #[builder(into)]
     pub transaction_id: jacquard_common::CowStr<'a>,
 }
 

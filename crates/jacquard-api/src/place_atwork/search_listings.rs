@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A job listing record with metadata for strong references
+/// A job listing record with metadata for strong references
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,20 +14,22 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListingRecord<'a> {
-    ///CID of the listing record
+    /// CID of the listing record
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    ///AT-URI of the listing (at://did/place.atwork.listing/rkey)
+    /// AT-URI of the listing (at://did/place.atwork.listing/rkey)
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    ///The full job listing record
+    /// The full job listing record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub value: std::option::Option<crate::place_atwork::listing::Listing<'a>>,
+    pub value: Option<crate::place_atwork::listing::Listing<'a>>,
 }
 
 #[derive(
@@ -79,7 +81,7 @@ pub struct SearchListingsOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SearchListingsError<'a> {
-    ///Failed to search listings
+    /// Failed to search listings
     #[serde(rename = "SearchFailed")]
     SearchFailed(std::option::Option<String>),
 }

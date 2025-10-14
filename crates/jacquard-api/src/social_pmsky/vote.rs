@@ -13,34 +13,39 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Vote<'a> {
-    ///The persistent, anonymous identifier for the user casting the vote.
+    /// The persistent, anonymous identifier for the user casting the vote.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub aid: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Optionally, CID specifying the specific version of 'uri' resource this vote applies to.
+    pub aid: Option<jacquard_common::CowStr<'a>>,
+    /// Optionally, CID specifying the specific version of 'uri' resource this vote applies to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    ///Timestamp when this vote was created.
+    pub cid: Option<jacquard_common::types::string::Cid<'a>>,
+    /// Timestamp when this vote was created.
     pub cts: jacquard_common::types::string::Datetime,
-    ///An optional array of predefined reasons justifying the vote.
+    /// An optional array of predefined reasons justifying the vote.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reasons: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///Signature of dag-cbor encoded vote.
+    pub reasons: Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// Signature of dag-cbor encoded vote.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sig: std::option::Option<bytes::Bytes>,
-    ///the account creating the vote, not necessarily the same as the user who voted
+    #[builder(into)]
+    pub sig: Option<bytes::Bytes>,
+    /// the account creating the vote, not necessarily the same as the user who voted
     #[serde(borrow)]
     pub src: jacquard_common::types::string::Did<'a>,
-    ///AT URI of the record, repository (account), or other resource that this vote applies to.
+    /// AT URI of the record, repository (account), or other resource that this vote applies to.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
-    ///The value of the vote. The exact meaning depends on what is being voted on, but generally '+1' means 'approval', -1 means 'disapproval', and 0 indicates 'neutrality'.
+    /// The value of the vote. The exact meaning depends on what is being voted on, but generally '+1' means 'approval', -1 means 'disapproval', and 0 indicates 'neutrality'.
     pub val: i64,
 }
 

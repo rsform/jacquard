@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record containing a bookmarked item, or 'clip'.
+/// Record containing a bookmarked item, or 'clip'.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,37 +14,42 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Clip<'a> {
-    ///Client-declared timestamp when the bookmark is created
+    /// Client-declared timestamp when the bookmark is created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///A description of the bookmark's content. This should be ripped from the URL metadata and be static for all records using the URL.
+    /// A description of the bookmark's content. This should be ripped from the URL metadata and be static for all records using the URL.
     #[serde(borrow)]
+    #[builder(into)]
     pub description: jacquard_common::CowStr<'a>,
-    ///Indicates human language of the given URL
+    /// Indicates human language of the given URL
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub languages: std::option::Option<Vec<jacquard_common::types::string::Language>>,
-    ///User-written notes for the bookmark. Public and personal.
+    #[builder(into)]
+    pub languages: Option<Vec<jacquard_common::types::string::Language>>,
+    /// User-written notes for the bookmark. Public and personal.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///An array of tags. A format of solely alphanumeric characters and dashes should be used.
+    pub notes: Option<jacquard_common::CowStr<'a>>,
+    /// An array of tags. A format of solely alphanumeric characters and dashes should be used.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<
-        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    >,
-    ///The title of the bookmark. If left empty, reuse the URL.
+    pub tags: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    /// The title of the bookmark. If left empty, reuse the URL.
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
-    ///Whether the bookmark can be used for feed indexing and aggregation
+    /// Whether the bookmark can be used for feed indexing and aggregation
     pub unlisted: bool,
-    ///Whether the bookmark has been read by the user
+    /// Whether the bookmark has been read by the user
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub unread: std::option::Option<bool>,
-    ///The URL of the bookmark. Cannot be left empty or be modified after creation.
+    #[builder(into)]
+    pub unread: Option<bool>,
+    /// The URL of the bookmark. Cannot be left empty or be modified after creation.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
 }

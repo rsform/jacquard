@@ -23,9 +23,9 @@ pub struct UpdateRead<'a> {
     #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub message_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub message_id: Option<jacquard_common::CowStr<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]

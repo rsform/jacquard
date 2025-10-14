@@ -21,7 +21,7 @@
 pub struct UpdateAccountSigningKey<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///Did-key formatted public key
+    /// Did-key formatted public key
     #[serde(borrow)]
     pub signing_key: jacquard_common::types::string::Did<'a>,
     #[serde(flatten)]

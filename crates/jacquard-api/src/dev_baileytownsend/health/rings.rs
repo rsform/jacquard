@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A record of daily activity rings (Apple Fitness), including move, exercise, and stand goals.
+/// A record of daily activity rings (Apple Fitness), including move, exercise, and stand goals.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,22 +14,23 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Rings<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The total minutes of exercise completed.
+    /// The total minutes of exercise completed.
     pub exercise: i64,
-    ///The daily exercise goal in minutes.
+    /// The daily exercise goal in minutes.
     pub exercise_goal: i64,
-    ///The total active calories burned for the day.
+    /// The total active calories burned for the day.
     pub r#move: i64,
-    ///The daily move goal in calories.
+    /// The daily move goal in calories.
     pub move_goal: i64,
-    ///The daily stand goal in hours.
+    /// The daily stand goal in hours.
     pub stand_goal: i64,
-    ///The number of hours the user stood up and moved around.
+    /// The number of hours the user stood up and moved around.
     pub stand_hours: i64,
 }
 

@@ -13,16 +13,17 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CancellationResults<'a> {
-    ///DIDs for which cancellation failed with error details
+    /// DIDs for which cancellation failed with error details
     #[serde(borrow)]
     pub failed: Vec<
         crate::tools_ozone::moderation::cancel_scheduled_actions::FailedCancellation<'a>,
     >,
-    ///DIDs for which all pending scheduled actions were successfully cancelled
+    /// DIDs for which all pending scheduled actions were successfully cancelled
     #[serde(borrow)]
     pub succeeded: Vec<jacquard_common::types::string::Did<'a>>,
 }
@@ -35,17 +36,20 @@ pub struct CancellationResults<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FailedCancellation<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub error: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub error_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub error_code: Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -62,12 +66,12 @@ pub struct FailedCancellation<'a> {
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct CancelScheduledActions<'a> {
-    ///Optional comment describing the reason for cancellation
+    /// Optional comment describing the reason for cancellation
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Array of DID subjects to cancel scheduled actions for
+    #[serde(borrow)]
+    pub comment: Option<jacquard_common::CowStr<'a>>,
+    /// Array of DID subjects to cancel scheduled actions for
     #[serde(borrow)]
     pub subjects: Vec<jacquard_common::types::string::Did<'a>>,
     #[serde(flatten)]

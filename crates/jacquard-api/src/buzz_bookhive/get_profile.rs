@@ -40,13 +40,13 @@ pub struct GetProfile<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfileOutput<'a> {
-    ///The user's activity
+    /// The user's activity
     #[serde(borrow)]
     pub activity: Vec<crate::buzz_bookhive::Activity<'a>>,
-    ///All books in the user's library
+    /// All books in the user's library
     #[serde(borrow)]
     pub books: Vec<crate::buzz_bookhive::UserBook<'a>>,
-    ///The user's profile
+    /// The user's profile
     #[serde(borrow)]
     pub profile: crate::buzz_bookhive::Profile<'a>,
 }

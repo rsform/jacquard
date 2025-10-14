@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A notebook entry
+/// A notebook entry
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,22 +14,26 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
-    ///The content of the notebook entry. This should be some flavor of Markdown.
+    /// The content of the notebook entry. This should be some flavor of Markdown.
     #[serde(borrow)]
+    #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
-    ///Client-declared timestamp when this was originally created.
+    /// Client-declared timestamp when this was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The set of images, if any, embedded in the notebook entry.
+    /// The set of images, if any, embedded in the notebook entry.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub images: std::option::Option<crate::sh_weaver::embed::images::Images<'a>>,
+    pub images: Option<crate::sh_weaver::embed::images::Images<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
+    pub tags: Option<crate::sh_weaver::notebook::Tags<'a>>,
     #[serde(borrow)]
     pub title: crate::sh_weaver::notebook::Title<'a>,
 }

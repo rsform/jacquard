@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record representing an account's inclusion on a specific list. The AppView will ignore duplicate listitem records.
+/// Record representing an account's inclusion on a specific list. The AppView will ignore duplicate listitem records.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,15 +14,16 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Listitem<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Reference (AT-URI) to the list record (app.bsky.graph.list).
+    /// Reference (AT-URI) to the list record (app.bsky.graph.list).
     #[serde(borrow)]
     pub list: jacquard_common::types::string::AtUri<'a>,
-    ///The account which is included on the list.
+    /// The account which is included on the list.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }

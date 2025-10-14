@@ -13,21 +13,24 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Actor<'a> {
-    ///Decentralized identifier of the actor
+    /// Decentralized identifier of the actor
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///Human-readable handle of the actor
+    /// Human-readable handle of the actor
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
-    ///When this actor was indexed
+    pub handle: Option<jacquard_common::types::string::Handle<'a>>,
+    /// When this actor was indexed
     pub indexed_at: jacquard_common::types::string::Datetime,
-    ///AT-URI of the slice this actor is indexed in
+    /// AT-URI of the slice this actor is indexed in
     #[serde(borrow)]
+    #[builder(into)]
     pub slice_uri: jacquard_common::CowStr<'a>,
 }
 
@@ -45,22 +48,24 @@ pub struct Actor<'a> {
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct GetActors<'a> {
-    ///Pagination cursor from previous response
+    /// Pagination cursor from previous response
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Maximum number of actors to return
+    #[serde(borrow)]
+    pub cursor: Option<jacquard_common::CowStr<'a>>,
+    /// Maximum number of actors to return
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    ///AT-URI of the slice to query
+    #[builder(into)]
+    pub limit: Option<i64>,
+    /// AT-URI of the slice to query
     #[serde(borrow)]
     #[builder(into)]
     pub slice: jacquard_common::CowStr<'a>,
-    ///Flexible filtering conditions for querying actors
+    /// Flexible filtering conditions for querying actors
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub r#where: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub r#where: Option<jacquard_common::types::value::Data<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
@@ -84,7 +89,7 @@ pub struct GetActors<'a> {
 pub struct GetActorsOutput<'a> {
     #[serde(borrow)]
     pub actors: Vec<jacquard_common::types::value::Data<'a>>,
-    ///Pagination cursor for next page
+    /// Pagination cursor for next page
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,

@@ -13,14 +13,17 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BackgroundImage<'a> {
     #[serde(borrow)]
     pub image: jacquard_common::types::blob::Blob<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub repeat: std::option::Option<bool>,
+    #[builder(into)]
+    pub repeat: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub width: std::option::Option<i64>,
+    #[builder(into)]
+    pub width: Option<i64>,
 }

@@ -19,15 +19,15 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct InitAgeAssurance<'a> {
-    ///An ISO 3166-1 alpha-2 code of the user's location.
+    /// An ISO 3166-1 alpha-2 code of the user's location.
     #[serde(borrow)]
     #[builder(into)]
     pub country_code: jacquard_common::CowStr<'a>,
-    ///The user's email address to receive assurance instructions.
+    /// The user's email address to receive assurance instructions.
     #[serde(borrow)]
     #[builder(into)]
     pub email: jacquard_common::CowStr<'a>,
-    ///The user's preferred language for communication during the assurance process.
+    /// The user's preferred language for communication during the assurance process.
     #[serde(borrow)]
     #[builder(into)]
     pub language: jacquard_common::CowStr<'a>,

@@ -46,7 +46,7 @@ pub struct SearchBooks<'a> {
 pub struct SearchBooksOutput<'a> {
     #[serde(borrow)]
     pub books: Vec<jacquard_common::types::value::Data<'a>>,
-    ///The next offset to use for pagination (result of limit + offset)
+    /// The next offset to use for pagination (result of limit + offset)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub offset: std::option::Option<i64>,
 }

@@ -13,16 +13,18 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AddressControl<'a> {
-    ///Ethereum address as bytes (20 bytes)
+    /// Ethereum address as bytes (20 bytes)
     pub address: bytes::Bytes,
-    ///List of all Chain IDs (besides the one in the sign-in message, though you can include it) that the holder of this address is also active on & accepts tokens thru.
+    /// List of all Chain IDs (besides the one in the sign-in message, though you can include it) that the holder of this address is also active on & accepts tokens thru.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub also_on: std::option::Option<Vec<i64>>,
-    ///Sign in With Ethereum message signature as bytes
+    #[builder(into)]
+    pub also_on: Option<Vec<i64>>,
+    /// Sign in With Ethereum message signature as bytes
     pub signature: bytes::Bytes,
     #[serde(borrow)]
     pub siwe: crate::club_stellz::evm::address_control::SiweMessage<'a>,
@@ -36,30 +38,36 @@ pub struct AddressControl<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SiweMessage<'a> {
-    ///Ethereum address in 0x-prefixed, checksummed hex format
+    /// Ethereum address in 0x-prefixed, checksummed hex format
     #[serde(borrow)]
+    #[builder(into)]
     pub address: jacquard_common::CowStr<'a>,
-    ///Chain ID of the Ethereum VM network the address is on
+    /// Chain ID of the Ethereum VM network the address is on
     pub chain_id: i64,
-    ///Domain of the application requesting the signature, e.g. 'wallet-link.stellz.club'
+    /// Domain of the application requesting the signature, e.g. 'wallet-link.stellz.club'
     #[serde(borrow)]
+    #[builder(into)]
     pub domain: jacquard_common::CowStr<'a>,
-    ///Timestamp when the message was signed
+    /// Timestamp when the message was signed
     pub issued_at: jacquard_common::types::string::Datetime,
-    ///Random nonce the message was signed with
+    /// Random nonce the message was signed with
     #[serde(borrow)]
+    #[builder(into)]
     pub nonce: jacquard_common::CowStr<'a>,
-    ///The message shown to the user in their wallet before signing, which MUST be of the format 'Prove control of ${address} to link it to ${did}', where ${address} is the linked Ethereum address in 0x-prefixed, checksummed hex format, and ${did} is the DID of the user.
+    /// The message shown to the user in their wallet before signing, which MUST be of the format 'Prove control of ${address} to link it to ${did}', where ${address} is the linked Ethereum address in 0x-prefixed, checksummed hex format, and ${did} is the DID of the user.
     #[serde(borrow)]
+    #[builder(into)]
     pub statement: jacquard_common::CowStr<'a>,
-    ///URI of the application requesting the signature, e.g. 'https://wallet-link.stellz.club'
+    /// URI of the application requesting the signature, e.g. 'https://wallet-link.stellz.club'
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
-    ///Sign in With Ethereum message version
+    /// Sign in With Ethereum message version
     #[serde(borrow)]
+    #[builder(into)]
     pub version: jacquard_common::CowStr<'a>,
 }

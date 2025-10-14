@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Specifies the sub-string range a facet feature applies to. Start index is inclusive, end index is exclusive. Indices are zero-indexed, counting bytes of the UTF-8 encoded text. NOTE: some languages, like Javascript, use UTF-16 or Unicode codepoints for string slice indexing; in these languages, convert to byte arrays before working with facets.
+/// Specifies the sub-string range a facet feature applies to. Start index is inclusive, end index is exclusive. Indices are zero-indexed, counting bytes of the UTF-8 encoded text. NOTE: some languages, like Javascript, use UTF-16 or Unicode codepoints for string slice indexing; in these languages, convert to byte arrays before working with facets.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,7 +14,8 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ByteSlice<'a> {
@@ -22,7 +23,7 @@ pub struct ByteSlice<'a> {
     pub byte_start: i64,
 }
 
-///Facet feature for a URL. The text URL may have been simplified or truncated, but the facet reference should be a complete URL.
+/// Facet feature for a URL. The text URL may have been simplified or truncated, but the facet reference should be a complete URL.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -31,7 +32,8 @@ pub struct ByteSlice<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Link<'a> {
@@ -39,7 +41,7 @@ pub struct Link<'a> {
     pub uri: jacquard_common::types::string::Uri<'a>,
 }
 
-///Annotation of a sub-string within rich text.
+/// Annotation of a sub-string within rich text.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -48,7 +50,8 @@ pub struct Link<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Facet<'a> {
@@ -79,7 +82,7 @@ pub enum FacetFeaturesItem<'a> {
     Room(Box<crate::social_psky::richtext::facet::Room<'a>>),
 }
 
-///Facet feature for mention of another account. The text is usually a handle, including a '@' prefix, but the facet reference is a DID.
+/// Facet feature for mention of another account. The text is usually a handle, including a '@' prefix, but the facet reference is a DID.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -88,7 +91,8 @@ pub enum FacetFeaturesItem<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Mention<'a> {
@@ -96,7 +100,7 @@ pub struct Mention<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
-///Facet feature for a room. The text usually includes a '#' prefix, but the facet reference should not (except in the case of a room tag that includes a '#' prefix) - TODO: update when rooms are actually implemented
+/// Facet feature for a room. The text usually includes a '#' prefix, but the facet reference should not (except in the case of a room tag that includes a '#' prefix) - TODO: update when rooms are actually implemented
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -105,10 +109,12 @@ pub struct Mention<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Room<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub room: jacquard_common::CowStr<'a>,
 }

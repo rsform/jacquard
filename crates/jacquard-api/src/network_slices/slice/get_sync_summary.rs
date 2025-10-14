@@ -13,11 +13,13 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionSummary<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub collection: jacquard_common::CowStr<'a>,
     pub estimated_repos: i64,
     pub is_external: bool,
@@ -62,15 +64,15 @@ pub struct GetSyncSummary<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSyncSummaryOutput<'a> {
-    ///The actual limit applied (user-specified or default)
+    /// The actual limit applied (user-specified or default)
     pub applied_limit: i64,
-    ///Number of repositories after applying limit
+    /// Number of repositories after applying limit
     pub capped_repos: i64,
     #[serde(borrow)]
     pub collections_summary: Vec<jacquard_common::types::value::Data<'a>>,
-    ///Total number of repositories that would be synced
+    /// Total number of repositories that would be synced
     pub total_repos: i64,
-    ///Whether the sync would be limited by maxRepos
+    /// Whether the sync would be limited by maxRepos
     pub would_be_capped: bool,
 }
 

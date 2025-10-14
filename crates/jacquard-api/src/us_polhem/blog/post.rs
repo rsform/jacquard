@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record describing a blog post.
+/// Record describing a blog post.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,33 +14,42 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub excerpt: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub excerpt: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub featured_image: std::option::Option<crate::app_bsky::embed::images::Image<'a>>,
+    pub featured_image: Option<crate::app_bsky::embed::images::Image<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub images: std::option::Option<Vec<crate::app_bsky::embed::images::Image<'a>>>,
+    pub images: Option<Vec<crate::app_bsky::embed::images::Image<'a>>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub slug: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub tags: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
-    ///Tells the visibility of the article to AppView.
+    /// Tells the visibility of the article to AppView.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub visibility: Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

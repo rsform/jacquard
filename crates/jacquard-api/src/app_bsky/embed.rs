@@ -11,7 +11,7 @@ pub mod record;
 pub mod record_with_media;
 pub mod video;
 
-///width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.
+/// width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -20,7 +20,8 @@ pub mod video;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AspectRatio<'a> {

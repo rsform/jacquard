@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Facet feature for bold text
+/// Facet feature for bold text
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,11 +14,12 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Bold<'a> {}
-///Specifies the sub-string range a facet feature applies to. Start index is inclusive, end index is exclusive. Indices are zero-indexed, counting bytes of the UTF-8 encoded text. NOTE: some languages, like Javascript, use UTF-16 or Unicode codepoints for string slice indexing; in these languages, convert to byte arrays before working with facets.
+/// Specifies the sub-string range a facet feature applies to. Start index is inclusive, end index is exclusive. Indices are zero-indexed, counting bytes of the UTF-8 encoded text. NOTE: some languages, like Javascript, use UTF-16 or Unicode codepoints for string slice indexing; in these languages, convert to byte arrays before working with facets.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -27,7 +28,8 @@ pub struct Bold<'a> {}
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ByteSlice<'a> {
@@ -35,7 +37,7 @@ pub struct ByteSlice<'a> {
     pub byte_start: i64,
 }
 
-///Facet feature for inline code.
+/// Facet feature for inline code.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -44,11 +46,12 @@ pub struct ByteSlice<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Code<'a> {}
-///Facet feature for highlighted text.
+/// Facet feature for highlighted text.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -57,11 +60,12 @@ pub struct Code<'a> {}
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Highlight<'a> {}
-///Facet feature for an identifier. Used for linking to a segment
+/// Facet feature for an identifier. Used for linking to a segment
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -70,16 +74,18 @@ pub struct Highlight<'a> {}
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Id<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Facet feature for italic text
+/// Facet feature for italic text
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -88,11 +94,12 @@ pub struct Id<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Italic<'a> {}
-///Facet feature for a URL. The text URL may have been simplified or truncated, but the facet reference should be a complete URL.
+/// Facet feature for a URL. The text URL may have been simplified or truncated, but the facet reference should be a complete URL.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -101,7 +108,8 @@ pub struct Italic<'a> {}
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Link<'a> {
@@ -109,7 +117,7 @@ pub struct Link<'a> {
     pub uri: jacquard_common::types::string::Uri<'a>,
 }
 
-///Annotation of a sub-string within rich text.
+/// Annotation of a sub-string within rich text.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -118,7 +126,8 @@ pub struct Link<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Facet<'a> {
@@ -159,7 +168,7 @@ pub enum FacetFeaturesItem<'a> {
     Italic(Box<crate::pub_leaflet::richtext::facet::Italic<'a>>),
 }
 
-///Facet feature for strikethrough markup
+/// Facet feature for strikethrough markup
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -168,11 +177,12 @@ pub enum FacetFeaturesItem<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Strikethrough<'a> {}
-///Facet feature for underline markup
+/// Facet feature for underline markup
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -181,7 +191,8 @@ pub struct Strikethrough<'a> {}
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Underline<'a> {}

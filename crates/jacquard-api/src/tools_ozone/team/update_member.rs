@@ -22,11 +22,12 @@ pub struct UpdateMember<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disabled: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub role: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub disabled: Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub role: Option<jacquard_common::CowStr<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
@@ -68,7 +69,7 @@ pub struct UpdateMemberOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdateMemberError<'a> {
-    ///The member being updated does not exist in the team
+    /// The member being updated does not exist in the team
     #[serde(rename = "MemberNotFound")]
     MemberNotFound(std::option::Option<String>),
 }

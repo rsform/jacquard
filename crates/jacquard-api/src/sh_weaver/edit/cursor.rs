@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContainerId<'a> {
@@ -48,11 +49,12 @@ pub enum ContainerIdValue<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CursorSide<'a> {
-    ///The side of an item the cursor is on (left = -1, right = 1, middle = 0)
+    /// The side of an item the cursor is on (left = -1, right = 1, middle = 0)
     pub value: i64,
 }
 
@@ -64,7 +66,8 @@ pub struct CursorSide<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Id<'a> {
@@ -72,7 +75,7 @@ pub struct Id<'a> {
     pub peer: i64,
 }
 
-///An edit record for a notebook.
+/// An edit record for a notebook.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -81,18 +84,21 @@ pub struct Id<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Cursor<'a> {
     #[serde(borrow)]
     pub container: crate::sh_weaver::edit::cursor::ContainerId<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub id: std::option::Option<crate::sh_weaver::edit::cursor::Id<'a>>,
+    pub id: Option<crate::sh_weaver::edit::cursor::Id<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub side: std::option::Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
+    pub side: Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -145,11 +151,13 @@ impl From<CursorGetRecordOutput<'_>> for Cursor<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NormalContainerId<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub container_type: jacquard_common::CowStr<'a>,
     pub counter: i64,
     pub peer: i64,
@@ -163,12 +171,15 @@ pub struct NormalContainerId<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RootContainerId<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub container_type: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
 }

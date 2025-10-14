@@ -19,27 +19,31 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct ListScheduledActions<'a> {
-    ///Cursor for pagination
+    /// Cursor for pagination
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Filter actions scheduled to execute before this time
+    #[serde(borrow)]
+    pub cursor: Option<jacquard_common::CowStr<'a>>,
+    /// Filter actions scheduled to execute before this time
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ends_before: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Maximum number of results to return
+    #[builder(into)]
+    pub ends_before: Option<jacquard_common::types::string::Datetime>,
+    /// Maximum number of results to return
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    ///Filter actions scheduled to execute after this time
+    #[builder(into)]
+    pub limit: Option<i64>,
+    /// Filter actions scheduled to execute after this time
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub starts_after: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Filter actions by status
+    #[builder(into)]
+    pub starts_after: Option<jacquard_common::types::string::Datetime>,
+    /// Filter actions by status
     #[serde(borrow)]
     pub statuses: Vec<jacquard_common::CowStr<'a>>,
-    ///Filter actions for specific DID subjects
+    /// Filter actions for specific DID subjects
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub subjects: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    pub subjects: Option<Vec<jacquard_common::types::string::Did<'a>>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
@@ -63,7 +67,7 @@ pub struct ListScheduledActions<'a> {
 pub struct ListScheduledActionsOutput<'a> {
     #[serde(borrow)]
     pub actions: Vec<crate::tools_ozone::moderation::ScheduledActionView<'a>>,
-    ///Cursor for next page of results
+    /// Cursor for next page of results
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,

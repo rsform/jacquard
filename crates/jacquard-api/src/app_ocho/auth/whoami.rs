@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///The session data
+/// The session data
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -18,10 +18,10 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WhoamiOutput<'a> {
-    ///The user's DID
+    /// The user's DID
     #[serde(borrow)]
     pub did: jacquard_common::CowStr<'a>,
-    ///The user's ID
+    /// The user's ID
     #[serde(borrow)]
     pub handle: jacquard_common::CowStr<'a>,
 }

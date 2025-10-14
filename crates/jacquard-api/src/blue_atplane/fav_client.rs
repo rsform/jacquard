@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A declaration of a favorite client.
+/// A declaration of a favorite client.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,12 +14,14 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FavClient<'a> {
-    ///Set to your favorite client.
+    /// Set to your favorite client.
     #[serde(borrow)]
+    #[builder(into)]
     pub fav_client: jacquard_common::CowStr<'a>,
 }
 

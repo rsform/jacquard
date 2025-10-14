@@ -19,15 +19,17 @@ pub mod notify_of_new_entry;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlobMetadata<'a> {
     #[serde(borrow)]
     pub blobref: jacquard_common::types::blob::Blob<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -38,14 +40,17 @@ pub struct BlobMetadata<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlogEntry<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
 }
 
 #[jacquard_derive::lexicon]
@@ -56,11 +61,13 @@ pub struct BlogEntry<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Comment<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub entry_uri: jacquard_common::types::string::AtUri<'a>,
@@ -74,14 +81,17 @@ pub struct Comment<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Ogp<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: std::option::Option<i64>,
+    #[builder(into)]
+    pub height: Option<i64>,
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub width: std::option::Option<i64>,
+    #[builder(into)]
+    pub width: Option<i64>,
 }

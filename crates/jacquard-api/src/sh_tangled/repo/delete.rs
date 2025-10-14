@@ -19,14 +19,14 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct Delete<'a> {
-    ///DID of the repository owner
+    /// DID of the repository owner
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///Name of the repository to delete
+    /// Name of the repository to delete
     #[serde(borrow)]
     #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Rkey of the repository record
+    /// Rkey of the repository record
     #[serde(borrow)]
     #[builder(into)]
     pub rkey: jacquard_common::CowStr<'a>,

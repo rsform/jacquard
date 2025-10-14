@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Web Monetization wallet.
+/// Web Monetization wallet.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,17 +14,19 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WebMonetization<'a> {
-    ///Wallet address.
+    /// Wallet address.
     #[serde(borrow)]
     pub address: jacquard_common::types::string::Uri<'a>,
-    ///Short, human-readable description of how this wallet is related to this account.
+    /// Short, human-readable description of how this wallet is related to this account.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub note: Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

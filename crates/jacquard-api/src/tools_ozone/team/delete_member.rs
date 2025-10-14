@@ -45,10 +45,10 @@ pub struct DeleteMember<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteMemberError<'a> {
-    ///The member being deleted does not exist
+    /// The member being deleted does not exist
     #[serde(rename = "MemberNotFound")]
     MemberNotFound(std::option::Option<String>),
-    ///You can not delete yourself from the team
+    /// You can not delete yourself from the team
     #[serde(rename = "CannotDeleteSelf")]
     CannotDeleteSelf(std::option::Option<String>),
 }

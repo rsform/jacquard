@@ -19,41 +19,44 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct CreateWebhook<'a> {
-    ///Whether this webhook should be active upon creation.
+    /// Whether this webhook should be active upon creation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub active: std::option::Option<bool>,
-    ///A description of what this webhook is used for.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The types of events this webhook should receive.
+    pub active: Option<bool>,
+    /// A description of what this webhook is used for.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// The types of events this webhook should receive.
     #[serde(borrow)]
     pub events: Vec<jacquard_common::CowStr<'a>>,
-    ///Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
+    /// Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub mute_words: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///A user-friendly name for this webhook.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Text to prepend to webhook messages.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    pub mute_words: Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// A user-friendly name for this webhook.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
-    pub prefix: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Text replacement rules for webhook messages.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub rewrite: std::option::Option<Vec<crate::place_stream::server::RewriteRule<'a>>>,
-    ///Text to append to webhook messages.
+    pub name: Option<jacquard_common::CowStr<'a>>,
+    /// Text to prepend to webhook messages.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub suffix: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The webhook URL where events will be sent.
+    #[serde(borrow)]
+    pub prefix: Option<jacquard_common::CowStr<'a>>,
+    /// Text replacement rules for webhook messages.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub rewrite: Option<Vec<crate::place_stream::server::RewriteRule<'a>>>,
+    /// Text to append to webhook messages.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub suffix: Option<jacquard_common::CowStr<'a>>,
+    /// The webhook URL where events will be sent.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
     #[serde(flatten)]
@@ -96,13 +99,13 @@ pub struct CreateWebhookOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateWebhookError<'a> {
-    ///The provided webhook URL is invalid or unreachable.
+    /// The provided webhook URL is invalid or unreachable.
     #[serde(rename = "InvalidUrl")]
     InvalidUrl(std::option::Option<String>),
-    ///A webhook with this URL already exists for this user.
+    /// A webhook with this URL already exists for this user.
     #[serde(rename = "DuplicateWebhook")]
     DuplicateWebhook(std::option::Option<String>),
-    ///The user has reached their maximum number of webhooks.
+    /// The user has reached their maximum number of webhooks.
     #[serde(rename = "TooManyWebhooks")]
     TooManyWebhooks(std::option::Option<String>),
 }

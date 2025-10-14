@@ -34,17 +34,17 @@ pub struct ResolveMiniDoc<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveMiniDocOutput<'a> {
-    ///DID, bi-directionally verified if a handle was provided in the query.
+    /// DID, bi-directionally verified if a handle was provided in the query.
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    /**The validated handle of the account or `handle.invalid` if the handle
+    /** The validated handle of the account or `handle.invalid` if the handle
 did not bi-directionally match the DID document.*/
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
-    ///The identity's PDS URL
+    /// The identity's PDS URL
     #[serde(borrow)]
     pub pds: jacquard_common::types::string::Uri<'a>,
-    /**The atproto signing key publicKeyMultibase
+    /** The atproto signing key publicKeyMultibase
 
 Legacy key encoding not supported. the key is returned directly; `id`,
 `type`, and `controller` are omitted.*/

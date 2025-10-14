@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Going to the event
+/// Going to the event
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -23,7 +23,7 @@ impl std::fmt::Display for Going {
     }
 }
 
-///Interested in the event
+/// Interested in the event
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -41,7 +41,7 @@ impl std::fmt::Display for Interested {
     }
 }
 
-///An RSVP for an event.
+/// An RSVP for an event.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -50,11 +50,13 @@ impl std::fmt::Display for Interested {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Rsvp<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
@@ -102,7 +104,7 @@ impl From<RsvpGetRecordOutput<'_>> for Rsvp<'_> {
     }
 }
 
-///Not going to the event
+/// Not going to the event
 #[derive(
     serde::Serialize,
     serde::Deserialize,

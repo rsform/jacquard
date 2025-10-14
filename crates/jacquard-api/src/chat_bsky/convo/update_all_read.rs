@@ -20,9 +20,9 @@
 #[builder(start_fn = new)]
 pub struct UpdateAllRead<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub status: Option<jacquard_common::CowStr<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
@@ -44,7 +44,7 @@ pub struct UpdateAllRead<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAllReadOutput<'a> {
-    ///The count of updated convos.
+    /// The count of updated convos.
     pub updated_count: i64,
 }
 

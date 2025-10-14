@@ -13,7 +13,8 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LivestreamView<'a> {
@@ -26,15 +27,14 @@ pub struct LivestreamView<'a> {
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    ///The number of viewers watching this livestream. Use when you can't reasonably use #viewerCount directly.
+    /// The number of viewers watching this livestream. Use when you can't reasonably use #viewerCount directly.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub viewer_count: std::option::Option<
-        crate::place_stream::livestream::ViewerCount<'a>,
-    >,
+    pub viewer_count: Option<crate::place_stream::livestream::ViewerCount<'a>>,
 }
 
-///Record announcing a livestream is happening
+/// Record announcing a livestream is happening
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -43,34 +43,41 @@ pub struct LivestreamView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Livestream<'a> {
-    ///The source of the livestream, if available, in a User Agent format: `<product> / <product-version> <comment>` e.g. Streamplace/0.7.5 iOS
+    /// The source of the livestream, if available, in a User Agent format: `<product> / <product-version> <comment>` e.g. Streamplace/0.7.5 iOS
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub agent: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The primary URL where this livestream can be viewed, if available.
+    pub agent: Option<jacquard_common::CowStr<'a>>,
+    /// The primary URL where this livestream can be viewed, if available.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub canonical_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
-    ///Client-declared timestamp when this livestream started.
+    pub canonical_url: Option<jacquard_common::types::string::Uri<'a>>,
+    /// Client-declared timestamp when this livestream started.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The post that announced this livestream.
+    /// The post that announced this livestream.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub post: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub post: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub thumb: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
-    ///The title of the livestream, as it will be announced to followers.
+    pub thumb: Option<jacquard_common::types::blob::Blob<'a>>,
+    /// The title of the livestream, as it will be announced to followers.
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
-    ///The URL where this stream can be found. This is primarily a hint for other Streamplace nodes to locate and replicate the stream.
+    /// The URL where this stream can be found. This is primarily a hint for other Streamplace nodes to locate and replicate the stream.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub url: Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -123,7 +130,8 @@ impl From<LivestreamGetRecordOutput<'_>> for Livestream<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StreamplaceAnything<'a> {
@@ -166,7 +174,8 @@ pub enum StreamplaceAnythingLivestream<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ViewerCount<'a> {

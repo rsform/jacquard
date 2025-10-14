@@ -21,20 +21,21 @@
 pub struct UpdateRule<'a> {
     #[serde(borrow)]
     pub action: crate::tools_ozone::safelink::ActionType<'a>,
-    ///Optional comment about the update
+    /// Optional comment about the update
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Optional DID to credit as the creator. Only respected for admin_token authentication.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub created_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub comment: Option<jacquard_common::CowStr<'a>>,
+    /// Optional DID to credit as the creator. Only respected for admin_token authentication.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub created_by: Option<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
     pub pattern: crate::tools_ozone::safelink::PatternType<'a>,
     #[serde(borrow)]
     pub reason: crate::tools_ozone::safelink::ReasonType<'a>,
-    ///The URL or domain to update the rule for
+    /// The URL or domain to update the rule for
     #[serde(borrow)]
     #[builder(into)]
     pub url: jacquard_common::CowStr<'a>,
@@ -79,7 +80,7 @@ pub struct UpdateRuleOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdateRuleError<'a> {
-    ///No active rule found for this URL/domain
+    /// No active rule found for this URL/domain
     #[serde(rename = "RuleNotFound")]
     RuleNotFound(std::option::Option<String>),
 }

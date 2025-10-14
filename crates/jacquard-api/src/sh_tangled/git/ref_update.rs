@@ -13,13 +13,15 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CommitCountBreakdown<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub by_email: std::option::Option<
+    pub by_email: Option<
         Vec<crate::sh_tangled::git::ref_update::IndividualEmailCommitCount<'a>>,
     >,
 }
@@ -32,12 +34,14 @@ pub struct CommitCountBreakdown<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct IndividualEmailCommitCount<'a> {
     pub count: i64,
     #[serde(borrow)]
+    #[builder(into)]
     pub email: jacquard_common::CowStr<'a>,
 }
 
@@ -49,11 +53,13 @@ pub struct IndividualEmailCommitCount<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct IndividualLanguageSize<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub lang: jacquard_common::CowStr<'a>,
     pub size: i64,
 }
@@ -66,18 +72,20 @@ pub struct IndividualLanguageSize<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LangBreakdown<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub inputs: std::option::Option<
+    pub inputs: Option<
         Vec<crate::sh_tangled::git::ref_update::IndividualLanguageSize<'a>>,
     >,
 }
 
-///An update to a git repository, emitted by knots.
+/// An update to a git repository, emitted by knots.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -86,29 +94,34 @@ pub struct LangBreakdown<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RefUpdate<'a> {
-    ///did of the user that pushed this ref
+    /// did of the user that pushed this ref
     #[serde(borrow)]
     pub committer_did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
     pub meta: crate::sh_tangled::git::ref_update::Meta<'a>,
-    ///new SHA of this ref
+    /// new SHA of this ref
     #[serde(borrow)]
+    #[builder(into)]
     pub new_sha: jacquard_common::CowStr<'a>,
-    ///old SHA of this ref
+    /// old SHA of this ref
     #[serde(borrow)]
+    #[builder(into)]
     pub old_sha: jacquard_common::CowStr<'a>,
-    ///Ref being updated
+    /// Ref being updated
     #[serde(borrow)]
+    #[builder(into)]
     pub r#ref: jacquard_common::CowStr<'a>,
-    ///did of the owner of the repo
+    /// did of the owner of the repo
     #[serde(borrow)]
     pub repo_did: jacquard_common::types::string::Did<'a>,
-    ///name of the repo
+    /// name of the repo
     #[serde(borrow)]
+    #[builder(into)]
     pub repo_name: jacquard_common::CowStr<'a>,
 }
 
@@ -162,7 +175,8 @@ impl From<RefUpdateGetRecordOutput<'_>> for RefUpdate<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Meta<'a> {
@@ -170,8 +184,7 @@ pub struct Meta<'a> {
     pub commit_count: crate::sh_tangled::git::ref_update::CommitCountBreakdown<'a>,
     pub is_default_ref: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub lang_breakdown: std::option::Option<
-        crate::sh_tangled::git::ref_update::LangBreakdown<'a>,
-    >,
+    pub lang_breakdown: Option<crate::sh_tangled::git::ref_update::LangBreakdown<'a>>,
 }

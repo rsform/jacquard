@@ -28,7 +28,7 @@ pub mod search_actors_skeleton;
 pub mod search_posts_skeleton;
 pub mod search_starter_packs_skeleton;
 
-///Object used to store age assurance data in stash.
+/// Object used to store age assurance data in stash.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -37,41 +37,49 @@ pub mod search_starter_packs_skeleton;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AgeAssuranceEvent<'a> {
-    ///The unique identifier for this instance of the age assurance flow, in UUID format.
+    /// The unique identifier for this instance of the age assurance flow, in UUID format.
     #[serde(borrow)]
+    #[builder(into)]
     pub attempt_id: jacquard_common::CowStr<'a>,
-    ///The IP address used when completing the AA flow.
+    /// The IP address used when completing the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub complete_ip: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The user agent used when completing the AA flow.
+    pub complete_ip: Option<jacquard_common::CowStr<'a>>,
+    /// The user agent used when completing the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub complete_ua: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The date and time of this write operation.
+    pub complete_ua: Option<jacquard_common::CowStr<'a>>,
+    /// The date and time of this write operation.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The email used for AA.
+    /// The email used for AA.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The IP address used when initiating the AA flow.
+    pub email: Option<jacquard_common::CowStr<'a>>,
+    /// The IP address used when initiating the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub init_ip: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The user agent used when initiating the AA flow.
+    pub init_ip: Option<jacquard_common::CowStr<'a>>,
+    /// The user agent used when initiating the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub init_ua: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The status of the age assurance process.
+    pub init_ua: Option<jacquard_common::CowStr<'a>>,
+    /// The status of the age assurance process.
     #[serde(borrow)]
+    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
 }
 
-///The computed state of the age assurance process, returned to the user in question on certain authenticated requests.
+/// The computed state of the age assurance process, returned to the user in question on certain authenticated requests.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -80,15 +88,18 @@ pub struct AgeAssuranceEvent<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AgeAssuranceState<'a> {
-    ///The timestamp when this state was last updated.
+    /// The timestamp when this state was last updated.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_initiated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The status of the age assurance process.
+    #[builder(into)]
+    pub last_initiated_at: Option<jacquard_common::types::string::Datetime>,
+    /// The status of the age assurance process.
     #[serde(borrow)]
+    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
 }
 
@@ -100,7 +111,8 @@ pub struct AgeAssuranceState<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonSearchActor<'a> {
@@ -116,7 +128,8 @@ pub struct SkeletonSearchActor<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonSearchPost<'a> {
@@ -132,7 +145,8 @@ pub struct SkeletonSearchPost<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonSearchStarterPack<'a> {
@@ -148,25 +162,31 @@ pub struct SkeletonSearchStarterPack<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonTrend<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub category: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub display_name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub link: jacquard_common::CowStr<'a>,
     pub post_count: i64,
     pub started_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub topic: jacquard_common::CowStr<'a>,
 }
 
@@ -178,7 +198,8 @@ pub struct SkeletonTrend<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItemBlocked<'a> {
@@ -194,7 +215,8 @@ pub struct ThreadItemBlocked<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItemNoUnauthenticated<'a> {}
@@ -206,7 +228,8 @@ pub struct ThreadItemNoUnauthenticated<'a> {}
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItemNotFound<'a> {}
@@ -218,19 +241,20 @@ pub struct ThreadItemNotFound<'a> {}
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItemPost<'a> {
-    ///The threadgate created by the author indicates this post as a reply to be hidden for everyone consuming the thread.
+    /// The threadgate created by the author indicates this post as a reply to be hidden for everyone consuming the thread.
     pub hidden_by_threadgate: bool,
-    ///This post has more parents that were not present in the response. This is just a boolean, without the number of parents.
+    /// This post has more parents that were not present in the response. This is just a boolean, without the number of parents.
     pub more_parents: bool,
-    ///This post has more replies that were not present in the response. This is a numeric value, which is best-effort and might not be accurate.
+    /// This post has more replies that were not present in the response. This is a numeric value, which is best-effort and might not be accurate.
     pub more_replies: i64,
-    ///This is by an account muted by the viewer requesting it.
+    /// This is by an account muted by the viewer requesting it.
     pub muted_by_viewer: bool,
-    ///This post is part of a contiguous thread by the OP from the thread root. Many different OP threads can happen in the same thread.
+    /// This post is part of a contiguous thread by the OP from the thread root. Many different OP threads can happen in the same thread.
     pub op_thread: bool,
     #[serde(borrow)]
     pub post: crate::app_bsky::feed::PostView<'a>,
@@ -244,25 +268,31 @@ pub struct ThreadItemPost<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TrendView<'a> {
     #[serde(borrow)]
     pub actors: Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub category: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub display_name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub link: jacquard_common::CowStr<'a>,
     pub post_count: i64,
     pub started_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub topic: jacquard_common::CowStr<'a>,
 }
 
@@ -274,18 +304,23 @@ pub struct TrendView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TrendingTopic<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub link: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub topic: jacquard_common::CowStr<'a>,
 }

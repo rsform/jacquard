@@ -20,7 +20,7 @@ pub struct GetRecommendedDidCredentialsOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub also_known_as: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///Recommended rotation keys for PLC dids. Should be undefined (or ignored) for did:webs.
+    /// Recommended rotation keys for PLC dids. Should be undefined (or ignored) for did:webs.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub rotation_keys: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,

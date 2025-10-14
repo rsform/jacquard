@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A declaration of a Bluesky account profile.
+/// A declaration of a Bluesky account profile.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,48 +14,57 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
-    ///Small image to be displayed next to posts from account. AKA, 'profile picture'
+    /// Small image to be displayed next to posts from account. AKA, 'profile picture'
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
-    ///Larger horizontal image to display behind profile view.
+    pub avatar: Option<jacquard_common::types::blob::Blob<'a>>,
+    /// Larger horizontal image to display behind profile view.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub banner: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
+    pub banner: Option<jacquard_common::types::blob::Blob<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Free-form profile description text.
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    /// Free-form profile description text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub joined_via_starter_pack: std::option::Option<
+    pub joined_via_starter_pack: Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
-    ///Self-label values, specific to the Bluesky application, on the overall account.
+    /// Self-label values, specific to the Bluesky application, on the overall account.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub pinned_post: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
-    ///Free-form pronouns text.
+    pub pinned_post: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    /// Free-form pronouns text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub pronouns: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub website: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub website: Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

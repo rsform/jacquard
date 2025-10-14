@@ -19,9 +19,10 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct DeactivateAccount<'a> {
-    ///A recommendation to server as to how long they should hold onto the deactivated account before deleting.
+    /// A recommendation to server as to how long they should hold onto the deactivated account before deleting.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub delete_after: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub delete_after: Option<jacquard_common::types::string::Datetime>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]

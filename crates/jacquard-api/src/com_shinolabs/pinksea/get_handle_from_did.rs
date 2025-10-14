@@ -34,7 +34,7 @@ pub struct GetHandleFromDid<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetHandleFromDidOutput<'a> {
-    ///The handle.
+    /// The handle.
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
 }

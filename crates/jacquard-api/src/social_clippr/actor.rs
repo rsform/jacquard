@@ -30,9 +30,9 @@ pub enum PreferencesItem<'a> {
     PublishingScopesPref(Box<crate::social_clippr::actor::PublishingScopesPref<'a>>),
 }
 
-///An array of refs to various preferences.
+/// An array of refs to various preferences.
 pub type Preferences<'a> = Vec<PreferencesItem<'a>>;
-///A view of an actor's profile.
+/// A view of an actor's profile.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -41,33 +41,38 @@ pub type Preferences<'a> = Vec<PreferencesItem<'a>>;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileView<'a> {
-    ///A link to the profile's avatar
+    /// A link to the profile's avatar
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
-    ///When the profile record was first created
+    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
+    /// When the profile record was first created
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The biography associated to the profile
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    /// The biography associated to the profile
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The DID of the profile
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// The DID of the profile
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///The display name associated to the profile
+    /// The display name associated to the profile
     #[serde(borrow)]
+    #[builder(into)]
     pub display_name: jacquard_common::CowStr<'a>,
-    ///The handle of the profile
+    /// The handle of the profile
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
-///Preferences for an user's publishing scopes.
+/// Preferences for an user's publishing scopes.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -76,11 +81,13 @@ pub struct ProfileView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublishingScopesPref<'a> {
-    ///What publishing scope to mark a clip as by default
+    /// What publishing scope to mark a clip as by default
     #[serde(borrow)]
+    #[builder(into)]
     pub default_scope: jacquard_common::CowStr<'a>,
 }

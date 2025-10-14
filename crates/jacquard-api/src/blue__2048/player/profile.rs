@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A declaration of a at://2048 player's profile
+/// A declaration of a at://2048 player's profile
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,14 +14,15 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Does not want to show up anywhere. Keep stats to your PDS.
+    /// Does not want to show up anywhere. Keep stats to your PDS.
     pub solo_play: bool,
-    ///The sync status of this record with the users AT Protocol repo.
+    /// The sync status of this record with the users AT Protocol repo.
     #[serde(borrow)]
     pub sync_status: crate::blue__2048::SyncStatus<'a>,
 }

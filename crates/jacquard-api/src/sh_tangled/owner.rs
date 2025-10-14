@@ -36,7 +36,7 @@ pub struct OwnerOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum OwnerError<'a> {
-    ///Owner is not set for this service
+    /// Owner is not set for this service
     #[serde(rename = "OwnerNotFound")]
     OwnerNotFound(std::option::Option<String>),
 }

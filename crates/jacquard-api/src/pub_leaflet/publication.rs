@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record declaring a publication
+/// Record declaring a publication
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,29 +14,34 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Publication<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub base_path: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub base_path: Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
+    pub icon: Option<jacquard_common::types::blob::Blob<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub preferences: std::option::Option<
-        crate::pub_leaflet::publication::Preferences<'a>,
-    >,
+    pub preferences: Option<crate::pub_leaflet::publication::Preferences<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub theme: std::option::Option<crate::pub_leaflet::publication::Theme<'a>>,
+    pub theme: Option<crate::pub_leaflet::publication::Theme<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -89,14 +94,17 @@ impl From<PublicationGetRecordOutput<'_>> for Publication<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Preferences<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_comments: std::option::Option<bool>,
+    #[builder(into)]
+    pub show_comments: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_in_discover: std::option::Option<bool>,
+    #[builder(into)]
+    pub show_in_discover: Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -107,32 +115,40 @@ pub struct Preferences<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Theme<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub accent_background: std::option::Option<ThemeAccentBackground<'a>>,
+    pub accent_background: Option<ThemeAccentBackground<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub accent_text: std::option::Option<ThemeAccentText<'a>>,
+    pub accent_text: Option<ThemeAccentText<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub background_color: std::option::Option<ThemeBackgroundColor<'a>>,
+    pub background_color: Option<ThemeBackgroundColor<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub background_image: std::option::Option<
+    pub background_image: Option<
         crate::pub_leaflet::theme::background_image::BackgroundImage<'a>,
     >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub page_background: std::option::Option<ThemePageBackground<'a>>,
+    pub page_background: Option<ThemePageBackground<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub primary: std::option::Option<ThemePrimary<'a>>,
+    pub primary: Option<ThemePrimary<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_page_background: std::option::Option<bool>,
+    #[builder(into)]
+    pub show_page_background: Option<bool>,
 }
 
 #[jacquard_derive::open_union]

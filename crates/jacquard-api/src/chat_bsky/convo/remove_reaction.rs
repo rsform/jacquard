@@ -68,10 +68,10 @@ pub struct RemoveReactionOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RemoveReactionError<'a> {
-    ///Indicates that the message has been deleted and reactions can no longer be added/removed.
+    /// Indicates that the message has been deleted and reactions can no longer be added/removed.
     #[serde(rename = "ReactionMessageDeleted")]
     ReactionMessageDeleted(std::option::Option<String>),
-    ///Indicates the value for the reaction is not acceptable. In general, this means it is not an emoji.
+    /// Indicates the value for the reaction is not acceptable. In general, this means it is not an emoji.
     #[serde(rename = "ReactionInvalidValue")]
     ReactionInvalidValue(std::option::Option<String>),
 }

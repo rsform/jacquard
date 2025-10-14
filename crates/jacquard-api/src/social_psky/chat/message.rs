@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A Picosky message containing at most 2048 graphemes.
+/// A Picosky message containing at most 2048 graphemes.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,20 +14,24 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Message<'a> {
-    ///Text content.
+    /// Text content.
     #[serde(borrow)]
+    #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
-    ///Annotations of text (mentions, URLs, hashtags, etc)
+    /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::social_psky::richtext::facet::Facet<'a>>>,
+    pub facets: Option<Vec<crate::social_psky::richtext::facet::Facet<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub reply: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub reply: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     #[serde(borrow)]
     pub room: jacquard_common::types::string::AtUri<'a>,
 }

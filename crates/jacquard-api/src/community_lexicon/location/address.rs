@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A physical location in the form of a street address.
+/// A physical location in the form of a street address.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,31 +14,38 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Address<'a> {
-    ///The ISO 3166 country code. Preferably the 2-letter code.
+    /// The ISO 3166 country code. Preferably the 2-letter code.
     #[serde(borrow)]
+    #[builder(into)]
     pub country: jacquard_common::CowStr<'a>,
-    ///The locality of the region. For example, a city in the USA.
+    /// The locality of the region. For example, a city in the USA.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub locality: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The name of the location.
+    pub locality: Option<jacquard_common::CowStr<'a>>,
+    /// The name of the location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The postal code of the location.
+    pub name: Option<jacquard_common::CowStr<'a>>,
+    /// The postal code of the location.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub postal_code: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The administrative region of the country. For example, a state in the USA.
+    pub postal_code: Option<jacquard_common::CowStr<'a>>,
+    /// The administrative region of the country. For example, a state in the USA.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub region: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The street address.
+    pub region: Option<jacquard_common::CowStr<'a>>,
+    /// The street address.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub street: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub street: Option<jacquard_common::CowStr<'a>>,
 }

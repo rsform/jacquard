@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record containing user settings for a particular Streamplace node
+/// Record containing user settings for a particular Streamplace node
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,13 +14,15 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Settings<'a> {
-    ///Whether this node may archive your livestream for improving the service
+    /// Whether this node may archive your livestream for improving the service
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub debug_recording: std::option::Option<bool>,
+    #[builder(into)]
+    pub debug_recording: Option<bool>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

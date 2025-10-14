@@ -35,7 +35,7 @@ pub struct SwapLaunchToken<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SwapLaunchTokenOutput<'a> {
-    ///The did of the user
+    /// The did of the user
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,

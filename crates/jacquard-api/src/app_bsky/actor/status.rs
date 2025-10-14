@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Advertises an account as currently offering live content.
+/// Advertises an account as currently offering live content.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -23,7 +23,7 @@ impl std::fmt::Display for Live {
     }
 }
 
-///A declaration of a Bluesky account status.
+/// A declaration of a Bluesky account status.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -32,20 +32,24 @@ impl std::fmt::Display for Live {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Status<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The duration of the status in minutes. Applications can choose to impose minimum and maximum limits.
+    /// The duration of the status in minutes. Applications can choose to impose minimum and maximum limits.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration_minutes: std::option::Option<i64>,
-    ///An optional embed associated with the status.
+    #[builder(into)]
+    pub duration_minutes: Option<i64>,
+    /// An optional embed associated with the status.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub embed: std::option::Option<crate::app_bsky::embed::external::ExternalRecord<'a>>,
-    ///The status for the account.
+    pub embed: Option<crate::app_bsky::embed::external::ExternalRecord<'a>>,
+    /// The status for the account.
     #[serde(borrow)]
+    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
 }
 

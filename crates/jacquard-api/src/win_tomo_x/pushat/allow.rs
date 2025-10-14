@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///allow service to push. key must be did
+/// allow service to push. key must be did
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,13 +14,15 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Allow<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub config: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub config: Option<jacquard_common::types::value::Data<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
 }
 

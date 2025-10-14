@@ -30,17 +30,20 @@ pub mod update_o_auth_client;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Slice<'a> {
-    ///When the slice was created
+    /// When the slice was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Primary domain namespace for this slice (e.g. social.grain)
+    /// Primary domain namespace for this slice (e.g. social.grain)
     #[serde(borrow)]
+    #[builder(into)]
     pub domain: jacquard_common::CowStr<'a>,
-    ///Name of the slice
+    /// Name of the slice
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
 }
 
@@ -94,45 +97,52 @@ impl From<SliceGetRecordOutput<'_>> for Slice<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SliceView<'a> {
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Profile of the slice creator
+    /// Profile of the slice creator
     #[serde(borrow)]
     pub creator: crate::network_slices::actor::ProfileViewBasic<'a>,
-    ///Primary domain namespace for this slice (e.g. social.grain)
+    /// Primary domain namespace for this slice (e.g. social.grain)
     #[serde(borrow)]
+    #[builder(into)]
     pub domain: jacquard_common::CowStr<'a>,
-    ///Total number of unique indexed actors in this slice
+    /// Total number of unique indexed actors in this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_actor_count: std::option::Option<i64>,
-    ///Number of collections with indexed records
+    #[builder(into)]
+    pub indexed_actor_count: Option<i64>,
+    /// Number of collections with indexed records
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_collection_count: std::option::Option<i64>,
-    ///Total number of indexed records in this slice
+    #[builder(into)]
+    pub indexed_collection_count: Option<i64>,
+    /// Total number of indexed records in this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_record_count: std::option::Option<i64>,
-    ///Display name of the slice
+    #[builder(into)]
+    pub indexed_record_count: Option<i64>,
+    /// Display name of the slice
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Recent activity sparkline data points for the last 24 hours
+    /// Recent activity sparkline data points for the last 24 hours
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub sparkline: std::option::Option<
-        Vec<crate::network_slices::slice::SparklinePoint<'a>>,
-    >,
+    pub sparkline: Option<Vec<crate::network_slices::slice::SparklinePoint<'a>>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    ///Total number of waitlist invites for this slice
+    /// Total number of waitlist invites for this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub waitlist_invite_count: std::option::Option<i64>,
-    ///Total number of waitlist requests for this slice
+    #[builder(into)]
+    pub waitlist_invite_count: Option<i64>,
+    /// Total number of waitlist requests for this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub waitlist_request_count: std::option::Option<i64>,
+    #[builder(into)]
+    pub waitlist_request_count: Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -143,7 +153,8 @@ pub struct SliceView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SparklinePoint<'a> {

@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Beta version: Record representing a collected specimen in a player's collection
+/// Beta version: Record representing a collected specimen in a player's collection
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,71 +14,86 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Collection<'a> {
-    ///When the specimen was first acquired
+    /// When the specimen was first acquired
     pub acquired_at: jacquard_common::types::string::Datetime,
-    ///Common name of the specimen
+    /// Common name of the specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub common_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///When the record was created
+    pub common_name: Option<jacquard_common::CowStr<'a>>,
+    /// When the record was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Taxonomic family
+    /// Taxonomic family
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub family: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Taxonomic genus
+    pub family: Option<jacquard_common::CowStr<'a>>,
+    /// Taxonomic genus
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub genus: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///When the record was last modified
+    pub genus: Option<jacquard_common::CowStr<'a>>,
+    /// When the record was last modified
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_modified: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///When the specimen was last encountered
+    #[builder(into)]
+    pub last_modified: Option<jacquard_common::types::string::Datetime>,
+    /// When the specimen was last encountered
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_seen: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///URI of the game.log record that documents the acquisition of this specimen
+    #[builder(into)]
+    pub last_seen: Option<jacquard_common::types::string::Datetime>,
+    /// URI of the game.log record that documents the acquisition of this specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub log_record_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Number of specimens collected
+    pub log_record_uri: Option<jacquard_common::CowStr<'a>>,
+    /// Number of specimens collected
     pub quantity: i64,
-    ///Rarity level of the specimen
+    /// Rarity level of the specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Scientific name of the specimen
+    pub rarity: Option<jacquard_common::CowStr<'a>>,
+    /// Scientific name of the specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub scientific_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///How the specimen was acquired
+    pub scientific_name: Option<jacquard_common::CowStr<'a>>,
+    /// How the specimen was acquired
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub source: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub source_details: std::option::Option<
+    pub source_details: Option<
         crate::net_anisota::beta::game::collection::SourceDetails<'a>,
     >,
-    ///Taxonomic species
+    /// Taxonomic species
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub species: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub species: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub specimen_data: std::option::Option<
+    pub specimen_data: Option<
         crate::net_anisota::beta::game::collection::SpecimenData<'a>,
     >,
-    ///Unique identifier for the specimen
+    /// Unique identifier for the specimen
     #[serde(borrow)]
+    #[builder(into)]
     pub specimen_id: jacquard_common::CowStr<'a>,
-    ///Collection status of this specimen
+    /// Collection status of this specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -123,7 +138,7 @@ impl From<CollectionGetRecordOutput<'_>> for Collection<'_> {
     }
 }
 
-///Additional details about how the specimen was acquired
+/// Additional details about how the specimen was acquired
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -132,28 +147,33 @@ impl From<CollectionGetRecordOutput<'_>> for Collection<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SourceDetails<'a> {
-    ///Number of attempts before successful capture
+    /// Number of attempts before successful capture
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub attempts: std::option::Option<i64>,
-    ///Probability used when catching this specimen (decimal string, e.g. '0.75')
+    #[builder(into)]
+    pub attempts: Option<i64>,
+    /// Probability used when catching this specimen (decimal string, e.g. '0.75')
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub catch_probability: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URI of the game card that provided this specimen
+    pub catch_probability: Option<jacquard_common::CowStr<'a>>,
+    /// URI of the game card that provided this specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub game_card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Location where specimen was found or observed
+    pub game_card_uri: Option<jacquard_common::CowStr<'a>>,
+    /// Location where specimen was found or observed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub location: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub location: Option<jacquard_common::CowStr<'a>>,
 }
 
-///Complete specimen information
+/// Complete specimen information
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -162,16 +182,19 @@ pub struct SourceDetails<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SpecimenData<'a> {
-    ///Scientific authorship of the species
+    /// Scientific authorship of the species
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub authorship: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Detailed description of the specimen
+    pub authorship: Option<jacquard_common::CowStr<'a>>,
+    /// Detailed description of the specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<jacquard_common::CowStr<'a>>,
 }

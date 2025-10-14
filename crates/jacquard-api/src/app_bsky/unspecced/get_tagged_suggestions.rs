@@ -68,14 +68,17 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedSuggestionsRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Suggestion<'a> {
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Uri<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub subject_type: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub tag: jacquard_common::CowStr<'a>,
 }

@@ -37,10 +37,10 @@ pub struct GetRepoStatusOutput<'a> {
     pub active: bool,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///Optional field, the current rev of the repo, if active=true
+    /// Optional field, the current rev of the repo, if active=true
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub rev: std::option::Option<jacquard_common::types::string::Tid>,
-    ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+    /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,

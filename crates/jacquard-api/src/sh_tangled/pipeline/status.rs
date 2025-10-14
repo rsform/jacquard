@@ -13,26 +13,30 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Status<'a> {
-    ///time of creation of this status update
+    /// time of creation of this status update
     pub created_at: jacquard_common::types::string::Datetime,
-    ///error message if failed
+    /// error message if failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub error: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///exit code if failed
+    pub error: Option<jacquard_common::CowStr<'a>>,
+    /// exit code if failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub exit_code: std::option::Option<i64>,
-    ///ATURI of the pipeline
+    #[builder(into)]
+    pub exit_code: Option<i64>,
+    /// ATURI of the pipeline
     #[serde(borrow)]
     pub pipeline: jacquard_common::types::string::AtUri<'a>,
-    ///status of the workflow
+    /// status of the workflow
     #[serde(borrow)]
+    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
-    ///name of the workflow within this pipeline
+    /// name of the workflow within this pipeline
     #[serde(borrow)]
     pub workflow: jacquard_common::types::string::AtUri<'a>,
 }

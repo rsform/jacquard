@@ -13,27 +13,32 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Language<'a> {
-    ///Hex color code for this language
+    /// Hex color code for this language
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub color: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///File extensions associated with this language
+    pub color: Option<jacquard_common::CowStr<'a>>,
+    /// File extensions associated with this language
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub extensions: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///Number of files in this language
+    pub extensions: Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// Number of files in this language
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub file_count: std::option::Option<i64>,
-    ///Programming language name
+    #[builder(into)]
+    pub file_count: Option<i64>,
+    /// Programming language name
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Percentage of total codebase (0-100)
+    /// Percentage of total codebase (0-100)
     pub percentage: i64,
-    ///Total size of files in this language (bytes)
+    /// Total size of files in this language (bytes)
     pub size: i64,
 }
 
@@ -74,13 +79,13 @@ pub struct Languages<'a> {
 pub struct LanguagesOutput<'a> {
     #[serde(borrow)]
     pub languages: Vec<jacquard_common::types::value::Data<'a>>,
-    ///The git reference used
+    /// The git reference used
     #[serde(borrow)]
     pub r#ref: jacquard_common::CowStr<'a>,
-    ///Total number of files analyzed
+    /// Total number of files analyzed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub total_files: std::option::Option<i64>,
-    ///Total size of all analyzed files in bytes
+    /// Total size of all analyzed files in bytes
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub total_size: std::option::Option<i64>,
 }
@@ -100,13 +105,13 @@ pub struct LanguagesOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LanguagesError<'a> {
-    ///Repository not found or access denied
+    /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
     RepoNotFound(std::option::Option<String>),
-    ///Git reference not found
+    /// Git reference not found
     #[serde(rename = "RefNotFound")]
     RefNotFound(std::option::Option<String>),
-    ///Invalid request parameters
+    /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
     InvalidRequest(std::option::Option<String>),
 }

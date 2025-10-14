@@ -22,16 +22,20 @@ pub mod whoami;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AuthCallback<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub access_jwt: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub handle: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub refresh_jwt: jacquard_common::CowStr<'a>,
 }

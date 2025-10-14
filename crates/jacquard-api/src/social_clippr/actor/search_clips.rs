@@ -45,10 +45,10 @@ pub struct SearchClips<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchClipsOutput<'a> {
-    ///A list of clips and their associated details
+    /// A list of clips and their associated details
     #[serde(borrow)]
     pub clips: Vec<crate::social_clippr::feed::ClipView<'a>>,
-    ///A parameter to paginate results
+    /// A parameter to paginate results
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,

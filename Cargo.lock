@@ -1732,17 +1732,17 @@ checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 
 [[package]]
 name = "jacquard"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "async-trait",
  "bon",
  "bytes",
  "clap",
  "http",
- "jacquard-api 0.5.1",
- "jacquard-common 0.5.1",
- "jacquard-derive 0.5.1",
- "jacquard-identity 0.5.1",
+ "jacquard-api 0.5.2",
+ "jacquard-common 0.5.2",
+ "jacquard-derive 0.5.2",
+ "jacquard-identity 0.5.2",
  "jacquard-oauth",
  "jose-jwk",
  "miette",
@@ -1763,6 +1763,7 @@ dependencies = [
 [[package]]
 name = "jacquard-api"
 version = "0.5.1"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#77915fd4920b282b4b1342749dcdad9dce30cadf"
 dependencies = [
  "bon",
  "bytes",
@@ -1775,13 +1776,12 @@ dependencies = [
 
 [[package]]
 name = "jacquard-api"
-version = "0.5.1"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#77915fd4920b282b4b1342749dcdad9dce30cadf"
+version = "0.5.2"
 dependencies = [
  "bon",
  "bytes",
- "jacquard-common 0.5.1 (git+https://tangled.org/@nonbinary.computer/jacquard)",
- "jacquard-derive 0.5.1 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-common 0.5.2",
+ "jacquard-derive 0.5.2",
  "miette",
  "serde",
  "thiserror 2.0.17",
@@ -1789,7 +1789,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-axum"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "axum",
  "axum-macros",
@@ -1798,9 +1798,9 @@ dependencies = [
  "bytes",
  "chrono",
  "jacquard",
- "jacquard-common 0.5.1",
- "jacquard-derive 0.5.1",
- "jacquard-identity 0.5.1",
+ "jacquard-common 0.5.2",
+ "jacquard-derive 0.5.2",
+ "jacquard-identity 0.5.2",
  "k256",
  "miette",
  "multibase",
@@ -1816,40 +1816,6 @@ dependencies = [
  "tower-http",
  "tracing",
  "tracing-subscriber",
-]
-
-[[package]]
-name = "jacquard-common"
-version = "0.5.1"
-dependencies = [
- "async-trait",
- "base64 0.22.1",
- "bon",
- "bytes",
- "chrono",
- "cid",
- "ed25519-dalek",
- "http",
- "ipld-core",
- "k256",
- "langtag",
- "miette",
- "multibase",
- "multihash",
- "ouroboros",
- "p256",
- "rand 0.9.2",
- "regex",
- "reqwest",
- "serde",
- "serde_html_form",
- "serde_ipld_dagcbor",
- "serde_json",
- "signature",
- "smol_str",
- "thiserror 2.0.17",
- "tokio",
- "url",
 ]
 
 [[package]]
@@ -1886,15 +1852,37 @@ dependencies = [
 ]
 
 [[package]]
-name = "jacquard-derive"
-version = "0.5.1"
+name = "jacquard-common"
+version = "0.5.2"
 dependencies = [
- "jacquard-common 0.5.1",
- "proc-macro2",
- "quote",
+ "async-trait",
+ "base64 0.22.1",
+ "bon",
+ "bytes",
+ "chrono",
+ "cid",
+ "ed25519-dalek",
+ "http",
+ "ipld-core",
+ "k256",
+ "langtag",
+ "miette",
+ "multibase",
+ "multihash",
+ "ouroboros",
+ "p256",
+ "rand 0.9.2",
+ "regex",
+ "reqwest",
  "serde",
+ "serde_html_form",
+ "serde_ipld_dagcbor",
  "serde_json",
- "syn 2.0.106",
+ "signature",
+ "smol_str",
+ "thiserror 2.0.17",
+ "tokio",
+ "url",
 ]
 
 [[package]]
@@ -1915,13 +1903,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "jacquard-derive"
+version = "0.5.2"
+dependencies = [
+ "jacquard-common 0.5.2",
+ "proc-macro2",
+ "quote",
+ "serde",
+ "serde_json",
+ "syn 2.0.106",
+]
+
+[[package]]
 name = "jacquard-identity"
 version = "0.5.1"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#77915fd4920b282b4b1342749dcdad9dce30cadf"
 dependencies = [
  "async-trait",
  "bon",
  "bytes",
- "hickory-resolver",
  "http",
  "jacquard-api 0.5.1",
  "jacquard-common 0.5.1",
@@ -1939,15 +1939,15 @@ dependencies = [
 
 [[package]]
 name = "jacquard-identity"
-version = "0.5.1"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#77915fd4920b282b4b1342749dcdad9dce30cadf"
+version = "0.5.2"
 dependencies = [
  "async-trait",
  "bon",
  "bytes",
+ "hickory-resolver",
  "http",
- "jacquard-api 0.5.1 (git+https://tangled.org/@nonbinary.computer/jacquard)",
- "jacquard-common 0.5.1 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-api 0.5.2",
+ "jacquard-common 0.5.2",
  "miette",
  "percent-encoding",
  "reqwest",
@@ -1962,15 +1962,15 @@ dependencies = [
 
 [[package]]
 name = "jacquard-lexicon"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "async-trait",
  "clap",
  "glob",
  "heck 0.5.0",
- "jacquard-api 0.5.1 (git+https://tangled.org/@nonbinary.computer/jacquard)",
- "jacquard-common 0.5.1 (git+https://tangled.org/@nonbinary.computer/jacquard)",
- "jacquard-identity 0.5.1 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-api 0.5.1",
+ "jacquard-common 0.5.1",
+ "jacquard-identity 0.5.1",
  "kdl",
  "miette",
  "prettyplease",
@@ -1990,7 +1990,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-oauth"
-version = "0.5.1"
+version = "0.5.2"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -1999,8 +1999,8 @@ dependencies = [
  "dashmap",
  "elliptic-curve",
  "http",
- "jacquard-common 0.5.1",
- "jacquard-identity 0.5.1",
+ "jacquard-common 0.5.2",
+ "jacquard-identity 0.5.2",
  "jose-jwa",
  "jose-jwk",
  "miette",

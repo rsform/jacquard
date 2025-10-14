@@ -23,12 +23,13 @@ pub struct UpdateEmail<'a> {
     #[builder(into)]
     pub email: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub email_auth_factor: std::option::Option<bool>,
-    ///Requires a token from com.atproto.sever.requestEmailUpdate if the account's email has been confirmed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub token: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub email_auth_factor: Option<bool>,
+    /// Requires a token from com.atproto.sever.requestEmailUpdate if the account's email has been confirmed.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub token: Option<jacquard_common::CowStr<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]

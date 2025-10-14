@@ -19,11 +19,11 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct Send<'a> {
-    ///The user to send the message to.
+    /// The user to send the message to.
     #[serde(borrow)]
     #[builder(into)]
     pub did: jacquard_common::CowStr<'a>,
-    ///The message to send to the user.
+    /// The message to send to the user.
     #[serde(borrow)]
     #[builder(into)]
     pub message: jacquard_common::CowStr<'a>,
@@ -48,7 +48,7 @@ pub struct Send<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SendOutput<'a> {
-    ///Whether the token was successfully registered.
+    /// Whether the token was successfully registered.
     pub success: bool,
 }
 

@@ -19,14 +19,15 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct CreateSession<'a> {
-    ///When true, instead of throwing error for takendown accounts, a valid response with a narrow scoped token will be returned
+    /// When true, instead of throwing error for takendown accounts, a valid response with a narrow scoped token will be returned
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub allow_takendown: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub auth_factor_token: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Handle or other identifier supported by the server for the authenticating user.
+    pub allow_takendown: Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
+    #[serde(borrow)]
+    pub auth_factor_token: Option<jacquard_common::CowStr<'a>>,
+    /// Handle or other identifier supported by the server for the authenticating user.
     #[serde(borrow)]
     #[builder(into)]
     pub identifier: jacquard_common::CowStr<'a>,
@@ -74,7 +75,7 @@ pub struct CreateSessionOutput<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(borrow)]
     pub refresh_jwt: jacquard_common::CowStr<'a>,
-    ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+    /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,

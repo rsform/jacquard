@@ -73,52 +73,61 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetOAuthClientsRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct OauthClientDetails<'a> {
-    ///OAuth client ID
+    /// OAuth client ID
     #[serde(borrow)]
+    #[builder(into)]
     pub client_id: jacquard_common::CowStr<'a>,
-    ///Human-readable name of the OAuth client
+    /// Human-readable name of the OAuth client
     #[serde(borrow)]
+    #[builder(into)]
     pub client_name: jacquard_common::CowStr<'a>,
-    ///OAuth client secret (only returned on creation)
+    /// OAuth client secret (only returned on creation)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub client_secret: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URI of the client application
+    pub client_secret: Option<jacquard_common::CowStr<'a>>,
+    /// URI of the client application
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub client_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
-    ///When the OAuth client was created
+    pub client_uri: Option<jacquard_common::types::string::Uri<'a>>,
+    /// When the OAuth client was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///DID of the user who created this client
+    /// DID of the user who created this client
     #[serde(borrow)]
     pub created_by_did: jacquard_common::types::string::Did<'a>,
-    ///Allowed OAuth grant types
+    /// Allowed OAuth grant types
     #[serde(borrow)]
     pub grant_types: Vec<jacquard_common::CowStr<'a>>,
-    ///URI of the client logo
+    /// URI of the client logo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub logo_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
-    ///URI of the privacy policy
+    pub logo_uri: Option<jacquard_common::types::string::Uri<'a>>,
+    /// URI of the privacy policy
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub policy_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
-    ///Allowed redirect URIs for OAuth flow
+    pub policy_uri: Option<jacquard_common::types::string::Uri<'a>>,
+    /// Allowed redirect URIs for OAuth flow
     #[serde(borrow)]
     pub redirect_uris: Vec<jacquard_common::types::string::Uri<'a>>,
-    ///Allowed OAuth response types
+    /// Allowed OAuth response types
     #[serde(borrow)]
     pub response_types: Vec<jacquard_common::CowStr<'a>>,
-    ///OAuth scope
+    /// OAuth scope
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub scope: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///URI of the terms of service
+    pub scope: Option<jacquard_common::CowStr<'a>>,
+    /// URI of the terms of service
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub tos_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub tos_uri: Option<jacquard_common::types::string::Uri<'a>>,
 }

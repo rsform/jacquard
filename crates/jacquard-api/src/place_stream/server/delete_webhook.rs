@@ -19,7 +19,7 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct DeleteWebhook<'a> {
-    ///The ID of the webhook to delete.
+    /// The ID of the webhook to delete.
     #[serde(borrow)]
     #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
@@ -44,7 +44,7 @@ pub struct DeleteWebhook<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteWebhookOutput<'a> {
-    ///Whether the webhook was successfully deleted.
+    /// Whether the webhook was successfully deleted.
     pub success: bool,
 }
 
@@ -63,10 +63,10 @@ pub struct DeleteWebhookOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteWebhookError<'a> {
-    ///The specified webhook was not found.
+    /// The specified webhook was not found.
     #[serde(rename = "WebhookNotFound")]
     WebhookNotFound(std::option::Option<String>),
-    ///The authenticated user does not have access to this webhook.
+    /// The authenticated user does not have access to this webhook.
     #[serde(rename = "Unauthorized")]
     Unauthorized(std::option::Option<String>),
 }

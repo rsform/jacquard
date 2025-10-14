@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A single author in a Weaver notebook.
+/// A single author in a Weaver notebook.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,15 +14,18 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorListItem<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub index: std::option::Option<i64>,
+    #[builder(into)]
+    pub index: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub profile: std::option::Option<AuthorListItemProfile<'a>>,
+    pub profile: Option<AuthorListItemProfile<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -44,7 +47,7 @@ pub enum AuthorListItemProfile<'a> {
     ProfileView(Box<crate::sh_weaver::actor::ProfileView<'a>>),
 }
 
-///Authors of a Weaver notebook.
+/// Authors of a Weaver notebook.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -53,14 +56,16 @@ pub enum AuthorListItemProfile<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Authors<'a> {
     #[serde(borrow)]
     pub author_list: Vec<crate::sh_weaver::notebook::authors::AuthorListItem<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record declaring a publication
+/// Record declaring a publication
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,38 +14,46 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Publication<'a> {
-    ///Base URL path for the publication ex https://blog.pckt.blog
+    /// Base URL path for the publication ex https://blog.pckt.blog
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub base_path: std::option::Option<jacquard_common::types::string::Uri<'a>>,
-    ///Timestamp when the publication was first created
+    pub base_path: Option<jacquard_common::types::string::Uri<'a>>,
+    /// Timestamp when the publication was first created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Publication description
+    /// Publication description
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Extension objects (open union) for additional features
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// Extension objects (open union) for additional features
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub extensions: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-    ///Publication icon/avatar image
+    pub extensions: Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    /// Publication icon/avatar image
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
-    ///Publication name/title
+    pub icon: Option<jacquard_common::types::blob::Blob<'a>>,
+    /// Publication name/title
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
-    ///Theme configuration as an open union; accepts blog.pckt.theme and future types.
+    /// Theme configuration as an open union; accepts blog.pckt.theme and future types.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub theme: std::option::Option<crate::blog_pckt::theme::Theme<'a>>,
-    ///Timestamp when the publication was last updated (optional)
+    pub theme: Option<crate::blog_pckt::theme::Theme<'a>>,
+    /// Timestamp when the publication was last updated (optional)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub updated_at: Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

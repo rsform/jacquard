@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Indicates the identity is available for hire
+/// Indicates the identity is available for hire
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -23,7 +23,7 @@ impl std::fmt::Display for Forhire {
     }
 }
 
-///Indicates the identity is actively hiring
+/// Indicates the identity is actively hiring
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -41,7 +41,7 @@ impl std::fmt::Display for Hiring {
     }
 }
 
-///A user profile for AT://Work.Place
+/// A user profile for AT://Work.Place
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -50,42 +50,51 @@ impl std::fmt::Display for Hiring {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
-    ///Small image to be displayed next to job listings from account. AKA, 'profile picture'
+    /// Small image to be displayed next to job listings from account. AKA, 'profile picture'
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
-    ///Larger horizontal image to display behind profile view.
+    pub avatar: Option<jacquard_common::types::blob::Blob<'a>>,
+    /// Larger horizontal image to display behind profile view.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub banner: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
-    ///A free text description of the identity.
+    pub banner: Option<jacquard_common::types::blob::Blob<'a>>,
+    /// A free text description of the identity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The display name of the identity.
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// The display name of the identity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Annotations of text (mentions, URLs, hashtags, etc) in the description.
+    pub display_name: Option<jacquard_common::CowStr<'a>>,
+    /// Annotations of text (mentions, URLs, hashtags, etc) in the description.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    ///The service used for profile links
+    pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    /// The service used for profile links
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub profile_host: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The identity's resume.
+    pub profile_host: Option<jacquard_common::CowStr<'a>>,
+    /// The identity's resume.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub resume: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
-    ///The current status of the identity.
+    pub resume: Option<jacquard_common::types::blob::Blob<'a>>,
+    /// The current status of the identity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

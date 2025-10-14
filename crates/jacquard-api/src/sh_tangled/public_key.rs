@@ -13,17 +13,20 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublicKey<'a> {
-    ///key upload timestamp
+    /// key upload timestamp
     pub created_at: jacquard_common::types::string::Datetime,
-    ///public key contents
+    /// public key contents
     #[serde(borrow)]
+    #[builder(into)]
     pub key: jacquard_common::CowStr<'a>,
-    ///human-readable name for this key
+    /// human-readable name for this key
     #[serde(borrow)]
+    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
 }
 

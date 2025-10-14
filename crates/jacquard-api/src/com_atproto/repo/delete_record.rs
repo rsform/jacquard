@@ -19,25 +19,27 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct DeleteRecord<'a> {
-    ///The NSID of the record collection.
+    /// The NSID of the record collection.
     #[serde(borrow)]
     pub collection: jacquard_common::types::string::Nsid<'a>,
-    ///The handle or DID of the repo (aka, current account).
+    /// The handle or DID of the repo (aka, current account).
     #[serde(borrow)]
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
-    ///The Record Key.
+    /// The Record Key.
     #[serde(borrow)]
     pub rkey: jacquard_common::types::string::RecordKey<
         jacquard_common::types::string::Rkey<'a>,
     >,
-    ///Compare and swap with the previous commit by CID.
+    /// Compare and swap with the previous commit by CID.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub swap_commit: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    ///Compare and swap with the previous record by CID.
+    pub swap_commit: Option<jacquard_common::types::string::Cid<'a>>,
+    /// Compare and swap with the previous record by CID.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub swap_record: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub swap_record: Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]

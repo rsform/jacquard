@@ -19,7 +19,7 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct NotifyOfUpdate<'a> {
-    ///Hostname of the current service (usually a PDS) that is notifying of update.
+    /// Hostname of the current service (usually a PDS) that is notifying of update.
     #[serde(borrow)]
     #[builder(into)]
     pub hostname: jacquard_common::CowStr<'a>,

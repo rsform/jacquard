@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Appeal a previously taken moderation action
+/// Appeal a previously taken moderation action
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -23,7 +23,7 @@ impl std::fmt::Display for ReasonAppeal {
     }
 }
 
-///Child sexual abuse material (CSAM). These reports will be sent only be sent to the application's Moderation Authority.
+/// Child sexual abuse material (CSAM). These reports will be sent only be sent to the application's Moderation Authority.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -41,7 +41,7 @@ impl std::fmt::Display for ReasonChildSafetyCsam {
     }
 }
 
-///Grooming or predatory behavior. These reports will be sent only be sent to the application's Moderation Authority.
+/// Grooming or predatory behavior. These reports will be sent only be sent to the application's Moderation Authority.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -59,7 +59,7 @@ impl std::fmt::Display for ReasonChildSafetyGroom {
     }
 }
 
-///Harassment or bullying of minors
+/// Harassment or bullying of minors
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -77,7 +77,7 @@ impl std::fmt::Display for ReasonChildSafetyHarassment {
     }
 }
 
-///Other child safety. These reports will be sent only be sent to the application's Moderation Authority.
+/// Other child safety. These reports will be sent only be sent to the application's Moderation Authority.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -95,7 +95,7 @@ impl std::fmt::Display for ReasonChildSafetyOther {
     }
 }
 
-///Privacy violation involving a minor
+/// Privacy violation involving a minor
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -113,7 +113,7 @@ impl std::fmt::Display for ReasonChildSafetyPrivacy {
     }
 }
 
-///Doxxing
+/// Doxxing
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -131,7 +131,7 @@ impl std::fmt::Display for ReasonHarassmentDoxxing {
     }
 }
 
-///Hate speech
+/// Hate speech
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -149,7 +149,7 @@ impl std::fmt::Display for ReasonHarassmentHateSpeech {
     }
 }
 
-///Other harassing or hateful content
+/// Other harassing or hateful content
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -167,7 +167,7 @@ impl std::fmt::Display for ReasonHarassmentOther {
     }
 }
 
-///Targeted harassment
+/// Targeted harassment
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -185,7 +185,7 @@ impl std::fmt::Display for ReasonHarassmentTargeted {
     }
 }
 
-///Trolling
+/// Trolling
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -203,7 +203,7 @@ impl std::fmt::Display for ReasonHarassmentTroll {
     }
 }
 
-///Fake account or bot
+/// Fake account or bot
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -221,7 +221,7 @@ impl std::fmt::Display for ReasonMisleadingBot {
     }
 }
 
-///False information about elections
+/// False information about elections
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -239,7 +239,7 @@ impl std::fmt::Display for ReasonMisleadingElections {
     }
 }
 
-///Impersonation
+/// Impersonation
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -257,7 +257,7 @@ impl std::fmt::Display for ReasonMisleadingImpersonation {
     }
 }
 
-///Other misleading content
+/// Other misleading content
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -275,7 +275,7 @@ impl std::fmt::Display for ReasonMisleadingOther {
     }
 }
 
-///Scam
+/// Scam
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -293,7 +293,7 @@ impl std::fmt::Display for ReasonMisleadingScam {
     }
 }
 
-///Spam
+/// Spam
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -311,7 +311,7 @@ impl std::fmt::Display for ReasonMisleadingSpam {
     }
 }
 
-///An issue not included in these options
+/// An issue not included in these options
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -329,7 +329,7 @@ impl std::fmt::Display for ReasonOther {
     }
 }
 
-///Banned user returning
+/// Banned user returning
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -347,7 +347,7 @@ impl std::fmt::Display for ReasonRuleBanEvasion {
     }
 }
 
-///Other
+/// Other
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -365,7 +365,7 @@ impl std::fmt::Display for ReasonRuleOther {
     }
 }
 
-///Promoting or selling prohibited items or services
+/// Promoting or selling prohibited items or services
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -383,7 +383,7 @@ impl std::fmt::Display for ReasonRuleProhibitedSales {
     }
 }
 
-///Hacking or system attacks
+/// Hacking or system attacks
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -401,7 +401,7 @@ impl std::fmt::Display for ReasonRuleSiteSecurity {
     }
 }
 
-///Content promoting or depicting self-harm
+/// Content promoting or depicting self-harm
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -419,7 +419,7 @@ impl std::fmt::Display for ReasonSelfHarmContent {
     }
 }
 
-///Eating disorders
+/// Eating disorders
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -437,7 +437,7 @@ impl std::fmt::Display for ReasonSelfHarmEd {
     }
 }
 
-///Other dangerous content
+/// Other dangerous content
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -455,7 +455,7 @@ impl std::fmt::Display for ReasonSelfHarmOther {
     }
 }
 
-///Dangerous challenges or activities
+/// Dangerous challenges or activities
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -473,7 +473,7 @@ impl std::fmt::Display for ReasonSelfHarmStunts {
     }
 }
 
-///Dangerous substances or drug abuse
+/// Dangerous substances or drug abuse
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -491,7 +491,7 @@ impl std::fmt::Display for ReasonSelfHarmSubstances {
     }
 }
 
-///Adult sexual abuse content
+/// Adult sexual abuse content
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -509,7 +509,7 @@ impl std::fmt::Display for ReasonSexualAbuseContent {
     }
 }
 
-///Animal sexual abuse
+/// Animal sexual abuse
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -527,7 +527,7 @@ impl std::fmt::Display for ReasonSexualAnimal {
     }
 }
 
-///Deepfake adult content
+/// Deepfake adult content
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -545,7 +545,7 @@ impl std::fmt::Display for ReasonSexualDeepfake {
     }
 }
 
-///Non-consensual intimate imagery
+/// Non-consensual intimate imagery
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -563,7 +563,7 @@ impl std::fmt::Display for ReasonSexualNcii {
     }
 }
 
-///Other sexual violence content
+/// Other sexual violence content
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -581,7 +581,7 @@ impl std::fmt::Display for ReasonSexualOther {
     }
 }
 
-///Unlabelled adult content
+/// Unlabelled adult content
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -1185,7 +1185,7 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
     }
 }
 
-///Animal welfare violations
+/// Animal welfare violations
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -1203,7 +1203,7 @@ impl std::fmt::Display for ReasonViolenceAnimal {
     }
 }
 
-///Extremist content. These reports will be sent only be sent to the application's Moderation Authority.
+/// Extremist content. These reports will be sent only be sent to the application's Moderation Authority.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -1221,7 +1221,7 @@ impl std::fmt::Display for ReasonViolenceExtremistContent {
     }
 }
 
-///Glorification of violence
+/// Glorification of violence
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -1239,7 +1239,7 @@ impl std::fmt::Display for ReasonViolenceGlorification {
     }
 }
 
-///Graphic violent content
+/// Graphic violent content
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -1257,7 +1257,7 @@ impl std::fmt::Display for ReasonViolenceGraphicContent {
     }
 }
 
-///Other violent content
+/// Other violent content
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -1275,7 +1275,7 @@ impl std::fmt::Display for ReasonViolenceOther {
     }
 }
 
-///Threats or incitement
+/// Threats or incitement
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -1293,7 +1293,7 @@ impl std::fmt::Display for ReasonViolenceThreats {
     }
 }
 
-///Human trafficking
+/// Human trafficking
 #[derive(
     serde::Serialize,
     serde::Deserialize,

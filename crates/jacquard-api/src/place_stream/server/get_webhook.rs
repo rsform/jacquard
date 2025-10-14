@@ -54,10 +54,10 @@ pub struct GetWebhookOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetWebhookError<'a> {
-    ///The specified webhook was not found.
+    /// The specified webhook was not found.
     #[serde(rename = "WebhookNotFound")]
     WebhookNotFound(std::option::Option<String>),
-    ///The authenticated user does not have access to this webhook.
+    /// The authenticated user does not have access to this webhook.
     #[serde(rename = "Unauthorized")]
     Unauthorized(std::option::Option<String>),
 }

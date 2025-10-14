@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///it's a kind of fungus!
+/// it's a kind of fungus!
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,17 +14,21 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Fungus<'a> {
     #[serde(borrow)]
+    #[builder(into)]
     pub common_name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub edible: std::option::Option<bool>,
+    #[builder(into)]
+    pub edible: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub species: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub species: Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

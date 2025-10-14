@@ -54,13 +54,13 @@ pub struct ResolveIdentityOutput<'a> {
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ResolveIdentityError<'a> {
-    ///The resolution process confirmed that the handle does not resolve to any DID.
+    /// The resolution process confirmed that the handle does not resolve to any DID.
     #[serde(rename = "HandleNotFound")]
     HandleNotFound(std::option::Option<String>),
-    ///The DID resolution process confirmed that there is no current DID.
+    /// The DID resolution process confirmed that there is no current DID.
     #[serde(rename = "DidNotFound")]
     DidNotFound(std::option::Option<String>),
-    ///The DID previously existed, but has been deactivated.
+    /// The DID previously existed, but has been deactivated.
     #[serde(rename = "DidDeactivated")]
     DidDeactivated(std::option::Option<String>),
 }

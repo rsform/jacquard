@@ -13,12 +13,14 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Audio<'a> {
     pub channels: i64,
     #[serde(borrow)]
+    #[builder(into)]
     pub codec: jacquard_common::CowStr<'a>,
     pub rate: i64,
 }
@@ -31,7 +33,8 @@ pub struct Audio<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Framerate<'a> {
@@ -39,7 +42,7 @@ pub struct Framerate<'a> {
     pub num: i64,
 }
 
-///Media file representing a segment of a livestream
+/// Media file representing a segment of a livestream
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -48,32 +51,39 @@ pub struct Framerate<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Segment<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub audio: std::option::Option<Vec<crate::place_stream::segment::Audio<'a>>>,
+    pub audio: Option<Vec<crate::place_stream::segment::Audio<'a>>>,
     #[serde(borrow)]
     pub creator: jacquard_common::types::string::Did<'a>,
-    ///The duration of the segment in nanoseconds
+    /// The duration of the segment in nanoseconds
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration: std::option::Option<i64>,
-    ///Unique identifier for the segment
+    #[builder(into)]
+    pub duration: Option<i64>,
+    /// Unique identifier for the segment
     #[serde(borrow)]
+    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
-    ///The DID of the signing key used for this segment
+    /// The DID of the signing key used for this segment
     #[serde(borrow)]
+    #[builder(into)]
     pub signing_key: jacquard_common::CowStr<'a>,
-    ///The size of the segment in bytes
+    /// The size of the segment in bytes
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub size: std::option::Option<i64>,
-    ///When this segment started
+    #[builder(into)]
+    pub size: Option<i64>,
+    /// When this segment started
     pub start_time: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub video: std::option::Option<Vec<crate::place_stream::segment::Video<'a>>>,
+    pub video: Option<Vec<crate::place_stream::segment::Video<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -126,7 +136,8 @@ impl From<SegmentGetRecordOutput<'_>> for Segment<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SegmentView<'a> {
@@ -144,17 +155,21 @@ pub struct SegmentView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Video<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub bframes: std::option::Option<bool>,
+    #[builder(into)]
+    pub bframes: Option<bool>,
     #[serde(borrow)]
+    #[builder(into)]
     pub codec: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub framerate: std::option::Option<crate::place_stream::segment::Framerate<'a>>,
+    pub framerate: Option<crate::place_stream::segment::Framerate<'a>>,
     pub height: i64,
     pub width: i64,
 }

@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A declaration of a Clippr account's profile.
+/// A declaration of a Clippr account's profile.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,22 +14,26 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
-    ///Image to show on user's profiles
+    /// Image to show on user's profiles
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
-    ///The creation date of the profile
+    pub avatar: Option<jacquard_common::types::blob::Blob<'a>>,
+    /// The creation date of the profile
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Text for user to describe themselves
+    /// Text for user to describe themselves
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///A display name to be shown on a profile
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// A display name to be shown on a profile
     #[serde(borrow)]
+    #[builder(into)]
     pub display_name: jacquard_common::CowStr<'a>,
 }
 

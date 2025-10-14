@@ -13,13 +13,15 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Contact<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub email: Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -30,16 +32,19 @@ pub struct Contact<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Links<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub privacy_policy: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub privacy_policy: Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub terms_of_service: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    pub terms_of_service: Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -54,23 +59,23 @@ pub struct Links<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DescribeServerOutput<'a> {
-    ///List of domain suffixes that can be used in account handles.
+    /// List of domain suffixes that can be used in account handles.
     #[serde(borrow)]
     pub available_user_domains: Vec<jacquard_common::CowStr<'a>>,
-    ///Contact information
+    /// Contact information
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub contact: std::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    ///If true, an invite code must be supplied to create an account on this instance.
+    /// If true, an invite code must be supplied to create an account on this instance.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub invite_code_required: std::option::Option<bool>,
-    ///URLs of service policy documents.
+    /// URLs of service policy documents.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub links: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///If true, a phone verification token must be supplied to create an account on this instance.
+    /// If true, a phone verification token must be supplied to create an account on this instance.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub phone_verification_required: std::option::Option<bool>,
 }

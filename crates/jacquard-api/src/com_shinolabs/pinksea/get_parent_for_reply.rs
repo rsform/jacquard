@@ -37,10 +37,10 @@ pub struct GetParentForReply<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetParentForReplyOutput<'a> {
-    ///The DID of the author.
+    /// The DID of the author.
     #[serde(borrow)]
     pub did: jacquard_common::types::ident::AtIdentifier<'a>,
-    ///The record key.
+    /// The record key.
     #[serde(borrow)]
     pub rkey: jacquard_common::CowStr<'a>,
 }

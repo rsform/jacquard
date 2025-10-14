@@ -17,27 +17,34 @@ pub mod upload_video;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct JobStatus<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub blob: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
+    pub blob: Option<jacquard_common::types::blob::Blob<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub error: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub error: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub job_id: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Progress within the current processing state.
+    pub message: Option<jacquard_common::CowStr<'a>>,
+    /// Progress within the current processing state.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub progress: std::option::Option<i64>,
-    ///The state of the video processing job. All values not listed as a known value indicate that the job is in process.
+    #[builder(into)]
+    pub progress: Option<i64>,
+    /// The state of the video processing job. All values not listed as a known value indicate that the job is in process.
     #[serde(borrow)]
+    #[builder(into)]
     pub state: jacquard_common::CowStr<'a>,
 }

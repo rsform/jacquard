@@ -18,6 +18,13 @@ pub(super) enum EnumVariantKind {
     Struct(Vec<String>),
 }
 
+/// Check if a type name conflicts with types referenced by bon::Builder macro.
+/// bon::Builder generates code that uses unqualified `Option` and `Result`,
+/// so structs with these names cause compilation errors.
+fn conflicts_with_builder_macro(type_name: &str) -> bool {
+    matches!(type_name, "Option" | "Result")
+}
+
 impl<'c> CodeGenerator<'c> {
     pub(super) fn generate_record(
         &self,
@@ -30,19 +37,34 @@ impl<'c> CodeGenerator<'c> {
                 let type_name = self.def_to_type_name(nsid, def_name);
                 let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
 
-                // Generate main struct fields
-                let fields = self.generate_object_fields(nsid, &type_name, obj, false)?;
-                let doc = self.generate_doc_comment(record.description.as_ref());
-
                 // Records always get a lifetime since they have the #[lexicon] attribute
                 // which adds extra_data: BTreeMap<..., Data<'a>>
-                let struct_def = quote! {
-                    #doc
-                    #[jacquard_derive::lexicon]
-                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
-                    #[serde(rename_all = "camelCase")]
-                    pub struct #ident<'a> {
-                        #fields
+                // Skip bon::Builder for types that conflict with the macro's unqualified type references
+                let has_builder = !conflicts_with_builder_macro(&type_name);
+
+                // Generate main struct fields
+                let fields = self.generate_object_fields(nsid, &type_name, obj, has_builder)?;
+                let doc = self.generate_doc_comment(record.description.as_ref());
+
+                let struct_def = if has_builder {
+                    quote! {
+                        #doc
+                        #[jacquard_derive::lexicon]
+                        #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic, bon::Builder)]
+                        #[serde(rename_all = "camelCase")]
+                        pub struct #ident<'a> {
+                            #fields
+                        }
+                    }
+                } else {
+                    quote! {
+                        #doc
+                        #[jacquard_derive::lexicon]
+                        #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                        #[serde(rename_all = "camelCase")]
+                        pub struct #ident<'a> {
+                            #fields
+                        }
                     }
                 };
 
@@ -175,18 +197,33 @@ impl<'c> CodeGenerator<'c> {
         let type_name = self.def_to_type_name(nsid, def_name);
         let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
 
-        let fields = self.generate_object_fields(nsid, &type_name, obj, false)?;
-        let doc = self.generate_doc_comment(obj.description.as_ref());
-
         // Objects always get a lifetime since they have the #[lexicon] attribute
         // which adds extra_data: BTreeMap<..., Data<'a>>
-        let struct_def = quote! {
-            #doc
-            #[jacquard_derive::lexicon]
-            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
-            #[serde(rename_all = "camelCase")]
-            pub struct #ident<'a> {
-                #fields
+        // Skip bon::Builder for types that conflict with the macro's unqualified type references
+        let has_builder = !conflicts_with_builder_macro(&type_name);
+
+        let fields = self.generate_object_fields(nsid, &type_name, obj, has_builder)?;
+        let doc = self.generate_doc_comment(obj.description.as_ref());
+
+        let struct_def = if has_builder {
+            quote! {
+                #doc
+                #[jacquard_derive::lexicon]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic, bon::Builder)]
+                #[serde(rename_all = "camelCase")]
+                pub struct #ident<'a> {
+                    #fields
+                }
+            }
+        } else {
+            quote! {
+                #doc
+                #[jacquard_derive::lexicon]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                #[serde(rename_all = "camelCase")]
+                pub struct #ident<'a> {
+                    #fields
+                }
             }
         };
 
@@ -292,7 +329,12 @@ impl<'c> CodeGenerator<'c> {
         let rust_type = if is_required {
             rust_type
         } else {
-            quote! { std::option::Option<#rust_type> }
+            // Use std::option::Option for non-builder structs to avoid name collision
+            if is_builder {
+                quote! { Option<#rust_type> }
+            } else {
+                quote! { std::option::Option<#rust_type> }
+            }
         };
 
         // Extract description from field type
@@ -317,13 +359,17 @@ impl<'c> CodeGenerator<'c> {
             attrs.push(quote! { #[serde(skip_serializing_if = "std::option::Option::is_none")] });
         }
 
+        if is_builder && !is_required {
+            attrs.push(quote! { #[builder(into)] });
+        }
+
         // Add serde(borrow) to all fields with lifetimes
         if needs_lifetime {
             attrs.push(quote! { #[serde(borrow)] });
         }
 
         // Add builder(into) for CowStr fields to allow String, &str, etc., but only for builder structs
-        if is_builder && is_cowstr {
+        if is_builder && is_cowstr && is_required {
             attrs.push(quote! { #[builder(into)] });
         }
 

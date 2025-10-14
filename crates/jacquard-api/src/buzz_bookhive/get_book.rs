@@ -35,32 +35,32 @@ pub struct GetBook<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBookOutput<'a> {
-    ///The hive book's info
+    /// The hive book's info
     #[serde(borrow)]
     pub book: jacquard_common::types::value::Data<'a>,
-    ///Comments on the book
+    /// Comments on the book
     #[serde(borrow)]
     pub comments: Vec<crate::buzz_bookhive::Comment<'a>>,
-    ///Cover image of the book
+    /// Cover image of the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub cover: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The date the user finished reading the book
+    /// The date the user finished reading the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub finished_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The book's review
+    /// The book's review
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub review: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Reviews of the book
+    /// Reviews of the book
     #[serde(borrow)]
     pub reviews: Vec<crate::buzz_bookhive::Review<'a>>,
-    ///Number of stars given to the book (1-10) which will be mapped to 1-5 stars
+    /// Number of stars given to the book (1-10) which will be mapped to 1-5 stars
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub stars: std::option::Option<i64>,
-    ///The date the user started reading the book
+    /// The date the user started reading the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub started_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]

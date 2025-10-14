@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///Record declaring of the existence of a feed generator, and containing metadata about it. The record can exist in any repository.
+/// Record declaring of the existence of a feed generator, and containing metadata about it. The record can exist in any repository.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,36 +14,42 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Generator<'a> {
-    ///Declaration that a feed accepts feedback interactions from a client through app.bsky.feed.sendInteractions
+    /// Declaration that a feed accepts feedback interactions from a client through app.bsky.feed.sendInteractions
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub accepts_interactions: std::option::Option<bool>,
+    #[builder(into)]
+    pub accepts_interactions: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
+    pub avatar: Option<jacquard_common::types::blob::Blob<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub content_mode: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub content_mode: Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
-        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
-    >,
+    pub description_facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub display_name: jacquard_common::CowStr<'a>,
-    ///Self-label values
+    /// Self-label values
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.

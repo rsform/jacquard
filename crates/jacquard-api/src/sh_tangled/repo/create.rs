@@ -19,20 +19,20 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct Create<'a> {
-    ///Default branch to push to
+    /// Default branch to push to
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub default_branch: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Rkey of the repository record
+    #[serde(borrow)]
+    pub default_branch: Option<jacquard_common::CowStr<'a>>,
+    /// Rkey of the repository record
     #[serde(borrow)]
     #[builder(into)]
     pub rkey: jacquard_common::CowStr<'a>,
-    ///A source URL to clone from, populate this when forking or importing a repository.
+    /// A source URL to clone from, populate this when forking or importing a repository.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
     #[builder(into)]
-    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub source: Option<jacquard_common::CowStr<'a>>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]

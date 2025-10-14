@@ -13,20 +13,24 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Image<'a> {
-    ///alt text description of the image
+    /// alt text description of the image
     #[serde(borrow)]
+    #[builder(into)]
     pub alt: jacquard_common::CowStr<'a>,
-    ///Blurhash string for the image, used for low-resolution placeholders. This must be a valid Blurhash string.
+    /// Blurhash string for the image, used for low-resolution placeholders. This must be a valid Blurhash string.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub blurhash: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub blurhash: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub dimensions: std::option::Option<ImageDimensions<'a>>,
+    pub dimensions: Option<ImageDimensions<'a>>,
     #[serde(borrow)]
     pub image: jacquard_common::types::blob::Blob<'a>,
 }
@@ -60,7 +64,8 @@ pub enum ImageDimensions<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Images<'a> {

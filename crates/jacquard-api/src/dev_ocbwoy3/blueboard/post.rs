@@ -13,21 +13,24 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
-    ///The post's attachment blob. Must be present if parent is dev.ocbwoy3.blueboard.board, otherwise AppView will ignore it.
+    /// The post's attachment blob. Must be present if parent is dev.ocbwoy3.blueboard.board, otherwise AppView will ignore it.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub attachment: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
-    ///The date and time when the post was created
+    pub attachment: Option<jacquard_common::types::blob::Blob<'a>>,
+    /// The date and time when the post was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Determines the parent of the post. Must either be a `dev.ocbwoy3.blueboard.board` or a `dev.ocbwoy3.blueboard.post`.
+    /// Determines the parent of the post. Must either be a `dev.ocbwoy3.blueboard.board` or a `dev.ocbwoy3.blueboard.post`.
     #[serde(borrow)]
     pub parent: jacquard_common::types::string::AtUri<'a>,
-    ///The post's text
+    /// The post's text
     #[serde(borrow)]
+    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
 }
 

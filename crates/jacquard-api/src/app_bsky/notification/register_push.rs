@@ -19,9 +19,10 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct RegisterPush<'a> {
-    ///Set to true when the actor is age restricted
+    /// Set to true when the actor is age restricted
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub age_restricted: std::option::Option<bool>,
+    #[builder(into)]
+    pub age_restricted: Option<bool>,
     #[serde(borrow)]
     #[builder(into)]
     pub app_id: jacquard_common::CowStr<'a>,

@@ -12,7 +12,7 @@ pub mod get_profile;
 pub mod hive_book;
 pub mod search_books;
 
-///User has abandoned the book
+/// User has abandoned the book
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -38,18 +38,22 @@ impl std::fmt::Display for Abandoned {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Activity<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The hive id of the book
+    /// The hive id of the book
     #[serde(borrow)]
+    #[builder(into)]
     pub hive_id: jacquard_common::CowStr<'a>,
-    ///The title of the book
+    /// The title of the book
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub r#type: jacquard_common::CowStr<'a>,
 }
 
@@ -61,28 +65,32 @@ pub struct Activity<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Comment<'a> {
     #[serde(borrow)]
     pub book: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    ///The content of the comment.
+    /// The content of the comment.
     #[serde(borrow)]
+    #[builder(into)]
     pub comment: jacquard_common::CowStr<'a>,
-    ///Client-declared timestamp when this comment was originally created.
+    /// Client-declared timestamp when this comment was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The DID of the user who made the comment
+    /// The DID of the user who made the comment
     #[serde(borrow)]
+    #[builder(into)]
     pub did: jacquard_common::CowStr<'a>,
-    ///The handle of the user who made the comment
+    /// The handle of the user who made the comment
     #[serde(borrow)]
+    #[builder(into)]
     pub handle: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub parent: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
-///User has finished reading the book
+/// User has finished reading the book
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -100,7 +108,7 @@ impl std::fmt::Display for Finished {
     }
 }
 
-///User owns the book
+/// User owns the book
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -126,25 +134,30 @@ impl std::fmt::Display for Owned {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub avatar: Option<jacquard_common::CowStr<'a>>,
     pub books_read: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
+    #[builder(into)]
     pub display_name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
+    #[builder(into)]
     pub handle: jacquard_common::CowStr<'a>,
     pub reviews: i64,
 }
 
-///User is currently reading the book
+/// User is currently reading the book
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -170,24 +183,29 @@ impl std::fmt::Display for Reading {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Review<'a> {
-    ///The date the review was created
+    /// The date the review was created
     pub created_at: jacquard_common::types::string::Datetime,
-    ///The DID of the user who made the review
+    /// The DID of the user who made the review
     #[serde(borrow)]
+    #[builder(into)]
     pub did: jacquard_common::CowStr<'a>,
-    ///The handle of the user who made the review
+    /// The handle of the user who made the review
     #[serde(borrow)]
+    #[builder(into)]
     pub handle: jacquard_common::CowStr<'a>,
-    ///The review content
+    /// The review content
     #[serde(borrow)]
+    #[builder(into)]
     pub review: jacquard_common::CowStr<'a>,
-    ///The number of stars given to the book
+    /// The number of stars given to the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stars: std::option::Option<i64>,
+    #[builder(into)]
+    pub stars: Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -198,53 +216,66 @@ pub struct Review<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UserBook<'a> {
-    ///The authors of the book (tab separated)
+    /// The authors of the book (tab separated)
     #[serde(borrow)]
+    #[builder(into)]
     pub authors: jacquard_common::CowStr<'a>,
-    ///Cover image of the book
+    /// Cover image of the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub cover: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cover: Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    ///Book description/summary
+    /// Book description/summary
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///The date the user finished reading the book
+    pub description: Option<jacquard_common::CowStr<'a>>,
+    /// The date the user finished reading the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub finished_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///The book's hive id, used to correlate user's books with the hive
+    #[builder(into)]
+    pub finished_at: Option<jacquard_common::types::string::Datetime>,
+    /// The book's hive id, used to correlate user's books with the hive
     #[serde(borrow)]
+    #[builder(into)]
     pub hive_id: jacquard_common::CowStr<'a>,
-    ///Average rating (0-1000)
+    /// Average rating (0-1000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rating: std::option::Option<i64>,
-    ///The book's review
+    #[builder(into)]
+    pub rating: Option<i64>,
+    /// The book's review
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub review: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Number of stars given to the book (1-10) which will be mapped to 1-5 stars
+    pub review: Option<jacquard_common::CowStr<'a>>,
+    /// Number of stars given to the book (1-10) which will be mapped to 1-5 stars
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stars: std::option::Option<i64>,
-    ///The date the user started reading the book
+    #[builder(into)]
+    pub stars: Option<i64>,
+    /// The date the user started reading the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub started_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[builder(into)]
+    pub started_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
-    ///Cover image of the book
+    pub status: Option<jacquard_common::CowStr<'a>>,
+    /// Cover image of the book
     #[serde(borrow)]
+    #[builder(into)]
     pub thumbnail: jacquard_common::CowStr<'a>,
-    ///The title of the book
+    /// The title of the book
     #[serde(borrow)]
+    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
 }
 
-///User wants to read the book
+/// User wants to read the book
 #[derive(
     serde::Serialize,
     serde::Deserialize,

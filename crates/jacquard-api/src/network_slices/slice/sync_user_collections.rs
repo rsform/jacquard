@@ -19,13 +19,14 @@
 #[serde(rename_all = "camelCase")]
 #[builder(start_fn = new)]
 pub struct SyncUserCollections<'a> {
-    ///AT-URI of the slice to sync user data into
+    /// AT-URI of the slice to sync user data into
     #[serde(borrow)]
     #[builder(into)]
     pub slice: jacquard_common::CowStr<'a>,
-    ///Timeout in seconds for the sync operation
+    /// Timeout in seconds for the sync operation
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub timeout_seconds: std::option::Option<i64>,
+    #[builder(into)]
+    pub timeout_seconds: Option<i64>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
@@ -47,11 +48,11 @@ pub struct SyncUserCollections<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SyncUserCollectionsOutput<'a> {
-    ///Number of records successfully synced
+    /// Number of records successfully synced
     pub records_synced: i64,
-    ///Number of repositories processed during sync
+    /// Number of repositories processed during sync
     pub repos_processed: i64,
-    ///Whether the sync operation exceeded the timeout
+    /// Whether the sync operation exceeded the timeout
     pub timed_out: bool,
 }
 

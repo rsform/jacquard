@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///A declaration of a Weaver account profile.
+/// A declaration of a Weaver account profile.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,47 +14,54 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
-    ///Small image to be displayed next to posts from account. AKA, 'profile picture'
+    /// Small image to be displayed next to posts from account. AKA, 'profile picture'
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
-    ///Include link to this account on Bluesky.
+    pub avatar: Option<jacquard_common::types::blob::Blob<'a>>,
+    /// Include link to this account on Bluesky.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub bluesky: std::option::Option<bool>,
+    #[builder(into)]
+    pub bluesky: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Free-form profile description text.
+    #[builder(into)]
+    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    /// Free-form profile description text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub links: std::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
-    ///Free-form location text.
+    pub links: Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+    /// Free-form location text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub location: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub location: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub pinned_post: std::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
-    ///Pronouns to use in user-generated content.
+    pub pinned_post: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    /// Pronouns to use in user-generated content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[builder(into)]
     #[serde(borrow)]
-    pub pronouns: std::option::Option<
-        crate::sh_weaver::actor::profile::PronounsList<'a>,
-    >,
-    ///Include link to this account on Tangled.
+    pub pronouns: Option<crate::sh_weaver::actor::profile::PronounsList<'a>>,
+    /// Include link to this account on Tangled.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub tangled: std::option::Option<bool>,
+    #[builder(into)]
+    pub tangled: Option<bool>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
