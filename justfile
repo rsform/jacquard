@@ -13,46 +13,57 @@ run *ARGS:
 watch *ARGS:
 	bacon --job run -- -- {{ ARGS }}
 
-# Run the OAuth timeline example
-example-oauth *ARGS:
-    cargo run -p jacquard --example oauth_timeline --features fancy -- {{ARGS}}
+update-api:
+    cargo run -p jacquard-lexicon --bin lex-fetch -- -v
 
-# Create a simple post
-example-create-post *ARGS:
-    cargo run -p jacquard --example create_post --features fancy -- {{ARGS}}
+generate-api:
+    cargo run -p jacquard-lexicon --bin jacquard-codegen -- -i crates/jacquard-api/lexicons -o crates/jacquard-api/src -r crate
 
-# Create a post with an image
-example-post-image *ARGS:
-    cargo run -p jacquard --example post_with_image --features fancy -- {{ARGS}}
+lex-gen *ARGS:
+    cargo run -p jacquard-lexicon --bin lex-fetch -- {{ARGS}}
 
-# Update profile display name and description
-example-update-profile *ARGS:
-    cargo run -p jacquard --example update_profile --features fancy -- {{ARGS}}
+lex-fetch *ARGS:
+    cargo run -p jacquard-lexicon --bin lex-fetch -- --no-codegen {{ARGS}}
 
-# Fetch public AT Protocol feed (no auth)
-example-public-feed:
-    cargo run -p jacquard --example public_atproto_feed
+codegen *ARGS:
+    cargo run -p jacquard-lexicon --bin jacquard-codegen -- -r crate {{ARGS}}
 
-# Create a WhiteWind blog post
-example-whitewind-create *ARGS:
-    cargo run -p jacquard --example create_whitewind_post --features fancy -- {{ARGS}}
+# List all available examples
+examples:
+    #!/usr/bin/env bash
+    echo "jacquard examples:"
+    for file in "examples"/*.rs; do
+        name=$(basename "$file" .rs)
+        echo "  - $name"
+    done
+    echo ""
+    echo "jacquard-axum examples:"
+    cargo metadata --format-version=1 --no-deps | \
+        jq -r '.packages[] | select(.name == "jacquard-axum") | .targets[] | select(.kind[] == "example") | .name' | \
+        sed 's/^/  - /'
+    echo ""
+    echo "Usage: just example <name> [ARGS...]"
 
-# Read a WhiteWind blog post
-example-whitewind-read *ARGS:
-    cargo run -p jacquard --example read_whitewind_posts --features fancy -- {{ARGS}}
-
-# Read info about a Tangled git repository
-example-tangled-repo *ARGS:
-    cargo run -p jacquard --example read_tangled_repo --features fancy -- {{ARGS}}
-
-# Resolve a handle to its DID document
-example-resolve-did *ARGS:
-    cargo run -p jacquard --example resolve_did -- {{ARGS}}
-
-# Update Bluesky preferences
-example-update-preferences *ARGS:
-    cargo run -p jacquard --example update_preferences --features fancy -- {{ARGS}}
-
-# Run the Axum server example
-example-axum:
-    cargo run -p jacquard-axum --example axum_server --features jacquard/fancy
+# Run an example by name (auto-detects package)
+example NAME *ARGS:
+    #!/usr/bin/env bash
+    if [ -f "examples/{{NAME}}.rs" ]; then
+        cargo run -p jacquard --example {{NAME}} -- {{ARGS}}
+    elif cargo metadata --format-version=1 --no-deps | \
+         jq -e '.packages[] | select(.name == "jacquard-axum") | .targets[] | select(.kind[] == "example" and .name == "{{NAME}}")' > /dev/null; then
+        cargo run -p jacquard-axum --example {{NAME}} -- {{ARGS}}
+    else
+        echo "Example '{{NAME}}' not found."
+        echo ""
+        echo "jacquard examples:"
+        for file in "examples"/*.rs; do
+            name=$(basename "$file" .rs)
+            echo "  - $name"
+        done
+        echo ""
+        echo "jacquard-axum examples:"
+        cargo metadata --format-version=1 --no-deps | \
+            jq -r '.packages[] | select(.name == "jacquard-axum") | .targets[] | select(.kind[] == "example") | .name' | \
+            sed 's/^/  - /'
+        exit 1
+    fi

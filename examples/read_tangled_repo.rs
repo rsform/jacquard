@@ -1,6 +1,6 @@
 use clap::Parser;
 use jacquard::api::sh_tangled::repo::Repo;
-use jacquard::client::BasicClient;
+use jacquard::client::{AgentSessionExt, BasicClient};
 use jacquard::types::string::AtUri;
 
 #[derive(Parser, Debug)]

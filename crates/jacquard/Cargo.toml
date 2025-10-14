@@ -23,8 +23,6 @@ api_full = ["api", "jacquard-api/bluesky", "jacquard-api/other", "jacquard-api/l
 # All captured generated lexicon API bindings
 api_all = ["api_full", "jacquard-api/ufos"]
 dns = ["jacquard-identity/dns"]
-# Pretty debug prints for examples
-fancy = ["miette/fancy"]
 # Propagate loopback to oauth (server + browser helper)
 loopback = ["jacquard-oauth/loopback", "jacquard-oauth/browser-open"]
 
@@ -32,22 +30,18 @@ loopback = ["jacquard-oauth/loopback", "jacquard-oauth/browser-open"]
 [[example]]
 name = "oauth_timeline"
 path = "../../examples/oauth_timeline.rs"
-required-features = ["fancy"]
 
 [[example]]
 name = "create_post"
 path = "../../examples/create_post.rs"
-required-features = ["fancy"]
 
 [[example]]
 name = "post_with_image"
 path = "../../examples/post_with_image.rs"
-required-features = ["fancy"]
 
 [[example]]
 name = "update_profile"
 path = "../../examples/update_profile.rs"
-required-features = ["fancy"]
 
 [[example]]
 name = "public_atproto_feed"
@@ -56,27 +50,22 @@ path = "../../examples/public_atproto_feed.rs"
 [[example]]
 name = "create_whitewind_post"
 path = "../../examples/create_whitewind_post.rs"
-required-features = ["fancy", ]
 
 [[example]]
 name = "read_whitewind_post"
 path = "../../examples/read_whitewind_post.rs"
-required-features = ["fancy"]
 
 [[example]]
 name = "read_tangled_repo"
 path = "../../examples/read_tangled_repo.rs"
-required-features = ["fancy"]
 
 [[example]]
 name = "resolve_did"
 path = "../../examples/resolve_did.rs"
-required-features = ["fancy"]
 
 [[example]]
 name = "update_preferences"
 path = "../../examples/update_preferences.rs"
-required-features = ["fancy"]
 
 [dependencies]
 jacquard-api = { version = "0.5", path = "../jacquard-api" }
@@ -88,7 +77,6 @@ jacquard-identity = { version = "0.5", path = "../jacquard-identity" }
 bon.workspace = true
 async-trait.workspace = true
 bytes.workspace = true
-clap.workspace = true
 http.workspace = true
 miette = { workspace = true }
 reqwest = { workspace = true, features = ["charset", "http2", "json", "system-proxy", "gzip", "rustls-tls"] }
@@ -101,10 +89,13 @@ tokio = { workspace = true, features = ["macros", "rt-multi-thread", "fs"] }
 url.workspace = true
 smol_str.workspace = true
 percent-encoding.workspace = true
-urlencoding.workspace = true
 jose-jwk = { workspace = true, features = ["p256"] }
 p256 = { workspace = true, features = ["ecdsa"] }
 rand_core.workspace = true
 
+[dev-dependencies]
+clap.workspace = true
+miette = { workspace = true, features = ["fancy"] }
+
 [package.metadata.docs.rs]
-features = [ "api_all", "derive", "dns", "fancy", "loopback" ]
+features = [ "api_all", "derive", "dns", "loopback" ]

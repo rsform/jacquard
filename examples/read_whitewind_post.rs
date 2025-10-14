@@ -1,6 +1,6 @@
 use clap::Parser;
 use jacquard::api::com_whtwnd::blog::entry::Entry;
-use jacquard::client::BasicClient;
+use jacquard::client::{AgentSessionExt, BasicClient};
 use jacquard::types::string::AtUri;
 
 #[derive(Parser, Debug)]
@@ -27,7 +27,10 @@ async fn main() -> miette::Result<()> {
 
     println!("📚 WhiteWind Blog Entry\n");
     println!("URI: {}", output.uri);
-    println!("Title: {}", output.value.title.as_deref().unwrap_or("[Untitled]"));
+    println!(
+        "Title: {}",
+        output.value.title.as_deref().unwrap_or("[Untitled]")
+    );
     if let Some(subtitle) = &output.value.subtitle {
         println!("Subtitle: {}", subtitle);
     }

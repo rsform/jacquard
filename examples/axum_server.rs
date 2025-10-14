@@ -1,11 +1,6 @@
 use std::sync::Arc;
 
-use axum::{
-    Json, Router,
-    extract::State,
-    http::{StatusCode, header},
-    response::IntoResponse,
-};
+use axum::{Json, Router, extract::State, http::StatusCode, response::IntoResponse};
 use jacquard::{
     api::com_atproto::identity::resolve_did::{ResolveDidOutput, ResolveDidRequest},
     identity::{JacquardResolver, resolver::IdentityResolver},

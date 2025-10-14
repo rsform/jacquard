@@ -1,13 +1,10 @@
 use clap::Parser;
 use jacquard::CowStr;
 use jacquard::api::app_bsky::actor::profile::Profile;
-use jacquard::client::{Agent, FileAuthStore};
-use jacquard::oauth::atproto::AtprotoClientMetadata;
+use jacquard::client::{Agent, AgentSessionExt, FileAuthStore};
 use jacquard::oauth::client::OAuthClient;
 use jacquard::oauth::loopback::LoopbackConfig;
 use jacquard::types::string::AtUri;
-use jacquard::xrpc::XrpcClient;
-use miette::IntoDiagnostic;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Update profile display name and description")]

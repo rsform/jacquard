@@ -29,7 +29,6 @@ regex = "1.11.3"
 serde.workspace = true
 serde_html_form.workspace = true
 serde_json.workspace = true
-serde_with.workspace = true
 smol_str.workspace = true
 thiserror.workspace = true
 url.workspace = true
@@ -38,7 +37,6 @@ async-trait.workspace = true
 tokio = { workspace = true, features = ["sync"] }
 reqwest = { workspace = true, optional = true, features = ["charset", "http2", "json", "system-proxy", "gzip", "rustls-tls"] }
 serde_ipld_dagcbor.workspace = true
-trait-variant.workspace = true
 signature = { version = "2", optional = true }
 
 [features]

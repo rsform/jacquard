@@ -1,12 +1,10 @@
 use clap::Parser;
 use jacquard::CowStr;
 use jacquard::api::com_whtwnd::blog::entry::Entry;
-use jacquard::client::{Agent, FileAuthStore};
-use jacquard::oauth::atproto::AtprotoClientMetadata;
+use jacquard::client::{Agent, AgentSessionExt, FileAuthStore};
 use jacquard::oauth::client::OAuthClient;
 use jacquard::oauth::loopback::LoopbackConfig;
 use jacquard::types::string::Datetime;
-use jacquard::xrpc::XrpcClient;
 use miette::IntoDiagnostic;
 use url::Url;
 
@@ -59,9 +57,9 @@ async fn main() -> miette::Result<()> {
         extra_data: Default::default(),
     };
 
-    let mut output = agent.create_record(entry, None).await?;
+    let output = agent.create_record(entry, None).await?;
     println!("Created WhiteWind blog post: {}", output.uri);
-    let url = Url::parse(format!(
+    let url = Url::parse(&format!(
         "https://whtwnd.nat.vg/{}/{}",
         output.uri.authority(),
         output.uri.rkey().map(|r| r.as_ref()).unwrap_or("")

@@ -18,11 +18,9 @@ path = "src/lib.rs"
 [[example]]
 name = "axum_server"
 path = "../../examples/axum_server.rs"
-required-features = ["jacquard/fancy"]
 
 [dependencies]
 axum = "0.8.6"
-axum-macros = "0.5.0"
 bytes.workspace = true
 jacquard = { version = "0.5", path = "../jacquard" }
 jacquard-common = { version = "0.5", path = "../jacquard-common", features = ["reqwest-client"] }
@@ -38,20 +36,21 @@ thiserror.workspace = true
 tokio.workspace = true
 tower-http = { version = "0.6.6", features = ["trace", "tracing"] }
 tracing = "0.1.41"
-tracing-subscriber = { version = "0.3.20", features = ["env-filter", "time"] }
-urlencoding.workspace = true
 
 [features]
 default = ["service-auth"]
 service-auth = ["jacquard-common/service-auth", "dep:jacquard-identity", "dep:multibase"]
 
 [dev-dependencies]
+axum-macros = "0.5.0"
 axum-test = "18.1.0"
 base64.workspace = true
 chrono.workspace = true
 k256 = { version = "0.13", features = ["ecdsa"] }
+miette = { workspace = true, features = ["fancy"] }
 rand = "0.8"
 reqwest.workspace = true
 serde_json.workspace = true
-tokio-test = "0.4.4"
+#tokio-test = "0.4.4"
 tower = { version = "0.5", features = ["util"] }
+tracing-subscriber = { version = "0.3.20", features = ["env-filter", "time"] }

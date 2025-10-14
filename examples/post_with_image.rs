@@ -2,13 +2,11 @@ use clap::Parser;
 use jacquard::CowStr;
 use jacquard::api::app_bsky::embed::images::{Image, Images};
 use jacquard::api::app_bsky::feed::post::{Post, PostEmbed};
-use jacquard::client::{Agent, FileAuthStore};
-use jacquard::oauth::atproto::AtprotoClientMetadata;
+use jacquard::client::{Agent, AgentSessionExt, FileAuthStore};
 use jacquard::oauth::client::OAuthClient;
 use jacquard::oauth::loopback::LoopbackConfig;
 use jacquard::types::blob::MimeType;
 use jacquard::types::string::Datetime;
-use jacquard::xrpc::XrpcClient;
 use miette::IntoDiagnostic;
 use std::path::PathBuf;
 

@@ -1,13 +1,10 @@
 use clap::Parser;
+use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::post::Post;
-use jacquard::client::{Agent, FileAuthStore};
-use jacquard::oauth::atproto::AtprotoClientMetadata;
+use jacquard::client::{Agent, AgentSessionExt, FileAuthStore};
 use jacquard::oauth::client::OAuthClient;
 use jacquard::oauth::loopback::LoopbackConfig;
 use jacquard::types::string::Datetime;
-use jacquard::xrpc::XrpcClient;
-use jacquard::CowStr;
-use miette::IntoDiagnostic;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Create a simple post")]

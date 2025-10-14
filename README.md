@@ -81,7 +81,7 @@ async fn main() -> miette::Result<()> {
 
 ```
 
-If you have `just` installed, you can run the [examples](https://tangled.org/@nonbinary.computer/jacquard/tree/main/examples) using `just example-{example-name} {ARGS}`
+If you have `just` installed, you can run the [examples](https://tangled.org/@nonbinary.computer/jacquard/tree/main/examples) using `just example {example-name} {ARGS}` or `just examples` to see what's available.
 
 ## Component crates
 
