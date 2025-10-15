@@ -7,6 +7,7 @@ members = ["crates/*"]
 edition = "2024"
 version = "0.5.3"
 authors = ["Orual <orual@nonbinary.computer>"]
+#repository = "https://github.com/rsform/jacquard"
 repository = "https://tangled.org/@nonbinary.computer/jacquard"
 keywords = ["atproto", "at", "bluesky", "api", "client"]
 categories = ["api-bindings", "web-programming::http-client"]
@@ -76,3 +77,8 @@ chrono = "0.4"
 # Crypto curves and JOSE
 p256 = "0.13"
 jose-jwk = "0.1"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"

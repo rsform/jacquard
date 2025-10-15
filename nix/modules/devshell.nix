@@ -19,6 +19,8 @@
         rust-analyzer
         cargo-release
         cargo-semver-checks
+        cargo-binstall
+        cargo-dist
       ];
     };
   };

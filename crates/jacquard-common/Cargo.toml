@@ -35,7 +35,7 @@ thiserror.workspace = true
 url.workspace = true
 http.workspace = true
 
-reqwest = { workspace = true, optional = true, features = ["charset", "gzip", "stream"] }
+reqwest = { workspace = true, optional = true, features = ["json", "charset", "gzip", "stream"] }
 serde_ipld_dagcbor.workspace = true
 signature = { version = "2", optional = true }
 tracing = { workspace = true, optional = true }
@@ -49,7 +49,7 @@ futures = { version = "0.3", optional = true }
 getrandom = { version = "0.3.4", features = ["wasm_js"] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-reqwest = { workspace = true, optional = true, features = ["http2", "system-proxy", "rustls-tls"] }
+reqwest = { workspace = true, optional = true, features = [ "http2", "system-proxy", "rustls-tls"] }
 
 [features]
 default = ["service-auth", "reqwest-client", "crypto"]
