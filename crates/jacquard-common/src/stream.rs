@@ -133,14 +133,14 @@ use bytes::Bytes;
 
 /// Platform-agnostic byte stream abstraction
 pub struct ByteStream {
-    inner: Box<dyn n0_future::Stream<Item = Result<Bytes, StreamError>>>,
+    inner: Box<dyn n0_future::Stream<Item = Result<Bytes, StreamError>> + Unpin>,
 }
 
 impl ByteStream {
     /// Create a new byte stream from any compatible stream
     pub fn new<S>(stream: S) -> Self
     where
-        S: n0_future::Stream<Item = Result<Bytes, StreamError>> + 'static,
+        S: n0_future::Stream<Item = Result<Bytes, StreamError>> + Unpin + 'static,
     {
         Self {
             inner: Box::new(stream),
@@ -153,7 +153,7 @@ impl ByteStream {
     }
 
     /// Convert into the inner boxed stream
-    pub fn into_inner(self) -> Box<dyn n0_future::Stream<Item = Result<Bytes, StreamError>>> {
+    pub fn into_inner(self) -> Box<dyn n0_future::Stream<Item = Result<Bytes, StreamError>> + Unpin> {
         self.inner
     }
 }

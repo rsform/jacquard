@@ -1,9 +1,9 @@
 //! Example: Upload data using streaming request body
 #![cfg(all(feature = "streaming", feature = "reqwest-client"))]
 
-use jacquard_common::http_client::HttpClientExt;
-use futures::stream;
 use bytes::Bytes;
+use futures::stream;
+use jacquard_common::http_client::HttpClientExt;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

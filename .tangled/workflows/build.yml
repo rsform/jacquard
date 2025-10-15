@@ -14,3 +14,11 @@ steps:
   - name: build crate
     command: |
       cargo build
+
+  - name: check wasm compatibility
+    command: |
+      rustup target add wasm32-unknown-unknown
+      cargo build -p jacquard-common \
+        --target wasm32-unknown-unknown \
+        --features streaming \
+        --no-default-features
