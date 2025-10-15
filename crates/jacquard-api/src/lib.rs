@@ -87,6 +87,9 @@ pub mod my_skylights;
 #[cfg(feature = "net_aftertheinter")]
 pub mod net_aftertheinter;
 
+#[cfg(feature = "net_altq")]
+pub mod net_altq;
+
 #[cfg(feature = "net_anisota")]
 pub mod net_anisota;
 

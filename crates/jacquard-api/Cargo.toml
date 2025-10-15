@@ -2,7 +2,7 @@
 name = "jacquard-api"
 description = "Generated AT Protocol API bindings for Jacquard"
 edition.workspace = true
-version = "0.5.2"
+version = "0.5.3"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -62,6 +62,7 @@ garden_lexicon = []
 moe_karashiiro = []
 my_skylights = []
 net_aftertheinter = []
+net_altq = []
 net_anisota = ["app_bsky"]
 net_bnewbold = []
 net_mmatt = []

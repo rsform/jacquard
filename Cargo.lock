@@ -1739,10 +1739,10 @@ dependencies = [
  "clap",
  "getrandom 0.2.16",
  "http",
- "jacquard-api 0.5.2",
- "jacquard-common 0.5.2",
+ "jacquard-api 0.5.3",
+ "jacquard-common 0.5.3",
  "jacquard-derive 0.5.3",
- "jacquard-identity 0.5.2",
+ "jacquard-identity 0.5.3",
  "jacquard-oauth",
  "jose-jwk",
  "miette",
@@ -1778,11 +1778,11 @@ dependencies = [
 
 [[package]]
 name = "jacquard-api"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "bon",
  "bytes",
- "jacquard-common 0.5.2",
+ "jacquard-common 0.5.3",
  "jacquard-derive 0.5.3",
  "miette",
  "serde",
@@ -1800,9 +1800,9 @@ dependencies = [
  "bytes",
  "chrono",
  "jacquard",
- "jacquard-common 0.5.2",
+ "jacquard-common 0.5.3",
  "jacquard-derive 0.5.3",
- "jacquard-identity 0.5.2",
+ "jacquard-identity 0.5.3",
  "k256",
  "miette",
  "multibase",
@@ -1855,7 +1855,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-common"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "base64 0.22.1",
  "bon",
@@ -1910,7 +1910,7 @@ dependencies = [
 name = "jacquard-derive"
 version = "0.5.3"
 dependencies = [
- "jacquard-common 0.5.2",
+ "jacquard-common 0.5.3",
  "proc-macro2",
  "quote",
  "serde",
@@ -1943,14 +1943,14 @@ dependencies = [
 
 [[package]]
 name = "jacquard-identity"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "bon",
  "bytes",
  "hickory-resolver",
  "http",
- "jacquard-api 0.5.2",
- "jacquard-common 0.5.2",
+ "jacquard-api 0.5.3",
+ "jacquard-common 0.5.3",
  "miette",
  "percent-encoding",
  "reqwest",
@@ -1995,7 +1995,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-oauth"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -2003,8 +2003,8 @@ dependencies = [
  "dashmap",
  "elliptic-curve",
  "http",
- "jacquard-common 0.5.2",
- "jacquard-identity 0.5.2",
+ "jacquard-common 0.5.3",
+ "jacquard-identity 0.5.3",
  "jose-jwa",
  "jose-jwk",
  "miette",
