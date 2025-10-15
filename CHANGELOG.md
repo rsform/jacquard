@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.5.3] - 2025-10-15
+
+### Added
+
+**Experimental WASM Support** (`jacquard-common`, `jacquard-api`, `jacquard-identity`, `jacquard-oauth`)
+- Core crates now compile for `wasm32-unknown-unknown` target
+- Traits use `trait-variant` to conditionally exclude `Send` bounds on WASM
+- Platform-specific trait method implementations for methods with `Self: Sync` bounds
+- DNS-based handle resolution remains gated behind `dns` feature (unavailable on WASM)
+- HTTPS well-known and PDS resolution work on all platforms
+
+### Fixed
+
+**OAuth client** (`jacquard-oauth`)
+- Fixed tokio runtime detection for non-WASM targets
+- Conditional compilation for tokio-specific features
+
+
+---
+
 ## [0.5.2] - 2025-10-14
 
 ### Added

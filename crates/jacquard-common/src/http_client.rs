@@ -5,14 +5,16 @@ use std::future::Future;
 use std::sync::Arc;
 
 /// HTTP client trait for sending raw HTTP requests.
+#[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait HttpClient {
     /// Error type returned by the HTTP client
     type Error: std::error::Error + Display + Send + Sync + 'static;
+
     /// Send an HTTP request and return the response.
     fn send_http(
         &self,
         request: http::Request<Vec<u8>>,
-    ) -> impl Future<Output = core::result::Result<http::Response<Vec<u8>>, Self::Error>> + Send;
+    ) -> impl Future<Output = core::result::Result<http::Response<Vec<u8>>, Self::Error>>;
 }
 
 #[cfg(feature = "reqwest-client")]
@@ -51,7 +53,8 @@ impl HttpClient for reqwest::Client {
     }
 }
 
-impl<T: HttpClient> HttpClient for Arc<T> {
+#[cfg(not(target_arch = "wasm32"))]
+impl<T: HttpClient + Sync> HttpClient for Arc<T> {
     type Error = T::Error;
 
     fn send_http(
@@ -59,6 +62,18 @@ impl<T: HttpClient> HttpClient for Arc<T> {
         request: http::Request<Vec<u8>>,
     ) -> impl Future<Output = core::result::Result<http::Response<Vec<u8>>, Self::Error>> + Send
     {
+        self.as_ref().send_http(request)
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl<T: HttpClient> HttpClient for Arc<T> {
+    type Error = T::Error;
+
+    fn send_http(
+        &self,
+        request: http::Request<Vec<u8>>,
+    ) -> impl Future<Output = core::result::Result<http::Response<Vec<u8>>, Self::Error>> {
         self.as_ref().send_http(request)
     }
 }

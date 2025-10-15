@@ -119,11 +119,22 @@ pub type XrpcResult<T> = std::result::Result<T, ClientError>;
 
 #[cfg(feature = "reqwest-client")]
 impl From<reqwest::Error> for TransportError {
+    #[cfg(not(target_arch = "wasm32"))]
     fn from(e: reqwest::Error) -> Self {
         if e.is_timeout() {
             Self::Timeout
         } else if e.is_connect() {
             Self::Connect(e.to_string())
+        } else if e.is_builder() || e.is_request() {
+            Self::InvalidRequest(e.to_string())
+        } else {
+            Self::Other(Box::new(e))
+        }
+    }
+    #[cfg(target_arch = "wasm32")]
+    fn from(e: reqwest::Error) -> Self {
+        if e.is_timeout() {
+            Self::Timeout
         } else if e.is_builder() || e.is_request() {
             Self::InvalidRequest(e.to_string())
         } else {

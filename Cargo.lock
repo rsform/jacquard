@@ -1176,21 +1176,21 @@ dependencies = [
  "cfg-if",
  "js-sys",
  "libc",
- "wasi 0.11.1+wasi-snapshot-preview1",
+ "wasi",
  "wasm-bindgen",
 ]
 
 [[package]]
 name = "getrandom"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "26145e563e54f2cadc477553f1ec5ee650b00862f0a58bcd12cbdc5f0ea2d2f4"
+checksum = "899def5c37c4fd7b2664648c28120ecec138e4d395b459e5ca34f9cce2dd77fd"
 dependencies = [
  "cfg-if",
  "js-sys",
  "libc",
  "r-efi",
- "wasi 0.14.7+wasi-0.2.4",
+ "wasip2",
  "wasm-bindgen",
 ]
 
@@ -1470,7 +1470,7 @@ dependencies = [
  "libc",
  "percent-encoding",
  "pin-project-lite",
- "socket2 0.5.10",
+ "socket2 0.6.0",
  "system-configuration",
  "tokio",
  "tower-service",
@@ -1732,16 +1732,16 @@ checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 
 [[package]]
 name = "jacquard"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
- "async-trait",
  "bon",
  "bytes",
  "clap",
+ "getrandom 0.2.16",
  "http",
  "jacquard-api 0.5.2",
  "jacquard-common 0.5.2",
- "jacquard-derive 0.5.2",
+ "jacquard-derive 0.5.3",
  "jacquard-identity 0.5.2",
  "jacquard-oauth",
  "jose-jwk",
@@ -1758,6 +1758,7 @@ dependencies = [
  "thiserror 2.0.17",
  "tokio",
  "tracing",
+ "trait-variant",
  "url",
 ]
 
@@ -1782,7 +1783,7 @@ dependencies = [
  "bon",
  "bytes",
  "jacquard-common 0.5.2",
- "jacquard-derive 0.5.2",
+ "jacquard-derive 0.5.3",
  "miette",
  "serde",
  "thiserror 2.0.17",
@@ -1800,7 +1801,7 @@ dependencies = [
  "chrono",
  "jacquard",
  "jacquard-common 0.5.2",
- "jacquard-derive 0.5.2",
+ "jacquard-derive 0.5.3",
  "jacquard-identity 0.5.2",
  "k256",
  "miette",
@@ -1856,13 +1857,13 @@ dependencies = [
 name = "jacquard-common"
 version = "0.5.2"
 dependencies = [
- "async-trait",
  "base64 0.22.1",
  "bon",
  "bytes",
  "chrono",
  "cid",
  "ed25519-dalek",
+ "getrandom 0.3.4",
  "http",
  "ipld-core",
  "k256",
@@ -1884,6 +1885,7 @@ dependencies = [
  "thiserror 2.0.17",
  "tokio",
  "tracing",
+ "trait-variant",
  "url",
 ]
 
@@ -1906,7 +1908,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-derive"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "jacquard-common 0.5.2",
  "proc-macro2",
@@ -1943,7 +1945,6 @@ dependencies = [
 name = "jacquard-identity"
 version = "0.5.2"
 dependencies = [
- "async-trait",
  "bon",
  "bytes",
  "hickory-resolver",
@@ -1959,13 +1960,14 @@ dependencies = [
  "thiserror 2.0.17",
  "tokio",
  "tracing",
+ "trait-variant",
  "url",
  "urlencoding",
 ]
 
 [[package]]
 name = "jacquard-lexicon"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "async-trait",
  "clap",
@@ -1995,7 +1997,6 @@ dependencies = [
 name = "jacquard-oauth"
 version = "0.5.2"
 dependencies = [
- "async-trait",
  "base64 0.22.1",
  "bytes",
  "chrono",
@@ -2308,7 +2309,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78bed444cc8a2160f01cbcf811ef18cac863ad68ae8ca62092e8db51d51c761c"
 dependencies = [
  "libc",
- "wasi 0.11.1+wasi-snapshot-preview1",
+ "wasi",
  "windows-sys 0.59.0",
 ]
 
@@ -2764,7 +2765,7 @@ dependencies = [
  "quinn-udp",
  "rustc-hash",
  "rustls",
- "socket2 0.5.10",
+ "socket2 0.6.0",
  "thiserror 2.0.17",
  "tokio",
  "tracing",
@@ -2778,7 +2779,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f1906b49b0c3bc04b5fe5d86a77925ae6524a19b816ae38ce1e426255f1d8a31"
 dependencies = [
  "bytes",
- "getrandom 0.3.3",
+ "getrandom 0.3.4",
  "lru-slab",
  "rand 0.9.2",
  "ring",
@@ -2801,7 +2802,7 @@ dependencies = [
  "cfg_aliases",
  "libc",
  "once_cell",
- "socket2 0.5.10",
+ "socket2 0.6.0",
  "tracing",
  "windows-sys 0.60.2",
 ]
@@ -2877,7 +2878,7 @@ version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "99d9a13982dcf210057a8a78572b2217b667c3beacbf3a0d8b454f6f82837d38"
 dependencies = [
- "getrandom 0.3.3",
+ "getrandom 0.3.4",
 ]
 
 [[package]]
@@ -3624,7 +3625,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2d31c77bdf42a745371d260a26ca7163f1e0924b64afa0b688e61b5a9fa02f16"
 dependencies = [
  "fastrand",
- "getrandom 0.3.3",
+ "getrandom 0.3.4",
  "once_cell",
  "rustix",
  "windows-sys 0.60.2",
@@ -4124,15 +4125,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ccf3ec651a847eb01de73ccad15eb7d99f80485de043efb2f370cd654f4ea44b"
 
 [[package]]
-name = "wasi"
-version = "0.14.7+wasi-0.2.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "883478de20367e224c0090af9cf5f9fa85bed63a95c1abf3afc5c083ebc06e8c"
-dependencies = [
- "wasip2",
-]
-
-[[package]]
 name = "wasip2"
 version = "1.0.1+wasi-0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4271,7 +4263,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.48.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]

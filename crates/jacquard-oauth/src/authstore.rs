@@ -1,3 +1,4 @@
+use std::future::Future;
 use std::sync::Arc;
 
 use dashmap::DashMap;
@@ -10,34 +11,34 @@ use smol_str::{SmolStr, ToSmolStr, format_smolstr};
 
 use crate::session::{AuthRequestData, ClientSessionData};
 
-#[async_trait::async_trait]
+#[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait ClientAuthStore {
-    async fn get_session(
+    fn get_session(
         &self,
         did: &Did<'_>,
         session_id: &str,
-    ) -> Result<Option<ClientSessionData<'_>>, SessionStoreError>;
+    ) -> impl Future<Output = Result<Option<ClientSessionData<'_>>, SessionStoreError>>;
 
-    async fn upsert_session(&self, session: ClientSessionData<'_>)
-    -> Result<(), SessionStoreError>;
+    fn upsert_session(&self, session: ClientSessionData<'_>)
+    -> impl Future<Output = Result<(), SessionStoreError>>;
 
-    async fn delete_session(
+    fn delete_session(
         &self,
         did: &Did<'_>,
         session_id: &str,
-    ) -> Result<(), SessionStoreError>;
+    ) -> impl Future<Output = Result<(), SessionStoreError>>;
 
-    async fn get_auth_req_info(
+    fn get_auth_req_info(
         &self,
         state: &str,
-    ) -> Result<Option<AuthRequestData<'_>>, SessionStoreError>;
+    ) -> impl Future<Output = Result<Option<AuthRequestData<'_>>, SessionStoreError>>;
 
-    async fn save_auth_req_info(
+    fn save_auth_req_info(
         &self,
         auth_req_info: &AuthRequestData<'_>,
-    ) -> Result<(), SessionStoreError>;
+    ) -> impl Future<Output = Result<(), SessionStoreError>>;
 
-    async fn delete_auth_req_info(&self, state: &str) -> Result<(), SessionStoreError>;
+    fn delete_auth_req_info(&self, state: &str) -> impl Future<Output = Result<(), SessionStoreError>>;
 }
 
 pub struct MemoryAuthStore {
@@ -54,7 +55,6 @@ impl MemoryAuthStore {
     }
 }
 
-#[async_trait::async_trait]
 impl ClientAuthStore for MemoryAuthStore {
     async fn get_session(
         &self,
@@ -108,7 +108,6 @@ impl ClientAuthStore for MemoryAuthStore {
     }
 }
 
-#[async_trait::async_trait]
 impl<T: ClientAuthStore + Send + Sync>
     SessionStore<(Did<'static>, SmolStr), ClientSessionData<'static>> for Arc<T>
 {

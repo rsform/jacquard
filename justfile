@@ -5,6 +5,10 @@ default:
 pre-commit-all:
     pre-commit run --all-files
 
+# Check that jacquard-common compiles for wasm32
+check-wasm:
+    cargo build --target wasm32-unknown-unknown -p jacquard-common --no-default-features
+
 # Run 'cargo run' on the project
 run *ARGS:
     cargo run {{ARGS}}

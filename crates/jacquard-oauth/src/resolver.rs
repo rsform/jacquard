@@ -115,7 +115,287 @@ pub enum ResolverError {
     Uri(#[from] url::ParseError),
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+async fn verify_issuer_impl<T: OAuthResolver + Sync + ?Sized>(
+    resolver: &T,
+    server_metadata: &OAuthAuthorizationServerMetadata<'_>,
+    sub: &Did<'_>,
+) -> Result<Url, ResolverError> {
+    let (metadata, identity) = resolver.resolve_from_identity(sub.as_str()).await?;
+    if !issuer_equivalent(&metadata.issuer, &server_metadata.issuer) {
+        return Err(ResolverError::AuthorizationServerMetadata(
+            "issuer mismatch".to_string(),
+        ));
+    }
+    Ok(identity
+        .pds_endpoint()
+        .ok_or(ResolverError::DidDocument(format!("{:?}", identity).into()))?)
+}
+
+#[cfg(target_arch = "wasm32")]
+async fn verify_issuer_impl<T: OAuthResolver + ?Sized>(
+    resolver: &T,
+    server_metadata: &OAuthAuthorizationServerMetadata<'_>,
+    sub: &Did<'_>,
+) -> Result<Url, ResolverError> {
+    let (metadata, identity) = resolver.resolve_from_identity(sub.as_str()).await?;
+    if !issuer_equivalent(&metadata.issuer, &server_metadata.issuer) {
+        return Err(ResolverError::AuthorizationServerMetadata(
+            "issuer mismatch".to_string(),
+        ));
+    }
+    Ok(identity
+        .pds_endpoint()
+        .ok_or(ResolverError::DidDocument(format!("{:?}", identity).into()))?)
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+async fn resolve_oauth_impl<T: OAuthResolver + Sync + ?Sized>(
+    resolver: &T,
+    input: &str,
+) -> Result<
+    (
+        OAuthAuthorizationServerMetadata<'static>,
+        Option<DidDocument<'static>>,
+    ),
+    ResolverError,
+> {
+    // Allow using an entryway, or PDS url, directly as login input (e.g.
+    // when the user forgot their handle, or when the handle does not
+    // resolve to a DID)
+    Ok(if input.starts_with("https://") {
+        let url = Url::parse(input).map_err(|_| ResolverError::NotFound)?;
+        (resolver.resolve_from_service(&url).await?, None)
+    } else {
+        let (metadata, identity) = resolver.resolve_from_identity(input).await?;
+        (metadata, Some(identity))
+    })
+}
+
+#[cfg(target_arch = "wasm32")]
+async fn resolve_oauth_impl<T: OAuthResolver + ?Sized>(
+    resolver: &T,
+    input: &str,
+) -> Result<
+    (
+        OAuthAuthorizationServerMetadata<'static>,
+        Option<DidDocument<'static>>,
+    ),
+    ResolverError,
+> {
+    // Allow using an entryway, or PDS url, directly as login input (e.g.
+    // when the user forgot their handle, or when the handle does not
+    // resolve to a DID)
+    Ok(if input.starts_with("https://") {
+        let url = Url::parse(input).map_err(|_| ResolverError::NotFound)?;
+        (resolver.resolve_from_service(&url).await?, None)
+    } else {
+        let (metadata, identity) = resolver.resolve_from_identity(input).await?;
+        (metadata, Some(identity))
+    })
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+async fn resolve_from_service_impl<T: OAuthResolver + Sync + ?Sized>(
+    resolver: &T,
+    input: &Url,
+) -> Result<OAuthAuthorizationServerMetadata<'static>, ResolverError> {
+    // Assume first that input is a PDS URL (as required by ATPROTO)
+    if let Ok(metadata) = resolver.get_resource_server_metadata(input).await {
+        return Ok(metadata);
+    }
+    // Fallback to trying to fetch as an issuer (Entryway)
+    resolver.get_authorization_server_metadata(input).await
+}
+
+#[cfg(target_arch = "wasm32")]
+async fn resolve_from_service_impl<T: OAuthResolver + ?Sized>(
+    resolver: &T,
+    input: &Url,
+) -> Result<OAuthAuthorizationServerMetadata<'static>, ResolverError> {
+    // Assume first that input is a PDS URL (as required by ATPROTO)
+    if let Ok(metadata) = resolver.get_resource_server_metadata(input).await {
+        return Ok(metadata);
+    }
+    // Fallback to trying to fetch as an issuer (Entryway)
+    resolver.get_authorization_server_metadata(input).await
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+async fn resolve_from_identity_impl<T: OAuthResolver + Sync + ?Sized>(
+    resolver: &T,
+    input: &str,
+) -> Result<
+    (
+        OAuthAuthorizationServerMetadata<'static>,
+        DidDocument<'static>,
+    ),
+    ResolverError,
+> {
+    let actor =
+        AtIdentifier::new(input).map_err(|e| ResolverError::AtIdentifier(format!("{:?}", e)))?;
+    let identity = resolver.resolve_ident_owned(&actor).await?;
+    if let Some(pds) = &identity.pds_endpoint() {
+        let metadata = resolver.get_resource_server_metadata(pds).await?;
+        Ok((metadata, identity))
+    } else {
+        Err(ResolverError::DidDocument(format!("Did doc lacking pds")))
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+async fn resolve_from_identity_impl<T: OAuthResolver + ?Sized>(
+    resolver: &T,
+    input: &str,
+) -> Result<
+    (
+        OAuthAuthorizationServerMetadata<'static>,
+        DidDocument<'static>,
+    ),
+    ResolverError,
+> {
+    let actor =
+        AtIdentifier::new(input).map_err(|e| ResolverError::AtIdentifier(format!("{:?}", e)))?;
+    let identity = resolver.resolve_ident_owned(&actor).await?;
+    if let Some(pds) = &identity.pds_endpoint() {
+        let metadata = resolver.get_resource_server_metadata(pds).await?;
+        Ok((metadata, identity))
+    } else {
+        Err(ResolverError::DidDocument(format!("Did doc lacking pds")))
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+async fn get_authorization_server_metadata_impl<T: HttpClient + Sync + ?Sized>(
+    client: &T,
+    issuer: &Url,
+) -> Result<OAuthAuthorizationServerMetadata<'static>, ResolverError> {
+    let mut md = resolve_authorization_server(client, issuer).await?;
+    // Normalize issuer string to the input URL representation to avoid slash quirks
+    md.issuer = jacquard_common::CowStr::from(issuer.as_str()).into_static();
+    Ok(md)
+}
+
+#[cfg(target_arch = "wasm32")]
+async fn get_authorization_server_metadata_impl<T: HttpClient + ?Sized>(
+    client: &T,
+    issuer: &Url,
+) -> Result<OAuthAuthorizationServerMetadata<'static>, ResolverError> {
+    let mut md = resolve_authorization_server(client, issuer).await?;
+    // Normalize issuer string to the input URL representation to avoid slash quirks
+    md.issuer = jacquard_common::CowStr::from(issuer.as_str()).into_static();
+    Ok(md)
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+async fn get_resource_server_metadata_impl<T: OAuthResolver + Sync + ?Sized>(
+    resolver: &T,
+    pds: &Url,
+) -> Result<OAuthAuthorizationServerMetadata<'static>, ResolverError> {
+    let rs_metadata = resolve_protected_resource_info(resolver, pds).await?;
+    // ATPROTO requires one, and only one, authorization server entry
+    // > That document MUST contain a single item in the authorization_servers array.
+    // https://github.com/bluesky-social/proposals/tree/main/0004-oauth#server-metadata
+    let issuer = match &rs_metadata.authorization_servers {
+        Some(servers) if !servers.is_empty() => {
+            if servers.len() > 1 {
+                return Err(ResolverError::ProtectedResourceMetadata(format!(
+                    "unable to determine authorization server for PDS: {pds}"
+                )));
+            }
+            &servers[0]
+        }
+        _ => {
+            return Err(ResolverError::ProtectedResourceMetadata(format!(
+                "no authorization server found for PDS: {pds}"
+            )));
+        }
+    };
+    let as_metadata = resolver.get_authorization_server_metadata(issuer).await?;
+    // https://datatracker.ietf.org/doc/html/draft-ietf-oauth-resource-metadata-08#name-authorization-server-metada
+    if let Some(protected_resources) = &as_metadata.protected_resources {
+        let resource_url = rs_metadata
+            .resource
+            .strip_suffix('/')
+            .unwrap_or(rs_metadata.resource.as_str());
+        if !protected_resources.contains(&CowStr::Borrowed(resource_url)) {
+            return Err(ResolverError::AuthorizationServerMetadata(format!(
+                "pds {pds}, resource {0} not protected by issuer: {issuer}, protected resources: {1:?}",
+                rs_metadata.resource, protected_resources
+            )));
+        }
+    }
+
+    // TODO: atproot specific validation?
+    // https://github.com/bluesky-social/proposals/tree/main/0004-oauth#server-metadata
+    //
+    // eg.
+    // https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html
+    // if as_metadata.client_id_metadata_document_supported != Some(true) {
+    //     return Err(Error::AuthorizationServerMetadata(format!(
+    //         "authorization server does not support client_id_metadata_document: {issuer}"
+    //     )));
+    // }
+
+    Ok(as_metadata)
+}
+
+#[cfg(target_arch = "wasm32")]
+async fn get_resource_server_metadata_impl<T: OAuthResolver + ?Sized>(
+    resolver: &T,
+    pds: &Url,
+) -> Result<OAuthAuthorizationServerMetadata<'static>, ResolverError> {
+    let rs_metadata = resolve_protected_resource_info(resolver, pds).await?;
+    // ATPROTO requires one, and only one, authorization server entry
+    // > That document MUST contain a single item in the authorization_servers array.
+    // https://github.com/bluesky-social/proposals/tree/main/0004-oauth#server-metadata
+    let issuer = match &rs_metadata.authorization_servers {
+        Some(servers) if !servers.is_empty() => {
+            if servers.len() > 1 {
+                return Err(ResolverError::ProtectedResourceMetadata(format!(
+                    "unable to determine authorization server for PDS: {pds}"
+                )));
+            }
+            &servers[0]
+        }
+        _ => {
+            return Err(ResolverError::ProtectedResourceMetadata(format!(
+                "no authorization server found for PDS: {pds}"
+            )));
+        }
+    };
+    let as_metadata = resolver.get_authorization_server_metadata(issuer).await?;
+    // https://datatracker.ietf.org/doc/html/draft-ietf-oauth-resource-metadata-08#name-authorization-server-metada
+    if let Some(protected_resources) = &as_metadata.protected_resources {
+        let resource_url = rs_metadata
+            .resource
+            .strip_suffix('/')
+            .unwrap_or(rs_metadata.resource.as_str());
+        if !protected_resources.contains(&CowStr::Borrowed(resource_url)) {
+            return Err(ResolverError::AuthorizationServerMetadata(format!(
+                "pds {pds}, resource {0} not protected by issuer: {issuer}, protected resources: {1:?}",
+                rs_metadata.resource, protected_resources
+            )));
+        }
+    }
+
+    // TODO: atproot specific validation?
+    // https://github.com/bluesky-social/proposals/tree/main/0004-oauth#server-metadata
+    //
+    // eg.
+    // https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html
+    // if as_metadata.client_id_metadata_document_supported != Some(true) {
+    //     return Err(Error::AuthorizationServerMetadata(format!(
+    //         "authorization server does not support client_id_metadata_document: {issuer}"
+    //     )));
+    // }
+
+    Ok(as_metadata)
+}
+
+#[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait OAuthResolver: IdentityResolver + HttpClient {
+    #[cfg(not(target_arch = "wasm32"))]
     fn verify_issuer(
         &self,
         server_metadata: &OAuthAuthorizationServerMetadata<'_>,
@@ -124,22 +404,23 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     where
         Self: Sync,
     {
-        async {
-            let (metadata, identity) = self.resolve_from_identity(sub).await?;
-            if !issuer_equivalent(&metadata.issuer, &server_metadata.issuer) {
-                return Err(ResolverError::AuthorizationServerMetadata(
-                    "issuer mismatch".to_string(),
-                ));
-            }
-            Ok(identity
-                .pds_endpoint()
-                .ok_or(ResolverError::DidDocument(format!("{:?}", identity).into()))?)
-        }
+        verify_issuer_impl(self, server_metadata, sub)
     }
+
+    #[cfg(target_arch = "wasm32")]
+    fn verify_issuer(
+        &self,
+        server_metadata: &OAuthAuthorizationServerMetadata<'_>,
+        sub: &Did<'_>,
+    ) -> impl std::future::Future<Output = Result<Url, ResolverError>> {
+        verify_issuer_impl(self, server_metadata, sub)
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
     fn resolve_oauth(
         &self,
         input: &str,
-    ) -> impl Future<
+    ) -> impl std::future::Future<
         Output = Result<
             (
                 OAuthAuthorizationServerMetadata<'static>,
@@ -151,39 +432,53 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     where
         Self: Sync,
     {
-        // Allow using an entryway, or PDS url, directly as login input (e.g.
-        // when the user forgot their handle, or when the handle does not
-        // resolve to a DID)
-        async {
-            Ok(if input.starts_with("https://") {
-                let url = Url::parse(input).map_err(|_| ResolverError::NotFound)?;
-                (self.resolve_from_service(&url).await?, None)
-            } else {
-                let (metadata, identity) = self.resolve_from_identity(input).await?;
-                (metadata, Some(identity))
-            })
-        }
+        resolve_oauth_impl(self, input)
     }
+
+    #[cfg(target_arch = "wasm32")]
+    fn resolve_oauth(
+        &self,
+        input: &str,
+    ) -> impl std::future::Future<
+        Output = Result<
+            (
+                OAuthAuthorizationServerMetadata<'static>,
+                Option<DidDocument<'static>>,
+            ),
+            ResolverError,
+        >,
+    > {
+        resolve_oauth_impl(self, input)
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
     fn resolve_from_service(
         &self,
         input: &Url,
-    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>> + Send
+    ) -> impl std::future::Future<
+        Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>,
+    > + Send
     where
         Self: Sync,
     {
-        async {
-            // Assume first that input is a PDS URL (as required by ATPROTO)
-            if let Ok(metadata) = self.get_resource_server_metadata(input).await {
-                return Ok(metadata);
-            }
-            // Fallback to trying to fetch as an issuer (Entryway)
-            self.get_authorization_server_metadata(input).await
-        }
+        resolve_from_service_impl(self, input)
     }
+
+    #[cfg(target_arch = "wasm32")]
+    fn resolve_from_service(
+        &self,
+        input: &Url,
+    ) -> impl std::future::Future<
+        Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>,
+    > {
+        resolve_from_service_impl(self, input)
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
     fn resolve_from_identity(
         &self,
         input: &str,
-    ) -> impl Future<
+    ) -> impl std::future::Future<
         Output = Result<
             (
                 OAuthAuthorizationServerMetadata<'static>,
@@ -195,87 +490,69 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     where
         Self: Sync,
     {
-        async {
-            let actor = AtIdentifier::new(input)
-                .map_err(|e| ResolverError::AtIdentifier(format!("{:?}", e)))?;
-            let identity = self.resolve_ident_owned(&actor).await?;
-            if let Some(pds) = &identity.pds_endpoint() {
-                let metadata = self.get_resource_server_metadata(pds).await?;
-                Ok((metadata, identity))
-            } else {
-                Err(ResolverError::DidDocument(format!("Did doc lacking pds")))
-            }
-        }
+        resolve_from_identity_impl(self, input)
     }
+
+    #[cfg(target_arch = "wasm32")]
+    fn resolve_from_identity(
+        &self,
+        input: &str,
+    ) -> impl std::future::Future<
+        Output = Result<
+            (
+                OAuthAuthorizationServerMetadata<'static>,
+                DidDocument<'static>,
+            ),
+            ResolverError,
+        >,
+    > {
+        resolve_from_identity_impl(self, input)
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
     fn get_authorization_server_metadata(
         &self,
         issuer: &Url,
-    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>> + Send
+    ) -> impl std::future::Future<
+        Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>,
+    > + Send
     where
         Self: Sync,
     {
-        async {
-            let mut md = resolve_authorization_server(self, issuer).await?;
-            // Normalize issuer string to the input URL representation to avoid slash quirks
-            md.issuer = jacquard_common::CowStr::from(issuer.as_str()).into_static();
-            Ok(md)
-        }
+        get_authorization_server_metadata_impl(self, issuer)
     }
+
+    #[cfg(target_arch = "wasm32")]
+    fn get_authorization_server_metadata(
+        &self,
+        issuer: &Url,
+    ) -> impl std::future::Future<
+        Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>,
+    > {
+        get_authorization_server_metadata_impl(self, issuer)
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
     fn get_resource_server_metadata(
         &self,
         pds: &Url,
-    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>> + Send
+    ) -> impl std::future::Future<
+        Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>,
+    > + Send
     where
         Self: Sync,
     {
-        async move {
-            let rs_metadata = resolve_protected_resource_info(self, pds).await?;
-            // ATPROTO requires one, and only one, authorization server entry
-            // > That document MUST contain a single item in the authorization_servers array.
-            // https://github.com/bluesky-social/proposals/tree/main/0004-oauth#server-metadata
-            let issuer = match &rs_metadata.authorization_servers {
-                Some(servers) if !servers.is_empty() => {
-                    if servers.len() > 1 {
-                        return Err(ResolverError::ProtectedResourceMetadata(format!(
-                            "unable to determine authorization server for PDS: {pds}"
-                        )));
-                    }
-                    &servers[0]
-                }
-                _ => {
-                    return Err(ResolverError::ProtectedResourceMetadata(format!(
-                        "no authorization server found for PDS: {pds}"
-                    )));
-                }
-            };
-            let as_metadata = self.get_authorization_server_metadata(issuer).await?;
-            // https://datatracker.ietf.org/doc/html/draft-ietf-oauth-resource-metadata-08#name-authorization-server-metada
-            if let Some(protected_resources) = &as_metadata.protected_resources {
-                let resource_url = rs_metadata
-                    .resource
-                    .strip_suffix('/')
-                    .unwrap_or(rs_metadata.resource.as_str());
-                if !protected_resources.contains(&CowStr::Borrowed(resource_url)) {
-                    return Err(ResolverError::AuthorizationServerMetadata(format!(
-                        "pds {pds}, resource {0} not protected by issuer: {issuer}, protected resources: {1:?}",
-                        rs_metadata.resource, protected_resources
-                    )));
-                }
-            }
+        get_resource_server_metadata_impl(self, pds)
+    }
 
-            // TODO: atproot specific validation?
-            // https://github.com/bluesky-social/proposals/tree/main/0004-oauth#server-metadata
-            //
-            // eg.
-            // https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html
-            // if as_metadata.client_id_metadata_document_supported != Some(true) {
-            //     return Err(Error::AuthorizationServerMetadata(format!(
-            //         "authorization server does not support client_id_metadata_document: {issuer}"
-            //     )));
-            // }
-
-            Ok(as_metadata)
-        }
+    #[cfg(target_arch = "wasm32")]
+    fn get_resource_server_metadata(
+        &self,
+        pds: &Url,
+    ) -> impl std::future::Future<
+        Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>,
+    > {
+        get_resource_server_metadata_impl(self, pds)
     }
 }
 

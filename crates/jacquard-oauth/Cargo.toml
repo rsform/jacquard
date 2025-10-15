@@ -33,14 +33,16 @@ elliptic-curve = "0.13.8"
 http.workspace = true
 bytes.workspace = true
 rand = { version = "0.8.5", features = ["small_rng"] }
-async-trait.workspace = true
 dashmap = "6.1.0"
-tokio = { workspace = true, features = ["sync", "net", "time"] }
+tokio = { workspace = true, default-features = false, features = ["sync"] }
 reqwest.workspace = true
 trait-variant.workspace = true
 webbrowser = { version = "0.8", optional = true }
-rouille  = { version =  "3.6.2", optional = true }
 tracing = { workspace = true, optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio = { workspace = true, features = ["rt", "net", "time"] }
+rouille = { version = "3.6.2", optional = true }
 
 [features]
 default = []

@@ -104,18 +104,17 @@ Jacquard is broken up into several crates for modularity. The correct one to use
 
 Highlights:
 
+- experimental WASM support
 - better value type deserialization helpers
 - service auth implementation
 - XrpcRequest derive Macros
 - more builders in generated api to make constructing things easier (lmk if compile time is awful)
 - `AgentSessionExt` trait with a host of convenience methods for working with records and preferences
 - Improvements to the `Collection` trait, code generation, and addition of the `VecUpdate` trait to enable that
-- A bunch of examples, both in the docs and in the repository
-- More lexicons in the generated API bindings.
 
 ## Development
 
-This repo uses [Flakes](https://nixos.asia/en/flakes) from the get-go.
+This repo uses [Flakes](https://nixos.asia/en/flakes)
 
 ```bash
 # Dev shell
@@ -129,5 +128,16 @@ nix build
 ```
 
 There's also a [`justfile`](https://just.systems/) for Makefile-esque commands to be run inside of the devShell, and you can generally `cargo ...` or `just ...` whatever just fine if you don't want to use Nix and have the prerequisites installed.
+
+
+## Experimental WASM Support
+
+Core crates (`jacquard-common`, `jacquard-api`, `jacquard-identity`, `jacquard-oauth`) compile for `wasm32-unknown-unknown`. Traits use [`trait-variant`](https://docs.rs/trait-variant) to conditionally exclude `Send` bounds on WASM targets. DNS-based handle resolution is gated behind the `dns` feature and unavailable on WASM (HTTPS well-known and PDS resolution still work).
+
+Test WASM compilation:
+```bash
+just check-wasm
+# or: cargo build --target wasm32-unknown-unknown -p jacquard-common --no-default-features
+```
 
 [![License](https://img.shields.io/crates/l/jacquard.svg)](./LICENSE)

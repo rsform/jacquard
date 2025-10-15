@@ -226,6 +226,7 @@ pub trait XrpcExt: HttpClient {
 impl<T: HttpClient> XrpcExt for T {}
 
 /// Stateful XRPC call trait
+#[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait XrpcClient: HttpClient {
     /// Get the base URI for the client.
     fn base_uri(&self) -> Url;
@@ -234,11 +235,24 @@ pub trait XrpcClient: HttpClient {
     fn opts(&self) -> impl Future<Output = CallOptions<'_>> {
         async { CallOptions::default() }
     }
+
     /// Send an XRPC request and parse the response
+    #[cfg(not(target_arch = "wasm32"))]
     fn send<R>(
         &self,
         request: R,
-    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest>::Response>>> + Send
+    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest>::Response>>>
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+        Self: Sync;
+
+    /// Send an XRPC request and parse the response
+    #[cfg(target_arch = "wasm32")]
+    fn send<R>(
+        &self,
+        request: R,
+    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest>::Response>>>
     where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync;
@@ -308,7 +322,7 @@ impl<'a, C: HttpClient> XrpcCall<'a, C> {
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self, request), fields(nsid = R::NSID)))]
     pub async fn send<R>(self, request: &R) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest,
         <R as XrpcRequest>::Response: Send + Sync,
     {
         let http_request = build_http_request(&self.base, request, &self.opts)

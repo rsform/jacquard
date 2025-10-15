@@ -168,7 +168,8 @@ where
         S: Any + 'static,
     {
         #[cfg(feature = "tracing")]
-        let _span = tracing::info_span!("credential_session_login", identifier = %identifier).entered();
+        let _span =
+            tracing::info_span!("credential_session_login", identifier = %identifier).entered();
 
         // Resolve PDS base
         let pds = if identifier.as_ref().starts_with("http://")
@@ -272,7 +273,9 @@ where
         S: Any + 'static,
     {
         #[cfg(feature = "tracing")]
-        let _span = tracing::info_span!("credential_session_restore", did = %did, session_id = %session_id).entered();
+        let _span =
+            tracing::info_span!("credential_session_restore", did = %did, session_id = %session_id)
+                .entered();
 
         let key = (did.clone().into_static(), session_id.clone().into_static());
         let Some(sess) = self.store.get(&key).await else {
@@ -401,6 +404,7 @@ where
     fn base_uri(&self) -> Url {
         // base_uri is a synchronous trait method; avoid `.await` here.
         // Under Tokio, use `block_in_place` to make a blocking RwLock read safe.
+        #[cfg(not(target_arch = "wasm32"))]
         if tokio::runtime::Handle::try_current().is_ok() {
             tokio::task::block_in_place(|| {
                 self.endpoint.blocking_read().clone().unwrap_or(
@@ -409,6 +413,13 @@ where
                 )
             })
         } else {
+            self.endpoint.blocking_read().clone().unwrap_or(
+                Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
+            )
+        }
+
+        #[cfg(target_arch = "wasm32")]
+        {
             self.endpoint.blocking_read().clone().unwrap_or(
                 Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
             )

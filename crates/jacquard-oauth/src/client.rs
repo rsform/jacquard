@@ -421,22 +421,20 @@ where
 {
     fn base_uri(&self) -> Url {
         // base_uri is a synchronous trait method; we must avoid async `.read().await`.
-        // Use `block_in_place` under Tokio to perform a blocking RwLock read safely.
+        // Use `block_in_place` under Tokio runtime to perform a blocking RwLock read safely.
+        #[cfg(not(target_arch = "wasm32"))]
         if tokio::runtime::Handle::try_current().is_ok() {
-            tokio::task::block_in_place(|| self.data.blocking_read().host_url.clone())
-        } else {
-            self.data.blocking_read().host_url.clone()
+            return tokio::task::block_in_place(|| self.data.blocking_read().host_url.clone());
         }
+
+        self.data.blocking_read().host_url.clone()
     }
 
     async fn opts(&self) -> CallOptions<'_> {
         self.options.read().await.clone()
     }
 
-    async fn send<R>(
-        &self,
-        request: R,
-    ) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
+    async fn send<R>(&self, request: R) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
     where
         R: XrpcRequest,
     {

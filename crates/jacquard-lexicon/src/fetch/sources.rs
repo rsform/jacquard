@@ -14,9 +14,9 @@ pub use local::LocalSource;
 pub use slices::SlicesSource;
 
 use crate::lexicon::LexiconDoc;
-use async_trait::async_trait;
 use miette::{IntoDiagnostic, Result};
 use std::collections::HashMap;
+use std::future::Future;
 
 #[derive(Debug, Clone)]
 pub struct Source {
@@ -58,9 +58,8 @@ pub enum SourceType {
     Slices(SlicesSource),
 }
 
-#[async_trait]
 pub trait LexiconSource {
-    fn fetch(&self) -> impl Future<Output = Result<HashMap<String, LexiconDoc<'_>>>>;
+    fn fetch(&self) -> impl Future<Output = Result<HashMap<String, LexiconDoc<'_>>>> + Send;
 }
 
 impl LexiconSource for SourceType {

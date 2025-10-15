@@ -246,7 +246,6 @@ impl FileAuthStore {
     }
 }
 
-#[async_trait::async_trait]
 impl jacquard_oauth::authstore::ClientAuthStore for FileAuthStore {
     async fn get_session(
         &self,
@@ -388,7 +387,6 @@ impl FileAuthStore {
     }
 }
 
-#[async_trait::async_trait]
 impl
     jacquard_common::session::SessionStore<
         crate::client::credential_session::SessionKey,

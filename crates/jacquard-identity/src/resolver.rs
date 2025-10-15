@@ -8,11 +8,7 @@
 //!
 //! Parsing returns a `DidDocResponse` so callers can borrow from the response buffer
 //! and optionally validate the document `id` against the requested DID.
-
-use std::collections::BTreeMap;
-use std::marker::Sync;
-use std::str::FromStr;
-
+#![cfg_attr(target_arch = "wasm32", allow(unused))]
 use bon::Builder;
 use bytes::Bytes;
 use http::StatusCode;
@@ -25,6 +21,9 @@ use jacquard_common::types::uri::Uri;
 use jacquard_common::types::value::{AtDataError, Data};
 use jacquard_common::{CowStr, IntoStatic};
 use miette::Diagnostic;
+use std::collections::BTreeMap;
+use std::marker::Sync;
+use std::str::FromStr;
 use thiserror::Error;
 use url::Url;
 
@@ -73,7 +72,7 @@ pub enum IdentityError {
     #[diagnostic(code(jacquard_identity::url))]
     Url(#[from] url::ParseError),
     #[error("DNS error: {0}")]
-    #[cfg(feature = "dns")]
+    #[cfg(all(feature = "dns", not(target_family = "wasm")))]
     #[diagnostic(code(jacquard_identity::dns))]
     Dns(#[from] hickory_resolver::error::ResolveError),
     #[error("serialize/deserialize error: {0}")]
@@ -299,13 +298,15 @@ impl Default for ResolverOptions {
     fn default() -> Self {
         // By default, prefer DNS then HTTPS for handles, then PDS fallback
         // For DID documents, prefer method-native sources, then PDS fallback
+        let mut handle_order = vec![];
+        #[cfg(not(target_family = "wasm"))]
+        handle_order.push(HandleStep::DnsTxt);
+        handle_order.push(HandleStep::HttpsWellKnown);
+        handle_order.push(HandleStep::PdsResolveHandle);
+
         Self::new()
             .plc_source(PlcSource::default())
-            .handle_order(vec![
-                HandleStep::DnsTxt,
-                HandleStep::HttpsWellKnown,
-                HandleStep::PdsResolveHandle,
-            ])
+            .handle_order(handle_order)
             .did_order(vec![
                 DidStep::DidWebHttps,
                 DidStep::PlcHttp,
@@ -326,31 +327,49 @@ impl Default for ResolverOptions {
 /// - Slingshot `resolveHandle` (unauthenticated) when configured as the PLC source
 /// - PDS fallbacks via helpers that use stateless XRPC on top of reqwest
 
+#[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait IdentityResolver {
     /// Access options for validation decisions in default methods
     fn options(&self) -> &ResolverOptions;
 
     /// Resolve handle
+    #[cfg(not(target_arch = "wasm32"))]
     fn resolve_handle(
         &self,
         handle: &Handle<'_>,
-    ) -> impl Future<Output = Result<Did<'static>, IdentityError>> + Send
+    ) -> impl Future<Output = Result<Did<'static>, IdentityError>>
+    where
+        Self: Sync;
+
+    /// Resolve handle
+    #[cfg(target_arch = "wasm32")]
+    fn resolve_handle(
+        &self,
+        handle: &Handle<'_>,
+    ) -> impl Future<Output = Result<Did<'static>, IdentityError>>;
+
+    /// Resolve DID document
+    #[cfg(not(target_arch = "wasm32"))]
+    fn resolve_did_doc(
+        &self,
+        did: &Did<'_>,
+    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>>
     where
         Self: Sync;
 
     /// Resolve DID document
+    #[cfg(target_arch = "wasm32")]
     fn resolve_did_doc(
         &self,
         did: &Did<'_>,
-    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>> + Send
-    where
-        Self: Sync;
+    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>>;
 
     /// Resolve DID doc from an identifier
+    #[cfg(not(target_arch = "wasm32"))]
     fn resolve_ident(
         &self,
         actor: &AtIdentifier<'_>,
-    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>> + Send
+    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>>
     where
         Self: Sync,
     {
@@ -366,10 +385,28 @@ pub trait IdentityResolver {
     }
 
     /// Resolve DID doc from an identifier
+    #[cfg(target_arch = "wasm32")]
+    fn resolve_ident(
+        &self,
+        actor: &AtIdentifier<'_>,
+    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>> {
+        async move {
+            match actor {
+                AtIdentifier::Did(did) => self.resolve_did_doc(&did).await,
+                AtIdentifier::Handle(handle) => {
+                    let did = self.resolve_handle(&handle).await?;
+                    self.resolve_did_doc(&did).await
+                }
+            }
+        }
+    }
+
+    /// Resolve DID doc from an identifier
+    #[cfg(not(target_arch = "wasm32"))]
     fn resolve_ident_owned(
         &self,
         actor: &AtIdentifier<'_>,
-    ) -> impl Future<Output = Result<DidDocument<'static>, IdentityError>> + Send
+    ) -> impl Future<Output = Result<DidDocument<'static>, IdentityError>>
     where
         Self: Sync,
     {
@@ -384,18 +421,47 @@ pub trait IdentityResolver {
         }
     }
 
+    /// Resolve DID doc from an identifier
+    #[cfg(target_arch = "wasm32")]
+    fn resolve_ident_owned(
+        &self,
+        actor: &AtIdentifier<'_>,
+    ) -> impl Future<Output = Result<DidDocument<'static>, IdentityError>> {
+        async move {
+            match actor {
+                AtIdentifier::Did(did) => self.resolve_did_doc_owned(&did).await,
+                AtIdentifier::Handle(handle) => {
+                    let did = self.resolve_handle(&handle).await?;
+                    self.resolve_did_doc_owned(&did).await
+                }
+            }
+        }
+    }
+
     /// Resolve the DID document and return an owned version
+    #[cfg(not(target_arch = "wasm32"))]
     fn resolve_did_doc_owned(
         &self,
         did: &Did<'_>,
-    ) -> impl Future<Output = Result<DidDocument<'static>, IdentityError>> + Send
+    ) -> impl Future<Output = Result<DidDocument<'static>, IdentityError>>
     where
         Self: Sync,
     {
         async { self.resolve_did_doc(did).await?.into_owned() }
     }
+
+    /// Resolve the DID document and return an owned version
+    #[cfg(target_arch = "wasm32")]
+    fn resolve_did_doc_owned(
+        &self,
+        did: &Did<'_>,
+    ) -> impl Future<Output = Result<DidDocument<'static>, IdentityError>> {
+        async { self.resolve_did_doc(did).await?.into_owned() }
+    }
+
     /// Return the PDS url for a DID
-    fn pds_for_did(&self, did: &Did<'_>) -> impl Future<Output = Result<Url, IdentityError>> + Send
+    #[cfg(not(target_arch = "wasm32"))]
+    fn pds_for_did(&self, did: &Did<'_>) -> impl Future<Output = Result<Url, IdentityError>>
     where
         Self: Sync,
     {
@@ -414,11 +480,32 @@ pub trait IdentityResolver {
             doc.pds_endpoint().ok_or(IdentityError::MissingPdsEndpoint)
         }
     }
+
+    /// Return the PDS url for a DID
+    #[cfg(target_arch = "wasm32")]
+    fn pds_for_did(&self, did: &Did<'_>) -> impl Future<Output = Result<Url, IdentityError>> {
+        async {
+            let resp = self.resolve_did_doc(did).await?;
+            let doc = resp.parse()?;
+            // Default-on doc id equality check
+            if self.options().validate_doc_id {
+                if doc.id.as_str() != did.as_str() {
+                    return Err(IdentityError::DocIdMismatch {
+                        expected: did.clone().into_static(),
+                        doc: doc.clone().into_static(),
+                    });
+                }
+            }
+            doc.pds_endpoint().ok_or(IdentityError::MissingPdsEndpoint)
+        }
+    }
+
     /// Return the DIS and PDS url for a handle
+    #[cfg(not(target_arch = "wasm32"))]
     fn pds_for_handle(
         &self,
         handle: &Handle<'_>,
-    ) -> impl Future<Output = Result<(Did<'static>, Url), IdentityError>> + Send
+    ) -> impl Future<Output = Result<(Did<'static>, Url), IdentityError>>
     where
         Self: Sync,
     {
@@ -428,9 +515,40 @@ pub trait IdentityResolver {
             Ok((did, pds))
         }
     }
+
+    /// Return the DIS and PDS url for a handle
+    #[cfg(target_arch = "wasm32")]
+    fn pds_for_handle(
+        &self,
+        handle: &Handle<'_>,
+    ) -> impl Future<Output = Result<(Did<'static>, Url), IdentityError>> {
+        async {
+            let did = self.resolve_handle(handle).await?;
+            let pds = self.pds_for_did(&did).await?;
+            Ok((did, pds))
+        }
+    }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 impl<T: IdentityResolver + Sync> IdentityResolver for std::sync::Arc<T> {
+    fn options(&self) -> &ResolverOptions {
+        self.as_ref().options()
+    }
+
+    /// Resolve handle
+    async fn resolve_handle(&self, handle: &Handle<'_>) -> Result<Did<'static>, IdentityError> {
+        self.as_ref().resolve_handle(handle).await
+    }
+
+    /// Resolve DID document
+    async fn resolve_did_doc(&self, did: &Did<'_>) -> Result<DidDocResponse, IdentityError> {
+        self.as_ref().resolve_did_doc(did).await
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl<T: IdentityResolver> IdentityResolver for std::sync::Arc<T> {
     fn options(&self) -> &ResolverOptions {
         self.as_ref().options()
     }

@@ -190,6 +190,7 @@ pub enum AgentKind {
 /// Common interface for stateful sessions used by the Agent wrapper.
 ///
 /// Implemented by `CredentialSession` (app‑password) and `OAuthSession` (DPoP).
+#[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait AgentSession: XrpcClient + HttpClient + Send + Sync {
     /// Identify the kind of session.
     fn session_kind(&self) -> AgentKind;
@@ -877,11 +878,20 @@ impl<T: AgentSession + IdentityResolver> AgentSessionExt for T {}
 impl<A: AgentSession> HttpClient for Agent<A> {
     type Error = <A as HttpClient>::Error;
 
+    #[cfg(not(target_arch = "wasm32"))]
     fn send_http(
         &self,
         request: http::Request<Vec<u8>>,
     ) -> impl Future<Output = core::result::Result<http::Response<Vec<u8>>, Self::Error>> + Send
     {
+        self.inner.send_http(request)
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    fn send_http(
+        &self,
+        request: http::Request<Vec<u8>>,
+    ) -> impl Future<Output = core::result::Result<http::Response<Vec<u8>>, Self::Error>> {
         self.inner.send_http(request)
     }
 }

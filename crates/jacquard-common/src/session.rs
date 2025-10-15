@@ -1,6 +1,5 @@
 //! Generic session storage traits and utilities.
 
-use async_trait::async_trait;
 use miette::Diagnostic;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
@@ -8,6 +7,7 @@ use serde_json::Value;
 use std::collections::HashMap;
 use std::error::Error as StdError;
 use std::fmt::Display;
+use std::future::Future;
 use std::hash::Hash;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -31,18 +31,18 @@ pub enum SessionStoreError {
 }
 
 /// Pluggable storage for arbitrary session records.
-#[async_trait]
+#[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait SessionStore<K, T>: Send + Sync
 where
     K: Eq + Hash,
     T: Clone,
 {
     /// Get the current session if present.
-    async fn get(&self, key: &K) -> Option<T>;
+    fn get(&self, key: &K) -> impl Future<Output = Option<T>>;
     /// Persist the given session.
-    async fn set(&self, key: K, session: T) -> Result<(), SessionStoreError>;
+    fn set(&self, key: K, session: T) -> impl Future<Output = Result<(), SessionStoreError>>;
     /// Delete the given session.
-    async fn del(&self, key: &K) -> Result<(), SessionStoreError>;
+    fn del(&self, key: &K) -> impl Future<Output = Result<(), SessionStoreError>>;
 }
 
 /// In-memory session store suitable for short-lived sessions and tests.
@@ -55,7 +55,6 @@ impl<K, T> Default for MemorySessionStore<K, T> {
     }
 }
 
-#[async_trait]
 impl<K, T> SessionStore<K, T> for MemorySessionStore<K, T>
 where
     K: Eq + Hash + Send + Sync,
@@ -103,7 +102,6 @@ impl FileTokenStore {
     }
 }
 
-#[async_trait::async_trait]
 impl<
     K: Eq + Hash + Display + Send + Sync + 'static,
     T: Clone + Serialize + DeserializeOwned + Send + Sync + 'static,

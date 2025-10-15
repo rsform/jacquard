@@ -22,11 +22,12 @@ api_bluesky = ["api", "jacquard-api/bluesky" ]
 api_full = ["api", "jacquard-api/bluesky", "jacquard-api/other", "jacquard-api/lexicon_community"]
 # All captured generated lexicon API bindings
 api_all = ["api_full", "jacquard-api/ufos"]
-dns = ["jacquard-identity/dns"]
+
 # Propagate loopback to oauth (server + browser helper)
 loopback = ["jacquard-oauth/loopback", "jacquard-oauth/browser-open"]
 # Enable tracing instrumentation
 tracing = ["dep:tracing", "jacquard-common/tracing", "jacquard-oauth/tracing", "jacquard-identity/tracing"]
+dns = ["jacquard-identity/dns"]
 
 
 [[example]]
@@ -78,17 +79,17 @@ jacquard-derive = { version = "0.5", path = "../jacquard-derive", optional = tru
 jacquard-identity = { version = "0.5", path = "../jacquard-identity" }
 
 bon.workspace = true
-async-trait.workspace = true
+trait-variant.workspace = true
 bytes.workspace = true
 http.workspace = true
 miette = { workspace = true }
-reqwest = { workspace = true, features = ["charset", "http2", "json", "system-proxy", "gzip", "rustls-tls"] }
+reqwest = { workspace = true, features = ["charset", "json", "gzip"] }
 serde.workspace = true
 serde_html_form.workspace = true
 serde_ipld_dagcbor.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
-tokio = { workspace = true, features = ["macros", "rt-multi-thread", "fs"] }
+tokio = { workspace = true, default-features = false, features = ["sync"] }
 url.workspace = true
 smol_str.workspace = true
 percent-encoding.workspace = true
@@ -96,6 +97,13 @@ jose-jwk = { workspace = true, features = ["p256"] }
 p256 = { workspace = true, features = ["ecdsa"] }
 rand_core.workspace = true
 tracing = { workspace = true, optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+reqwest = { workspace = true, features = ["http2", "system-proxy", "rustls-tls"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "fs"] }
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+getrandom = { version = "0.2", features = ["js"] }
 
 [dev-dependencies]
 clap.workspace = true

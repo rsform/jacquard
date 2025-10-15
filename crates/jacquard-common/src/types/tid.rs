@@ -119,7 +119,7 @@ impl Tid {
     }
 
     /// Construct a TID from a timestamp (in microseconds) and clock ID
-    pub fn from_time(timestamp: usize, clkid: u32) -> Self {
+    pub fn from_time(timestamp: u64, clkid: u32) -> Self {
         let str = smol_str::format_smolstr!(
             "{0}{1:2>2}",
             s32_encode(timestamp as u64),
@@ -129,7 +129,7 @@ impl Tid {
     }
 
     /// Extract the timestamp component (microseconds since UNIX epoch)
-    pub fn timestamp(&self) -> usize {
+    pub fn timestamp(&self) -> u64 {
         s32decode(self.0[0..11].to_owned())
     }
 
@@ -194,12 +194,12 @@ impl Tid {
 }
 
 /// Decode a base32-sortable string into a usize
-pub fn s32decode(s: String) -> usize {
+pub fn s32decode(s: String) -> u64 {
     let mut i: usize = 0;
     for c in s.chars() {
         i = i * 32 + S32_CHAR.chars().position(|x| x == c).unwrap();
     }
-    i
+    i as u64
 }
 
 impl FromStr for Tid {
@@ -289,7 +289,7 @@ impl Deref for Tid {
 /// Based on adenosine/adenosine/src/identifiers.rs
 /// TODO: clean up and normalize stuff between this and the stuff pulled from atrium
 pub struct Ticker {
-    last_timestamp: usize,
+    last_timestamp: u64,
     clock_id: u32,
 }
 
@@ -311,7 +311,7 @@ impl Ticker {
         let now = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
             .expect("timestamp in micros since UNIX epoch")
-            .as_micros() as usize;
+            .as_micros() as u64;
         // mask to 53 bits
         let now = now & 0x001FFFFFFFFFFFFF;
         if now > self.last_timestamp {

@@ -66,6 +66,8 @@
 //! Both support `.parse()` for borrowing and validation.
 
 // use crate::CowStr; // not currently needed directly here
+
+#![cfg_attr(target_arch = "wasm32", allow(unused))]
 pub mod resolver;
 
 use crate::resolver::{
@@ -84,11 +86,10 @@ use jacquard_common::xrpc::XrpcExt;
 use jacquard_common::{IntoStatic, types::string::Handle};
 use percent_encoding::percent_decode_str;
 use reqwest::StatusCode;
-use std::sync::Arc;
 use url::{ParseError, Url};
 
-#[cfg(feature = "dns")]
-use hickory_resolver::{TokioAsyncResolver, config::ResolverConfig};
+#[cfg(all(feature = "dns", not(target_family = "wasm")))]
+use {hickory_resolver::{TokioAsyncResolver, config::ResolverConfig}, std::sync::Arc};
 
 /// Default resolver implementation with configurable fallback order.
 #[derive(Clone)]
