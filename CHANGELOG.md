@@ -16,10 +16,10 @@
 **Service Auth** (`jacquard-axum`, `jacquard-common`)
 - Full service authentication implementation for inter-service JWT verification
 - `ExtractServiceAuth` Axum extractor for validating service auth tokens
+- Axum service auth middleware
 - JWT parsing and signature verification (ES256, ES256K)
 - Service auth claims validation (issuer, audience, expiration, method binding)
 - DID document resolution for signing key verification
-- Optional replay protection via `ReplayTracker` trait
 
 **XrpcRequest derive macro** (`jacquard-derive`)
 - `#[derive(XrpcRequest)]` for custom XRPC endpoints
