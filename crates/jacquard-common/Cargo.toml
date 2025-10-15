@@ -35,7 +35,7 @@ thiserror.workspace = true
 url.workspace = true
 http.workspace = true
 
-reqwest = { workspace = true, optional = true, features = ["charset", "gzip"] }
+reqwest = { workspace = true, optional = true, features = ["charset", "gzip", "stream"] }
 serde_ipld_dagcbor.workspace = true
 signature = { version = "2", optional = true }
 tracing = { workspace = true, optional = true }
@@ -43,6 +43,7 @@ tokio = { workspace = true, default-features = false, features = ["sync"] }
 
 # Streaming support (optional)
 n0-future = { version = "0.1", optional = true }
+futures = { version = "0.3", optional = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 getrandom = { version = "0.3.4", features = ["wasm_js"] }
@@ -59,7 +60,7 @@ crypto-p256 = ["crypto", "dep:p256", "p256/ecdsa"]
 service-auth = ["crypto-k256", "crypto-p256", "dep:signature"]
 reqwest-client = ["dep:reqwest"]
 tracing = ["dep:tracing"]
-streaming = ["n0-future"]
+streaming = ["n0-future", "futures"]
 
 [dependencies.ed25519-dalek]
 version = "2"
@@ -80,7 +81,6 @@ features = ["arithmetic"]
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt"] }
-futures = "0.3"
 
 [package.metadata.docs.rs]
 features = [ "crypto-k256", "crypto-k256", "crypto-p256"]
