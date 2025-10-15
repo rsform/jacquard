@@ -101,6 +101,10 @@ Jacquard is broken up into several crates for modularity. The correct one to use
 
 Highlights:
 
+- better value type deserialization helpers
+- service auth implementation
+- XrpcRequest derive Macros
+- more builders in generated api to make constructing things easier (lmk if compile time is awful)
 - `AgentSessionExt` trait with a host of convenience methods for working with records and preferences
 - Improvements to the `Collection` trait, code generation, and addition of the `VecUpdate` trait to enable that
 - A bunch of examples, both in the docs and in the repository
