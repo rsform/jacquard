@@ -94,3 +94,8 @@ source "skylights" type="git" priority=50 {
     repo "https://github.com/Gregoor/skylights"
     pattern "**/*.json"
 }
+
+source "rocksky" type="git" priority=50 {
+    repo "https://github.com/tsirysndr/rocksky-lexicons/"
+    pattern "lexicons/**/*.json"
+}

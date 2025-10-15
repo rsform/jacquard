@@ -1,0 +1,61 @@
+{
+  "lexicon": 1,
+  "id": "app.rocksky.shout.defs",
+  "defs": {
+    "author": {
+      "type": "object",
+      "properties": {
+        "avatar": {
+          "type": "string",
+          "description": "The URL of the author's avatar image.",
+          "format": "uri"
+        },
+        "did": {
+          "type": "string",
+          "description": "The decentralized identifier (DID) of the author.",
+          "format": "at-identifier"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The display name of the author."
+        },
+        "handle": {
+          "type": "string",
+          "description": "The handle of the author.",
+          "format": "at-identifier"
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the author."
+        }
+      }
+    },
+    "shoutView": {
+      "type": "object",
+      "properties": {
+        "author": {
+          "type": "ref",
+          "description": "The author of the shout.",
+          "ref": "app.rocksky.shout.defs#author"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date and time when the shout was created.",
+          "format": "datetime"
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the shout."
+        },
+        "message": {
+          "type": "string",
+          "description": "The content of the shout."
+        },
+        "parent": {
+          "type": "string",
+          "description": "The ID of the parent shout if this is a reply, otherwise null."
+        }
+      }
+    }
+  }
+}

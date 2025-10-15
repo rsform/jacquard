@@ -1,0 +1,150 @@
+{
+  "lexicon": 1,
+  "id": "app.rocksky.song",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of a song.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "artist",
+          "album",
+          "albumArtist",
+          "duration",
+          "createdAt"
+        ],
+        "properties": {
+          "album": {
+            "type": "string",
+            "description": "The album of the song.",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "albumArt": {
+            "type": "blob",
+            "description": "The album art of the song.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 2000000
+          },
+          "albumArtist": {
+            "type": "string",
+            "description": "The album artist of the song.",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "appleMusicLink": {
+            "type": "string",
+            "description": "The Apple Music link of the song.",
+            "format": "uri"
+          },
+          "artist": {
+            "type": "string",
+            "description": "The artist of the song.",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "composer": {
+            "type": "string",
+            "description": "The composer of the song.",
+            "maxLength": 256
+          },
+          "copyrightMessage": {
+            "type": "string",
+            "description": "The copyright message of the song.",
+            "maxLength": 256
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The date when the song was created.",
+            "format": "datetime"
+          },
+          "discNumber": {
+            "type": "integer",
+            "description": "The disc number of the song in the album.",
+            "minimum": 1
+          },
+          "duration": {
+            "type": "integer",
+            "description": "The duration of the song in seconds.",
+            "minimum": 1
+          },
+          "genre": {
+            "type": "string",
+            "description": "The genre of the song.",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "label": {
+            "type": "string",
+            "description": "The label of the song.",
+            "maxLength": 256
+          },
+          "lyrics": {
+            "type": "string",
+            "description": "The lyrics of the song.",
+            "maxLength": 10000
+          },
+          "mbid": {
+            "type": "string",
+            "description": "The MusicBrainz ID of the song."
+          },
+          "releaseDate": {
+            "type": "string",
+            "description": "The release date of the song.",
+            "format": "datetime"
+          },
+          "spotifyLink": {
+            "type": "string",
+            "description": "The Spotify link of the song.",
+            "format": "uri"
+          },
+          "tags": {
+            "type": "array",
+            "description": "The tags of the song.",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          "tidalLink": {
+            "type": "string",
+            "description": "The Tidal link of the song.",
+            "format": "uri"
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the song.",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "trackNumber": {
+            "type": "integer",
+            "description": "The track number of the song in the album.",
+            "minimum": 1
+          },
+          "wiki": {
+            "type": "string",
+            "description": "Informations about the song",
+            "maxLength": 10000
+          },
+          "year": {
+            "type": "integer",
+            "description": "The year the song was released."
+          },
+          "youtubeLink": {
+            "type": "string",
+            "description": "The YouTube link of the song.",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

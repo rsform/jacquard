@@ -12,6 +12,9 @@ pub mod app_bsky;
 #[cfg(feature = "app_ocho")]
 pub mod app_ocho;
 
+#[cfg(feature = "app_rocksky")]
+pub mod app_rocksky;
+
 #[cfg(feature = "beauty_cybernetic")]
 pub mod beauty_cybernetic;
 
