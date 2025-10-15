@@ -22,17 +22,6 @@ It is also designed around zero-copy/borrowed deserialization: types like [`Post
 - Use as much or as little from the crates as you need
 
 
-### Streaming Support
-
-Jacquard supports efficient streaming for large payloads:
-
-- **Blob uploads/downloads**: Stream media without loading into memory
-- **CAR file streaming**: Efficient repo sync operations
-- **Thin forwarding**: Pipe data between endpoints
-- **WebSocket support**: Bidirectional streaming connections
-
-Enable with the `streaming` feature flag. See `jacquard-common` documentation for details.
-
 ## Example
 
 Dead simple API client. Logs in with OAuth and prints the latest 5 posts from your timeline.
@@ -123,6 +112,29 @@ Highlights:
 - `AgentSessionExt` trait with a host of convenience methods for working with records and preferences
 - Improvements to the `Collection` trait, code generation, and addition of the `VecUpdate` trait to enable that
 
+
+## Experimental WASM Support
+
+Core crates (`jacquard-common`, `jacquard-api`, `jacquard-identity`, `jacquard-oauth`) compile for `wasm32-unknown-unknown`. Traits use [`trait-variant`](https://docs.rs/trait-variant) to conditionally exclude `Send` bounds on WASM targets. DNS-based handle resolution is gated behind the `dns` feature and unavailable on WASM (HTTPS well-known and PDS resolution still work).
+
+Test WASM compilation:
+```bash
+just check-wasm
+# or: cargo build --target wasm32-unknown-unknown -p jacquard-common --no-default-features
+```
+
+
+### Streaming Support
+
+Jacquard supports efficient streaming for large payloads:
+
+- **Blob uploads/downloads**: Stream media without loading into memory
+- **CAR file streaming**: Efficient repo sync operations
+- **Thin forwarding**: Pipe data between endpoints
+- **WebSocket support**: Bidirectional streaming connections
+
+Enable with the `streaming` feature flag. See `jacquard-common` documentation for details.
+
 ## Development
 
 This repo uses [Flakes](https://nixos.asia/en/flakes)
@@ -139,16 +151,5 @@ nix build
 ```
 
 There's also a [`justfile`](https://just.systems/) for Makefile-esque commands to be run inside of the devShell, and you can generally `cargo ...` or `just ...` whatever just fine if you don't want to use Nix and have the prerequisites installed.
-
-
-## Experimental WASM Support
-
-Core crates (`jacquard-common`, `jacquard-api`, `jacquard-identity`, `jacquard-oauth`) compile for `wasm32-unknown-unknown`. Traits use [`trait-variant`](https://docs.rs/trait-variant) to conditionally exclude `Send` bounds on WASM targets. DNS-based handle resolution is gated behind the `dns` feature and unavailable on WASM (HTTPS well-known and PDS resolution still work).
-
-Test WASM compilation:
-```bash
-just check-wasm
-# or: cargo build --target wasm32-unknown-unknown -p jacquard-common --no-default-features
-```
 
 [![License](https://img.shields.io/crates/l/jacquard.svg)](./LICENSE)

@@ -28,7 +28,8 @@ loopback = ["jacquard-oauth/loopback", "jacquard-oauth/browser-open"]
 # Enable tracing instrumentation
 tracing = ["dep:tracing", "jacquard-common/tracing", "jacquard-oauth/tracing", "jacquard-identity/tracing"]
 dns = ["jacquard-identity/dns"]
-
+streaming = ["jacquard-common/streaming"]
+websocket = ["jacquard-common/websocket"]
 
 [[example]]
 name = "oauth_timeline"
@@ -70,6 +71,18 @@ path = "../../examples/resolve_did.rs"
 name = "update_preferences"
 path = "../../examples/update_preferences.rs"
 required-features = ["api_bluesky"]
+
+
+[[example]]
+name = "streaming_upload"
+path = "../../examples/streaming_upload.rs"
+required-features = ["api_bluesky", "streaming"]
+
+[[example]]
+name = "streaming_download"
+path = "../../examples/streaming_download.rs"
+required-features = ["api_bluesky", "streaming"]
+
 
 [dependencies]
 jacquard-api = { version = "0.5", path = "../jacquard-api" }

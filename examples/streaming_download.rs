@@ -1,6 +1,4 @@
 //! Example: Download large file using streaming
-#![cfg(all(feature = "streaming", feature = "reqwest-client"))]
-
 use jacquard_common::http_client::HttpClientExt;
 
 #[tokio::main]

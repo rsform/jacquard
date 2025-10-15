@@ -1,5 +1,4 @@
 //! Example: Upload data using streaming request body
-#![cfg(all(feature = "streaming", feature = "reqwest-client"))]
 
 use bytes::Bytes;
 use futures::stream;
