@@ -46,3 +46,8 @@ walkdir = "2.5"
 
 [dev-dependencies]
 tempfile = { version = "3.23.0" }
+
+[package.metadata.binstall]
+pkg-url = "https://github.com/rsform/jacquard/releases/download/v{ version }/{ name }_{ target }_v{ version }{ archive-suffix }"
+bin-dir = "{ name }_{ target }_v{ version }/{ bin }{ binary-ext }"
+pkg-fmt = "txz"
