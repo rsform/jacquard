@@ -87,9 +87,73 @@ impl Error for StreamError {
     }
 }
 
+use bytes::Bytes;
+
+/// Platform-agnostic byte stream abstraction
+pub struct ByteStream {
+    inner: Box<dyn n0_future::Stream<Item = Result<Bytes, StreamError>>>,
+}
+
+impl ByteStream {
+    /// Create a new byte stream from any compatible stream
+    pub fn new<S>(stream: S) -> Self
+    where
+        S: n0_future::Stream<Item = Result<Bytes, StreamError>> + 'static,
+    {
+        Self {
+            inner: Box::new(stream),
+        }
+    }
+
+    /// Check if stream is known to be empty (always false for dynamic streams)
+    pub fn is_empty(&self) -> bool {
+        false
+    }
+
+    /// Convert into the inner boxed stream
+    pub fn into_inner(self) -> Box<dyn n0_future::Stream<Item = Result<Bytes, StreamError>>> {
+        self.inner
+    }
+}
+
+impl fmt::Debug for ByteStream {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ByteStream").finish_non_exhaustive()
+    }
+}
+
+/// Platform-agnostic byte sink abstraction
+pub struct ByteSink {
+    inner: Box<dyn n0_future::Sink<Bytes, Error = StreamError>>,
+}
+
+impl ByteSink {
+    /// Create a new byte sink from any compatible sink
+    pub fn new<S>(sink: S) -> Self
+    where
+        S: n0_future::Sink<Bytes, Error = StreamError> + 'static,
+    {
+        Self {
+            inner: Box::new(sink),
+        }
+    }
+
+    /// Convert into the inner boxed sink
+    pub fn into_inner(self) -> Box<dyn n0_future::Sink<Bytes, Error = StreamError>> {
+        self.inner
+    }
+}
+
+impl fmt::Debug for ByteSink {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ByteSink").finish_non_exhaustive()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use bytes::Bytes;
 
     #[test]
     fn stream_error_carries_kind_and_source() {
@@ -107,5 +171,19 @@ mod tests {
 
         assert_eq!(err.kind(), &StreamErrorKind::Closed);
         assert!(err.source().is_none());
+    }
+
+    #[tokio::test]
+    async fn byte_stream_can_be_created() {
+        use futures::stream;
+
+        let data = vec![
+            Ok(Bytes::from("hello")),
+            Ok(Bytes::from(" world")),
+        ];
+        let stream = stream::iter(data);
+
+        let byte_stream = ByteStream::new(stream);
+        assert!(!byte_stream.is_empty());
     }
 }

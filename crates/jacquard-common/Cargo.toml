@@ -78,5 +78,9 @@ workspace = true
 optional = true
 features = ["arithmetic"]
 
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt"] }
+futures = "0.3"
+
 [package.metadata.docs.rs]
 features = [ "crypto-k256", "crypto-k256", "crypto-p256"]
