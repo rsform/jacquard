@@ -22,6 +22,17 @@ It is also designed around zero-copy/borrowed deserialization: types like [`Post
 - Use as much or as little from the crates as you need
 
 
+### Streaming Support
+
+Jacquard supports efficient streaming for large payloads:
+
+- **Blob uploads/downloads**: Stream media without loading into memory
+- **CAR file streaming**: Efficient repo sync operations
+- **Thin forwarding**: Pipe data between endpoints
+- **WebSocket support**: Bidirectional streaming connections
+
+Enable with the `streaming` feature flag. See `jacquard-common` documentation for details.
+
 ## Example
 
 Dead simple API client. Logs in with OAuth and prints the latest 5 posts from your timeline.
