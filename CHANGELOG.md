@@ -4,6 +4,15 @@
 
 ### Added
 
+**Value type deserialization** (`jacquard-common`)
+- `from_json_value()`: Deserialize typed data directly from `serde_json::Value` without borrowing
+- `from_data_owned()`, `from_raw_data_owned()`: Owned deserialization helpers
+- `Data::from_json_owned()`: Parse JSON into owned `Data<'static>`
+- `IntoStatic` implementation for `RawData` enabling owned conversions
+- Re-exported value types from crate root for easier imports
+- `Deserializer` trait implementations for `Data<'static>` and `RawData<'static>`
+- Owned deserializer helpers: `OwnedArrayDeserializer`, `OwnedObjectDeserializer`, `OwnedBlobDeserializer`
+
 **Service Auth** (`jacquard-axum`, `jacquard-common`)
 - Full service authentication implementation for inter-service JWT verification
 - `ExtractServiceAuth` Axum extractor for validating service auth tokens
@@ -11,7 +20,6 @@
 - Service auth claims validation (issuer, audience, expiration, method binding)
 - DID document resolution for signing key verification
 - Optional replay protection via `ReplayTracker` trait
-- See CLAUDE.md for detailed implementation notes
 
 **XrpcRequest derive macro** (`jacquard-derive`)
 - `#[derive(XrpcRequest)]` for custom XRPC endpoints

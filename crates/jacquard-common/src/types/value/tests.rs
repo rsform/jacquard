@@ -646,6 +646,32 @@ fn test_atidentifier_deserialization() {
 }
 
 #[test]
+fn test_json_value_deser() {
+    // if this compiles, it works.
+    let json = serde_json::json!({"name": "alice", "age": 30, "active": true});
+    #[derive(Debug, serde::Deserialize)]
+    struct TestStruct<'a> {
+        #[serde(borrow)]
+        name: CowStr<'a>,
+        age: i64,
+        active: bool,
+    }
+
+    impl IntoStatic for TestStruct<'_> {
+        type Output = TestStruct<'static>;
+        fn into_static(self) -> Self::Output {
+            TestStruct {
+                name: self.name.into_static(),
+                age: self.age,
+                active: self.active,
+            }
+        }
+    }
+
+    let _result = from_json_value::<TestStruct>(json).expect("should be right struct");
+}
+
+#[test]
 fn test_to_raw_data() {
     use serde::Serialize;
 

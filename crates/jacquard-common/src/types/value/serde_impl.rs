@@ -843,6 +843,37 @@ impl<'de> serde::Deserializer<'de> for &'de Data<'de> {
     }
 }
 
+// Deserializer implementation for &Data<'de> - allows deserializing typed data from Data values
+impl<'de> serde::Deserializer<'de> for Data<'static> {
+    type Error = DataDeserializerError;
+
+    fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::Visitor<'de>,
+    {
+        match self {
+            Data::Null => visitor.visit_unit(),
+            Data::Boolean(b) => visitor.visit_bool(b),
+            Data::Integer(i) => visitor.visit_i64(i),
+            Data::String(s) => visitor.visit_str(s.as_str()),
+            Data::Bytes(b) => visitor.visit_bytes(b.as_ref()),
+            Data::CidLink(cid) => visitor.visit_str(cid.as_str()),
+            Data::Array(arr) => visitor.visit_seq(OwnedArrayDeserializer::new(arr.0)),
+            Data::Object(obj) => visitor.visit_map(OwnedObjectDeserializer::new(obj.0)),
+            Data::Blob(blob) => {
+                // Blob is a root type - deserialize as the Blob itself via map representation
+                visitor.visit_map(OwnedBlobDeserializer::new(blob))
+            }
+        }
+    }
+
+    serde::forward_to_deserialize_any! {
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+        bytes byte_buf option unit unit_struct newtype_struct seq tuple
+        tuple_struct map struct enum identifier ignored_any
+    }
+}
+
 // Deserializer implementation for &RawData<'de>
 impl<'de> serde::Deserializer<'de> for &'de RawData<'de> {
     type Error = DataDeserializerError;
@@ -868,6 +899,41 @@ impl<'de> serde::Deserializer<'de> for &'de RawData<'de> {
             RawData::InvalidBlob(data) => data.as_ref().deserialize_any(visitor),
             RawData::InvalidNumber(bytes) => visitor.visit_bytes(bytes),
             RawData::InvalidData(bytes) => visitor.visit_bytes(bytes),
+        }
+    }
+
+    serde::forward_to_deserialize_any! {
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+        bytes byte_buf option unit unit_struct newtype_struct seq tuple
+        tuple_struct map struct enum identifier ignored_any
+    }
+}
+
+// Deserializer implementation for &RawData<'de>
+impl<'de> serde::Deserializer<'de> for RawData<'static> {
+    type Error = DataDeserializerError;
+
+    fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::Visitor<'de>,
+    {
+        match self {
+            RawData::Null => visitor.visit_unit(),
+            RawData::Boolean(b) => visitor.visit_bool(b),
+            RawData::SignedInt(i) => visitor.visit_i64(i),
+            RawData::UnsignedInt(u) => visitor.visit_u64(u),
+            RawData::String(cow) => match cow {
+                CowStr::Borrowed(s) => visitor.visit_borrowed_str(s),
+                CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
+            },
+            RawData::Bytes(b) => visitor.visit_bytes(b.as_ref()),
+            RawData::CidLink(cid) => visitor.visit_str(cid.as_str()),
+            RawData::Array(arr) => visitor.visit_seq(RawOwnedArrayDeserializer::new(arr)),
+            RawData::Object(obj) => visitor.visit_map(RawOwnedObjectDeserializer::new(obj)),
+            RawData::Blob(blob) => visitor.visit_map(OwnedBlobDeserializer::new(blob)),
+            RawData::InvalidBlob(data) => data.deserialize_any(visitor),
+            RawData::InvalidNumber(bytes) => visitor.visit_bytes(bytes.as_ref()),
+            RawData::InvalidData(bytes) => visitor.visit_bytes(bytes.as_ref()),
         }
     }
 
@@ -955,6 +1021,54 @@ impl<'de> serde::de::MapAccess<'de> for BlobDeserializer<'de> {
     }
 }
 
+struct OwnedBlobDeserializer {
+    blob: Blob<'static>,
+    field_index: usize,
+}
+
+impl OwnedBlobDeserializer {
+    fn new(blob: Blob<'_>) -> Self {
+        Self {
+            blob: blob.into_static(),
+            field_index: 0,
+        }
+    }
+}
+
+impl<'de> serde::de::MapAccess<'de> for OwnedBlobDeserializer {
+    type Error = DataDeserializerError;
+
+    fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>, Self::Error>
+    where
+        K: serde::de::DeserializeSeed<'de>,
+    {
+        let key = match self.field_index {
+            0 => "$type",
+            1 => "ref",
+            2 => "mimeType",
+            3 => "size",
+            _ => return Ok(None),
+        };
+        self.field_index += 1;
+        seed.deserialize(BorrowedStrDeserializer(key)).map(Some)
+    }
+
+    fn next_value_seed<V>(&mut self, seed: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::DeserializeSeed<'de>,
+    {
+        match self.field_index - 1 {
+            0 => seed.deserialize(OwnedStrDeserializer("blob".into())),
+            1 => seed.deserialize(OwnedStrDeserializer(self.blob.r#ref.to_smolstr())),
+            2 => seed.deserialize(OwnedStrDeserializer(self.blob.mime_type.to_smolstr())),
+            3 => seed.deserialize(I64Deserializer(self.blob.size as i64)),
+            _ => Err(DataDeserializerError::Message(
+                "invalid field index".to_string(),
+            )),
+        }
+    }
+}
+
 // Helper deserializer for borrowed strings
 struct BorrowedStrDeserializer<'de>(&'de str);
 
@@ -966,6 +1080,26 @@ impl<'de> serde::Deserializer<'de> for BorrowedStrDeserializer<'de> {
         V: serde::de::Visitor<'de>,
     {
         visitor.visit_borrowed_str(self.0)
+    }
+
+    serde::forward_to_deserialize_any! {
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+        bytes byte_buf option unit unit_struct newtype_struct seq tuple
+        tuple_struct map struct enum identifier ignored_any
+    }
+}
+
+// Helper deserializer for borrowed strings
+struct OwnedStrDeserializer(SmolStr);
+
+impl<'de> serde::Deserializer<'de> for OwnedStrDeserializer {
+    type Error = DataDeserializerError;
+
+    fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::Visitor<'de>,
+    {
+        visitor.visit_str(&self.0)
     }
 
     serde::forward_to_deserialize_any! {
@@ -1007,6 +1141,33 @@ impl<'de> ArrayDeserializer<'de> {
 }
 
 impl<'de> serde::de::SeqAccess<'de> for ArrayDeserializer<'de> {
+    type Error = DataDeserializerError;
+
+    fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
+    where
+        T: serde::de::DeserializeSeed<'de>,
+    {
+        match self.iter.next() {
+            Some(value) => seed.deserialize(value).map(Some),
+            None => Ok(None),
+        }
+    }
+}
+
+// SeqAccess implementation for Data::Array
+struct OwnedArrayDeserializer {
+    iter: std::vec::IntoIter<Data<'static>>,
+}
+
+impl OwnedArrayDeserializer {
+    fn new(slice: Vec<Data<'static>>) -> Self {
+        Self {
+            iter: slice.into_iter(),
+        }
+    }
+}
+
+impl<'de> serde::de::SeqAccess<'de> for OwnedArrayDeserializer {
     type Error = DataDeserializerError;
 
     fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
@@ -1065,6 +1226,50 @@ impl<'de> serde::de::MapAccess<'de> for ObjectDeserializer<'de> {
     }
 }
 
+// MapAccess implementation for Data::Object
+struct OwnedObjectDeserializer {
+    iter: std::collections::btree_map::IntoIter<SmolStr, Data<'static>>,
+    value: Option<Data<'static>>,
+}
+
+impl OwnedObjectDeserializer {
+    fn new(map: BTreeMap<SmolStr, Data<'static>>) -> Self {
+        Self {
+            iter: map.into_iter(),
+            value: None,
+        }
+    }
+}
+
+impl<'de> serde::de::MapAccess<'de> for OwnedObjectDeserializer {
+    type Error = DataDeserializerError;
+
+    fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>, Self::Error>
+    where
+        K: serde::de::DeserializeSeed<'de>,
+    {
+        match self.iter.next() {
+            Some((key, value)) => {
+                self.value = Some(value);
+                seed.deserialize(OwnedStrDeserializer(key)).map(Some)
+            }
+            None => Ok(None),
+        }
+    }
+
+    fn next_value_seed<V>(&mut self, seed: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::DeserializeSeed<'de>,
+    {
+        match self.value.take() {
+            Some(value) => seed.deserialize(value),
+            None => Err(DataDeserializerError::Message(
+                "value is missing".to_string(),
+            )),
+        }
+    }
+}
+
 // SeqAccess implementation for RawData::Array
 struct RawArrayDeserializer<'de> {
     iter: std::slice::Iter<'de, RawData<'de>>,
@@ -1085,6 +1290,33 @@ impl<'de> serde::de::SeqAccess<'de> for RawArrayDeserializer<'de> {
     {
         match self.iter.next() {
             Some(value) => seed.deserialize(value).map(Some),
+            None => Ok(None),
+        }
+    }
+}
+
+// SeqAccess implementation for RawData::Array
+struct RawOwnedArrayDeserializer<'de> {
+    iter: std::vec::IntoIter<RawData<'de>>,
+}
+
+impl<'de> RawOwnedArrayDeserializer<'de> {
+    fn new(data: Vec<RawData<'de>>) -> Self {
+        Self {
+            iter: data.into_iter(),
+        }
+    }
+}
+
+impl<'de> serde::de::SeqAccess<'de> for RawOwnedArrayDeserializer<'de> {
+    type Error = DataDeserializerError;
+
+    fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
+    where
+        T: serde::de::DeserializeSeed<'de>,
+    {
+        match self.iter.next() {
+            Some(value) => seed.deserialize(value.into_static()).map(Some),
             None => Ok(None),
         }
     }
@@ -1128,6 +1360,50 @@ impl<'de> serde::de::MapAccess<'de> for RawObjectDeserializer<'de> {
     {
         match self.value.take() {
             Some(value) => seed.deserialize(value),
+            None => Err(DataDeserializerError::Message(
+                "value is missing".to_string(),
+            )),
+        }
+    }
+}
+
+// MapAccess implementation for RawData::Object
+struct RawOwnedObjectDeserializer<'de> {
+    iter: std::collections::btree_map::IntoIter<SmolStr, RawData<'de>>,
+    value: Option<RawData<'de>>,
+}
+
+impl<'de> RawOwnedObjectDeserializer<'de> {
+    fn new(map: BTreeMap<SmolStr, RawData<'de>>) -> Self {
+        Self {
+            iter: map.into_iter(),
+            value: None,
+        }
+    }
+}
+
+impl<'de> serde::de::MapAccess<'de> for RawOwnedObjectDeserializer<'de> {
+    type Error = DataDeserializerError;
+
+    fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>, Self::Error>
+    where
+        K: serde::de::DeserializeSeed<'de>,
+    {
+        match self.iter.next() {
+            Some((key, value)) => {
+                self.value = Some(value);
+                seed.deserialize(OwnedStrDeserializer(key)).map(Some)
+            }
+            None => Ok(None),
+        }
+    }
+
+    fn next_value_seed<V>(&mut self, seed: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::DeserializeSeed<'de>,
+    {
+        match self.value.take() {
+            Some(value) => seed.deserialize(value.into_static()),
             None => Err(DataDeserializerError::Message(
                 "value is missing".to_string(),
             )),

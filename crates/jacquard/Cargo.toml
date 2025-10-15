@@ -15,7 +15,7 @@ license.workspace = true
 default = ["api_full", "dns", "loopback", "derive"]
 derive = ["dep:jacquard-derive"]
 # Minimal API bindings
-api = ["jacquard-api/com_atproto", "jacquard-api/com_bad_example" ]
+api = ["jacquard-api/minimal"]
 # Bluesky API bindings
 api_bluesky = ["api", "jacquard-api/bluesky" ]
 # Bluesky API bindings, plus a curated selection of community lexicons

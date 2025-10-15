@@ -112,6 +112,11 @@ impl<'s> Data<'s> {
         })
     }
 
+    /// Parse a Data value from a JSON value (owned)
+    pub fn from_json_owned(json: serde_json::Value) -> Result<Data<'static>, AtDataError> {
+        Data::from_json(&json).map(|data| data.into_static())
+    }
+
     /// Parse a Data value from an IPLD value (CBOR)
     pub fn from_cbor(cbor: &'s Ipld) -> Result<Self, AtDataError> {
         Ok(match cbor {
@@ -352,6 +357,28 @@ pub enum RawData<'s> {
     InvalidData(Bytes),
 }
 
+impl IntoStatic for RawData<'_> {
+    type Output = RawData<'static>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            RawData::Null => RawData::Null,
+            RawData::Boolean(b) => RawData::Boolean(b),
+            RawData::SignedInt(i) => RawData::SignedInt(i),
+            RawData::UnsignedInt(u) => RawData::UnsignedInt(u),
+            RawData::String(s) => RawData::String(s.into_static()),
+            RawData::Bytes(b) => RawData::Bytes(b.into_static()),
+            RawData::CidLink(c) => RawData::CidLink(c.into_static()),
+            RawData::Array(a) => RawData::Array(a.into_static()),
+            RawData::Object(o) => RawData::Object(o.into_static()),
+            RawData::Blob(b) => RawData::Blob(b.into_static()),
+            RawData::InvalidBlob(b) => RawData::InvalidBlob(b.into_static()),
+            RawData::InvalidNumber(b) => RawData::InvalidNumber(b.into_static()),
+            RawData::InvalidData(b) => RawData::InvalidData(b.into_static()),
+        }
+    }
+}
+
 /// Deserialize a typed value from a `Data` value
 ///
 /// Allows extracting strongly-typed structures from untyped `Data` values,
@@ -384,6 +411,28 @@ where
     T::deserialize(data)
 }
 
+/// Deserialize a typed value from a `Data` value
+///
+/// Takes ownership rather than borrows. Will allocate.
+pub fn from_data_owned<'de, T>(data: Data<'_>) -> Result<T, DataDeserializerError>
+where
+    T: serde::Deserialize<'de>,
+{
+    T::deserialize(data.into_static())
+}
+
+/// Deserialize a typed value from a `serde_json::Value`
+///
+/// Returns an owned version, will allocate
+pub fn from_json_value<'de, T>(
+    json: serde_json::Value,
+) -> Result<<T as IntoStatic>::Output, serde_json::Error>
+where
+    T: serde::Deserialize<'de> + IntoStatic,
+{
+    T::deserialize(json).map(IntoStatic::into_static)
+}
+
 /// Deserialize a typed value from a `RawData` value
 ///
 /// Allows extracting strongly-typed structures from untyped `RawData` values.
@@ -411,6 +460,16 @@ where
     T: serde::Deserialize<'de>,
 {
     T::deserialize(data)
+}
+
+/// Deserialize a typed value from a `RawData` value
+///
+/// Takes ownership rather than borrows. Will allocate.
+pub fn from_raw_data_owned<'de, T>(data: RawData<'_>) -> Result<T, DataDeserializerError>
+where
+    T: serde::Deserialize<'de>,
+{
+    T::deserialize(data.into_static())
 }
 
 /// Serialize a typed value into a `RawData` value
@@ -469,9 +528,8 @@ pub fn to_data<T>(value: &T) -> Result<Data<'static>, convert::ConversionError>
 where
     T: serde::Serialize,
 {
-    let raw = to_raw_data(value)
-        .map_err(|e| convert::ConversionError::InvalidRawData {
-            message: e.to_string()
-        })?;
+    let raw = to_raw_data(value).map_err(|e| convert::ConversionError::InvalidRawData {
+        message: e.to_string(),
+    })?;
     raw.try_into()
 }

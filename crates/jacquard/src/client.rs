@@ -24,14 +24,6 @@ pub mod token;
 pub mod vec_update;
 
 use core::future::Future;
-
-use jacquard_api::com_atproto::repo::create_record::CreateRecordOutput;
-use jacquard_api::com_atproto::repo::delete_record::DeleteRecordOutput;
-use jacquard_api::com_atproto::repo::get_record::GetRecordResponse;
-use jacquard_api::com_atproto::repo::put_record::PutRecordOutput;
-use jacquard_api::com_atproto::repo::upload_blob::UploadBlobResponse;
-use jacquard_api::com_atproto::server::create_session::CreateSessionOutput;
-use jacquard_api::com_atproto::server::refresh_session::RefreshSessionOutput;
 use jacquard_common::error::TransportError;
 pub use jacquard_common::error::{ClientError, XrpcResult};
 use jacquard_common::http_client::HttpClient;
@@ -323,6 +315,16 @@ impl<A: AgentSession> Agent<A> {
     }
 }
 
+#[cfg(feature = "api")]
+use jacquard_api::com_atproto::{
+    repo::{
+        create_record::CreateRecordOutput, delete_record::DeleteRecordOutput,
+        get_record::GetRecordResponse, put_record::PutRecordOutput,
+        upload_blob::UploadBlobResponse,
+    },
+    server::{create_session::CreateSessionOutput, refresh_session::RefreshSessionOutput},
+};
+
 /// Extension trait providing convenience methods for common repository operations.
 ///
 /// This trait is automatically implemented for any type that implements both
@@ -365,6 +367,7 @@ impl<A: AgentSession> Agent<A> {
 /// # Ok(())
 /// # }
 /// ```
+#[cfg(feature = "api")]
 pub trait AgentSessionExt: AgentSession + IdentityResolver {
     /// Create a new record in the repository.
     ///
@@ -477,7 +480,8 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     {
         async move {
             #[cfg(feature = "tracing")]
-            let _span = tracing::debug_span!("get_record", collection = %R::nsid(), uri = %uri).entered();
+            let _span =
+                tracing::debug_span!("get_record", collection = %R::nsid(), uri = %uri).entered();
 
             // Validate that URI's collection matches the expected type
             if let Some(uri_collection) = uri.collection() {
@@ -575,7 +579,8 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     {
         async move {
             #[cfg(feature = "tracing")]
-            let _span = tracing::debug_span!("update_record", collection = %R::nsid(), uri = %uri).entered();
+            let _span = tracing::debug_span!("update_record", collection = %R::nsid(), uri = %uri)
+                .entered();
 
             // Fetch the record - Response<R::Record> where R::Record::Output<'de> = R<'de>
             let response = self.get_record::<R>(uri.clone()).await?;
