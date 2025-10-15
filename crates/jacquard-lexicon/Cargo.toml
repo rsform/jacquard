@@ -26,14 +26,14 @@ glob = "0.3"
 heck.workspace = true
 #itertools.workspace = true
 jacquard-api = {  version = "0.5", git = "https://tangled.org/@nonbinary.computer/jacquard" }
-jacquard-common = { version = "0.5", git = "https://tangled.org/@nonbinary.computer/jacquard" }
+jacquard-common = { version = "0.5", features = [ "reqwest-client" ], git = "https://tangled.org/@nonbinary.computer/jacquard" }
 jacquard-identity = { version = "0.5", git = "https://tangled.org/@nonbinary.computer/jacquard" }
 kdl = "6"
 miette = { workspace = true, features = ["fancy"] }
 prettyplease.workspace = true
 proc-macro2.workspace = true
 quote.workspace = true
-reqwest.workspace = true
+reqwest = { workspace = true, features = ["json", "http2", "system-proxy", "rustls-tls"] }
 serde.workspace = true
 serde_json.workspace = true
 serde_repr.workspace = true

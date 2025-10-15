@@ -130,14 +130,15 @@ impl HttpClientExt for reqwest::Client {
 
         // Convert bytes_stream to ByteStream
         use futures::StreamExt;
-        let stream = resp.bytes_stream().map(|result| {
-            result.map_err(|e| StreamError::transport(e))
-        });
+        let stream = resp
+            .bytes_stream()
+            .map(|result| result.map_err(|e| StreamError::transport(e)));
         let byte_stream = ByteStream::new(stream);
 
         Ok(builder.body(byte_stream).expect("Failed to build response"))
     }
 
+    #[cfg(not(target_arch = "wasm32"))]
     async fn send_http_bidirectional<S>(
         &self,
         parts: http::request::Parts,
@@ -169,9 +170,47 @@ impl HttpClientExt for reqwest::Client {
             builder = builder.header(name.as_str(), value.as_bytes());
         }
 
-        let stream = resp.bytes_stream().map(|result| {
-            result.map_err(|e| StreamError::transport(e))
-        });
+        let stream = resp
+            .bytes_stream()
+            .map(|result| result.map_err(|e| StreamError::transport(e)));
+        let byte_stream = ByteStream::new(stream);
+
+        Ok(builder.body(byte_stream).expect("Failed to build response"))
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    async fn send_http_bidirectional<S>(
+        &self,
+        parts: http::request::Parts,
+        body: S,
+    ) -> Result<http::Response<ByteStream>, Self::Error>
+    where
+        S: n0_future::Stream<Item = bytes::Bytes> + Send + 'static,
+    {
+        // Convert stream to reqwest::Body
+        use futures::StreamExt;
+
+        let mut req = self
+            .request(parts.method, parts.uri.to_string())
+            .body(reqwest_body);
+
+        // Copy headers
+        for (name, value) in parts.headers.iter() {
+            req = req.header(name.as_str(), value.as_bytes());
+        }
+
+        // Send and convert response
+        let resp = req.send().await?;
+
+        let mut builder = http::Response::builder().status(resp.status());
+
+        for (name, value) in resp.headers().iter() {
+            builder = builder.header(name.as_str(), value.as_bytes());
+        }
+
+        let stream = resp
+            .bytes_stream()
+            .map(|result| result.map_err(|e| StreamError::transport(e)));
         let byte_stream = ByteStream::new(stream);
 
         Ok(builder.body(byte_stream).expect("Failed to build response"))
