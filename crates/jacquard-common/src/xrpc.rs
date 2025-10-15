@@ -9,6 +9,13 @@
 //!   can inspect `error="invalid_token"` or `error="use_dpop_nonce"` and refresh/retry.
 //!   If the header is absent, parse the body and map auth errors to
 //!   `AuthError::TokenExpired`/`InvalidToken`.
+
+#[cfg(feature = "streaming")]
+pub mod streaming;
+
+#[cfg(feature = "streaming")]
+pub use streaming::StreamingResponse;
+
 use bytes::Bytes;
 use http::{
     HeaderName, HeaderValue, Request, StatusCode,

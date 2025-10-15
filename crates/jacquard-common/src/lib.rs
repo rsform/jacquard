@@ -227,6 +227,9 @@ pub mod stream;
 #[cfg(feature = "streaming")]
 pub use stream::{ByteStream, ByteSink, StreamError, StreamErrorKind};
 
+#[cfg(feature = "streaming")]
+pub use xrpc::StreamingResponse;
+
 pub use types::value::*;
 
 /// Authorization token types for XRPC requests.
