@@ -131,6 +131,3 @@ nix build
 There's also a [`justfile`](https://just.systems/) for Makefile-esque commands to be run inside of the devShell, and you can generally `cargo ...` or `just ...` whatever just fine if you don't want to use Nix and have the prerequisites installed.
 
 [![License](https://img.shields.io/crates/l/jacquard.svg)](./LICENSE)
-
-
-<iframe src="https://github.com/sponsors/orual/card" title="Sponsor orual" height="225" width="600" style="border: 0;"></iframe>
