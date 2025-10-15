@@ -220,6 +220,9 @@ pub mod session;
 pub mod types;
 // XRPC protocol types and traits
 pub mod xrpc;
+/// Stream abstractions for HTTP request/response bodies.
+#[cfg(feature = "streaming")]
+pub mod stream;
 
 pub use types::value::*;
 
