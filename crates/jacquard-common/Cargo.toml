@@ -81,7 +81,8 @@ optional = true
 features = ["arithmetic"]
 
 [dev-dependencies]
-tokio = { version = "1", features = ["macros", "rt"] }
+tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
+futures-lite = "2.6"
 
 [package.metadata.docs.rs]
 features = [ "crypto-k256", "crypto-k256", "crypto-p256"]

@@ -1,4 +1,46 @@
 //! Stream abstractions for HTTP request/response bodies
+//!
+//! This module provides platform-agnostic streaming types for handling large
+//! payloads efficiently without loading everything into memory.
+//!
+//! # Features
+//!
+//! - [`ByteStream`]: Streaming response bodies
+//! - [`ByteSink`]: Streaming request bodies
+//! - [`StreamError`]: Concrete error type for streaming operations
+//!
+//! # Platform Support
+//!
+//! Uses `n0-future` for platform-agnostic async streams that work on both
+//! native and WASM targets without requiring `Send` bounds on WASM.
+//!
+//! # Examples
+//!
+//! ## Streaming Download
+//!
+//! ```no_run
+//! # #[cfg(all(feature = "streaming", feature = "reqwest-client"))]
+//! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+//! use jacquard_common::http_client::{HttpClient, HttpClientExt};
+//! use futures_lite::StreamExt;
+//!
+//! let client = reqwest::Client::new();
+//! let request = http::Request::builder()
+//!     .uri("https://example.com/large-file")
+//!     .body(vec![])
+//!     .unwrap();
+//!
+//! let response = client.send_http_streaming(request).await?;
+//! let (_parts, body) = response.into_parts();
+//! let mut stream = Box::pin(body.into_inner());
+//!
+//! // Use futures_lite::StreamExt for iteration
+//! while let Some(chunk) = stream.as_mut().try_next().await? {
+//!     // Process chunk without loading entire file into memory
+//! }
+//! # Ok(())
+//! # }
+//! ```
 
 use std::error::Error;
 use std::fmt;
