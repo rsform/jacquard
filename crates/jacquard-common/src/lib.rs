@@ -230,6 +230,12 @@ pub use stream::{ByteStream, ByteSink, StreamError, StreamErrorKind};
 #[cfg(feature = "streaming")]
 pub use xrpc::StreamingResponse;
 
+#[cfg(feature = "websocket")]
+pub mod websocket;
+
+#[cfg(feature = "websocket")]
+pub use websocket::{WebSocketClient, WebSocketConnection};
+
 pub use types::value::*;
 
 /// Authorization token types for XRPC requests.

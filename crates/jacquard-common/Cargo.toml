@@ -61,6 +61,7 @@ service-auth = ["crypto-k256", "crypto-p256", "dep:signature"]
 reqwest-client = ["dep:reqwest"]
 tracing = ["dep:tracing"]
 streaming = ["n0-future", "futures"]
+websocket = ["streaming"]
 
 [dependencies.ed25519-dalek]
 version = "2"
