@@ -1,0 +1,106 @@
+{
+  "lexicon": 1,
+  "id": "net.altq.aqfile",
+  "description": "A record for uploading and tracking binary blob files with metadata.",
+  "defs": {
+    "checksum": {
+      "type": "object",
+      "description": "Cryptographic checksum for integrity verification.",
+      "required": [
+        "algo",
+        "hash"
+      ],
+      "properties": {
+        "algo": {
+          "type": "string",
+          "description": "Hash algorithm name.",
+          "maxLength": 32,
+          "knownValues": [
+            "sha256",
+            "sha512",
+            "blake3"
+          ]
+        },
+        "hash": {
+          "type": "string",
+          "description": "Hex or base64 encoded digest produced by the algorithm.",
+          "maxLength": 128
+        }
+      }
+    },
+    "file": {
+      "type": "object",
+      "description": "File metadata describing the uploaded blob.",
+      "required": [
+        "name",
+        "size"
+      ],
+      "properties": {
+        "mimeType": {
+          "type": "string",
+          "description": "MIME type, e.g. 'video/mp4'.",
+          "maxLength": 255
+        },
+        "modifiedAt": {
+          "type": "string",
+          "description": "Client-side last-modified timestamp.",
+          "format": "datetime"
+        },
+        "name": {
+          "type": "string",
+          "description": "User-visible filename.",
+          "maxLength": 512
+        },
+        "size": {
+          "type": "integer",
+          "description": "File size in bytes.",
+          "minimum": 0,
+          "maximum": 1000000000
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A record representing an uploaded file blob with metadata.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "blob",
+          "createdAt",
+          "file"
+        ],
+        "properties": {
+          "attribution": {
+            "type": "string",
+            "description": "Handle or DID of the account to attribute this upload to.",
+            "format": "at-identifier"
+          },
+          "blob": {
+            "type": "blob",
+            "description": "The uploaded blob reference. Note: Individual PDS instances may enforce lower size limits.",
+            "accept": [
+              "*/*"
+            ],
+            "maxSize": 1000000000
+          },
+          "checksum": {
+            "type": "ref",
+            "description": "Optional cryptographic checksum for integrity verification.",
+            "ref": "#checksum"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when this record was created.",
+            "format": "datetime"
+          },
+          "file": {
+            "type": "ref",
+            "description": "Metadata about the file.",
+            "ref": "#file"
+          }
+        }
+      }
+    }
+  }
+}
