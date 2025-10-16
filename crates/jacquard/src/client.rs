@@ -1042,3 +1042,61 @@ impl Default for BasicClient {
         Self::unauthenticated()
     }
 }
+
+/// MemoryCredentialSession: credential session with in memory store and identity resolver
+pub type MemoryCredentialSession = CredentialSession<
+    MemorySessionStore<SessionKey, AtpSession>,
+    jacquard_identity::PublicResolver,
+>;
+
+impl MemoryCredentialSession {
+    /// Create an unauthenticated MemoryCredentialSession.
+    ///
+    /// Uses an in memory store and a public resolver.
+    /// Equivalent to a BasicClient that isn't wrapped in Agent
+    fn unauthenticated() -> Self {
+        use std::sync::Arc;
+        let http = reqwest::Client::new();
+        let resolver = jacquard_identity::PublicResolver::new(http, Default::default());
+        let store = MemorySessionStore::default();
+        CredentialSession::new(Arc::new(store), Arc::new(resolver))
+    }
+
+    /// Create a MemoryCredentialSession and authenticate with the provided details
+    ///
+    /// - `identifier`: handle (preferred), DID, or `https://` PDS base URL.
+    /// - `session_id`: optional session label; defaults to "session".
+    /// - Persists and activates the session, and updates the base endpoint to the user's PDS.
+    ///
+    /// # Example
+    /// ```no_run
+    /// # use jacquard::client::BasicClient;
+    /// # use jacquard::types::string::AtUri;
+    /// # use jacquard_api::app_bsky::feed::post::Post;
+    /// use crate::jacquard::client::{Agent, AgentSessionExt};
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let (session, _) = MemoryCredentialSession::authenticated(identifier, password, None);
+    /// let agent = Agent::from(session);
+    /// let output = agent.create_record::<Post>(post, None).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    async fn authenticated(
+        identifier: CowStr<'_>,
+        password: CowStr<'_>,
+        session_id: Option<CowStr<'_>>,
+    ) -> Result<(Self, AtpSession), ClientError> {
+        let session = MemoryCredentialSession::unauthenticated();
+        let auth = session
+            .login(identifier, password, session_id, None, None)
+            .await?;
+        Ok((session, auth))
+    }
+}
+
+impl Default for MemoryCredentialSession {
+    fn default() -> Self {
+        MemoryCredentialSession::unauthenticated()
+    }
+}
