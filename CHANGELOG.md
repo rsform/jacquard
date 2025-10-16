@@ -1,6 +1,13 @@
 # Changelog
 
 
+## `jacquard-api` [0.5.5], `jacquard-lexicon` [0.5.4] - 2025-10-16
+
+### Fixed
+
+- events.smokesignal.invokeWebhook lexicon now generates valid code
+- lexicon code generation now uses `Data` for blank objects, rather than naming and then failing to generate a struct
+
 ## [0.5.4] - 2025-10-16
 
 ### Added

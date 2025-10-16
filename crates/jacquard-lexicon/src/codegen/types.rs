@@ -51,7 +51,11 @@ impl<'c> CodeGenerator<'c> {
                     Ok(quote! { Vec<#item_type> })
                 }
             }
-            LexObjectProperty::Object(_object) => {
+            LexObjectProperty::Object(object) => {
+                // Empty objects (no properties) are untyped data bags
+                if object.properties.is_empty() {
+                    return Ok(quote! { jacquard_common::types::value::Data<'a> });
+                }
                 // Generate unique nested object type name with collision detection
                 let object_name = self.generate_field_type_name(nsid, parent_type_name, field_name, "");
                 let object_ident = syn::Ident::new(&object_name, proc_macro2::Span::call_site());

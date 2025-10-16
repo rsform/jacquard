@@ -20,12 +20,12 @@
 #[builder(start_fn = new)]
 pub struct InvokeWebhook<'a> {
     #[serde(borrow)]
-    pub context: InvokeWebhookContext<'a>,
+    pub context: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
     #[builder(into)]
     pub event: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    pub record: InvokeWebhookRecord<'a>,
+    pub record: jacquard_common::types::value::Data<'a>,
     #[serde(flatten)]
     #[serde(borrow)]
     #[builder(default)]
