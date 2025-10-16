@@ -1850,7 +1850,7 @@ checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 
 [[package]]
 name = "jacquard"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "bon",
  "bytes",
@@ -1858,8 +1858,8 @@ dependencies = [
  "getrandom 0.2.16",
  "http",
  "jacquard-api 0.5.3",
- "jacquard-common 0.5.3",
- "jacquard-derive 0.5.3",
+ "jacquard-common 0.5.4",
+ "jacquard-derive 0.5.4",
  "jacquard-identity 0.5.3",
  "jacquard-oauth",
  "jose-jwk",
@@ -1900,8 +1900,8 @@ version = "0.5.3"
 dependencies = [
  "bon",
  "bytes",
- "jacquard-common 0.5.3",
- "jacquard-derive 0.5.3",
+ "jacquard-common 0.5.4",
+ "jacquard-derive 0.5.4",
  "miette",
  "serde",
  "thiserror 2.0.17",
@@ -1918,8 +1918,8 @@ dependencies = [
  "bytes",
  "chrono",
  "jacquard",
- "jacquard-common 0.5.3",
- "jacquard-derive 0.5.3",
+ "jacquard-common 0.5.4",
+ "jacquard-derive 0.5.4",
  "jacquard-identity 0.5.3",
  "k256",
  "miette",
@@ -1973,7 +1973,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-common"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "base64 0.22.1",
  "bon",
@@ -2029,9 +2029,9 @@ dependencies = [
 
 [[package]]
 name = "jacquard-derive"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
- "jacquard-common 0.5.3",
+ "jacquard-common 0.5.4",
  "proc-macro2",
  "quote",
  "serde",
@@ -2071,7 +2071,7 @@ dependencies = [
  "hickory-resolver",
  "http",
  "jacquard-api 0.5.3",
- "jacquard-common 0.5.3",
+ "jacquard-common 0.5.4",
  "miette",
  "percent-encoding",
  "reqwest",
@@ -2088,7 +2088,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-lexicon"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "async-trait",
  "clap",
@@ -2116,7 +2116,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-oauth"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -2124,7 +2124,7 @@ dependencies = [
  "dashmap",
  "elliptic-curve",
  "http",
- "jacquard-common 0.5.3",
+ "jacquard-common 0.5.4",
  "jacquard-identity 0.5.3",
  "jose-jwa",
  "jose-jwk",

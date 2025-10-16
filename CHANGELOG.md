@@ -1,5 +1,23 @@
 # Changelog
 
+
+## [0.5.4] - 2025-10-16
+
+### Added
+
+**Initial streaming client support** (`jacquard-common`)
+- First primitives for streamed requests and responses
+
+**`send_with_options()` method on XrpcClient** (`jacquard-common`, `jacquard-oauth`, `jacquard`)
+- allows setting custom options per request in stateful client
+- updated oauth and credential session clients to use it
+- implementations should generally override provided auth with own internal auth
+
+### Fixed
+
+**`AgentSessionExt::upload_blob()` failed to authenticate** (`jacquard`)
+- new `XrpcClient::send_with_options()` method now allows properly overriding the content-type header while still handling auth internally
+
 ## [0.5.3] - 2025-10-15
 
 ### Added

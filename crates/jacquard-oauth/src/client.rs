@@ -436,10 +436,23 @@ where
 
     async fn send<R>(&self, request: R) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
     where
-        R: XrpcRequest,
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+    {
+        let opts = self.options.read().await.clone();
+        self.send_with_opts(request, opts).await
+    }
+
+    async fn send_with_opts<R>(
+        &self,
+        request: R,
+        mut opts: CallOptions<'_>,
+    ) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
     {
         let base_uri = self.base_uri();
-        let mut opts = self.options.read().await.clone();
         opts.auth = Some(self.access_token().await);
         let guard = self.data.read().await;
         let mut dpop = guard.dpop_data.clone();

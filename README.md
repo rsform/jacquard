@@ -104,6 +104,7 @@ Jacquard is broken up into several crates for modularity. The correct one to use
 
 Highlights:
 
+- initial streaming support
 - experimental WASM support
 - better value type deserialization helpers
 - service auth implementation
@@ -124,9 +125,9 @@ just check-wasm
 ```
 
 
-### Streaming Support
+### Initial Streaming Support
 
-Jacquard supports efficient streaming for large payloads:
+Jacquard is building out support for efficient streaming for large payloads:
 
 - **Blob uploads/downloads**: Stream media without loading into memory
 - **CAR file streaming**: Efficient repo sync operations

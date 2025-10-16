@@ -263,6 +263,29 @@ pub trait XrpcClient: HttpClient {
     where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync;
+
+    /// Send an XRPC request and parse the response
+    #[cfg(not(target_arch = "wasm32"))]
+    fn send_with_opts<R>(
+        &self,
+        request: R,
+        opts: CallOptions<'_>,
+    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest>::Response>>>
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+        Self: Sync;
+
+    /// Send an XRPC request and parse the response
+    #[cfg(target_arch = "wasm32")]
+    fn send_with_opts<R>(
+        &self,
+        request: R,
+        opts: CallOptions<'_>,
+    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest>::Response>>>
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync;
 }
 
 /// Stateless XRPC call builder.

@@ -1,6 +1,6 @@
 [package]
 name = "jacquard-oauth"
-version = "0.5.3"
+version = "0.5.4"
 edition.workspace = true
 description = "AT Protocol OAuth 2.1 core types and helpers for Jacquard"
 authors.workspace = true

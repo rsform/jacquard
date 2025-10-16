@@ -321,7 +321,6 @@ use jacquard_api::com_atproto::{
     repo::{
         create_record::CreateRecordOutput, delete_record::DeleteRecordOutput,
         get_record::GetRecordResponse, put_record::PutRecordOutput,
-        upload_blob::UploadBlobResponse,
     },
     server::{create_session::CreateSessionOutput, refresh_session::RefreshSessionOutput},
 };
@@ -738,8 +737,8 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             let request = UploadBlob::new().body(bytes).build();
 
             // Override Content-Type header with actual mime type instead of */*
-            let base = self.base_uri();
             let mut opts = self.opts().await;
+
             opts.extra_headers.push((
                 CONTENT_TYPE,
                 http::HeaderValue::from_str(mime_type.as_str()).map_err(|e| {
@@ -749,20 +748,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                     }
                 })?,
             ));
-
-            let response: Response<UploadBlobResponse> = {
-                let http_request =
-                    xrpc::build_http_request(&base, &request, &opts).map_err(|e| {
-                        AgentError::Client(ClientError::Transport(TransportError::from(e)))
-                    })?;
-
-                let http_response = self.send_http(http_request).await.map_err(|e| {
-                    AgentError::Client(ClientError::Transport(TransportError::Other(Box::new(e))))
-                })?;
-
-                xrpc::process_response(http_response)
-            }?;
-
+            let response = self.send_with_opts(request, opts).await?;
             let output = response.into_output().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::Auth(auth),
                 XrpcError::Generic(g) => AgentError::Generic(g),
@@ -912,6 +898,18 @@ impl<A: AgentSession> XrpcClient for Agent<A> {
         <R as XrpcRequest>::Response: Send + Sync,
     {
         async move { self.inner.send(request).await }
+    }
+
+    async fn send_with_opts<R>(
+        &self,
+        request: R,
+        opts: CallOptions<'_>,
+    ) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+    {
+        self.inner.send_with_opts(request, opts).await
     }
 }
 
