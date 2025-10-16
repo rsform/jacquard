@@ -1,3 +1,6 @@
+#[cfg(not(target_arch = "wasm32"))]
+use std::future::Future;
+
 use crate::types::{OAuthAuthorizationServerMetadata, OAuthProtectedResourceMetadata};
 use http::{Request, StatusCode};
 use jacquard_common::CowStr;
@@ -400,7 +403,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         &self,
         server_metadata: &OAuthAuthorizationServerMetadata<'_>,
         sub: &Did<'_>,
-    ) -> impl std::future::Future<Output = Result<Url, ResolverError>> + Send
+    ) -> impl Future<Output = Result<Url, ResolverError>> + Send
     where
         Self: Sync,
     {
@@ -412,7 +415,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
         &self,
         server_metadata: &OAuthAuthorizationServerMetadata<'_>,
         sub: &Did<'_>,
-    ) -> impl std::future::Future<Output = Result<Url, ResolverError>> {
+    ) -> impl Future<Output = Result<Url, ResolverError>> {
         verify_issuer_impl(self, server_metadata, sub)
     }
 
@@ -420,7 +423,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn resolve_oauth(
         &self,
         input: &str,
-    ) -> impl std::future::Future<
+    ) -> impl Future<
         Output = Result<
             (
                 OAuthAuthorizationServerMetadata<'static>,
@@ -439,7 +442,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn resolve_oauth(
         &self,
         input: &str,
-    ) -> impl std::future::Future<
+    ) -> impl Future<
         Output = Result<
             (
                 OAuthAuthorizationServerMetadata<'static>,
@@ -455,9 +458,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn resolve_from_service(
         &self,
         input: &Url,
-    ) -> impl std::future::Future<
-        Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>,
-    > + Send
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>> + Send
     where
         Self: Sync,
     {
@@ -468,9 +469,8 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn resolve_from_service(
         &self,
         input: &Url,
-    ) -> impl std::future::Future<
-        Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>,
-    > {
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>>
+    {
         resolve_from_service_impl(self, input)
     }
 
@@ -478,7 +478,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn resolve_from_identity(
         &self,
         input: &str,
-    ) -> impl std::future::Future<
+    ) -> impl Future<
         Output = Result<
             (
                 OAuthAuthorizationServerMetadata<'static>,
@@ -497,7 +497,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn resolve_from_identity(
         &self,
         input: &str,
-    ) -> impl std::future::Future<
+    ) -> impl Future<
         Output = Result<
             (
                 OAuthAuthorizationServerMetadata<'static>,
@@ -513,9 +513,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn get_authorization_server_metadata(
         &self,
         issuer: &Url,
-    ) -> impl std::future::Future<
-        Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>,
-    > + Send
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>> + Send
     where
         Self: Sync,
     {
@@ -526,9 +524,8 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn get_authorization_server_metadata(
         &self,
         issuer: &Url,
-    ) -> impl std::future::Future<
-        Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>,
-    > {
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>>
+    {
         get_authorization_server_metadata_impl(self, issuer)
     }
 
@@ -536,9 +533,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn get_resource_server_metadata(
         &self,
         pds: &Url,
-    ) -> impl std::future::Future<
-        Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>,
-    > + Send
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>> + Send
     where
         Self: Sync,
     {
@@ -549,9 +544,8 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn get_resource_server_metadata(
         &self,
         pds: &Url,
-    ) -> impl std::future::Future<
-        Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>,
-    > {
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>, ResolverError>>
+    {
         get_resource_server_metadata_impl(self, pds)
     }
 }
@@ -630,23 +624,26 @@ impl OAuthResolver for jacquard_identity::JacquardResolver {}
 
 #[cfg(test)]
 mod tests {
+    use core::future::Future;
+    use std::{convert::Infallible, sync::Arc};
+
     use super::*;
     use http::{Request as HttpRequest, Response as HttpResponse, StatusCode};
     use jacquard_common::http_client::HttpClient;
+    use tokio::sync::Mutex;
 
     #[derive(Default, Clone)]
     struct MockHttp {
-        next: std::sync::Arc<tokio::sync::Mutex<Option<HttpResponse<Vec<u8>>>>>,
+        next: Arc<Mutex<Option<HttpResponse<Vec<u8>>>>>,
     }
 
     impl HttpClient for MockHttp {
-        type Error = std::convert::Infallible;
+        type Error = Infallible;
         fn send_http(
             &self,
             _request: HttpRequest<Vec<u8>>,
-        ) -> impl core::future::Future<
-            Output = core::result::Result<HttpResponse<Vec<u8>>, Self::Error>,
-        > + Send {
+        ) -> impl Future<Output = core::result::Result<HttpResponse<Vec<u8>>, Self::Error>> + Send
+        {
             let next = self.next.clone();
             async move { Ok(next.lock().await.take().unwrap()) }
         }

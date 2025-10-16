@@ -232,6 +232,9 @@ pub trait XrpcExt: HttpClient {
 
 impl<T: HttpClient> XrpcExt for T {}
 
+/// Nicer alias for Xrpc response type
+pub type XrpcResponse<R> = Response<<R as XrpcRequest>::Response>;
+
 /// Stateful XRPC call trait
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait XrpcClient: HttpClient {
@@ -245,10 +248,7 @@ pub trait XrpcClient: HttpClient {
 
     /// Send an XRPC request and parse the response
     #[cfg(not(target_arch = "wasm32"))]
-    fn send<R>(
-        &self,
-        request: R,
-    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest>::Response>>>
+    fn send<R>(&self, request: R) -> impl Future<Output = XrpcResult<XrpcResponse<R>>>
     where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync,
@@ -256,10 +256,7 @@ pub trait XrpcClient: HttpClient {
 
     /// Send an XRPC request and parse the response
     #[cfg(target_arch = "wasm32")]
-    fn send<R>(
-        &self,
-        request: R,
-    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest>::Response>>>
+    fn send<R>(&self, request: R) -> impl Future<Output = XrpcResult<XrpcResponse<R>>>
     where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync;
@@ -270,7 +267,7 @@ pub trait XrpcClient: HttpClient {
         &self,
         request: R,
         opts: CallOptions<'_>,
-    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest>::Response>>>
+    ) -> impl Future<Output = XrpcResult<XrpcResponse<R>>>
     where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync,
@@ -282,7 +279,7 @@ pub trait XrpcClient: HttpClient {
         &self,
         request: R,
         opts: CallOptions<'_>,
-    ) -> impl Future<Output = XrpcResult<Response<<R as XrpcRequest>::Response>>>
+    ) -> impl Future<Output = XrpcResult<XrpcResponse<R>>>
     where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync;
@@ -517,9 +514,9 @@ where
     status: StatusCode,
 }
 
-impl<Resp> Response<Resp>
+impl<R> Response<R>
 where
-    Resp: XrpcResp,
+    R: XrpcResp,
 {
     /// Create a new response from a buffer and status code
     pub fn new(buffer: Bytes, status: StatusCode) -> Self {
@@ -541,9 +538,7 @@ where
     }
 
     /// Parse the response, borrowing from the internal buffer
-    pub fn parse<'s>(
-        &'s self,
-    ) -> Result<<Resp as XrpcResp>::Output<'s>, XrpcError<<Resp as XrpcResp>::Err<'s>>> {
+    pub fn parse<'s>(&'s self) -> Result<RespOutput<'s, R>, XrpcError<RespErr<'s, R>>> {
         // 200: parse as output
         if self.status.is_success() {
             match serde_json::from_slice::<_>(&self.buffer) {
@@ -558,7 +553,7 @@ where
                     // Fallback to generic error (InvalidRequest, ExpiredToken, etc.)
                     match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
                         Ok(mut generic) => {
-                            generic.nsid = Resp::NSID;
+                            generic.nsid = R::NSID;
                             generic.method = ""; // method info only available on request
                             generic.http_status = self.status;
                             // Map auth-related errors to AuthError
@@ -576,7 +571,7 @@ where
         } else {
             match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
                 Ok(mut generic) => {
-                    generic.nsid = Resp::NSID;
+                    generic.nsid = R::NSID;
                     generic.method = ""; // method info only available on request
                     generic.http_status = self.status;
                     match generic.error.as_str() {
@@ -593,7 +588,7 @@ where
     /// Parse this as validated, loosely typed atproto data.
     ///
     /// NOTE: If the response is an error, it will still parse as the matching error type for the request.
-    pub fn parse_data<'s>(&'s self) -> Result<Data<'s>, XrpcError<<Resp as XrpcResp>::Err<'s>>> {
+    pub fn parse_data<'s>(&'s self) -> Result<Data<'s>, XrpcError<RespErr<'s, R>>> {
         // 200: parse as output
         if self.status.is_success() {
             match serde_json::from_slice::<_>(&self.buffer) {
@@ -608,7 +603,7 @@ where
                     // Fallback to generic error (InvalidRequest, ExpiredToken, etc.)
                     match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
                         Ok(mut generic) => {
-                            generic.nsid = Resp::NSID;
+                            generic.nsid = R::NSID;
                             generic.method = ""; // method info only available on request
                             generic.http_status = self.status;
                             // Map auth-related errors to AuthError
@@ -626,7 +621,7 @@ where
         } else {
             match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
                 Ok(mut generic) => {
-                    generic.nsid = Resp::NSID;
+                    generic.nsid = R::NSID;
                     generic.method = ""; // method info only available on request
                     generic.http_status = self.status;
                     match generic.error.as_str() {
@@ -643,7 +638,7 @@ where
     /// Parse this as raw atproto data with minimal validation.
     ///
     /// NOTE: If the response is an error, it will still parse as the matching error type for the request.
-    pub fn parse_raw<'s>(&'s self) -> Result<RawData<'s>, XrpcError<<Resp as XrpcResp>::Err<'s>>> {
+    pub fn parse_raw<'s>(&'s self) -> Result<RawData<'s>, XrpcError<RespErr<'s, R>>> {
         // 200: parse as output
         if self.status.is_success() {
             match serde_json::from_slice::<_>(&self.buffer) {
@@ -658,7 +653,7 @@ where
                     // Fallback to generic error (InvalidRequest, ExpiredToken, etc.)
                     match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
                         Ok(mut generic) => {
-                            generic.nsid = Resp::NSID;
+                            generic.nsid = R::NSID;
                             generic.method = ""; // method info only available on request
                             generic.http_status = self.status;
                             // Map auth-related errors to AuthError
@@ -676,7 +671,7 @@ where
         } else {
             match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
                 Ok(mut generic) => {
-                    generic.nsid = Resp::NSID;
+                    generic.nsid = R::NSID;
                     generic.method = ""; // method info only available on request
                     generic.http_status = self.status;
                     match generic.error.as_str() {
@@ -710,18 +705,20 @@ where
     }
 }
 
-impl<Resp> Response<Resp>
+/// doc
+pub type RespOutput<'a, Resp> = <Resp as XrpcResp>::Output<'a>;
+/// doc
+pub type RespErr<'a, Resp> = <Resp as XrpcResp>::Err<'a>;
+
+impl<R> Response<R>
 where
-    Resp: XrpcResp,
+    R: XrpcResp,
 {
     /// Parse the response into an owned output
-    pub fn into_output(
-        self,
-    ) -> Result<<Resp as XrpcResp>::Output<'static>, XrpcError<<Resp as XrpcResp>::Err<'static>>>
+    pub fn into_output(self) -> Result<RespOutput<'static, R>, XrpcError<RespErr<'static, R>>>
     where
-        for<'a> <Resp as XrpcResp>::Output<'a>:
-            IntoStatic<Output = <Resp as XrpcResp>::Output<'static>>,
-        for<'a> <Resp as XrpcResp>::Err<'a>: IntoStatic<Output = <Resp as XrpcResp>::Err<'static>>,
+        for<'a> RespOutput<'a, R>: IntoStatic<Output = RespOutput<'static, R>>,
+        for<'a> RespErr<'a, R>: IntoStatic<Output = RespErr<'static, R>>,
     {
         // Use a helper to make lifetime inference work
         fn parse_output<'b, R: XrpcResp>(
@@ -736,7 +733,7 @@ where
 
         // 200: parse as output
         if self.status.is_success() {
-            match parse_output::<Resp>(&self.buffer) {
+            match parse_output::<R>(&self.buffer) {
                 Ok(output) => {
                     return Ok(output.into_static());
                 }
@@ -744,13 +741,13 @@ where
             }
         // 400: try typed XRPC error, fallback to generic error
         } else if self.status.as_u16() == 400 {
-            let error = match parse_error::<Resp>(&self.buffer) {
+            let error = match parse_error::<R>(&self.buffer) {
                 Ok(error) => XrpcError::Xrpc(error),
                 Err(_) => {
                     // Fallback to generic error (InvalidRequest, ExpiredToken, etc.)
                     match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
                         Ok(mut generic) => {
-                            generic.nsid = Resp::NSID;
+                            generic.nsid = R::NSID;
                             generic.method = ""; // method info only available on request
                             generic.http_status = self.status;
                             // Map auth-related errors to AuthError
@@ -767,11 +764,11 @@ where
             Err(error.into_static())
         // 401: always auth error
         } else {
-            let error: XrpcError<<Resp as XrpcResp>::Err<'_>> =
+            let error: XrpcError<<R as XrpcResp>::Err<'_>> =
                 match serde_json::from_slice::<GenericXrpcError>(&self.buffer) {
                     Ok(mut generic) => {
                         let status = self.status;
-                        generic.nsid = Resp::NSID;
+                        generic.nsid = R::NSID;
                         generic.method = ""; // method info only available on request
                         generic.http_status = status;
                         match generic.error.as_ref() {

@@ -40,7 +40,9 @@ use jacquard_common::{
     CowStr, IntoStatic,
     types::string::{Did, Handle},
 };
-use jacquard_identity::resolver::IdentityResolver;
+use jacquard_identity::resolver::{
+    DidDocResponse, IdentityError, IdentityResolver, ResolverOptions,
+};
 use jacquard_oauth::authstore::ClientAuthStore;
 use jacquard_oauth::client::OAuthSession;
 use jacquard_oauth::dpop::DpopExt;
@@ -325,6 +327,15 @@ use jacquard_api::com_atproto::{
     server::{create_session::CreateSessionOutput, refresh_session::RefreshSessionOutput},
 };
 
+/// doc
+pub type CollectionOutput<'a, R> = <<R as Collection>::Record as XrpcResp>::Output<'a>;
+/// doc
+pub type CollectionErr<'a, R> = <<R as Collection>::Record as XrpcResp>::Err<'a>;
+/// doc
+pub type VecGetResponse<U> = <<U as VecUpdate>::GetRequest as XrpcRequest>::Response;
+/// doc
+pub type VecPutResponse<U> = <<U as VecUpdate>::PutRequest as XrpcRequest>::Response;
+
 /// Extension trait providing convenience methods for common repository operations.
 ///
 /// This trait is automatically implemented for any type that implements both
@@ -406,7 +417,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         &self,
         record: R,
         rkey: Option<RecordKey<Rkey<'_>>>,
-    ) -> impl std::future::Future<Output = Result<CreateRecordOutput<'static>, AgentError>>
+    ) -> impl Future<Output = Result<CreateRecordOutput<'static>, AgentError>>
     where
         R: Collection + serde::Serialize,
     {
@@ -474,7 +485,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     fn get_record<R>(
         &self,
         uri: AtUri<'_>,
-    ) -> impl std::future::Future<Output = Result<Response<R::Record>, ClientError>>
+    ) -> impl Future<Output = Result<Response<R::Record>, ClientError>>
     where
         R: Collection,
     {
@@ -550,15 +561,11 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         &self,
         record_type: R,
         uri: AtUri<'_>,
-    ) -> impl std::future::Future<
-        Output = Result<<<R as Collection>::Record as XrpcResp>::Output<'static>, ClientError>,
-    >
+    ) -> impl Future<Output = Result<CollectionOutput<'static, R>, ClientError>>
     where
         R: Collection,
-        for<'a> <<R as Collection>::Record as XrpcResp>::Output<'a>:
-            IntoStatic<Output = <<R as Collection>::Record as XrpcResp>::Output<'static>>,
-        for<'a> <<R as Collection>::Record as XrpcResp>::Err<'a>:
-            IntoStatic<Output = <<R as Collection>::Record as XrpcResp>::Err<'static>>,
+        for<'a> CollectionOutput<'a, R>: IntoStatic<Output = CollectionOutput<'static, R>>,
+        for<'a> CollectionErr<'a, R>: IntoStatic<Output = CollectionErr<'static, R>>,
     {
         let _ = record_type;
         async move {
@@ -602,10 +609,10 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         &self,
         uri: AtUri<'_>,
         f: impl FnOnce(&mut R),
-    ) -> impl std::future::Future<Output = Result<PutRecordOutput<'static>, AgentError>>
+    ) -> impl Future<Output = Result<PutRecordOutput<'static>, AgentError>>
     where
         R: Collection + Serialize,
-        R: for<'a> From<<<R as Collection>::Record as XrpcResp>::Output<'a>>,
+        R: for<'a> From<CollectionOutput<'a, R>>,
     {
         async move {
             #[cfg(feature = "tracing")]
@@ -652,7 +659,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     fn delete_record<R>(
         &self,
         rkey: RecordKey<Rkey<'_>>,
-    ) -> impl std::future::Future<Output = Result<DeleteRecordOutput<'static>, AgentError>>
+    ) -> impl Future<Output = Result<DeleteRecordOutput<'static>, AgentError>>
     where
         R: Collection,
     {
@@ -692,7 +699,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         &self,
         rkey: RecordKey<Rkey<'static>>,
         record: R,
-    ) -> impl std::future::Future<Output = Result<PutRecordOutput<'static>, AgentError>>
+    ) -> impl Future<Output = Result<PutRecordOutput<'static>, AgentError>>
     where
         R: Collection + serde::Serialize,
     {
@@ -755,7 +762,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         &self,
         data: impl Into<bytes::Bytes>,
         mime_type: MimeType<'_>,
-    ) -> impl std::future::Future<Output = Result<Blob<'static>, AgentError>> {
+    ) -> impl Future<Output = Result<Blob<'static>, AgentError>> {
         async move {
             #[cfg(feature = "tracing")]
             let _span = tracing::debug_span!("upload_blob", mime_type = %mime_type).entered();
@@ -808,18 +815,13 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     fn update_vec<U>(
         &self,
         modify: impl FnOnce(&mut Vec<<U as VecUpdate>::Item>),
-    ) -> impl std::future::Future<
-        Output = Result<
-            xrpc::Response<<<U as VecUpdate>::PutRequest as XrpcRequest>::Response>,
-            AgentError,
-        >,
-    >
+    ) -> impl Future<Output = Result<xrpc::Response<VecPutResponse<U>>, AgentError>>
     where
         U: VecUpdate,
         <U as VecUpdate>::PutRequest: Send + Sync,
         <U as VecUpdate>::GetRequest: Send + Sync,
-        <<U as VecUpdate>::GetRequest as XrpcRequest>::Response: Send + Sync,
-        <<U as VecUpdate>::PutRequest as XrpcRequest>::Response: Send + Sync,
+        VecGetResponse<U>: Send + Sync,
+        VecPutResponse<U>: Send + Sync,
     {
         async {
             // Fetch current data
@@ -863,18 +865,13 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     fn update_vec_item<U>(
         &self,
         item: <U as VecUpdate>::Item,
-    ) -> impl std::future::Future<
-        Output = Result<
-            xrpc::Response<<<U as VecUpdate>::PutRequest as XrpcRequest>::Response>,
-            AgentError,
-        >,
-    >
+    ) -> impl Future<Output = Result<xrpc::Response<VecPutResponse<U>>, AgentError>>
     where
         U: VecUpdate,
         <U as VecUpdate>::PutRequest: Send + Sync,
         <U as VecUpdate>::GetRequest: Send + Sync,
-        <<U as VecUpdate>::GetRequest as XrpcRequest>::Response: Send + Sync,
-        <<U as VecUpdate>::PutRequest as XrpcRequest>::Response: Send + Sync,
+        VecGetResponse<U>: Send + Sync,
+        VecPutResponse<U>: Send + Sync,
     {
         async {
             self.update_vec::<U>(|vec| {
@@ -944,27 +941,21 @@ impl<A: AgentSession> XrpcClient for Agent<A> {
 }
 
 impl<A: AgentSession + IdentityResolver> IdentityResolver for Agent<A> {
-    fn options(&self) -> &jacquard_identity::resolver::ResolverOptions {
+    fn options(&self) -> &ResolverOptions {
         self.inner.options()
     }
 
     fn resolve_handle(
         &self,
         handle: &Handle<'_>,
-    ) -> impl Future<Output = Result<Did<'static>, jacquard_identity::resolver::IdentityError>>
-    {
+    ) -> impl Future<Output = Result<Did<'static>, IdentityError>> {
         async { self.inner.resolve_handle(handle).await }
     }
 
     fn resolve_did_doc(
         &self,
         did: &Did<'_>,
-    ) -> impl Future<
-        Output = Result<
-            jacquard_identity::resolver::DidDocResponse,
-            jacquard_identity::resolver::IdentityError,
-        >,
-    > {
+    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>> {
         async { self.inner.resolve_did_doc(did).await }
     }
 }

@@ -9,13 +9,17 @@ use jacquard_common::{
     http_client::HttpClient,
     session::SessionStore,
     types::{did::Did, string::Handle},
-    xrpc::{CallOptions, Response, XrpcClient, XrpcError, XrpcExt, XrpcRequest, XrpcResp},
+    xrpc::{
+        CallOptions, Response, XrpcClient, XrpcError, XrpcExt, XrpcRequest, XrpcResp, XrpcResponse,
+    },
 };
 use tokio::sync::RwLock;
 use url::Url;
 
 use crate::client::AtpSession;
-use jacquard_identity::resolver::IdentityResolver;
+use jacquard_identity::resolver::{
+    DidDocResponse, IdentityError, IdentityResolver, ResolverOptions,
+};
 use std::any::Any;
 
 /// Storage key for app‑password sessions: `(account DID, session id)`.
@@ -426,7 +430,7 @@ where
         }
     }
 
-    async fn send<R>(&self, request: R) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
+    async fn send<R>(&self, request: R) -> XrpcResult<XrpcResponse<R>>
     where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync,
@@ -439,7 +443,7 @@ where
         &self,
         request: R,
         mut opts: CallOptions<'_>,
-    ) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
+    ) -> XrpcResult<XrpcResponse<R>>
     where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync,
@@ -485,27 +489,21 @@ where
     S: SessionStore<SessionKey, AtpSession> + Send + Sync + 'static,
     T: HttpClient + IdentityResolver + Send + Sync + 'static,
 {
-    fn options(&self) -> &jacquard_identity::resolver::ResolverOptions {
+    fn options(&self) -> &ResolverOptions {
         self.client.options()
     }
 
     fn resolve_handle(
         &self,
         handle: &Handle<'_>,
-    ) -> impl Future<Output = Result<Did<'static>, jacquard_identity::resolver::IdentityError>>
-    {
+    ) -> impl Future<Output = Result<Did<'static>, IdentityError>> {
         async { self.client.resolve_handle(handle).await }
     }
 
     fn resolve_did_doc(
         &self,
         did: &Did<'_>,
-    ) -> impl Future<
-        Output = Result<
-            jacquard_identity::resolver::DidDocResponse,
-            jacquard_identity::resolver::IdentityError,
-        >,
-    > {
+    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>> {
         async { self.client.resolve_did_doc(did).await }
     }
 }

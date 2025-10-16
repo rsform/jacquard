@@ -1,3 +1,5 @@
+use std::future::Future;
+
 use base64::{Engine as _, engine::general_purpose::URL_SAFE_NO_PAD};
 use chrono::Utc;
 use http::{Request, Response, header::InvalidHeaderValue};
@@ -43,9 +45,18 @@ type Result<T> = core::result::Result<T, Error>;
 
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait DpopClient: HttpClient {
-    fn dpop_server(&self, request: Request<Vec<u8>>) -> impl std::future::Future<Output = Result<Response<Vec<u8>>>>;
-    fn dpop_client(&self, request: Request<Vec<u8>>) -> impl std::future::Future<Output = Result<Response<Vec<u8>>>>;
-    fn wrap_request(&self, request: Request<Vec<u8>>) -> impl std::future::Future<Output = Result<Response<Vec<u8>>>>;
+    fn dpop_server(
+        &self,
+        request: Request<Vec<u8>>,
+    ) -> impl Future<Output = Result<Response<Vec<u8>>>>;
+    fn dpop_client(
+        &self,
+        request: Request<Vec<u8>>,
+    ) -> impl Future<Output = Result<Response<Vec<u8>>>>;
+    fn wrap_request(
+        &self,
+        request: Request<Vec<u8>>,
+    ) -> impl Future<Output = Result<Response<Vec<u8>>>>;
 }
 
 pub trait DpopExt: HttpClient {

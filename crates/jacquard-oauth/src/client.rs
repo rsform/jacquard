@@ -15,11 +15,14 @@ use jacquard_common::{
     http_client::HttpClient,
     types::{did::Did, string::Handle},
     xrpc::{
-        CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest, XrpcResp, build_http_request,
-        process_response,
+        CallOptions, Response, XrpcClient, XrpcError, XrpcExt, XrpcRequest, XrpcResp, XrpcResponse,
+        build_http_request, process_response,
     },
 };
-use jacquard_identity::{JacquardResolver, resolver::IdentityResolver};
+use jacquard_identity::{
+    JacquardResolver,
+    resolver::{DidDocResponse, IdentityError, IdentityResolver, ResolverOptions},
+};
 use jose_jwk::JwkSet;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -434,7 +437,7 @@ where
         self.options.read().await.clone()
     }
 
-    async fn send<R>(&self, request: R) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
+    async fn send<R>(&self, request: R) -> XrpcResult<XrpcResponse<R>>
     where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync,
@@ -447,7 +450,7 @@ where
         &self,
         request: R,
         mut opts: CallOptions<'_>,
-    ) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
+    ) -> XrpcResult<XrpcResponse<R>>
     where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync,
@@ -492,7 +495,7 @@ fn is_invalid_token_response<R: XrpcResp>(response: &XrpcResult<Response<R>>) ->
             .to_str()
             .is_ok_and(|s| s.starts_with("DPoP ") && s.contains("error=\"invalid_token\"")),
         Ok(resp) => match resp.parse() {
-            Err(jacquard_common::xrpc::XrpcError::Auth(AuthError::InvalidToken)) => true,
+            Err(XrpcError::Auth(AuthError::InvalidToken)) => true,
             _ => false,
         },
         _ => false,
@@ -504,28 +507,21 @@ where
     S: ClientAuthStore + Send + Sync + 'static,
     T: OAuthResolver + IdentityResolver + XrpcExt + Send + Sync + 'static,
 {
-    fn options(&self) -> &jacquard_identity::resolver::ResolverOptions {
+    fn options(&self) -> &ResolverOptions {
         self.client.options()
     }
 
     fn resolve_handle(
         &self,
         handle: &Handle<'_>,
-    ) -> impl Future<
-        Output = std::result::Result<Did<'static>, jacquard_identity::resolver::IdentityError>,
-    > {
+    ) -> impl Future<Output = std::result::Result<Did<'static>, IdentityError>> {
         async { self.client.resolve_handle(handle).await }
     }
 
     fn resolve_did_doc(
         &self,
         did: &Did<'_>,
-    ) -> impl Future<
-        Output = std::result::Result<
-            jacquard_identity::resolver::DidDocResponse,
-            jacquard_identity::resolver::IdentityError,
-        >,
-    > {
+    ) -> impl Future<Output = std::result::Result<DidDocResponse, IdentityError>> {
         async { self.client.resolve_did_doc(did).await }
     }
 }
