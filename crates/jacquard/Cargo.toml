@@ -17,16 +17,26 @@ derive = ["dep:jacquard-derive"]
 # Minimal API bindings
 api = ["jacquard-api/minimal"]
 # Bluesky API bindings
-api_bluesky = ["api", "jacquard-api/bluesky" ]
+api_bluesky = ["api", "jacquard-api/bluesky"]
 # Bluesky API bindings, plus a curated selection of community lexicons
-api_full = ["api", "jacquard-api/bluesky", "jacquard-api/other", "jacquard-api/lexicon_community"]
+api_full = [
+    "api",
+    "jacquard-api/bluesky",
+    "jacquard-api/other",
+    "jacquard-api/lexicon_community",
+]
 # All captured generated lexicon API bindings
 api_all = ["api_full", "jacquard-api/ufos"]
 
 # Propagate loopback to oauth (server + browser helper)
 loopback = ["jacquard-oauth/loopback", "jacquard-oauth/browser-open"]
 # Enable tracing instrumentation
-tracing = ["dep:tracing", "jacquard-common/tracing", "jacquard-oauth/tracing", "jacquard-identity/tracing"]
+tracing = [
+    "dep:tracing",
+    "jacquard-common/tracing",
+    "jacquard-oauth/tracing",
+    "jacquard-identity/tracing",
+]
 dns = ["jacquard-identity/dns"]
 streaming = ["jacquard-common/streaming"]
 websocket = ["jacquard-common/websocket"]
@@ -83,10 +93,17 @@ name = "streaming_download"
 path = "../../examples/streaming_download.rs"
 required-features = ["api_bluesky", "streaming"]
 
+[[example]]
+name = "app_password_create_post"
+path = "../../examples/app_password_create_post.rs"
+required-features = ["api_bluesky"]
+
 
 [dependencies]
 jacquard-api = { version = "0.5", path = "../jacquard-api" }
-jacquard-common = { version = "0.5", path = "../jacquard-common", features = ["reqwest-client"] }
+jacquard-common = { version = "0.5", path = "../jacquard-common", features = [
+    "reqwest-client",
+] }
 jacquard-oauth = { version = "0.5", path = "../jacquard-oauth" }
 jacquard-derive = { version = "0.5", path = "../jacquard-derive", optional = true }
 jacquard-identity = { version = "0.5", path = "../jacquard-identity" }
@@ -112,7 +129,11 @@ rand_core.workspace = true
 tracing = { workspace = true, optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-reqwest = { workspace = true, features = ["http2", "system-proxy", "rustls-tls"] }
+reqwest = { workspace = true, features = [
+    "http2",
+    "system-proxy",
+    "rustls-tls",
+] }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "fs"] }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
@@ -123,4 +144,4 @@ clap.workspace = true
 miette = { workspace = true, features = ["fancy"] }
 
 [package.metadata.docs.rs]
-features = [ "api_all", "derive", "dns", "loopback" ]
+features = ["api_all", "derive", "dns", "loopback"]
