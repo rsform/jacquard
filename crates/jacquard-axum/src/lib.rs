@@ -53,12 +53,12 @@ use axum::{
     Json, Router,
     body::Bytes,
     extract::{FromRequest, Request},
-    http::{HeaderValue, StatusCode, header},
+    http::StatusCode,
     response::{IntoResponse, Response},
 };
 use jacquard::{
     IntoStatic,
-    xrpc::{XrpcEndpoint, XrpcMethod, XrpcRequest},
+    xrpc::{XrpcEndpoint, XrpcError, XrpcMethod, XrpcRequest},
 };
 use serde_json::json;
 
@@ -92,10 +92,6 @@ where
                         Ok(value) => Ok(ExtractXrpc(*value.into_static())),
                         Err(err) => Err((
                             StatusCode::BAD_REQUEST,
-                            [(
-                                header::CONTENT_TYPE,
-                                HeaderValue::from_static("application/json"),
-                            )],
                             Json(json!({
                                 "error": "InvalidRequest",
                                 "message": format!("failed to decode request: {}", err)
@@ -107,34 +103,24 @@ where
                 XrpcMethod::Query => {
                     if let Some(path_query) = req.uri().path_and_query() {
                         let query = path_query.query().unwrap_or("");
-                        let value: R::Request<'_> = serde_html_form::from_str::<R::Request<'_>>(
-                            query,
-                        )
-                        .map_err(|e| {
-                            (
-                                StatusCode::BAD_REQUEST,
-                                [(
-                                    header::CONTENT_TYPE,
-                                    HeaderValue::from_static("application/json"),
-                                )],
-                                Json(json!({
-                                    "error": "InvalidRequest",
-                                    "message": format!("failed to decode request: {}", e)
-                                })),
-                            )
-                                .into_response()
-                        })?;
+                        let value: R::Request<'_> =
+                            serde_html_form::from_str::<R::Request<'_>>(query).map_err(|e| {
+                                (
+                                    StatusCode::BAD_REQUEST,
+                                    Json(json!({
+                                        "error": "InvalidRequest",
+                                        "message": format!("failed to decode request: {}", e)
+                                    })),
+                                )
+                                    .into_response()
+                            })?;
                         Ok(ExtractXrpc(value.into_static()))
                     } else {
                         Err((
                             StatusCode::BAD_REQUEST,
-                            [(
-                                header::CONTENT_TYPE,
-                                HeaderValue::from_static("application/json"),
-                            )],
                             Json(json!({
                                 "error": "InvalidRequest",
-                                "message": "wrong nsid for wherever this ended up"
+                                "message": "wrong path"
                             })),
                         )
                             .into_response())
@@ -143,16 +129,6 @@ where
             }
         }
     }
-}
-
-#[derive(Debug, thiserror::Error, miette::Diagnostic)]
-pub enum XrpcRequestError {
-    #[error("Unsupported encoding: {0}")]
-    UnsupportedEncoding(String),
-    #[error("JSON decode error: {0}")]
-    JsonDecodeError(serde_json::Error),
-    #[error("UTF-8 decode error: {0}")]
-    Utf8DecodeError(std::string::FromUtf8Error),
 }
 
 /// Conversion trait to turn an XrpcEndpoint and a handler into an axum Router
@@ -183,5 +159,100 @@ where
                 XrpcMethod::Procedure(_) => axum::routing::post,
             })(handler),
         )
+    }
+}
+
+/// Axum-compatible Xrpc error wrapper
+///
+/// Implements IntoResponse, and does some mildly opinionated mapping.
+///
+/// Currently assumes that the internal xrpc errors are well-formed and
+/// compatible with [the spec](https://atproto.com/specs/xrpc#error-responses).
+#[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[error("Xrpc error: {error}")]
+pub struct XrpcErrorResponse<E>
+where
+    E: std::error::Error + IntoStatic,
+{
+    pub status: StatusCode,
+    #[diagnostic_source]
+    pub error: XrpcError<E>,
+}
+
+impl<E> XrpcErrorResponse<E>
+where
+    E: std::error::Error + IntoStatic + serde::Serialize,
+{
+    /// Creates a new XrpcErrorResponse from the given status code and error.
+    pub fn new(status: StatusCode, error: XrpcError<E>) -> Self {
+        Self { status, error }
+    }
+
+    /// Changes the status code of the error response.
+    pub fn with_status(self, status: StatusCode) -> Self {
+        Self {
+            status,
+            error: self.error,
+        }
+    }
+}
+
+impl<E> IntoResponse for XrpcErrorResponse<E>
+where
+    E: std::error::Error + IntoStatic + serde::Serialize,
+{
+    fn into_response(self) -> Response {
+        let (status, json) = match self.error {
+            XrpcError::Xrpc(error) => (
+                self.status,
+                serde_json::to_value(&error).unwrap_or(json!({
+                    "error": "InternalError",
+                    "message": format!("{error}")
+                })),
+            ),
+            XrpcError::Auth(auth_error) => (
+                self.status,
+                json!({
+                    "error": "Authentication",
+                    "message": format!("{auth_error}")
+                }),
+            ),
+            XrpcError::Generic(generic) => (
+                self.status,
+                serde_json::to_value(&generic).unwrap_or(json!({
+                    "error": "InternalError",
+                    "message": format!("{generic}", )
+                })),
+            ),
+            XrpcError::Decode(error) => (
+                self.status,
+                json!({
+                    "error": "InvalidRequest",
+                    "message": format!("failed to decode request: {error}", )
+                }),
+            ),
+        };
+        (status, Json(json)).into_response()
+    }
+}
+
+impl<E> From<XrpcError<E>> for XrpcErrorResponse<E>
+where
+    E: std::error::Error + IntoStatic,
+{
+    fn from(value: XrpcError<E>) -> Self {
+        Self {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            error: value,
+        }
+    }
+}
+
+impl<E> From<XrpcErrorResponse<E>> for XrpcError<E>
+where
+    E: std::error::Error + IntoStatic,
+{
+    fn from(value: XrpcErrorResponse<E>) -> Self {
+        value.error
     }
 }

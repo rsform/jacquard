@@ -1,5 +1,4 @@
 use clap::Parser;
-use jacquard::api::sh_tangled::repo::Repo;
 use jacquard::client::{AgentSessionExt, BasicClient};
 use jacquard::types::string::AtUri;
 use jacquard_api::sh_tangled::repo::RepoRecord;
@@ -24,7 +23,7 @@ async fn main() -> miette::Result<()> {
     // Create an unauthenticated agent for public record access
     let agent = BasicClient::unauthenticated();
 
-    // Use Agent's get_record helper with the at:// URI
+    // Use Agent's fetch_record helper with the at:// URI & marker struct
     let output = agent.fetch_record(RepoRecord, uri).await?;
 
     println!("Tangled Repository\n");
