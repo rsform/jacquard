@@ -32,6 +32,19 @@ pub struct Theme<'a> {
     pub light: crate::blog_pckt::theme::Palette<'a>,
 }
 
+impl<'a> Theme<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ThemeRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
     serde::Serialize,

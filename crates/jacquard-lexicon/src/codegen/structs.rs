@@ -216,6 +216,12 @@ impl<'c> CodeGenerator<'c> {
 
                 Ok(quote! {
                     #struct_def
+
+                    impl<'a> #ident<'a> {
+                        pub fn uri(uri: impl Into<jacquard_common::CowStr<'a>>) -> Result<jacquard_common::types::uri::RecordUri<'a, #record_marker_ident>, jacquard_common::types::uri::UriError> {
+                            jacquard_common::types::uri::RecordUri::try_from_uri(jacquard_common::types::string::AtUri::new_cow(uri.into())?)
+                        }
+                    }
                     #(#unions)*
                     #output_wrapper
                     #from_impl

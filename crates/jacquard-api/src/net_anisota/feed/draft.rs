@@ -58,6 +58,19 @@ pub struct Draft<'a> {
     pub updated_at: Option<jacquard_common::types::string::Datetime>,
 }
 
+impl<'a> Draft<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DraftRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,

@@ -37,6 +37,19 @@ pub struct Book<'a> {
     pub title: Option<crate::sh_weaver::notebook::Title<'a>>,
 }
 
+impl<'a> Book<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, BookRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
     serde::Serialize,

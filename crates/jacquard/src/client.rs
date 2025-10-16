@@ -32,6 +32,8 @@ use jacquard_common::types::blob::{Blob, MimeType};
 use jacquard_common::types::collection::Collection;
 use jacquard_common::types::recordkey::{RecordKey, Rkey};
 use jacquard_common::types::string::AtUri;
+#[cfg(feature = "api")]
+use jacquard_common::types::uri::RecordUri;
 use jacquard_common::xrpc::{
     CallOptions, Response, XrpcClient, XrpcError, XrpcExt, XrpcRequest, XrpcResp,
 };
@@ -47,6 +49,7 @@ use jacquard_oauth::authstore::ClientAuthStore;
 use jacquard_oauth::client::OAuthSession;
 use jacquard_oauth::dpop::DpopExt;
 use jacquard_oauth::resolver::OAuthResolver;
+use std::marker::PhantomData;
 
 use serde::Serialize;
 pub use token::FileAuthStore;
@@ -484,7 +487,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     /// ```
     fn get_record<R>(
         &self,
-        uri: AtUri<'_>,
+        uri: &AtUri<'_>,
     ) -> impl Future<Output = Result<Response<R::Record>, ClientError>>
     where
         R: Collection,
@@ -555,21 +558,20 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
 
     /// Fetches a record from the PDS. Returns an owned, parsed response.
     ///
-    /// `record_type` parameter should be the marker struct for the record (e.g. `PostRecord` for `Post`), rather than the Post itself (though it will intuit things correctly regardless).
-    /// This allows the compiler to better intuit the output type without turbofishing.
+    /// Takes an at:// URI annotated with the collection type, which be constructed with `R::uri(uri)`
+    /// where `R` is the type of record you want (e.g. `app_bsky::feed::post::Post::uri(uri)` for Bluesky posts).
     fn fetch_record<R>(
         &self,
-        record_type: R,
-        uri: AtUri<'_>,
+        uri: &RecordUri<'_, R>,
     ) -> impl Future<Output = Result<CollectionOutput<'static, R>, ClientError>>
     where
         R: Collection,
         for<'a> CollectionOutput<'a, R>: IntoStatic<Output = CollectionOutput<'static, R>>,
         for<'a> CollectionErr<'a, R>: IntoStatic<Output = CollectionErr<'static, R>>,
     {
-        let _ = record_type;
+        let uri = uri.as_uri();
         async move {
-            let response = self.get_record::<R>(uri.clone()).await?;
+            let response = self.get_record::<R>(uri).await?;
             let response: Response<R::Record> = response.transmute();
             let output = response
                 .into_output()
@@ -607,7 +609,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     /// ```
     fn update_record<R>(
         &self,
-        uri: AtUri<'_>,
+        uri: &AtUri<'_>,
         f: impl FnOnce(&mut R),
     ) -> impl Future<Output = Result<PutRecordOutput<'static>, AgentError>>
     where
@@ -620,7 +622,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                 .entered();
 
             // Fetch the record - Response<R::Record> where R::Record::Output<'de> = R<'de>
-            let response = self.get_record::<R>(uri.clone()).await?;
+            let response = self.get_record::<R>(uri).await?;
 
             // Parse to get R<'_> borrowing from response buffer
             let record = response.parse().map_err(|e| match e {

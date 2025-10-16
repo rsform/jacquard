@@ -64,6 +64,19 @@ pub struct Profile<'a> {
     pub tangled: Option<bool>,
 }
 
+impl<'a> Profile<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ProfileRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
     serde::Serialize,

@@ -24,6 +24,10 @@ serde.workspace = true
 thiserror.workspace = true
 
 
+[lints.rust]
+# just so that my rust-analyzer shuts up about the module name for 2048.blue's namespace
+non_snake_case = "allow"
+
 [features]
 default = [ "minimal"]
 minimal =  [ "com_atproto", "com_bad_example"]

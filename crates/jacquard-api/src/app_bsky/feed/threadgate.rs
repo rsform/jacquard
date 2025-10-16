@@ -81,6 +81,19 @@ pub struct Threadgate<'a> {
     pub post: jacquard_common::types::string::AtUri<'a>,
 }
 
+impl<'a> Threadgate<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, ThreadgateRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,

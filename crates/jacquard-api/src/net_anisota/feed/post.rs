@@ -54,6 +54,19 @@ pub struct Post<'a> {
     pub text: jacquard_common::CowStr<'a>,
 }
 
+impl<'a> Post<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PostRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,

@@ -1,7 +1,6 @@
 use clap::Parser;
 use jacquard::client::{AgentSessionExt, BasicClient};
-use jacquard::types::string::AtUri;
-use jacquard_api::sh_tangled::repo::RepoRecord;
+use jacquard_api::sh_tangled::repo::Repo;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Read a Tangled git repository record")]
@@ -18,34 +17,34 @@ async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
     // Parse the at:// URI
-    let uri = AtUri::new(&args.uri)?;
+    let uri = Repo::uri(args.uri)?;
 
     // Create an unauthenticated agent for public record access
     let agent = BasicClient::unauthenticated();
 
-    // Use Agent's fetch_record helper with the at:// URI & marker struct
-    let output = agent.fetch_record(RepoRecord, uri).await?;
+    // Use Agent's fetch_record helper with typed record URI
+    let output: Repo<'_> = agent.fetch_record(&uri).await?.into();
 
     println!("Tangled Repository\n");
-    println!("URI: {}", output.uri);
-    println!("Name: {}", output.value.name);
+    println!("URI: {}", uri);
+    println!("Name: {}", output.name);
 
-    if let Some(desc) = &output.value.description {
+    if let Some(desc) = &output.description {
         println!("Description: {}", desc);
     }
 
-    println!("Knot: {}", output.value.knot);
-    println!("Created: {}", output.value.created_at);
+    println!("Knot: {}", output.knot);
+    println!("Created: {}", output.created_at);
 
-    if let Some(source) = &output.value.source {
+    if let Some(source) = &output.source {
         println!("Source: {}", source.as_str());
     }
 
-    if let Some(spindle) = &output.value.spindle {
+    if let Some(spindle) = &output.spindle {
         println!("CI Spindle: {}", spindle);
     }
 
-    if let Some(labels) = &output.value.labels {
+    if let Some(labels) = &output.labels {
         if !labels.is_empty() {
             println!(
                 "Labels available: {}",

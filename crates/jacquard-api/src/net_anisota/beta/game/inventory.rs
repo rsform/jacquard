@@ -83,6 +83,19 @@ pub struct Inventory<'a> {
     pub stackable: Option<bool>,
 }
 
+impl<'a> Inventory<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, InventoryRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
     serde::Serialize,

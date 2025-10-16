@@ -38,6 +38,19 @@ pub struct Workout<'a> {
     pub start_time: jacquard_common::types::string::Datetime,
 }
 
+impl<'a> Workout<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, WorkoutRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
     serde::Serialize,

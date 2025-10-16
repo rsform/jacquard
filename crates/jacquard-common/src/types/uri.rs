@@ -1,10 +1,12 @@
 use crate::{
     CowStr, IntoStatic,
-    types::{aturi::AtUri, cid::Cid, did::Did, string::AtStrError},
+    types::{
+        aturi::AtUri, cid::Cid, collection::Collection, did::Did, nsid::Nsid, string::AtStrError,
+    },
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use smol_str::ToSmolStr;
-use std::str::FromStr;
+use std::{fmt::Display, marker::PhantomData, str::FromStr};
 use url::Url;
 
 /// Generic URI with type-specific parsing
@@ -164,4 +166,57 @@ impl IntoStatic for Uri<'_> {
             Uri::Any(s) => Uri::Any(s.into_static()),
         }
     }
+}
+
+#[repr(transparent)]
+/// Collection type-annotated at:// URI
+///
+/// Carries the corresponding collection type for fetching records easily
+pub struct RecordUri<'a, R: Collection>(AtUri<'a>, PhantomData<R>);
+
+impl<'a, R: Collection> RecordUri<'a, R> {
+    /// attepts to parse an at-uri as the corresponding collection
+    pub fn try_from_uri(uri: AtUri<'a>) -> Result<Self, UriError> {
+        if let Some(collection) = uri.collection() {
+            if collection.as_str() == R::NSID {
+                return Ok(Self(uri, PhantomData));
+            }
+        }
+        Err(UriError::CollectionMismatch {
+            expected: R::NSID,
+            found: uri.collection().map(|c| c.clone().into_static()),
+        })
+    }
+
+    /// Spits out the internal un-typed AtUri
+    pub fn into_inner(self) -> AtUri<'a> {
+        self.0
+    }
+
+    /// Accesses the internal AtUri for use
+    pub fn as_uri(&self) -> &AtUri<'a> {
+        &self.0
+    }
+}
+
+impl<R: Collection> Display for RecordUri<'_, R> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, thiserror::Error, miette::Diagnostic)]
+/// Errors that can occur when parsing or validating collection type-annotated URIs
+pub enum UriError {
+    /// Given at-uri didn't have the matching collection for the record
+    #[error("Collection mismatch: expected {expected}, found {found:?}")]
+    CollectionMismatch {
+        /// The collection of the record
+        expected: &'static str,
+        /// What the at-uri had
+        found: Option<Nsid<'static>>,
+    },
+    /// Couldn't parse the string as an AtUri
+    #[error("Invalid URI: {0}")]
+    InvalidUri(#[from] AtStrError),
 }
