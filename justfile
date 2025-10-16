@@ -32,6 +32,10 @@ lex-fetch *ARGS:
 codegen *ARGS:
     cargo run -p jacquard-lexicon --bin jacquard-codegen -- -r crate {{ARGS}}
 
+# Package binaries for distribution (creates tar.xz archives)
+package-binaries:
+    ./scripts/package-binaries.sh
+
 # List all available examples
 examples:
     #!/usr/bin/env bash
