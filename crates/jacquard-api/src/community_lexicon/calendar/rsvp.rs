@@ -83,7 +83,20 @@ pub struct RsvpGetRecordOutput<'a> {
     pub value: Rsvp<'a>,
 }
 
+impl From<RsvpGetRecordOutput<'_>> for Rsvp<'_> {
+    fn from(output: RsvpGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Rsvp<'_> {
+    const NSID: &'static str = "community.lexicon.calendar.rsvp";
+    type Record = RsvpRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct RsvpRecord;
 impl jacquard_common::xrpc::XrpcResp for RsvpRecord {
     const NSID: &'static str = "community.lexicon.calendar.rsvp";
@@ -92,16 +105,9 @@ impl jacquard_common::xrpc::XrpcResp for RsvpRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Rsvp<'_> {
+impl jacquard_common::types::collection::Collection for RsvpRecord {
     const NSID: &'static str = "community.lexicon.calendar.rsvp";
     type Record = RsvpRecord;
-}
-
-impl From<RsvpGetRecordOutput<'_>> for Rsvp<'_> {
-    fn from(output: RsvpGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 /// Not going to the event

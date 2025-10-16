@@ -278,7 +278,20 @@ pub struct LogGetRecordOutput<'a> {
     pub value: Log<'a>,
 }
 
+impl From<LogGetRecordOutput<'_>> for Log<'_> {
+    fn from(output: LogGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Log<'_> {
+    const NSID: &'static str = "net.anisota.beta.game.log";
+    type Record = LogRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct LogRecord;
 impl jacquard_common::xrpc::XrpcResp for LogRecord {
     const NSID: &'static str = "net.anisota.beta.game.log";
@@ -287,16 +300,9 @@ impl jacquard_common::xrpc::XrpcResp for LogRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Log<'_> {
+impl jacquard_common::types::collection::Collection for LogRecord {
     const NSID: &'static str = "net.anisota.beta.game.log";
     type Record = LogRecord;
-}
-
-impl From<LogGetRecordOutput<'_>> for Log<'_> {
-    fn from(output: LogGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 /// Additional event-specific metadata

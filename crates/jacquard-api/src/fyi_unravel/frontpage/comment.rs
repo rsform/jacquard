@@ -54,7 +54,20 @@ pub struct CommentGetRecordOutput<'a> {
     pub value: Comment<'a>,
 }
 
+impl From<CommentGetRecordOutput<'_>> for Comment<'_> {
+    fn from(output: CommentGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Comment<'_> {
+    const NSID: &'static str = "fyi.unravel.frontpage.comment";
+    type Record = CommentRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct CommentRecord;
 impl jacquard_common::xrpc::XrpcResp for CommentRecord {
     const NSID: &'static str = "fyi.unravel.frontpage.comment";
@@ -63,14 +76,7 @@ impl jacquard_common::xrpc::XrpcResp for CommentRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Comment<'_> {
+impl jacquard_common::types::collection::Collection for CommentRecord {
     const NSID: &'static str = "fyi.unravel.frontpage.comment";
     type Record = CommentRecord;
-}
-
-impl From<CommentGetRecordOutput<'_>> for Comment<'_> {
-    fn from(output: CommentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

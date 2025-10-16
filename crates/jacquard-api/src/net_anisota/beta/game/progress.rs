@@ -100,7 +100,20 @@ pub struct ProgressGetRecordOutput<'a> {
     pub value: Progress<'a>,
 }
 
+impl From<ProgressGetRecordOutput<'_>> for Progress<'_> {
+    fn from(output: ProgressGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Progress<'_> {
+    const NSID: &'static str = "net.anisota.beta.game.progress";
+    type Record = ProgressRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ProgressRecord;
 impl jacquard_common::xrpc::XrpcResp for ProgressRecord {
     const NSID: &'static str = "net.anisota.beta.game.progress";
@@ -109,16 +122,9 @@ impl jacquard_common::xrpc::XrpcResp for ProgressRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Progress<'_> {
+impl jacquard_common::types::collection::Collection for ProgressRecord {
     const NSID: &'static str = "net.anisota.beta.game.progress";
     type Record = ProgressRecord;
-}
-
-impl From<ProgressGetRecordOutput<'_>> for Progress<'_> {
-    fn from(output: ProgressGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 /// Additional metadata about this progress update

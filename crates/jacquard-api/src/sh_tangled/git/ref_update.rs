@@ -144,7 +144,20 @@ pub struct RefUpdateGetRecordOutput<'a> {
     pub value: RefUpdate<'a>,
 }
 
+impl From<RefUpdateGetRecordOutput<'_>> for RefUpdate<'_> {
+    fn from(output: RefUpdateGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for RefUpdate<'_> {
+    const NSID: &'static str = "sh.tangled.git.refUpdate";
+    type Record = RefUpdateRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct RefUpdateRecord;
 impl jacquard_common::xrpc::XrpcResp for RefUpdateRecord {
     const NSID: &'static str = "sh.tangled.git.refUpdate";
@@ -153,16 +166,9 @@ impl jacquard_common::xrpc::XrpcResp for RefUpdateRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for RefUpdate<'_> {
+impl jacquard_common::types::collection::Collection for RefUpdateRecord {
     const NSID: &'static str = "sh.tangled.git.refUpdate";
     type Record = RefUpdateRecord;
-}
-
-impl From<RefUpdateGetRecordOutput<'_>> for RefUpdate<'_> {
-    fn from(output: RefUpdateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

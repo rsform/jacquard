@@ -67,7 +67,20 @@ pub struct LexiconGetRecordOutput<'a> {
     pub value: Lexicon<'a>,
 }
 
+impl From<LexiconGetRecordOutput<'_>> for Lexicon<'_> {
+    fn from(output: LexiconGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Lexicon<'_> {
+    const NSID: &'static str = "network.slices.lexicon";
+    type Record = LexiconRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct LexiconRecord;
 impl jacquard_common::xrpc::XrpcResp for LexiconRecord {
     const NSID: &'static str = "network.slices.lexicon";
@@ -76,14 +89,7 @@ impl jacquard_common::xrpc::XrpcResp for LexiconRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Lexicon<'_> {
+impl jacquard_common::types::collection::Collection for LexiconRecord {
     const NSID: &'static str = "network.slices.lexicon";
     type Record = LexiconRecord;
-}
-
-impl From<LexiconGetRecordOutput<'_>> for Lexicon<'_> {
-    fn from(output: LexiconGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

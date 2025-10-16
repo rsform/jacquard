@@ -68,7 +68,20 @@ pub struct SliceGetRecordOutput<'a> {
     pub value: Slice<'a>,
 }
 
+impl From<SliceGetRecordOutput<'_>> for Slice<'_> {
+    fn from(output: SliceGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Slice<'_> {
+    const NSID: &'static str = "network.slices.slice";
+    type Record = SliceRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct SliceRecord;
 impl jacquard_common::xrpc::XrpcResp for SliceRecord {
     const NSID: &'static str = "network.slices.slice";
@@ -77,16 +90,9 @@ impl jacquard_common::xrpc::XrpcResp for SliceRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Slice<'_> {
+impl jacquard_common::types::collection::Collection for SliceRecord {
     const NSID: &'static str = "network.slices.slice";
     type Record = SliceRecord;
-}
-
-impl From<SliceGetRecordOutput<'_>> for Slice<'_> {
-    fn from(output: SliceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

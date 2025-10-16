@@ -55,7 +55,20 @@ pub struct RingsGetRecordOutput<'a> {
     pub value: Rings<'a>,
 }
 
+impl From<RingsGetRecordOutput<'_>> for Rings<'_> {
+    fn from(output: RingsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Rings<'_> {
+    const NSID: &'static str = "dev.baileytownsend.health.rings";
+    type Record = RingsRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct RingsRecord;
 impl jacquard_common::xrpc::XrpcResp for RingsRecord {
     const NSID: &'static str = "dev.baileytownsend.health.rings";
@@ -64,14 +77,7 @@ impl jacquard_common::xrpc::XrpcResp for RingsRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Rings<'_> {
+impl jacquard_common::types::collection::Collection for RingsRecord {
     const NSID: &'static str = "dev.baileytownsend.health.rings";
     type Record = RingsRecord;
-}
-
-impl From<RingsGetRecordOutput<'_>> for Rings<'_> {
-    fn from(output: RingsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

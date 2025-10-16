@@ -52,7 +52,20 @@ pub struct FungusGetRecordOutput<'a> {
     pub value: Fungus<'a>,
 }
 
+impl From<FungusGetRecordOutput<'_>> for Fungus<'_> {
+    fn from(output: FungusGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Fungus<'_> {
+    const NSID: &'static str = "org.robocracy.demo.fungus";
+    type Record = FungusRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct FungusRecord;
 impl jacquard_common::xrpc::XrpcResp for FungusRecord {
     const NSID: &'static str = "org.robocracy.demo.fungus";
@@ -61,14 +74,7 @@ impl jacquard_common::xrpc::XrpcResp for FungusRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Fungus<'_> {
+impl jacquard_common::types::collection::Collection for FungusRecord {
     const NSID: &'static str = "org.robocracy.demo.fungus";
     type Record = FungusRecord;
-}
-
-impl From<FungusGetRecordOutput<'_>> for Fungus<'_> {
-    fn from(output: FungusGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

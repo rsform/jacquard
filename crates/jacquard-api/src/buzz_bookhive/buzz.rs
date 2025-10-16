@@ -52,7 +52,20 @@ pub struct BuzzGetRecordOutput<'a> {
     pub value: Buzz<'a>,
 }
 
+impl From<BuzzGetRecordOutput<'_>> for Buzz<'_> {
+    fn from(output: BuzzGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Buzz<'_> {
+    const NSID: &'static str = "buzz.bookhive.buzz";
+    type Record = BuzzRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct BuzzRecord;
 impl jacquard_common::xrpc::XrpcResp for BuzzRecord {
     const NSID: &'static str = "buzz.bookhive.buzz";
@@ -61,14 +74,7 @@ impl jacquard_common::xrpc::XrpcResp for BuzzRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Buzz<'_> {
+impl jacquard_common::types::collection::Collection for BuzzRecord {
     const NSID: &'static str = "buzz.bookhive.buzz";
     type Record = BuzzRecord;
-}
-
-impl From<BuzzGetRecordOutput<'_>> for Buzz<'_> {
-    fn from(output: BuzzGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

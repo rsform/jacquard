@@ -104,7 +104,20 @@ pub struct InventoryGetRecordOutput<'a> {
     pub value: Inventory<'a>,
 }
 
+impl From<InventoryGetRecordOutput<'_>> for Inventory<'_> {
+    fn from(output: InventoryGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Inventory<'_> {
+    const NSID: &'static str = "net.anisota.beta.game.inventory";
+    type Record = InventoryRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct InventoryRecord;
 impl jacquard_common::xrpc::XrpcResp for InventoryRecord {
     const NSID: &'static str = "net.anisota.beta.game.inventory";
@@ -113,16 +126,9 @@ impl jacquard_common::xrpc::XrpcResp for InventoryRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Inventory<'_> {
+impl jacquard_common::types::collection::Collection for InventoryRecord {
     const NSID: &'static str = "net.anisota.beta.game.inventory";
     type Record = InventoryRecord;
-}
-
-impl From<InventoryGetRecordOutput<'_>> for Inventory<'_> {
-    fn from(output: InventoryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 /// Additional details about how the item was acquired

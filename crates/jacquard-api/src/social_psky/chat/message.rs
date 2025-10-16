@@ -57,7 +57,20 @@ pub struct MessageGetRecordOutput<'a> {
     pub value: Message<'a>,
 }
 
+impl From<MessageGetRecordOutput<'_>> for Message<'_> {
+    fn from(output: MessageGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Message<'_> {
+    const NSID: &'static str = "social.psky.chat.message";
+    type Record = MessageRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct MessageRecord;
 impl jacquard_common::xrpc::XrpcResp for MessageRecord {
     const NSID: &'static str = "social.psky.chat.message";
@@ -66,14 +79,7 @@ impl jacquard_common::xrpc::XrpcResp for MessageRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Message<'_> {
+impl jacquard_common::types::collection::Collection for MessageRecord {
     const NSID: &'static str = "social.psky.chat.message";
     type Record = MessageRecord;
-}
-
-impl From<MessageGetRecordOutput<'_>> for Message<'_> {
-    fn from(output: MessageGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

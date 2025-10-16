@@ -56,7 +56,20 @@ pub struct GalleryGetRecordOutput<'a> {
     pub value: Gallery<'a>,
 }
 
+impl From<GalleryGetRecordOutput<'_>> for Gallery<'_> {
+    fn from(output: GalleryGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Gallery<'_> {
+    const NSID: &'static str = "social.grain.gallery";
+    type Record = GalleryRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct GalleryRecord;
 impl jacquard_common::xrpc::XrpcResp for GalleryRecord {
     const NSID: &'static str = "social.grain.gallery";
@@ -65,16 +78,9 @@ impl jacquard_common::xrpc::XrpcResp for GalleryRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Gallery<'_> {
+impl jacquard_common::types::collection::Collection for GalleryRecord {
     const NSID: &'static str = "social.grain.gallery";
     type Record = GalleryRecord;
-}
-
-impl From<GalleryGetRecordOutput<'_>> for Gallery<'_> {
-    fn from(output: GalleryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

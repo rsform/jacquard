@@ -54,7 +54,20 @@ pub struct CategoryGetRecordOutput<'a> {
     pub value: Category<'a>,
 }
 
+impl From<CategoryGetRecordOutput<'_>> for Category<'_> {
+    fn from(output: CategoryGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Category<'_> {
+    const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.category";
+    type Record = CategoryRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct CategoryRecord;
 impl jacquard_common::xrpc::XrpcResp for CategoryRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.category";
@@ -63,14 +76,7 @@ impl jacquard_common::xrpc::XrpcResp for CategoryRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Category<'_> {
+impl jacquard_common::types::collection::Collection for CategoryRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.category";
     type Record = CategoryRecord;
-}
-
-impl From<CategoryGetRecordOutput<'_>> for Category<'_> {
-    fn from(output: CategoryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

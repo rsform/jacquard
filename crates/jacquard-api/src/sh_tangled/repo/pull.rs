@@ -61,7 +61,20 @@ pub struct PullGetRecordOutput<'a> {
     pub value: Pull<'a>,
 }
 
+impl From<PullGetRecordOutput<'_>> for Pull<'_> {
+    fn from(output: PullGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Pull<'_> {
+    const NSID: &'static str = "sh.tangled.repo.pull";
+    type Record = PullRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct PullRecord;
 impl jacquard_common::xrpc::XrpcResp for PullRecord {
     const NSID: &'static str = "sh.tangled.repo.pull";
@@ -70,16 +83,9 @@ impl jacquard_common::xrpc::XrpcResp for PullRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Pull<'_> {
+impl jacquard_common::types::collection::Collection for PullRecord {
     const NSID: &'static str = "sh.tangled.repo.pull";
     type Record = PullRecord;
-}
-
-impl From<PullGetRecordOutput<'_>> for Pull<'_> {
-    fn from(output: PullGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

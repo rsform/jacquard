@@ -59,7 +59,20 @@ pub struct WorkoutGetRecordOutput<'a> {
     pub value: Workout<'a>,
 }
 
+impl From<WorkoutGetRecordOutput<'_>> for Workout<'_> {
+    fn from(output: WorkoutGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Workout<'_> {
+    const NSID: &'static str = "dev.baileytownsend.health.workout";
+    type Record = WorkoutRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct WorkoutRecord;
 impl jacquard_common::xrpc::XrpcResp for WorkoutRecord {
     const NSID: &'static str = "dev.baileytownsend.health.workout";
@@ -68,14 +81,7 @@ impl jacquard_common::xrpc::XrpcResp for WorkoutRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Workout<'_> {
+impl jacquard_common::types::collection::Collection for WorkoutRecord {
     const NSID: &'static str = "dev.baileytownsend.health.workout";
     type Record = WorkoutRecord;
-}
-
-impl From<WorkoutGetRecordOutput<'_>> for Workout<'_> {
-    fn from(output: WorkoutGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

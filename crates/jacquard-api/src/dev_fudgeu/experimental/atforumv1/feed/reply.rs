@@ -51,7 +51,20 @@ pub struct ReplyGetRecordOutput<'a> {
     pub value: Reply<'a>,
 }
 
+impl From<ReplyGetRecordOutput<'_>> for Reply<'_> {
+    fn from(output: ReplyGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Reply<'_> {
+    const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.feed.reply";
+    type Record = ReplyRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ReplyRecord;
 impl jacquard_common::xrpc::XrpcResp for ReplyRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.feed.reply";
@@ -60,14 +73,7 @@ impl jacquard_common::xrpc::XrpcResp for ReplyRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Reply<'_> {
+impl jacquard_common::types::collection::Collection for ReplyRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.feed.reply";
     type Record = ReplyRecord;
-}
-
-impl From<ReplyGetRecordOutput<'_>> for Reply<'_> {
-    fn from(output: ReplyGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

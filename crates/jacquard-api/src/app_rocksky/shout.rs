@@ -64,7 +64,20 @@ pub struct ShoutGetRecordOutput<'a> {
     pub value: Shout<'a>,
 }
 
+impl From<ShoutGetRecordOutput<'_>> for Shout<'_> {
+    fn from(output: ShoutGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Shout<'_> {
+    const NSID: &'static str = "app.rocksky.shout";
+    type Record = ShoutRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ShoutRecord;
 impl jacquard_common::xrpc::XrpcResp for ShoutRecord {
     const NSID: &'static str = "app.rocksky.shout";
@@ -73,16 +86,9 @@ impl jacquard_common::xrpc::XrpcResp for ShoutRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Shout<'_> {
+impl jacquard_common::types::collection::Collection for ShoutRecord {
     const NSID: &'static str = "app.rocksky.shout";
     type Record = ShoutRecord;
-}
-
-impl From<ShoutGetRecordOutput<'_>> for Shout<'_> {
-    fn from(output: ShoutGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

@@ -182,7 +182,20 @@ pub struct SessionGetRecordOutput<'a> {
     pub value: Session<'a>,
 }
 
+impl From<SessionGetRecordOutput<'_>> for Session<'_> {
+    fn from(output: SessionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Session<'_> {
+    const NSID: &'static str = "net.anisota.beta.game.session";
+    type Record = SessionRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct SessionRecord;
 impl jacquard_common::xrpc::XrpcResp for SessionRecord {
     const NSID: &'static str = "net.anisota.beta.game.session";
@@ -191,16 +204,9 @@ impl jacquard_common::xrpc::XrpcResp for SessionRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Session<'_> {
+impl jacquard_common::types::collection::Collection for SessionRecord {
     const NSID: &'static str = "net.anisota.beta.game.session";
     type Record = SessionRecord;
-}
-
-impl From<SessionGetRecordOutput<'_>> for Session<'_> {
-    fn from(output: SessionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 /// Additional session metadata

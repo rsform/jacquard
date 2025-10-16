@@ -49,7 +49,20 @@ pub struct OpGetRecordOutput<'a> {
     pub value: Op<'a>,
 }
 
+impl From<OpGetRecordOutput<'_>> for Op<'_> {
+    fn from(output: OpGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Op<'_> {
+    const NSID: &'static str = "sh.tangled.label.op";
+    type Record = OpRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct OpRecord;
 impl jacquard_common::xrpc::XrpcResp for OpRecord {
     const NSID: &'static str = "sh.tangled.label.op";
@@ -58,16 +71,9 @@ impl jacquard_common::xrpc::XrpcResp for OpRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Op<'_> {
+impl jacquard_common::types::collection::Collection for OpRecord {
     const NSID: &'static str = "sh.tangled.label.op";
     type Record = OpRecord;
-}
-
-impl From<OpGetRecordOutput<'_>> for Op<'_> {
-    fn from(output: OpGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

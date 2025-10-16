@@ -59,7 +59,20 @@ pub struct EndorsementGetRecordOutput<'a> {
     pub value: Endorsement<'a>,
 }
 
+impl From<EndorsementGetRecordOutput<'_>> for Endorsement<'_> {
+    fn from(output: EndorsementGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Endorsement<'_> {
+    const NSID: &'static str = "place.atwork.endorsement";
+    type Record = EndorsementRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct EndorsementRecord;
 impl jacquard_common::xrpc::XrpcResp for EndorsementRecord {
     const NSID: &'static str = "place.atwork.endorsement";
@@ -68,14 +81,7 @@ impl jacquard_common::xrpc::XrpcResp for EndorsementRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Endorsement<'_> {
+impl jacquard_common::types::collection::Collection for EndorsementRecord {
     const NSID: &'static str = "place.atwork.endorsement";
     type Record = EndorsementRecord;
-}
-
-impl From<EndorsementGetRecordOutput<'_>> for Endorsement<'_> {
-    fn from(output: EndorsementGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

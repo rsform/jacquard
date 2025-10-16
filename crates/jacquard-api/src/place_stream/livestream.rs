@@ -101,7 +101,20 @@ pub struct LivestreamGetRecordOutput<'a> {
     pub value: Livestream<'a>,
 }
 
+impl From<LivestreamGetRecordOutput<'_>> for Livestream<'_> {
+    fn from(output: LivestreamGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Livestream<'_> {
+    const NSID: &'static str = "place.stream.livestream";
+    type Record = LivestreamRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct LivestreamRecord;
 impl jacquard_common::xrpc::XrpcResp for LivestreamRecord {
     const NSID: &'static str = "place.stream.livestream";
@@ -110,16 +123,9 @@ impl jacquard_common::xrpc::XrpcResp for LivestreamRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Livestream<'_> {
+impl jacquard_common::types::collection::Collection for LivestreamRecord {
     const NSID: &'static str = "place.stream.livestream";
     type Record = LivestreamRecord;
-}
-
-impl From<LivestreamGetRecordOutput<'_>> for Livestream<'_> {
-    fn from(output: LivestreamGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

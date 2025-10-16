@@ -52,7 +52,20 @@ pub struct MushroomGetRecordOutput<'a> {
     pub value: Mushroom<'a>,
 }
 
+impl From<MushroomGetRecordOutput<'_>> for Mushroom<'_> {
+    fn from(output: MushroomGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Mushroom<'_> {
+    const NSID: &'static str = "net.bnewbold.demo.mushroom";
+    type Record = MushroomRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct MushroomRecord;
 impl jacquard_common::xrpc::XrpcResp for MushroomRecord {
     const NSID: &'static str = "net.bnewbold.demo.mushroom";
@@ -61,14 +74,7 @@ impl jacquard_common::xrpc::XrpcResp for MushroomRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Mushroom<'_> {
+impl jacquard_common::types::collection::Collection for MushroomRecord {
     const NSID: &'static str = "net.bnewbold.demo.mushroom";
     type Record = MushroomRecord;
-}
-
-impl From<MushroomGetRecordOutput<'_>> for Mushroom<'_> {
-    fn from(output: MushroomGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

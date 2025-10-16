@@ -50,7 +50,20 @@ pub struct RootGetRecordOutput<'a> {
     pub value: Root<'a>,
 }
 
+impl From<RootGetRecordOutput<'_>> for Root<'_> {
+    fn from(output: RootGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Root<'_> {
+    const NSID: &'static str = "sh.weaver.edit.root";
+    type Record = RootRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct RootRecord;
 impl jacquard_common::xrpc::XrpcResp for RootRecord {
     const NSID: &'static str = "sh.weaver.edit.root";
@@ -59,14 +72,7 @@ impl jacquard_common::xrpc::XrpcResp for RootRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Root<'_> {
+impl jacquard_common::types::collection::Collection for RootRecord {
     const NSID: &'static str = "sh.weaver.edit.root";
     type Record = RootRecord;
-}
-
-impl From<RootGetRecordOutput<'_>> for Root<'_> {
-    fn from(output: RootGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

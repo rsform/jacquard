@@ -50,7 +50,20 @@ pub struct WebMonetizationGetRecordOutput<'a> {
     pub value: WebMonetization<'a>,
 }
 
+impl From<WebMonetizationGetRecordOutput<'_>> for WebMonetization<'_> {
+    fn from(output: WebMonetizationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for WebMonetization<'_> {
+    const NSID: &'static str = "community.lexicon.payments.webMonetization";
+    type Record = WebMonetizationRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct WebMonetizationRecord;
 impl jacquard_common::xrpc::XrpcResp for WebMonetizationRecord {
     const NSID: &'static str = "community.lexicon.payments.webMonetization";
@@ -59,14 +72,7 @@ impl jacquard_common::xrpc::XrpcResp for WebMonetizationRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for WebMonetization<'_> {
+impl jacquard_common::types::collection::Collection for WebMonetizationRecord {
     const NSID: &'static str = "community.lexicon.payments.webMonetization";
     type Record = WebMonetizationRecord;
-}
-
-impl From<WebMonetizationGetRecordOutput<'_>> for WebMonetization<'_> {
-    fn from(output: WebMonetizationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

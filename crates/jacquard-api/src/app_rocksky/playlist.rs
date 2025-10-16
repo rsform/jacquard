@@ -86,7 +86,20 @@ pub struct PlaylistGetRecordOutput<'a> {
     pub value: Playlist<'a>,
 }
 
+impl From<PlaylistGetRecordOutput<'_>> for Playlist<'_> {
+    fn from(output: PlaylistGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Playlist<'_> {
+    const NSID: &'static str = "app.rocksky.playlist";
+    type Record = PlaylistRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct PlaylistRecord;
 impl jacquard_common::xrpc::XrpcResp for PlaylistRecord {
     const NSID: &'static str = "app.rocksky.playlist";
@@ -95,16 +108,9 @@ impl jacquard_common::xrpc::XrpcResp for PlaylistRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Playlist<'_> {
+impl jacquard_common::types::collection::Collection for PlaylistRecord {
     const NSID: &'static str = "app.rocksky.playlist";
     type Record = PlaylistRecord;
-}
-
-impl From<PlaylistGetRecordOutput<'_>> for Playlist<'_> {
-    fn from(output: PlaylistGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 /// Basic view of a playlist, including its metadata

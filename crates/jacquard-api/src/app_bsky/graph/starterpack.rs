@@ -79,7 +79,20 @@ pub struct StarterpackGetRecordOutput<'a> {
     pub value: Starterpack<'a>,
 }
 
+impl From<StarterpackGetRecordOutput<'_>> for Starterpack<'_> {
+    fn from(output: StarterpackGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Starterpack<'_> {
+    const NSID: &'static str = "app.bsky.graph.starterpack";
+    type Record = StarterpackRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct StarterpackRecord;
 impl jacquard_common::xrpc::XrpcResp for StarterpackRecord {
     const NSID: &'static str = "app.bsky.graph.starterpack";
@@ -88,14 +101,7 @@ impl jacquard_common::xrpc::XrpcResp for StarterpackRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Starterpack<'_> {
+impl jacquard_common::types::collection::Collection for StarterpackRecord {
     const NSID: &'static str = "app.bsky.graph.starterpack";
     type Record = StarterpackRecord;
-}
-
-impl From<StarterpackGetRecordOutput<'_>> for Starterpack<'_> {
-    fn from(output: StarterpackGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

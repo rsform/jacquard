@@ -49,7 +49,20 @@ pub struct ServiceGetRecordOutput<'a> {
     pub value: Service<'a>,
 }
 
+impl From<ServiceGetRecordOutput<'_>> for Service<'_> {
+    fn from(output: ServiceGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Service<'_> {
+    const NSID: &'static str = "app.ocho.plugin.service";
+    type Record = ServiceRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ServiceRecord;
 impl jacquard_common::xrpc::XrpcResp for ServiceRecord {
     const NSID: &'static str = "app.ocho.plugin.service";
@@ -58,14 +71,7 @@ impl jacquard_common::xrpc::XrpcResp for ServiceRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Service<'_> {
+impl jacquard_common::types::collection::Collection for ServiceRecord {
     const NSID: &'static str = "app.ocho.plugin.service";
     type Record = ServiceRecord;
-}
-
-impl From<ServiceGetRecordOutput<'_>> for Service<'_> {
-    fn from(output: ServiceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

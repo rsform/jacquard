@@ -53,7 +53,20 @@ pub struct NowGetRecordOutput<'a> {
     pub value: Now<'a>,
 }
 
+impl From<NowGetRecordOutput<'_>> for Now<'_> {
+    fn from(output: NowGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Now<'_> {
+    const NSID: &'static str = "net.mmatt.right.now";
+    type Record = NowRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct NowRecord;
 impl jacquard_common::xrpc::XrpcResp for NowRecord {
     const NSID: &'static str = "net.mmatt.right.now";
@@ -62,14 +75,7 @@ impl jacquard_common::xrpc::XrpcResp for NowRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Now<'_> {
+impl jacquard_common::types::collection::Collection for NowRecord {
     const NSID: &'static str = "net.mmatt.right.now";
     type Record = NowRecord;
-}
-
-impl From<NowGetRecordOutput<'_>> for Now<'_> {
-    fn from(output: NowGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

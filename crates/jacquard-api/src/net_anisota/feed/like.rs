@@ -47,7 +47,20 @@ pub struct LikeGetRecordOutput<'a> {
     pub value: Like<'a>,
 }
 
+impl From<LikeGetRecordOutput<'_>> for Like<'_> {
+    fn from(output: LikeGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Like<'_> {
+    const NSID: &'static str = "net.anisota.feed.like";
+    type Record = LikeRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct LikeRecord;
 impl jacquard_common::xrpc::XrpcResp for LikeRecord {
     const NSID: &'static str = "net.anisota.feed.like";
@@ -56,14 +69,7 @@ impl jacquard_common::xrpc::XrpcResp for LikeRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Like<'_> {
+impl jacquard_common::types::collection::Collection for LikeRecord {
     const NSID: &'static str = "net.anisota.feed.like";
     type Record = LikeRecord;
-}
-
-impl From<LikeGetRecordOutput<'_>> for Like<'_> {
-    fn from(output: LikeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

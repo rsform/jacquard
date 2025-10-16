@@ -44,7 +44,20 @@ pub struct SpindleGetRecordOutput<'a> {
     pub value: Spindle<'a>,
 }
 
+impl From<SpindleGetRecordOutput<'_>> for Spindle<'_> {
+    fn from(output: SpindleGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Spindle<'_> {
+    const NSID: &'static str = "sh.tangled.spindle";
+    type Record = SpindleRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct SpindleRecord;
 impl jacquard_common::xrpc::XrpcResp for SpindleRecord {
     const NSID: &'static str = "sh.tangled.spindle";
@@ -53,14 +66,7 @@ impl jacquard_common::xrpc::XrpcResp for SpindleRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Spindle<'_> {
+impl jacquard_common::types::collection::Collection for SpindleRecord {
     const NSID: &'static str = "sh.tangled.spindle";
     type Record = SpindleRecord;
-}
-
-impl From<SpindleGetRecordOutput<'_>> for Spindle<'_> {
-    fn from(output: SpindleGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

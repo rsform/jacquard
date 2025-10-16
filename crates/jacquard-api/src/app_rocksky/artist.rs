@@ -81,7 +81,20 @@ pub struct ArtistGetRecordOutput<'a> {
     pub value: Artist<'a>,
 }
 
+impl From<ArtistGetRecordOutput<'_>> for Artist<'_> {
+    fn from(output: ArtistGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Artist<'_> {
+    const NSID: &'static str = "app.rocksky.artist";
+    type Record = ArtistRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ArtistRecord;
 impl jacquard_common::xrpc::XrpcResp for ArtistRecord {
     const NSID: &'static str = "app.rocksky.artist";
@@ -90,16 +103,9 @@ impl jacquard_common::xrpc::XrpcResp for ArtistRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Artist<'_> {
+impl jacquard_common::types::collection::Collection for ArtistRecord {
     const NSID: &'static str = "app.rocksky.artist";
     type Record = ArtistRecord;
-}
-
-impl From<ArtistGetRecordOutput<'_>> for Artist<'_> {
-    fn from(output: ArtistGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

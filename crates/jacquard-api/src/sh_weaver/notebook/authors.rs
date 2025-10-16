@@ -89,7 +89,20 @@ pub struct AuthorsGetRecordOutput<'a> {
     pub value: Authors<'a>,
 }
 
+impl From<AuthorsGetRecordOutput<'_>> for Authors<'_> {
+    fn from(output: AuthorsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Authors<'_> {
+    const NSID: &'static str = "sh.weaver.notebook.authors";
+    type Record = AuthorsRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct AuthorsRecord;
 impl jacquard_common::xrpc::XrpcResp for AuthorsRecord {
     const NSID: &'static str = "sh.weaver.notebook.authors";
@@ -98,14 +111,7 @@ impl jacquard_common::xrpc::XrpcResp for AuthorsRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Authors<'_> {
+impl jacquard_common::types::collection::Collection for AuthorsRecord {
     const NSID: &'static str = "sh.weaver.notebook.authors";
     type Record = AuthorsRecord;
-}
-
-impl From<AuthorsGetRecordOutput<'_>> for Authors<'_> {
-    fn from(output: AuthorsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

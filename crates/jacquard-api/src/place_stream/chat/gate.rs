@@ -45,7 +45,20 @@ pub struct GateGetRecordOutput<'a> {
     pub value: Gate<'a>,
 }
 
+impl From<GateGetRecordOutput<'_>> for Gate<'_> {
+    fn from(output: GateGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Gate<'_> {
+    const NSID: &'static str = "place.stream.chat.gate";
+    type Record = GateRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct GateRecord;
 impl jacquard_common::xrpc::XrpcResp for GateRecord {
     const NSID: &'static str = "place.stream.chat.gate";
@@ -54,14 +67,7 @@ impl jacquard_common::xrpc::XrpcResp for GateRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Gate<'_> {
+impl jacquard_common::types::collection::Collection for GateRecord {
     const NSID: &'static str = "place.stream.chat.gate";
     type Record = GateRecord;
-}
-
-impl From<GateGetRecordOutput<'_>> for Gate<'_> {
-    fn from(output: GateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

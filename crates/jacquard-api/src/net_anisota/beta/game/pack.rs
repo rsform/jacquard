@@ -65,7 +65,20 @@ pub struct PackGetRecordOutput<'a> {
     pub value: Pack<'a>,
 }
 
+impl From<PackGetRecordOutput<'_>> for Pack<'_> {
+    fn from(output: PackGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Pack<'_> {
+    const NSID: &'static str = "net.anisota.beta.game.pack";
+    type Record = PackRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct PackRecord;
 impl jacquard_common::xrpc::XrpcResp for PackRecord {
     const NSID: &'static str = "net.anisota.beta.game.pack";
@@ -74,16 +87,9 @@ impl jacquard_common::xrpc::XrpcResp for PackRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Pack<'_> {
+impl jacquard_common::types::collection::Collection for PackRecord {
     const NSID: &'static str = "net.anisota.beta.game.pack";
     type Record = PackRecord;
-}
-
-impl From<PackGetRecordOutput<'_>> for Pack<'_> {
-    fn from(output: PackGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 /// A single pack opening entry in the history

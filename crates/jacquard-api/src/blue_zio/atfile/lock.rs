@@ -45,7 +45,20 @@ pub struct LockGetRecordOutput<'a> {
     pub value: Lock<'a>,
 }
 
+impl From<LockGetRecordOutput<'_>> for Lock<'_> {
+    fn from(output: LockGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Lock<'_> {
+    const NSID: &'static str = "blue.zio.atfile.lock";
+    type Record = LockRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct LockRecord;
 impl jacquard_common::xrpc::XrpcResp for LockRecord {
     const NSID: &'static str = "blue.zio.atfile.lock";
@@ -54,14 +67,7 @@ impl jacquard_common::xrpc::XrpcResp for LockRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Lock<'_> {
+impl jacquard_common::types::collection::Collection for LockRecord {
     const NSID: &'static str = "blue.zio.atfile.lock";
     type Record = LockRecord;
-}
-
-impl From<LockGetRecordOutput<'_>> for Lock<'_> {
-    fn from(output: LockGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

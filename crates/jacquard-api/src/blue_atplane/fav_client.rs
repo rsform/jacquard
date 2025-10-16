@@ -46,7 +46,20 @@ pub struct FavClientGetRecordOutput<'a> {
     pub value: FavClient<'a>,
 }
 
+impl From<FavClientGetRecordOutput<'_>> for FavClient<'_> {
+    fn from(output: FavClientGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for FavClient<'_> {
+    const NSID: &'static str = "blue.atplane.favClient";
+    type Record = FavClientRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct FavClientRecord;
 impl jacquard_common::xrpc::XrpcResp for FavClientRecord {
     const NSID: &'static str = "blue.atplane.favClient";
@@ -55,14 +68,7 @@ impl jacquard_common::xrpc::XrpcResp for FavClientRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for FavClient<'_> {
+impl jacquard_common::types::collection::Collection for FavClientRecord {
     const NSID: &'static str = "blue.atplane.favClient";
     type Record = FavClientRecord;
-}
-
-impl From<FavClientGetRecordOutput<'_>> for FavClient<'_> {
-    fn from(output: FavClientGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

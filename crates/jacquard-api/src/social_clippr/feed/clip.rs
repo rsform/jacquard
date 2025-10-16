@@ -75,7 +75,20 @@ pub struct ClipGetRecordOutput<'a> {
     pub value: Clip<'a>,
 }
 
+impl From<ClipGetRecordOutput<'_>> for Clip<'_> {
+    fn from(output: ClipGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Clip<'_> {
+    const NSID: &'static str = "social.clippr.feed.clip";
+    type Record = ClipRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ClipRecord;
 impl jacquard_common::xrpc::XrpcResp for ClipRecord {
     const NSID: &'static str = "social.clippr.feed.clip";
@@ -84,14 +97,7 @@ impl jacquard_common::xrpc::XrpcResp for ClipRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Clip<'_> {
+impl jacquard_common::types::collection::Collection for ClipRecord {
     const NSID: &'static str = "social.clippr.feed.clip";
     type Record = ClipRecord;
-}
-
-impl From<ClipGetRecordOutput<'_>> for Clip<'_> {
-    fn from(output: ClipGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

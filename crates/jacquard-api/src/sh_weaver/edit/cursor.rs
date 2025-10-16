@@ -122,7 +122,20 @@ pub struct CursorGetRecordOutput<'a> {
     pub value: Cursor<'a>,
 }
 
+impl From<CursorGetRecordOutput<'_>> for Cursor<'_> {
+    fn from(output: CursorGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Cursor<'_> {
+    const NSID: &'static str = "sh.weaver.edit.cursor";
+    type Record = CursorRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct CursorRecord;
 impl jacquard_common::xrpc::XrpcResp for CursorRecord {
     const NSID: &'static str = "sh.weaver.edit.cursor";
@@ -131,16 +144,9 @@ impl jacquard_common::xrpc::XrpcResp for CursorRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Cursor<'_> {
+impl jacquard_common::types::collection::Collection for CursorRecord {
     const NSID: &'static str = "sh.weaver.edit.cursor";
     type Record = CursorRecord;
-}
-
-impl From<CursorGetRecordOutput<'_>> for Cursor<'_> {
-    fn from(output: CursorGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

@@ -70,7 +70,20 @@ pub struct PostgateGetRecordOutput<'a> {
     pub value: Postgate<'a>,
 }
 
+impl From<PostgateGetRecordOutput<'_>> for Postgate<'_> {
+    fn from(output: PostgateGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Postgate<'_> {
+    const NSID: &'static str = "app.bsky.feed.postgate";
+    type Record = PostgateRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct PostgateRecord;
 impl jacquard_common::xrpc::XrpcResp for PostgateRecord {
     const NSID: &'static str = "app.bsky.feed.postgate";
@@ -79,14 +92,7 @@ impl jacquard_common::xrpc::XrpcResp for PostgateRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Postgate<'_> {
+impl jacquard_common::types::collection::Collection for PostgateRecord {
     const NSID: &'static str = "app.bsky.feed.postgate";
     type Record = PostgateRecord;
-}
-
-impl From<PostgateGetRecordOutput<'_>> for Postgate<'_> {
-    fn from(output: PostgateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

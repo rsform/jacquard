@@ -74,7 +74,20 @@ pub struct ListingGetRecordOutput<'a> {
     pub value: Listing<'a>,
 }
 
+impl From<ListingGetRecordOutput<'_>> for Listing<'_> {
+    fn from(output: ListingGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Listing<'_> {
+    const NSID: &'static str = "place.atwork.listing";
+    type Record = ListingRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ListingRecord;
 impl jacquard_common::xrpc::XrpcResp for ListingRecord {
     const NSID: &'static str = "place.atwork.listing";
@@ -83,14 +96,7 @@ impl jacquard_common::xrpc::XrpcResp for ListingRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Listing<'_> {
+impl jacquard_common::types::collection::Collection for ListingRecord {
     const NSID: &'static str = "place.atwork.listing";
     type Record = ListingRecord;
-}
-
-impl From<ListingGetRecordOutput<'_>> for Listing<'_> {
-    fn from(output: ListingGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

@@ -60,7 +60,20 @@ pub struct StatsGetRecordOutput<'a> {
     pub value: Stats<'a>,
 }
 
+impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
+    fn from(output: StatsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Stats<'_> {
+    const NSID: &'static str = "blue.2048.player.stats";
+    type Record = StatsRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct StatsRecord;
 impl jacquard_common::xrpc::XrpcResp for StatsRecord {
     const NSID: &'static str = "blue.2048.player.stats";
@@ -69,14 +82,7 @@ impl jacquard_common::xrpc::XrpcResp for StatsRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Stats<'_> {
+impl jacquard_common::types::collection::Collection for StatsRecord {
     const NSID: &'static str = "blue.2048.player.stats";
     type Record = StatsRecord;
-}
-
-impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
-    fn from(output: StatsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

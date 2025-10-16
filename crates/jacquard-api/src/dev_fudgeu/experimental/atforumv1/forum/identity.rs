@@ -53,7 +53,20 @@ pub struct IdentityGetRecordOutput<'a> {
     pub value: Identity<'a>,
 }
 
+impl From<IdentityGetRecordOutput<'_>> for Identity<'_> {
+    fn from(output: IdentityGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Identity<'_> {
+    const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.identity";
+    type Record = IdentityRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct IdentityRecord;
 impl jacquard_common::xrpc::XrpcResp for IdentityRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.identity";
@@ -62,14 +75,7 @@ impl jacquard_common::xrpc::XrpcResp for IdentityRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Identity<'_> {
+impl jacquard_common::types::collection::Collection for IdentityRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.identity";
     type Record = IdentityRecord;
-}
-
-impl From<IdentityGetRecordOutput<'_>> for Identity<'_> {
-    fn from(output: IdentityGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

@@ -46,7 +46,20 @@ pub struct ListblockGetRecordOutput<'a> {
     pub value: Listblock<'a>,
 }
 
+impl From<ListblockGetRecordOutput<'_>> for Listblock<'_> {
+    fn from(output: ListblockGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Listblock<'_> {
+    const NSID: &'static str = "app.bsky.graph.listblock";
+    type Record = ListblockRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ListblockRecord;
 impl jacquard_common::xrpc::XrpcResp for ListblockRecord {
     const NSID: &'static str = "app.bsky.graph.listblock";
@@ -55,14 +68,7 @@ impl jacquard_common::xrpc::XrpcResp for ListblockRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Listblock<'_> {
+impl jacquard_common::types::collection::Collection for ListblockRecord {
     const NSID: &'static str = "app.bsky.graph.listblock";
     type Record = ListblockRecord;
-}
-
-impl From<ListblockGetRecordOutput<'_>> for Listblock<'_> {
-    fn from(output: ListblockGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

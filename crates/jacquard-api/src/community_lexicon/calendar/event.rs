@@ -160,7 +160,20 @@ pub struct EventGetRecordOutput<'a> {
     pub value: Event<'a>,
 }
 
+impl From<EventGetRecordOutput<'_>> for Event<'_> {
+    fn from(output: EventGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Event<'_> {
+    const NSID: &'static str = "community.lexicon.calendar.event";
+    type Record = EventRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct EventRecord;
 impl jacquard_common::xrpc::XrpcResp for EventRecord {
     const NSID: &'static str = "community.lexicon.calendar.event";
@@ -169,16 +182,9 @@ impl jacquard_common::xrpc::XrpcResp for EventRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Event<'_> {
+impl jacquard_common::types::collection::Collection for EventRecord {
     const NSID: &'static str = "community.lexicon.calendar.event";
     type Record = EventRecord;
-}
-
-impl From<EventGetRecordOutput<'_>> for Event<'_> {
-    fn from(output: EventGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 /// The mode of the event.

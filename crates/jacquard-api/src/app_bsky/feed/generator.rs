@@ -73,7 +73,20 @@ pub struct GeneratorGetRecordOutput<'a> {
     pub value: Generator<'a>,
 }
 
+impl From<GeneratorGetRecordOutput<'_>> for Generator<'_> {
+    fn from(output: GeneratorGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Generator<'_> {
+    const NSID: &'static str = "app.bsky.feed.generator";
+    type Record = GeneratorRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct GeneratorRecord;
 impl jacquard_common::xrpc::XrpcResp for GeneratorRecord {
     const NSID: &'static str = "app.bsky.feed.generator";
@@ -82,14 +95,7 @@ impl jacquard_common::xrpc::XrpcResp for GeneratorRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Generator<'_> {
+impl jacquard_common::types::collection::Collection for GeneratorRecord {
     const NSID: &'static str = "app.bsky.feed.generator";
     type Record = GeneratorRecord;
-}
-
-impl From<GeneratorGetRecordOutput<'_>> for Generator<'_> {
-    fn from(output: GeneratorGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

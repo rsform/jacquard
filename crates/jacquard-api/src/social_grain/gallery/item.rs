@@ -49,7 +49,20 @@ pub struct ItemGetRecordOutput<'a> {
     pub value: Item<'a>,
 }
 
+impl From<ItemGetRecordOutput<'_>> for Item<'_> {
+    fn from(output: ItemGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Item<'_> {
+    const NSID: &'static str = "social.grain.gallery.item";
+    type Record = ItemRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ItemRecord;
 impl jacquard_common::xrpc::XrpcResp for ItemRecord {
     const NSID: &'static str = "social.grain.gallery.item";
@@ -58,14 +71,7 @@ impl jacquard_common::xrpc::XrpcResp for ItemRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Item<'_> {
+impl jacquard_common::types::collection::Collection for ItemRecord {
     const NSID: &'static str = "social.grain.gallery.item";
     type Record = ItemRecord;
-}
-
-impl From<ItemGetRecordOutput<'_>> for Item<'_> {
-    fn from(output: ItemGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

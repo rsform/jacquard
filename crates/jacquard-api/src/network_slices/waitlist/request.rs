@@ -47,7 +47,20 @@ pub struct RequestGetRecordOutput<'a> {
     pub value: Request<'a>,
 }
 
+impl From<RequestGetRecordOutput<'_>> for Request<'_> {
+    fn from(output: RequestGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Request<'_> {
+    const NSID: &'static str = "network.slices.waitlist.request";
+    type Record = RequestRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct RequestRecord;
 impl jacquard_common::xrpc::XrpcResp for RequestRecord {
     const NSID: &'static str = "network.slices.waitlist.request";
@@ -56,14 +69,7 @@ impl jacquard_common::xrpc::XrpcResp for RequestRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Request<'_> {
+impl jacquard_common::types::collection::Collection for RequestRecord {
     const NSID: &'static str = "network.slices.waitlist.request";
     type Record = RequestRecord;
-}
-
-impl From<RequestGetRecordOutput<'_>> for Request<'_> {
-    fn from(output: RequestGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

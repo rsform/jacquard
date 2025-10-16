@@ -67,7 +67,20 @@ pub struct PostGetRecordOutput<'a> {
     pub value: Post<'a>,
 }
 
+impl From<PostGetRecordOutput<'_>> for Post<'_> {
+    fn from(output: PostGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Post<'_> {
+    const NSID: &'static str = "com.crabdance.nandi.post";
+    type Record = PostRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct PostRecord;
 impl jacquard_common::xrpc::XrpcResp for PostRecord {
     const NSID: &'static str = "com.crabdance.nandi.post";
@@ -76,14 +89,7 @@ impl jacquard_common::xrpc::XrpcResp for PostRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Post<'_> {
+impl jacquard_common::types::collection::Collection for PostRecord {
     const NSID: &'static str = "com.crabdance.nandi.post";
     type Record = PostRecord;
-}
-
-impl From<PostGetRecordOutput<'_>> for Post<'_> {
-    fn from(output: PostGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

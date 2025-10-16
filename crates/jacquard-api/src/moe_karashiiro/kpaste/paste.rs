@@ -60,7 +60,20 @@ pub struct PasteGetRecordOutput<'a> {
     pub value: Paste<'a>,
 }
 
+impl From<PasteGetRecordOutput<'_>> for Paste<'_> {
+    fn from(output: PasteGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Paste<'_> {
+    const NSID: &'static str = "moe.karashiiro.kpaste.paste";
+    type Record = PasteRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct PasteRecord;
 impl jacquard_common::xrpc::XrpcResp for PasteRecord {
     const NSID: &'static str = "moe.karashiiro.kpaste.paste";
@@ -69,14 +82,7 @@ impl jacquard_common::xrpc::XrpcResp for PasteRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Paste<'_> {
+impl jacquard_common::types::collection::Collection for PasteRecord {
     const NSID: &'static str = "moe.karashiiro.kpaste.paste";
     type Record = PasteRecord;
-}
-
-impl From<PasteGetRecordOutput<'_>> for Paste<'_> {
-    fn from(output: PasteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

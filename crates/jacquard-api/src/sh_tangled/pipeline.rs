@@ -65,7 +65,20 @@ pub struct PipelineGetRecordOutput<'a> {
     pub value: Pipeline<'a>,
 }
 
+impl From<PipelineGetRecordOutput<'_>> for Pipeline<'_> {
+    fn from(output: PipelineGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Pipeline<'_> {
+    const NSID: &'static str = "sh.tangled.pipeline";
+    type Record = PipelineRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct PipelineRecord;
 impl jacquard_common::xrpc::XrpcResp for PipelineRecord {
     const NSID: &'static str = "sh.tangled.pipeline";
@@ -74,16 +87,9 @@ impl jacquard_common::xrpc::XrpcResp for PipelineRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Pipeline<'_> {
+impl jacquard_common::types::collection::Collection for PipelineRecord {
     const NSID: &'static str = "sh.tangled.pipeline";
     type Record = PipelineRecord;
-}
-
-impl From<PipelineGetRecordOutput<'_>> for Pipeline<'_> {
-    fn from(output: PipelineGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

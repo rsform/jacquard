@@ -53,7 +53,20 @@ pub struct ContentGetRecordOutput<'a> {
     pub value: Content<'a>,
 }
 
+impl From<ContentGetRecordOutput<'_>> for Content<'_> {
+    fn from(output: ContentGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Content<'_> {
+    const NSID: &'static str = "us.polhem.blog.content";
+    type Record = ContentRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ContentRecord;
 impl jacquard_common::xrpc::XrpcResp for ContentRecord {
     const NSID: &'static str = "us.polhem.blog.content";
@@ -62,14 +75,7 @@ impl jacquard_common::xrpc::XrpcResp for ContentRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Content<'_> {
+impl jacquard_common::types::collection::Collection for ContentRecord {
     const NSID: &'static str = "us.polhem.blog.content";
     type Record = ContentRecord;
-}
-
-impl From<ContentGetRecordOutput<'_>> for Content<'_> {
-    fn from(output: ContentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

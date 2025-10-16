@@ -48,7 +48,20 @@ pub struct MemberGetRecordOutput<'a> {
     pub value: Member<'a>,
 }
 
+impl From<MemberGetRecordOutput<'_>> for Member<'_> {
+    fn from(output: MemberGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Member<'_> {
+    const NSID: &'static str = "sh.tangled.knot.member";
+    type Record = MemberRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct MemberRecord;
 impl jacquard_common::xrpc::XrpcResp for MemberRecord {
     const NSID: &'static str = "sh.tangled.knot.member";
@@ -57,14 +70,7 @@ impl jacquard_common::xrpc::XrpcResp for MemberRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Member<'_> {
+impl jacquard_common::types::collection::Collection for MemberRecord {
     const NSID: &'static str = "sh.tangled.knot.member";
     type Record = MemberRecord;
-}
-
-impl From<MemberGetRecordOutput<'_>> for Member<'_> {
-    fn from(output: MemberGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

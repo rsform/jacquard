@@ -60,7 +60,20 @@ pub struct RecordGetRecordOutput<'a> {
     pub value: Record<'a>,
 }
 
+impl From<RecordGetRecordOutput<'_>> for Record<'_> {
+    fn from(output: RecordGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Record<'_> {
+    const NSID: &'static str = "app.blebbit.authr.group.record";
+    type Record = RecordRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct RecordRecord;
 impl jacquard_common::xrpc::XrpcResp for RecordRecord {
     const NSID: &'static str = "app.blebbit.authr.group.record";
@@ -69,14 +82,7 @@ impl jacquard_common::xrpc::XrpcResp for RecordRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Record<'_> {
+impl jacquard_common::types::collection::Collection for RecordRecord {
     const NSID: &'static str = "app.blebbit.authr.group.record";
     type Record = RecordRecord;
-}
-
-impl From<RecordGetRecordOutput<'_>> for Record<'_> {
-    fn from(output: RecordGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

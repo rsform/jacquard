@@ -50,7 +50,20 @@ pub struct BookmarkGetRecordOutput<'a> {
     pub value: Bookmark<'a>,
 }
 
+impl From<BookmarkGetRecordOutput<'_>> for Bookmark<'_> {
+    fn from(output: BookmarkGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Bookmark<'_> {
+    const NSID: &'static str = "community.lexicon.bookmarks.bookmark";
+    type Record = BookmarkRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct BookmarkRecord;
 impl jacquard_common::xrpc::XrpcResp for BookmarkRecord {
     const NSID: &'static str = "community.lexicon.bookmarks.bookmark";
@@ -59,14 +72,7 @@ impl jacquard_common::xrpc::XrpcResp for BookmarkRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Bookmark<'_> {
+impl jacquard_common::types::collection::Collection for BookmarkRecord {
     const NSID: &'static str = "community.lexicon.bookmarks.bookmark";
     type Record = BookmarkRecord;
-}
-
-impl From<BookmarkGetRecordOutput<'_>> for Bookmark<'_> {
-    fn from(output: BookmarkGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

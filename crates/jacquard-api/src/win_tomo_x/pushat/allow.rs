@@ -47,7 +47,20 @@ pub struct AllowGetRecordOutput<'a> {
     pub value: Allow<'a>,
 }
 
+impl From<AllowGetRecordOutput<'_>> for Allow<'_> {
+    fn from(output: AllowGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Allow<'_> {
+    const NSID: &'static str = "win.tomo-x.pushat.allow";
+    type Record = AllowRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct AllowRecord;
 impl jacquard_common::xrpc::XrpcResp for AllowRecord {
     const NSID: &'static str = "win.tomo-x.pushat.allow";
@@ -56,14 +69,7 @@ impl jacquard_common::xrpc::XrpcResp for AllowRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Allow<'_> {
+impl jacquard_common::types::collection::Collection for AllowRecord {
     const NSID: &'static str = "win.tomo-x.pushat.allow";
     type Record = AllowRecord;
-}
-
-impl From<AllowGetRecordOutput<'_>> for Allow<'_> {
-    fn from(output: AllowGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

@@ -48,7 +48,8 @@ pub(crate) fn all_required_are_defaultable_strings(obj: &LexObject<'static>) -> 
 
     required.iter().all(|field_name| {
         let field_name_str: &str = field_name.as_ref();
-        obj.properties.get(field_name_str)
+        obj.properties
+            .get(field_name_str)
             .map(is_defaultable_string)
             .unwrap_or(false)
     })
@@ -176,6 +177,7 @@ impl<'c> CodeGenerator<'c> {
 
                 let record_marker = quote! {
                     /// Marker type for deserializing records from this collection.
+                    #[derive(Debug, serde::Serialize, serde::Deserialize)]
                     pub struct #record_marker_ident;
 
                     impl jacquard_common::xrpc::XrpcResp for #record_marker_ident {
@@ -204,13 +206,22 @@ impl<'c> CodeGenerator<'c> {
                     }
                 };
 
+                // Generate collection impl for the marker struct to drive fetch_record()
+                let collection_marker_impl = quote! {
+                    impl jacquard_common::types::collection::Collection for #record_marker_ident {
+                        const NSID: &'static str = #nsid;
+                        type Record = #record_marker_ident;
+                    }
+                };
+
                 Ok(quote! {
                     #struct_def
                     #(#unions)*
                     #output_wrapper
-                    #record_marker
-                    #collection_impl
                     #from_impl
+                    #collection_impl
+                    #record_marker
+                    #collection_marker_impl
                 })
             }
         }
@@ -235,7 +246,8 @@ impl<'c> CodeGenerator<'c> {
         // - 1+ required fields (not all strings): bon::Builder (but not if name conflicts)
         let required_count = count_required_fields(obj);
         let has_default = required_count == 0 || all_required_are_defaultable_strings(obj);
-        let has_builder = required_count >= 1 && !has_default && !conflicts_with_builder_macro(&type_name);
+        let has_builder =
+            required_count >= 1 && !has_default && !conflicts_with_builder_macro(&type_name);
 
         let fields = self.generate_object_fields(nsid, &type_name, obj, has_builder)?;
         let doc = self.generate_doc_comment(obj.description.as_ref());

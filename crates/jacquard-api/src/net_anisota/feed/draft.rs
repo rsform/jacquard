@@ -104,7 +104,20 @@ pub struct DraftGetRecordOutput<'a> {
     pub value: Draft<'a>,
 }
 
+impl From<DraftGetRecordOutput<'_>> for Draft<'_> {
+    fn from(output: DraftGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Draft<'_> {
+    const NSID: &'static str = "net.anisota.feed.draft";
+    type Record = DraftRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct DraftRecord;
 impl jacquard_common::xrpc::XrpcResp for DraftRecord {
     const NSID: &'static str = "net.anisota.feed.draft";
@@ -113,16 +126,9 @@ impl jacquard_common::xrpc::XrpcResp for DraftRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Draft<'_> {
+impl jacquard_common::types::collection::Collection for DraftRecord {
     const NSID: &'static str = "net.anisota.feed.draft";
     type Record = DraftRecord;
-}
-
-impl From<DraftGetRecordOutput<'_>> for Draft<'_> {
-    fn from(output: DraftGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

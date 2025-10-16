@@ -44,7 +44,20 @@ pub struct SubscriptionGetRecordOutput<'a> {
     pub value: Subscription<'a>,
 }
 
+impl From<SubscriptionGetRecordOutput<'_>> for Subscription<'_> {
+    fn from(output: SubscriptionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Subscription<'_> {
+    const NSID: &'static str = "pub.leaflet.graph.subscription";
+    type Record = SubscriptionRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct SubscriptionRecord;
 impl jacquard_common::xrpc::XrpcResp for SubscriptionRecord {
     const NSID: &'static str = "pub.leaflet.graph.subscription";
@@ -53,14 +66,7 @@ impl jacquard_common::xrpc::XrpcResp for SubscriptionRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Subscription<'_> {
+impl jacquard_common::types::collection::Collection for SubscriptionRecord {
     const NSID: &'static str = "pub.leaflet.graph.subscription";
     type Record = SubscriptionRecord;
-}
-
-impl From<SubscriptionGetRecordOutput<'_>> for Subscription<'_> {
-    fn from(output: SubscriptionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

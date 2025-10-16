@@ -53,7 +53,20 @@ pub struct KeyGetRecordOutput<'a> {
     pub value: Key<'a>,
 }
 
+impl From<KeyGetRecordOutput<'_>> for Key<'_> {
+    fn from(output: KeyGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Key<'_> {
+    const NSID: &'static str = "place.stream.key";
+    type Record = KeyRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct KeyRecord;
 impl jacquard_common::xrpc::XrpcResp for KeyRecord {
     const NSID: &'static str = "place.stream.key";
@@ -62,14 +75,7 @@ impl jacquard_common::xrpc::XrpcResp for KeyRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Key<'_> {
+impl jacquard_common::types::collection::Collection for KeyRecord {
     const NSID: &'static str = "place.stream.key";
     type Record = KeyRecord;
-}
-
-impl From<KeyGetRecordOutput<'_>> for Key<'_> {
-    fn from(output: KeyGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

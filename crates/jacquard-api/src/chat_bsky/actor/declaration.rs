@@ -45,7 +45,20 @@ pub struct DeclarationGetRecordOutput<'a> {
     pub value: Declaration<'a>,
 }
 
+impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
+    fn from(output: DeclarationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Declaration<'_> {
+    const NSID: &'static str = "chat.bsky.actor.declaration";
+    type Record = DeclarationRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct DeclarationRecord;
 impl jacquard_common::xrpc::XrpcResp for DeclarationRecord {
     const NSID: &'static str = "chat.bsky.actor.declaration";
@@ -54,14 +67,7 @@ impl jacquard_common::xrpc::XrpcResp for DeclarationRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Declaration<'_> {
+impl jacquard_common::types::collection::Collection for DeclarationRecord {
     const NSID: &'static str = "chat.bsky.actor.declaration";
     type Record = DeclarationRecord;
-}
-
-impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
-    fn from(output: DeclarationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

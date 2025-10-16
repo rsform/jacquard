@@ -45,7 +45,20 @@ pub struct CaloriesGetRecordOutput<'a> {
     pub value: Calories<'a>,
 }
 
+impl From<CaloriesGetRecordOutput<'_>> for Calories<'_> {
+    fn from(output: CaloriesGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Calories<'_> {
+    const NSID: &'static str = "dev.baileytownsend.health.calories";
+    type Record = CaloriesRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct CaloriesRecord;
 impl jacquard_common::xrpc::XrpcResp for CaloriesRecord {
     const NSID: &'static str = "dev.baileytownsend.health.calories";
@@ -54,14 +67,7 @@ impl jacquard_common::xrpc::XrpcResp for CaloriesRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Calories<'_> {
+impl jacquard_common::types::collection::Collection for CaloriesRecord {
     const NSID: &'static str = "dev.baileytownsend.health.calories";
     type Record = CaloriesRecord;
-}
-
-impl From<CaloriesGetRecordOutput<'_>> for Calories<'_> {
-    fn from(output: CaloriesGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

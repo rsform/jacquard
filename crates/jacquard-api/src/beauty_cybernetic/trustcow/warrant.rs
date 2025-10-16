@@ -67,7 +67,20 @@ pub struct WarrantGetRecordOutput<'a> {
     pub value: Warrant<'a>,
 }
 
+impl From<WarrantGetRecordOutput<'_>> for Warrant<'_> {
+    fn from(output: WarrantGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Warrant<'_> {
+    const NSID: &'static str = "beauty.cybernetic.trustcow.warrant";
+    type Record = WarrantRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct WarrantRecord;
 impl jacquard_common::xrpc::XrpcResp for WarrantRecord {
     const NSID: &'static str = "beauty.cybernetic.trustcow.warrant";
@@ -76,14 +89,7 @@ impl jacquard_common::xrpc::XrpcResp for WarrantRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Warrant<'_> {
+impl jacquard_common::types::collection::Collection for WarrantRecord {
     const NSID: &'static str = "beauty.cybernetic.trustcow.warrant";
     type Record = WarrantRecord;
-}
-
-impl From<WarrantGetRecordOutput<'_>> for Warrant<'_> {
-    fn from(output: WarrantGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

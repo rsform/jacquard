@@ -53,7 +53,20 @@ pub struct ThemeGetRecordOutput<'a> {
     pub value: Theme<'a>,
 }
 
+impl From<ThemeGetRecordOutput<'_>> for Theme<'_> {
+    fn from(output: ThemeGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Theme<'_> {
+    const NSID: &'static str = "blog.pckt.theme";
+    type Record = ThemeRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ThemeRecord;
 impl jacquard_common::xrpc::XrpcResp for ThemeRecord {
     const NSID: &'static str = "blog.pckt.theme";
@@ -62,16 +75,9 @@ impl jacquard_common::xrpc::XrpcResp for ThemeRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Theme<'_> {
+impl jacquard_common::types::collection::Collection for ThemeRecord {
     const NSID: &'static str = "blog.pckt.theme";
     type Record = ThemeRecord;
-}
-
-impl From<ThemeGetRecordOutput<'_>> for Theme<'_> {
-    fn from(output: ThemeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 /// Color palette with CSS hex values

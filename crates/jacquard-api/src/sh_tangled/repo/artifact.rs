@@ -55,7 +55,20 @@ pub struct ArtifactGetRecordOutput<'a> {
     pub value: Artifact<'a>,
 }
 
+impl From<ArtifactGetRecordOutput<'_>> for Artifact<'_> {
+    fn from(output: ArtifactGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Artifact<'_> {
+    const NSID: &'static str = "sh.tangled.repo.artifact";
+    type Record = ArtifactRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ArtifactRecord;
 impl jacquard_common::xrpc::XrpcResp for ArtifactRecord {
     const NSID: &'static str = "sh.tangled.repo.artifact";
@@ -64,14 +77,7 @@ impl jacquard_common::xrpc::XrpcResp for ArtifactRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Artifact<'_> {
+impl jacquard_common::types::collection::Collection for ArtifactRecord {
     const NSID: &'static str = "sh.tangled.repo.artifact";
     type Record = ArtifactRecord;
-}
-
-impl From<ArtifactGetRecordOutput<'_>> for Artifact<'_> {
-    fn from(output: ArtifactGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

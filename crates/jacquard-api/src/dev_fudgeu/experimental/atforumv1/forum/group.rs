@@ -49,7 +49,20 @@ pub struct GroupGetRecordOutput<'a> {
     pub value: Group<'a>,
 }
 
+impl From<GroupGetRecordOutput<'_>> for Group<'_> {
+    fn from(output: GroupGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Group<'_> {
+    const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.group";
+    type Record = GroupRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct GroupRecord;
 impl jacquard_common::xrpc::XrpcResp for GroupRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.group";
@@ -58,14 +71,7 @@ impl jacquard_common::xrpc::XrpcResp for GroupRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Group<'_> {
+impl jacquard_common::types::collection::Collection for GroupRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.group";
     type Record = GroupRecord;
-}
-
-impl From<GroupGetRecordOutput<'_>> for Group<'_> {
-    fn from(output: GroupGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

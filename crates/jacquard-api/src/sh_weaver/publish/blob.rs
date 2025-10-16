@@ -45,7 +45,20 @@ pub struct BlobGetRecordOutput<'a> {
     pub value: Blob<'a>,
 }
 
+impl From<BlobGetRecordOutput<'_>> for Blob<'_> {
+    fn from(output: BlobGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Blob<'_> {
+    const NSID: &'static str = "sh.weaver.publish.blob";
+    type Record = BlobRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct BlobRecord;
 impl jacquard_common::xrpc::XrpcResp for BlobRecord {
     const NSID: &'static str = "sh.weaver.publish.blob";
@@ -54,14 +67,7 @@ impl jacquard_common::xrpc::XrpcResp for BlobRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Blob<'_> {
+impl jacquard_common::types::collection::Collection for BlobRecord {
     const NSID: &'static str = "sh.weaver.publish.blob";
     type Record = BlobRecord;
-}
-
-impl From<BlobGetRecordOutput<'_>> for Blob<'_> {
-    fn from(output: BlobGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

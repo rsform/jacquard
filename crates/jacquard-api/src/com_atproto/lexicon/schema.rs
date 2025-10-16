@@ -44,7 +44,20 @@ pub struct SchemaGetRecordOutput<'a> {
     pub value: Schema<'a>,
 }
 
+impl From<SchemaGetRecordOutput<'_>> for Schema<'_> {
+    fn from(output: SchemaGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Schema<'_> {
+    const NSID: &'static str = "com.atproto.lexicon.schema";
+    type Record = SchemaRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct SchemaRecord;
 impl jacquard_common::xrpc::XrpcResp for SchemaRecord {
     const NSID: &'static str = "com.atproto.lexicon.schema";
@@ -53,14 +66,7 @@ impl jacquard_common::xrpc::XrpcResp for SchemaRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Schema<'_> {
+impl jacquard_common::types::collection::Collection for SchemaRecord {
     const NSID: &'static str = "com.atproto.lexicon.schema";
     type Record = SchemaRecord;
-}
-
-impl From<SchemaGetRecordOutput<'_>> for Schema<'_> {
-    fn from(output: SchemaGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

@@ -2,6 +2,7 @@ use clap::Parser;
 use jacquard::api::sh_tangled::repo::Repo;
 use jacquard::client::{AgentSessionExt, BasicClient};
 use jacquard::types::string::AtUri;
+use jacquard_api::sh_tangled::repo::RepoRecord;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Read a Tangled git repository record")]
@@ -24,8 +25,7 @@ async fn main() -> miette::Result<()> {
     let agent = BasicClient::unauthenticated();
 
     // Use Agent's get_record helper with the at:// URI
-    let response = agent.get_record::<Repo>(uri).await?;
-    let output = response.into_output()?;
+    let output = agent.fetch_record(RepoRecord, uri).await?;
 
     println!("Tangled Repository\n");
     println!("URI: {}", output.uri);

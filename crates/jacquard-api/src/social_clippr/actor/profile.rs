@@ -58,7 +58,20 @@ pub struct ProfileGetRecordOutput<'a> {
     pub value: Profile<'a>,
 }
 
+impl From<ProfileGetRecordOutput<'_>> for Profile<'_> {
+    fn from(output: ProfileGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Profile<'_> {
+    const NSID: &'static str = "social.clippr.actor.profile";
+    type Record = ProfileRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ProfileRecord;
 impl jacquard_common::xrpc::XrpcResp for ProfileRecord {
     const NSID: &'static str = "social.clippr.actor.profile";
@@ -67,14 +80,7 @@ impl jacquard_common::xrpc::XrpcResp for ProfileRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Profile<'_> {
+impl jacquard_common::types::collection::Collection for ProfileRecord {
     const NSID: &'static str = "social.clippr.actor.profile";
     type Record = ProfileRecord;
-}
-
-impl From<ProfileGetRecordOutput<'_>> for Profile<'_> {
-    fn from(output: ProfileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

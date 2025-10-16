@@ -71,7 +71,20 @@ pub struct RadioGetRecordOutput<'a> {
     pub value: Radio<'a>,
 }
 
+impl From<RadioGetRecordOutput<'_>> for Radio<'_> {
+    fn from(output: RadioGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Radio<'_> {
+    const NSID: &'static str = "app.rocksky.radio";
+    type Record = RadioRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct RadioRecord;
 impl jacquard_common::xrpc::XrpcResp for RadioRecord {
     const NSID: &'static str = "app.rocksky.radio";
@@ -80,16 +93,9 @@ impl jacquard_common::xrpc::XrpcResp for RadioRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Radio<'_> {
+impl jacquard_common::types::collection::Collection for RadioRecord {
     const NSID: &'static str = "app.rocksky.radio";
     type Record = RadioRecord;
-}
-
-impl From<RadioGetRecordOutput<'_>> for Radio<'_> {
-    fn from(output: RadioGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

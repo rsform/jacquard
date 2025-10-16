@@ -52,7 +52,20 @@ pub struct MGetRecordOutput<'a> {
     pub value: M<'a>,
 }
 
+impl From<MGetRecordOutput<'_>> for M<'_> {
+    fn from(output: MGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for M<'_> {
+    const NSID: &'static str = "net.bnewbold.m";
+    type Record = MRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct MRecord;
 impl jacquard_common::xrpc::XrpcResp for MRecord {
     const NSID: &'static str = "net.bnewbold.m";
@@ -61,14 +74,7 @@ impl jacquard_common::xrpc::XrpcResp for MRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for M<'_> {
+impl jacquard_common::types::collection::Collection for MRecord {
     const NSID: &'static str = "net.bnewbold.m";
     type Record = MRecord;
-}
-
-impl From<MGetRecordOutput<'_>> for M<'_> {
-    fn from(output: MGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

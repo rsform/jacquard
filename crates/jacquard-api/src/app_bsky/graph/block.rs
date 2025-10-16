@@ -46,7 +46,20 @@ pub struct BlockGetRecordOutput<'a> {
     pub value: Block<'a>,
 }
 
+impl From<BlockGetRecordOutput<'_>> for Block<'_> {
+    fn from(output: BlockGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Block<'_> {
+    const NSID: &'static str = "app.bsky.graph.block";
+    type Record = BlockRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct BlockRecord;
 impl jacquard_common::xrpc::XrpcResp for BlockRecord {
     const NSID: &'static str = "app.bsky.graph.block";
@@ -55,14 +68,7 @@ impl jacquard_common::xrpc::XrpcResp for BlockRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Block<'_> {
+impl jacquard_common::types::collection::Collection for BlockRecord {
     const NSID: &'static str = "app.bsky.graph.block";
     type Record = BlockRecord;
-}
-
-impl From<BlockGetRecordOutput<'_>> for Block<'_> {
-    fn from(output: BlockGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

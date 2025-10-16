@@ -54,7 +54,20 @@ pub struct RelGetRecordOutput<'a> {
     pub value: Rel<'a>,
 }
 
+impl From<RelGetRecordOutput<'_>> for Rel<'_> {
+    fn from(output: RelGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Rel<'_> {
+    const NSID: &'static str = "my.skylights.rel";
+    type Record = RelRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct RelRecord;
 impl jacquard_common::xrpc::XrpcResp for RelRecord {
     const NSID: &'static str = "my.skylights.rel";
@@ -63,16 +76,9 @@ impl jacquard_common::xrpc::XrpcResp for RelRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Rel<'_> {
+impl jacquard_common::types::collection::Collection for RelRecord {
     const NSID: &'static str = "my.skylights.rel";
     type Record = RelRecord;
-}
-
-impl From<RelGetRecordOutput<'_>> for Rel<'_> {
-    fn from(output: RelGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

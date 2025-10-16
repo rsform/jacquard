@@ -48,7 +48,20 @@ pub struct DiffGetRecordOutput<'a> {
     pub value: Diff<'a>,
 }
 
+impl From<DiffGetRecordOutput<'_>> for Diff<'_> {
+    fn from(output: DiffGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Diff<'_> {
+    const NSID: &'static str = "sh.weaver.edit.diff";
+    type Record = DiffRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct DiffRecord;
 impl jacquard_common::xrpc::XrpcResp for DiffRecord {
     const NSID: &'static str = "sh.weaver.edit.diff";
@@ -57,14 +70,7 @@ impl jacquard_common::xrpc::XrpcResp for DiffRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Diff<'_> {
+impl jacquard_common::types::collection::Collection for DiffRecord {
     const NSID: &'static str = "sh.weaver.edit.diff";
     type Record = DiffRecord;
-}
-
-impl From<DiffGetRecordOutput<'_>> for Diff<'_> {
-    fn from(output: DiffGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

@@ -77,7 +77,20 @@ pub struct PublicationGetRecordOutput<'a> {
     pub value: Publication<'a>,
 }
 
+impl From<PublicationGetRecordOutput<'_>> for Publication<'_> {
+    fn from(output: PublicationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Publication<'_> {
+    const NSID: &'static str = "blog.pckt.publication";
+    type Record = PublicationRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct PublicationRecord;
 impl jacquard_common::xrpc::XrpcResp for PublicationRecord {
     const NSID: &'static str = "blog.pckt.publication";
@@ -86,14 +99,7 @@ impl jacquard_common::xrpc::XrpcResp for PublicationRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Publication<'_> {
+impl jacquard_common::types::collection::Collection for PublicationRecord {
     const NSID: &'static str = "blog.pckt.publication";
     type Record = PublicationRecord;
-}
-
-impl From<PublicationGetRecordOutput<'_>> for Publication<'_> {
-    fn from(output: PublicationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

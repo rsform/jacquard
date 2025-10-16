@@ -47,7 +47,20 @@ pub struct RepostGetRecordOutput<'a> {
     pub value: Repost<'a>,
 }
 
+impl From<RepostGetRecordOutput<'_>> for Repost<'_> {
+    fn from(output: RepostGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Repost<'_> {
+    const NSID: &'static str = "net.anisota.feed.repost";
+    type Record = RepostRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct RepostRecord;
 impl jacquard_common::xrpc::XrpcResp for RepostRecord {
     const NSID: &'static str = "net.anisota.feed.repost";
@@ -56,14 +69,7 @@ impl jacquard_common::xrpc::XrpcResp for RepostRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Repost<'_> {
+impl jacquard_common::types::collection::Collection for RepostRecord {
     const NSID: &'static str = "net.anisota.feed.repost";
     type Record = RepostRecord;
-}
-
-impl From<RepostGetRecordOutput<'_>> for Repost<'_> {
-    fn from(output: RepostGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

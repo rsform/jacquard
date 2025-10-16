@@ -46,7 +46,20 @@ pub struct SettingsGetRecordOutput<'a> {
     pub value: Settings<'a>,
 }
 
+impl From<SettingsGetRecordOutput<'_>> for Settings<'_> {
+    fn from(output: SettingsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Settings<'_> {
+    const NSID: &'static str = "place.stream.server.settings";
+    type Record = SettingsRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct SettingsRecord;
 impl jacquard_common::xrpc::XrpcResp for SettingsRecord {
     const NSID: &'static str = "place.stream.server.settings";
@@ -55,14 +68,7 @@ impl jacquard_common::xrpc::XrpcResp for SettingsRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Settings<'_> {
+impl jacquard_common::types::collection::Collection for SettingsRecord {
     const NSID: &'static str = "place.stream.server.settings";
     type Record = SettingsRecord;
-}
-
-impl From<SettingsGetRecordOutput<'_>> for Settings<'_> {
-    fn from(output: SettingsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

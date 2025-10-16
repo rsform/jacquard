@@ -147,7 +147,20 @@ pub struct ScrobbleGetRecordOutput<'a> {
     pub value: Scrobble<'a>,
 }
 
+impl From<ScrobbleGetRecordOutput<'_>> for Scrobble<'_> {
+    fn from(output: ScrobbleGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Scrobble<'_> {
+    const NSID: &'static str = "app.rocksky.scrobble";
+    type Record = ScrobbleRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ScrobbleRecord;
 impl jacquard_common::xrpc::XrpcResp for ScrobbleRecord {
     const NSID: &'static str = "app.rocksky.scrobble";
@@ -156,16 +169,9 @@ impl jacquard_common::xrpc::XrpcResp for ScrobbleRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Scrobble<'_> {
+impl jacquard_common::types::collection::Collection for ScrobbleRecord {
     const NSID: &'static str = "app.rocksky.scrobble";
     type Record = ScrobbleRecord;
-}
-
-impl From<ScrobbleGetRecordOutput<'_>> for Scrobble<'_> {
-    fn from(output: ScrobbleGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

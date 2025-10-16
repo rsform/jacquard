@@ -46,7 +46,20 @@ pub struct VoteGetRecordOutput<'a> {
     pub value: Vote<'a>,
 }
 
+impl From<VoteGetRecordOutput<'_>> for Vote<'_> {
+    fn from(output: VoteGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Vote<'_> {
+    const NSID: &'static str = "fyi.unravel.frontpage.vote";
+    type Record = VoteRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct VoteRecord;
 impl jacquard_common::xrpc::XrpcResp for VoteRecord {
     const NSID: &'static str = "fyi.unravel.frontpage.vote";
@@ -55,14 +68,7 @@ impl jacquard_common::xrpc::XrpcResp for VoteRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Vote<'_> {
+impl jacquard_common::types::collection::Collection for VoteRecord {
     const NSID: &'static str = "fyi.unravel.frontpage.vote";
     type Record = VoteRecord;
-}
-
-impl From<VoteGetRecordOutput<'_>> for Vote<'_> {
-    fn from(output: VoteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

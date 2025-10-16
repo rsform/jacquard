@@ -45,7 +45,20 @@ pub struct FollowGetRecordOutput<'a> {
     pub value: Follow<'a>,
 }
 
+impl From<FollowGetRecordOutput<'_>> for Follow<'_> {
+    fn from(output: FollowGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Follow<'_> {
+    const NSID: &'static str = "app.bsky.graph.follow";
+    type Record = FollowRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct FollowRecord;
 impl jacquard_common::xrpc::XrpcResp for FollowRecord {
     const NSID: &'static str = "app.bsky.graph.follow";
@@ -54,14 +67,7 @@ impl jacquard_common::xrpc::XrpcResp for FollowRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Follow<'_> {
+impl jacquard_common::types::collection::Collection for FollowRecord {
     const NSID: &'static str = "app.bsky.graph.follow";
     type Record = FollowRecord;
-}
-
-impl From<FollowGetRecordOutput<'_>> for Follow<'_> {
-    fn from(output: FollowGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

@@ -46,7 +46,20 @@ pub struct GameGetRecordOutput<'a> {
     pub value: Game<'a>,
 }
 
+impl From<GameGetRecordOutput<'_>> for Game<'_> {
+    fn from(output: GameGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Game<'_> {
+    const NSID: &'static str = "blue.2048.key.game";
+    type Record = GameRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct GameRecord;
 impl jacquard_common::xrpc::XrpcResp for GameRecord {
     const NSID: &'static str = "blue.2048.key.game";
@@ -55,14 +68,7 @@ impl jacquard_common::xrpc::XrpcResp for GameRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Game<'_> {
+impl jacquard_common::types::collection::Collection for GameRecord {
     const NSID: &'static str = "blue.2048.key.game";
     type Record = GameRecord;
-}
-
-impl From<GameGetRecordOutput<'_>> for Game<'_> {
-    fn from(output: GameGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

@@ -67,7 +67,20 @@ pub struct RoomGetRecordOutput<'a> {
     pub value: Room<'a>,
 }
 
+impl From<RoomGetRecordOutput<'_>> for Room<'_> {
+    fn from(output: RoomGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Room<'_> {
+    const NSID: &'static str = "social.psky.chat.room";
+    type Record = RoomRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct RoomRecord;
 impl jacquard_common::xrpc::XrpcResp for RoomRecord {
     const NSID: &'static str = "social.psky.chat.room";
@@ -76,16 +89,9 @@ impl jacquard_common::xrpc::XrpcResp for RoomRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Room<'_> {
+impl jacquard_common::types::collection::Collection for RoomRecord {
     const NSID: &'static str = "social.psky.chat.room";
     type Record = RoomRecord;
-}
-
-impl From<RoomGetRecordOutput<'_>> for Room<'_> {
-    fn from(output: RoomGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

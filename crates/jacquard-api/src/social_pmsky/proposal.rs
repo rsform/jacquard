@@ -85,7 +85,20 @@ pub struct ProposalGetRecordOutput<'a> {
     pub value: Proposal<'a>,
 }
 
+impl From<ProposalGetRecordOutput<'_>> for Proposal<'_> {
+    fn from(output: ProposalGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Proposal<'_> {
+    const NSID: &'static str = "social.pmsky.proposal";
+    type Record = ProposalRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ProposalRecord;
 impl jacquard_common::xrpc::XrpcResp for ProposalRecord {
     const NSID: &'static str = "social.pmsky.proposal";
@@ -94,14 +107,7 @@ impl jacquard_common::xrpc::XrpcResp for ProposalRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Proposal<'_> {
+impl jacquard_common::types::collection::Collection for ProposalRecord {
     const NSID: &'static str = "social.pmsky.proposal";
     type Record = ProposalRecord;
-}
-
-impl From<ProposalGetRecordOutput<'_>> for Proposal<'_> {
-    fn from(output: ProposalGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

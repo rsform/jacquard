@@ -43,7 +43,20 @@ pub struct StepsGetRecordOutput<'a> {
     pub value: Steps<'a>,
 }
 
+impl From<StepsGetRecordOutput<'_>> for Steps<'_> {
+    fn from(output: StepsGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Steps<'_> {
+    const NSID: &'static str = "dev.baileytownsend.health.steps";
+    type Record = StepsRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct StepsRecord;
 impl jacquard_common::xrpc::XrpcResp for StepsRecord {
     const NSID: &'static str = "dev.baileytownsend.health.steps";
@@ -52,14 +65,7 @@ impl jacquard_common::xrpc::XrpcResp for StepsRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Steps<'_> {
+impl jacquard_common::types::collection::Collection for StepsRecord {
     const NSID: &'static str = "dev.baileytownsend.health.steps";
     type Record = StepsRecord;
-}
-
-impl From<StepsGetRecordOutput<'_>> for Steps<'_> {
-    fn from(output: StepsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

@@ -61,7 +61,20 @@ pub struct DefinitionGetRecordOutput<'a> {
     pub value: Definition<'a>,
 }
 
+impl From<DefinitionGetRecordOutput<'_>> for Definition<'_> {
+    fn from(output: DefinitionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Definition<'_> {
+    const NSID: &'static str = "sh.tangled.label.definition";
+    type Record = DefinitionRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct DefinitionRecord;
 impl jacquard_common::xrpc::XrpcResp for DefinitionRecord {
     const NSID: &'static str = "sh.tangled.label.definition";
@@ -70,16 +83,9 @@ impl jacquard_common::xrpc::XrpcResp for DefinitionRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Definition<'_> {
+impl jacquard_common::types::collection::Collection for DefinitionRecord {
     const NSID: &'static str = "sh.tangled.label.definition";
     type Record = DefinitionRecord;
-}
-
-impl From<DefinitionGetRecordOutput<'_>> for Definition<'_> {
-    fn from(output: DefinitionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

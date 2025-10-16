@@ -44,7 +44,20 @@ pub struct FavoriteGetRecordOutput<'a> {
     pub value: Favorite<'a>,
 }
 
+impl From<FavoriteGetRecordOutput<'_>> for Favorite<'_> {
+    fn from(output: FavoriteGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Favorite<'_> {
+    const NSID: &'static str = "social.grain.favorite";
+    type Record = FavoriteRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct FavoriteRecord;
 impl jacquard_common::xrpc::XrpcResp for FavoriteRecord {
     const NSID: &'static str = "social.grain.favorite";
@@ -53,14 +66,7 @@ impl jacquard_common::xrpc::XrpcResp for FavoriteRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Favorite<'_> {
+impl jacquard_common::types::collection::Collection for FavoriteRecord {
     const NSID: &'static str = "social.grain.favorite";
     type Record = FavoriteRecord;
-}
-
-impl From<FavoriteGetRecordOutput<'_>> for Favorite<'_> {
-    fn from(output: FavoriteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

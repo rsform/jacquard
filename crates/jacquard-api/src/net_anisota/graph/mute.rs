@@ -94,7 +94,20 @@ pub struct MuteGetRecordOutput<'a> {
     pub value: Mute<'a>,
 }
 
+impl From<MuteGetRecordOutput<'_>> for Mute<'_> {
+    fn from(output: MuteGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Mute<'_> {
+    const NSID: &'static str = "net.anisota.graph.mute";
+    type Record = MuteRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct MuteRecord;
 impl jacquard_common::xrpc::XrpcResp for MuteRecord {
     const NSID: &'static str = "net.anisota.graph.mute";
@@ -103,14 +116,7 @@ impl jacquard_common::xrpc::XrpcResp for MuteRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Mute<'_> {
+impl jacquard_common::types::collection::Collection for MuteRecord {
     const NSID: &'static str = "net.anisota.graph.mute";
     type Record = MuteRecord;
-}
-
-impl From<MuteGetRecordOutput<'_>> for Mute<'_> {
-    fn from(output: MuteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

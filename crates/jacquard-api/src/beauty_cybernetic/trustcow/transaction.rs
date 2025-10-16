@@ -71,7 +71,20 @@ pub struct TransactionGetRecordOutput<'a> {
     pub value: Transaction<'a>,
 }
 
+impl From<TransactionGetRecordOutput<'_>> for Transaction<'_> {
+    fn from(output: TransactionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Transaction<'_> {
+    const NSID: &'static str = "beauty.cybernetic.trustcow.transaction";
+    type Record = TransactionRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct TransactionRecord;
 impl jacquard_common::xrpc::XrpcResp for TransactionRecord {
     const NSID: &'static str = "beauty.cybernetic.trustcow.transaction";
@@ -80,14 +93,7 @@ impl jacquard_common::xrpc::XrpcResp for TransactionRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Transaction<'_> {
+impl jacquard_common::types::collection::Collection for TransactionRecord {
     const NSID: &'static str = "beauty.cybernetic.trustcow.transaction";
     type Record = TransactionRecord;
-}
-
-impl From<TransactionGetRecordOutput<'_>> for Transaction<'_> {
-    fn from(output: TransactionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

@@ -59,7 +59,20 @@ pub struct ChapterGetRecordOutput<'a> {
     pub value: Chapter<'a>,
 }
 
+impl From<ChapterGetRecordOutput<'_>> for Chapter<'_> {
+    fn from(output: ChapterGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Chapter<'_> {
+    const NSID: &'static str = "sh.weaver.notebook.chapter";
+    type Record = ChapterRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ChapterRecord;
 impl jacquard_common::xrpc::XrpcResp for ChapterRecord {
     const NSID: &'static str = "sh.weaver.notebook.chapter";
@@ -68,14 +81,7 @@ impl jacquard_common::xrpc::XrpcResp for ChapterRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Chapter<'_> {
+impl jacquard_common::types::collection::Collection for ChapterRecord {
     const NSID: &'static str = "sh.weaver.notebook.chapter";
     type Record = ChapterRecord;
-}
-
-impl From<ChapterGetRecordOutput<'_>> for Chapter<'_> {
-    fn from(output: ChapterGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

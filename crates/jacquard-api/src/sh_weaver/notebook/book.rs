@@ -58,7 +58,20 @@ pub struct BookGetRecordOutput<'a> {
     pub value: Book<'a>,
 }
 
+impl From<BookGetRecordOutput<'_>> for Book<'_> {
+    fn from(output: BookGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Book<'_> {
+    const NSID: &'static str = "sh.weaver.notebook.book";
+    type Record = BookRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct BookRecord;
 impl jacquard_common::xrpc::XrpcResp for BookRecord {
     const NSID: &'static str = "sh.weaver.notebook.book";
@@ -67,14 +80,7 @@ impl jacquard_common::xrpc::XrpcResp for BookRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Book<'_> {
+impl jacquard_common::types::collection::Collection for BookRecord {
     const NSID: &'static str = "sh.weaver.notebook.book";
     type Record = BookRecord;
-}
-
-impl From<BookGetRecordOutput<'_>> for Book<'_> {
-    fn from(output: BookGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

@@ -62,7 +62,20 @@ pub struct DocumentGetRecordOutput<'a> {
     pub value: Document<'a>,
 }
 
+impl From<DocumentGetRecordOutput<'_>> for Document<'_> {
+    fn from(output: DocumentGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Document<'_> {
+    const NSID: &'static str = "pub.leaflet.document";
+    type Record = DocumentRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct DocumentRecord;
 impl jacquard_common::xrpc::XrpcResp for DocumentRecord {
     const NSID: &'static str = "pub.leaflet.document";
@@ -71,14 +84,7 @@ impl jacquard_common::xrpc::XrpcResp for DocumentRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Document<'_> {
+impl jacquard_common::types::collection::Collection for DocumentRecord {
     const NSID: &'static str = "pub.leaflet.document";
     type Record = DocumentRecord;
-}
-
-impl From<DocumentGetRecordOutput<'_>> for Document<'_> {
-    fn from(output: DocumentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

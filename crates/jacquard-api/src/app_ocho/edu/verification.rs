@@ -51,7 +51,20 @@ pub struct VerificationGetRecordOutput<'a> {
     pub value: Verification<'a>,
 }
 
+impl From<VerificationGetRecordOutput<'_>> for Verification<'_> {
+    fn from(output: VerificationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Verification<'_> {
+    const NSID: &'static str = "app.ocho.edu.verification";
+    type Record = VerificationRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct VerificationRecord;
 impl jacquard_common::xrpc::XrpcResp for VerificationRecord {
     const NSID: &'static str = "app.ocho.edu.verification";
@@ -60,14 +73,7 @@ impl jacquard_common::xrpc::XrpcResp for VerificationRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Verification<'_> {
+impl jacquard_common::types::collection::Collection for VerificationRecord {
     const NSID: &'static str = "app.ocho.edu.verification";
     type Record = VerificationRecord;
-}
-
-impl From<VerificationGetRecordOutput<'_>> for Verification<'_> {
-    fn from(output: VerificationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

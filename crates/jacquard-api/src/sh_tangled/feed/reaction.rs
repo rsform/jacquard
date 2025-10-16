@@ -47,7 +47,20 @@ pub struct ReactionGetRecordOutput<'a> {
     pub value: Reaction<'a>,
 }
 
+impl From<ReactionGetRecordOutput<'_>> for Reaction<'_> {
+    fn from(output: ReactionGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Reaction<'_> {
+    const NSID: &'static str = "sh.tangled.feed.reaction";
+    type Record = ReactionRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ReactionRecord;
 impl jacquard_common::xrpc::XrpcResp for ReactionRecord {
     const NSID: &'static str = "sh.tangled.feed.reaction";
@@ -56,14 +69,7 @@ impl jacquard_common::xrpc::XrpcResp for ReactionRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Reaction<'_> {
+impl jacquard_common::types::collection::Collection for ReactionRecord {
     const NSID: &'static str = "sh.tangled.feed.reaction";
     type Record = ReactionRecord;
-}
-
-impl From<ReactionGetRecordOutput<'_>> for Reaction<'_> {
-    fn from(output: ReactionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

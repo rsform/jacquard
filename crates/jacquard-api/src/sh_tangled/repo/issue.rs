@@ -54,7 +54,20 @@ pub struct IssueGetRecordOutput<'a> {
     pub value: Issue<'a>,
 }
 
+impl From<IssueGetRecordOutput<'_>> for Issue<'_> {
+    fn from(output: IssueGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Issue<'_> {
+    const NSID: &'static str = "sh.tangled.repo.issue";
+    type Record = IssueRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct IssueRecord;
 impl jacquard_common::xrpc::XrpcResp for IssueRecord {
     const NSID: &'static str = "sh.tangled.repo.issue";
@@ -63,14 +76,7 @@ impl jacquard_common::xrpc::XrpcResp for IssueRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Issue<'_> {
+impl jacquard_common::types::collection::Collection for IssueRecord {
     const NSID: &'static str = "sh.tangled.repo.issue";
     type Record = IssueRecord;
-}
-
-impl From<IssueGetRecordOutput<'_>> for Issue<'_> {
-    fn from(output: IssueGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

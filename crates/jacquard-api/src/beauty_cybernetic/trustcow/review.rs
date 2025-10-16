@@ -65,7 +65,20 @@ pub struct ReviewGetRecordOutput<'a> {
     pub value: Review<'a>,
 }
 
+impl From<ReviewGetRecordOutput<'_>> for Review<'_> {
+    fn from(output: ReviewGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Review<'_> {
+    const NSID: &'static str = "beauty.cybernetic.trustcow.review";
+    type Record = ReviewRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ReviewRecord;
 impl jacquard_common::xrpc::XrpcResp for ReviewRecord {
     const NSID: &'static str = "beauty.cybernetic.trustcow.review";
@@ -74,14 +87,7 @@ impl jacquard_common::xrpc::XrpcResp for ReviewRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Review<'_> {
+impl jacquard_common::types::collection::Collection for ReviewRecord {
     const NSID: &'static str = "beauty.cybernetic.trustcow.review";
     type Record = ReviewRecord;
-}
-
-impl From<ReviewGetRecordOutput<'_>> for Review<'_> {
-    fn from(output: ReviewGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

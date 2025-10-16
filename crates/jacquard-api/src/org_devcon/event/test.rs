@@ -67,7 +67,20 @@ pub struct TestGetRecordOutput<'a> {
     pub value: Test<'a>,
 }
 
+impl From<TestGetRecordOutput<'_>> for Test<'_> {
+    fn from(output: TestGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Test<'_> {
+    const NSID: &'static str = "org.devcon.event.test";
+    type Record = TestRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct TestRecord;
 impl jacquard_common::xrpc::XrpcResp for TestRecord {
     const NSID: &'static str = "org.devcon.event.test";
@@ -76,14 +89,7 @@ impl jacquard_common::xrpc::XrpcResp for TestRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Test<'_> {
+impl jacquard_common::types::collection::Collection for TestRecord {
     const NSID: &'static str = "org.devcon.event.test";
     type Record = TestRecord;
-}
-
-impl From<TestGetRecordOutput<'_>> for Test<'_> {
-    fn from(output: TestGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

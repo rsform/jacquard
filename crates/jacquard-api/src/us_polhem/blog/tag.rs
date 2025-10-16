@@ -52,7 +52,20 @@ pub struct TagGetRecordOutput<'a> {
     pub value: Tag<'a>,
 }
 
+impl From<TagGetRecordOutput<'_>> for Tag<'_> {
+    fn from(output: TagGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Tag<'_> {
+    const NSID: &'static str = "us.polhem.blog.tag";
+    type Record = TagRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct TagRecord;
 impl jacquard_common::xrpc::XrpcResp for TagRecord {
     const NSID: &'static str = "us.polhem.blog.tag";
@@ -61,14 +74,7 @@ impl jacquard_common::xrpc::XrpcResp for TagRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Tag<'_> {
+impl jacquard_common::types::collection::Collection for TagRecord {
     const NSID: &'static str = "us.polhem.blog.tag";
     type Record = TagRecord;
-}
-
-impl From<TagGetRecordOutput<'_>> for Tag<'_> {
-    fn from(output: TagGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

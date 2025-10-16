@@ -44,7 +44,20 @@ pub struct StarGetRecordOutput<'a> {
     pub value: Star<'a>,
 }
 
+impl From<StarGetRecordOutput<'_>> for Star<'_> {
+    fn from(output: StarGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Star<'_> {
+    const NSID: &'static str = "sh.tangled.feed.star";
+    type Record = StarRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct StarRecord;
 impl jacquard_common::xrpc::XrpcResp for StarRecord {
     const NSID: &'static str = "sh.tangled.feed.star";
@@ -53,14 +66,7 @@ impl jacquard_common::xrpc::XrpcResp for StarRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Star<'_> {
+impl jacquard_common::types::collection::Collection for StarRecord {
     const NSID: &'static str = "sh.tangled.feed.star";
     type Record = StarRecord;
-}
-
-impl From<StarGetRecordOutput<'_>> for Star<'_> {
-    fn from(output: StarGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

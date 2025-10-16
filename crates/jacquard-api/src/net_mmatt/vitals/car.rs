@@ -69,7 +69,20 @@ pub struct CarGetRecordOutput<'a> {
     pub value: Car<'a>,
 }
 
+impl From<CarGetRecordOutput<'_>> for Car<'_> {
+    fn from(output: CarGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Car<'_> {
+    const NSID: &'static str = "net.mmatt.vitals.car";
+    type Record = CarRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct CarRecord;
 impl jacquard_common::xrpc::XrpcResp for CarRecord {
     const NSID: &'static str = "net.mmatt.vitals.car";
@@ -78,14 +91,7 @@ impl jacquard_common::xrpc::XrpcResp for CarRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Car<'_> {
+impl jacquard_common::types::collection::Collection for CarRecord {
     const NSID: &'static str = "net.mmatt.vitals.car";
     type Record = CarRecord;
-}
-
-impl From<CarGetRecordOutput<'_>> for Car<'_> {
-    fn from(output: CarGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

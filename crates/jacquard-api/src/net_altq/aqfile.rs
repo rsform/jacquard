@@ -113,7 +113,20 @@ pub struct AqfileGetRecordOutput<'a> {
     pub value: Aqfile<'a>,
 }
 
+impl From<AqfileGetRecordOutput<'_>> for Aqfile<'_> {
+    fn from(output: AqfileGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Aqfile<'_> {
+    const NSID: &'static str = "net.altq.aqfile";
+    type Record = AqfileRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct AqfileRecord;
 impl jacquard_common::xrpc::XrpcResp for AqfileRecord {
     const NSID: &'static str = "net.altq.aqfile";
@@ -122,14 +135,7 @@ impl jacquard_common::xrpc::XrpcResp for AqfileRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Aqfile<'_> {
+impl jacquard_common::types::collection::Collection for AqfileRecord {
     const NSID: &'static str = "net.altq.aqfile";
     type Record = AqfileRecord;
-}
-
-impl From<AqfileGetRecordOutput<'_>> for Aqfile<'_> {
-    fn from(output: AqfileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

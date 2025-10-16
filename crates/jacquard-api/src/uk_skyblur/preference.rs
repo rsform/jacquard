@@ -44,7 +44,20 @@ pub struct PreferenceGetRecordOutput<'a> {
     pub value: Preference<'a>,
 }
 
+impl From<PreferenceGetRecordOutput<'_>> for Preference<'_> {
+    fn from(output: PreferenceGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Preference<'_> {
+    const NSID: &'static str = "uk.skyblur.preference";
+    type Record = PreferenceRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct PreferenceRecord;
 impl jacquard_common::xrpc::XrpcResp for PreferenceRecord {
     const NSID: &'static str = "uk.skyblur.preference";
@@ -53,16 +66,9 @@ impl jacquard_common::xrpc::XrpcResp for PreferenceRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Preference<'_> {
+impl jacquard_common::types::collection::Collection for PreferenceRecord {
     const NSID: &'static str = "uk.skyblur.preference";
     type Record = PreferenceRecord;
-}
-
-impl From<PreferenceGetRecordOutput<'_>> for Preference<'_> {
-    fn from(output: PreferenceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

@@ -67,7 +67,20 @@ pub struct BlogGetRecordOutput<'a> {
     pub value: Blog<'a>,
 }
 
+impl From<BlogGetRecordOutput<'_>> for Blog<'_> {
+    fn from(output: BlogGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Blog<'_> {
+    const NSID: &'static str = "blog.pckt.blog";
+    type Record = BlogRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct BlogRecord;
 impl jacquard_common::xrpc::XrpcResp for BlogRecord {
     const NSID: &'static str = "blog.pckt.blog";
@@ -76,16 +89,9 @@ impl jacquard_common::xrpc::XrpcResp for BlogRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Blog<'_> {
+impl jacquard_common::types::collection::Collection for BlogRecord {
     const NSID: &'static str = "blog.pckt.blog";
     type Record = BlogRecord;
-}
-
-impl From<BlogGetRecordOutput<'_>> for Blog<'_> {
-    fn from(output: BlogGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 #[jacquard_derive::lexicon]

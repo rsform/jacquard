@@ -47,7 +47,20 @@ pub struct CollaboratorGetRecordOutput<'a> {
     pub value: Collaborator<'a>,
 }
 
+impl From<CollaboratorGetRecordOutput<'_>> for Collaborator<'_> {
+    fn from(output: CollaboratorGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Collaborator<'_> {
+    const NSID: &'static str = "sh.tangled.repo.collaborator";
+    type Record = CollaboratorRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct CollaboratorRecord;
 impl jacquard_common::xrpc::XrpcResp for CollaboratorRecord {
     const NSID: &'static str = "sh.tangled.repo.collaborator";
@@ -56,14 +69,7 @@ impl jacquard_common::xrpc::XrpcResp for CollaboratorRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Collaborator<'_> {
+impl jacquard_common::types::collection::Collection for CollaboratorRecord {
     const NSID: &'static str = "sh.tangled.repo.collaborator";
     type Record = CollaboratorRecord;
-}
-
-impl From<CollaboratorGetRecordOutput<'_>> for Collaborator<'_> {
-    fn from(output: CollaboratorGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

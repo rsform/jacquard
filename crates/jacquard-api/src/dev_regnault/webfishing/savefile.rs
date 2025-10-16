@@ -47,7 +47,20 @@ pub struct SavefileGetRecordOutput<'a> {
     pub value: Savefile<'a>,
 }
 
+impl From<SavefileGetRecordOutput<'_>> for Savefile<'_> {
+    fn from(output: SavefileGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Savefile<'_> {
+    const NSID: &'static str = "dev.regnault.webfishing.savefile";
+    type Record = SavefileRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct SavefileRecord;
 impl jacquard_common::xrpc::XrpcResp for SavefileRecord {
     const NSID: &'static str = "dev.regnault.webfishing.savefile";
@@ -56,14 +69,7 @@ impl jacquard_common::xrpc::XrpcResp for SavefileRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Savefile<'_> {
+impl jacquard_common::types::collection::Collection for SavefileRecord {
     const NSID: &'static str = "dev.regnault.webfishing.savefile";
     type Record = SavefileRecord;
-}
-
-impl From<SavefileGetRecordOutput<'_>> for Savefile<'_> {
-    fn from(output: SavefileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

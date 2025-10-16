@@ -80,7 +80,20 @@ pub struct ExifGetRecordOutput<'a> {
     pub value: Exif<'a>,
 }
 
+impl From<ExifGetRecordOutput<'_>> for Exif<'_> {
+    fn from(output: ExifGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Exif<'_> {
+    const NSID: &'static str = "social.grain.photo.exif";
+    type Record = ExifRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExifRecord;
 impl jacquard_common::xrpc::XrpcResp for ExifRecord {
     const NSID: &'static str = "social.grain.photo.exif";
@@ -89,14 +102,7 @@ impl jacquard_common::xrpc::XrpcResp for ExifRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Exif<'_> {
+impl jacquard_common::types::collection::Collection for ExifRecord {
     const NSID: &'static str = "social.grain.photo.exif";
     type Record = ExifRecord;
-}
-
-impl From<ExifGetRecordOutput<'_>> for Exif<'_> {
-    fn from(output: ExifGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

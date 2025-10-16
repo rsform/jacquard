@@ -125,7 +125,20 @@ pub struct ThreadgateGetRecordOutput<'a> {
     pub value: Threadgate<'a>,
 }
 
+impl From<ThreadgateGetRecordOutput<'_>> for Threadgate<'_> {
+    fn from(output: ThreadgateGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Threadgate<'_> {
+    const NSID: &'static str = "app.bsky.feed.threadgate";
+    type Record = ThreadgateRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ThreadgateRecord;
 impl jacquard_common::xrpc::XrpcResp for ThreadgateRecord {
     const NSID: &'static str = "app.bsky.feed.threadgate";
@@ -134,16 +147,9 @@ impl jacquard_common::xrpc::XrpcResp for ThreadgateRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Threadgate<'_> {
+impl jacquard_common::types::collection::Collection for ThreadgateRecord {
     const NSID: &'static str = "app.bsky.feed.threadgate";
     type Record = ThreadgateRecord;
-}
-
-impl From<ThreadgateGetRecordOutput<'_>> for Threadgate<'_> {
-    fn from(output: ThreadgateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
 
 /// Allow replies from actors mentioned in your post.

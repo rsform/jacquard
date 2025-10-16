@@ -542,6 +542,36 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         }
     }
 
+    /// Fetches a record from the PDS. Returns an owned, parsed response.
+    ///
+    /// `record_type` parameter should be the marker struct for the record (e.g. `PostRecord` for `Post`), rather than the Post itself (though it will intuit things correctly regardless).
+    /// This allows the compiler to better intuit the output type without turbofishing.
+    fn fetch_record<R>(
+        &self,
+        record_type: R,
+        uri: AtUri<'_>,
+    ) -> impl std::future::Future<
+        Output = Result<<<R as Collection>::Record as XrpcResp>::Output<'static>, ClientError>,
+    >
+    where
+        R: Collection,
+        for<'a> <<R as Collection>::Record as XrpcResp>::Output<'a>:
+            IntoStatic<Output = <<R as Collection>::Record as XrpcResp>::Output<'static>>,
+        for<'a> <<R as Collection>::Record as XrpcResp>::Err<'a>:
+            IntoStatic<Output = <<R as Collection>::Record as XrpcResp>::Err<'static>>,
+    {
+        let _ = record_type;
+        async move {
+            let response = self.get_record::<R>(uri.clone()).await?;
+            let response: Response<R::Record> = response.transmute();
+            let output = response
+                .into_output()
+                .map_err(|e| ClientError::Transport(TransportError::Other(e.to_string().into())))?;
+            // TODO: fix this to use a better error lol
+            Ok(output)
+        }
+    }
+
     /// Update a record in-place with a fetch-modify-put pattern.
     ///
     /// This fetches the record using an at:// URI, converts it to owned data, applies

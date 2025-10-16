@@ -53,7 +53,20 @@ pub struct BoardGetRecordOutput<'a> {
     pub value: Board<'a>,
 }
 
+impl From<BoardGetRecordOutput<'_>> for Board<'_> {
+    fn from(output: BoardGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Board<'_> {
+    const NSID: &'static str = "dev.ocbwoy3.blueboard.board";
+    type Record = BoardRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct BoardRecord;
 impl jacquard_common::xrpc::XrpcResp for BoardRecord {
     const NSID: &'static str = "dev.ocbwoy3.blueboard.board";
@@ -62,14 +75,7 @@ impl jacquard_common::xrpc::XrpcResp for BoardRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Board<'_> {
+impl jacquard_common::types::collection::Collection for BoardRecord {
     const NSID: &'static str = "dev.ocbwoy3.blueboard.board";
     type Record = BoardRecord;
-}
-
-impl From<BoardGetRecordOutput<'_>> for Board<'_> {
-    fn from(output: BoardGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

@@ -49,7 +49,20 @@ pub struct ListitemGetRecordOutput<'a> {
     pub value: Listitem<'a>,
 }
 
+impl From<ListitemGetRecordOutput<'_>> for Listitem<'_> {
+    fn from(output: ListitemGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Listitem<'_> {
+    const NSID: &'static str = "app.bsky.graph.listitem";
+    type Record = ListitemRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ListitemRecord;
 impl jacquard_common::xrpc::XrpcResp for ListitemRecord {
     const NSID: &'static str = "app.bsky.graph.listitem";
@@ -58,14 +71,7 @@ impl jacquard_common::xrpc::XrpcResp for ListitemRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Listitem<'_> {
+impl jacquard_common::types::collection::Collection for ListitemRecord {
     const NSID: &'static str = "app.bsky.graph.listitem";
     type Record = ListitemRecord;
-}
-
-impl From<ListitemGetRecordOutput<'_>> for Listitem<'_> {
-    fn from(output: ListitemGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

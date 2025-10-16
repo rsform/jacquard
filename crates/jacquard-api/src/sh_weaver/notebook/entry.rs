@@ -59,7 +59,20 @@ pub struct EntryGetRecordOutput<'a> {
     pub value: Entry<'a>,
 }
 
+impl From<EntryGetRecordOutput<'_>> for Entry<'_> {
+    fn from(output: EntryGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Entry<'_> {
+    const NSID: &'static str = "sh.weaver.notebook.entry";
+    type Record = EntryRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct EntryRecord;
 impl jacquard_common::xrpc::XrpcResp for EntryRecord {
     const NSID: &'static str = "sh.weaver.notebook.entry";
@@ -68,14 +81,7 @@ impl jacquard_common::xrpc::XrpcResp for EntryRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Entry<'_> {
+impl jacquard_common::types::collection::Collection for EntryRecord {
     const NSID: &'static str = "sh.weaver.notebook.entry";
     type Record = EntryRecord;
-}
-
-impl From<EntryGetRecordOutput<'_>> for Entry<'_> {
-    fn from(output: EntryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }

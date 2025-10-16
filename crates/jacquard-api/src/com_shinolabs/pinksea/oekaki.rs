@@ -100,7 +100,20 @@ pub struct OekakiGetRecordOutput<'a> {
     pub value: Oekaki<'a>,
 }
 
+impl From<OekakiGetRecordOutput<'_>> for Oekaki<'_> {
+    fn from(output: OekakiGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Oekaki<'_> {
+    const NSID: &'static str = "com.shinolabs.pinksea.oekaki";
+    type Record = OekakiRecord;
+}
+
 /// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct OekakiRecord;
 impl jacquard_common::xrpc::XrpcResp for OekakiRecord {
     const NSID: &'static str = "com.shinolabs.pinksea.oekaki";
@@ -109,14 +122,7 @@ impl jacquard_common::xrpc::XrpcResp for OekakiRecord {
     type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
 }
 
-impl jacquard_common::types::collection::Collection for Oekaki<'_> {
+impl jacquard_common::types::collection::Collection for OekakiRecord {
     const NSID: &'static str = "com.shinolabs.pinksea.oekaki";
     type Record = OekakiRecord;
-}
-
-impl From<OekakiGetRecordOutput<'_>> for Oekaki<'_> {
-    fn from(output: OekakiGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
-    }
 }
