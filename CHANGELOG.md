@@ -13,6 +13,8 @@
 - updated oauth and credential session clients to use it
 - implementations should generally override provided auth with own internal auth
 
+**Prelude providing common traits into scope**
+
 ### Fixed
 
 **`AgentSessionExt::upload_blob()` failed to authenticate** (`jacquard`)

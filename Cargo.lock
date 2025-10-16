@@ -1857,7 +1857,7 @@ dependencies = [
  "clap",
  "getrandom 0.2.16",
  "http",
- "jacquard-api 0.5.3",
+ "jacquard-api 0.5.4",
  "jacquard-common 0.5.4",
  "jacquard-derive 0.5.4",
  "jacquard-identity 0.5.3",
@@ -1896,7 +1896,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-api"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "bon",
  "bytes",
@@ -2070,7 +2070,7 @@ dependencies = [
  "bytes",
  "hickory-resolver",
  "http",
- "jacquard-api 0.5.3",
+ "jacquard-api 0.5.4",
  "jacquard-common 0.5.4",
  "miette",
  "percent-encoding",

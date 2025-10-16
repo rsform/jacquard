@@ -230,3 +230,17 @@ pub use jacquard_derive::*;
 pub use jacquard_identity as identity;
 
 pub use jacquard_oauth as oauth;
+
+/// Prelude with the extension traits you're likely to want and some other stuff
+pub mod prelude {
+    pub use crate::client::AgentSession;
+    pub use crate::client::AgentSessionExt;
+    pub use crate::client::BasicClient;
+    pub use crate::common::http_client::HttpClient;
+    pub use crate::common::xrpc::XrpcClient;
+    pub use crate::common::xrpc::XrpcExt;
+    pub use crate::identity::PublicResolver;
+    pub use crate::identity::resolver::IdentityResolver;
+    pub use crate::oauth::dpop::DpopExt;
+    pub use crate::oauth::resolver::OAuthResolver;
+}

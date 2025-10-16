@@ -2,7 +2,7 @@
 name = "jacquard-api"
 description = "Generated AT Protocol API bindings for Jacquard"
 edition.workspace = true
-version = "0.5.3"
+version = "0.5.4"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true

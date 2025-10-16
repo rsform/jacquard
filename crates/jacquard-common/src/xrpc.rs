@@ -276,7 +276,7 @@ pub trait XrpcClient: HttpClient {
         <R as XrpcRequest>::Response: Send + Sync,
         Self: Sync;
 
-    /// Send an XRPC request and parse the response
+    /// Send an XRPC request with custom options and parse the response
     #[cfg(target_arch = "wasm32")]
     fn send_with_opts<R>(
         &self,
