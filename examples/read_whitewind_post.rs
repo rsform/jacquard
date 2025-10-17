@@ -22,7 +22,7 @@ async fn main() -> miette::Result<()> {
     let agent = BasicClient::unauthenticated();
 
     // Use Agent's get_record helper with the at:// URI
-    let response = agent.get_record::<Entry>(uri).await?;
+    let response = agent.get_record::<Entry>(&uri).await?;
     let output = response.into_output()?;
 
     println!("📚 WhiteWind Blog Entry\n");

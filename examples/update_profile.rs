@@ -48,7 +48,7 @@ async fn main() -> miette::Result<()> {
 
     // Update profile in-place using the fetch-modify-put pattern
     agent
-        .update_record::<Profile>(uri, |profile| {
+        .update_record::<Profile>(&uri, |profile| {
             if let Some(name) = &args.display_name {
                 profile.display_name = Some(CowStr::from(name.clone()));
             }

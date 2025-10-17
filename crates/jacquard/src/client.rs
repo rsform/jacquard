@@ -376,7 +376,7 @@ pub type VecPutResponse<U> = <<U as VecUpdate>::PutRequest as XrpcRequest>::Resp
 /// let output = agent.create_record(post, None).await?;
 ///
 /// // Read it back
-/// let response = agent.get_record::<Post>(output.uri).await?;
+/// let response = agent.get_record::<Post>(&output.uri).await?;
 /// let record = response.parse()?;
 /// println!("Post: {}", record.value.text);
 /// # Ok(())
@@ -477,7 +477,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// # let agent: BasicClient = todo!();
     /// let uri = AtUri::new_static("at://did:plc:xyz/app.bsky.feed.post/3l5bqm7lepk2c").unwrap();
-    /// let response = agent.get_record::<Post>(uri).await?;
+    /// let response = agent.get_record::<Post>(&uri).await?;
     /// let output = response.parse()?;  // PostGetRecordOutput<'_> borrowing from buffer
     /// println!("Post text: {}", output.value.text);
     ///
@@ -601,7 +601,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     /// # let agent: BasicClient = todo!();
     /// let uri = AtUri::new_static("at://did:plc:xyz/app.bsky.actor.profile/self").unwrap();
     /// // Update profile record in-place
-    /// agent.update_record::<Profile>(uri, |profile| {
+    /// agent.update_record::<Profile>(&uri, |profile| {
     ///     profile.display_name = Some(CowStr::from("New Name"));
     ///     profile.description = Some(CowStr::from("Updated bio"));
     /// }).await?;
@@ -1023,7 +1023,7 @@ impl BasicClient {
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let client = BasicClient::unauthenticated();
     /// let uri = AtUri::new_static("at://did:plc:xyz/app.bsky.feed.post/3l5abc").unwrap();
-    /// let response = client.get_record::<Post<'_>>(uri).await?;
+    /// let response = client.get_record::<Post<'_>>(&uri).await?;
     /// # Ok(())
     /// # }
     /// ```
