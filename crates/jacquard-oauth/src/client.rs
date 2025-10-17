@@ -19,6 +19,11 @@ use jacquard_common::{
         build_http_request, process_response,
     },
 };
+
+#[cfg(feature = "websocket")]
+use jacquard_common::websocket::{WebSocketClient, WebSocketConnection};
+#[cfg(feature = "websocket")]
+use jacquard_common::xrpc::XrpcSubscription;
 use jacquard_identity::{
     JacquardResolver,
     resolver::{DidDocResponse, IdentityError, IdentityResolver, ResolverOptions},
@@ -279,18 +284,19 @@ where
     }
 }
 
-pub struct OAuthSession<T, S>
+pub struct OAuthSession<T, S, W = ()>
 where
     T: OAuthResolver,
     S: ClientAuthStore,
 {
     pub registry: Arc<SessionRegistry<T, S>>,
     pub client: Arc<T>,
+    pub ws_client: W,
     pub data: RwLock<ClientSessionData<'static>>,
     pub options: RwLock<CallOptions<'static>>,
 }
 
-impl<T, S> OAuthSession<T, S>
+impl<T, S> OAuthSession<T, S, ()>
 where
     T: OAuthResolver,
     S: ClientAuthStore,
@@ -303,6 +309,28 @@ where
         Self {
             registry,
             client,
+            ws_client: (),
+            data: RwLock::new(data),
+            options: RwLock::new(CallOptions::default()),
+        }
+    }
+}
+
+impl<T, S, W> OAuthSession<T, S, W>
+where
+    T: OAuthResolver,
+    S: ClientAuthStore,
+{
+    pub fn new_with_ws(
+        registry: Arc<SessionRegistry<T, S>>,
+        client: Arc<T>,
+        ws_client: W,
+        data: ClientSessionData<'static>,
+    ) -> Self {
+        Self {
+            registry,
+            client,
+            ws_client,
             data: RwLock::new(data),
             options: RwLock::new(CallOptions::default()),
         }
@@ -312,9 +340,15 @@ where
         Self {
             registry: self.registry,
             client: self.client,
+            ws_client: self.ws_client,
             data: self.data,
             options: RwLock::new(options.into_static()),
         }
+    }
+
+    /// Get a reference to the WebSocket client.
+    pub fn ws_client(&self) -> &W {
+        &self.ws_client
     }
 
     pub async fn set_options(&self, options: CallOptions<'_>) {
@@ -344,7 +378,7 @@ where
             .map(|t| AuthorizationToken::Dpop(t.clone()))
     }
 }
-impl<T, S> OAuthSession<T, S>
+impl<T, S, W> OAuthSession<T, S, W>
 where
     S: ClientAuthStore + Send + Sync + 'static,
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
@@ -373,14 +407,14 @@ where
     T: OAuthResolver,
     S: ClientAuthStore,
 {
-    pub fn from_session(session: &OAuthSession<T, S>) -> Self {
+    pub fn from_session<W>(session: &OAuthSession<T, S, W>) -> Self {
         Self {
             registry: session.registry.clone(),
             client: session.client.clone(),
         }
     }
 }
-impl<T, S> OAuthSession<T, S>
+impl<T, S, W> OAuthSession<T, S, W>
 where
     S: ClientAuthStore + Send + Sync + 'static,
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
@@ -402,10 +436,54 @@ where
     }
 }
 
-impl<T, S> HttpClient for OAuthSession<T, S>
+#[cfg(feature = "websocket")]
+impl<T, S, W> OAuthSession<T, S, W>
+where
+    S: ClientAuthStore,
+    T: OAuthResolver,
+    W: WebSocketClient,
+{
+    /// Subscribe to an XRPC WebSocket subscription.
+    ///
+    /// Connects to the WebSocket endpoint and threads through DPoP authentication headers.
+    pub async fn subscribe<Sub>(&self, params: &Sub) -> Result<WebSocketConnection, W::Error>
+    where
+        Sub: XrpcSubscription,
+    {
+        let base_uri = self.endpoint().await;
+
+        // Build WebSocket URL
+        let mut ws_url = base_uri.clone();
+        ws_url.set_scheme("wss").ok();
+        ws_url.set_path(&format!("/xrpc/{}", Sub::NSID));
+
+        // Add query params
+        let query_params = params.query_params();
+        if !query_params.is_empty() {
+            let query_string = serde_html_form::to_string(&query_params).unwrap_or_default();
+            ws_url.set_query(Some(&query_string));
+        }
+
+        // Thread DPoP auth headers (even though tokio-tungstenite-wasm doesn't support them yet)
+        let token = self.access_token().await;
+        let auth_value = match token {
+            AuthorizationToken::Bearer(t) => format!("Bearer {}", t.as_ref()),
+            AuthorizationToken::Dpop(t) => format!("DPoP {}", t.as_ref()),
+        };
+        let headers = vec![(
+            CowStr::from("Authorization"),
+            CowStr::from(auth_value),
+        )];
+
+        self.ws_client.connect_with_headers(ws_url, headers).await
+    }
+}
+
+impl<T, S, W> HttpClient for OAuthSession<T, S, W>
 where
     S: ClientAuthStore + Send + Sync + 'static,
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
+    W: Send + Sync,
 {
     type Error = T::Error;
 
@@ -417,10 +495,11 @@ where
     }
 }
 
-impl<T, S> XrpcClient for OAuthSession<T, S>
+impl<T, S, W> XrpcClient for OAuthSession<T, S, W>
 where
     S: ClientAuthStore + Send + Sync + 'static,
     T: OAuthResolver + DpopExt + XrpcExt + Send + Sync + 'static,
+    W: Send + Sync,
 {
     fn base_uri(&self) -> Url {
         // base_uri is a synchronous trait method; we must avoid async `.read().await`.
@@ -502,10 +581,11 @@ fn is_invalid_token_response<R: XrpcResp>(response: &XrpcResult<Response<R>>) ->
     }
 }
 
-impl<T, S> IdentityResolver for OAuthSession<T, S>
+impl<T, S, W> IdentityResolver for OAuthSession<T, S, W>
 where
     S: ClientAuthStore + Send + Sync + 'static,
     T: OAuthResolver + IdentityResolver + XrpcExt + Send + Sync + 'static,
+    W: Send + Sync,
 {
     fn options(&self) -> &ResolverOptions {
         self.client.options()

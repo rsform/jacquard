@@ -475,12 +475,24 @@ impl fmt::Debug for WsSink {
 
 /// WebSocket client trait
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
-pub trait WebSocketClient {
+pub trait WebSocketClient: Sync {
     /// Error type for WebSocket operations
     type Error: std::error::Error + Send + Sync + 'static;
 
     /// Connect to a WebSocket endpoint
     fn connect(&self, url: Url) -> impl Future<Output = Result<WebSocketConnection, Self::Error>>;
+
+    /// Connect to a WebSocket endpoint with custom headers
+    ///
+    /// Default implementation ignores headers and calls `connect()`.
+    /// Override this method to support authentication headers for subscriptions.
+    fn connect_with_headers(
+        &self,
+        url: Url,
+        _headers: Vec<(CowStr<'_>, CowStr<'_>)>,
+    ) -> impl Future<Output = Result<WebSocketConnection, Self::Error>> {
+        async move { self.connect(url).await }
+    }
 }
 
 /// WebSocket connection with bidirectional streams

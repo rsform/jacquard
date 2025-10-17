@@ -22,6 +22,11 @@ use jacquard_identity::resolver::{
 };
 use std::any::Any;
 
+#[cfg(feature = "websocket")]
+use jacquard_common::websocket::{WebSocketClient, WebSocketConnection};
+#[cfg(feature = "websocket")]
+use jacquard_common::xrpc::XrpcSubscription;
+
 /// Storage key for app‑password sessions: `(account DID, session id)`.
 pub type SessionKey = (Did<'static>, CowStr<'static>);
 
@@ -30,12 +35,14 @@ pub type SessionKey = (Did<'static>, CowStr<'static>);
 /// - Persists sessions via a pluggable `SessionStore`.
 /// - Automatically refreshes on token expiry.
 /// - Tracks a base endpoint, defaulting to the public appview until login/restore.
-pub struct CredentialSession<S, T>
+/// - Optional WebSocket client for subscription support.
+pub struct CredentialSession<S, T, W = ()>
 where
     S: SessionStore<SessionKey, AtpSession>,
 {
     store: Arc<S>,
     client: Arc<T>,
+    ws_client: W,
     /// Default call options applied to each request (auth/headers/labelers).
     pub options: RwLock<CallOptions<'static>>,
     /// Active session key, if any.
@@ -44,15 +51,16 @@ where
     pub endpoint: RwLock<Option<Url>>,
 }
 
-impl<S, T> CredentialSession<S, T>
+impl<S, T> CredentialSession<S, T, ()>
 where
     S: SessionStore<SessionKey, AtpSession>,
 {
-    /// Create a new credential session using the given store and client.
+    /// Create a new credential session using the given store and client (no WebSocket support).
     pub fn new(store: Arc<S>, client: Arc<T>) -> Self {
         Self {
             store,
             client,
+            ws_client: (),
             options: RwLock::new(CallOptions::default()),
             key: RwLock::new(None),
             endpoint: RwLock::new(None),
@@ -60,15 +68,33 @@ where
     }
 }
 
-impl<S, T> CredentialSession<S, T>
+impl<S, T, W> CredentialSession<S, T, W>
 where
     S: SessionStore<SessionKey, AtpSession>,
 {
+    /// Create a new credential session with WebSocket client support.
+    pub fn new_with_ws(store: Arc<S>, client: Arc<T>, ws_client: W) -> Self {
+        Self {
+            store,
+            client,
+            ws_client,
+            options: RwLock::new(CallOptions::default()),
+            key: RwLock::new(None),
+            endpoint: RwLock::new(None),
+        }
+    }
+
+    /// Get a reference to the WebSocket client.
+    pub fn ws_client(&self) -> &W {
+        &self.ws_client
+    }
+
     /// Return a copy configured with the provided default call options.
     pub fn with_options(self, options: CallOptions<'_>) -> Self {
         Self {
             client: self.client,
             store: self.store,
+            ws_client: self.ws_client,
             options: RwLock::new(options.into_static()),
             key: self.key,
             endpoint: self.endpoint,
@@ -112,7 +138,7 @@ where
     }
 }
 
-impl<S, T> CredentialSession<S, T>
+impl<S, T, W> CredentialSession<S, T, W>
 where
     S: SessionStore<SessionKey, AtpSession>,
     T: HttpClient,
@@ -150,7 +176,7 @@ where
     }
 }
 
-impl<S, T> CredentialSession<S, T>
+impl<S, T, W> CredentialSession<S, T, W>
 where
     S: SessionStore<SessionKey, AtpSession>,
     T: HttpClient + IdentityResolver + XrpcExt + Sync + Send,
@@ -385,10 +411,60 @@ where
     }
 }
 
-impl<S, T> HttpClient for CredentialSession<S, T>
+#[cfg(feature = "websocket")]
+impl<S, T, W> CredentialSession<S, T, W>
+where
+    S: SessionStore<SessionKey, AtpSession>,
+    W: WebSocketClient,
+{
+    /// Subscribe to an XRPC WebSocket subscription.
+    ///
+    /// Connects to the WebSocket endpoint and threads through authentication headers.
+    pub async fn subscribe<Sub>(
+        &self,
+        params: &Sub,
+    ) -> Result<WebSocketConnection, W::Error>
+    where
+        Sub: XrpcSubscription,
+    {
+        let base_uri = self.endpoint().await;
+
+        // Build WebSocket URL
+        let mut ws_url = base_uri.clone();
+        ws_url.set_scheme("wss").ok();
+        ws_url.set_path(&format!("/xrpc/{}", Sub::NSID));
+
+        // Add query params
+        let query_params = params.query_params();
+        if !query_params.is_empty() {
+            let query_string = serde_html_form::to_string(&query_params)
+                .unwrap_or_default();
+            ws_url.set_query(Some(&query_string));
+        }
+
+        // Thread auth headers (even though tokio-tungstenite-wasm doesn't support them yet)
+        let headers = if let Some(token) = self.access_token().await {
+            let auth_value = match token {
+                AuthorizationToken::Bearer(t) => format!("Bearer {}", t.as_ref()),
+                AuthorizationToken::Dpop(t) => format!("DPoP {}", t.as_ref()),
+            };
+            vec![(
+                CowStr::from("Authorization"),
+                CowStr::from(auth_value),
+            )]
+        } else {
+            vec![]
+        };
+
+        self.ws_client.connect_with_headers(ws_url, headers).await
+    }
+}
+
+impl<S, T, W> HttpClient for CredentialSession<S, T, W>
 where
     S: SessionStore<SessionKey, AtpSession> + Send + Sync + 'static,
     T: HttpClient + XrpcExt + Send + Sync + 'static,
+    W: Send + Sync,
 {
     type Error = T::Error;
 
@@ -400,10 +476,11 @@ where
     }
 }
 
-impl<S, T> XrpcClient for CredentialSession<S, T>
+impl<S, T, W> XrpcClient for CredentialSession<S, T, W>
 where
     S: SessionStore<SessionKey, AtpSession> + Send + Sync + 'static,
     T: HttpClient + XrpcExt + Send + Sync + 'static,
+    W: Send + Sync,
 {
     fn base_uri(&self) -> Url {
         // base_uri is a synchronous trait method; avoid `.await` here.
@@ -484,10 +561,11 @@ fn is_expired<R: XrpcResp>(response: &XrpcResult<Response<R>>) -> bool {
     }
 }
 
-impl<S, T> IdentityResolver for CredentialSession<S, T>
+impl<S, T, W> IdentityResolver for CredentialSession<S, T, W>
 where
     S: SessionStore<SessionKey, AtpSession> + Send + Sync + 'static,
     T: HttpClient + IdentityResolver + Send + Sync + 'static,
+    W: Send + Sync,
 {
     fn options(&self) -> &ResolverOptions {
         self.client.options()

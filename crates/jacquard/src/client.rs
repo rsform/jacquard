@@ -49,7 +49,6 @@ use jacquard_oauth::authstore::ClientAuthStore;
 use jacquard_oauth::client::OAuthSession;
 use jacquard_oauth::dpop::DpopExt;
 use jacquard_oauth::resolver::OAuthResolver;
-use std::marker::PhantomData;
 
 use serde::Serialize;
 pub use token::FileAuthStore;
@@ -210,10 +209,11 @@ pub trait AgentSession: XrpcClient + HttpClient + Send + Sync {
     fn refresh(&self) -> impl Future<Output = Result<AuthorizationToken<'static>, ClientError>>;
 }
 
-impl<S, T> AgentSession for CredentialSession<S, T>
+impl<S, T, W> AgentSession for CredentialSession<S, T, W>
 where
     S: SessionStore<SessionKey, AtpSession> + Send + Sync + 'static,
     T: IdentityResolver + HttpClient + XrpcExt + Send + Sync + 'static,
+    W: Send + Sync,
 {
     fn session_kind(&self) -> AgentKind {
         AgentKind::AppPassword
@@ -227,30 +227,31 @@ where
         )>,
     > {
         async move {
-            CredentialSession::<S, T>::session_info(self)
+            CredentialSession::<S, T, W>::session_info(self)
                 .await
                 .map(|(did, sid)| (did, Some(sid)))
         }
     }
     fn endpoint(&self) -> impl Future<Output = url::Url> {
-        async move { CredentialSession::<S, T>::endpoint(self).await }
+        async move { CredentialSession::<S, T, W>::endpoint(self).await }
     }
     fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
-        async move { CredentialSession::<S, T>::set_options(self, opts).await }
+        async move { CredentialSession::<S, T, W>::set_options(self, opts).await }
     }
     fn refresh(&self) -> impl Future<Output = Result<AuthorizationToken<'static>, ClientError>> {
         async move {
-            Ok(CredentialSession::<S, T>::refresh(self)
+            Ok(CredentialSession::<S, T, W>::refresh(self)
                 .await?
                 .into_static())
         }
     }
 }
 
-impl<T, S> AgentSession for OAuthSession<T, S>
+impl<T, S, W> AgentSession for OAuthSession<T, S, W>
 where
     S: ClientAuthStore + Send + Sync + 'static,
     T: OAuthResolver + DpopExt + XrpcExt + Send + Sync + 'static,
+    W: Send + Sync,
 {
     fn session_kind(&self) -> AgentKind {
         AgentKind::OAuth
@@ -264,7 +265,7 @@ where
         )>,
     > {
         async {
-            let (did, sid) = OAuthSession::<T, S>::session_info(self).await;
+            let (did, sid) = OAuthSession::<T, S, W>::session_info(self).await;
             Some((did.into_static(), Some(sid.into_static())))
         }
     }
