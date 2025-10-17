@@ -411,55 +411,6 @@ where
     }
 }
 
-#[cfg(feature = "websocket")]
-impl<S, T, W> CredentialSession<S, T, W>
-where
-    S: SessionStore<SessionKey, AtpSession>,
-    W: WebSocketClient,
-{
-    /// Subscribe to an XRPC WebSocket subscription.
-    ///
-    /// Connects to the WebSocket endpoint and threads through authentication headers.
-    pub async fn subscribe<Sub>(
-        &self,
-        params: &Sub,
-    ) -> Result<WebSocketConnection, W::Error>
-    where
-        Sub: XrpcSubscription,
-    {
-        let base_uri = self.endpoint().await;
-
-        // Build WebSocket URL
-        let mut ws_url = base_uri.clone();
-        ws_url.set_scheme("wss").ok();
-        ws_url.set_path(&format!("/xrpc/{}", Sub::NSID));
-
-        // Add query params
-        let query_params = params.query_params();
-        if !query_params.is_empty() {
-            let query_string = serde_html_form::to_string(&query_params)
-                .unwrap_or_default();
-            ws_url.set_query(Some(&query_string));
-        }
-
-        // Thread auth headers (even though tokio-tungstenite-wasm doesn't support them yet)
-        let headers = if let Some(token) = self.access_token().await {
-            let auth_value = match token {
-                AuthorizationToken::Bearer(t) => format!("Bearer {}", t.as_ref()),
-                AuthorizationToken::Dpop(t) => format!("DPoP {}", t.as_ref()),
-            };
-            vec![(
-                CowStr::from("Authorization"),
-                CowStr::from(auth_value),
-            )]
-        } else {
-            vec![]
-        };
-
-        self.ws_client.connect_with_headers(ws_url, headers).await
-    }
-}
-
 impl<S, T, W> HttpClient for CredentialSession<S, T, W>
 where
     S: SessionStore<SessionKey, AtpSession> + Send + Sync + 'static,
@@ -583,5 +534,100 @@ where
         did: &Did<'_>,
     ) -> impl Future<Output = Result<DidDocResponse, IdentityError>> {
         async { self.client.resolve_did_doc(did).await }
+    }
+}
+
+#[cfg(feature = "websocket")]
+impl<S, T, W> WebSocketClient for CredentialSession<S, T, W>
+where
+    S: SessionStore<SessionKey, AtpSession> + Send + Sync + 'static,
+    T: Send + Sync + 'static,
+    W: WebSocketClient + Send + Sync,
+{
+    type Error = W::Error;
+
+    async fn connect(&self, url: Url) -> Result<WebSocketConnection, Self::Error> {
+        self.ws_client.connect(url).await
+    }
+
+    async fn connect_with_headers(
+        &self,
+        url: Url,
+        headers: Vec<(CowStr<'_>, CowStr<'_>)>,
+    ) -> Result<WebSocketConnection, Self::Error> {
+        self.ws_client.connect_with_headers(url, headers).await
+    }
+}
+
+#[cfg(feature = "websocket")]
+impl<S, T, W> jacquard_common::xrpc::SubscriptionClient for CredentialSession<S, T, W>
+where
+    S: SessionStore<SessionKey, AtpSession> + Send + Sync + 'static,
+    T: Send + Sync + 'static,
+    W: WebSocketClient + Send + Sync,
+{
+    fn base_uri(&self) -> Url {
+        #[cfg(not(target_arch = "wasm32"))]
+        if tokio::runtime::Handle::try_current().is_ok() {
+            tokio::task::block_in_place(|| {
+                self.endpoint.blocking_read().clone().unwrap_or(
+                    Url::parse("https://public.bsky.app")
+                        .expect("public appview should be valid url"),
+                )
+            })
+        } else {
+            self.endpoint.blocking_read().clone().unwrap_or(
+                Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
+            )
+        }
+
+        #[cfg(target_arch = "wasm32")]
+        {
+            self.endpoint.blocking_read().clone().unwrap_or(
+                Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
+            )
+        }
+    }
+
+    async fn subscription_opts(&self) -> jacquard_common::xrpc::SubscriptionOptions<'_> {
+        let mut opts = jacquard_common::xrpc::SubscriptionOptions::default();
+        if let Some(token) = self.access_token().await {
+            let auth_value = match token {
+                AuthorizationToken::Bearer(t) => format!("Bearer {}", t.as_ref()),
+                AuthorizationToken::Dpop(t) => format!("DPoP {}", t.as_ref()),
+            };
+            opts.headers.push((
+                CowStr::from("Authorization"),
+                CowStr::from(auth_value),
+            ));
+        }
+        opts
+    }
+
+    async fn subscribe<Sub>(
+        &self,
+        params: &Sub,
+    ) -> Result<WebSocketConnection, Self::Error>
+    where
+        Sub: XrpcSubscription + Send + Sync,
+    {
+        let opts = self.subscription_opts().await;
+        self.subscribe_with_opts(params, opts).await
+    }
+
+    async fn subscribe_with_opts<Sub>(
+        &self,
+        params: &Sub,
+        opts: jacquard_common::xrpc::SubscriptionOptions<'_>,
+    ) -> Result<WebSocketConnection, Self::Error>
+    where
+        Sub: XrpcSubscription + Send + Sync,
+    {
+        use jacquard_common::xrpc::SubscriptionExt;
+        let base = self.base_uri();
+        self.subscription(base)
+            .with_options(opts)
+            .subscribe(params)
+            .await
     }
 }

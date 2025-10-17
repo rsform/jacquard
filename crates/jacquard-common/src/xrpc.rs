@@ -20,7 +20,11 @@ pub use streaming::StreamingResponse;
 pub mod subscription;
 
 #[cfg(feature = "websocket")]
-pub use subscription::{MessageEncoding, SubscriptionEndpoint, SubscriptionResp, XrpcSubscription};
+pub use subscription::{
+    BasicSubscriptionClient, MessageEncoding, SubscriptionCall, SubscriptionClient,
+    SubscriptionEndpoint, SubscriptionExt, SubscriptionOptions, SubscriptionResp,
+    TungsteniteSubscriptionClient, XrpcSubscription,
+};
 
 use bytes::Bytes;
 use http::{
