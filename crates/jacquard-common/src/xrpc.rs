@@ -23,7 +23,7 @@ pub mod subscription;
 pub use subscription::{
     BasicSubscriptionClient, MessageEncoding, SubscriptionCall, SubscriptionClient,
     SubscriptionEndpoint, SubscriptionExt, SubscriptionOptions, SubscriptionResp,
-    TungsteniteSubscriptionClient, XrpcSubscription,
+    SubscriptionStream, TungsteniteSubscriptionClient, XrpcSubscription,
 };
 
 use bytes::Bytes;

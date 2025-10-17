@@ -607,7 +607,7 @@ where
     async fn subscribe<Sub>(
         &self,
         params: &Sub,
-    ) -> Result<WebSocketConnection, Self::Error>
+    ) -> Result<jacquard_common::xrpc::SubscriptionStream<Sub::Stream>, Self::Error>
     where
         Sub: XrpcSubscription + Send + Sync,
     {
@@ -619,7 +619,7 @@ where
         &self,
         params: &Sub,
         opts: jacquard_common::xrpc::SubscriptionOptions<'_>,
-    ) -> Result<WebSocketConnection, Self::Error>
+    ) -> Result<jacquard_common::xrpc::SubscriptionStream<Sub::Stream>, Self::Error>
     where
         Sub: XrpcSubscription + Send + Sync,
     {
