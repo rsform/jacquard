@@ -67,7 +67,7 @@ async fn main() -> miette::Result<()> {
         embed: Some(PostEmbed::Images(Box::new(Images {
             images: vec![Image {
                 alt: CowStr::from(args.alt.unwrap_or_default()),
-                image: blob,
+                image: blob.into(),
                 aspect_ratio: None,
                 extra_data: Default::default(),
             }],

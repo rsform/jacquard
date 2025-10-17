@@ -1072,13 +1072,18 @@ impl MemoryCredentialSession {
     /// ```no_run
     /// # use jacquard::client::BasicClient;
     /// # use jacquard::types::string::AtUri;
-    /// # use jacquard_api::app_bsky::feed::post::Post;
-    /// use crate::jacquard::client::{Agent, AgentSessionExt};
+    /// # use jacquard::api::app_bsky::feed::post::Post;
+    /// # use jacquard::types::string::Datetime;
+    /// # use jacquard::CowStr;
+    /// use jacquard::client::MemoryCredentialSession;
+    /// use jacquard::client::{Agent, AgentSessionExt};
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let (session, _) = MemoryCredentialSession::authenticated(identifier, password, None);
+    /// # let (identifier, password, post_text): (CowStr<'_>, CowStr<'_>, CowStr<'_>)  = todo!();
+    /// let (session, _) = MemoryCredentialSession::authenticated(identifier, password, None).await?;
     /// let agent = Agent::from(session);
-    /// let output = agent.create_record::<Post>(post, None).await?;
+    /// let post = Post::builder().text(post_text).created_at(Datetime::now()).build();
+    /// let output = agent.create_record(post, None).await?;
     /// # Ok(())
     /// # }
     /// ```

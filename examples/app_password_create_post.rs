@@ -29,7 +29,10 @@ async fn main() -> miette::Result<()> {
     let agent: Agent<_> = Agent::from(session);
 
     // Create a simple text post using the Agent convenience method
-    let post = Post::builder().text(args.text).build();
+    let post = Post::builder()
+        .text(args.text)
+        .created_at(Datetime::now())
+        .build();
     let output = agent.create_record(post, None).await?;
     println!("✓ Created post: {}", output.uri);
 
