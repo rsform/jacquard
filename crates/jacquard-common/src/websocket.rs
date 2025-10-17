@@ -1,5 +1,7 @@
 //! WebSocket client abstraction
 
+use crate::CowStr;
+use crate::stream::StreamError;
 use bytes::Bytes;
 use n0_future::Stream;
 use n0_future::stream::Boxed;
@@ -8,9 +10,6 @@ use std::fmt::{self, Display};
 use std::future::Future;
 use std::ops::Deref;
 use url::Url;
-
-use crate::stream::StreamError;
-use crate::{CowStr, IntoStatic};
 
 /// UTF-8 validated bytes for WebSocket text messages
 #[repr(transparent)]
