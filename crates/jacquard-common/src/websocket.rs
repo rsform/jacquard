@@ -9,8 +9,8 @@ use std::future::Future;
 use std::ops::Deref;
 use url::Url;
 
-use crate::CowStr;
 use crate::stream::StreamError;
+use crate::{CowStr, IntoStatic};
 
 /// UTF-8 validated bytes for WebSocket text messages
 #[repr(transparent)]
@@ -308,56 +308,129 @@ impl WsStream {
     pub fn into_inner(self) -> Boxed<Result<WsMessage, StreamError>> {
         self.0
     }
+
+    /// Split this stream into two streams that both receive all messages
+    ///
+    /// Messages are cloned (cheaply via Bytes rc). Spawns a forwarder task.
+    /// Both returned streams will receive all messages from the original stream.
+    /// The forwarder continues as long as at least one stream is alive.
+    /// If the underlying stream errors, both teed streams will end.
+    pub fn tee(self) -> (WsStream, WsStream) {
+        use futures::channel::mpsc;
+        use n0_future::StreamExt as _;
+
+        let (tx1, rx1) = mpsc::unbounded();
+        let (tx2, rx2) = mpsc::unbounded();
+
+        n0_future::task::spawn(async move {
+            let mut stream = self.0;
+            while let Some(result) = stream.next().await {
+                match result {
+                    Ok(msg) => {
+                        // Clone message (cheap - Bytes is rc'd)
+                        let msg2 = msg.clone();
+
+                        // Send to both channels, continue if at least one succeeds
+                        let send1 = tx1.unbounded_send(Ok(msg));
+                        let send2 = tx2.unbounded_send(Ok(msg2));
+
+                        // Only stop if both channels are closed
+                        if send1.is_err() && send2.is_err() {
+                            break;
+                        }
+                    }
+                    Err(_e) => {
+                        // Underlying stream errored, stop forwarding.
+                        // Both channels will close, ending both streams.
+                        break;
+                    }
+                }
+            }
+        });
+
+        (WsStream::new(rx1), WsStream::new(rx2))
+    }
 }
 
 /// Extension trait for decoding typed messages from WebSocket streams
 pub trait WsStreamExt: Sized {
     /// Decode JSON text/binary frames into typed messages
     ///
-    /// Deserializes messages but does not automatically convert to owned.
-    /// The caller is responsible for calling `.into_static()` if needed.
-    fn decode_json<T>(self) -> impl Stream<Item = Result<T, StreamError>>
+    /// Deserializes borrowing from temporary frame bytes, then converts to owned.
+    fn decode_json<T>(self) -> impl Stream<Item = Result<T::Output, StreamError>>
     where
-        T: for<'de> serde::Deserialize<'de>;
+        T: IntoStatic,
+        for<'de> T: serde::Deserialize<'de>,
+        T::Output: 'static;
 
     /// Decode DAG-CBOR binary frames into typed messages
     ///
-    /// Deserializes messages but does not automatically convert to owned.
-    /// The caller is responsible for calling `.into_static()` if needed.
-    fn decode_cbor<T>(self) -> impl Stream<Item = Result<T, StreamError>>
+    /// Deserializes borrowing from temporary frame bytes, then converts to owned.
+    fn decode_cbor<T>(self) -> impl Stream<Item = Result<T::Output, StreamError>>
     where
-        T: for<'de> serde::Deserialize<'de>;
+        T: IntoStatic,
+        for<'de> T: serde::Deserialize<'de>,
+        T::Output: 'static;
 }
 
 impl WsStreamExt for WsStream {
-    fn decode_json<T>(self) -> impl Stream<Item = Result<T, StreamError>>
+    fn decode_json<T>(self) -> impl Stream<Item = Result<T::Output, StreamError>>
     where
-        T: for<'de> serde::Deserialize<'de>,
+        T: IntoStatic,
+        for<'de> T: serde::Deserialize<'de>,
+        T::Output: 'static,
     {
         use n0_future::StreamExt as _;
 
-        Box::pin(self.into_inner().filter_map(|msg_result| match msg_result {
-            Ok(WsMessage::Text(text)) => {
-                Some(serde_json::from_slice(text.as_ref()).map_err(StreamError::decode))
+        // Helper to deserialize with concrete lifetime
+        fn parse_json<'a, T>(bytes: &'a [u8]) -> Result<T, serde_json::Error>
+        where
+            T: serde::Deserialize<'a>,
+        {
+            serde_json::from_slice(bytes)
+        }
+
+        Box::pin(self.into_inner().filter_map(|msg_result| {
+            match msg_result {
+                Ok(WsMessage::Text(text)) => Some(
+                    parse_json::<T>(text.as_ref())
+                        .map(|v| v.into_static())
+                        .map_err(StreamError::decode),
+                ),
+                Ok(WsMessage::Binary(bytes)) => Some(
+                    parse_json::<T>(&bytes)
+                        .map(|v| v.into_static())
+                        .map_err(StreamError::decode),
+                ),
+                Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
+                Err(e) => Some(Err(e)),
             }
-            Ok(WsMessage::Binary(bytes)) => {
-                Some(serde_json::from_slice(&bytes).map_err(StreamError::decode))
-            }
-            Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
-            Err(e) => Some(Err(e)),
         }))
     }
 
-    fn decode_cbor<T>(self) -> impl Stream<Item = Result<T, StreamError>>
+    fn decode_cbor<T>(self) -> impl Stream<Item = Result<T::Output, StreamError>>
     where
-        T: for<'de> serde::Deserialize<'de>,
+        T: IntoStatic,
+        for<'de> T: serde::Deserialize<'de>,
+        T::Output: 'static,
     {
         use n0_future::StreamExt as _;
+
+        // Helper to deserialize with concrete lifetime
+        fn parse_cbor<'a, T>(
+            bytes: &'a [u8],
+        ) -> Result<T, serde_ipld_dagcbor::DecodeError<std::convert::Infallible>>
+        where
+            T: serde::Deserialize<'a>,
+        {
+            serde_ipld_dagcbor::from_slice(bytes)
+        }
 
         Box::pin(self.into_inner().filter_map(|msg_result| {
             match msg_result {
                 Ok(WsMessage::Binary(bytes)) => Some(
-                    serde_ipld_dagcbor::from_slice(&bytes)
+                    parse_cbor::<T>(&bytes)
+                        .map(|v| v.into_static())
                         .map_err(|e| StreamError::decode(crate::error::DecodeError::from(e))),
                 ),
                 Ok(WsMessage::Text(_)) => Some(Err(StreamError::wrong_message_format(
