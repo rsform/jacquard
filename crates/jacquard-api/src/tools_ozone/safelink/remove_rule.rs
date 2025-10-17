@@ -96,7 +96,7 @@ impl std::fmt::Display for RemoveRuleError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.safelink.removeRule
 pub struct RemoveRuleResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveRuleResponse {
@@ -114,7 +114,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveRule<'a> {
     type Response = RemoveRuleResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.safelink.removeRule
 pub struct RemoveRuleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveRuleRequest {

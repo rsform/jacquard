@@ -47,7 +47,7 @@ pub struct SearchActorsTypeaheadOutput<'a> {
     pub actors: Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.actor.searchActorsTypeahead
 pub struct SearchActorsTypeaheadResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchActorsTypeaheadResponse {
@@ -63,7 +63,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActorsTypeahead<'a> {
     type Response = SearchActorsTypeaheadResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.actor.searchActorsTypeahead
 pub struct SearchActorsTypeaheadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsTypeaheadRequest {

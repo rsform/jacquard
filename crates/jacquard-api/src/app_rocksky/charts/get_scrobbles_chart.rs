@@ -49,7 +49,7 @@ pub struct GetScrobblesChartOutput<'a> {
     pub value: crate::app_rocksky::charts::ChartsView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.charts.getScrobblesChart
 pub struct GetScrobblesChartResponse;
 impl jacquard_common::xrpc::XrpcResp for GetScrobblesChartResponse {
@@ -65,7 +65,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetScrobblesChart<'a> {
     type Response = GetScrobblesChartResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.charts.getScrobblesChart
 pub struct GetScrobblesChartRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetScrobblesChartRequest {

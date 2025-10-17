@@ -86,7 +86,7 @@ impl std::fmt::Display for GetValuesError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.set.getValues
 pub struct GetValuesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetValuesResponse {
@@ -102,7 +102,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetValues<'a> {
     type Response = GetValuesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.set.getValues
 pub struct GetValuesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetValuesRequest {

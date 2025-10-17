@@ -30,7 +30,6 @@ pub struct Tags<'a> {
     pub repo: jacquard_common::CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -41,7 +40,10 @@ pub struct Tags<'a> {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct TagsOutput<'a> {}
+pub struct TagsOutput {
+    pub body: bytes::Bytes,
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -87,14 +89,29 @@ impl std::fmt::Display for TagsError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.tags
 pub struct TagsResponse;
 impl jacquard_common::xrpc::XrpcResp for TagsResponse {
     const NSID: &'static str = "sh.tangled.repo.tags";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = TagsOutput<'de>;
+    type Output<'de> = TagsOutput;
     type Err<'de> = TagsError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(TagsOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Tags<'a> {
@@ -103,7 +120,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Tags<'a> {
     type Response = TagsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.tags
 pub struct TagsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for TagsRequest {

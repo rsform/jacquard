@@ -34,7 +34,7 @@ pub struct GetJetstreamStatusOutput<'a> {
     pub connected: bool,
 }
 
-///Response type for
+/// Response type for
 ///network.slices.slice.getJetstreamStatus
 pub struct GetJetstreamStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetJetstreamStatusResponse {
@@ -50,7 +50,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetJetstreamStatus {
     type Response = GetJetstreamStatusResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///network.slices.slice.getJetstreamStatus
 pub struct GetJetstreamStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetJetstreamStatusRequest {

@@ -40,7 +40,7 @@ pub struct GetTemporaryLinkOutput<'a> {
     pub value: crate::app_rocksky::dropbox::TemporaryLinkView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.dropbox.getTemporaryLink
 pub struct GetTemporaryLinkResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTemporaryLinkResponse {
@@ -56,7 +56,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetTemporaryLink<'a> {
     type Response = GetTemporaryLinkResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.dropbox.getTemporaryLink
 pub struct GetTemporaryLinkRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTemporaryLinkRequest {

@@ -95,7 +95,7 @@ pub struct PutPreferencesV2Output<'a> {
     pub preferences: crate::app_bsky::notification::Preferences<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.notification.putPreferencesV2
 pub struct PutPreferencesV2Response;
 impl jacquard_common::xrpc::XrpcResp for PutPreferencesV2Response {
@@ -113,7 +113,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PutPreferencesV2<'a> {
     type Response = PutPreferencesV2Response;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.notification.putPreferencesV2
 pub struct PutPreferencesV2Request;
 impl jacquard_common::xrpc::XrpcEndpoint for PutPreferencesV2Request {

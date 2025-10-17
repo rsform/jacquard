@@ -43,7 +43,7 @@ pub struct GetAuthorFeedOutput<'a> {
     pub oekaki: Vec<crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///com.shinolabs.pinksea.getAuthorFeed
 pub struct GetAuthorFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAuthorFeedResponse {
@@ -59,7 +59,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetAuthorFeed<'a> {
     type Response = GetAuthorFeedResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.shinolabs.pinksea.getAuthorFeed
 pub struct GetAuthorFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorFeedRequest {

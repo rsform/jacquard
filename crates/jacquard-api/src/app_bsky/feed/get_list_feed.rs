@@ -82,7 +82,7 @@ impl std::fmt::Display for GetListFeedError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.feed.getListFeed
 pub struct GetListFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetListFeedResponse {
@@ -98,7 +98,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetListFeed<'a> {
     type Response = GetListFeedResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.feed.getListFeed
 pub struct GetListFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetListFeedRequest {

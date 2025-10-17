@@ -48,7 +48,7 @@ pub struct InvokeWebhook<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InvokeWebhookOutput<'a> {}
-///Response type for
+/// Response type for
 ///events.smokesignal.automation.InvokeWebhook
 pub struct InvokeWebhookResponse;
 impl jacquard_common::xrpc::XrpcResp for InvokeWebhookResponse {
@@ -66,7 +66,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for InvokeWebhook<'a> {
     type Response = InvokeWebhookResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///events.smokesignal.automation.InvokeWebhook
 pub struct InvokeWebhookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for InvokeWebhookRequest {

@@ -22,7 +22,7 @@ pub struct DeleteTemplate<'a> {
     pub id: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.communication.deleteTemplate
 pub struct DeleteTemplateResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteTemplateResponse {
@@ -40,7 +40,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteTemplate<'a> {
     type Response = DeleteTemplateResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.communication.deleteTemplate
 pub struct DeleteTemplateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteTemplateRequest {

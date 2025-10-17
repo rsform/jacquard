@@ -44,7 +44,7 @@ pub struct GetSuggestedFollowsByActorOutput<'a> {
     pub suggestions: Vec<crate::app_bsky::actor::ProfileView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.graph.getSuggestedFollowsByActor
 pub struct GetSuggestedFollowsByActorResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedFollowsByActorResponse {
@@ -60,7 +60,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedFollowsByActor<'a> {
     type Response = GetSuggestedFollowsByActorResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.graph.getSuggestedFollowsByActor
 pub struct GetSuggestedFollowsByActorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedFollowsByActorRequest {

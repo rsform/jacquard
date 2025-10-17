@@ -57,7 +57,7 @@ impl std::fmt::Display for RequestCrawlError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.sync.requestCrawl
 pub struct RequestCrawlResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestCrawlResponse {
@@ -75,7 +75,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RequestCrawl<'a> {
     type Response = RequestCrawlResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.sync.requestCrawl
 pub struct RequestCrawlRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestCrawlRequest {

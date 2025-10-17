@@ -26,7 +26,6 @@ pub struct Diff<'a> {
     pub repo: jacquard_common::CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -37,7 +36,10 @@ pub struct Diff<'a> {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct DiffOutput<'a> {}
+pub struct DiffOutput {
+    pub body: bytes::Bytes,
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -93,14 +95,29 @@ impl std::fmt::Display for DiffError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.diff
 pub struct DiffResponse;
 impl jacquard_common::xrpc::XrpcResp for DiffResponse {
     const NSID: &'static str = "sh.tangled.repo.diff";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = DiffOutput<'de>;
+    type Output<'de> = DiffOutput;
     type Err<'de> = DiffError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(DiffOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Diff<'a> {
@@ -109,7 +126,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Diff<'a> {
     type Response = DiffResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.diff
 pub struct DiffRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DiffRequest {

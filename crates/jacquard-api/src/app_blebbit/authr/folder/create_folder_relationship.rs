@@ -26,7 +26,7 @@ pub struct CreateFolderRelationship<'a> {
     pub subject: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.blebbit.authr.folder.createFolderRelationship
 pub struct CreateFolderRelationshipResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateFolderRelationshipResponse {
@@ -44,7 +44,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateFolderRelationship<'a> {
     type Response = CreateFolderRelationshipResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.blebbit.authr.folder.createFolderRelationship
 pub struct CreateFolderRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateFolderRelationshipRequest {

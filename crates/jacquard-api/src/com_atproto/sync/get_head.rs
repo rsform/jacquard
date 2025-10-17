@@ -72,7 +72,7 @@ impl std::fmt::Display for GetHeadError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.sync.getHead
 pub struct GetHeadResponse;
 impl jacquard_common::xrpc::XrpcResp for GetHeadResponse {
@@ -88,7 +88,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetHead<'a> {
     type Response = GetHeadResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.sync.getHead
 pub struct GetHeadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetHeadRequest {

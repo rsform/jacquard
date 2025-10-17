@@ -40,7 +40,7 @@ pub struct GetMetadataOutput<'a> {
     pub value: crate::app_rocksky::dropbox::FileView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.dropbox.getMetadata
 pub struct GetMetadataResponse;
 impl jacquard_common::xrpc::XrpcResp for GetMetadataResponse {
@@ -56,7 +56,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetMetadata<'a> {
     type Response = GetMetadataResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.dropbox.getMetadata
 pub struct GetMetadataRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetMetadataRequest {

@@ -83,7 +83,7 @@ pub struct GetActorsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///network.slices.slice.getActors
 pub struct GetActorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorsResponse {
@@ -101,7 +101,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetActors<'a> {
     type Response = GetActorsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///network.slices.slice.getActors
 pub struct GetActorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorsRequest {

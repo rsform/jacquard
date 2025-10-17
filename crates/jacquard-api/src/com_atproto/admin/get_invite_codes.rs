@@ -51,7 +51,7 @@ pub struct GetInviteCodesOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.admin.getInviteCodes
 pub struct GetInviteCodesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetInviteCodesResponse {
@@ -67,7 +67,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetInviteCodes<'a> {
     type Response = GetInviteCodesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.admin.getInviteCodes
 pub struct GetInviteCodesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetInviteCodesRequest {

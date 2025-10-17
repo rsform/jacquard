@@ -91,7 +91,7 @@ impl std::fmt::Display for GetActorLikesError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.feed.getActorLikes
 pub struct GetActorLikesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorLikesResponse {
@@ -107,7 +107,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorLikes<'a> {
     type Response = GetActorLikesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.feed.getActorLikes
 pub struct GetActorLikesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorLikesRequest {

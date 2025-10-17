@@ -20,7 +20,7 @@
 pub struct Paste<'a> {
     /// Blob reference to the paste content
     #[serde(borrow)]
-    pub content: jacquard_common::types::blob::Blob<'a>,
+    pub content: jacquard_common::types::blob::BlobRef<'a>,
     /// When the paste was created
     pub created_at: jacquard_common::types::string::Datetime,
     /// Programming language for syntax highlighting

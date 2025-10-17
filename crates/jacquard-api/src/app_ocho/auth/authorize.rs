@@ -50,7 +50,7 @@ pub struct AuthorizeOutput<'a> {
     pub url: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.ocho.auth.authorize
 pub struct AuthorizeResponse;
 impl jacquard_common::xrpc::XrpcResp for AuthorizeResponse {
@@ -68,7 +68,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Authorize<'a> {
     type Response = AuthorizeResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.auth.authorize
 pub struct AuthorizeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AuthorizeRequest {

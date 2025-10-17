@@ -41,7 +41,7 @@ pub struct FetchLabelsOutput<'a> {
     pub labels: Vec<crate::com_atproto::label::Label<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.temp.fetchLabels
 pub struct FetchLabelsResponse;
 impl jacquard_common::xrpc::XrpcResp for FetchLabelsResponse {
@@ -57,7 +57,7 @@ impl jacquard_common::xrpc::XrpcRequest for FetchLabels {
     type Response = FetchLabelsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.temp.fetchLabels
 pub struct FetchLabelsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for FetchLabelsRequest {

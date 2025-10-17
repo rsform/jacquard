@@ -54,7 +54,7 @@ pub struct SearchActorsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.actor.searchActors
 pub struct SearchActorsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchActorsResponse {
@@ -70,7 +70,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActors<'a> {
     type Response = SearchActorsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.actor.searchActors
 pub struct SearchActorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsRequest {

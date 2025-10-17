@@ -83,7 +83,7 @@ pub struct ScheduleActionOutput<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.moderation.scheduleAction
 pub struct ScheduleActionResponse;
 impl jacquard_common::xrpc::XrpcResp for ScheduleActionResponse {
@@ -101,7 +101,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ScheduleAction<'a> {
     type Response = ScheduleActionResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.moderation.scheduleAction
 pub struct ScheduleActionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ScheduleActionRequest {

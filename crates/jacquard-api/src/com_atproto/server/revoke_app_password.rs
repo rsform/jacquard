@@ -22,7 +22,7 @@ pub struct RevokeAppPassword<'a> {
     pub name: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.server.revokeAppPassword
 pub struct RevokeAppPasswordResponse;
 impl jacquard_common::xrpc::XrpcResp for RevokeAppPasswordResponse {
@@ -40,7 +40,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RevokeAppPassword<'a> {
     type Response = RevokeAppPasswordResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.revokeAppPassword
 pub struct RevokeAppPasswordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RevokeAppPasswordRequest {

@@ -73,7 +73,7 @@ pub struct GetListsWithMembershipOutput<'a> {
     pub lists_with_membership: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.graph.getListsWithMembership
 pub struct GetListsWithMembershipResponse;
 impl jacquard_common::xrpc::XrpcResp for GetListsWithMembershipResponse {
@@ -89,7 +89,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetListsWithMembership<'a> {
     type Response = GetListsWithMembershipResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.graph.getListsWithMembership
 pub struct GetListsWithMembershipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetListsWithMembershipRequest {

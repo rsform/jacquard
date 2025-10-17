@@ -46,7 +46,7 @@ pub struct GetGroupsOutput<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///app.blebbit.authr.group.getGroups
 pub struct GetGroupsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetGroupsResponse {
@@ -62,7 +62,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetGroups<'a> {
     type Response = GetGroupsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.blebbit.authr.group.getGroups
 pub struct GetGroupsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetGroupsRequest {

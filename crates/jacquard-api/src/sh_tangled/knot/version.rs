@@ -57,7 +57,7 @@ impl std::fmt::Display for VersionError<'_> {
     jacquard_derive::IntoStatic
 )]
 pub struct Version;
-///Response type for
+/// Response type for
 ///sh.tangled.knot.version
 pub struct VersionResponse;
 impl jacquard_common::xrpc::XrpcResp for VersionResponse {
@@ -73,7 +73,7 @@ impl jacquard_common::xrpc::XrpcRequest for Version {
     type Response = VersionResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.knot.version
 pub struct VersionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for VersionRequest {

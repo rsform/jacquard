@@ -66,7 +66,7 @@ impl std::fmt::Display for NotifyOfNewEntryError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.whtwnd.blog.notifyOfNewEntry
 pub struct NotifyOfNewEntryResponse;
 impl jacquard_common::xrpc::XrpcResp for NotifyOfNewEntryResponse {
@@ -84,7 +84,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for NotifyOfNewEntry<'a> {
     type Response = NotifyOfNewEntryResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.whtwnd.blog.notifyOfNewEntry
 pub struct NotifyOfNewEntryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NotifyOfNewEntryRequest {

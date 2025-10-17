@@ -38,7 +38,7 @@ pub struct GetReporterStatsOutput<'a> {
     pub stats: Vec<crate::tools_ozone::moderation::ReporterStats<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.moderation.getReporterStats
 pub struct GetReporterStatsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetReporterStatsResponse {
@@ -54,7 +54,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetReporterStats<'a> {
     type Response = GetReporterStatsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.moderation.getReporterStats
 pub struct GetReporterStatsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetReporterStatsRequest {

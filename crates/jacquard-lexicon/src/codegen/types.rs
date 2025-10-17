@@ -23,7 +23,7 @@ impl<'c> CodeGenerator<'c> {
             LexObjectProperty::CidLink(_) => {
                 Ok(quote! { jacquard_common::types::cid::CidLink<'a> })
             }
-            LexObjectProperty::Blob(_) => Ok(quote! { jacquard_common::types::blob::Blob<'a> }),
+            LexObjectProperty::Blob(_) => Ok(quote! { jacquard_common::types::blob::BlobRef<'a> }),
             LexObjectProperty::Unknown(_) => Ok(quote! { jacquard_common::types::value::Data<'a> }),
             LexObjectProperty::Array(array) => {
                 // For arrays with union items, check if multi-variant
@@ -42,8 +42,14 @@ impl<'c> CodeGenerator<'c> {
                         Ok(quote! { Vec<#ref_type> })
                     } else {
                         // Multi-variant: use generated union type
-                        let union_name = self.generate_field_type_name(nsid, parent_type_name, field_name, "Item");
-                        let union_ident = syn::Ident::new(&union_name, proc_macro2::Span::call_site());
+                        let union_name = self.generate_field_type_name(
+                            nsid,
+                            parent_type_name,
+                            field_name,
+                            "Item",
+                        );
+                        let union_ident =
+                            syn::Ident::new(&union_name, proc_macro2::Span::call_site());
                         Ok(quote! { Vec<#union_ident<'a>> })
                     }
                 } else {
@@ -57,7 +63,8 @@ impl<'c> CodeGenerator<'c> {
                     return Ok(quote! { jacquard_common::types::value::Data<'a> });
                 }
                 // Generate unique nested object type name with collision detection
-                let object_name = self.generate_field_type_name(nsid, parent_type_name, field_name, "");
+                let object_name =
+                    self.generate_field_type_name(nsid, parent_type_name, field_name, "");
                 let object_ident = syn::Ident::new(&object_name, proc_macro2::Span::call_site());
                 Ok(quote! { #object_ident<'a> })
             }
@@ -83,17 +90,20 @@ impl<'c> CodeGenerator<'c> {
                     };
 
                     // Parse ref to get type name
-                    let (ref_nsid, ref_def) = if let Some((nsid_part, fragment)) = ref_str.split_once('#') {
-                        (nsid_part, fragment)
-                    } else {
-                        (ref_str.as_str(), "main")
-                    };
+                    let (ref_nsid, ref_def) =
+                        if let Some((nsid_part, fragment)) = ref_str.split_once('#') {
+                            (nsid_part, fragment)
+                        } else {
+                            (ref_str.as_str(), "main")
+                        };
                     let ref_type_name = self.def_to_type_name(ref_nsid, ref_def);
 
                     // If self-referential, keep union for indirection (variants are boxed)
                     if ref_type_name == parent_type_name {
-                        let union_name = self.generate_field_type_name(nsid, parent_type_name, field_name, "");
-                        let union_ident = syn::Ident::new(&union_name, proc_macro2::Span::call_site());
+                        let union_name =
+                            self.generate_field_type_name(nsid, parent_type_name, field_name, "");
+                        let union_ident =
+                            syn::Ident::new(&union_name, proc_macro2::Span::call_site());
                         Ok(quote! { #union_ident<'a> })
                     } else {
                         // Non-self-ref single-variant: use the ref type directly
@@ -101,7 +111,8 @@ impl<'c> CodeGenerator<'c> {
                     }
                 } else {
                     // Multi-variant: generate union type with collision detection
-                    let union_name = self.generate_field_type_name(nsid, parent_type_name, field_name, "");
+                    let union_name =
+                        self.generate_field_type_name(nsid, parent_type_name, field_name, "");
                     let union_ident = syn::Ident::new(&union_name, proc_macro2::Span::call_site());
                     Ok(quote! { #union_ident<'a> })
                 }
@@ -110,14 +121,18 @@ impl<'c> CodeGenerator<'c> {
     }
 
     /// Convert array item to Rust type
-    pub(super) fn array_item_to_rust_type(&self, nsid: &str, item: &LexArrayItem) -> Result<TokenStream> {
+    pub(super) fn array_item_to_rust_type(
+        &self,
+        nsid: &str,
+        item: &LexArrayItem,
+    ) -> Result<TokenStream> {
         match item {
             LexArrayItem::Boolean(_) => Ok(quote! { bool }),
             LexArrayItem::Integer(_) => Ok(quote! { i64 }),
             LexArrayItem::String(s) => Ok(self.string_to_rust_type(s)),
             LexArrayItem::Bytes(_) => Ok(quote! { bytes::Bytes }),
             LexArrayItem::CidLink(_) => Ok(quote! { jacquard_common::types::cid::CidLink<'a> }),
-            LexArrayItem::Blob(_) => Ok(quote! { jacquard_common::types::blob::Blob<'a> }),
+            LexArrayItem::Blob(_) => Ok(quote! { jacquard_common::types::blob::BlobRef<'a> }),
             LexArrayItem::Unknown(_) => Ok(quote! { jacquard_common::types::value::Data<'a> }),
             LexArrayItem::Object(_) => {
                 // For inline objects in arrays, use Data since we can't generate a unique type name
@@ -167,8 +182,8 @@ impl<'c> CodeGenerator<'c> {
 
     /// Convert ref to Rust type path
     pub(super) fn ref_to_rust_type(&self, ref_str: &str) -> Result<TokenStream> {
-        use crate::error::CodegenError;
         use super::utils::sanitize_name;
+        use crate::error::CodegenError;
 
         // Parse NSID and fragment
         let (ref_nsid, ref_def) = if let Some((nsid, fragment)) = ref_str.split_once('#') {

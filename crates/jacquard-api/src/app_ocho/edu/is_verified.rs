@@ -39,7 +39,7 @@ pub struct IsVerifiedOutput<'a> {
     pub verified: bool,
 }
 
-///Response type for
+/// Response type for
 ///app.ocho.edu.isVerified
 pub struct IsVerifiedResponse;
 impl jacquard_common::xrpc::XrpcResp for IsVerifiedResponse {
@@ -55,7 +55,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for IsVerified<'a> {
     type Response = IsVerifiedResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.edu.isVerified
 pub struct IsVerifiedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for IsVerifiedRequest {

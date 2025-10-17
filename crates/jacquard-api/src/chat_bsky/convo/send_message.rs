@@ -50,7 +50,7 @@ pub struct SendMessageOutput<'a> {
     pub value: crate::chat_bsky::convo::MessageView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.sendMessage
 pub struct SendMessageResponse;
 impl jacquard_common::xrpc::XrpcResp for SendMessageResponse {
@@ -68,7 +68,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SendMessage<'a> {
     type Response = SendMessageResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.sendMessage
 pub struct SendMessageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendMessageRequest {

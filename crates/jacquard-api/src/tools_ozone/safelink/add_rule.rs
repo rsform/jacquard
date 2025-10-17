@@ -110,7 +110,7 @@ impl std::fmt::Display for AddRuleError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.safelink.addRule
 pub struct AddRuleResponse;
 impl jacquard_common::xrpc::XrpcResp for AddRuleResponse {
@@ -128,7 +128,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AddRule<'a> {
     type Response = AddRuleResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.safelink.addRule
 pub struct AddRuleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddRuleRequest {

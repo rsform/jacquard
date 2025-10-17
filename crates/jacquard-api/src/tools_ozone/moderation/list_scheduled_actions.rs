@@ -73,7 +73,7 @@ pub struct ListScheduledActionsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.moderation.listScheduledActions
 pub struct ListScheduledActionsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListScheduledActionsResponse {
@@ -91,7 +91,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListScheduledActions<'a> {
     type Response = ListScheduledActionsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.moderation.listScheduledActions
 pub struct ListScheduledActionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListScheduledActionsRequest {

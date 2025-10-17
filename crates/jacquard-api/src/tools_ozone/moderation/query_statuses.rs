@@ -146,7 +146,7 @@ pub struct QueryStatusesOutput<'a> {
     pub subject_statuses: Vec<crate::tools_ozone::moderation::SubjectStatusView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.moderation.queryStatuses
 pub struct QueryStatusesResponse;
 impl jacquard_common::xrpc::XrpcResp for QueryStatusesResponse {
@@ -162,7 +162,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for QueryStatuses<'a> {
     type Response = QueryStatusesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.moderation.queryStatuses
 pub struct QueryStatusesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QueryStatusesRequest {

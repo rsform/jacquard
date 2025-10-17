@@ -31,7 +31,7 @@ pub struct Scrobble<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub album_art: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub album_art: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The album artist of the song.
     #[serde(borrow)]
     #[builder(into)]

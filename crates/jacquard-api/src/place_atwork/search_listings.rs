@@ -101,7 +101,7 @@ impl std::fmt::Display for SearchListingsError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///place.atwork.searchListings
 pub struct SearchListingsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchListingsResponse {
@@ -117,7 +117,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SearchListings<'a> {
     type Response = SearchListingsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///place.atwork.searchListings
 pub struct SearchListingsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchListingsRequest {

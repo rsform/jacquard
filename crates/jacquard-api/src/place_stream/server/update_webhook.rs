@@ -139,7 +139,7 @@ impl std::fmt::Display for UpdateWebhookError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///place.stream.server.updateWebhook
 pub struct UpdateWebhookResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateWebhookResponse {
@@ -157,7 +157,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateWebhook<'a> {
     type Response = UpdateWebhookResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///place.stream.server.updateWebhook
 pub struct UpdateWebhookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateWebhookRequest {

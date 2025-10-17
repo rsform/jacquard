@@ -27,7 +27,7 @@ pub struct DeletePageRelationship<'a> {
     pub subject: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.blebbit.authr.page.deletePageRelationship
 pub struct DeletePageRelationshipResponse;
 impl jacquard_common::xrpc::XrpcResp for DeletePageRelationshipResponse {
@@ -45,7 +45,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeletePageRelationship<'a> {
     type Response = DeletePageRelationshipResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.blebbit.authr.page.deletePageRelationship
 pub struct DeletePageRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeletePageRelationshipRequest {

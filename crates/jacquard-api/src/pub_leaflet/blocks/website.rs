@@ -25,7 +25,7 @@ pub struct Website<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub preview_image: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub preview_image: Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub src: jacquard_common::types::string::Uri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]

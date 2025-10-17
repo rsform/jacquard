@@ -84,7 +84,7 @@ impl std::fmt::Display for DeleteWebhookError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///place.stream.server.deleteWebhook
 pub struct DeleteWebhookResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteWebhookResponse {
@@ -102,7 +102,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteWebhook<'a> {
     type Response = DeleteWebhookResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///place.stream.server.deleteWebhook
 pub struct DeleteWebhookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteWebhookRequest {

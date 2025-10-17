@@ -100,7 +100,7 @@ impl std::fmt::Display for GetLatestCommitError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.sync.getLatestCommit
 pub struct GetLatestCommitResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLatestCommitResponse {
@@ -116,7 +116,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetLatestCommit<'a> {
     type Response = GetLatestCommitResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.sync.getLatestCommit
 pub struct GetLatestCommitRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLatestCommitRequest {

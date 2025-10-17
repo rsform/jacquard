@@ -17,7 +17,7 @@
     jacquard_derive::IntoStatic
 )]
 pub struct DeleteSession;
-///Response type for
+/// Response type for
 ///com.atproto.server.deleteSession
 pub struct DeleteSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteSessionResponse {
@@ -35,7 +35,7 @@ impl jacquard_common::xrpc::XrpcRequest for DeleteSession {
     type Response = DeleteSessionResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.deleteSession
 pub struct DeleteSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteSessionRequest {

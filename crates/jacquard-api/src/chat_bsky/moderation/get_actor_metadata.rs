@@ -42,7 +42,7 @@ pub struct GetActorMetadataOutput<'a> {
     pub month: jacquard_common::types::value::Data<'a>,
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.moderation.getActorMetadata
 pub struct GetActorMetadataResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorMetadataResponse {
@@ -58,7 +58,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorMetadata<'a> {
     type Response = GetActorMetadataResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.moderation.getActorMetadata
 pub struct GetActorMetadataRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorMetadataRequest {

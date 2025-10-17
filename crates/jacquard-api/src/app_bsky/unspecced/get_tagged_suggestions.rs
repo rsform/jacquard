@@ -34,7 +34,7 @@ pub struct GetTaggedSuggestionsOutput<'a> {
     pub suggestions: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.getTaggedSuggestions
 pub struct GetTaggedSuggestionsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTaggedSuggestionsResponse {
@@ -50,7 +50,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetTaggedSuggestions {
     type Response = GetTaggedSuggestionsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.getTaggedSuggestions
 pub struct GetTaggedSuggestionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedSuggestionsRequest {

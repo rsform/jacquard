@@ -35,7 +35,7 @@ pub struct UpdateActorAccess<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.moderation.updateActorAccess
 pub struct UpdateActorAccessResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateActorAccessResponse {
@@ -53,7 +53,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateActorAccess<'a> {
     type Response = UpdateActorAccessResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.moderation.updateActorAccess
 pub struct UpdateActorAccessRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateActorAccessRequest {

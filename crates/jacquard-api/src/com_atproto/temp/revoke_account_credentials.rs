@@ -30,7 +30,7 @@ pub struct RevokeAccountCredentials<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.temp.revokeAccountCredentials
 pub struct RevokeAccountCredentialsResponse;
 impl jacquard_common::xrpc::XrpcResp for RevokeAccountCredentialsResponse {
@@ -48,7 +48,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RevokeAccountCredentials<'a> {
     type Response = RevokeAccountCredentialsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.temp.revokeAccountCredentials
 pub struct RevokeAccountCredentialsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RevokeAccountCredentialsRequest {

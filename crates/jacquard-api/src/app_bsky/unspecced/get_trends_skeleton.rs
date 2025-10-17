@@ -42,7 +42,7 @@ pub struct GetTrendsSkeletonOutput<'a> {
     pub trends: Vec<crate::app_bsky::unspecced::SkeletonTrend<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.getTrendsSkeleton
 pub struct GetTrendsSkeletonResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTrendsSkeletonResponse {
@@ -58,7 +58,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetTrendsSkeleton<'a> {
     type Response = GetTrendsSkeletonResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.getTrendsSkeleton
 pub struct GetTrendsSkeletonRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTrendsSkeletonRequest {

@@ -80,7 +80,7 @@ impl std::fmt::Display for UpdateEmailError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///app.ocho.auth.updateEmail
 pub struct UpdateEmailResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateEmailResponse {
@@ -98,7 +98,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateEmail<'a> {
     type Response = UpdateEmailResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.auth.updateEmail
 pub struct UpdateEmailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateEmailRequest {

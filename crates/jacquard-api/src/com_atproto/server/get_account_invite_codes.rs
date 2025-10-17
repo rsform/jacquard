@@ -76,7 +76,7 @@ impl std::fmt::Display for GetAccountInviteCodesError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.server.getAccountInviteCodes
 pub struct GetAccountInviteCodesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAccountInviteCodesResponse {
@@ -92,7 +92,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetAccountInviteCodes {
     type Response = GetAccountInviteCodesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.getAccountInviteCodes
 pub struct GetAccountInviteCodesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInviteCodesRequest {

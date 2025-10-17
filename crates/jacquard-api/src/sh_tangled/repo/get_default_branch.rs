@@ -101,7 +101,7 @@ impl std::fmt::Display for GetDefaultBranchError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.getDefaultBranch
 pub struct GetDefaultBranchResponse;
 impl jacquard_common::xrpc::XrpcResp for GetDefaultBranchResponse {
@@ -117,7 +117,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetDefaultBranch<'a> {
     type Response = GetDefaultBranchResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.getDefaultBranch
 pub struct GetDefaultBranchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetDefaultBranchRequest {

@@ -47,7 +47,7 @@ pub struct UpdateApikeyOutput<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.apikey.updateApikey
 pub struct UpdateApikeyResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateApikeyResponse {
@@ -65,7 +65,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateApikey<'a> {
     type Response = UpdateApikeyResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.apikey.updateApikey
 pub struct UpdateApikeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateApikeyRequest {

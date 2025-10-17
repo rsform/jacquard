@@ -102,7 +102,7 @@ impl std::fmt::Display for CreateAppPasswordError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.server.createAppPassword
 pub struct CreateAppPasswordResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateAppPasswordResponse {
@@ -120,7 +120,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateAppPassword<'a> {
     type Response = CreateAppPasswordResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.createAppPassword
 pub struct CreateAppPasswordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateAppPasswordRequest {

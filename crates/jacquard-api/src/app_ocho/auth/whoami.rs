@@ -39,7 +39,7 @@ pub struct WhoamiOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct Whoami;
-///Response type for
+/// Response type for
 ///app.ocho.auth.whoami
 pub struct WhoamiResponse;
 impl jacquard_common::xrpc::XrpcResp for WhoamiResponse {
@@ -55,7 +55,7 @@ impl jacquard_common::xrpc::XrpcRequest for Whoami {
     type Response = WhoamiResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.auth.whoami
 pub struct WhoamiRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for WhoamiRequest {

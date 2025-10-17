@@ -17,7 +17,7 @@
     jacquard_derive::IntoStatic
 )]
 pub struct Previous;
-///Response type for
+/// Response type for
 ///app.rocksky.spotify.previous
 pub struct PreviousResponse;
 impl jacquard_common::xrpc::XrpcResp for PreviousResponse {
@@ -35,7 +35,7 @@ impl jacquard_common::xrpc::XrpcRequest for Previous {
     type Response = PreviousResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.spotify.previous
 pub struct PreviousRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PreviousRequest {

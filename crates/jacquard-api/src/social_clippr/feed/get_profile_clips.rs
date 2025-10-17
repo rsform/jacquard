@@ -53,7 +53,7 @@ pub struct GetProfileClipsOutput<'a> {
     pub feed: Vec<crate::social_clippr::feed::ClipView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///social.clippr.feed.getProfileClips
 pub struct GetProfileClipsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfileClipsResponse {
@@ -69,7 +69,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfileClips<'a> {
     type Response = GetProfileClipsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///social.clippr.feed.getProfileClips
 pub struct GetProfileClipsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfileClipsRequest {

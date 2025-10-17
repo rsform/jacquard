@@ -24,7 +24,7 @@ pub struct Root<'a> {
     #[serde(borrow)]
     pub doc: crate::sh_weaver::edit::DocRef<'a>,
     #[serde(borrow)]
-    pub snapshot: jacquard_common::types::blob::Blob<'a>,
+    pub snapshot: jacquard_common::types::blob::BlobRef<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }

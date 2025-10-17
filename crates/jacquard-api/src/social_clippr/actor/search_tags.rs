@@ -54,7 +54,7 @@ pub struct SearchTagsOutput<'a> {
     pub tags: Vec<crate::social_clippr::feed::TagView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///social.clippr.actor.searchTags
 pub struct SearchTagsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchTagsResponse {
@@ -70,7 +70,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SearchTags<'a> {
     type Response = SearchTagsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///social.clippr.actor.searchTags
 pub struct SearchTagsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchTagsRequest {

@@ -75,7 +75,7 @@ impl std::fmt::Display for DeleteMemberError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.team.deleteMember
 pub struct DeleteMemberResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteMemberResponse {
@@ -93,7 +93,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteMember<'a> {
     type Response = DeleteMemberResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.team.deleteMember
 pub struct DeleteMemberRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteMemberRequest {

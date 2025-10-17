@@ -43,7 +43,7 @@ pub struct ReplyShoutOutput<'a> {
     pub value: crate::app_rocksky::shout::ShoutView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.shout.replyShout
 pub struct ReplyShoutResponse;
 impl jacquard_common::xrpc::XrpcResp for ReplyShoutResponse {
@@ -61,7 +61,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ReplyShout<'a> {
     type Response = ReplyShoutResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.shout.replyShout
 pub struct ReplyShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ReplyShoutRequest {

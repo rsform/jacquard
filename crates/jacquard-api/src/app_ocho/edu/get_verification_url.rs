@@ -41,7 +41,7 @@ pub struct GetVerificationUrlOutput<'a> {
     pub url: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.ocho.edu.getVerificationUrl
 pub struct GetVerificationUrlResponse;
 impl jacquard_common::xrpc::XrpcResp for GetVerificationUrlResponse {
@@ -57,7 +57,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetVerificationUrl<'a> {
     type Response = GetVerificationUrlResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.edu.getVerificationUrl
 pub struct GetVerificationUrlRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetVerificationUrlRequest {

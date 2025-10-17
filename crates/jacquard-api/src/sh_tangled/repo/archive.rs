@@ -36,7 +36,6 @@ pub struct Archive<'a> {
 }
 
 /// Binary archive data
-#[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -47,7 +46,10 @@ pub struct Archive<'a> {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct ArchiveOutput<'a> {}
+pub struct ArchiveOutput {
+    pub body: bytes::Bytes,
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -113,14 +115,29 @@ impl std::fmt::Display for ArchiveError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.archive
 pub struct ArchiveResponse;
 impl jacquard_common::xrpc::XrpcResp for ArchiveResponse {
     const NSID: &'static str = "sh.tangled.repo.archive";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = ArchiveOutput<'de>;
+    type Output<'de> = ArchiveOutput;
     type Err<'de> = ArchiveError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(ArchiveOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Archive<'a> {
@@ -129,7 +146,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Archive<'a> {
     type Response = ArchiveResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.archive
 pub struct ArchiveRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ArchiveRequest {

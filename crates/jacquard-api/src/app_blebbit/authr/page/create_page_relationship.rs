@@ -26,7 +26,7 @@ pub struct CreatePageRelationship<'a> {
     pub subject: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.blebbit.authr.page.createPageRelationship
 pub struct CreatePageRelationshipResponse;
 impl jacquard_common::xrpc::XrpcResp for CreatePageRelationshipResponse {
@@ -44,7 +44,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreatePageRelationship<'a> {
     type Response = CreatePageRelationshipResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.blebbit.authr.page.createPageRelationship
 pub struct CreatePageRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreatePageRelationshipRequest {

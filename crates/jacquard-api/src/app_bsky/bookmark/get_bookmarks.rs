@@ -46,7 +46,7 @@ pub struct GetBookmarksOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.bookmark.getBookmarks
 pub struct GetBookmarksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBookmarksResponse {
@@ -62,7 +62,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetBookmarks<'a> {
     type Response = GetBookmarksResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.bookmark.getBookmarks
 pub struct GetBookmarksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBookmarksRequest {

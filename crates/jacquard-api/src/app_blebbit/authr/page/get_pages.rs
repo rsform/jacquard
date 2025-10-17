@@ -44,7 +44,7 @@ pub struct GetPagesOutput<'a> {
     pub pages: std::option::Option<Vec<crate::app_blebbit::authr::page::PageView<'a>>>,
 }
 
-///Response type for
+/// Response type for
 ///app.blebbit.authr.page.getPages
 pub struct GetPagesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPagesResponse {
@@ -60,7 +60,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPages<'a> {
     type Response = GetPagesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.blebbit.authr.page.getPages
 pub struct GetPagesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPagesRequest {

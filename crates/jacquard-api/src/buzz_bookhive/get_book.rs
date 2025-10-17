@@ -44,7 +44,7 @@ pub struct GetBookOutput<'a> {
     /// Cover image of the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
+    pub cover: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The date the user finished reading the book
@@ -68,7 +68,7 @@ pub struct GetBookOutput<'a> {
     pub status: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///buzz.bookhive.getBook
 pub struct GetBookResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBookResponse {
@@ -84,7 +84,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetBook<'a> {
     type Response = GetBookResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///buzz.bookhive.getBook
 pub struct GetBookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBookRequest {

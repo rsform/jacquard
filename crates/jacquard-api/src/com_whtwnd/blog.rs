@@ -25,7 +25,7 @@ pub mod notify_of_new_entry;
 #[serde(rename_all = "camelCase")]
 pub struct BlobMetadata<'a> {
     #[serde(borrow)]
-    pub blobref: jacquard_common::types::blob::Blob<'a>,
+    pub blobref: jacquard_common::types::blob::BlobRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]

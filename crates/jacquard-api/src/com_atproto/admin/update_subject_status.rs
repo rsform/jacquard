@@ -99,7 +99,7 @@ pub enum UpdateSubjectStatusOutputSubject<'a> {
     RepoBlobRef(Box<crate::com_atproto::admin::RepoBlobRef<'a>>),
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.admin.updateSubjectStatus
 pub struct UpdateSubjectStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateSubjectStatusResponse {
@@ -117,7 +117,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateSubjectStatus<'a> {
     type Response = UpdateSubjectStatusResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.admin.updateSubjectStatus
 pub struct UpdateSubjectStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateSubjectStatusRequest {

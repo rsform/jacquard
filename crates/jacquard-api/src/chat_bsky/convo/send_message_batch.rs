@@ -66,7 +66,7 @@ pub struct SendMessageBatchOutput<'a> {
     pub items: Vec<crate::chat_bsky::convo::MessageView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.sendMessageBatch
 pub struct SendMessageBatchResponse;
 impl jacquard_common::xrpc::XrpcResp for SendMessageBatchResponse {
@@ -84,7 +84,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SendMessageBatch<'a> {
     type Response = SendMessageBatchResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.sendMessageBatch
 pub struct SendMessageBatchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendMessageBatchRequest {

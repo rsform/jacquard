@@ -38,7 +38,7 @@ pub struct ListSecretsOutput<'a> {
     pub secrets: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.listSecrets
 pub struct ListSecretsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListSecretsResponse {
@@ -54,7 +54,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListSecrets<'a> {
     type Response = ListSecretsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.listSecrets
 pub struct ListSecretsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListSecretsRequest {

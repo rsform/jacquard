@@ -85,7 +85,7 @@ pub struct GetJobStatusOutput<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
-///Response type for
+/// Response type for
 ///network.slices.slice.getJobStatus
 pub struct GetJobStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetJobStatusResponse {
@@ -101,7 +101,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetJobStatus<'a> {
     type Response = GetJobStatusResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///network.slices.slice.getJobStatus
 pub struct GetJobStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetJobStatusRequest {

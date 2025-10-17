@@ -38,7 +38,7 @@ pub struct GetPostsOutput<'a> {
     pub posts: Vec<crate::app_bsky::feed::PostView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.feed.getPosts
 pub struct GetPostsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPostsResponse {
@@ -54,7 +54,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPosts<'a> {
     type Response = GetPostsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.feed.getPosts
 pub struct GetPostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostsRequest {

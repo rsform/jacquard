@@ -84,7 +84,7 @@ impl std::fmt::Display for ResolveDidError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.identity.resolveDid
 pub struct ResolveDidResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveDidResponse {
@@ -100,7 +100,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveDid<'a> {
     type Response = ResolveDidResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.identity.resolveDid
 pub struct ResolveDidRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveDidRequest {

@@ -46,7 +46,7 @@ pub struct RemoveOptions<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveOptionsOutput<'a> {}
-///Response type for
+/// Response type for
 ///tools.ozone.setting.removeOptions
 pub struct RemoveOptionsResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveOptionsResponse {
@@ -64,7 +64,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveOptions<'a> {
     type Response = RemoveOptionsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.setting.removeOptions
 pub struct RemoveOptionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveOptionsRequest {

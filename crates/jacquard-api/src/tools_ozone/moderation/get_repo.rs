@@ -73,7 +73,7 @@ impl std::fmt::Display for GetRepoError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.moderation.getRepo
 pub struct GetRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRepoResponse {
@@ -89,7 +89,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepo<'a> {
     type Response = GetRepoResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.moderation.getRepo
 pub struct GetRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRepoRequest {

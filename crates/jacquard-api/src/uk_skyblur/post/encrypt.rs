@@ -45,7 +45,7 @@ pub struct EncryptOutput<'a> {
     pub message: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///uk.skyblur.post.encrypt
 pub struct EncryptResponse;
 impl jacquard_common::xrpc::XrpcResp for EncryptResponse {
@@ -63,7 +63,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Encrypt<'a> {
     type Response = EncryptResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///uk.skyblur.post.encrypt
 pub struct EncryptRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for EncryptRequest {

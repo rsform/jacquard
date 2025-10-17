@@ -56,7 +56,7 @@ pub struct GetConfigOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct GetConfig;
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.getConfig
 pub struct GetConfigResponse;
 impl jacquard_common::xrpc::XrpcResp for GetConfigResponse {
@@ -72,7 +72,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetConfig {
     type Response = GetConfigResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.getConfig
 pub struct GetConfigRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetConfigRequest {

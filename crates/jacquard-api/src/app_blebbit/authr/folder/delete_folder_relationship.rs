@@ -27,7 +27,7 @@ pub struct DeleteFolderRelationship<'a> {
     pub subject: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.blebbit.authr.folder.deleteFolderRelationship
 pub struct DeleteFolderRelationshipResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteFolderRelationshipResponse {
@@ -45,7 +45,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteFolderRelationship<'a> {
     type Response = DeleteFolderRelationshipResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.blebbit.authr.folder.deleteFolderRelationship
 pub struct DeleteFolderRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteFolderRelationshipRequest {

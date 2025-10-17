@@ -61,7 +61,7 @@ pub struct GetStripeIntentOutput<'a> {
     pub publishable_key: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.ocho.payment.getStripeIntent
 pub struct GetStripeIntentResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStripeIntentResponse {
@@ -77,7 +77,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetStripeIntent<'a> {
     type Response = GetStripeIntentResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.payment.getStripeIntent
 pub struct GetStripeIntentRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStripeIntentRequest {

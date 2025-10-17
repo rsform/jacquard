@@ -41,7 +41,7 @@ pub struct LeaveConvoOutput<'a> {
     pub rev: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.leaveConvo
 pub struct LeaveConvoResponse;
 impl jacquard_common::xrpc::XrpcResp for LeaveConvoResponse {
@@ -59,7 +59,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for LeaveConvo<'a> {
     type Response = LeaveConvoResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.leaveConvo
 pub struct LeaveConvoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LeaveConvoRequest {

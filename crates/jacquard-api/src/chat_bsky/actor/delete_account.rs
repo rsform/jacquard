@@ -30,7 +30,7 @@ pub struct DeleteAccountOutput<'a> {}
     jacquard_derive::IntoStatic
 )]
 pub struct DeleteAccount;
-///Response type for
+/// Response type for
 ///chat.bsky.actor.deleteAccount
 pub struct DeleteAccountResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteAccountResponse {
@@ -48,7 +48,7 @@ impl jacquard_common::xrpc::XrpcRequest for DeleteAccount {
     type Response = DeleteAccountResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.actor.deleteAccount
 pub struct DeleteAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteAccountRequest {

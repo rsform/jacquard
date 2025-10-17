@@ -48,7 +48,7 @@ pub struct ListReposByCollectionOutput<'a> {
     pub repos: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.sync.listReposByCollection
 pub struct ListReposByCollectionResponse;
 impl jacquard_common::xrpc::XrpcResp for ListReposByCollectionResponse {
@@ -64,7 +64,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListReposByCollection<'a> {
     type Response = ListReposByCollectionResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.sync.listReposByCollection
 pub struct ListReposByCollectionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListReposByCollectionRequest {

@@ -102,7 +102,7 @@ impl std::fmt::Display for GetPostThreadError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.feed.getPostThread
 pub struct GetPostThreadResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPostThreadResponse {
@@ -118,7 +118,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPostThread<'a> {
     type Response = GetPostThreadResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.feed.getPostThread
 pub struct GetPostThreadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadRequest {

@@ -25,7 +25,7 @@ pub struct JobStatus<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub blob: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub blob: Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]

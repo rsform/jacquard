@@ -34,7 +34,7 @@ pub struct GetPreferencesOutput<'a> {
     pub preferences: crate::app_bsky::actor::Preferences<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.actor.getPreferences
 pub struct GetPreferencesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPreferencesResponse {
@@ -50,7 +50,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetPreferences {
     type Response = GetPreferencesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.actor.getPreferences
 pub struct GetPreferencesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPreferencesRequest {

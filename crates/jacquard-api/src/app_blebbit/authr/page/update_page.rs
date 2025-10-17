@@ -70,7 +70,7 @@ pub struct UpdatePageOutput<'a> {
     pub public: std::option::Option<bool>,
 }
 
-///Response type for
+/// Response type for
 ///app.blebbit.authr.page.updatePage
 pub struct UpdatePageResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdatePageResponse {
@@ -88,7 +88,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdatePage<'a> {
     type Response = UpdatePageResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.blebbit.authr.page.updatePage
 pub struct UpdatePageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdatePageRequest {

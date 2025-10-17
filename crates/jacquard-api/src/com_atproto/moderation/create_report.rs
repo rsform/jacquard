@@ -105,7 +105,7 @@ pub enum CreateReportOutputSubject<'a> {
     StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.moderation.createReport
 pub struct CreateReportResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateReportResponse {
@@ -123,7 +123,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateReport<'a> {
     type Response = CreateReportResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.moderation.createReport
 pub struct CreateReportRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateReportRequest {

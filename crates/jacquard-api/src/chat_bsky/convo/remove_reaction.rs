@@ -87,7 +87,7 @@ impl std::fmt::Display for RemoveReactionError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.removeReaction
 pub struct RemoveReactionResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveReactionResponse {
@@ -105,7 +105,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveReaction<'a> {
     type Response = RemoveReactionResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.removeReaction
 pub struct RemoveReactionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveReactionRequest {

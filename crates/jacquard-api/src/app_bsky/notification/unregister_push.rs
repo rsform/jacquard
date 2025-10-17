@@ -39,7 +39,7 @@ pub struct UnregisterPush<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.notification.unregisterPush
 pub struct UnregisterPushResponse;
 impl jacquard_common::xrpc::XrpcResp for UnregisterPushResponse {
@@ -57,7 +57,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UnregisterPush<'a> {
     type Response = UnregisterPushResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.notification.unregisterPush
 pub struct UnregisterPushRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UnregisterPushRequest {

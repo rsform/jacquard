@@ -41,7 +41,7 @@ pub struct GetRecentOutput<'a> {
     pub oekaki: Vec<crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///com.shinolabs.pinksea.getRecent
 pub struct GetRecentResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecentResponse {
@@ -57,7 +57,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetRecent {
     type Response = GetRecentResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.shinolabs.pinksea.getRecent
 pub struct GetRecentRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecentRequest {

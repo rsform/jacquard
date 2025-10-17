@@ -21,7 +21,6 @@ pub struct Sign {
     pub body: bytes::Bytes,
 }
 
-#[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -32,15 +31,33 @@ pub struct Sign {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct SignOutput<'a> {}
-///Response type for
+pub struct SignOutput {
+    pub body: bytes::Bytes,
+}
+
+/// Response type for
 ///garden.lexicon.ngerakines.semeion.Sign
 pub struct SignResponse;
 impl jacquard_common::xrpc::XrpcResp for SignResponse {
     const NSID: &'static str = "garden.lexicon.ngerakines.semeion.Sign";
     const ENCODING: &'static str = "application/octet-stream";
-    type Output<'de> = SignOutput<'de>;
+    type Output<'de> = SignOutput;
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(SignOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl jacquard_common::xrpc::XrpcRequest for Sign {
@@ -66,7 +83,7 @@ impl jacquard_common::xrpc::XrpcRequest for Sign {
     }
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///garden.lexicon.ngerakines.semeion.Sign
 pub struct SignRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SignRequest {

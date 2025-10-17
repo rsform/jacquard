@@ -73,7 +73,7 @@ impl std::fmt::Display for ResolveHandleError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.identity.resolveHandle
 pub struct ResolveHandleResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveHandleResponse {
@@ -89,7 +89,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveHandle<'a> {
     type Response = ResolveHandleResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.identity.resolveHandle
 pub struct ResolveHandleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveHandleRequest {

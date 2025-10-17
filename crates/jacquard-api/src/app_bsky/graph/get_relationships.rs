@@ -100,7 +100,7 @@ impl std::fmt::Display for GetRelationshipsError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.graph.getRelationships
 pub struct GetRelationshipsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRelationshipsResponse {
@@ -116,7 +116,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetRelationships<'a> {
     type Response = GetRelationshipsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.graph.getRelationships
 pub struct GetRelationshipsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRelationshipsRequest {

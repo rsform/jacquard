@@ -76,7 +76,7 @@ pub struct DescribeFeedGeneratorOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct DescribeFeedGenerator;
-///Response type for
+/// Response type for
 ///app.bsky.feed.describeFeedGenerator
 pub struct DescribeFeedGeneratorResponse;
 impl jacquard_common::xrpc::XrpcResp for DescribeFeedGeneratorResponse {
@@ -92,7 +92,7 @@ impl jacquard_common::xrpc::XrpcRequest for DescribeFeedGenerator {
     type Response = DescribeFeedGeneratorResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.feed.describeFeedGenerator
 pub struct DescribeFeedGeneratorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DescribeFeedGeneratorRequest {

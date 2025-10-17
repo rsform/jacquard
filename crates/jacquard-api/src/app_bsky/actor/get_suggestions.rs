@@ -49,7 +49,7 @@ pub struct GetSuggestionsOutput<'a> {
     pub rec_id: std::option::Option<i64>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.actor.getSuggestions
 pub struct GetSuggestionsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestionsResponse {
@@ -65,7 +65,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestions<'a> {
     type Response = GetSuggestionsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.actor.getSuggestions
 pub struct GetSuggestionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestionsRequest {

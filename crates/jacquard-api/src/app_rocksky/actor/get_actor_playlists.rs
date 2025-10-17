@@ -48,7 +48,7 @@ pub struct GetActorPlaylistsOutput<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.actor.getActorPlaylists
 pub struct GetActorPlaylistsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorPlaylistsResponse {
@@ -64,7 +64,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorPlaylists<'a> {
     type Response = GetActorPlaylistsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.actor.getActorPlaylists
 pub struct GetActorPlaylistsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorPlaylistsRequest {

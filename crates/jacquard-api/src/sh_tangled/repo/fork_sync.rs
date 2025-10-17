@@ -42,7 +42,7 @@ pub struct ForkSync<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.forkSync
 pub struct ForkSyncResponse;
 impl jacquard_common::xrpc::XrpcResp for ForkSyncResponse {
@@ -60,7 +60,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ForkSync<'a> {
     type Response = ForkSyncResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.forkSync
 pub struct ForkSyncRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ForkSyncRequest {

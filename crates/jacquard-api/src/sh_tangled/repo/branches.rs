@@ -30,7 +30,6 @@ pub struct Branches<'a> {
     pub repo: jacquard_common::CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -41,7 +40,10 @@ pub struct Branches<'a> {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct BranchesOutput<'a> {}
+pub struct BranchesOutput {
+    pub body: bytes::Bytes,
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -87,14 +89,29 @@ impl std::fmt::Display for BranchesError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.branches
 pub struct BranchesResponse;
 impl jacquard_common::xrpc::XrpcResp for BranchesResponse {
     const NSID: &'static str = "sh.tangled.repo.branches";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = BranchesOutput<'de>;
+    type Output<'de> = BranchesOutput;
     type Err<'de> = BranchesError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(BranchesOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Branches<'a> {
@@ -103,7 +120,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Branches<'a> {
     type Response = BranchesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.branches
 pub struct BranchesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for BranchesRequest {

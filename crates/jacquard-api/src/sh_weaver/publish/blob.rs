@@ -21,7 +21,7 @@
 pub struct Blob<'a> {
     /// Reference to the uploaded file
     #[serde(borrow)]
-    pub upload: jacquard_common::types::blob::Blob<'a>,
+    pub upload: jacquard_common::types::blob::BlobRef<'a>,
 }
 
 impl<'a> Blob<'a> {

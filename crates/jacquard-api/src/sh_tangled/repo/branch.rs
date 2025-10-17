@@ -117,7 +117,7 @@ impl std::fmt::Display for BranchError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.branch
 pub struct BranchResponse;
 impl jacquard_common::xrpc::XrpcResp for BranchResponse {
@@ -133,7 +133,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Branch<'a> {
     type Response = BranchResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.branch
 pub struct BranchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for BranchRequest {

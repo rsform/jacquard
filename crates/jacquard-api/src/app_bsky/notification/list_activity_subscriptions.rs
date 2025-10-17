@@ -46,7 +46,7 @@ pub struct ListActivitySubscriptionsOutput<'a> {
     pub subscriptions: Vec<crate::app_bsky::actor::ProfileView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.notification.listActivitySubscriptions
 pub struct ListActivitySubscriptionsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListActivitySubscriptionsResponse {
@@ -62,7 +62,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListActivitySubscriptions<'a> {
     type Response = ListActivitySubscriptionsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.notification.listActivitySubscriptions
 pub struct ListActivitySubscriptionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListActivitySubscriptionsRequest {

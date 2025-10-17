@@ -42,7 +42,7 @@ pub struct ReserveSigningKeyOutput<'a> {
     pub signing_key: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.server.reserveSigningKey
 pub struct ReserveSigningKeyResponse;
 impl jacquard_common::xrpc::XrpcResp for ReserveSigningKeyResponse {
@@ -60,7 +60,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ReserveSigningKey<'a> {
     type Response = ReserveSigningKeyResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.reserveSigningKey
 pub struct ReserveSigningKeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ReserveSigningKeyRequest {

@@ -71,7 +71,7 @@ pub struct StatsOutput<'a> {
     pub total_records: i64,
 }
 
-///Response type for
+/// Response type for
 ///network.slices.slice.stats
 pub struct StatsResponse;
 impl jacquard_common::xrpc::XrpcResp for StatsResponse {
@@ -87,7 +87,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Stats<'a> {
     type Response = StatsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///network.slices.slice.stats
 pub struct StatsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StatsRequest {

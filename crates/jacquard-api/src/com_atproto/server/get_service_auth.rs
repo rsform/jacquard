@@ -79,7 +79,7 @@ impl std::fmt::Display for GetServiceAuthError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.server.getServiceAuth
 pub struct GetServiceAuthResponse;
 impl jacquard_common::xrpc::XrpcResp for GetServiceAuthResponse {
@@ -95,7 +95,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetServiceAuth<'a> {
     type Response = GetServiceAuthResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.getServiceAuth
 pub struct GetServiceAuthRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetServiceAuthRequest {

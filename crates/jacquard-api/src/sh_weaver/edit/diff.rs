@@ -24,7 +24,7 @@ pub struct Diff<'a> {
     #[serde(borrow)]
     pub root: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(borrow)]
-    pub snapshot: jacquard_common::types::blob::Blob<'a>,
+    pub snapshot: jacquard_common::types::blob::BlobRef<'a>,
 }
 
 impl<'a> Diff<'a> {

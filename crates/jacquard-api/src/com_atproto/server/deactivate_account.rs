@@ -23,7 +23,7 @@ pub struct DeactivateAccount<'a> {
     pub delete_after: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.server.deactivateAccount
 pub struct DeactivateAccountResponse;
 impl jacquard_common::xrpc::XrpcResp for DeactivateAccountResponse {
@@ -41,7 +41,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeactivateAccount<'a> {
     type Response = DeactivateAccountResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.deactivateAccount
 pub struct DeactivateAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeactivateAccountRequest {

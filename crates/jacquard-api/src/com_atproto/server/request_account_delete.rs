@@ -17,7 +17,7 @@
     jacquard_derive::IntoStatic
 )]
 pub struct RequestAccountDelete;
-///Response type for
+/// Response type for
 ///com.atproto.server.requestAccountDelete
 pub struct RequestAccountDeleteResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestAccountDeleteResponse {
@@ -35,7 +35,7 @@ impl jacquard_common::xrpc::XrpcRequest for RequestAccountDelete {
     type Response = RequestAccountDeleteResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.requestAccountDelete
 pub struct RequestAccountDeleteRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestAccountDeleteRequest {

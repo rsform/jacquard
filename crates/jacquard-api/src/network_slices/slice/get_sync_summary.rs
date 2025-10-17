@@ -76,7 +76,7 @@ pub struct GetSyncSummaryOutput<'a> {
     pub would_be_capped: bool,
 }
 
-///Response type for
+/// Response type for
 ///network.slices.slice.getSyncSummary
 pub struct GetSyncSummaryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSyncSummaryResponse {
@@ -92,7 +92,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSyncSummary<'a> {
     type Response = GetSyncSummaryResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///network.slices.slice.getSyncSummary
 pub struct GetSyncSummaryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSyncSummaryRequest {

@@ -46,7 +46,7 @@ pub struct GetMutesOutput<'a> {
     pub mutes: Vec<crate::app_bsky::actor::ProfileView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.graph.getMutes
 pub struct GetMutesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetMutesResponse {
@@ -62,7 +62,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetMutes<'a> {
     type Response = GetMutesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.graph.getMutes
 pub struct GetMutesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetMutesRequest {

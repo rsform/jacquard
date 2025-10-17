@@ -47,7 +47,7 @@ pub struct GetRecommendedDidCredentialsOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct GetRecommendedDidCredentials;
-///Response type for
+/// Response type for
 ///com.atproto.identity.getRecommendedDidCredentials
 pub struct GetRecommendedDidCredentialsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecommendedDidCredentialsResponse {
@@ -63,7 +63,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetRecommendedDidCredentials {
     type Response = GetRecommendedDidCredentialsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.identity.getRecommendedDidCredentials
 pub struct GetRecommendedDidCredentialsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecommendedDidCredentialsRequest {

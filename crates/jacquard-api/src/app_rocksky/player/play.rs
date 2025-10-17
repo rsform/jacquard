@@ -17,7 +17,7 @@
     jacquard_derive::IntoStatic
 )]
 pub struct Play;
-///Response type for
+/// Response type for
 ///app.rocksky.player.play
 pub struct PlayResponse;
 impl jacquard_common::xrpc::XrpcResp for PlayResponse {
@@ -35,7 +35,7 @@ impl jacquard_common::xrpc::XrpcRequest for Play {
     type Response = PlayResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.player.play
 pub struct PlayRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PlayRequest {

@@ -48,7 +48,7 @@ pub struct FindRelatedAccountsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.signature.findRelatedAccounts
 pub struct FindRelatedAccountsResponse;
 impl jacquard_common::xrpc::XrpcResp for FindRelatedAccountsResponse {
@@ -64,7 +64,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for FindRelatedAccounts<'a> {
     type Response = FindRelatedAccountsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.signature.findRelatedAccounts
 pub struct FindRelatedAccountsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for FindRelatedAccountsRequest {

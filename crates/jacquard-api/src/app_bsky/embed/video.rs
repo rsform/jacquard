@@ -19,7 +19,7 @@
 #[serde(rename_all = "camelCase")]
 pub struct Caption<'a> {
     #[serde(borrow)]
-    pub file: jacquard_common::types::blob::Blob<'a>,
+    pub file: jacquard_common::types::blob::BlobRef<'a>,
     pub lang: jacquard_common::types::string::Language,
 }
 
@@ -51,7 +51,7 @@ pub struct Video<'a> {
     pub captions: Option<Vec<crate::app_bsky::embed::video::Caption<'a>>>,
     /// The mp4 video file. May be up to 100mb, formerly limited to 50mb.
     #[serde(borrow)]
-    pub video: jacquard_common::types::blob::Blob<'a>,
+    pub video: jacquard_common::types::blob::BlobRef<'a>,
 }
 
 #[jacquard_derive::lexicon]

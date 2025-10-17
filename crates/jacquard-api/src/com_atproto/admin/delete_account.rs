@@ -30,7 +30,7 @@ pub struct DeleteAccount<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.admin.deleteAccount
 pub struct DeleteAccountResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteAccountResponse {
@@ -48,7 +48,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteAccount<'a> {
     type Response = DeleteAccountResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.admin.deleteAccount
 pub struct DeleteAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteAccountRequest {

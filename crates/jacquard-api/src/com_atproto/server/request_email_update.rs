@@ -32,7 +32,7 @@ pub struct RequestEmailUpdateOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct RequestEmailUpdate;
-///Response type for
+/// Response type for
 ///com.atproto.server.requestEmailUpdate
 pub struct RequestEmailUpdateResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestEmailUpdateResponse {
@@ -50,7 +50,7 @@ impl jacquard_common::xrpc::XrpcRequest for RequestEmailUpdate {
     type Response = RequestEmailUpdateResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.requestEmailUpdate
 pub struct RequestEmailUpdateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestEmailUpdateRequest {

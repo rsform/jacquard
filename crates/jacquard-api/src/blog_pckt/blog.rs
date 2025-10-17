@@ -25,7 +25,7 @@ pub struct Blog<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub icon: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub icon: Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,

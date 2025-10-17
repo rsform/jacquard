@@ -71,7 +71,7 @@ pub struct QueryRulesOutput<'a> {
     pub rules: Vec<crate::tools_ozone::safelink::UrlRule<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.safelink.queryRules
 pub struct QueryRulesResponse;
 impl jacquard_common::xrpc::XrpcResp for QueryRulesResponse {
@@ -89,7 +89,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for QueryRules<'a> {
     type Response = QueryRulesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.safelink.queryRules
 pub struct QueryRulesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QueryRulesRequest {

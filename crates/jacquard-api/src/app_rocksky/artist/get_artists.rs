@@ -46,7 +46,7 @@ pub struct GetArtistsOutput<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.artist.getArtists
 pub struct GetArtistsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetArtistsResponse {
@@ -62,7 +62,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetArtists {
     type Response = GetArtistsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.artist.getArtists
 pub struct GetArtistsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetArtistsRequest {

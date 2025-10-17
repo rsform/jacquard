@@ -33,7 +33,7 @@ pub struct SeekParams {
     jacquard_derive::IntoStatic
 )]
 pub struct Seek;
-///Response type for
+/// Response type for
 ///app.rocksky.player.seek
 pub struct SeekResponse;
 impl jacquard_common::xrpc::XrpcResp for SeekResponse {
@@ -51,7 +51,7 @@ impl jacquard_common::xrpc::XrpcRequest for Seek {
     type Response = SeekResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.player.seek
 pub struct SeekRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SeekRequest {

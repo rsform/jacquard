@@ -102,7 +102,7 @@ impl std::fmt::Display for RefreshIdentityError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.identity.refreshIdentity
 pub struct RefreshIdentityResponse;
 impl jacquard_common::xrpc::XrpcResp for RefreshIdentityResponse {
@@ -120,7 +120,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RefreshIdentity<'a> {
     type Response = RefreshIdentityResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.identity.refreshIdentity
 pub struct RefreshIdentityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RefreshIdentityRequest {

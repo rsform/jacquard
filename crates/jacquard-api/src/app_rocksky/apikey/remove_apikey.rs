@@ -52,7 +52,7 @@ pub struct RemoveApikeyOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct RemoveApikey;
-///Response type for
+/// Response type for
 ///app.rocksky.apikey.removeApikey
 pub struct RemoveApikeyResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveApikeyResponse {
@@ -70,7 +70,7 @@ impl jacquard_common::xrpc::XrpcRequest for RemoveApikey {
     type Response = RemoveApikeyResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.apikey.removeApikey
 pub struct RemoveApikeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveApikeyRequest {

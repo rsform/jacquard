@@ -27,7 +27,7 @@ pub struct Image<'a> {
     #[serde(borrow)]
     pub aspect_ratio: Option<crate::app_bsky::embed::AspectRatio<'a>>,
     #[serde(borrow)]
-    pub image: jacquard_common::types::blob::Blob<'a>,
+    pub image: jacquard_common::types::blob::BlobRef<'a>,
 }
 
 #[jacquard_derive::lexicon]

@@ -118,7 +118,7 @@ pub struct CreateScrobbleOutput<'a> {
     pub value: crate::app_rocksky::scrobble::ScrobbleViewBasic<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.scrobble.createScrobble
 pub struct CreateScrobbleResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateScrobbleResponse {
@@ -136,7 +136,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateScrobble<'a> {
     type Response = CreateScrobbleResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.scrobble.createScrobble
 pub struct CreateScrobbleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateScrobbleRequest {

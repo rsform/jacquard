@@ -42,7 +42,7 @@ pub struct GetSuggestedFeedsSkeletonOutput<'a> {
     pub feeds: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.getSuggestedFeedsSkeleton
 pub struct GetSuggestedFeedsSkeletonResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedFeedsSkeletonResponse {
@@ -58,7 +58,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedFeedsSkeleton<'a> {
     type Response = GetSuggestedFeedsSkeletonResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.getSuggestedFeedsSkeleton
 pub struct GetSuggestedFeedsSkeletonRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedFeedsSkeletonRequest {

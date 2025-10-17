@@ -42,7 +42,7 @@ pub struct HelloOutput<'a> {
     pub message: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///garden.lexicon.ngerakines.helloworld.Hello
 pub struct HelloResponse;
 impl jacquard_common::xrpc::XrpcResp for HelloResponse {
@@ -58,7 +58,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Hello<'a> {
     type Response = HelloResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///garden.lexicon.ngerakines.helloworld.Hello
 pub struct HelloRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for HelloRequest {

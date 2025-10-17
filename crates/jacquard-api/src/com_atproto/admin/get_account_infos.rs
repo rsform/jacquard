@@ -38,7 +38,7 @@ pub struct GetAccountInfosOutput<'a> {
     pub infos: Vec<crate::com_atproto::admin::AccountView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.admin.getAccountInfos
 pub struct GetAccountInfosResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAccountInfosResponse {
@@ -54,7 +54,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetAccountInfos<'a> {
     type Response = GetAccountInfosResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.admin.getAccountInfos
 pub struct GetAccountInfosRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInfosRequest {

@@ -37,7 +37,7 @@ pub struct UploadVideoOutput<'a> {
     pub job_status: crate::app_bsky::video::JobStatus<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.video.uploadVideo
 pub struct UploadVideoResponse;
 impl jacquard_common::xrpc::XrpcResp for UploadVideoResponse {
@@ -70,7 +70,7 @@ impl jacquard_common::xrpc::XrpcRequest for UploadVideo {
     }
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.video.uploadVideo
 pub struct UploadVideoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UploadVideoRequest {

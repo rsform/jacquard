@@ -58,7 +58,7 @@ pub struct GetSparklinesOutput<'a> {
     pub sparklines: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///network.slices.slice.getSparklines
 pub struct GetSparklinesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSparklinesResponse {
@@ -76,7 +76,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSparklines<'a> {
     type Response = GetSparklinesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///network.slices.slice.getSparklines
 pub struct GetSparklinesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSparklinesRequest {

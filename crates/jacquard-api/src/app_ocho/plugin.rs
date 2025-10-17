@@ -34,7 +34,7 @@ pub struct AdaptiveIcon<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub foreground_image_blob: std::option::Option<
-        jacquard_common::types::blob::Blob<'a>,
+        jacquard_common::types::blob::BlobRef<'a>,
     >,
 }
 
@@ -95,7 +95,7 @@ pub struct AndroidStatusBar<'a> {
 pub struct Asset<'a> {
     /// The blob of the asset
     #[serde(borrow)]
-    pub blob: jacquard_common::types::blob::Blob<'a>,
+    pub blob: jacquard_common::types::blob::BlobRef<'a>,
     /// The hash of the asset
     #[serde(borrow)]
     #[builder(into)]
@@ -392,7 +392,7 @@ pub struct Web<'a> {
     pub favicon: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub favicon_blob: std::option::Option<jacquard_common::types::blob::Blob<'a>>,
+    pub favicon_blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The output directory for the web app.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]

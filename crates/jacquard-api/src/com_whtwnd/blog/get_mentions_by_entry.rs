@@ -38,7 +38,7 @@ pub struct GetMentionsByEntryOutput<'a> {
     pub mentions: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///com.whtwnd.blog.getMentionsByEntry
 pub struct GetMentionsByEntryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetMentionsByEntryResponse {
@@ -54,7 +54,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetMentionsByEntry<'a> {
     type Response = GetMentionsByEntryResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.whtwnd.blog.getMentionsByEntry
 pub struct GetMentionsByEntryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetMentionsByEntryRequest {

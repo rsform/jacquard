@@ -31,7 +31,7 @@ pub struct Create<'a> {
     pub source: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.create
 pub struct CreateResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateResponse {
@@ -49,7 +49,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Create<'a> {
     type Response = CreateResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.create
 pub struct CreateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateRequest {

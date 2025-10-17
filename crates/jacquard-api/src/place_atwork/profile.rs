@@ -59,12 +59,12 @@ pub struct Profile<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub avatar: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// Larger horizontal image to display behind profile view.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub banner: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub banner: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// A free text description of the identity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
@@ -89,7 +89,7 @@ pub struct Profile<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub resume: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub resume: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The current status of the identity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]

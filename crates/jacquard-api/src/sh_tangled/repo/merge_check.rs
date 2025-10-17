@@ -92,7 +92,7 @@ pub struct MergeCheckOutput<'a> {
     pub message: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.mergeCheck
 pub struct MergeCheckResponse;
 impl jacquard_common::xrpc::XrpcResp for MergeCheckResponse {
@@ -110,7 +110,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for MergeCheck<'a> {
     type Response = MergeCheckResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.mergeCheck
 pub struct MergeCheckRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MergeCheckRequest {

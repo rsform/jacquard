@@ -70,7 +70,7 @@ impl std::fmt::Display for DeleteValuesError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.set.deleteValues
 pub struct DeleteValuesResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteValuesResponse {
@@ -88,7 +88,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteValues<'a> {
     type Response = DeleteValuesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.set.deleteValues
 pub struct DeleteValuesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteValuesRequest {

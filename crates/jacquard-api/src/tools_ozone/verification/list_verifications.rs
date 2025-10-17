@@ -63,7 +63,7 @@ pub struct ListVerificationsOutput<'a> {
     pub verifications: Vec<crate::tools_ozone::verification::VerificationView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.verification.listVerifications
 pub struct ListVerificationsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListVerificationsResponse {
@@ -79,7 +79,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListVerifications<'a> {
     type Response = ListVerificationsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.verification.listVerifications
 pub struct ListVerificationsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListVerificationsRequest {

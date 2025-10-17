@@ -179,7 +179,7 @@ pub struct GetAccountHistoryOutput<'a> {
     pub events: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.hosting.getAccountHistory
 pub struct GetAccountHistoryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAccountHistoryResponse {
@@ -195,7 +195,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetAccountHistory<'a> {
     type Response = GetAccountHistoryResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.hosting.getAccountHistory
 pub struct GetAccountHistoryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAccountHistoryRequest {

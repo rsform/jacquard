@@ -98,7 +98,7 @@ impl std::fmt::Display for InitAgeAssuranceError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.initAgeAssurance
 pub struct InitAgeAssuranceResponse;
 impl jacquard_common::xrpc::XrpcResp for InitAgeAssuranceResponse {
@@ -116,7 +116,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for InitAgeAssurance<'a> {
     type Response = InitAgeAssuranceResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.initAgeAssurance
 pub struct InitAgeAssuranceRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for InitAgeAssuranceRequest {

@@ -52,7 +52,7 @@ pub struct RemoveShoutOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct RemoveShout;
-///Response type for
+/// Response type for
 ///app.rocksky.shout.removeShout
 pub struct RemoveShoutResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveShoutResponse {
@@ -70,7 +70,7 @@ impl jacquard_common::xrpc::XrpcRequest for RemoveShout {
     type Response = RemoveShoutResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.shout.removeShout
 pub struct RemoveShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveShoutRequest {

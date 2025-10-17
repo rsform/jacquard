@@ -13,6 +13,7 @@
 #[cfg(feature = "streaming")]
 pub mod streaming;
 
+use ipld_core::ipld::Ipld;
 #[cfg(feature = "streaming")]
 pub use streaming::StreamingResponse;
 
@@ -140,10 +141,27 @@ pub trait XrpcResp {
     const ENCODING: &'static str;
 
     /// Response output type
-    type Output<'de>: Deserialize<'de> + IntoStatic;
+    type Output<'de>: Serialize + Deserialize<'de> + IntoStatic;
 
     /// Error type for this request
     type Err<'de>: Error + Deserialize<'de> + IntoStatic;
+
+    /// Output body encoding function, similar to the request-side type
+    fn encode_output(output: &Self::Output<'_>) -> Result<Vec<u8>, EncodeError> {
+        Ok(serde_json::to_vec(output)?)
+    }
+
+    /// Decode the response output body.
+    ///
+    /// Default implementation deserializes from JSON. Override for non-JSON encodings.
+    fn decode_output<'de>(body: &'de [u8]) -> Result<Self::Output<'de>, DecodeError>
+    where
+        Self::Output<'de>: Deserialize<'de>,
+    {
+        let body = serde_json::from_slice(body).map_err(|e| DecodeError::Json(e))?;
+
+        Ok(body)
+    }
 }
 
 /// XRPC server endpoint trait
@@ -551,7 +569,7 @@ where
     pub fn parse<'s>(&'s self) -> Result<RespOutput<'s, R>, XrpcError<RespErr<'s, R>>> {
         // 200: parse as output
         if self.status.is_success() {
-            match serde_json::from_slice::<_>(&self.buffer) {
+            match R::decode_output(&self.buffer) {
                 Ok(output) => Ok(output),
                 Err(e) => Err(XrpcError::Decode(e)),
             }
@@ -573,7 +591,7 @@ where
                                 _ => Err(XrpcError::Generic(generic)),
                             }
                         }
-                        Err(e) => Err(XrpcError::Decode(e)),
+                        Err(e) => Err(XrpcError::Decode(DecodeError::Json(e))),
                     }
                 }
             }
@@ -590,7 +608,7 @@ where
                         _ => Err(XrpcError::Auth(AuthError::NotAuthenticated)),
                     }
                 }
-                Err(e) => Err(XrpcError::Decode(e)),
+                Err(e) => Err(XrpcError::Decode(DecodeError::Json(e))),
             }
         }
     }
@@ -603,7 +621,17 @@ where
         if self.status.is_success() {
             match serde_json::from_slice::<_>(&self.buffer) {
                 Ok(output) => Ok(output),
-                Err(e) => Err(XrpcError::Decode(e)),
+                Err(_) => {
+                    if let Ok(data) = serde_ipld_dagcbor::from_slice::<Ipld>(&self.buffer) {
+                        if let Ok(data) = Data::from_cbor(&data) {
+                            Ok(data.into_static())
+                        } else {
+                            Ok(Data::Bytes(self.buffer.clone()))
+                        }
+                    } else {
+                        Ok(Data::Bytes(self.buffer.clone()))
+                    }
+                }
             }
         // 400: try typed XRPC error, fallback to generic error
         } else if self.status.as_u16() == 400 {
@@ -623,7 +651,7 @@ where
                                 _ => Err(XrpcError::Generic(generic)),
                             }
                         }
-                        Err(e) => Err(XrpcError::Decode(e)),
+                        Err(e) => Err(XrpcError::Decode(DecodeError::Json(e))),
                     }
                 }
             }
@@ -640,7 +668,7 @@ where
                         _ => Err(XrpcError::Auth(AuthError::NotAuthenticated)),
                     }
                 }
-                Err(e) => Err(XrpcError::Decode(e)),
+                Err(e) => Err(XrpcError::Decode(DecodeError::Json(e))),
             }
         }
     }
@@ -653,7 +681,17 @@ where
         if self.status.is_success() {
             match serde_json::from_slice::<_>(&self.buffer) {
                 Ok(output) => Ok(output),
-                Err(e) => Err(XrpcError::Decode(e)),
+                Err(_) => {
+                    if let Ok(data) = serde_ipld_dagcbor::from_slice::<Ipld>(&self.buffer) {
+                        if let Ok(data) = RawData::from_cbor(&data) {
+                            Ok(data.into_static())
+                        } else {
+                            Ok(RawData::Bytes(self.buffer.clone()))
+                        }
+                    } else {
+                        Ok(RawData::Bytes(self.buffer.clone()))
+                    }
+                }
             }
         // 400: try typed XRPC error, fallback to generic error
         } else if self.status.as_u16() == 400 {
@@ -673,7 +711,7 @@ where
                                 _ => Err(XrpcError::Generic(generic)),
                             }
                         }
-                        Err(e) => Err(XrpcError::Decode(e)),
+                        Err(e) => Err(XrpcError::Decode(DecodeError::Json(e))),
                     }
                 }
             }
@@ -690,7 +728,7 @@ where
                         _ => Err(XrpcError::Auth(AuthError::NotAuthenticated)),
                     }
                 }
-                Err(e) => Err(XrpcError::Decode(e)),
+                Err(e) => Err(XrpcError::Decode(DecodeError::Json(e))),
             }
         }
     }
@@ -730,23 +768,14 @@ where
         for<'a> RespOutput<'a, R>: IntoStatic<Output = RespOutput<'static, R>>,
         for<'a> RespErr<'a, R>: IntoStatic<Output = RespErr<'static, R>>,
     {
-        // Use a helper to make lifetime inference work
-        fn parse_output<'b, R: XrpcResp>(
-            buffer: &'b [u8],
-        ) -> Result<R::Output<'b>, serde_json::Error> {
-            serde_json::from_slice(buffer)
-        }
-
         fn parse_error<'b, R: XrpcResp>(buffer: &'b [u8]) -> Result<R::Err<'b>, serde_json::Error> {
             serde_json::from_slice(buffer)
         }
 
         // 200: parse as output
         if self.status.is_success() {
-            match parse_output::<R>(&self.buffer) {
-                Ok(output) => {
-                    return Ok(output.into_static());
-                }
+            match R::decode_output(&self.buffer) {
+                Ok(output) => Ok(output.into_static()),
                 Err(e) => Err(XrpcError::Decode(e)),
             }
         // 400: try typed XRPC error, fallback to generic error
@@ -767,7 +796,7 @@ where
                                 _ => XrpcError::Generic(generic),
                             }
                         }
-                        Err(e) => XrpcError::Decode(e),
+                        Err(e) => XrpcError::Decode(DecodeError::Json(e)),
                     }
                 }
             };
@@ -787,7 +816,7 @@ where
                             _ => XrpcError::Auth(AuthError::NotAuthenticated),
                         }
                     }
-                    Err(e) => XrpcError::Decode(e),
+                    Err(e) => XrpcError::Decode(DecodeError::Json(e)),
                 };
 
             Err(error.into_static())
@@ -867,7 +896,7 @@ pub enum XrpcError<E: std::error::Error + IntoStatic> {
     /// Failed to decode the response body
     #[error("Failed to decode response: {0}")]
     #[diagnostic(code(jacquard_common::xrpc::decode))]
-    Decode(#[from] serde_json::Error),
+    Decode(#[from] DecodeError),
 }
 
 impl<E> IntoStatic for XrpcError<E>

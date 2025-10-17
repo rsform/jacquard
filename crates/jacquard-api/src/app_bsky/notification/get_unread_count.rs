@@ -39,7 +39,7 @@ pub struct GetUnreadCountOutput<'a> {
     pub count: i64,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.notification.getUnreadCount
 pub struct GetUnreadCountResponse;
 impl jacquard_common::xrpc::XrpcResp for GetUnreadCountResponse {
@@ -55,7 +55,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetUnreadCount {
     type Response = GetUnreadCountResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.notification.getUnreadCount
 pub struct GetUnreadCountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetUnreadCountRequest {

@@ -76,7 +76,7 @@ impl std::fmt::Display for DereferenceScopeError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.temp.dereferenceScope
 pub struct DereferenceScopeResponse;
 impl jacquard_common::xrpc::XrpcResp for DereferenceScopeResponse {
@@ -92,7 +92,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DereferenceScope<'a> {
     type Response = DereferenceScopeResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.temp.dereferenceScope
 pub struct DereferenceScopeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DereferenceScopeRequest {

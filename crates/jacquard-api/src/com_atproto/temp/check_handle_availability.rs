@@ -105,7 +105,7 @@ impl std::fmt::Display for CheckHandleAvailabilityError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.temp.checkHandleAvailability
 pub struct CheckHandleAvailabilityResponse;
 impl jacquard_common::xrpc::XrpcResp for CheckHandleAvailabilityResponse {
@@ -121,7 +121,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CheckHandleAvailability<'a> {
     type Response = CheckHandleAvailabilityResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.temp.checkHandleAvailability
 pub struct CheckHandleAvailabilityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CheckHandleAvailabilityRequest {

@@ -70,7 +70,7 @@ pub struct CreateInviteCodesOutput<'a> {
     pub codes: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.server.createInviteCodes
 pub struct CreateInviteCodesResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateInviteCodesResponse {
@@ -88,7 +88,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateInviteCodes<'a> {
     type Response = CreateInviteCodesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.createInviteCodes
 pub struct CreateInviteCodesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateInviteCodesRequest {

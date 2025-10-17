@@ -35,7 +35,7 @@ pub struct AddValues<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.set.addValues
 pub struct AddValuesResponse;
 impl jacquard_common::xrpc::XrpcResp for AddValuesResponse {
@@ -53,7 +53,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AddValues<'a> {
     type Response = AddValuesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.set.addValues
 pub struct AddValuesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddValuesRequest {

@@ -59,7 +59,7 @@ pub struct GetSuggestionsSkeletonOutput<'a> {
     pub relative_to_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.getSuggestionsSkeleton
 pub struct GetSuggestionsSkeletonResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestionsSkeletonResponse {
@@ -75,7 +75,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestionsSkeleton<'a> {
     type Response = GetSuggestionsSkeletonResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.getSuggestionsSkeleton
 pub struct GetSuggestionsSkeletonRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestionsSkeletonRequest {

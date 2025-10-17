@@ -17,7 +17,7 @@
     jacquard_derive::IntoStatic
 )]
 pub struct RequestPlcOperationSignature;
-///Response type for
+/// Response type for
 ///com.atproto.identity.requestPlcOperationSignature
 pub struct RequestPlcOperationSignatureResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestPlcOperationSignatureResponse {
@@ -35,7 +35,7 @@ impl jacquard_common::xrpc::XrpcRequest for RequestPlcOperationSignature {
     type Response = RequestPlcOperationSignatureResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.identity.requestPlcOperationSignature
 pub struct RequestPlcOperationSignatureRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestPlcOperationSignatureRequest {

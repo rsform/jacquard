@@ -40,7 +40,7 @@ pub struct Publication<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub icon: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub icon: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// Publication name/title
     #[serde(borrow)]
     #[builder(into)]

@@ -35,7 +35,7 @@ pub struct GetPreferencesOutput<'a> {
     pub preferences: crate::social_clippr::actor::Preferences<'a>,
 }
 
-///Response type for
+/// Response type for
 ///social.clippr.actor.getPreferences
 pub struct GetPreferencesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPreferencesResponse {
@@ -51,7 +51,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetPreferences {
     type Response = GetPreferencesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///social.clippr.actor.getPreferences
 pub struct GetPreferencesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPreferencesRequest {

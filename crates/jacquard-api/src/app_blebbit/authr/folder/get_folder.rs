@@ -46,7 +46,7 @@ pub struct GetFolderOutput<'a> {
     pub public: std::option::Option<bool>,
 }
 
-///Response type for
+/// Response type for
 ///app.blebbit.authr.folder.getFolder
 pub struct GetFolderResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFolderResponse {
@@ -62,7 +62,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetFolder<'a> {
     type Response = GetFolderResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.blebbit.authr.folder.getFolder
 pub struct GetFolderRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFolderRequest {

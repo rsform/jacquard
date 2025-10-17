@@ -65,7 +65,7 @@ impl std::fmt::Display for DeleteBookmarkError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.bookmark.deleteBookmark
 pub struct DeleteBookmarkResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteBookmarkResponse {
@@ -83,7 +83,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBookmark<'a> {
     type Response = DeleteBookmarkResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.bookmark.deleteBookmark
 pub struct DeleteBookmarkRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteBookmarkRequest {

@@ -42,7 +42,7 @@ pub struct GetUploadLimitsOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct GetUploadLimits;
-///Response type for
+/// Response type for
 ///app.bsky.video.getUploadLimits
 pub struct GetUploadLimitsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetUploadLimitsResponse {
@@ -58,7 +58,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetUploadLimits {
     type Response = GetUploadLimitsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.video.getUploadLimits
 pub struct GetUploadLimitsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetUploadLimitsRequest {

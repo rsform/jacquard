@@ -26,7 +26,7 @@ pub struct DisableInviteCodes<'a> {
     pub codes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.admin.disableInviteCodes
 pub struct DisableInviteCodesResponse;
 impl jacquard_common::xrpc::XrpcResp for DisableInviteCodesResponse {
@@ -44,7 +44,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DisableInviteCodes<'a> {
     type Response = DisableInviteCodesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.admin.disableInviteCodes
 pub struct DisableInviteCodesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DisableInviteCodesRequest {

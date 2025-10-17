@@ -101,7 +101,7 @@ impl std::fmt::Display for DeleteRecordError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.repo.deleteRecord
 pub struct DeleteRecordResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteRecordResponse {
@@ -119,7 +119,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteRecord<'a> {
     type Response = DeleteRecordResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.repo.deleteRecord
 pub struct DeleteRecordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteRecordRequest {

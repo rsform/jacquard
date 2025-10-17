@@ -41,7 +41,7 @@ pub struct AcceptConvoOutput<'a> {
     pub rev: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.acceptConvo
 pub struct AcceptConvoResponse;
 impl jacquard_common::xrpc::XrpcResp for AcceptConvoResponse {
@@ -59,7 +59,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AcceptConvo<'a> {
     type Response = AcceptConvoResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.acceptConvo
 pub struct AcceptConvoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AcceptConvoRequest {

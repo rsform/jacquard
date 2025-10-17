@@ -50,7 +50,7 @@ pub struct SwapLaunchTokenOutput<'a> {
     pub token: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.ocho.server.swapLaunchToken
 pub struct SwapLaunchTokenResponse;
 impl jacquard_common::xrpc::XrpcResp for SwapLaunchTokenResponse {
@@ -66,7 +66,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SwapLaunchToken<'a> {
     type Response = SwapLaunchTokenResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.server.swapLaunchToken
 pub struct SwapLaunchTokenRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SwapLaunchTokenRequest {

@@ -81,7 +81,7 @@ impl std::fmt::Display for GetEntryMetadataByNameError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.whtwnd.blog.getEntryMetadataByName
 pub struct GetEntryMetadataByNameResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryMetadataByNameResponse {
@@ -97,7 +97,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryMetadataByName<'a> {
     type Response = GetEntryMetadataByNameResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.whtwnd.blog.getEntryMetadataByName
 pub struct GetEntryMetadataByNameRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryMetadataByNameRequest {

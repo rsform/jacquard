@@ -56,7 +56,7 @@ pub struct GetRepostedByOutput<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.feed.getRepostedBy
 pub struct GetRepostedByResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRepostedByResponse {
@@ -72,7 +72,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepostedBy<'a> {
     type Response = GetRepostedByResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.feed.getRepostedBy
 pub struct GetRepostedByRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRepostedByRequest {

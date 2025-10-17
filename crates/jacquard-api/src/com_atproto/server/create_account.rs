@@ -182,7 +182,7 @@ impl std::fmt::Display for CreateAccountError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.server.createAccount
 pub struct CreateAccountResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateAccountResponse {
@@ -200,7 +200,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateAccount<'a> {
     type Response = CreateAccountResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.createAccount
 pub struct CreateAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateAccountRequest {

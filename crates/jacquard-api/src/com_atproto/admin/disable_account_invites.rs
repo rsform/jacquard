@@ -35,7 +35,7 @@ pub struct DisableAccountInvites<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.admin.disableAccountInvites
 pub struct DisableAccountInvitesResponse;
 impl jacquard_common::xrpc::XrpcResp for DisableAccountInvitesResponse {
@@ -53,7 +53,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DisableAccountInvites<'a> {
     type Response = DisableAccountInvitesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.admin.disableAccountInvites
 pub struct DisableAccountInvitesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DisableAccountInvitesRequest {

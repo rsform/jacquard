@@ -139,7 +139,7 @@ impl std::fmt::Display for CreateWebhookError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///place.stream.server.createWebhook
 pub struct CreateWebhookResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateWebhookResponse {
@@ -157,7 +157,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateWebhook<'a> {
     type Response = CreateWebhookResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///place.stream.server.createWebhook
 pub struct CreateWebhookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateWebhookRequest {

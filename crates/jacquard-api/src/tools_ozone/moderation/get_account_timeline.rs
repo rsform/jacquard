@@ -72,7 +72,7 @@ impl std::fmt::Display for GetAccountTimelineError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.moderation.getAccountTimeline
 pub struct GetAccountTimelineResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAccountTimelineResponse {
@@ -88,7 +88,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetAccountTimeline<'a> {
     type Response = GetAccountTimelineResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.moderation.getAccountTimeline
 pub struct GetAccountTimelineRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAccountTimelineRequest {

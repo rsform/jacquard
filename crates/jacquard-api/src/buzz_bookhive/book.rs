@@ -27,7 +27,7 @@ pub struct Book<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub cover: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub cover: Option<jacquard_common::types::blob::BlobRef<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     /// The date the user finished reading the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]

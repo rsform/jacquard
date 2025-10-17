@@ -42,7 +42,7 @@ pub struct GetFollowingUserOutput<'a> {
     pub follow: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///place.stream.graph.getFollowingUser
 pub struct GetFollowingUserResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFollowingUserResponse {
@@ -58,7 +58,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetFollowingUser<'a> {
     type Response = GetFollowingUserResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///place.stream.graph.getFollowingUser
 pub struct GetFollowingUserRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFollowingUserRequest {

@@ -24,7 +24,7 @@ pub struct Attachment<'a> {
     #[serde(borrow)]
     pub alt: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    pub content: jacquard_common::types::blob::Blob<'a>,
+    pub content: jacquard_common::types::blob::BlobRef<'a>,
 }
 
 /// A blagh post
@@ -51,7 +51,7 @@ pub struct Post<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub content: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub content: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// Indicates human language of text content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]

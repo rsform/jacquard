@@ -85,7 +85,7 @@ impl std::fmt::Display for ConfirmEmailError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.server.confirmEmail
 pub struct ConfirmEmailResponse;
 impl jacquard_common::xrpc::XrpcResp for ConfirmEmailResponse {
@@ -103,7 +103,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ConfirmEmail<'a> {
     type Response = ConfirmEmailResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.confirmEmail
 pub struct ConfirmEmailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ConfirmEmailRequest {

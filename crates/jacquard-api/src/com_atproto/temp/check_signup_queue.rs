@@ -36,7 +36,7 @@ pub struct CheckSignupQueueOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct CheckSignupQueue;
-///Response type for
+/// Response type for
 ///com.atproto.temp.checkSignupQueue
 pub struct CheckSignupQueueResponse;
 impl jacquard_common::xrpc::XrpcResp for CheckSignupQueueResponse {
@@ -52,7 +52,7 @@ impl jacquard_common::xrpc::XrpcRequest for CheckSignupQueue {
     type Response = CheckSignupQueueResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.temp.checkSignupQueue
 pub struct CheckSignupQueueRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CheckSignupQueueRequest {

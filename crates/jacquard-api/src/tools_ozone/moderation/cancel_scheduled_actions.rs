@@ -100,7 +100,7 @@ pub struct CancelScheduledActionsOutput<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.moderation.cancelScheduledActions
 pub struct CancelScheduledActionsResponse;
 impl jacquard_common::xrpc::XrpcResp for CancelScheduledActionsResponse {
@@ -118,7 +118,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CancelScheduledActions<'a> {
     type Response = CancelScheduledActionsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.moderation.cancelScheduledActions
 pub struct CancelScheduledActionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CancelScheduledActionsRequest {

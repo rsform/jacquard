@@ -56,7 +56,7 @@ pub struct RevokeVerificationsOutput<'a> {
     pub revoked_verifications: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.verification.revokeVerifications
 pub struct RevokeVerificationsResponse;
 impl jacquard_common::xrpc::XrpcResp for RevokeVerificationsResponse {
@@ -74,7 +74,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RevokeVerifications<'a> {
     type Response = RevokeVerificationsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.verification.revokeVerifications
 pub struct RevokeVerificationsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RevokeVerificationsRequest {

@@ -59,7 +59,7 @@ pub struct QueryEventsOutput<'a> {
     pub events: Vec<crate::tools_ozone::safelink::Event<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.safelink.queryEvents
 pub struct QueryEventsResponse;
 impl jacquard_common::xrpc::XrpcResp for QueryEventsResponse {
@@ -77,7 +77,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for QueryEvents<'a> {
     type Response = QueryEventsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.safelink.queryEvents
 pub struct QueryEventsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QueryEventsRequest {

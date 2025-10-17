@@ -46,7 +46,7 @@ pub struct GetBlocksOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.graph.getBlocks
 pub struct GetBlocksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBlocksResponse {
@@ -62,7 +62,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetBlocks<'a> {
     type Response = GetBlocksResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.graph.getBlocks
 pub struct GetBlocksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBlocksRequest {

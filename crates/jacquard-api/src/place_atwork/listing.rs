@@ -28,7 +28,7 @@ pub struct Listing<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub banner: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub banner: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The description of the job listing.
     #[serde(borrow)]
     #[builder(into)]

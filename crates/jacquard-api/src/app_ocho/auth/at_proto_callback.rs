@@ -29,7 +29,7 @@ pub struct AtProtoCallback<'a> {
     pub state: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.ocho.auth.atProtoCallback
 pub struct AtProtoCallbackResponse;
 impl jacquard_common::xrpc::XrpcResp for AtProtoCallbackResponse {
@@ -45,7 +45,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AtProtoCallback<'a> {
     type Response = AtProtoCallbackResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.auth.atProtoCallback
 pub struct AtProtoCallbackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AtProtoCallbackRequest {

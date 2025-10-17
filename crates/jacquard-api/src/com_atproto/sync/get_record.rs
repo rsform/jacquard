@@ -28,7 +28,6 @@ pub struct GetRecord<'a> {
     >,
 }
 
-#[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -39,7 +38,10 @@ pub struct GetRecord<'a> {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct GetRecordOutput<'a> {}
+pub struct GetRecordOutput {
+    pub body: bytes::Bytes,
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -110,14 +112,29 @@ impl std::fmt::Display for GetRecordError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.sync.getRecord
 pub struct GetRecordResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecordResponse {
     const NSID: &'static str = "com.atproto.sync.getRecord";
     const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<'de> = GetRecordOutput<'de>;
+    type Output<'de> = GetRecordOutput;
     type Err<'de> = GetRecordError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(GetRecordOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecord<'a> {
@@ -126,7 +143,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecord<'a> {
     type Response = GetRecordResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.sync.getRecord
 pub struct GetRecordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecordRequest {

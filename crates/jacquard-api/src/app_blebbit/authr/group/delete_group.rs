@@ -36,7 +36,7 @@ pub struct DeleteGroupParams<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct DeleteGroup;
-///Response type for
+/// Response type for
 ///app.blebbit.authr.group.deleteGroup
 pub struct DeleteGroupResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteGroupResponse {
@@ -54,7 +54,7 @@ impl jacquard_common::xrpc::XrpcRequest for DeleteGroup {
     type Response = DeleteGroupResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.blebbit.authr.group.deleteGroup
 pub struct DeleteGroupRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteGroupRequest {

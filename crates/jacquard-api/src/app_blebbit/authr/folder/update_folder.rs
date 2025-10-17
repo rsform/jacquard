@@ -67,7 +67,7 @@ pub struct UpdateFolderOutput<'a> {
     pub public: std::option::Option<bool>,
 }
 
-///Response type for
+/// Response type for
 ///app.blebbit.authr.folder.updateFolder
 pub struct UpdateFolderResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateFolderResponse {
@@ -85,7 +85,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateFolder<'a> {
     type Response = UpdateFolderResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.blebbit.authr.folder.updateFolder
 pub struct UpdateFolderRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateFolderRequest {

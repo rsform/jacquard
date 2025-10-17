@@ -68,7 +68,7 @@ pub struct UpdateOAuthClientOutput<'a> {
     pub value: crate::network_slices::slice::get_o_auth_clients::OauthClientDetails<'a>,
 }
 
-///Response type for
+/// Response type for
 ///network.slices.slice.updateOAuthClient
 pub struct UpdateOAuthClientResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateOAuthClientResponse {
@@ -86,7 +86,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateOAuthClient<'a> {
     type Response = UpdateOAuthClientResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///network.slices.slice.updateOAuthClient
 pub struct UpdateOAuthClientRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateOAuthClientRequest {

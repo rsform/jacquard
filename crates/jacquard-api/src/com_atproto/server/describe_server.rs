@@ -89,7 +89,7 @@ pub struct DescribeServerOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct DescribeServer;
-///Response type for
+/// Response type for
 ///com.atproto.server.describeServer
 pub struct DescribeServerResponse;
 impl jacquard_common::xrpc::XrpcResp for DescribeServerResponse {
@@ -105,7 +105,7 @@ impl jacquard_common::xrpc::XrpcRequest for DescribeServer {
     type Response = DescribeServerResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.describeServer
 pub struct DescribeServerRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DescribeServerRequest {

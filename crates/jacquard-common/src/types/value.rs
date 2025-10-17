@@ -357,6 +357,48 @@ pub enum RawData<'s> {
     InvalidData(Bytes),
 }
 
+impl<'d> RawData<'d> {
+    /// Convert a CBOR-encoded byte slice into a `RawData` value.
+    /// Parse a Data value from an IPLD value (CBOR)
+    pub fn from_cbor(cbor: &'d Ipld) -> Result<Self, AtDataError> {
+        Ok(match cbor {
+            Ipld::Null => RawData::Null,
+            Ipld::Bool(bool) => RawData::Boolean(*bool),
+            Ipld::Integer(int) => {
+                if *int > i64::MAX as i128 {
+                    RawData::UnsignedInt(*int as u64)
+                } else {
+                    RawData::SignedInt(*int as i64)
+                }
+            }
+            Ipld::Float(_) => {
+                return Err(AtDataError::FloatNotAllowed);
+            }
+            Ipld::String(string) => Self::String(CowStr::Borrowed(&string)),
+            Ipld::Bytes(items) => Self::Bytes(Bytes::copy_from_slice(items.as_slice())),
+            Ipld::List(iplds) => Self::Array(
+                iplds
+                    .into_iter()
+                    .filter_map(|item| RawData::from_cbor(item).ok())
+                    .collect(),
+            ),
+            Ipld::Map(btree_map) => Self::Object(
+                btree_map
+                    .into_iter()
+                    .filter_map(|(key, value)| {
+                        if let Ok(value) = RawData::from_cbor(value) {
+                            Some((key.to_smolstr(), value))
+                        } else {
+                            None
+                        }
+                    })
+                    .collect(),
+            ),
+            Ipld::Link(cid) => Self::CidLink(Cid::ipld(*cid)),
+        })
+    }
+}
+
 impl IntoStatic for RawData<'_> {
     type Output = RawData<'static>;
 

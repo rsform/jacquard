@@ -50,7 +50,7 @@ pub struct GetPopularFeedGeneratorsOutput<'a> {
     pub feeds: Vec<crate::app_bsky::feed::GeneratorView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.getPopularFeedGenerators
 pub struct GetPopularFeedGeneratorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPopularFeedGeneratorsResponse {
@@ -66,7 +66,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPopularFeedGenerators<'a> {
     type Response = GetPopularFeedGeneratorsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.getPopularFeedGenerators
 pub struct GetPopularFeedGeneratorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPopularFeedGeneratorsRequest {

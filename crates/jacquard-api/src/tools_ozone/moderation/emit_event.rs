@@ -206,7 +206,7 @@ impl std::fmt::Display for EmitEventError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.moderation.emitEvent
 pub struct EmitEventResponse;
 impl jacquard_common::xrpc::XrpcResp for EmitEventResponse {
@@ -224,7 +224,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for EmitEvent<'a> {
     type Response = EmitEventResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.moderation.emitEvent
 pub struct EmitEventRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for EmitEventRequest {

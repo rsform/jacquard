@@ -17,7 +17,7 @@
     jacquard_derive::IntoStatic
 )]
 pub struct ActivateAccount;
-///Response type for
+/// Response type for
 ///com.atproto.server.activateAccount
 pub struct ActivateAccountResponse;
 impl jacquard_common::xrpc::XrpcResp for ActivateAccountResponse {
@@ -35,7 +35,7 @@ impl jacquard_common::xrpc::XrpcRequest for ActivateAccount {
     type Response = ActivateAccountResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.activateAccount
 pub struct ActivateAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ActivateAccountRequest {

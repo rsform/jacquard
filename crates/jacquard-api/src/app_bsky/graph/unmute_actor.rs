@@ -30,7 +30,7 @@ pub struct UnmuteActor<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.graph.unmuteActor
 pub struct UnmuteActorResponse;
 impl jacquard_common::xrpc::XrpcResp for UnmuteActorResponse {
@@ -48,7 +48,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UnmuteActor<'a> {
     type Response = UnmuteActorResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.graph.unmuteActor
 pub struct UnmuteActorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UnmuteActorRequest {

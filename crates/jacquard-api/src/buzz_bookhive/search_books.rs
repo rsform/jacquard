@@ -51,7 +51,7 @@ pub struct SearchBooksOutput<'a> {
     pub offset: std::option::Option<i64>,
 }
 
-///Response type for
+/// Response type for
 ///buzz.bookhive.searchBooks
 pub struct SearchBooksResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchBooksResponse {
@@ -67,7 +67,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SearchBooks<'a> {
     type Response = SearchBooksResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///buzz.bookhive.searchBooks
 pub struct SearchBooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchBooksRequest {

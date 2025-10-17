@@ -114,7 +114,7 @@ impl std::fmt::Display for CreateRecordError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.repo.createRecord
 pub struct CreateRecordResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateRecordResponse {
@@ -132,7 +132,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateRecord<'a> {
     type Response = CreateRecordResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.repo.createRecord
 pub struct CreateRecordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateRecordRequest {

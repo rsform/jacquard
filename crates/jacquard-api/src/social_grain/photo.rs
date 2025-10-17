@@ -32,7 +32,7 @@ pub struct Photo<'a> {
     #[builder(into)]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
-    pub photo: jacquard_common::types::blob::Blob<'a>,
+    pub photo: jacquard_common::types::blob::BlobRef<'a>,
 }
 
 impl<'a> Photo<'a> {

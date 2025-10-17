@@ -46,7 +46,7 @@ pub struct ListMissingBlobsOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.repo.listMissingBlobs
 pub struct ListMissingBlobsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListMissingBlobsResponse {
@@ -62,7 +62,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListMissingBlobs<'a> {
     type Response = ListMissingBlobsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.repo.listMissingBlobs
 pub struct ListMissingBlobsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListMissingBlobsRequest {

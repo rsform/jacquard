@@ -40,7 +40,7 @@ pub struct GetFileOutput<'a> {
     pub value: crate::app_rocksky::googledrive::FileView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.googledrive.getFile
 pub struct GetFileResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFileResponse {
@@ -56,7 +56,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetFile<'a> {
     type Response = GetFileResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.googledrive.getFile
 pub struct GetFileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFileRequest {

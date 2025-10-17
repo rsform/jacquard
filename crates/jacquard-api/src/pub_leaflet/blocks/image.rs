@@ -43,5 +43,5 @@ pub struct Image<'a> {
     #[serde(borrow)]
     pub aspect_ratio: crate::pub_leaflet::blocks::image::AspectRatio<'a>,
     #[serde(borrow)]
-    pub image: jacquard_common::types::blob::Blob<'a>,
+    pub image: jacquard_common::types::blob::BlobRef<'a>,
 }

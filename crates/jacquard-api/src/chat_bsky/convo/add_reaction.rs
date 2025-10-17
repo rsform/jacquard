@@ -97,7 +97,7 @@ impl std::fmt::Display for AddReactionError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.addReaction
 pub struct AddReactionResponse;
 impl jacquard_common::xrpc::XrpcResp for AddReactionResponse {
@@ -115,7 +115,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AddReaction<'a> {
     type Response = AddReactionResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.addReaction
 pub struct AddReactionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddReactionRequest {

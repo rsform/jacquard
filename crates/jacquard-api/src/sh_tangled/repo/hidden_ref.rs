@@ -63,7 +63,7 @@ pub struct HiddenRefOutput<'a> {
     pub success: bool,
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.hiddenRef
 pub struct HiddenRefResponse;
 impl jacquard_common::xrpc::XrpcResp for HiddenRefResponse {
@@ -81,7 +81,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for HiddenRef<'a> {
     type Response = HiddenRefResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.hiddenRef
 pub struct HiddenRefRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for HiddenRefRequest {

@@ -104,7 +104,7 @@ impl std::fmt::Display for GetListingError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///place.atwork.getListing
 pub struct GetListingResponse;
 impl jacquard_common::xrpc::XrpcResp for GetListingResponse {
@@ -120,7 +120,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetListing<'a> {
     type Response = GetListingResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///place.atwork.getListing
 pub struct GetListingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetListingRequest {

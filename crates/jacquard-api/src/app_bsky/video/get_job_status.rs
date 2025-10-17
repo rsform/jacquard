@@ -39,7 +39,7 @@ pub struct GetJobStatusOutput<'a> {
     pub job_status: crate::app_bsky::video::JobStatus<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.video.getJobStatus
 pub struct GetJobStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetJobStatusResponse {
@@ -55,7 +55,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetJobStatus<'a> {
     type Response = GetJobStatusResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.video.getJobStatus
 pub struct GetJobStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetJobStatusRequest {

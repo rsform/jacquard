@@ -46,7 +46,7 @@ pub struct SyncUserCollectionsOutput<'a> {
     pub timed_out: bool,
 }
 
-///Response type for
+/// Response type for
 ///network.slices.slice.syncUserCollections
 pub struct SyncUserCollectionsResponse;
 impl jacquard_common::xrpc::XrpcResp for SyncUserCollectionsResponse {
@@ -64,7 +64,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SyncUserCollections<'a> {
     type Response = SyncUserCollectionsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///network.slices.slice.syncUserCollections
 pub struct SyncUserCollectionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SyncUserCollectionsRequest {

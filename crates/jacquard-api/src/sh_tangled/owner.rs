@@ -68,7 +68,7 @@ impl std::fmt::Display for OwnerError<'_> {
     jacquard_derive::IntoStatic
 )]
 pub struct Owner;
-///Response type for
+/// Response type for
 ///sh.tangled.owner
 pub struct OwnerResponse;
 impl jacquard_common::xrpc::XrpcResp for OwnerResponse {
@@ -84,7 +84,7 @@ impl jacquard_common::xrpc::XrpcRequest for Owner {
     type Response = OwnerResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.owner
 pub struct OwnerRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for OwnerRequest {

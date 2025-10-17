@@ -39,7 +39,7 @@ pub struct GetHandleFromDidOutput<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
 
-///Response type for
+/// Response type for
 ///com.shinolabs.pinksea.getHandleFromDid
 pub struct GetHandleFromDidResponse;
 impl jacquard_common::xrpc::XrpcResp for GetHandleFromDidResponse {
@@ -55,7 +55,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetHandleFromDid<'a> {
     type Response = GetHandleFromDidResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.shinolabs.pinksea.getHandleFromDid
 pub struct GetHandleFromDidRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetHandleFromDidRequest {

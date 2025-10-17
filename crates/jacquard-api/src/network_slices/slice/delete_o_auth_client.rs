@@ -41,7 +41,7 @@ pub struct DeleteOAuthClientOutput<'a> {
     pub message: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///network.slices.slice.deleteOAuthClient
 pub struct DeleteOAuthClientResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteOAuthClientResponse {
@@ -59,7 +59,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteOAuthClient<'a> {
     type Response = DeleteOAuthClientResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///network.slices.slice.deleteOAuthClient
 pub struct DeleteOAuthClientRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteOAuthClientRequest {

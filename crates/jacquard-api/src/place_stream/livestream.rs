@@ -68,7 +68,7 @@ pub struct Livestream<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub thumb: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub thumb: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The title of the livestream, as it will be announced to followers.
     #[serde(borrow)]
     #[builder(into)]

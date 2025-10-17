@@ -57,7 +57,7 @@ pub struct ListNotificationsOutput<'a> {
     pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.notification.listNotifications
 pub struct ListNotificationsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListNotificationsResponse {
@@ -73,7 +73,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListNotifications<'a> {
     type Response = ListNotificationsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.notification.listNotifications
 pub struct ListNotificationsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListNotificationsRequest {

@@ -111,7 +111,7 @@ impl std::fmt::Display for ListBlobsError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.sync.listBlobs
 pub struct ListBlobsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListBlobsResponse {
@@ -127,7 +127,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListBlobs<'a> {
     type Response = ListBlobsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.sync.listBlobs
 pub struct ListBlobsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListBlobsRequest {

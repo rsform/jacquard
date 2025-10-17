@@ -34,10 +34,10 @@ pub struct UploadBlob {
 #[serde(rename_all = "camelCase")]
 pub struct UploadBlobOutput<'a> {
     #[serde(borrow)]
-    pub blob: jacquard_common::types::blob::Blob<'a>,
+    pub blob: jacquard_common::types::blob::BlobRef<'a>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.repo.uploadBlob
 pub struct UploadBlobResponse;
 impl jacquard_common::xrpc::XrpcResp for UploadBlobResponse {
@@ -70,7 +70,7 @@ impl jacquard_common::xrpc::XrpcRequest for UploadBlob {
     }
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.repo.uploadBlob
 pub struct UploadBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UploadBlobRequest {

@@ -54,7 +54,7 @@ pub struct ListConvosOutput<'a> {
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.listConvos
 pub struct ListConvosResponse;
 impl jacquard_common::xrpc::XrpcResp for ListConvosResponse {
@@ -70,7 +70,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListConvos<'a> {
     type Response = ListConvosResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.listConvos
 pub struct ListConvosRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListConvosRequest {

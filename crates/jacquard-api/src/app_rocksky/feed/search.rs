@@ -40,7 +40,7 @@ pub struct SearchOutput<'a> {
     pub value: crate::app_rocksky::feed::SearchResultsView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.feed.search
 pub struct SearchResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchResponse {
@@ -56,7 +56,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Search<'a> {
     type Response = SearchResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.feed.search
 pub struct SearchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchRequest {

@@ -42,7 +42,7 @@ pub struct GetApikeysOutput<'a> {
     pub api_keys: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.apikey.getApikeys
 pub struct GetApikeysResponse;
 impl jacquard_common::xrpc::XrpcResp for GetApikeysResponse {
@@ -58,7 +58,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetApikeys {
     type Response = GetApikeysResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.apikey.getApikeys
 pub struct GetApikeysRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetApikeysRequest {

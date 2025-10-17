@@ -43,7 +43,7 @@ pub struct GetSuggestedUsersOutput<'a> {
     pub actors: Vec<crate::app_bsky::actor::ProfileView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.getSuggestedUsers
 pub struct GetSuggestedUsersResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedUsersResponse {
@@ -59,7 +59,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedUsers<'a> {
     type Response = GetSuggestedUsersResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.getSuggestedUsers
 pub struct GetSuggestedUsersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedUsersRequest {

@@ -48,7 +48,7 @@ pub struct GetStarterPacksWithMembershipOutput<'a> {
     pub starter_packs_with_membership: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.graph.getStarterPacksWithMembership
 pub struct GetStarterPacksWithMembershipResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStarterPacksWithMembershipResponse {
@@ -64,7 +64,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetStarterPacksWithMembership<'a
     type Response = GetStarterPacksWithMembershipResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.graph.getStarterPacksWithMembership
 pub struct GetStarterPacksWithMembershipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksWithMembershipRequest {

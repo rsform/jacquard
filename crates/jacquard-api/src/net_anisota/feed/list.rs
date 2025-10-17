@@ -23,7 +23,7 @@ pub struct List<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub avatar: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// When the list was created
     pub created_at: jacquard_common::types::string::Datetime,
     /// Optional description of the list

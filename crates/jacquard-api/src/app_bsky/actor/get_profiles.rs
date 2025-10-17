@@ -38,7 +38,7 @@ pub struct GetProfilesOutput<'a> {
     pub profiles: Vec<crate::app_bsky::actor::ProfileViewDetailed<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.actor.getProfiles
 pub struct GetProfilesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfilesResponse {
@@ -54,7 +54,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfiles<'a> {
     type Response = GetProfilesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.actor.getProfiles
 pub struct GetProfilesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfilesRequest {

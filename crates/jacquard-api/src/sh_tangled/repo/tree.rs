@@ -152,7 +152,7 @@ impl std::fmt::Display for TreeError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.tree
 pub struct TreeResponse;
 impl jacquard_common::xrpc::XrpcResp for TreeResponse {
@@ -168,7 +168,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Tree<'a> {
     type Response = TreeResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.tree
 pub struct TreeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for TreeRequest {

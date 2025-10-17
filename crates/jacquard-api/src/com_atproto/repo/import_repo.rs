@@ -21,7 +21,7 @@ pub struct ImportRepo {
     pub body: bytes::Bytes,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.repo.importRepo
 pub struct ImportRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for ImportRepoResponse {
@@ -54,7 +54,7 @@ impl jacquard_common::xrpc::XrpcRequest for ImportRepo {
     }
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.repo.importRepo
 pub struct ImportRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ImportRepoRequest {

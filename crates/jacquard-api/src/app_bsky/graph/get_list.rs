@@ -50,7 +50,7 @@ pub struct GetListOutput<'a> {
     pub list: crate::app_bsky::graph::ListView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.graph.getList
 pub struct GetListResponse;
 impl jacquard_common::xrpc::XrpcResp for GetListResponse {
@@ -66,7 +66,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetList<'a> {
     type Response = GetListResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.graph.getList
 pub struct GetListRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetListRequest {

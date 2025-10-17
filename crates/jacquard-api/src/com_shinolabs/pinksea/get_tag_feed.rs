@@ -44,7 +44,7 @@ pub struct GetTagFeedOutput<'a> {
     pub oekaki: Vec<crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///com.shinolabs.pinksea.getTagFeed
 pub struct GetTagFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTagFeedResponse {
@@ -60,7 +60,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetTagFeed<'a> {
     type Response = GetTagFeedResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.shinolabs.pinksea.getTagFeed
 pub struct GetTagFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTagFeedRequest {

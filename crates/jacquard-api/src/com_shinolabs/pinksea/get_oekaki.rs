@@ -66,7 +66,7 @@ pub enum GetOekakiOutputParent<'a> {
     ),
 }
 
-///Response type for
+/// Response type for
 ///com.shinolabs.pinksea.getOekaki
 pub struct GetOekakiResponse;
 impl jacquard_common::xrpc::XrpcResp for GetOekakiResponse {
@@ -82,7 +82,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetOekaki<'a> {
     type Response = GetOekakiResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.shinolabs.pinksea.getOekaki
 pub struct GetOekakiRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetOekakiRequest {

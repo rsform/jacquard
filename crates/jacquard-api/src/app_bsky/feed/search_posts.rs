@@ -117,7 +117,7 @@ impl std::fmt::Display for SearchPostsError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.feed.searchPosts
 pub struct SearchPostsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchPostsResponse {
@@ -133,7 +133,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SearchPosts<'a> {
     type Response = SearchPostsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.feed.searchPosts
 pub struct SearchPostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchPostsRequest {

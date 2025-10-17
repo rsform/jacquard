@@ -94,7 +94,7 @@ impl std::fmt::Display for ResolveIdentityError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.identity.resolveIdentity
 pub struct ResolveIdentityResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveIdentityResponse {
@@ -110,7 +110,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveIdentity<'a> {
     type Response = ResolveIdentityResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.identity.resolveIdentity
 pub struct ResolveIdentityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveIdentityRequest {

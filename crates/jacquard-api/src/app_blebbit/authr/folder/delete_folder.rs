@@ -36,7 +36,7 @@ pub struct DeleteFolderParams<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct DeleteFolder;
-///Response type for
+/// Response type for
 ///app.blebbit.authr.folder.deleteFolder
 pub struct DeleteFolderResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteFolderResponse {
@@ -54,7 +54,7 @@ impl jacquard_common::xrpc::XrpcRequest for DeleteFolder {
     type Response = DeleteFolderResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.blebbit.authr.folder.deleteFolder
 pub struct DeleteFolderRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteFolderRequest {

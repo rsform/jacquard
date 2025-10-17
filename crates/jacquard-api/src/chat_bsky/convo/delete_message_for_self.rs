@@ -41,7 +41,7 @@ pub struct DeleteMessageForSelfOutput<'a> {
     pub value: crate::chat_bsky::convo::DeletedMessageView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.deleteMessageForSelf
 pub struct DeleteMessageForSelfResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteMessageForSelfResponse {
@@ -59,7 +59,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteMessageForSelf<'a> {
     type Response = DeleteMessageForSelfResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.deleteMessageForSelf
 pub struct DeleteMessageForSelfRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteMessageForSelfRequest {

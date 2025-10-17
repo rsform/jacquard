@@ -38,7 +38,7 @@ pub struct PutHostingUrlOutput<'a> {
     pub success: bool,
 }
 
-///Response type for
+/// Response type for
 ///app.ocho.plugin.putHostingUrl
 pub struct PutHostingUrlResponse;
 impl jacquard_common::xrpc::XrpcResp for PutHostingUrlResponse {
@@ -56,7 +56,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PutHostingUrl<'a> {
     type Response = PutHostingUrlResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.plugin.putHostingUrl
 pub struct PutHostingUrlRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutHostingUrlRequest {

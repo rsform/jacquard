@@ -60,7 +60,7 @@ pub enum GetServicesOutputViewsItem<'a> {
     LabelerViewDetailed(Box<crate::app_bsky::labeler::LabelerViewDetailed<'a>>),
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.labeler.getServices
 pub struct GetServicesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetServicesResponse {
@@ -76,7 +76,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetServices<'a> {
     type Response = GetServicesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.labeler.getServices
 pub struct GetServicesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetServicesRequest {

@@ -40,7 +40,7 @@ pub struct GetCurrentlyPlayingOutput<'a> {
     pub value: crate::app_rocksky::player::CurrentlyPlayingViewDetailed<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.player.getCurrentlyPlaying
 pub struct GetCurrentlyPlayingResponse;
 impl jacquard_common::xrpc::XrpcResp for GetCurrentlyPlayingResponse {
@@ -56,7 +56,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetCurrentlyPlaying<'a> {
     type Response = GetCurrentlyPlayingResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.player.getCurrentlyPlaying
 pub struct GetCurrentlyPlayingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetCurrentlyPlayingRequest {

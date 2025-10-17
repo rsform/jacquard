@@ -39,7 +39,7 @@ pub struct GetAlbumOutput<'a> {
     pub value: crate::app_rocksky::album::AlbumViewDetailed<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.album.getAlbum
 pub struct GetAlbumResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAlbumResponse {
@@ -55,7 +55,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetAlbum<'a> {
     type Response = GetAlbumResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.album.getAlbum
 pub struct GetAlbumRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAlbumRequest {

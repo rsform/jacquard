@@ -39,7 +39,7 @@ pub struct GetTrendsOutput<'a> {
     pub trends: Vec<crate::app_bsky::unspecced::TrendView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.getTrends
 pub struct GetTrendsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTrendsResponse {
@@ -55,7 +55,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetTrends {
     type Response = GetTrendsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.getTrends
 pub struct GetTrendsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTrendsRequest {

@@ -42,7 +42,7 @@ pub struct SendOutput<'a> {
     pub success: bool,
 }
 
-///Response type for
+/// Response type for
 ///app.ocho.message.send
 pub struct SendResponse;
 impl jacquard_common::xrpc::XrpcResp for SendResponse {
@@ -60,7 +60,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Send<'a> {
     type Response = SendResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.message.send
 pub struct SendRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendRequest {

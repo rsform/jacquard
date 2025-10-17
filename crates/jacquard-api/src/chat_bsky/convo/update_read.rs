@@ -41,7 +41,7 @@ pub struct UpdateReadOutput<'a> {
     pub convo: crate::chat_bsky::convo::ConvoView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.updateRead
 pub struct UpdateReadResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateReadResponse {
@@ -59,7 +59,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateRead<'a> {
     type Response = UpdateReadResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.updateRead
 pub struct UpdateReadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateReadRequest {

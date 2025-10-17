@@ -50,7 +50,7 @@ pub struct GetFollowersOutput<'a> {
     pub subject: crate::app_bsky::actor::ProfileView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.graph.getFollowers
 pub struct GetFollowersResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFollowersResponse {
@@ -66,7 +66,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetFollowers<'a> {
     type Response = GetFollowersResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.graph.getFollowers
 pub struct GetFollowersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFollowersRequest {

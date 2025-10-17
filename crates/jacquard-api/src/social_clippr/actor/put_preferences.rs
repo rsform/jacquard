@@ -31,7 +31,7 @@ pub struct PutPreferences<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///social.clippr.actor.putPreferences
 pub struct PutPreferencesResponse;
 impl jacquard_common::xrpc::XrpcResp for PutPreferencesResponse {
@@ -49,7 +49,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PutPreferences<'a> {
     type Response = PutPreferencesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///social.clippr.actor.putPreferences
 pub struct PutPreferencesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutPreferencesRequest {

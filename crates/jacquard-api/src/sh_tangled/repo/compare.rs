@@ -30,7 +30,6 @@ pub struct Compare<'a> {
 }
 
 /// Compare output in application/json
-#[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -41,7 +40,10 @@ pub struct Compare<'a> {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct CompareOutput<'a> {}
+pub struct CompareOutput {
+    pub body: bytes::Bytes,
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -107,14 +109,29 @@ impl std::fmt::Display for CompareError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.compare
 pub struct CompareResponse;
 impl jacquard_common::xrpc::XrpcResp for CompareResponse {
     const NSID: &'static str = "sh.tangled.repo.compare";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = CompareOutput<'de>;
+    type Output<'de> = CompareOutput;
     type Err<'de> = CompareError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(CompareOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Compare<'a> {
@@ -123,7 +140,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Compare<'a> {
     type Response = CompareResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.compare
 pub struct CompareRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CompareRequest {

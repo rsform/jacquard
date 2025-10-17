@@ -48,7 +48,7 @@ pub struct DescribeRepoOutput<'a> {
     pub handle_is_correct: bool,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.repo.describeRepo
 pub struct DescribeRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for DescribeRepoResponse {
@@ -64,7 +64,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DescribeRepo<'a> {
     type Response = DescribeRepoResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.repo.describeRepo
 pub struct DescribeRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DescribeRepoRequest {

@@ -145,7 +145,7 @@ impl std::fmt::Display for LanguagesError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.languages
 pub struct LanguagesResponse;
 impl jacquard_common::xrpc::XrpcResp for LanguagesResponse {
@@ -161,7 +161,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Languages<'a> {
     type Response = LanguagesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.languages
 pub struct LanguagesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LanguagesRequest {

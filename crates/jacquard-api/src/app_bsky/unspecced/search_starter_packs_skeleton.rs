@@ -89,7 +89,7 @@ impl std::fmt::Display for SearchStarterPacksSkeletonError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.searchStarterPacksSkeleton
 pub struct SearchStarterPacksSkeletonResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchStarterPacksSkeletonResponse {
@@ -105,7 +105,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SearchStarterPacksSkeleton<'a> {
     type Response = SearchStarterPacksSkeletonResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.searchStarterPacksSkeleton
 pub struct SearchStarterPacksSkeletonRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchStarterPacksSkeletonRequest {

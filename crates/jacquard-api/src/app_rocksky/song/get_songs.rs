@@ -44,7 +44,7 @@ pub struct GetSongsOutput<'a> {
     pub songs: std::option::Option<Vec<crate::app_rocksky::song::SongViewBasic<'a>>>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.song.getSongs
 pub struct GetSongsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSongsResponse {
@@ -60,7 +60,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetSongs {
     type Response = GetSongsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.song.getSongs
 pub struct GetSongsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSongsRequest {

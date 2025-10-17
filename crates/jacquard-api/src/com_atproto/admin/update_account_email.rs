@@ -34,7 +34,7 @@ pub struct UpdateAccountEmail<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.admin.updateAccountEmail
 pub struct UpdateAccountEmailResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateAccountEmailResponse {
@@ -52,7 +52,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountEmail<'a> {
     type Response = UpdateAccountEmailResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.admin.updateAccountEmail
 pub struct UpdateAccountEmailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountEmailRequest {

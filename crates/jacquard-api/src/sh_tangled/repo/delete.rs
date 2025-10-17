@@ -39,7 +39,7 @@ pub struct Delete<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.delete
 pub struct DeleteResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteResponse {
@@ -57,7 +57,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Delete<'a> {
     type Response = DeleteResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.delete
 pub struct DeleteRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteRequest {

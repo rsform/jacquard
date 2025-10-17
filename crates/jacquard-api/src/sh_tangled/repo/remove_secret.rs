@@ -33,7 +33,7 @@ pub struct RemoveSecret<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.removeSecret
 pub struct RemoveSecretResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveSecretResponse {
@@ -51,7 +51,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveSecret<'a> {
     type Response = RemoveSecretResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.removeSecret
 pub struct RemoveSecretRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveSecretRequest {

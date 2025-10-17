@@ -89,7 +89,7 @@ impl std::fmt::Display for ListAppPasswordsError<'_> {
     jacquard_derive::IntoStatic
 )]
 pub struct ListAppPasswords;
-///Response type for
+/// Response type for
 ///com.atproto.server.listAppPasswords
 pub struct ListAppPasswordsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListAppPasswordsResponse {
@@ -105,7 +105,7 @@ impl jacquard_common::xrpc::XrpcRequest for ListAppPasswords {
     type Response = ListAppPasswordsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.listAppPasswords
 pub struct ListAppPasswordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListAppPasswordsRequest {

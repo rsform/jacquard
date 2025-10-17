@@ -30,7 +30,7 @@ pub struct SubmitPlcOperation<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.identity.submitPlcOperation
 pub struct SubmitPlcOperationResponse;
 impl jacquard_common::xrpc::XrpcResp for SubmitPlcOperationResponse {
@@ -48,7 +48,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SubmitPlcOperation<'a> {
     type Response = SubmitPlcOperationResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.identity.submitPlcOperation
 pub struct SubmitPlcOperationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SubmitPlcOperationRequest {

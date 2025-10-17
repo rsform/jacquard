@@ -51,7 +51,7 @@ pub struct GetSessionOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct GetSession;
-///Response type for
+/// Response type for
 ///com.atproto.server.getSession
 pub struct GetSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSessionResponse {
@@ -67,7 +67,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetSession {
     type Response = GetSessionResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.getSession
 pub struct GetSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSessionRequest {

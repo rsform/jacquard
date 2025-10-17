@@ -61,7 +61,7 @@ pub struct GetPostThreadV2Output<'a> {
     pub threadgate: std::option::Option<crate::app_bsky::feed::ThreadgateView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.getPostThreadV2
 pub struct GetPostThreadV2Response;
 impl jacquard_common::xrpc::XrpcResp for GetPostThreadV2Response {
@@ -77,7 +77,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPostThreadV2<'a> {
     type Response = GetPostThreadV2Response;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.getPostThreadV2
 pub struct GetPostThreadV2Request;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadV2Request {

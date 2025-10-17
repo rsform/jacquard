@@ -42,7 +42,7 @@ pub struct CheckAccountStatusOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct CheckAccountStatus;
-///Response type for
+/// Response type for
 ///com.atproto.server.checkAccountStatus
 pub struct CheckAccountStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for CheckAccountStatusResponse {
@@ -58,7 +58,7 @@ impl jacquard_common::xrpc::XrpcRequest for CheckAccountStatus {
     type Response = CheckAccountStatusResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.checkAccountStatus
 pub struct CheckAccountStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CheckAccountStatusRequest {

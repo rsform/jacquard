@@ -82,7 +82,7 @@ impl std::fmt::Display for ListKeysError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.knot.listKeys
 pub struct ListKeysResponse;
 impl jacquard_common::xrpc::XrpcResp for ListKeysResponse {
@@ -98,7 +98,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListKeys<'a> {
     type Response = ListKeysResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.knot.listKeys
 pub struct ListKeysRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListKeysRequest {

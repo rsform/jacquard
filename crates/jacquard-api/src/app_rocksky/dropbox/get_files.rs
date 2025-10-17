@@ -41,7 +41,7 @@ pub struct GetFilesOutput<'a> {
     pub value: crate::app_rocksky::dropbox::FileListView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.dropbox.getFiles
 pub struct GetFilesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFilesResponse {
@@ -57,7 +57,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetFiles<'a> {
     type Response = GetFilesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.dropbox.getFiles
 pub struct GetFilesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFilesRequest {

@@ -38,7 +38,6 @@ pub struct Log<'a> {
     pub repo: jacquard_common::CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -49,7 +48,10 @@ pub struct Log<'a> {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct LogOutput<'a> {}
+pub struct LogOutput {
+    pub body: bytes::Bytes,
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -115,14 +117,29 @@ impl std::fmt::Display for LogError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.log
 pub struct LogResponse;
 impl jacquard_common::xrpc::XrpcResp for LogResponse {
     const NSID: &'static str = "sh.tangled.repo.log";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = LogOutput<'de>;
+    type Output<'de> = LogOutput;
     type Err<'de> = LogError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(LogOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for Log<'a> {
@@ -131,7 +148,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Log<'a> {
     type Response = LogResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.log
 pub struct LogRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LogRequest {

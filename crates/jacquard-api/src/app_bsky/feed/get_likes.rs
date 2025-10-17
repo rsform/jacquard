@@ -75,7 +75,7 @@ pub struct GetLikesOutput<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.feed.getLikes
 pub struct GetLikesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLikesResponse {
@@ -91,7 +91,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetLikes<'a> {
     type Response = GetLikesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.feed.getLikes
 pub struct GetLikesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLikesRequest {

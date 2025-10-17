@@ -82,7 +82,7 @@ impl std::fmt::Display for RefreshSessionError<'_> {
     jacquard_derive::IntoStatic
 )]
 pub struct RefreshSession;
-///Response type for
+/// Response type for
 ///com.atproto.server.refreshSession
 pub struct RefreshSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for RefreshSessionResponse {
@@ -100,7 +100,7 @@ impl jacquard_common::xrpc::XrpcRequest for RefreshSession {
     type Response = RefreshSessionResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.refreshSession
 pub struct RefreshSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RefreshSessionRequest {

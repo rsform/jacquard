@@ -29,11 +29,11 @@ pub struct Post<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub cover: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub cover: Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub images: Option<Vec<jacquard_common::types::blob::Blob<'a>>>,
+    pub images: Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     pub published_at: Option<jacquard_common::types::string::Datetime>,

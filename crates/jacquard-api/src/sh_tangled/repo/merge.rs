@@ -63,7 +63,7 @@ pub struct Merge<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.merge
 pub struct MergeResponse;
 impl jacquard_common::xrpc::XrpcResp for MergeResponse {
@@ -81,7 +81,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Merge<'a> {
     type Response = MergeResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.merge
 pub struct MergeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MergeRequest {

@@ -35,7 +35,7 @@ pub struct LoginOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct Login;
-///Response type for
+/// Response type for
 ///app.ocho.state.login
 pub struct LoginResponse;
 impl jacquard_common::xrpc::XrpcResp for LoginResponse {
@@ -51,7 +51,7 @@ impl jacquard_common::xrpc::XrpcRequest for Login {
     type Response = LoginResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.state.login
 pub struct LoginRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LoginRequest {

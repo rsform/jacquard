@@ -33,7 +33,7 @@ pub struct SetDefaultBranch<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.setDefaultBranch
 pub struct SetDefaultBranchResponse;
 impl jacquard_common::xrpc::XrpcResp for SetDefaultBranchResponse {
@@ -51,7 +51,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SetDefaultBranch<'a> {
     type Response = SetDefaultBranchResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.setDefaultBranch
 pub struct SetDefaultBranchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SetDefaultBranchRequest {

@@ -56,7 +56,7 @@ pub struct GetQuotesOutput<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.feed.getQuotes
 pub struct GetQuotesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetQuotesResponse {
@@ -72,7 +72,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetQuotes<'a> {
     type Response = GetQuotesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.feed.getQuotes
 pub struct GetQuotesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetQuotesRequest {

@@ -13,7 +13,7 @@
     PartialEq,
     Eq,
     bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -23,18 +23,14 @@ pub struct GetProfileCard<'a> {
     pub id: jacquard_common::CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
-pub struct GetProfileCardOutput<'a> {}
+pub struct GetProfileCardOutput {
+    pub body: bytes::Bytes,
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -45,7 +41,7 @@ pub struct GetProfileCardOutput<'a> {}
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -69,14 +65,29 @@ impl std::fmt::Display for GetProfileCardError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///place.stream.live.getProfileCard
 pub struct GetProfileCardResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfileCardResponse {
     const NSID: &'static str = "place.stream.live.getProfileCard";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = GetProfileCardOutput<'de>;
+    type Output<'de> = GetProfileCardOutput;
     type Err<'de> = GetProfileCardError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(GetProfileCardOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfileCard<'a> {
@@ -85,7 +96,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfileCard<'a> {
     type Response = GetProfileCardResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///place.stream.live.getProfileCard
 pub struct GetProfileCardRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfileCardRequest {

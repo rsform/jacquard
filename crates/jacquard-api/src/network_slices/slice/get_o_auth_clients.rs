@@ -39,7 +39,7 @@ pub struct GetOAuthClientsOutput<'a> {
     pub clients: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///network.slices.slice.getOAuthClients
 pub struct GetOAuthClientsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetOAuthClientsResponse {
@@ -55,7 +55,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetOAuthClients<'a> {
     type Response = GetOAuthClientsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///network.slices.slice.getOAuthClients
 pub struct GetOAuthClientsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetOAuthClientsRequest {

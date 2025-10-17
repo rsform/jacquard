@@ -33,7 +33,7 @@ pub struct UpdateAccountSigningKey<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.admin.updateAccountSigningKey
 pub struct UpdateAccountSigningKeyResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateAccountSigningKeyResponse {
@@ -51,7 +51,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountSigningKey<'a> {
     type Response = UpdateAccountSigningKeyResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.admin.updateAccountSigningKey
 pub struct UpdateAccountSigningKeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountSigningKeyRequest {

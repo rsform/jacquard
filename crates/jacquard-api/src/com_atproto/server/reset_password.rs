@@ -67,7 +67,7 @@ impl std::fmt::Display for ResetPasswordError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.server.resetPassword
 pub struct ResetPasswordResponse;
 impl jacquard_common::xrpc::XrpcResp for ResetPasswordResponse {
@@ -85,7 +85,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ResetPassword<'a> {
     type Response = ResetPasswordResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.resetPassword
 pub struct ResetPasswordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResetPasswordRequest {

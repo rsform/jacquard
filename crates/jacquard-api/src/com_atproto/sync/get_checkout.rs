@@ -22,7 +22,6 @@ pub struct GetCheckout<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -33,15 +32,33 @@ pub struct GetCheckout<'a> {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct GetCheckoutOutput<'a> {}
-///Response type for
+pub struct GetCheckoutOutput {
+    pub body: bytes::Bytes,
+}
+
+/// Response type for
 ///com.atproto.sync.getCheckout
 pub struct GetCheckoutResponse;
 impl jacquard_common::xrpc::XrpcResp for GetCheckoutResponse {
     const NSID: &'static str = "com.atproto.sync.getCheckout";
     const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<'de> = GetCheckoutOutput<'de>;
+    type Output<'de> = GetCheckoutOutput;
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(GetCheckoutOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for GetCheckout<'a> {
@@ -50,7 +67,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetCheckout<'a> {
     type Response = GetCheckoutResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.sync.getCheckout
 pub struct GetCheckoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetCheckoutRequest {

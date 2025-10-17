@@ -40,7 +40,7 @@ pub struct GetConvoAvailabilityOutput<'a> {
     pub convo: std::option::Option<crate::chat_bsky::convo::ConvoView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.getConvoAvailability
 pub struct GetConvoAvailabilityResponse;
 impl jacquard_common::xrpc::XrpcResp for GetConvoAvailabilityResponse {
@@ -56,7 +56,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetConvoAvailability<'a> {
     type Response = GetConvoAvailabilityResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.getConvoAvailability
 pub struct GetConvoAvailabilityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetConvoAvailabilityRequest {

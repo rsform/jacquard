@@ -24,7 +24,6 @@ pub struct GetRepo<'a> {
     pub since: std::option::Option<jacquard_common::types::string::Tid>,
 }
 
-#[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -35,7 +34,10 @@ pub struct GetRepo<'a> {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct GetRepoOutput<'a> {}
+pub struct GetRepoOutput {
+    pub body: bytes::Bytes,
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -97,14 +99,29 @@ impl std::fmt::Display for GetRepoError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.sync.getRepo
 pub struct GetRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRepoResponse {
     const NSID: &'static str = "com.atproto.sync.getRepo";
     const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<'de> = GetRepoOutput<'de>;
+    type Output<'de> = GetRepoOutput;
     type Err<'de> = GetRepoError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(GetRepoOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepo<'a> {
@@ -113,7 +130,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepo<'a> {
     type Response = GetRepoResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.sync.getRepo
 pub struct GetRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRepoRequest {

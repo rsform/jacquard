@@ -22,7 +22,7 @@ pub struct RequestPasswordReset<'a> {
     pub email: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.server.requestPasswordReset
 pub struct RequestPasswordResetResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestPasswordResetResponse {
@@ -40,7 +40,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RequestPasswordReset<'a> {
     type Response = RequestPasswordResetResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.requestPasswordReset
 pub struct RequestPasswordResetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestPasswordResetRequest {

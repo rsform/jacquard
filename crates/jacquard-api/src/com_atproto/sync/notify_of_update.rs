@@ -23,7 +23,7 @@ pub struct NotifyOfUpdate<'a> {
     pub hostname: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.sync.notifyOfUpdate
 pub struct NotifyOfUpdateResponse;
 impl jacquard_common::xrpc::XrpcResp for NotifyOfUpdateResponse {
@@ -41,7 +41,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for NotifyOfUpdate<'a> {
     type Response = NotifyOfUpdateResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.sync.notifyOfUpdate
 pub struct NotifyOfUpdateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NotifyOfUpdateRequest {

@@ -58,7 +58,7 @@ pub struct ListOptionsOutput<'a> {
     pub options: Vec<crate::tools_ozone::setting::Option<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.setting.listOptions
 pub struct ListOptionsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListOptionsResponse {
@@ -74,7 +74,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListOptions<'a> {
     type Response = ListOptionsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.setting.listOptions
 pub struct ListOptionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListOptionsRequest {

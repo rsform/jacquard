@@ -52,7 +52,7 @@ Legacy key encoding not supported. the key is returned directly; `id`,
     pub signing_key: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///com.bad-example.identity.resolveMiniDoc
 pub struct ResolveMiniDocResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveMiniDocResponse {
@@ -68,7 +68,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveMiniDoc<'a> {
     type Response = ResolveMiniDocResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.bad-example.identity.resolveMiniDoc
 pub struct ResolveMiniDocRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveMiniDocRequest {

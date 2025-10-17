@@ -43,7 +43,7 @@ pub struct GetJetstreamLogsOutput<'a> {
     pub logs: Vec<crate::network_slices::slice::get_job_logs::LogEntry<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///network.slices.slice.getJetstreamLogs
 pub struct GetJetstreamLogsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetJetstreamLogsResponse {
@@ -59,7 +59,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetJetstreamLogs<'a> {
     type Response = GetJetstreamLogsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///network.slices.slice.getJetstreamLogs
 pub struct GetJetstreamLogsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetJetstreamLogsRequest {

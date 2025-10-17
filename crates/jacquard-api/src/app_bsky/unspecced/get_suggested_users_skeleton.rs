@@ -46,7 +46,7 @@ pub struct GetSuggestedUsersSkeletonOutput<'a> {
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.getSuggestedUsersSkeleton
 pub struct GetSuggestedUsersSkeletonResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedUsersSkeletonResponse {
@@ -62,7 +62,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedUsersSkeleton<'a> {
     type Response = GetSuggestedUsersSkeletonResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.getSuggestedUsersSkeleton
 pub struct GetSuggestedUsersSkeletonRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedUsersSkeletonRequest {

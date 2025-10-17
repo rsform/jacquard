@@ -43,7 +43,7 @@ pub struct SendInteractions<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SendInteractionsOutput<'a> {}
-///Response type for
+/// Response type for
 ///app.bsky.feed.sendInteractions
 pub struct SendInteractionsResponse;
 impl jacquard_common::xrpc::XrpcResp for SendInteractionsResponse {
@@ -61,7 +61,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SendInteractions<'a> {
     type Response = SendInteractionsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.feed.sendInteractions
 pub struct SendInteractionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendInteractionsRequest {

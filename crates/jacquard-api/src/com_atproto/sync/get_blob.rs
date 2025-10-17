@@ -24,7 +24,6 @@ pub struct GetBlob<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -35,7 +34,10 @@ pub struct GetBlob<'a> {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct GetBlobOutput<'a> {}
+pub struct GetBlobOutput {
+    pub body: bytes::Bytes,
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -106,14 +108,29 @@ impl std::fmt::Display for GetBlobError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.sync.getBlob
 pub struct GetBlobResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBlobResponse {
     const NSID: &'static str = "com.atproto.sync.getBlob";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = GetBlobOutput<'de>;
+    type Output<'de> = GetBlobOutput;
     type Err<'de> = GetBlobError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(GetBlobOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for GetBlob<'a> {
@@ -122,7 +139,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetBlob<'a> {
     type Response = GetBlobResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.sync.getBlob
 pub struct GetBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBlobRequest {

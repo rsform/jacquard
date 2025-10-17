@@ -80,7 +80,7 @@ impl std::fmt::Display for GetRepoStatusError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.sync.getRepoStatus
 pub struct GetRepoStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRepoStatusResponse {
@@ -96,7 +96,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepoStatus<'a> {
     type Response = GetRepoStatusResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.sync.getRepoStatus
 pub struct GetRepoStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRepoStatusRequest {

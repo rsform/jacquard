@@ -39,7 +39,7 @@ pub struct RegisterOutput<'a> {
     pub success: bool,
 }
 
-///Response type for
+/// Response type for
 ///app.ocho.push.register
 pub struct RegisterResponse;
 impl jacquard_common::xrpc::XrpcResp for RegisterResponse {
@@ -57,7 +57,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Register<'a> {
     type Response = RegisterResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.push.register
 pub struct RegisterRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RegisterRequest {

@@ -42,7 +42,7 @@ pub struct GetManifestOutput<'a> {
     pub value: crate::app_ocho::plugin::Manifest<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.ocho.plugin.getManifest
 pub struct GetManifestResponse;
 impl jacquard_common::xrpc::XrpcResp for GetManifestResponse {
@@ -58,7 +58,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetManifest<'a> {
     type Response = GetManifestResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.plugin.getManifest
 pub struct GetManifestRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetManifestRequest {

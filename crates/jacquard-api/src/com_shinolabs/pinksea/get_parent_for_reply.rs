@@ -45,7 +45,7 @@ pub struct GetParentForReplyOutput<'a> {
     pub rkey: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///com.shinolabs.pinksea.getParentForReply
 pub struct GetParentForReplyResponse;
 impl jacquard_common::xrpc::XrpcResp for GetParentForReplyResponse {
@@ -61,7 +61,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetParentForReply<'a> {
     type Response = GetParentForReplyResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.shinolabs.pinksea.getParentForReply
 pub struct GetParentForReplyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetParentForReplyRequest {

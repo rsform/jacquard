@@ -63,7 +63,7 @@ pub struct ForkStatusOutput<'a> {
     pub status: i64,
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.forkStatus
 pub struct ForkStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for ForkStatusResponse {
@@ -81,7 +81,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ForkStatus<'a> {
     type Response = ForkStatusResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.forkStatus
 pub struct ForkStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ForkStatusRequest {

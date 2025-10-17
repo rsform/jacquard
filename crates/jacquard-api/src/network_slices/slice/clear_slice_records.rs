@@ -41,7 +41,7 @@ pub struct ClearSliceRecordsOutput<'a> {
     pub message: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///network.slices.slice.clearSliceRecords
 pub struct ClearSliceRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for ClearSliceRecordsResponse {
@@ -59,7 +59,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ClearSliceRecords<'a> {
     type Response = ClearSliceRecordsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///network.slices.slice.clearSliceRecords
 pub struct ClearSliceRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ClearSliceRecordsRequest {

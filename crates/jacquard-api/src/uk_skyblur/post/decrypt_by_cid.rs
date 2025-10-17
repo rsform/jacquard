@@ -61,7 +61,7 @@ pub struct DecryptByCidOutput<'a> {
     pub text: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///uk.skyblur.post.decryptByCid
 pub struct DecryptByCidResponse;
 impl jacquard_common::xrpc::XrpcResp for DecryptByCidResponse {
@@ -79,7 +79,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DecryptByCid<'a> {
     type Response = DecryptByCidResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///uk.skyblur.post.decryptByCid
 pub struct DecryptByCidRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DecryptByCidRequest {

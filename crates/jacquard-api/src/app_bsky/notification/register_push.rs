@@ -43,7 +43,7 @@ pub struct RegisterPush<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.notification.registerPush
 pub struct RegisterPushResponse;
 impl jacquard_common::xrpc::XrpcResp for RegisterPushResponse {
@@ -61,7 +61,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RegisterPush<'a> {
     type Response = RegisterPushResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.notification.registerPush
 pub struct RegisterPushRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RegisterPushRequest {

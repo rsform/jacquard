@@ -17,7 +17,7 @@
     jacquard_derive::IntoStatic
 )]
 pub struct RequestEmailConfirmation;
-///Response type for
+/// Response type for
 ///com.atproto.server.requestEmailConfirmation
 pub struct RequestEmailConfirmationResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestEmailConfirmationResponse {
@@ -35,7 +35,7 @@ impl jacquard_common::xrpc::XrpcRequest for RequestEmailConfirmation {
     type Response = RequestEmailConfirmationResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.requestEmailConfirmation
 pub struct RequestEmailConfirmationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestEmailConfirmationRequest {

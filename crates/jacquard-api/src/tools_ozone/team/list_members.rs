@@ -55,7 +55,7 @@ pub struct ListMembersOutput<'a> {
     pub members: Vec<crate::tools_ozone::team::Member<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.team.listMembers
 pub struct ListMembersResponse;
 impl jacquard_common::xrpc::XrpcResp for ListMembersResponse {
@@ -71,7 +71,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListMembers<'a> {
     type Response = ListMembersResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.team.listMembers
 pub struct ListMembersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListMembersRequest {

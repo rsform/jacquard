@@ -83,7 +83,7 @@ impl std::fmt::Display for GetHostStatusError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.sync.getHostStatus
 pub struct GetHostStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetHostStatusResponse {
@@ -99,7 +99,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetHostStatus<'a> {
     type Response = GetHostStatusResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.sync.getHostStatus
 pub struct GetHostStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetHostStatusRequest {

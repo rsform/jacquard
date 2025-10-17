@@ -112,7 +112,7 @@ impl std::fmt::Display for CreateSessionError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.server.createSession
 pub struct CreateSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateSessionResponse {
@@ -130,7 +130,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateSession<'a> {
     type Response = CreateSessionResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.createSession
 pub struct CreateSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateSessionRequest {

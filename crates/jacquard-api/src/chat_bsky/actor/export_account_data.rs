@@ -5,7 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -16,7 +15,10 @@
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct ExportAccountDataOutput<'a> {}
+pub struct ExportAccountDataOutput {
+    pub body: bytes::Bytes,
+}
+
 /// XRPC request marker type
 #[derive(
     Debug,
@@ -29,14 +31,29 @@ pub struct ExportAccountDataOutput<'a> {}
     jacquard_derive::IntoStatic
 )]
 pub struct ExportAccountData;
-///Response type for
+/// Response type for
 ///chat.bsky.actor.exportAccountData
 pub struct ExportAccountDataResponse;
 impl jacquard_common::xrpc::XrpcResp for ExportAccountDataResponse {
     const NSID: &'static str = "chat.bsky.actor.exportAccountData";
     const ENCODING: &'static str = "application/jsonl";
-    type Output<'de> = ExportAccountDataOutput<'de>;
+    type Output<'de> = ExportAccountDataOutput;
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(ExportAccountDataOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl jacquard_common::xrpc::XrpcRequest for ExportAccountData {
@@ -45,7 +62,7 @@ impl jacquard_common::xrpc::XrpcRequest for ExportAccountData {
     type Response = ExportAccountDataResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.actor.exportAccountData
 pub struct ExportAccountDataRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ExportAccountDataRequest {

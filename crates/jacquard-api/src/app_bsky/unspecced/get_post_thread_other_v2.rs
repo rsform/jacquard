@@ -42,7 +42,7 @@ pub struct GetPostThreadOtherV2Output<'a> {
     pub thread: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.getPostThreadOtherV2
 pub struct GetPostThreadOtherV2Response;
 impl jacquard_common::xrpc::XrpcResp for GetPostThreadOtherV2Response {
@@ -58,7 +58,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPostThreadOtherV2<'a> {
     type Response = GetPostThreadOtherV2Response;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.getPostThreadOtherV2
 pub struct GetPostThreadOtherV2Request;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadOtherV2Request {

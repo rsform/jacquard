@@ -191,9 +191,9 @@ pub struct RenderedView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub css: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub css: Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
-    pub html: jacquard_common::types::blob::Blob<'a>,
+    pub html: jacquard_common::types::blob::BlobRef<'a>,
 }
 
 /// An array of tags associated with the notebook entry. Tags can help categorize and organize entries.

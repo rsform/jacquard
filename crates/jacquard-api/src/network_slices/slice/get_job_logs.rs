@@ -93,7 +93,7 @@ pub struct GetJobLogsOutput<'a> {
     pub logs: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///network.slices.slice.getJobLogs
 pub struct GetJobLogsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetJobLogsResponse {
@@ -109,7 +109,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetJobLogs<'a> {
     type Response = GetJobLogsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///network.slices.slice.getJobLogs
 pub struct GetJobLogsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetJobLogsRequest {

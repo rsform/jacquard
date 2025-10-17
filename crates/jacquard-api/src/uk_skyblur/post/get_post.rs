@@ -59,7 +59,7 @@ pub struct GetPostOutput<'a> {
     pub text: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///uk.skyblur.post.getPost
 pub struct GetPostResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
@@ -77,7 +77,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPost<'a> {
     type Response = GetPostResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///uk.skyblur.post.getPost
 pub struct GetPostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {

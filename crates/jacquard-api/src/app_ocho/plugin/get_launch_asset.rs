@@ -26,7 +26,6 @@ pub struct GetLaunchAsset<'a> {
 }
 
 /// The launch asset for the plugin, which is the main JavaScript bundle.
-#[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -37,15 +36,33 @@ pub struct GetLaunchAsset<'a> {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct GetLaunchAssetOutput<'a> {}
-///Response type for
+pub struct GetLaunchAssetOutput {
+    pub body: bytes::Bytes,
+}
+
+/// Response type for
 ///app.ocho.plugin.getLaunchAsset
 pub struct GetLaunchAssetResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLaunchAssetResponse {
     const NSID: &'static str = "app.ocho.plugin.getLaunchAsset";
     const ENCODING: &'static str = "text/javascript";
-    type Output<'de> = GetLaunchAssetOutput<'de>;
+    type Output<'de> = GetLaunchAssetOutput;
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(GetLaunchAssetOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for GetLaunchAsset<'a> {
@@ -54,7 +71,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetLaunchAsset<'a> {
     type Response = GetLaunchAssetResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.plugin.getLaunchAsset
 pub struct GetLaunchAssetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLaunchAssetRequest {

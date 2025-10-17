@@ -78,7 +78,7 @@ pub struct UpdateGroupOutput<'a> {
     pub public: std::option::Option<bool>,
 }
 
-///Response type for
+/// Response type for
 ///app.blebbit.authr.group.updateGroup
 pub struct UpdateGroupResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateGroupResponse {
@@ -96,7 +96,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateGroup<'a> {
     type Response = UpdateGroupResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.blebbit.authr.group.updateGroup
 pub struct UpdateGroupRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateGroupRequest {

@@ -19,7 +19,7 @@
 #[serde(rename_all = "camelCase")]
 pub struct BackgroundImage<'a> {
     #[serde(borrow)]
-    pub image: jacquard_common::types::blob::Blob<'a>,
+    pub image: jacquard_common::types::blob::BlobRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     pub repeat: Option<bool>,

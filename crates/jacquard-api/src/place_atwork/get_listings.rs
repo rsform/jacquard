@@ -71,7 +71,7 @@ pub struct GetListingsOutput<'a> {
     pub listings: Vec<jacquard_common::types::value::Data<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///place.atwork.getListings
 pub struct GetListingsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetListingsResponse {
@@ -87,7 +87,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetListings<'a> {
     type Response = GetListingsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///place.atwork.getListings
 pub struct GetListingsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetListingsRequest {

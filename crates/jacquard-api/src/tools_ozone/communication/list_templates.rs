@@ -35,7 +35,7 @@ pub struct ListTemplatesOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct ListTemplates;
-///Response type for
+/// Response type for
 ///tools.ozone.communication.listTemplates
 pub struct ListTemplatesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListTemplatesResponse {
@@ -51,7 +51,7 @@ impl jacquard_common::xrpc::XrpcRequest for ListTemplates {
     type Response = ListTemplatesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.communication.listTemplates
 pub struct ListTemplatesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListTemplatesRequest {

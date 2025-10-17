@@ -42,7 +42,7 @@ pub struct GetSuggestedStarterPacksSkeletonOutput<'a> {
     pub starter_packs: Vec<jacquard_common::types::string::AtUri<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.getSuggestedStarterPacksSkeleton
 pub struct GetSuggestedStarterPacksSkeletonResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedStarterPacksSkeletonResponse {
@@ -58,7 +58,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedStarterPacksSkeleton
     type Response = GetSuggestedStarterPacksSkeletonResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.getSuggestedStarterPacksSkeleton
 pub struct GetSuggestedStarterPacksSkeletonRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedStarterPacksSkeletonRequest {

@@ -34,7 +34,7 @@ pub struct Post<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub encrypt_body: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub encrypt_body: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The post main contents. Blurred text must be enclosed in brackets [].
     #[serde(borrow)]
     #[builder(into)]

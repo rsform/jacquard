@@ -53,7 +53,7 @@ pub struct PutActivitySubscriptionOutput<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.notification.putActivitySubscription
 pub struct PutActivitySubscriptionResponse;
 impl jacquard_common::xrpc::XrpcResp for PutActivitySubscriptionResponse {
@@ -71,7 +71,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PutActivitySubscription<'a> {
     type Response = PutActivitySubscriptionResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.notification.putActivitySubscription
 pub struct PutActivitySubscriptionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutActivitySubscriptionRequest {

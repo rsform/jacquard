@@ -57,7 +57,7 @@ pub enum GetReposOutputReposItem<'a> {
     RepoViewNotFound(Box<crate::tools_ozone::moderation::RepoViewNotFound<'a>>),
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.moderation.getRepos
 pub struct GetReposResponse;
 impl jacquard_common::xrpc::XrpcResp for GetReposResponse {
@@ -73,7 +73,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepos<'a> {
     type Response = GetReposResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.moderation.getRepos
 pub struct GetReposRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetReposRequest {

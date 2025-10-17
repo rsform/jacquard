@@ -59,7 +59,7 @@ pub struct SendEmailOutput<'a> {
     pub sent: bool,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.admin.sendEmail
 pub struct SendEmailResponse;
 impl jacquard_common::xrpc::XrpcResp for SendEmailResponse {
@@ -77,7 +77,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SendEmail<'a> {
     type Response = SendEmailResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.admin.sendEmail
 pub struct SendEmailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendEmailRequest {

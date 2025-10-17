@@ -39,7 +39,7 @@ pub struct UpsertSetOutput<'a> {
     pub value: crate::tools_ozone::set::SetView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.set.upsertSet
 pub struct UpsertSetResponse;
 impl jacquard_common::xrpc::XrpcResp for UpsertSetResponse {
@@ -57,7 +57,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpsertSet<'a> {
     type Response = UpsertSetResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.set.upsertSet
 pub struct UpsertSetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpsertSetRequest {

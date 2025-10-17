@@ -54,7 +54,7 @@ pub struct SearchReposOutput<'a> {
     pub repos: Vec<crate::tools_ozone::moderation::RepoView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.moderation.searchRepos
 pub struct SearchReposResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchReposResponse {
@@ -70,7 +70,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SearchRepos<'a> {
     type Response = SearchReposResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.moderation.searchRepos
 pub struct SearchReposRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchReposRequest {

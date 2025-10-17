@@ -78,7 +78,7 @@ pub enum GetLogOutputLogsItem<'a> {
     LogRemoveReaction(Box<crate::chat_bsky::convo::LogRemoveReaction<'a>>),
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.getLog
 pub struct GetLogResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLogResponse {
@@ -94,7 +94,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetLog<'a> {
     type Response = GetLogResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.getLog
 pub struct GetLogRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLogRequest {

@@ -95,7 +95,7 @@ impl std::fmt::Display for UpdateTemplateError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.communication.updateTemplate
 pub struct UpdateTemplateResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateTemplateResponse {
@@ -113,7 +113,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateTemplate<'a> {
     type Response = UpdateTemplateResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.communication.updateTemplate
 pub struct UpdateTemplateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateTemplateRequest {

@@ -67,7 +67,7 @@ impl std::fmt::Display for CreateBookmarkError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.bookmark.createBookmark
 pub struct CreateBookmarkResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateBookmarkResponse {
@@ -85,7 +85,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateBookmark<'a> {
     type Response = CreateBookmarkResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.bookmark.createBookmark
 pub struct CreateBookmarkRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateBookmarkRequest {

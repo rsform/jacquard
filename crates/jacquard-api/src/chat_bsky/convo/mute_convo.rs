@@ -38,7 +38,7 @@ pub struct MuteConvoOutput<'a> {
     pub convo: crate::chat_bsky::convo::ConvoView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.muteConvo
 pub struct MuteConvoResponse;
 impl jacquard_common::xrpc::XrpcResp for MuteConvoResponse {
@@ -56,7 +56,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for MuteConvo<'a> {
     type Response = MuteConvoResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.muteConvo
 pub struct MuteConvoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MuteConvoRequest {

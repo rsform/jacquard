@@ -89,7 +89,7 @@ impl std::fmt::Display for PushNotifyError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///win.tomo-x.pushat.pushNotify
 pub struct PushNotifyResponse;
 impl jacquard_common::xrpc::XrpcResp for PushNotifyResponse {
@@ -107,7 +107,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PushNotify<'a> {
     type Response = PushNotifyResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///win.tomo-x.pushat.pushNotify
 pub struct PushNotifyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PushNotifyRequest {

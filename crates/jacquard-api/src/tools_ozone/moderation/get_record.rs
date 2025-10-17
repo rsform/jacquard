@@ -76,7 +76,7 @@ impl std::fmt::Display for GetRecordError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.moderation.getRecord
 pub struct GetRecordResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecordResponse {
@@ -92,7 +92,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecord<'a> {
     type Response = GetRecordResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.moderation.getRecord
 pub struct GetRecordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecordRequest {

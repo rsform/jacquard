@@ -57,7 +57,7 @@ pub enum GetRecordsOutputRecordsItem<'a> {
     RecordViewNotFound(Box<crate::tools_ozone::moderation::RecordViewNotFound<'a>>),
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.moderation.getRecords
 pub struct GetRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecordsResponse {
@@ -73,7 +73,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecords<'a> {
     type Response = GetRecordsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.moderation.getRecords
 pub struct GetRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecordsRequest {

@@ -60,7 +60,7 @@ pub struct QuerySetsOutput<'a> {
     pub sets: Vec<crate::tools_ozone::set::SetView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.set.querySets
 pub struct QuerySetsResponse;
 impl jacquard_common::xrpc::XrpcResp for QuerySetsResponse {
@@ -76,7 +76,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for QuerySets<'a> {
     type Response = QuerySetsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.set.querySets
 pub struct QuerySetsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QuerySetsRequest {

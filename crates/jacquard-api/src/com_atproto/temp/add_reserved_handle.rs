@@ -35,7 +35,7 @@ pub struct AddReservedHandle<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AddReservedHandleOutput<'a> {}
-///Response type for
+/// Response type for
 ///com.atproto.temp.addReservedHandle
 pub struct AddReservedHandleResponse;
 impl jacquard_common::xrpc::XrpcResp for AddReservedHandleResponse {
@@ -53,7 +53,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AddReservedHandle<'a> {
     type Response = AddReservedHandleResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.temp.addReservedHandle
 pub struct AddReservedHandleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddReservedHandleRequest {

@@ -26,7 +26,7 @@ pub struct GithubCallback<'a> {
     pub state: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.ocho.auth.githubCallback
 pub struct GithubCallbackResponse;
 impl jacquard_common::xrpc::XrpcResp for GithubCallbackResponse {
@@ -42,7 +42,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GithubCallback<'a> {
     type Response = GithubCallbackResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.auth.githubCallback
 pub struct GithubCallbackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GithubCallbackRequest {

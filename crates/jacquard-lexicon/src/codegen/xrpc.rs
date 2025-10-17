@@ -55,6 +55,7 @@ impl<'c> CodeGenerator<'c> {
             .as_ref()
             .map(|o| o.encoding.as_ref())
             .unwrap_or("application/json");
+
         let xrpc_impl = self.generate_xrpc_request_impl(
             nsid,
             &type_base,
@@ -610,7 +611,9 @@ impl<'c> CodeGenerator<'c> {
         let fields = if let Some(schema) = &body.schema {
             self.generate_body_fields("", &struct_name, schema, false)?
         } else {
-            quote! {}
+            quote! {
+                pub body: bytes::Bytes,
+            }
         };
 
         let doc = self.generate_doc_comment(body.description.as_ref());
@@ -637,6 +640,15 @@ impl<'c> CodeGenerator<'c> {
                 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic, Default)]
                 #[serde(rename_all = "camelCase")]
                 pub struct #ident<'a> {
+                    #fields
+                }
+            }
+        } else if body.schema.is_none() {
+            quote! {
+                #doc
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                #[serde(rename_all = "camelCase")]
+                pub struct #ident {
                     #fields
                 }
             }
@@ -1014,7 +1026,15 @@ impl<'c> CodeGenerator<'c> {
                 &format!("{}Output", type_base),
                 proc_macro2::Span::call_site(),
             );
-            quote! { #output_ident<'de> }
+            if output_encoding == "application/json" {
+                quote! {
+                    #output_ident<'de>
+                }
+            } else {
+                quote! {
+                    #output_ident
+                }
+            }
         } else {
             quote! { () }
         };
@@ -1041,6 +1061,36 @@ impl<'c> CodeGenerator<'c> {
             proc_macro2::Span::call_site(),
         );
 
+        let decode_output_method = if output_encoding == "application/json" {
+            quote! {}
+        } else {
+            let output_ident = syn::Ident::new(
+                &format!("{}Output", type_base),
+                proc_macro2::Span::call_site(),
+            );
+            quote! {
+
+                fn decode_output<'de>(body: &'de [u8]) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+                where
+                    Self::Output<'de>: serde::Deserialize<'de>,
+                {
+                    Ok(#output_ident {
+                        body: bytes::Bytes::copy_from_slice(body),
+                    })
+                }
+            }
+        };
+
+        let encode_output_method = if output_encoding == "application/json" {
+            quote! {}
+        } else {
+            quote! {
+                fn encode_output(output: &Self::Output<'_>) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+                    Ok(output.body.to_vec())
+                }
+            }
+        };
+
         let response_type = quote! {
             #[doc = " Response type for "]
             #[doc = #nsid]
@@ -1051,6 +1101,9 @@ impl<'c> CodeGenerator<'c> {
                 const ENCODING: &'static str = #output_encoding;
                 type Output<'de> = #output_type;
                 type Err<'de> = #error_type;
+
+                #encode_output_method
+                #decode_output_method
             }
         };
 

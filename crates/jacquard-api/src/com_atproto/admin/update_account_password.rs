@@ -33,7 +33,7 @@ pub struct UpdateAccountPassword<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.admin.updateAccountPassword
 pub struct UpdateAccountPasswordResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateAccountPasswordResponse {
@@ -51,7 +51,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountPassword<'a> {
     type Response = UpdateAccountPasswordResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.admin.updateAccountPassword
 pub struct UpdateAccountPasswordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountPasswordRequest {

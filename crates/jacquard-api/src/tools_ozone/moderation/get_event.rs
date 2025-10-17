@@ -38,7 +38,7 @@ pub struct GetEventOutput<'a> {
     pub value: crate::tools_ozone::moderation::ModEventViewDetail<'a>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.moderation.getEvent
 pub struct GetEventResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEventResponse {
@@ -54,7 +54,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetEvent {
     type Response = GetEventResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.moderation.getEvent
 pub struct GetEventRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEventRequest {

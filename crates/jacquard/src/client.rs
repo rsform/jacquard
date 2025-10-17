@@ -451,7 +451,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             response.into_output().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::Auth(auth),
                 XrpcError::Generic(g) => AgentError::Generic(g),
-                XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
+                XrpcError::Decode(e) => AgentError::Decode(e),
                 XrpcError::Xrpc(typed) => AgentError::SubOperation {
                     step: "create record",
                     error: Box::new(typed),
@@ -629,7 +629,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             let record = response.parse().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::Auth(auth),
                 XrpcError::Generic(g) => AgentError::Generic(g),
-                XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
+                XrpcError::Decode(e) => AgentError::Decode(e),
                 XrpcError::Xrpc(typed) => AgentError::SubOperation {
                     step: "get record",
                     error: format!("{:?}", typed).into(),
@@ -685,7 +685,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             response.into_output().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::Auth(auth),
                 XrpcError::Generic(g) => AgentError::Generic(g),
-                XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
+                XrpcError::Decode(e) => AgentError::Decode(e),
                 XrpcError::Xrpc(typed) => AgentError::SubOperation {
                     step: "delete record",
                     error: Box::new(typed),
@@ -732,7 +732,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             response.into_output().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::Auth(auth),
                 XrpcError::Generic(g) => AgentError::Generic(g),
-                XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
+                XrpcError::Decode(e) => AgentError::Decode(e),
                 XrpcError::Xrpc(typed) => AgentError::SubOperation {
                     step: "put record",
                     error: Box::new(typed),
@@ -792,13 +792,13 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             let output = response.into_output().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::Auth(auth),
                 XrpcError::Generic(g) => AgentError::Generic(g),
-                XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
+                XrpcError::Decode(e) => AgentError::Decode(e),
                 XrpcError::Xrpc(typed) => AgentError::SubOperation {
                     step: "upload blob",
                     error: Box::new(typed),
                 },
             })?;
-            Ok(output.blob.into_static())
+            Ok(output.blob.blob().clone().into_static())
         }
     }
 
@@ -833,7 +833,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             let output = response.parse().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::Auth(auth),
                 XrpcError::Generic(g) => AgentError::Generic(g),
-                XrpcError::Decode(e) => AgentError::Decode(DecodeError::Json(e)),
+                XrpcError::Decode(e) => AgentError::Decode(e),
                 XrpcError::Xrpc(_) => AgentError::SubOperation {
                     step: "get vec",
                     error: format!("{:?}", e).into(),
@@ -1054,7 +1054,7 @@ impl MemoryCredentialSession {
     ///
     /// Uses an in memory store and a public resolver.
     /// Equivalent to a BasicClient that isn't wrapped in Agent
-    fn unauthenticated() -> Self {
+    pub fn unauthenticated() -> Self {
         use std::sync::Arc;
         let http = reqwest::Client::new();
         let resolver = jacquard_identity::PublicResolver::new(http, Default::default());
@@ -1082,7 +1082,7 @@ impl MemoryCredentialSession {
     /// # Ok(())
     /// # }
     /// ```
-    async fn authenticated(
+    pub async fn authenticated(
         identifier: CowStr<'_>,
         password: CowStr<'_>,
         session_id: Option<CowStr<'_>>,

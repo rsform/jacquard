@@ -20,7 +20,7 @@
 pub struct Image<'a> {
     /// The actual atproto image blob.
     #[serde(borrow)]
-    pub blob: jacquard_common::types::blob::Blob<'a>,
+    pub blob: jacquard_common::types::blob::BlobRef<'a>,
     #[serde(borrow)]
     pub image_link: crate::com_shinolabs::pinksea::oekaki::ImageLink<'a>,
 }

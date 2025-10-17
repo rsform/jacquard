@@ -35,7 +35,7 @@ pub struct Radio<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub logo: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub logo: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The name of the radio station.
     #[serde(borrow)]
     #[builder(into)]

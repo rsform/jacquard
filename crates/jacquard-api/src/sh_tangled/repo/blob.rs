@@ -172,7 +172,7 @@ impl std::fmt::Display for BlobError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.blob
 pub struct BlobResponse;
 impl jacquard_common::xrpc::XrpcResp for BlobResponse {
@@ -188,7 +188,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Blob<'a> {
     type Response = BlobResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.blob
 pub struct BlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for BlobRequest {

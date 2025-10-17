@@ -26,7 +26,7 @@ pub struct UpdateGroupRelationship<'a> {
     pub subject: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.blebbit.authr.group.updateGroupRelationship
 pub struct UpdateGroupRelationshipResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateGroupRelationshipResponse {
@@ -44,7 +44,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateGroupRelationship<'a> {
     type Response = UpdateGroupRelationshipResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.blebbit.authr.group.updateGroupRelationship
 pub struct UpdateGroupRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateGroupRelationshipRequest {

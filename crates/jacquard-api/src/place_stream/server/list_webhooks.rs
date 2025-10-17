@@ -88,7 +88,7 @@ impl std::fmt::Display for ListWebhooksError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///place.stream.server.listWebhooks
 pub struct ListWebhooksResponse;
 impl jacquard_common::xrpc::XrpcResp for ListWebhooksResponse {
@@ -104,7 +104,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListWebhooks<'a> {
     type Response = ListWebhooksResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///place.stream.server.listWebhooks
 pub struct ListWebhooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListWebhooksRequest {

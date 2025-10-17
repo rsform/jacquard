@@ -49,7 +49,7 @@ pub struct SearchStarterPacksOutput<'a> {
     pub starter_packs: Vec<crate::app_bsky::graph::StarterPackViewBasic<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.graph.searchStarterPacks
 pub struct SearchStarterPacksResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchStarterPacksResponse {
@@ -65,7 +65,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SearchStarterPacks<'a> {
     type Response = SearchStarterPacksResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.graph.searchStarterPacks
 pub struct SearchStarterPacksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchStarterPacksRequest {

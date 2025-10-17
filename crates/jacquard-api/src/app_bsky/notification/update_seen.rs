@@ -29,7 +29,7 @@ pub struct UpdateSeen<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.notification.updateSeen
 pub struct UpdateSeenResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateSeenResponse {
@@ -47,7 +47,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateSeen<'a> {
     type Response = UpdateSeenResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.notification.updateSeen
 pub struct UpdateSeenRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateSeenRequest {

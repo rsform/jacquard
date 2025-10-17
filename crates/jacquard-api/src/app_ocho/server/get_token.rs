@@ -39,7 +39,7 @@ pub struct GetTokenOutput<'a> {
     pub token: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.ocho.server.getToken
 pub struct GetTokenResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTokenResponse {
@@ -55,7 +55,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetToken<'a> {
     type Response = GetTokenResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.ocho.server.getToken
 pub struct GetTokenRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTokenRequest {

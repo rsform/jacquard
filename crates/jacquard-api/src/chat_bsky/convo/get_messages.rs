@@ -68,7 +68,7 @@ pub enum GetMessagesOutputMessagesItem<'a> {
     DeletedMessageView(Box<crate::chat_bsky::convo::DeletedMessageView<'a>>),
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.getMessages
 pub struct GetMessagesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetMessagesResponse {
@@ -84,7 +84,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetMessages<'a> {
     type Response = GetMessagesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.getMessages
 pub struct GetMessagesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetMessagesRequest {

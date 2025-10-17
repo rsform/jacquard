@@ -38,7 +38,7 @@ pub struct GetAuthorPostsOutput<'a> {
     pub post: Vec<crate::com_whtwnd::blog::BlogEntry<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///com.whtwnd.blog.getAuthorPosts
 pub struct GetAuthorPostsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAuthorPostsResponse {
@@ -54,7 +54,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetAuthorPosts<'a> {
     type Response = GetAuthorPostsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.whtwnd.blog.getAuthorPosts
 pub struct GetAuthorPostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorPostsRequest {

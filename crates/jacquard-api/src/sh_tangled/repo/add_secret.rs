@@ -36,7 +36,7 @@ pub struct AddSecret<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///sh.tangled.repo.addSecret
 pub struct AddSecretResponse;
 impl jacquard_common::xrpc::XrpcResp for AddSecretResponse {
@@ -54,7 +54,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AddSecret<'a> {
     type Response = AddSecretResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///sh.tangled.repo.addSecret
 pub struct AddSecretRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddSecretRequest {

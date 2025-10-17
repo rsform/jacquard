@@ -32,7 +32,7 @@ pub struct UpdateAccountHandle<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.admin.updateAccountHandle
 pub struct UpdateAccountHandleResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateAccountHandleResponse {
@@ -50,7 +50,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountHandle<'a> {
     type Response = UpdateAccountHandleResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.admin.updateAccountHandle
 pub struct UpdateAccountHandleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountHandleRequest {

@@ -20,7 +20,7 @@
 pub struct Artifact<'a> {
     /// the artifact
     #[serde(borrow)]
-    pub artifact: jacquard_common::types::blob::Blob<'a>,
+    pub artifact: jacquard_common::types::blob::BlobRef<'a>,
     /// time of creation of this artifact
     pub created_at: jacquard_common::types::string::Datetime,
     /// name of the artifact

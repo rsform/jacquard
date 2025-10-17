@@ -71,7 +71,7 @@ impl std::fmt::Display for DeleteSetError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.set.deleteSet
 pub struct DeleteSetResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteSetResponse {
@@ -89,7 +89,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteSet<'a> {
     type Response = DeleteSetResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.set.deleteSet
 pub struct DeleteSetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteSetRequest {

@@ -46,7 +46,7 @@ pub struct GetListBlocksOutput<'a> {
     pub lists: Vec<crate::app_bsky::graph::ListView<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.graph.getListBlocks
 pub struct GetListBlocksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetListBlocksResponse {
@@ -62,7 +62,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetListBlocks<'a> {
     type Response = GetListBlocksResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.graph.getListBlocks
 pub struct GetListBlocksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetListBlocksRequest {

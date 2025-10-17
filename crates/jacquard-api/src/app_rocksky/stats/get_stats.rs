@@ -39,7 +39,7 @@ pub struct GetStatsOutput<'a> {
     pub value: crate::app_rocksky::stats::StatsView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.stats.getStats
 pub struct GetStatsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStatsResponse {
@@ -55,7 +55,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetStats<'a> {
     type Response = GetStatsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.stats.getStats
 pub struct GetStatsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStatsRequest {

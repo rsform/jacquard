@@ -39,7 +39,7 @@ pub struct UpdateAllReadOutput<'a> {
     pub updated_count: i64,
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.updateAllRead
 pub struct UpdateAllReadResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateAllReadResponse {
@@ -57,7 +57,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAllRead<'a> {
     type Response = UpdateAllReadResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.updateAllRead
 pub struct UpdateAllReadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAllReadRequest {

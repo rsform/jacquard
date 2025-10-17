@@ -50,7 +50,7 @@ pub struct CreateInviteCodeOutput<'a> {
     pub code: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.server.createInviteCode
 pub struct CreateInviteCodeResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateInviteCodeResponse {
@@ -68,7 +68,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateInviteCode<'a> {
     type Response = CreateInviteCodeResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.server.createInviteCode
 pub struct CreateInviteCodeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateInviteCodeRequest {

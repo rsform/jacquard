@@ -34,7 +34,7 @@ pub struct GetAgeAssuranceStateOutput<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct GetAgeAssuranceState;
-///Response type for
+/// Response type for
 ///app.bsky.unspecced.getAgeAssuranceState
 pub struct GetAgeAssuranceStateResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAgeAssuranceStateResponse {
@@ -50,7 +50,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetAgeAssuranceState {
     type Response = GetAgeAssuranceStateResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.unspecced.getAgeAssuranceState
 pub struct GetAgeAssuranceStateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAgeAssuranceStateRequest {

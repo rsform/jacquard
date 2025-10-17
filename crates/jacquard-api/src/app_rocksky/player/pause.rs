@@ -17,7 +17,7 @@
     jacquard_derive::IntoStatic
 )]
 pub struct Pause;
-///Response type for
+/// Response type for
 ///app.rocksky.player.pause
 pub struct PauseResponse;
 impl jacquard_common::xrpc::XrpcResp for PauseResponse {
@@ -35,7 +35,7 @@ impl jacquard_common::xrpc::XrpcRequest for Pause {
     type Response = PauseResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.player.pause
 pub struct PauseRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PauseRequest {

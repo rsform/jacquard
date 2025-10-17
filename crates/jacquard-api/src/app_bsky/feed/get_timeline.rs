@@ -50,7 +50,7 @@ pub struct GetTimelineOutput<'a> {
     pub feed: Vec<crate::app_bsky::feed::FeedViewPost<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///app.bsky.feed.getTimeline
 pub struct GetTimelineResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTimelineResponse {
@@ -66,7 +66,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetTimeline<'a> {
     type Response = GetTimelineResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.bsky.feed.getTimeline
 pub struct GetTimelineRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTimelineRequest {

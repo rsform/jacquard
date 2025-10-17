@@ -38,7 +38,7 @@ pub struct FindCorrelationOutput<'a> {
     pub details: Vec<crate::tools_ozone::signature::SigDetail<'a>>,
 }
 
-///Response type for
+/// Response type for
 ///tools.ozone.signature.findCorrelation
 pub struct FindCorrelationResponse;
 impl jacquard_common::xrpc::XrpcResp for FindCorrelationResponse {
@@ -54,7 +54,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for FindCorrelation<'a> {
     type Response = FindCorrelationResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///tools.ozone.signature.findCorrelation
 pub struct FindCorrelationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for FindCorrelationRequest {

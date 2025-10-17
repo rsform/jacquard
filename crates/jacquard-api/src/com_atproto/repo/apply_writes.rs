@@ -225,7 +225,7 @@ impl std::fmt::Display for ApplyWritesError<'_> {
     }
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.repo.applyWrites
 pub struct ApplyWritesResponse;
 impl jacquard_common::xrpc::XrpcResp for ApplyWritesResponse {
@@ -243,7 +243,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ApplyWrites<'a> {
     type Response = ApplyWritesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.repo.applyWrites
 pub struct ApplyWritesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ApplyWritesRequest {

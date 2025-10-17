@@ -23,7 +23,6 @@ pub struct DownloadFile<'a> {
     pub file_id: jacquard_common::CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -34,15 +33,33 @@ pub struct DownloadFile<'a> {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct DownloadFileOutput<'a> {}
-///Response type for
+pub struct DownloadFileOutput {
+    pub body: bytes::Bytes,
+}
+
+/// Response type for
 ///app.rocksky.googledrive.downloadFile
 pub struct DownloadFileResponse;
 impl jacquard_common::xrpc::XrpcResp for DownloadFileResponse {
     const NSID: &'static str = "app.rocksky.googledrive.downloadFile";
     const ENCODING: &'static str = "application/octet-stream";
-    type Output<'de> = DownloadFileOutput<'de>;
+    type Output<'de> = DownloadFileOutput;
     type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    fn encode_output(
+        output: &Self::Output<'_>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+        Ok(output.body.to_vec())
+    }
+    fn decode_output<'de>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    where
+        Self::Output<'de>: serde::Deserialize<'de>,
+    {
+        Ok(DownloadFileOutput {
+            body: bytes::Bytes::copy_from_slice(body),
+        })
+    }
 }
 
 impl<'a> jacquard_common::xrpc::XrpcRequest for DownloadFile<'a> {
@@ -51,7 +68,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DownloadFile<'a> {
     type Response = DownloadFileResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.googledrive.downloadFile
 pub struct DownloadFileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DownloadFileRequest {

@@ -36,7 +36,7 @@ pub struct DeletePageParams<'a> {
     jacquard_derive::IntoStatic
 )]
 pub struct DeletePage;
-///Response type for
+/// Response type for
 ///app.blebbit.authr.page.deletePage
 pub struct DeletePageResponse;
 impl jacquard_common::xrpc::XrpcResp for DeletePageResponse {
@@ -54,7 +54,7 @@ impl jacquard_common::xrpc::XrpcRequest for DeletePage {
     type Response = DeletePageResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.blebbit.authr.page.deletePage
 pub struct DeletePageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeletePageRequest {

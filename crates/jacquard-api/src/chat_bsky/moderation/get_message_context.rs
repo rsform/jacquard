@@ -68,7 +68,7 @@ pub enum GetMessageContextOutputMessagesItem<'a> {
     DeletedMessageView(Box<crate::chat_bsky::convo::DeletedMessageView<'a>>),
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.moderation.getMessageContext
 pub struct GetMessageContextResponse;
 impl jacquard_common::xrpc::XrpcResp for GetMessageContextResponse {
@@ -84,7 +84,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetMessageContext<'a> {
     type Response = GetMessageContextResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.moderation.getMessageContext
 pub struct GetMessageContextRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetMessageContextRequest {

@@ -55,7 +55,7 @@ pub struct SignPlcOperationOutput<'a> {
     pub operation: jacquard_common::types::value::Data<'a>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.identity.signPlcOperation
 pub struct SignPlcOperationResponse;
 impl jacquard_common::xrpc::XrpcResp for SignPlcOperationResponse {
@@ -73,7 +73,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SignPlcOperation<'a> {
     type Response = SignPlcOperationResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.identity.signPlcOperation
 pub struct SignPlcOperationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SignPlcOperationRequest {

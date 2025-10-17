@@ -64,7 +64,7 @@ pub struct StartSyncOutput<'a> {
     pub message: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///network.slices.slice.startSync
 pub struct StartSyncResponse;
 impl jacquard_common::xrpc::XrpcResp for StartSyncResponse {
@@ -82,7 +82,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for StartSync<'a> {
     type Response = StartSyncResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///network.slices.slice.startSync
 pub struct StartSyncRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StartSyncRequest {

@@ -22,7 +22,7 @@ pub struct RequestPhoneVerification<'a> {
     pub phone_number: jacquard_common::CowStr<'a>,
 }
 
-///Response type for
+/// Response type for
 ///com.atproto.temp.requestPhoneVerification
 pub struct RequestPhoneVerificationResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestPhoneVerificationResponse {
@@ -40,7 +40,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RequestPhoneVerification<'a> {
     type Response = RequestPhoneVerificationResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///com.atproto.temp.requestPhoneVerification
 pub struct RequestPhoneVerificationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestPhoneVerificationRequest {

@@ -39,7 +39,7 @@ pub struct GetConvoOutput<'a> {
     pub convo: crate::chat_bsky::convo::ConvoView<'a>,
 }
 
-///Response type for
+/// Response type for
 ///chat.bsky.convo.getConvo
 pub struct GetConvoResponse;
 impl jacquard_common::xrpc::XrpcResp for GetConvoResponse {
@@ -55,7 +55,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetConvo<'a> {
     type Response = GetConvoResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///chat.bsky.convo.getConvo
 pub struct GetConvoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetConvoRequest {

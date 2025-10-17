@@ -47,7 +47,7 @@ pub struct GetSegmentsOutput<'a> {
     >,
 }
 
-///Response type for
+/// Response type for
 ///place.stream.live.getSegments
 pub struct GetSegmentsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSegmentsResponse {
@@ -63,7 +63,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSegments<'a> {
     type Response = GetSegmentsResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///place.stream.live.getSegments
 pub struct GetSegmentsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSegmentsRequest {

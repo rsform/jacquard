@@ -46,7 +46,7 @@ pub struct GetShoutRepliesOutput<'a> {
     pub shouts: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
 }
 
-///Response type for
+/// Response type for
 ///app.rocksky.shout.getShoutReplies
 pub struct GetShoutRepliesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetShoutRepliesResponse {
@@ -62,7 +62,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetShoutReplies<'a> {
     type Response = GetShoutRepliesResponse;
 }
 
-///Endpoint type for
+/// Endpoint type for
 ///app.rocksky.shout.getShoutReplies
 pub struct GetShoutRepliesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetShoutRepliesRequest {

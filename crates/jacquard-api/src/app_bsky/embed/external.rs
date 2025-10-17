@@ -24,7 +24,7 @@ pub struct External<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[builder(into)]
     #[serde(borrow)]
-    pub thumb: Option<jacquard_common::types::blob::Blob<'a>>,
+    pub thumb: Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
