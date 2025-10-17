@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    bon::Builder,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Account<'a> {
@@ -42,7 +42,7 @@ pub struct Account<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    bon::Builder,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Commit<'a> {
@@ -87,7 +87,7 @@ pub struct Commit<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    bon::Builder,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Identity<'a> {
@@ -111,7 +111,7 @@ pub struct Identity<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Info<'a> {
@@ -130,7 +130,7 @@ pub struct Info<'a> {
     PartialEq,
     Eq,
     bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -141,27 +141,21 @@ pub struct SubscribeRepos {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SubscribeReposMessage<'a> {
     #[serde(rename = "#commit")]
-    Commit(Box<jacquard_common::types::value::Data<'a>>),
+    Commit(Box<crate::com_atproto::sync::subscribe_repos::Commit<'a>>),
     #[serde(rename = "#sync")]
-    Sync(Box<jacquard_common::types::value::Data<'a>>),
+    Sync(Box<crate::com_atproto::sync::subscribe_repos::Sync<'a>>),
     #[serde(rename = "#identity")]
-    Identity(Box<jacquard_common::types::value::Data<'a>>),
+    Identity(Box<crate::com_atproto::sync::subscribe_repos::Identity<'a>>),
     #[serde(rename = "#account")]
-    Account(Box<jacquard_common::types::value::Data<'a>>),
+    Account(Box<crate::com_atproto::sync::subscribe_repos::Account<'a>>),
     #[serde(rename = "#info")]
-    Info(Box<jacquard_common::types::value::Data<'a>>),
+    Info(Box<crate::com_atproto::sync::subscribe_repos::Info<'a>>),
 }
 
 #[jacquard_derive::open_union]
@@ -174,7 +168,7 @@ pub enum SubscribeReposMessage<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -208,6 +202,33 @@ impl std::fmt::Display for SubscribeReposError<'_> {
     }
 }
 
+///Stream response type for
+///com.atproto.sync.subscribeRepos
+pub struct SubscribeReposStream;
+impl jacquard_common::xrpc::SubscriptionResp for SubscribeReposStream {
+    const NSID: &'static str = "com.atproto.sync.subscribeRepos";
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::DagCbor;
+    type Message<'de> = SubscribeReposMessage<'de>;
+    type Error<'de> = SubscribeReposError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcSubscription for SubscribeRepos {
+    const NSID: &'static str = "com.atproto.sync.subscribeRepos";
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::DagCbor;
+    type Stream = SubscribeReposStream;
+}
+
+pub struct SubscribeReposEndpoint;
+impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeReposEndpoint {
+    const PATH: &'static str = "/xrpc/com.atproto.sync.subscribeRepos";
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::DagCbor;
+    type Params<'de> = SubscribeRepos;
+    type Stream = SubscribeReposStream;
+}
+
 /// A repo operation, ie a mutation of a single record.
 #[jacquard_derive::lexicon]
 #[derive(
@@ -218,7 +239,7 @@ impl std::fmt::Display for SubscribeReposError<'_> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    bon::Builder,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoOp<'a> {
@@ -248,7 +269,7 @@ pub struct RepoOp<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    bon::Builder,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Sync<'a> {

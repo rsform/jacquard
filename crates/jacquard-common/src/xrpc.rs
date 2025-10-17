@@ -16,6 +16,12 @@ pub mod streaming;
 #[cfg(feature = "streaming")]
 pub use streaming::StreamingResponse;
 
+#[cfg(feature = "websocket")]
+pub mod subscription;
+
+#[cfg(feature = "websocket")]
+pub use subscription::{MessageEncoding, SubscriptionEndpoint, SubscriptionResp, XrpcSubscription};
+
 use bytes::Bytes;
 use http::{
     HeaderName, HeaderValue, Request, StatusCode,

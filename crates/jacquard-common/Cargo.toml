@@ -44,6 +44,7 @@ tokio = { workspace = true, default-features = false, features = ["sync"] }
 # Streaming support (optional)
 n0-future = { version = "0.1", optional = true }
 futures = { version = "0.3", optional = true }
+tokio-tungstenite-wasm = { version = "0.4", optional = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 getrandom = { version = "0.3.4", features = ["wasm_js"] }
@@ -52,7 +53,7 @@ getrandom = { version = "0.3.4", features = ["wasm_js"] }
 reqwest = { workspace = true, optional = true, features = [ "http2", "system-proxy", "rustls-tls"] }
 
 [features]
-default = ["service-auth", "reqwest-client", "crypto"]
+default = ["service-auth", "reqwest-client", "crypto", "websocket"]
 crypto = []
 crypto-ed25519 = ["crypto", "dep:ed25519-dalek"]
 crypto-k256 = ["crypto", "dep:k256", "k256/ecdsa"]
@@ -61,7 +62,7 @@ service-auth = ["crypto-k256", "crypto-p256", "dep:signature"]
 reqwest-client = ["dep:reqwest"]
 tracing = ["dep:tracing"]
 streaming = ["n0-future", "futures"]
-websocket = ["streaming"]
+websocket = ["streaming", "tokio-tungstenite-wasm"]
 
 [dependencies.ed25519-dalek]
 version = "2"

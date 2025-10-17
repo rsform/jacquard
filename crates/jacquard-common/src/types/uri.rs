@@ -6,7 +6,7 @@ use crate::{
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use smol_str::ToSmolStr;
-use std::{fmt::Display, marker::PhantomData, str::FromStr};
+use std::{fmt::Display, marker::PhantomData, ops::Deref, str::FromStr};
 use url::Url;
 
 /// Generic URI with type-specific parsing
@@ -202,6 +202,20 @@ impl<'a, R: Collection> RecordUri<'a, R> {
 impl<R: Collection> Display for RecordUri<'_, R> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.0.fmt(f)
+    }
+}
+
+impl<'a, R: Collection> AsRef<AtUri<'a>> for RecordUri<'a, R> {
+    fn as_ref(&self) -> &AtUri<'a> {
+        &self.0
+    }
+}
+
+impl<'a, R: Collection> Deref for RecordUri<'a, R> {
+    type Target = AtUri<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 

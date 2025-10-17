@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Entity<'a> {
@@ -40,7 +40,7 @@ pub struct Entity<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
@@ -99,7 +99,13 @@ impl<'a> Post<'a> {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -118,7 +124,13 @@ pub enum PostEmbed<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostGetRecordOutput<'a> {
@@ -167,7 +179,7 @@ impl jacquard_common::types::collection::Collection for PostRecord {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReplyRef<'a> {
@@ -187,7 +199,7 @@ pub struct ReplyRef<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TextSlice<'a> {

@@ -64,6 +64,10 @@ pub enum StreamErrorKind {
     Closed,
     /// Protocol violation or framing error
     Protocol,
+    /// Message deserialization failed
+    Decode,
+    /// Wrong message format (e.g., text frame when expecting binary)
+    WrongMessageFormat,
 }
 
 impl StreamError {
@@ -105,6 +109,22 @@ impl StreamError {
             source: Some(msg.into().into()),
         }
     }
+
+    /// Create a decode error with source
+    pub fn decode(source: impl Error + Send + Sync + 'static) -> Self {
+        Self {
+            kind: StreamErrorKind::Decode,
+            source: Some(Box::new(source)),
+        }
+    }
+
+    /// Create a wrong message format error
+    pub fn wrong_message_format(msg: impl Into<String>) -> Self {
+        Self {
+            kind: StreamErrorKind::WrongMessageFormat,
+            source: Some(msg.into().into()),
+        }
+    }
 }
 
 impl fmt::Display for StreamError {
@@ -113,6 +133,8 @@ impl fmt::Display for StreamError {
             StreamErrorKind::Transport => write!(f, "Transport error"),
             StreamErrorKind::Closed => write!(f, "Stream closed"),
             StreamErrorKind::Protocol => write!(f, "Protocol error"),
+            StreamErrorKind::Decode => write!(f, "Decode error"),
+            StreamErrorKind::WrongMessageFormat => write!(f, "Wrong message format"),
         }?;
 
         if let Some(source) = &self.source {
@@ -125,7 +147,9 @@ impl fmt::Display for StreamError {
 
 impl Error for StreamError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
-        self.source.as_ref().map(|e| e.as_ref() as &(dyn Error + 'static))
+        self.source
+            .as_ref()
+            .map(|e| e.as_ref() as &(dyn Error + 'static))
     }
 }
 
@@ -153,7 +177,9 @@ impl ByteStream {
     }
 
     /// Convert into the inner boxed stream
-    pub fn into_inner(self) -> Box<dyn n0_future::Stream<Item = Result<Bytes, StreamError>> + Unpin> {
+    pub fn into_inner(
+        self,
+    ) -> Box<dyn n0_future::Stream<Item = Result<Bytes, StreamError>> + Unpin> {
         self.inner
     }
 }
@@ -219,10 +245,7 @@ mod tests {
     async fn byte_stream_can_be_created() {
         use futures::stream;
 
-        let data = vec![
-            Ok(Bytes::from("hello")),
-            Ok(Bytes::from(" world")),
-        ];
+        let data = vec![Ok(Bytes::from("hello")), Ok(Bytes::from(" world"))];
         let stream = stream::iter(data);
 
         let byte_stream = ByteStream::new(stream);

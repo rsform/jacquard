@@ -234,7 +234,10 @@ pub use xrpc::StreamingResponse;
 pub mod websocket;
 
 #[cfg(feature = "websocket")]
-pub use websocket::{WebSocketClient, WebSocketConnection};
+pub use websocket::{
+    tungstenite_client::TungsteniteClient, CloseCode, CloseFrame, WebSocketClient,
+    WebSocketConnection, WsMessage, WsSink, WsStream, WsText,
+};
 
 pub use types::value::*;
 

@@ -91,6 +91,13 @@ pub enum DecodeError {
         #[source]
         serde_ipld_dagcbor::DecodeError<HttpError>,
     ),
+    /// DAG-CBOR deserialization failed (in-memory, e.g., WebSocket frames)
+    #[error("Failed to deserialize DAG-CBOR: {0}")]
+    DagCborInfallible(
+        #[from]
+        #[source]
+        serde_ipld_dagcbor::DecodeError<std::convert::Infallible>,
+    ),
 }
 
 /// HTTP error response (non-200 status codes outside of XRPC error handling)

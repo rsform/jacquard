@@ -7,8 +7,8 @@ use heck::{ToPascalCase, ToSnakeCase};
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use super::utils::make_ident;
 use super::CodeGenerator;
+use super::utils::make_ident;
 
 impl<'c> CodeGenerator<'c> {
     /// Generate query type
@@ -178,6 +178,31 @@ impl<'c> CodeGenerator<'c> {
             output.push(error_enum);
         }
 
+        // Generate XrpcSubscription trait impl
+        let params_has_lifetime = sub
+            .parameters
+            .as_ref()
+            .map(|p| match p {
+                crate::lexicon::LexXrpcSubscriptionParameter::Params(params) => {
+                    self.params_need_lifetime(params)
+                }
+            })
+            .unwrap_or(false);
+
+        let has_params = sub.parameters.is_some();
+        let has_message = sub.message.is_some();
+        let has_errors = sub.errors.is_some();
+
+        let subscription_impl = self.generate_xrpc_subscription_impl(
+            nsid,
+            &type_base,
+            has_params,
+            params_has_lifetime,
+            has_message,
+            has_errors,
+        )?;
+        output.push(subscription_impl);
+
         Ok(quote! {
             #(#output)*
         })
@@ -200,12 +225,20 @@ impl<'c> CodeGenerator<'c> {
                 let mut variants = Vec::new();
                 for ref_str in &union.refs {
                     let ref_str_s = ref_str.as_ref();
+
+                    // Normalize local refs (starting with #) by prepending current NSID
+                    let normalized_ref = if ref_str.starts_with('#') {
+                        format!("{}{}", nsid, ref_str)
+                    } else {
+                        ref_str.to_string()
+                    };
+
                     // Parse ref to get NSID and def name
                     let (ref_nsid, ref_def) =
-                        if let Some((nsid, fragment)) = ref_str.split_once('#') {
-                            (nsid, fragment)
+                        if let Some((nsid_part, fragment)) = normalized_ref.split_once('#') {
+                            (nsid_part, fragment)
                         } else {
-                            (ref_str.as_ref(), "main")
+                            (normalized_ref.as_str(), "main")
                         };
 
                     let variant_name = if ref_def == "main" {
@@ -215,7 +248,7 @@ impl<'c> CodeGenerator<'c> {
                     };
                     let variant_ident =
                         syn::Ident::new(&variant_name, proc_macro2::Span::call_site());
-                    let type_path = self.ref_to_rust_type(ref_str)?;
+                    let type_path = self.ref_to_rust_type(&normalized_ref)?;
 
                     variants.push(quote! {
                         #[serde(rename = #ref_str_s)]
@@ -262,11 +295,24 @@ impl<'c> CodeGenerator<'c> {
                     match field_type {
                         LexObjectProperty::Union(union) => {
                             // Skip empty, single-variant unions unless they're self-referential
-                            if !union.refs.is_empty() && (union.refs.len() > 1 || self.is_self_referential_union(nsid, &struct_name, union)) {
-                                let union_name = self.generate_field_type_name(nsid, &struct_name, field_name, "");
+                            if !union.refs.is_empty()
+                                && (union.refs.len() > 1
+                                    || self.is_self_referential_union(nsid, &struct_name, union))
+                            {
+                                let union_name = self.generate_field_type_name(
+                                    nsid,
+                                    &struct_name,
+                                    field_name,
+                                    "",
+                                );
                                 let refs: Vec<_> = union.refs.iter().cloned().collect();
-                                let union_def =
-                                    self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
+                                let union_def = self.generate_union(
+                                    nsid,
+                                    &union_name,
+                                    &refs,
+                                    None,
+                                    union.closed,
+                                )?;
                                 unions.push(union_def);
                             }
                         }
@@ -274,9 +320,20 @@ impl<'c> CodeGenerator<'c> {
                             if let LexArrayItem::Union(union) = &array.items {
                                 // Skip single-variant array unions
                                 if union.refs.len() > 1 {
-                                    let union_name = self.generate_field_type_name(nsid, &struct_name, field_name, "Item");
+                                    let union_name = self.generate_field_type_name(
+                                        nsid,
+                                        &struct_name,
+                                        field_name,
+                                        "Item",
+                                    );
                                     let refs: Vec<_> = union.refs.iter().cloned().collect();
-                                    let union_def = self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
+                                    let union_def = self.generate_union(
+                                        nsid,
+                                        &union_name,
+                                        &refs,
+                                        None,
+                                        union.closed,
+                                    )?;
                                     unions.push(union_def);
                                 }
                             }
@@ -415,10 +472,14 @@ impl<'c> CodeGenerator<'c> {
         let (has_default, has_builder) = if is_binary_body {
             (false, true)
         } else if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
-            use crate::codegen::structs::{count_required_fields, all_required_are_defaultable_strings, conflicts_with_builder_macro};
+            use crate::codegen::structs::{
+                all_required_are_defaultable_strings, conflicts_with_builder_macro,
+                count_required_fields,
+            };
             let required_count = count_required_fields(obj);
             let can_default = required_count == 0 || all_required_are_defaultable_strings(obj);
-            let can_builder = required_count >= 1 && !can_default && !conflicts_with_builder_macro(type_base);
+            let can_builder =
+                required_count >= 1 && !can_default && !conflicts_with_builder_macro(type_base);
             (can_default, can_builder)
         } else {
             (false, false)
@@ -495,8 +556,12 @@ impl<'c> CodeGenerator<'c> {
                 match field_type {
                     LexObjectProperty::Union(union) => {
                         // Skip empty, single-variant unions unless they're self-referential
-                        if !union.refs.is_empty() && (union.refs.len() > 1 || self.is_self_referential_union(nsid, type_base, union)) {
-                            let union_name = self.generate_field_type_name(nsid, type_base, field_name, "");
+                        if !union.refs.is_empty()
+                            && (union.refs.len() > 1
+                                || self.is_self_referential_union(nsid, type_base, union))
+                        {
+                            let union_name =
+                                self.generate_field_type_name(nsid, type_base, field_name, "");
                             let refs: Vec<_> = union.refs.iter().cloned().collect();
                             let union_def =
                                 self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
@@ -507,9 +572,16 @@ impl<'c> CodeGenerator<'c> {
                         if let LexArrayItem::Union(union) = &array.items {
                             // Skip single-variant array unions
                             if union.refs.len() > 1 {
-                                let union_name = self.generate_field_type_name(nsid, type_base, field_name, "Item");
+                                let union_name = self
+                                    .generate_field_type_name(nsid, type_base, field_name, "Item");
                                 let refs: Vec<_> = union.refs.iter().cloned().collect();
-                                let union_def = self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
+                                let union_def = self.generate_union(
+                                    nsid,
+                                    &union_name,
+                                    &refs,
+                                    None,
+                                    union.closed,
+                                )?;
                                 unions.push(union_def);
                             }
                         }
@@ -545,8 +617,11 @@ impl<'c> CodeGenerator<'c> {
 
         // Determine if we should derive Default
         // Check if schema is an Object and apply heuristics
-        let has_default = if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
-            use crate::codegen::structs::{count_required_fields, all_required_are_defaultable_strings};
+        let has_default = if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema
+        {
+            use crate::codegen::structs::{
+                all_required_are_defaultable_strings, count_required_fields,
+            };
             let required_count = count_required_fields(obj);
             required_count == 0 || all_required_are_defaultable_strings(obj)
         } else {
@@ -584,8 +659,11 @@ impl<'c> CodeGenerator<'c> {
                 match field_type {
                     LexObjectProperty::Union(union) => {
                         // Skip single-variant unions unless they're self-referential
-                        if union.refs.len() > 1 || self.is_self_referential_union(nsid, &struct_name, union) {
-                            let union_name = self.generate_field_type_name(nsid, &struct_name, field_name, "");
+                        if union.refs.len() > 1
+                            || self.is_self_referential_union(nsid, &struct_name, union)
+                        {
+                            let union_name =
+                                self.generate_field_type_name(nsid, &struct_name, field_name, "");
                             let refs: Vec<_> = union.refs.iter().cloned().collect();
                             let union_def =
                                 self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
@@ -596,9 +674,20 @@ impl<'c> CodeGenerator<'c> {
                         if let LexArrayItem::Union(union) = &array.items {
                             // Skip single-variant array unions
                             if union.refs.len() > 1 {
-                                let union_name = self.generate_field_type_name(nsid, &struct_name, field_name, "Item");
+                                let union_name = self.generate_field_type_name(
+                                    nsid,
+                                    &struct_name,
+                                    field_name,
+                                    "Item",
+                                );
                                 let refs: Vec<_> = union.refs.iter().cloned().collect();
-                                let union_def = self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
+                                let union_def = self.generate_union(
+                                    nsid,
+                                    &union_name,
+                                    &refs,
+                                    None,
+                                    union.closed,
+                                )?;
                                 unions.push(union_def);
                             }
                         }
@@ -953,7 +1042,7 @@ impl<'c> CodeGenerator<'c> {
         );
 
         let response_type = quote! {
-            #[doc = "Response type for "]
+            #[doc = " Response type for "]
             #[doc = #nsid]
             pub struct #response_ident;
 
@@ -1027,7 +1116,7 @@ impl<'c> CodeGenerator<'c> {
                     #decode_body_method
                 }
 
-                #[doc = "Endpoint type for "]
+                #[doc = " Endpoint type for "]
                 #[doc = #nsid]
                 pub struct #endpoint_ident;
 
@@ -1057,7 +1146,7 @@ impl<'c> CodeGenerator<'c> {
                     type Response = #response_ident;
                 }
 
-                #[doc = "Endpoint type for "]
+                #[doc = " Endpoint type for "]
                 #[doc = #nsid]
                 pub struct #endpoint_ident;
 
@@ -1070,5 +1159,144 @@ impl<'c> CodeGenerator<'c> {
                 }
             })
         }
+    }
+
+    /// Generate XrpcSubscription trait impl for a subscription endpoint
+    pub(super) fn generate_xrpc_subscription_impl(
+        &self,
+        nsid: &str,
+        type_base: &str,
+        has_params: bool,
+        params_has_lifetime: bool,
+        has_message: bool,
+        has_errors: bool,
+    ) -> Result<TokenStream> {
+        // Generate stream response marker struct
+        let stream_ident = syn::Ident::new(
+            &format!("{}Stream", type_base),
+            proc_macro2::Span::call_site(),
+        );
+
+        let message_type = if has_message {
+            let msg_ident = syn::Ident::new(
+                &format!("{}Message", type_base),
+                proc_macro2::Span::call_site(),
+            );
+            quote! { #msg_ident<'de> }
+        } else {
+            quote! { () }
+        };
+
+        let error_type = if has_errors {
+            let err_ident = syn::Ident::new(
+                &format!("{}Error", type_base),
+                proc_macro2::Span::call_site(),
+            );
+            quote! { #err_ident<'de> }
+        } else {
+            quote! { jacquard_common::xrpc::GenericError<'de> }
+        };
+
+        // Determine encoding from nsid convention
+        // ATProto subscriptions use DAG-CBOR, community ones might use JSON
+        let encoding = if nsid.starts_with("com.atproto") {
+            quote! { jacquard_common::xrpc::MessageEncoding::DagCbor }
+        } else {
+            quote! { jacquard_common::xrpc::MessageEncoding::Json }
+        };
+
+        // Generate SubscriptionResp impl
+        let stream_resp_impl = quote! {
+            #[doc = "Stream response type for "]
+            #[doc = #nsid]
+            pub struct #stream_ident;
+
+            impl jacquard_common::xrpc::SubscriptionResp for #stream_ident {
+                const NSID: &'static str = #nsid;
+                const ENCODING: jacquard_common::xrpc::MessageEncoding = #encoding;
+
+                type Message<'de> = #message_type;
+                type Error<'de> = #error_type;
+            }
+        };
+
+        let params_ident = if has_params {
+            syn::Ident::new(type_base, proc_macro2::Span::call_site())
+        } else {
+            // Generate marker struct if no params
+            let marker = syn::Ident::new(type_base, proc_macro2::Span::call_site());
+            let endpoint_ident = syn::Ident::new(
+                &format!("{}Endpoint", type_base),
+                proc_macro2::Span::call_site(),
+            );
+            let endpoint_path = format!("/xrpc/{}", nsid);
+
+            return Ok(quote! {
+                #stream_resp_impl
+
+                #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+                pub struct #marker;
+
+                impl jacquard_common::xrpc::XrpcSubscription for #marker {
+                    const NSID: &'static str = #nsid;
+                    const ENCODING: jacquard_common::xrpc::MessageEncoding = #encoding;
+
+                    type Stream = #stream_ident;
+                }
+
+                pub struct #endpoint_ident;
+
+                impl jacquard_common::xrpc::SubscriptionEndpoint for #endpoint_ident {
+                    const PATH: &'static str = #endpoint_path;
+                    const ENCODING: jacquard_common::xrpc::MessageEncoding = #encoding;
+
+                    type Params<'de> = #marker;
+                    type Stream = #stream_ident;
+                }
+            });
+        };
+
+        let (impl_generics, impl_target, endpoint_params_type) =
+            if has_params && params_has_lifetime {
+                (
+                    quote! { <'a> },
+                    quote! { #params_ident<'a> },
+                    quote! { #params_ident<'de> },
+                )
+            } else {
+                (
+                    quote! {},
+                    quote! { #params_ident },
+                    quote! { #params_ident },
+                )
+            };
+
+        let endpoint_ident = syn::Ident::new(
+            &format!("{}Endpoint", type_base),
+            proc_macro2::Span::call_site(),
+        );
+
+        let endpoint_path = format!("/xrpc/{}", nsid);
+
+        Ok(quote! {
+            #stream_resp_impl
+
+            impl #impl_generics jacquard_common::xrpc::XrpcSubscription for #impl_target {
+                const NSID: &'static str = #nsid;
+                const ENCODING: jacquard_common::xrpc::MessageEncoding = #encoding;
+
+                type Stream = #stream_ident;
+            }
+
+            pub struct #endpoint_ident;
+
+            impl jacquard_common::xrpc::SubscriptionEndpoint for #endpoint_ident {
+                const PATH: &'static str = #endpoint_path;
+                const ENCODING: jacquard_common::xrpc::MessageEncoding = #encoding;
+
+                type Params<'de> = #endpoint_params_type;
+                type Stream = #stream_ident;
+            }
+        })
     }
 }

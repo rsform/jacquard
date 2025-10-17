@@ -74,9 +74,9 @@ pub struct SubscribeLabels {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SubscribeLabelsMessage<'a> {
     #[serde(rename = "#labels")]
-    Labels(Box<jacquard_common::types::value::Data<'a>>),
+    Labels(Box<crate::com_atproto::label::subscribe_labels::Labels<'a>>),
     #[serde(rename = "#info")]
-    Info(Box<jacquard_common::types::value::Data<'a>>),
+    Info(Box<crate::com_atproto::label::subscribe_labels::Info<'a>>),
 }
 
 #[jacquard_derive::open_union]
@@ -111,4 +111,28 @@ impl std::fmt::Display for SubscribeLabelsError<'_> {
             Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
         }
     }
+}
+
+///Stream response type for
+///com.atproto.label.subscribeLabels
+pub struct SubscribeLabelsStream;
+impl jacquard_common::xrpc::SubscriptionResp for SubscribeLabelsStream {
+    const NSID: &'static str = "com.atproto.label.subscribeLabels";
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    type Message<'de> = SubscribeLabelsMessage<'de>;
+    type Error<'de> = SubscribeLabelsError<'de>;
+}
+
+impl jacquard_common::xrpc::XrpcSubscription for SubscribeLabels {
+    const NSID: &'static str = "com.atproto.label.subscribeLabels";
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    type Stream = SubscribeLabelsStream;
+}
+
+pub struct SubscribeLabelsEndpoint;
+impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeLabelsEndpoint {
+    const PATH: &'static str = "/xrpc/com.atproto.label.subscribeLabels";
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    type Params<'de> = SubscribeLabels;
+    type Stream = SubscribeLabelsStream;
 }
