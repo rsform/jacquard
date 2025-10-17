@@ -22,7 +22,7 @@ path = "../../examples/axum_server.rs"
 [dependencies]
 axum = "0.8.6"
 bytes.workspace = true
-jacquard = { version = "0.5", path = "../jacquard" }
+jacquard = { version = "0.5", path = "../jacquard", default-features = false, features = ["api"] }
 jacquard-common = { version = "0.5", path = "../jacquard-common", features = ["reqwest-client"] }
 jacquard-derive = { version = "0.5.2", path = "../jacquard-derive" }
 jacquard-identity = { version = "0.5", path = "../jacquard-identity", optional = true }
