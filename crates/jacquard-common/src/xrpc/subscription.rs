@@ -3,6 +3,7 @@
 //! This module defines traits and types for typed WebSocket subscriptions,
 //! mirroring the request/response pattern used for HTTP XRPC endpoints.
 
+use n0_future::stream::Boxed;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::future::Future;
@@ -10,8 +11,8 @@ use std::marker::PhantomData;
 use url::Url;
 
 use crate::stream::StreamError;
-use crate::websocket::{WebSocketClient, WebSocketConnection};
-use crate::{CowStr, IntoStatic};
+use crate::websocket::{WebSocketClient, WebSocketConnection, WsSink, WsStream};
+use crate::{CowStr, Data, IntoStatic, RawData, WsMessage};
 
 /// Encoding format for subscription messages
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -173,8 +174,8 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
     pub fn into_stream(
         self,
     ) -> (
-        crate::websocket::WsSink,
-        n0_future::stream::Boxed<Result<StreamMessage<'static, S>, StreamError>>,
+        WsSink,
+        Boxed<Result<StreamMessage<'static, S>, StreamError>>,
     )
     where
         for<'a> StreamMessage<'a, S>: IntoStatic<Output = StreamMessage<'static, S>>,
@@ -183,13 +184,122 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
 
         let (tx, rx) = self.connection.split();
 
-        let stream: n0_future::stream::Boxed<_> = match S::ENCODING {
-            MessageEncoding::Json => {
-                Box::pin(rx.into_inner().filter_map(|msg| decode_json_msg::<S>(msg)))
-            }
-            MessageEncoding::DagCbor => {
-                Box::pin(rx.into_inner().filter_map(|msg| decode_cbor_msg::<S>(msg)))
-            }
+        let stream = match S::ENCODING {
+            MessageEncoding::Json => rx
+                .into_inner()
+                .filter_map(|msg| decode_json_msg::<S>(msg))
+                .boxed(),
+            MessageEncoding::DagCbor => rx
+                .into_inner()
+                .filter_map(|msg| decode_cbor_msg::<S>(msg))
+                .boxed(),
+        };
+
+        (tx, stream)
+    }
+
+    /// Converts the subscription into a stream of raw atproto data.
+    pub fn into_raw_data_stream(self) -> (WsSink, Boxed<Result<RawData<'static>, StreamError>>) {
+        use n0_future::StreamExt as _;
+
+        let (tx, rx) = self.connection.split();
+
+        fn parse_msg<'a>(bytes: &'a [u8]) -> Result<RawData<'a>, serde_json::Error> {
+            serde_json::from_slice(bytes)
+        }
+        fn parse_cbor<'a>(
+            bytes: &'a [u8],
+        ) -> Result<RawData<'a>, serde_ipld_dagcbor::DecodeError<std::convert::Infallible>>
+        {
+            serde_ipld_dagcbor::from_slice(bytes)
+        }
+
+        let stream = match S::ENCODING {
+            MessageEncoding::Json => rx
+                .into_inner()
+                .filter_map(|msg_result| match msg_result {
+                    Ok(WsMessage::Text(text)) => Some(
+                        parse_msg(text.as_ref())
+                            .map(|v| v.into_static())
+                            .map_err(StreamError::decode),
+                    ),
+                    Ok(WsMessage::Binary(bytes)) => Some(
+                        parse_msg(&bytes)
+                            .map(|v| v.into_static())
+                            .map_err(StreamError::decode),
+                    ),
+                    Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
+                    Err(e) => Some(Err(e)),
+                })
+                .boxed(),
+            MessageEncoding::DagCbor => rx
+                .into_inner()
+                .filter_map(|msg_result| match msg_result {
+                    Ok(WsMessage::Binary(bytes)) => Some(
+                        parse_cbor(&bytes)
+                            .map(|v| v.into_static())
+                            .map_err(|e| StreamError::decode(crate::error::DecodeError::from(e))),
+                    ),
+                    Ok(WsMessage::Text(_)) => Some(Err(StreamError::wrong_message_format(
+                        "expected binary frame for CBOR, got text",
+                    ))),
+                    Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
+                    Err(e) => Some(Err(e)),
+                })
+                .boxed(),
+        };
+
+        (tx, stream)
+    }
+
+    /// Converts the subscription into a stream of loosely-typed atproto data.
+    pub fn into_data_stream(self) -> (WsSink, Boxed<Result<Data<'static>, StreamError>>) {
+        use n0_future::StreamExt as _;
+
+        let (tx, rx) = self.connection.split();
+
+        fn parse_msg<'a>(bytes: &'a [u8]) -> Result<Data<'a>, serde_json::Error> {
+            serde_json::from_slice(bytes)
+        }
+        fn parse_cbor<'a>(
+            bytes: &'a [u8],
+        ) -> Result<Data<'a>, serde_ipld_dagcbor::DecodeError<std::convert::Infallible>> {
+            serde_ipld_dagcbor::from_slice(bytes)
+        }
+
+        let stream = match S::ENCODING {
+            MessageEncoding::Json => rx
+                .into_inner()
+                .filter_map(|msg_result| match msg_result {
+                    Ok(WsMessage::Text(text)) => Some(
+                        parse_msg(text.as_ref())
+                            .map(|v| v.into_static())
+                            .map_err(StreamError::decode),
+                    ),
+                    Ok(WsMessage::Binary(bytes)) => Some(
+                        parse_msg(&bytes)
+                            .map(|v| v.into_static())
+                            .map_err(StreamError::decode),
+                    ),
+                    Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
+                    Err(e) => Some(Err(e)),
+                })
+                .boxed(),
+            MessageEncoding::DagCbor => rx
+                .into_inner()
+                .filter_map(|msg_result| match msg_result {
+                    Ok(WsMessage::Binary(bytes)) => Some(
+                        parse_cbor(&bytes)
+                            .map(|v| v.into_static())
+                            .map_err(|e| StreamError::decode(crate::error::DecodeError::from(e))),
+                    ),
+                    Ok(WsMessage::Text(_)) => Some(Err(StreamError::wrong_message_format(
+                        "expected binary frame for CBOR, got text",
+                    ))),
+                    Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
+                    Err(e) => Some(Err(e)),
+                })
+                .boxed(),
         };
 
         (tx, stream)
@@ -205,35 +315,28 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
     /// Replaces the internal WebSocket stream with one copy and returns a typed decoded
     /// stream. Both streams receive all messages. Useful for observing raw messages
     /// while also processing typed messages.
-    pub fn tee(
-        &mut self,
-    ) -> n0_future::stream::Boxed<Result<StreamMessage<'static, S>, StreamError>>
+    pub fn tee(&mut self) -> Boxed<Result<StreamMessage<'static, S>, StreamError>>
     where
         for<'a> StreamMessage<'a, S>: IntoStatic<Output = StreamMessage<'static, S>>,
     {
         use n0_future::StreamExt as _;
 
         let rx = self.connection.receiver_mut();
-        let (raw_rx, typed_rx_source) = std::mem::replace(
-            rx,
-            crate::websocket::WsStream::new(futures::stream::empty()),
-        )
-        .tee();
+        let (raw_rx, typed_rx_source) =
+            std::mem::replace(rx, WsStream::new(n0_future::stream::empty())).tee();
 
         // Put the raw stream back
         *rx = raw_rx;
 
         match S::ENCODING {
-            MessageEncoding::Json => Box::pin(
-                typed_rx_source
-                    .into_inner()
-                    .filter_map(|msg| decode_json_msg::<S>(msg)),
-            ),
-            MessageEncoding::DagCbor => Box::pin(
-                typed_rx_source
-                    .into_inner()
-                    .filter_map(|msg| decode_cbor_msg::<S>(msg)),
-            ),
+            MessageEncoding::Json => typed_rx_source
+                .into_inner()
+                .filter_map(|msg| decode_json_msg::<S>(msg))
+                .boxed(),
+            MessageEncoding::DagCbor => typed_rx_source
+                .into_inner()
+                .filter_map(|msg| decode_cbor_msg::<S>(msg))
+                .boxed(),
         }
     }
 }
