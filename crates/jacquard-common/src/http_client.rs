@@ -37,7 +37,7 @@ pub trait HttpClientExt: HttpClient {
         body: S,
     ) -> impl Future<Output = Result<http::Response<ByteStream>, Self::Error>>
     where
-        S: n0_future::Stream<Item = bytes::Bytes> + Send + 'static;
+        S: n0_future::Stream<Item = Result<bytes::Bytes, StreamError>> + Send + 'static;
 }
 
 #[cfg(feature = "reqwest-client")]
@@ -145,12 +145,11 @@ impl HttpClientExt for reqwest::Client {
         body: S,
     ) -> Result<http::Response<ByteStream>, Self::Error>
     where
-        S: n0_future::Stream<Item = bytes::Bytes> + Send + 'static,
+        S: n0_future::Stream<Item = Result<bytes::Bytes, StreamError>> + Send + 'static,
     {
         // Convert stream to reqwest::Body
         use futures::StreamExt;
-        let ok_stream = body.map(Ok::<_, Self::Error>);
-        let reqwest_body = reqwest::Body::wrap_stream(ok_stream);
+        let reqwest_body = reqwest::Body::wrap_stream(body);
 
         let mut req = self
             .request(parts.method, parts.uri.to_string())

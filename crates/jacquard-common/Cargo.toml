@@ -45,12 +45,14 @@ tokio = { workspace = true, default-features = false, features = ["sync"] }
 n0-future = { version = "0.1", optional = true }
 futures = { version = "0.3", optional = true }
 tokio-tungstenite-wasm = { version = "0.4", optional = true }
+genawaiter = { version = "0.99.1", features = ["futures03"] }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 getrandom = { version = "0.3.4", features = ["wasm_js"] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 reqwest = { workspace = true, optional = true, features = [ "http2", "system-proxy", "rustls-tls"] }
+tokio-util = { version = "0.7.16", features = ["io"] }
 
 [features]
 default = ["service-auth", "reqwest-client", "crypto", "websocket"]

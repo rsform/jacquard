@@ -38,11 +38,16 @@ use std::fmt::{self, Debug};
 use std::{error::Error, marker::PhantomData};
 use url::Url;
 
-use crate::http_client::HttpClient;
+use crate::http_client::{HttpClient, HttpClientExt};
 use crate::types::value::Data;
 use crate::{AuthorizationToken, error::AuthError};
 use crate::{CowStr, error::XrpcResult};
 use crate::{IntoStatic, error::DecodeError};
+#[cfg(feature = "streaming")]
+use crate::{
+    StreamError,
+    xrpc::streaming::{XrpcProcedureSend, XrpcProcedureStream, XrpcResponseStream, XrpcStreamResp},
+};
 use crate::{error::TransportError, types::value::RawData};
 
 /// Error type for encoding XRPC requests
@@ -913,6 +918,103 @@ where
             XrpcError::Generic(e) => XrpcError::Generic(e),
             XrpcError::Decode(e) => XrpcError::Decode(e),
         }
+    }
+}
+
+#[cfg(feature = "streaming")]
+impl<'a, C: HttpClient + HttpClientExt> XrpcCall<'a, C> {
+    /// Send an XRPC call and stream the binary response.
+    ///
+    /// Useful for downloading blobs and entire repository archives
+    pub async fn download<R>(self, request: &R) -> Result<StreamingResponse, StreamError>
+    where
+        R: XrpcRequest,
+        <R as XrpcRequest>::Response: Send + Sync,
+    {
+        let http_request =
+            build_http_request(&self.base, request, &self.opts).map_err(StreamError::transport)?;
+
+        let http_response = self
+            .client
+            .send_http_streaming(http_request)
+            .await
+            .map_err(StreamError::transport)?;
+        let (parts, body) = http_response.into_parts();
+
+        Ok(StreamingResponse::new(parts, body))
+    }
+
+    /// Stream an XRPC procedure call and its response
+    ///
+    /// Useful for streaming upload of large payloads, or for "pipe-through" operations
+    /// where you processing a large payload.
+    pub async fn stream<S>(
+        self,
+        stream: XrpcProcedureSend<S::Frame<'static>>,
+    ) -> Result<XrpcResponseStream<<S::Response as XrpcStreamResp>::Frame<'static>>, StreamError>
+    where
+        S: XrpcProcedureStream + 'static,
+        <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>: XrpcStreamResp,
+    {
+        use futures::TryStreamExt;
+        use n0_future::StreamExt;
+
+        let mut url = self.base;
+        let mut path = url.path().trim_end_matches('/').to_owned();
+        path.push_str("/xrpc/");
+        path.push_str(<S::Request as XrpcRequest>::NSID);
+        url.set_path(&path);
+
+        let mut builder = http::Request::post(url.to_string());
+
+        if let Some(token) = &self.opts.auth {
+            let hv = match token {
+                AuthorizationToken::Bearer(t) => {
+                    HeaderValue::from_str(&format!("Bearer {}", t.as_ref()))
+                }
+                AuthorizationToken::Dpop(t) => {
+                    HeaderValue::from_str(&format!("DPoP {}", t.as_ref()))
+                }
+            }
+            .map_err(|e| StreamError::protocol(format!("Invalid authorization token: {}", e)))?;
+            builder = builder.header(Header::Authorization, hv);
+        }
+
+        if let Some(proxy) = &self.opts.atproto_proxy {
+            builder = builder.header(Header::AtprotoProxy, proxy.as_ref());
+        }
+        if let Some(labelers) = &self.opts.atproto_accept_labelers {
+            if !labelers.is_empty() {
+                let joined = labelers
+                    .iter()
+                    .map(|s| s.as_ref())
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                builder = builder.header(Header::AtprotoAcceptLabelers, joined);
+            }
+        }
+        for (name, value) in &self.opts.extra_headers {
+            builder = builder.header(name, value);
+        }
+
+        let (parts, _) = builder
+            .body(())
+            .map_err(|e| StreamError::protocol(e.to_string()))?
+            .into_parts();
+
+        let body_stream = stream.0.map_ok(|f| f.buffer).boxed();
+
+        let resp = self
+            .client
+            .send_http_bidirectional(parts, body_stream)
+            .await
+            .map_err(StreamError::transport)?;
+
+        let (parts, body) = resp.into_parts();
+
+        Ok(XrpcResponseStream::<
+            <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>,
+        >::from_typed_parts(parts, body))
     }
 }
 

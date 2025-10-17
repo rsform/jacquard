@@ -66,6 +66,8 @@ pub enum StreamErrorKind {
     Protocol,
     /// Message deserialization failed
     Decode,
+    /// Message serialization failed
+    Encode,
     /// Wrong message format (e.g., text frame when expecting binary)
     WrongMessageFormat,
 }
@@ -118,6 +120,14 @@ impl StreamError {
         }
     }
 
+    /// Create an encode error with source
+    pub fn encode(source: impl Error + Send + Sync + 'static) -> Self {
+        Self {
+            kind: StreamErrorKind::Encode,
+            source: Some(Box::new(source)),
+        }
+    }
+
     /// Create a wrong message format error
     pub fn wrong_message_format(msg: impl Into<String>) -> Self {
         Self {
@@ -134,6 +144,7 @@ impl fmt::Display for StreamError {
             StreamErrorKind::Closed => write!(f, "Stream closed"),
             StreamErrorKind::Protocol => write!(f, "Protocol error"),
             StreamErrorKind::Decode => write!(f, "Decode error"),
+            StreamErrorKind::Encode => write!(f, "Encode error"),
             StreamErrorKind::WrongMessageFormat => write!(f, "Wrong message format"),
         }?;
 
@@ -154,20 +165,33 @@ impl Error for StreamError {
 }
 
 use bytes::Bytes;
+use n0_future::stream::Boxed;
 
 /// Platform-agnostic byte stream abstraction
 pub struct ByteStream {
-    inner: Box<dyn n0_future::Stream<Item = Result<Bytes, StreamError>> + Unpin>,
+    inner: Boxed<Result<Bytes, StreamError>>,
 }
 
 impl ByteStream {
     /// Create a new byte stream from any compatible stream
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn new<S>(stream: S) -> Self
+    where
+        S: n0_future::Stream<Item = Result<Bytes, StreamError>> + Unpin + Send + 'static,
+    {
+        Self {
+            inner: Box::pin(stream),
+        }
+    }
+
+    /// Create a new byte stream from any compatible stream
+    #[cfg(target_arch = "wasm32")]
     pub fn new<S>(stream: S) -> Self
     where
         S: n0_future::Stream<Item = Result<Bytes, StreamError>> + Unpin + 'static,
     {
         Self {
-            inner: Box::new(stream),
+            inner: Box::pin(stream),
         }
     }
 
@@ -177,9 +201,7 @@ impl ByteStream {
     }
 
     /// Convert into the inner boxed stream
-    pub fn into_inner(
-        self,
-    ) -> Box<dyn n0_future::Stream<Item = Result<Bytes, StreamError>> + Unpin> {
+    pub fn into_inner(self) -> Boxed<Result<Bytes, StreamError>> {
         self.inner
     }
 }
