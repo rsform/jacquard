@@ -168,9 +168,9 @@ getrandom = { version = "0.2", features = ["js"] }
 clap.workspace = true
 miette = { workspace = true, features = ["fancy"] }
 tokio = { workspace = true, features = ["signal"] }
-viuer = { version =  "0.9", features = ["print-file", "sixel"] }
+viuer = { version =  "0.9", features = ["print-file"] }
 tiff = { version = "0.6.0-alpha" }
 image = { version = "0.25" }
 
 [package.metadata.docs.rs]
-features = ["api_all", "derive", "dns", "loopback"]
+features = ["api_all", "derive", "dns", "loopback", "streaming"]
