@@ -36,6 +36,7 @@
 //! - [`fetch`] - Ingests lexicons from git, atproto, http fetch, and other sources
 //! - [`fs`] - Filesystem utilities for lexicon storage
 
+pub mod cli;
 pub mod codegen;
 pub mod corpus;
 pub mod error;

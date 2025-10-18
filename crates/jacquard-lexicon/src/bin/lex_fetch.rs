@@ -1,29 +1,14 @@
 use clap::Parser;
+use jacquard_lexicon::cli::LexFetchArgs;
 use jacquard_lexicon::codegen::CodeGenerator;
 use jacquard_lexicon::corpus::LexiconCorpus;
 use jacquard_lexicon::fetch::{Config, Fetcher};
 use miette::{IntoDiagnostic, Result};
 use std::path::PathBuf;
 
-#[derive(Parser, Debug)]
-#[command(author, version, about = "Fetch Lexicon schemas from various sources")]
-struct Args {
-    /// Path to KDL config file
-    #[arg(short = 'c', long, default_value = "lexicons.kdl")]
-    config: PathBuf,
-
-    /// Skip code generation step
-    #[arg(long)]
-    no_codegen: bool,
-
-    /// Verbose output
-    #[arg(short = 'v', long)]
-    verbose: bool,
-}
-
 #[tokio::main]
 async fn main() -> Result<()> {
-    let args = Args::parse();
+    let args = LexFetchArgs::parse();
 
     if args.verbose {
         println!("Reading config from {:?}...", args.config);

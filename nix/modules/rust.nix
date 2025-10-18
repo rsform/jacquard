@@ -78,6 +78,20 @@
           crane = {
             args = {
               buildInputs = commonBuildInputs;
+              doCheck = false;  # Tests require lexicon corpus files not available in nix build
+              postInstall = ''
+                # Install man pages
+                if [ -d "$OUT_DIR/man" ]; then
+                  install -Dm644 $OUT_DIR/man/*.1 -t $out/share/man/man1/
+                fi
+
+                # Install shell completions
+                if [ -d "$OUT_DIR/completions" ]; then
+                  install -Dm644 $OUT_DIR/completions/lex-fetch.bash $out/share/bash-completion/completions/lex-fetch
+                  install -Dm644 $OUT_DIR/completions/lex-fetch.fish $out/share/fish/vendor_completions.d/lex-fetch.fish
+                  install -Dm644 $OUT_DIR/completions/_lex-fetch $out/share/zsh/site-functions/_lex-fetch
+                fi
+              '';
             };
           };
         };
@@ -123,6 +137,6 @@
         };
       };
     };
-    packages.default = self'.packages.jacquard;
+    packages.default = self'.packages.jacquard-lexicon;
   };
 }
