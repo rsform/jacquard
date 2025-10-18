@@ -595,7 +595,7 @@ where
         let mut opts = self.options.read().await.clone();
         opts.auth = self.access_token().await;
 
-        let mut url = base_uri;
+        let mut url = base_uri.clone();
         let mut path = url.path().trim_end_matches('/').to_owned();
         path.push_str("/xrpc/");
         path.push_str(<Str::Request as jacquard_common::xrpc::XrpcRequest>::NSID);
@@ -642,9 +642,12 @@ where
         let body_stream =
             jacquard_common::stream::ByteStream::new(stream.0.map_ok(|f| f.buffer).boxed());
 
+        // Clone the stream for potential retry
+        let (body1, body2) = body_stream.tee();
+
         let response = self
             .client
-            .send_http_bidirectional(parts.clone(), body_stream.into_inner())
+            .send_http_bidirectional(parts.clone(), body1.into_inner())
             .await
             .map_err(StreamError::transport)?;
 
@@ -694,14 +697,21 @@ where
                 .map_err(|e| StreamError::protocol(e.to_string()))?
                 .into_parts();
 
-            // Can't retry with the same stream - it's been consumed
-            // This is a limitation of streaming upload with auth refresh
-            return Err(StreamError::protocol("Authentication failed on streaming upload and stream cannot be retried".to_string()));
+            // Retry with the second half of the cloned stream
+            let response = self
+                .client
+                .send_http_bidirectional(parts, body2.into_inner())
+                .await
+                .map_err(StreamError::transport)?;
+            let (resp_parts, resp_body) = response.into_parts();
+            Ok(jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts(
+                resp_parts, resp_body,
+            ))
+        } else {
+            Ok(jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts(
+                resp_parts, resp_body,
+            ))
         }
-
-        Ok(jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts(
-            resp_parts, resp_body,
-        ))
     }
 }
 

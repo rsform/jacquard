@@ -11,6 +11,17 @@ readme.workspace = true
 exclude.workspace = true
 license.workspace = true
 
+[features]
+default = ["service-auth", "reqwest-client", "crypto"]
+crypto = []
+crypto-ed25519 = ["crypto", "dep:ed25519-dalek"]
+crypto-k256 = ["crypto", "dep:k256", "k256/ecdsa"]
+crypto-p256 = ["crypto", "dep:p256", "p256/ecdsa"]
+service-auth = ["crypto-k256", "crypto-p256", "dep:signature"]
+reqwest-client = ["dep:reqwest"]
+tracing = ["dep:tracing"]
+streaming = ["n0-future", "futures"]
+websocket = ["streaming", "tokio-tungstenite-wasm"]
 
 [dependencies]
 trait-variant.workspace = true
@@ -54,17 +65,7 @@ getrandom = { version = "0.3.4", features = ["wasm_js"] }
 reqwest = { workspace = true, optional = true, features = [ "http2", "system-proxy", "rustls-tls"] }
 tokio-util = { version = "0.7.16", features = ["io"] }
 
-[features]
-default = ["service-auth", "reqwest-client", "crypto", "websocket"]
-crypto = []
-crypto-ed25519 = ["crypto", "dep:ed25519-dalek"]
-crypto-k256 = ["crypto", "dep:k256", "k256/ecdsa"]
-crypto-p256 = ["crypto", "dep:p256", "p256/ecdsa"]
-service-auth = ["crypto-k256", "crypto-p256", "dep:signature"]
-reqwest-client = ["dep:reqwest"]
-tracing = ["dep:tracing"]
-streaming = ["n0-future", "futures"]
-websocket = ["streaming", "tokio-tungstenite-wasm"]
+
 
 [dependencies.ed25519-dalek]
 version = "2"

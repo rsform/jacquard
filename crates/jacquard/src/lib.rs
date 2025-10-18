@@ -220,6 +220,7 @@
 pub mod client;
 
 #[cfg(feature = "streaming")]
+/// Experimental streaming endpoints
 pub mod streaming;
 
 pub use common::*;

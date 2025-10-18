@@ -167,21 +167,9 @@ pub struct ByteStream {
 
 impl ByteStream {
     /// Create a new byte stream from any compatible stream
-    #[cfg(not(target_arch = "wasm32"))]
     pub fn new<S>(stream: S) -> Self
     where
         S: n0_future::Stream<Item = Result<Bytes, StreamError>> + Unpin + Send + 'static,
-    {
-        Self {
-            inner: Box::pin(stream),
-        }
-    }
-
-    /// Create a new byte stream from any compatible stream
-    #[cfg(target_arch = "wasm32")]
-    pub fn new<S>(stream: S) -> Self
-    where
-        S: n0_future::Stream<Item = Result<Bytes, StreamError>> + Unpin + 'static,
     {
         Self {
             inner: Box::pin(stream),

@@ -22,13 +22,16 @@ pub use streaming::{
 #[cfg(feature = "websocket")]
 pub mod subscription;
 
-#[cfg(feature = "websocket")]
-pub use subscription::{
-    BasicSubscriptionClient, MessageEncoding, SubscriptionCall, SubscriptionClient,
-    SubscriptionEndpoint, SubscriptionExt, SubscriptionOptions, SubscriptionResp,
-    SubscriptionStream, TungsteniteSubscriptionClient, XrpcSubscription,
-};
-
+#[cfg(feature = "streaming")]
+use crate::StreamError;
+use crate::http_client::HttpClient;
+#[cfg(feature = "streaming")]
+use crate::http_client::HttpClientExt;
+use crate::types::value::Data;
+use crate::{AuthorizationToken, error::AuthError};
+use crate::{CowStr, error::XrpcResult};
+use crate::{IntoStatic, error::DecodeError};
+use crate::{error::TransportError, types::value::RawData};
 use bytes::Bytes;
 use http::{
     HeaderName, HeaderValue, Request, StatusCode,
@@ -38,16 +41,13 @@ use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 use std::fmt::{self, Debug};
 use std::{error::Error, marker::PhantomData};
+#[cfg(feature = "websocket")]
+pub use subscription::{
+    BasicSubscriptionClient, MessageEncoding, SubscriptionCall, SubscriptionClient,
+    SubscriptionEndpoint, SubscriptionExt, SubscriptionOptions, SubscriptionResp,
+    SubscriptionStream, TungsteniteSubscriptionClient, XrpcSubscription,
+};
 use url::Url;
-
-use crate::http_client::{HttpClient, HttpClientExt};
-use crate::types::value::Data;
-use crate::{AuthorizationToken, error::AuthError};
-use crate::{CowStr, error::XrpcResult};
-use crate::{IntoStatic, error::DecodeError};
-#[cfg(feature = "streaming")]
-use crate::StreamError;
-use crate::{error::TransportError, types::value::RawData};
 
 /// Error type for encoding XRPC requests
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
@@ -315,7 +315,6 @@ pub trait XrpcClient: HttpClient {
     where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync;
-
 }
 
 /// Stateful XRPC streaming client trait
@@ -347,7 +346,14 @@ pub trait XrpcStreamingClient: XrpcClient + HttpClientExt {
     fn stream<S>(
         &self,
         stream: XrpcProcedureSend<S::Frame<'static>>,
-    ) -> impl Future<Output = Result<XrpcResponseStream<<<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>>, StreamError>>
+    ) -> impl Future<
+        Output = Result<
+            XrpcResponseStream<
+                <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>,
+            >,
+            StreamError,
+        >,
+    >
     where
         S: XrpcProcedureStream + 'static,
         <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>: XrpcStreamResp,
@@ -358,7 +364,14 @@ pub trait XrpcStreamingClient: XrpcClient + HttpClientExt {
     fn stream<S>(
         &self,
         stream: XrpcProcedureSend<S::Frame<'static>>,
-    ) -> impl Future<Output = Result<XrpcResponseStream<<<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>>, StreamError>>
+    ) -> impl Future<
+        Output = Result<
+            XrpcResponseStream<
+                <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>,
+            >,
+            StreamError,
+        >,
+    >
     where
         S: XrpcProcedureStream + 'static,
         <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>: XrpcStreamResp;

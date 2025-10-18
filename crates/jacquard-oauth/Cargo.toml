@@ -11,6 +11,15 @@ readme.workspace = true
 exclude.workspace = true
 license.workspace = true
 
+
+[features]
+default = []
+loopback = ["dep:rouille"]
+browser-open = ["dep:webbrowser"]
+tracing = ["dep:tracing"]
+websocket = ["jacquard-common/websocket"]
+streaming = ["jacquard-common/streaming", "dep:n0-future"]
+
 [dependencies]
 jacquard-common = { version = "0.5", path = "../jacquard-common", features = ["reqwest-client"] }
 jacquard-identity = { version = "0.5", path = "../jacquard-identity" }
@@ -44,11 +53,3 @@ tracing = { workspace = true, optional = true }
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio = { workspace = true, features = ["rt", "net", "time"] }
 rouille = { version = "3.6.2", optional = true }
-
-[features]
-default = []
-loopback = ["dep:rouille"]
-browser-open = ["dep:webbrowser"]
-tracing = ["dep:tracing"]
-websocket = ["jacquard-common/websocket"]
-streaming = ["jacquard-common/streaming", "dep:n0-future"]

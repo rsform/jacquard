@@ -1,19 +1,8 @@
-use crate::{
-    CowStr, IntoStatic,
-    types::cid::{Cid, CidLink},
-};
-#[allow(unused)]
+use crate::{CowStr, IntoStatic, types::cid::CidLink};
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error};
 use smol_str::ToSmolStr;
 use std::convert::Infallible;
-#[allow(unused)]
-use std::{
-    borrow::Cow,
-    fmt,
-    hash::{Hash, Hasher},
-    ops::Deref,
-    str::FromStr,
-};
+use std::{fmt, hash::Hash, ops::Deref, str::FromStr};
 
 /// Blob reference for binary data in AT Protocol
 ///
