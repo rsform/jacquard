@@ -44,6 +44,7 @@
 
 use std::error::Error;
 use std::fmt;
+use std::pin::Pin;
 
 /// Boxed error type for streaming operations
 pub type BoxError = Box<dyn Error + Send + Sync + 'static>;
@@ -237,7 +238,7 @@ impl fmt::Debug for ByteStream {
 
 /// Platform-agnostic byte sink abstraction
 pub struct ByteSink {
-    inner: Box<dyn n0_future::Sink<Bytes, Error = StreamError>>,
+    inner: Pin<Box<dyn n0_future::Sink<Bytes, Error = StreamError>>>,
 }
 
 impl ByteSink {
@@ -247,12 +248,12 @@ impl ByteSink {
         S: n0_future::Sink<Bytes, Error = StreamError> + 'static,
     {
         Self {
-            inner: Box::new(sink),
+            inner: Box::pin(sink),
         }
     }
 
     /// Convert into the inner boxed sink
-    pub fn into_inner(self) -> Box<dyn n0_future::Sink<Bytes, Error = StreamError>> {
+    pub fn into_inner(self) -> Pin<Box<dyn n0_future::Sink<Bytes, Error = StreamError>>> {
         self.inner
     }
 }

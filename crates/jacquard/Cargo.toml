@@ -47,6 +47,7 @@ streaming = [
     "jacquard-api/streaming",
 ]
 websocket = ["jacquard-common/websocket"]
+zstd = ["jacquard-common/zstd"]
 
 [[example]]
 name = "oauth_timeline"

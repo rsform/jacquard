@@ -3,7 +3,10 @@
 //! This module defines traits and types for typed WebSocket subscriptions,
 //! mirroring the request/response pattern used for HTTP XRPC endpoints.
 
+#[cfg(not(target_arch = "wasm32"))]
 use n0_future::stream::Boxed;
+#[cfg(target_arch = "wasm32")]
+use n0_future::stream::BoxedLocal as Boxed;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::future::Future;
@@ -258,6 +261,7 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
 
         let (tx, rx) = self.connection.split();
 
+        #[cfg(not(target_arch = "wasm32"))]
         let stream = match S::ENCODING {
             MessageEncoding::Json => rx
                 .into_inner()
@@ -267,6 +271,18 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
                 .into_inner()
                 .filter_map(|msg| decode_cbor_msg::<S>(msg))
                 .boxed(),
+        };
+
+        #[cfg(target_arch = "wasm32")]
+        let stream = match S::ENCODING {
+            MessageEncoding::Json => rx
+                .into_inner()
+                .filter_map(|msg| decode_json_msg::<S>(msg))
+                .boxed_local(),
+            MessageEncoding::DagCbor => rx
+                .into_inner()
+                .filter_map(|msg| decode_cbor_msg::<S>(msg))
+                .boxed_local(),
         };
 
         (tx, stream)
@@ -288,6 +304,7 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
             serde_ipld_dagcbor::from_slice(bytes)
         }
 
+        #[cfg(not(target_arch = "wasm32"))]
         let stream = match S::ENCODING {
             MessageEncoding::Json => rx
                 .into_inner()
@@ -343,6 +360,62 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
                 .boxed(),
         };
 
+        #[cfg(target_arch = "wasm32")]
+        let stream = match S::ENCODING {
+            MessageEncoding::Json => rx
+                .into_inner()
+                .filter_map(|msg_result| match msg_result {
+                    Ok(WsMessage::Text(text)) => Some(
+                        parse_msg(text.as_ref())
+                            .map(|v| v.into_static())
+                            .map_err(StreamError::decode),
+                    ),
+                    Ok(WsMessage::Binary(bytes)) => {
+                        #[cfg(feature = "zstd")]
+                        {
+                            match decompress_zstd(&bytes) {
+                                Ok(decompressed) => Some(
+                                    parse_msg(&decompressed)
+                                        .map(|v| v.into_static())
+                                        .map_err(StreamError::decode),
+                                ),
+                                Err(_) => Some(
+                                    parse_msg(&bytes)
+                                        .map(|v| v.into_static())
+                                        .map_err(StreamError::decode),
+                                ),
+                            }
+                        }
+                        #[cfg(not(feature = "zstd"))]
+                        {
+                            Some(
+                                parse_msg(&bytes)
+                                    .map(|v| v.into_static())
+                                    .map_err(StreamError::decode),
+                            )
+                        }
+                    }
+                    Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
+                    Err(e) => Some(Err(e)),
+                })
+                .boxed_local(),
+            MessageEncoding::DagCbor => rx
+                .into_inner()
+                .filter_map(|msg_result| match msg_result {
+                    Ok(WsMessage::Binary(bytes)) => Some(
+                        parse_cbor(&bytes)
+                            .map(|v| v.into_static())
+                            .map_err(|e| StreamError::decode(crate::error::DecodeError::from(e))),
+                    ),
+                    Ok(WsMessage::Text(_)) => Some(Err(StreamError::wrong_message_format(
+                        "expected binary frame for CBOR, got text",
+                    ))),
+                    Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
+                    Err(e) => Some(Err(e)),
+                })
+                .boxed_local(),
+        };
+
         (tx, stream)
     }
 
@@ -361,6 +434,7 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
             serde_ipld_dagcbor::from_slice(bytes)
         }
 
+        #[cfg(not(target_arch = "wasm32"))]
         let stream = match S::ENCODING {
             MessageEncoding::Json => rx
                 .into_inner()
@@ -414,6 +488,62 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
                     Err(e) => Some(Err(e)),
                 })
                 .boxed(),
+        };
+
+        #[cfg(target_arch = "wasm32")]
+        let stream = match S::ENCODING {
+            MessageEncoding::Json => rx
+                .into_inner()
+                .filter_map(|msg_result| match msg_result {
+                    Ok(WsMessage::Text(text)) => Some(
+                        parse_msg(text.as_ref())
+                            .map(|v| v.into_static())
+                            .map_err(StreamError::decode),
+                    ),
+                    Ok(WsMessage::Binary(bytes)) => {
+                        #[cfg(feature = "zstd")]
+                        {
+                            match decompress_zstd(&bytes) {
+                                Ok(decompressed) => Some(
+                                    parse_msg(&decompressed)
+                                        .map(|v| v.into_static())
+                                        .map_err(StreamError::decode),
+                                ),
+                                Err(_) => Some(
+                                    parse_msg(&bytes)
+                                        .map(|v| v.into_static())
+                                        .map_err(StreamError::decode),
+                                ),
+                            }
+                        }
+                        #[cfg(not(feature = "zstd"))]
+                        {
+                            Some(
+                                parse_msg(&bytes)
+                                    .map(|v| v.into_static())
+                                    .map_err(StreamError::decode),
+                            )
+                        }
+                    }
+                    Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
+                    Err(e) => Some(Err(e)),
+                })
+                .boxed_local(),
+            MessageEncoding::DagCbor => rx
+                .into_inner()
+                .filter_map(|msg_result| match msg_result {
+                    Ok(WsMessage::Binary(bytes)) => Some(
+                        parse_cbor(&bytes)
+                            .map(|v| v.into_static())
+                            .map_err(|e| StreamError::decode(crate::error::DecodeError::from(e))),
+                    ),
+                    Ok(WsMessage::Text(_)) => Some(Err(StreamError::wrong_message_format(
+                        "expected binary frame for CBOR, got text",
+                    ))),
+                    Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
+                    Err(e) => Some(Err(e)),
+                })
+                .boxed_local(),
         };
 
         (tx, stream)
@@ -442,7 +572,8 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
         // Put the raw stream back
         *rx = raw_rx;
 
-        match S::ENCODING {
+        #[cfg(not(target_arch = "wasm32"))]
+        let stream = match S::ENCODING {
             MessageEncoding::Json => typed_rx_source
                 .into_inner()
                 .filter_map(|msg| decode_json_msg::<S>(msg))
@@ -451,7 +582,20 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
                 .into_inner()
                 .filter_map(|msg| decode_cbor_msg::<S>(msg))
                 .boxed(),
-        }
+        };
+
+        #[cfg(target_arch = "wasm32")]
+        let stream = match S::ENCODING {
+            MessageEncoding::Json => typed_rx_source
+                .into_inner()
+                .filter_map(|msg| decode_json_msg::<S>(msg))
+                .boxed_local(),
+            MessageEncoding::DagCbor => typed_rx_source
+                .into_inner()
+                .filter_map(|msg| decode_cbor_msg::<S>(msg))
+                .boxed_local(),
+        };
+        stream
     }
 }
 

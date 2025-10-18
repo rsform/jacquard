@@ -85,15 +85,13 @@ async fn main() -> miette::Result<()> {
     let client = TungsteniteSubscriptionClient::from_base_uri(base_url);
 
     // Subscribe with no filters (firehose mode)
-    let mut params_builder = JetstreamParams::new();
-
     // Enable compression if zstd feature is available
     #[cfg(feature = "zstd")]
-    {
-        params_builder = params_builder.compress(true);
-    }
+    let params = { JetstreamParams::new().compress(true).build() };
 
-    let params = params_builder.build();
+    #[cfg(not(feature = "zstd"))]
+    let params = { JetstreamParams::new().build() };
+
     let stream = client.subscribe(&params).await.into_diagnostic()?;
 
     println!("Connected! Streaming messages (Ctrl-C to stop)...\n");

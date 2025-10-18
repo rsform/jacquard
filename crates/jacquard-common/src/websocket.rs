@@ -4,11 +4,11 @@ use crate::CowStr;
 use crate::stream::StreamError;
 use bytes::Bytes;
 use n0_future::Stream;
-use n0_future::stream::Boxed;
 use std::borrow::Borrow;
 use std::fmt::{self, Display};
 use std::future::Future;
 use std::ops::Deref;
+use std::pin::Pin;
 use url::Url;
 
 /// UTF-8 validated bytes for WebSocket text messages
@@ -282,7 +282,12 @@ impl From<Vec<u8>> for WsMessage {
 }
 
 /// WebSocket message stream
-pub struct WsStream(Boxed<Result<WsMessage, StreamError>>);
+#[cfg(not(target_arch = "wasm32"))]
+pub struct WsStream(Pin<Box<dyn Stream<Item = Result<WsMessage, StreamError>> + Send>>);
+
+/// WebSocket message stream
+#[cfg(target_arch = "wasm32")]
+pub struct WsStream(Pin<Box<dyn Stream<Item = Result<WsMessage, StreamError>>>>);
 
 impl WsStream {
     /// Create a new message stream
@@ -304,7 +309,14 @@ impl WsStream {
     }
 
     /// Convert into the inner pinned boxed stream
-    pub fn into_inner(self) -> Boxed<Result<WsMessage, StreamError>> {
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn into_inner(self) -> Pin<Box<dyn Stream<Item = Result<WsMessage, StreamError>> + Send>> {
+        self.0
+    }
+
+    /// Convert into the inner pinned boxed stream
+    #[cfg(target_arch = "wasm32")]
+    pub fn into_inner(self) -> Pin<Box<dyn Stream<Item = Result<WsMessage, StreamError>>>> {
         self.0
     }
 
@@ -358,19 +370,43 @@ impl fmt::Debug for WsStream {
 }
 
 /// WebSocket message sink
-pub struct WsSink(Box<dyn n0_future::Sink<WsMessage, Error = StreamError>>);
+#[cfg(not(target_arch = "wasm32"))]
+pub struct WsSink(Pin<Box<dyn n0_future::Sink<WsMessage, Error = StreamError> + Send>>);
+
+/// WebSocket message sink
+#[cfg(target_arch = "wasm32")]
+pub struct WsSink(Pin<Box<dyn n0_future::Sink<WsMessage, Error = StreamError>>>);
 
 impl WsSink {
     /// Create a new message sink
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn new<S>(sink: S) -> Self
     where
         S: n0_future::Sink<WsMessage, Error = StreamError> + Send + 'static,
     {
-        Self(Box::new(sink))
+        Self(Box::pin(sink))
+    }
+
+    /// Create a new message sink
+    #[cfg(target_arch = "wasm32")]
+    pub fn new<S>(sink: S) -> Self
+    where
+        S: n0_future::Sink<WsMessage, Error = StreamError> + 'static,
+    {
+        Self(Box::pin(sink))
     }
 
     /// Convert into the inner boxed sink
-    pub fn into_inner(self) -> Box<dyn n0_future::Sink<WsMessage, Error = StreamError>> {
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn into_inner(
+        self,
+    ) -> Pin<Box<dyn n0_future::Sink<WsMessage, Error = StreamError> + Send>> {
+        self.0
+    }
+
+    /// Convert into the inner boxed sink
+    #[cfg(target_arch = "wasm32")]
+    pub fn into_inner(self) -> Pin<Box<dyn n0_future::Sink<WsMessage, Error = StreamError>>> {
         self.0
     }
 }
