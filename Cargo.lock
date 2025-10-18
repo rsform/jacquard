@@ -2227,7 +2227,7 @@ dependencies = [
  "getrandom 0.2.16",
  "http",
  "image",
- "jacquard-api 0.6.0",
+ "jacquard-api 0.6.1",
  "jacquard-common 0.6.0",
  "jacquard-derive 0.6.0",
  "jacquard-identity 0.6.0",
@@ -2256,11 +2256,12 @@ dependencies = [
 [[package]]
 name = "jacquard-api"
 version = "0.6.0"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#861d9e86c582939ed1d50201954ef1368a91f9b7"
 dependencies = [
  "bon",
  "bytes",
- "jacquard-common 0.6.0",
- "jacquard-derive 0.6.0",
+ "jacquard-common 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-derive 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
  "miette",
  "serde",
  "serde_ipld_dagcbor",
@@ -2269,13 +2270,12 @@ dependencies = [
 
 [[package]]
 name = "jacquard-api"
-version = "0.6.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#861d9e86c582939ed1d50201954ef1368a91f9b7"
+version = "0.6.1"
 dependencies = [
  "bon",
  "bytes",
- "jacquard-common 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
- "jacquard-derive 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-common 0.6.0",
+ "jacquard-derive 0.6.0",
  "miette",
  "serde",
  "serde_ipld_dagcbor",
@@ -2424,7 +2424,7 @@ dependencies = [
  "bytes",
  "hickory-resolver",
  "http",
- "jacquard-api 0.6.0",
+ "jacquard-api 0.6.1",
  "jacquard-common 0.6.0",
  "miette",
  "n0-future",
@@ -2449,7 +2449,7 @@ dependencies = [
  "bon",
  "bytes",
  "http",
- "jacquard-api 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-api 0.6.0",
  "jacquard-common 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
  "miette",
  "percent-encoding",
@@ -2474,7 +2474,7 @@ dependencies = [
  "clap_mangen",
  "glob",
  "heck 0.5.0",
- "jacquard-api 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-api 0.6.0",
  "jacquard-common 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
  "jacquard-identity 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
  "kdl",

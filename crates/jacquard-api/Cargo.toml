@@ -2,7 +2,7 @@
 name = "jacquard-api"
 description = "Generated AT Protocol API bindings for Jacquard"
 edition.workspace = true
-version = "0.6.0"
+version = "0.6.1"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -12,7 +12,7 @@ exclude.workspace = true
 license.workspace = true
 
 [package.metadata.docs.rs]
-features = [ "bluesky", "other", "lexicon_community", "ufos" ]
+features = [ "bluesky", "other", "lexicon_community", "ufos", "streaming" ]
 
 [dependencies]
 bon.workspace = true
