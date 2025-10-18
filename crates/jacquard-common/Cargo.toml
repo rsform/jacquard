@@ -2,7 +2,7 @@
 name = "jacquard-common"
 description = "Core AT Protocol types and utilities for Jacquard"
 edition.workspace = true
-version = "0.5.4"
+version = "0.6.0"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -12,7 +12,7 @@ exclude.workspace = true
 license.workspace = true
 
 [features]
-default = ["service-auth", "reqwest-client", "crypto", "websocket", "zstd"]
+default = ["service-auth", "reqwest-client", "crypto"]
 crypto = []
 crypto-ed25519 = ["crypto", "dep:ed25519-dalek"]
 crypto-k256 = ["crypto", "dep:k256", "k256/ecdsa"]
@@ -92,4 +92,4 @@ tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
 futures-lite = "2.6"
 
 [package.metadata.docs.rs]
-features = [ "crypto-k256", "crypto-k256", "crypto-p256"]
+features = [ "crypto-k256", "crypto-k256", "crypto-p256",  "websocket", "zstd", "service-auth", "reqwest-client", "crypto"]

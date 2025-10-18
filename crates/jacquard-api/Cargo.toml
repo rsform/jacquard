@@ -2,7 +2,7 @@
 name = "jacquard-api"
 description = "Generated AT Protocol API bindings for Jacquard"
 edition.workspace = true
-version = "0.5.5"
+version = "0.6.0"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -17,8 +17,8 @@ features = [ "bluesky", "other", "lexicon_community", "ufos" ]
 [dependencies]
 bon.workspace = true
 bytes = { workspace = true, features = ["serde"] }
-jacquard-common = { version = "0.5", path = "../jacquard-common" }
-jacquard-derive = { version = "0.5", path = "../jacquard-derive" }
+jacquard-common = { version = "0.6", path = "../jacquard-common" }
+jacquard-derive = { version = "0.6", path = "../jacquard-derive" }
 miette.workspace = true
 serde.workspace = true
 serde_ipld_dagcbor.workspace = true

@@ -1,5 +1,115 @@
 # Changelog
 
+## [0.6.0] - 2025-10-18
+
+### Added
+
+**HTTP streaming support** (`jacquard-common`, `jacquard`)
+- `HttpClientExt` trait for streaming HTTP requests/responses
+- `send_http_streaming()` for streaming response bodies
+- `send_http_bidirectional()` for streaming both request and response
+- `StreamingResponse` wrapper type with parts + `ByteStream`
+- `XrpcResponseStream<R>` for typed XRPC streaming responses
+- `ByteStream` / `ByteSink` platform-agnostic stream wrappers (uses n0-future)
+- `StreamError` concrete error type with kind enum (Transport, Closed, Protocol)
+- Native support via reqwest's `bytes_stream()` and `Body::wrap_stream()`
+- WASM compatibility via n0-future (no Send bounds required)
+
+
+**WebSocket subscription support** (`jacquard-common`)
+- Full XRPC WebSocket subscription infrastructure
+- `SubscriptionResp` trait for defining subscription message/error types
+- `XrpcSubscription` trait for subscription parameters
+- `SubscriptionStream<S>` typed wrapper with automatic message decoding
+- `SubscriptionClient` stateful trait + `TungsteniteSubscriptionClient` implementation
+- `SubscriptionExt` for stateless subscription calls
+- Support for both JSON and DAG-CBOR message encodings
+- Custom path support via `CUSTOM_PATH` constant for non-XRPC endpoints
+- WebSocket integration into `Agent` struct (agents can now subscribe)
+- `into_stream()`, `into_raw_data_stream()`, `into_data_stream()` methods for different deserialization modes
+
+**Framed DAG-CBOR message decoding** (`jacquard-common`, `jacquard-api`, `jacquard-lexicon`)
+- Two-stage deserialization for AT Protocol event streams (header + body)
+- `EventHeader` struct and `parse_event_header()` function
+- `decode_framed()` methods generated for all DAG-CBOR subscription message enums
+- `decode_message()` override in `SubscriptionResp` trait for custom decoding
+- `UnknownEventType` variant in `DecodeError` for unknown discriminators
+- Fixes "TrailingData" errors when consuming subscribeRepos and subscribeLabels
+
+**Jetstream support** (`jacquard-common`)
+- Full typed support for Jetstream JSON firehose
+- `JetstreamMessage` enum with `Commit`, `Identity`, `Account` variants
+- `JetstreamCommit`, `JetstreamIdentity`, `JetstreamAccount` detail structs
+- `CommitOperation` enum for create/update/delete operations
+- `JetstreamParams` with filtering options (collections, DIDs, cursor, compression)
+- Uses proper AT Protocol types (`Did`, `Handle`, `Datetime`, `Data`)
+
+**Zstd compression** (`jacquard-common`)
+- Optional `zstd` feature for Jetstream message decompression
+- Automatic detection and decompression of zstd-compressed binary frames
+- Includes official Bluesky Jetstream zstd dictionary
+- Transparent fallback to uncompressed when zstd unavailable
+- Works across all JSON stream methods (`into_stream()`, `into_raw_data_stream()`, `into_data_stream()`)
+
+**Typed AT URI wrapper** (`jacquard-common`, `jacquard-api`, `jacquard-lexicon`)
+- `AtUri<'a>` newtype wrapper for `at://` URIs with proper validation
+- Generated `fetch_uri()` method on all record types for fetching by AT URI
+- `AtUri::from_parts()` constructor for building URIs from components
+- Proper Display and FromStr implementations
+
+**Memory-based credential session** (`jacquard`)
+- `MemoryCredentialSession` for in-memory session storage
+- Useful for short-lived applications or testing
+- No file I/O required
+
+**Collection record fetching improvements** (`jacquard-api`, `jacquard-lexicon`)
+- Generated `fetch_record()` convenience method on all record types
+- Fetches owned record without turbofish syntax: `Post::fetch_record(agent, uri).await`
+- Simplifies common pattern of fetching + converting to owned
+
+**Axum improvements** (`jacquard-axum`)
+- `XrpcError` now implements `IntoResponse` for better error handling
+- Proper typed error responses without manual conversion
+- Better integration with Axum's response system
+
+**Examples**
+- `subscribe_repos.rs`: Subscribe to PDS firehose with typed DAG-CBOR messages
+- `subscribe_jetstream.rs`: Subscribe to Jetstream with typed JSON messages and optional compression
+- `stream_get_blob.rs`: Download blobs using HTTP streaming
+- `app_password_example.rs`: App password authentication example
+
+**CID deserialization improvements** (`jacquard-common`)
+- Fixed `Cid` type to properly deserialize CBOR tag 42 via `IpldCid::deserialize`
+- Separate handling for JSON (string) vs CBOR (tag 42) formats
+- `CidLink` correctly delegates to `Cid` for both formats
+
+### Changed
+
+**Default features** (`jacquard-common`)
+- Added `zstd` to default features for better Jetstream experience
+- Jetstream compression enabled by default when using the full feature set
+
+**Generated code** (`jacquard-lexicon`, `jacquard-api`)
+- All DAG-CBOR subscriptions (subscribeRepos, subscribeLabels) now use framed decoding
+- Generated `decode_framed()` implementations match on event type discriminator
+- Override `decode_message()` in trait impls to use framed decoding
+- All record types now have `fetch_uri()` and `fetch_record()` methods generated
+
+**Dependencies** (`jacquard-axum`)
+- Disabled default features for `jacquard` dependency to reduce bloat
+
+### Fixed
+
+**Blob upload** (`jacquard`)
+- Fixed `upload_blob()` authentication issues
+- Properly authenticates while allowing custom Content-Type headers
+
+**XRPC client** (`jacquard-common`, `jacquard-oauth`, `jacquard`)
+- Added `send_with_options()` method for per-request option overrides
+- Stateful clients can now override options while preserving internal auth
+
+
+---
 
 ## `jacquard-api` [0.5.5], `jacquard-lexicon` [0.5.4] - 2025-10-16
 

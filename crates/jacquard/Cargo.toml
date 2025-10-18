@@ -122,13 +122,13 @@ required-features = ["streaming"]
 
 
 [dependencies]
-jacquard-api = { version = "0.5", path = "../jacquard-api" }
-jacquard-common = { version = "0.5", path = "../jacquard-common", features = [
+jacquard-api = { version = "0.6", path = "../jacquard-api" }
+jacquard-common = { version = "0.6", path = "../jacquard-common", features = [
     "reqwest-client",
 ] }
-jacquard-oauth = { version = "0.5", path = "../jacquard-oauth" }
-jacquard-derive = { version = "0.5", path = "../jacquard-derive", optional = true }
-jacquard-identity = { version = "0.5", path = "../jacquard-identity" }
+jacquard-oauth = { version = "0.6", path = "../jacquard-oauth" }
+jacquard-derive = { version = "0.6", path = "../jacquard-derive", optional = true }
+jacquard-identity = { version = "0.6", path = "../jacquard-identity" }
 
 bon.workspace = true
 trait-variant.workspace = true
