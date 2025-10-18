@@ -3,9 +3,11 @@
 //! Jetstream is a simplified JSON-based alternative to the atproto firehose.
 //! Unlike subscribeRepos which uses DAG-CBOR, Jetstream uses JSON encoding.
 
-use crate::types::string::{Datetime, Did, Handle};
+use crate::types::cid::Cid;
+use crate::types::nsid::Nsid;
+use crate::types::string::{Datetime, Did, Handle, Rkey};
 use crate::xrpc::{MessageEncoding, SubscriptionResp, XrpcSubscription};
-use crate::{CowStr, Data, IntoStatic};
+use crate::{CowStr, Data, IntoStatic, RawData};
 use serde::{Deserialize, Serialize};
 
 /// Parameters for subscribing to Jetstream
@@ -17,13 +19,13 @@ pub struct JetstreamParams<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
     #[builder(into)]
-    pub wanted_collections: Option<Vec<crate::CowStr<'a>>>,
+    pub wanted_collections: Option<Vec<Nsid<'a>>>,
 
     /// Filter by DIDs (max 10,000)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
     #[builder(into)]
-    pub wanted_dids: Option<Vec<crate::CowStr<'a>>>,
+    pub wanted_dids: Option<Vec<Did<'a>>>,
 
     /// Unix microseconds timestamp to start playback
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,9 +56,9 @@ pub enum CommitOperation {
     Delete,
 }
 
-/// Commit event details
+/// Commit event details (minimal validation)
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct JetstreamCommit<'a> {
+pub struct RawJetstreamCommit<'a> {
     /// Revision string
     #[serde(borrow)]
     pub rev: CowStr<'a>,
@@ -71,11 +73,35 @@ pub struct JetstreamCommit<'a> {
     /// Record data (present for create/update)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub record: Option<Data<'a>>,
+    pub record: Option<RawData<'a>>,
     /// Content identifier
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
     pub cid: Option<CowStr<'a>>,
+}
+
+/// Commit event details (additional validation)
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct JetstreamCommit<'a> {
+    /// Revision string
+    #[serde(borrow)]
+    pub rev: CowStr<'a>,
+    /// Operation type
+    pub operation: CommitOperation,
+    /// Collection NSID
+    #[serde(borrow)]
+    pub collection: Nsid<'a>,
+    /// Record key
+    #[serde(borrow)]
+    pub rkey: Rkey<'a>,
+    /// Record data (present for create/update)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(borrow)]
+    pub record: Option<Data<'a>>,
+    /// Content identifier
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(borrow)]
+    pub cid: Option<Cid<'a>>,
 }
 
 /// Identity event details
@@ -152,6 +178,49 @@ pub enum JetstreamMessage<'a> {
     },
 }
 
+/// Jetstream event message
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind")]
+#[serde(rename_all = "lowercase")]
+pub enum RawJetstreamMessage<'a> {
+    /// Commit event
+    Commit {
+        /// DID
+        #[serde(borrow)]
+        did: Did<'a>,
+        /// Unix microseconds timestamp
+        time_us: i64,
+        /// Commit details
+        #[serde(borrow)]
+        commit: RawJetstreamCommit<'a>,
+    },
+    /// Identity event
+    Identity {
+        /// DID
+        #[serde(borrow)]
+        did: Did<'a>,
+        /// Unix microseconds timestamp
+        time_us: i64,
+        /// Identity details
+        #[serde(borrow)]
+        identity: JetstreamIdentity<'a>,
+    },
+    /// Account event
+    Account {
+        /// DID
+        #[serde(borrow)]
+        did: Did<'a>,
+        /// Unix microseconds timestamp
+        time_us: i64,
+        /// Account details
+        #[serde(borrow)]
+        account: JetstreamAccount<'a>,
+    },
+    /// Unknown messsage type
+    #[serde(untagged)]
+    Unknown(RawData<'a>),
+}
+
 impl IntoStatic for CommitOperation {
     type Output = CommitOperation;
 
@@ -165,6 +234,21 @@ impl IntoStatic for JetstreamCommit<'_> {
 
     fn into_static(self) -> Self::Output {
         JetstreamCommit {
+            rev: self.rev.into_static(),
+            operation: self.operation,
+            collection: self.collection.into_static(),
+            rkey: self.rkey.into_static(),
+            record: self.record.map(|r| r.into_static()),
+            cid: self.cid.map(|c| c.into_static()),
+        }
+    }
+}
+
+impl IntoStatic for RawJetstreamCommit<'_> {
+    type Output = RawJetstreamCommit<'static>;
+
+    fn into_static(self) -> Self::Output {
+        RawJetstreamCommit {
             rev: self.rev.into_static(),
             operation: self.operation,
             collection: self.collection.into_static(),
@@ -238,6 +322,43 @@ impl IntoStatic for JetstreamMessage<'_> {
     }
 }
 
+impl IntoStatic for RawJetstreamMessage<'_> {
+    type Output = RawJetstreamMessage<'static>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            RawJetstreamMessage::Commit {
+                did,
+                time_us,
+                commit,
+            } => RawJetstreamMessage::Commit {
+                did: did.into_static(),
+                time_us,
+                commit: commit.into_static(),
+            },
+            RawJetstreamMessage::Identity {
+                did,
+                time_us,
+                identity,
+            } => RawJetstreamMessage::Identity {
+                did: did.into_static(),
+                time_us,
+                identity: identity.into_static(),
+            },
+            RawJetstreamMessage::Account {
+                did,
+                time_us,
+                account,
+            } => RawJetstreamMessage::Account {
+                did: did.into_static(),
+                time_us,
+                account: account.into_static(),
+            },
+            RawJetstreamMessage::Unknown(data) => RawJetstreamMessage::Unknown(data.into_static()),
+        }
+    }
+}
+
 /// Stream response type for Jetstream subscriptions
 pub struct JetstreamStream;
 
@@ -264,6 +385,80 @@ impl IntoStatic for JetstreamParams<'_> {
 
     fn into_static(self) -> Self::Output {
         JetstreamParams {
+            wanted_collections: self
+                .wanted_collections
+                .map(|v| v.into_iter().map(|s| s.into_static()).collect()),
+            wanted_dids: self
+                .wanted_dids
+                .map(|v| v.into_iter().map(|s| s.into_static()).collect()),
+            cursor: self.cursor,
+            max_message_size_bytes: self.max_message_size_bytes,
+            compress: self.compress,
+            require_hello: self.require_hello,
+        }
+    }
+}
+
+/// Parameters for subscribing to Jetstream
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, bon::Builder)]
+#[serde(rename_all = "camelCase")]
+#[builder(start_fn = new)]
+pub struct RawJetstreamParams<'a> {
+    /// Filter by collection NSIDs (max 100)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(borrow)]
+    #[builder(into)]
+    pub wanted_collections: Option<Vec<crate::CowStr<'a>>>,
+
+    /// Filter by DIDs (max 10,000)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(borrow)]
+    #[builder(into)]
+    pub wanted_dids: Option<Vec<crate::CowStr<'a>>>,
+
+    /// Unix microseconds timestamp to start playback
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<i64>,
+
+    /// Maximum payload size in bytes
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_message_size_bytes: Option<u64>,
+
+    /// Enable zstd compression
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub compress: Option<bool>,
+
+    /// Pause stream until first options update
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_hello: Option<bool>,
+}
+
+/// Stream response type for Jetstream subscriptions
+pub struct JetstreamRawStream;
+
+impl SubscriptionResp for JetstreamRawStream {
+    const NSID: &'static str = "jetstream";
+    const ENCODING: MessageEncoding = MessageEncoding::Json;
+
+    /// Typed Jetstream message
+    type Message<'de> = RawJetstreamMessage<'de>;
+
+    /// Generic error type
+    type Error<'de> = crate::xrpc::GenericError<'de>;
+}
+
+impl<'a> XrpcSubscription for RawJetstreamParams<'a> {
+    const NSID: &'static str = "jetstream";
+    const ENCODING: MessageEncoding = MessageEncoding::Json;
+    const CUSTOM_PATH: Option<&'static str> = Some("/subscribe");
+    type Stream = JetstreamRawStream;
+}
+
+impl IntoStatic for RawJetstreamParams<'_> {
+    type Output = RawJetstreamParams<'static>;
+
+    fn into_static(self) -> Self::Output {
+        RawJetstreamParams {
             wanted_collections: self
                 .wanted_collections
                 .map(|v| v.into_iter().map(|s| s.into_static()).collect()),

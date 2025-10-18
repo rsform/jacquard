@@ -11,14 +11,14 @@ dependencies:
     - gcc
 
 steps:
-  - name: build crate
-    command: |
-      cargo build
-
-  - name: check wasm compatibility
+  - name: check basic wasm compatibility
     command: |
       rustup target add wasm32-unknown-unknown
       cargo build -p jacquard-common \
         --target wasm32-unknown-unknown \
-        --features streaming \
+        --features websocket \
         --no-default-features
+
+  - name: run tests
+    command: |
+      cargo test

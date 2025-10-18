@@ -8,6 +8,9 @@
       "initialization_options": {
         "rust": {
           "analyzerTargetDir": true
+        },
+        "cargo": {
+          "allFeatures": true
         }
       }
     }
