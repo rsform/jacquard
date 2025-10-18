@@ -133,7 +133,7 @@ mod tests {
 
     #[test]
     fn test_resolve_ref_without_fragment() {
-        let corpus = LexiconCorpus::load_from_dir("tests/fixtures/lexicons")
+        let corpus = LexiconCorpus::load_from_dir("../jacquard-api/lexicons")
             .expect("failed to load lexicons");
 
         // Without fragment should resolve to main def
@@ -146,7 +146,7 @@ mod tests {
 
     #[test]
     fn test_resolve_ref_with_fragment() {
-        let corpus = LexiconCorpus::load_from_dir("tests/fixtures/lexicons")
+        let corpus = LexiconCorpus::load_from_dir("../jacquard-api/lexicons")
             .expect("failed to load lexicons");
 
         // With fragment should resolve to specific def
@@ -159,7 +159,7 @@ mod tests {
 
     #[test]
     fn test_ref_exists() {
-        let corpus = LexiconCorpus::load_from_dir("tests/fixtures/lexicons")
+        let corpus = LexiconCorpus::load_from_dir("../jacquard-api/lexicons")
             .expect("failed to load lexicons");
 
         // Existing refs
