@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    bon::Builder,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Account<'a> {
@@ -42,7 +42,7 @@ pub struct Account<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    bon::Builder,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Commit<'a> {
@@ -87,7 +87,7 @@ pub struct Commit<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    bon::Builder,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Identity<'a> {
@@ -111,7 +111,7 @@ pub struct Identity<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Info<'a> {
@@ -130,7 +130,7 @@ pub struct Info<'a> {
     PartialEq,
     Eq,
     bon::Builder,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
@@ -141,13 +141,7 @@ pub struct SubscribeRepos {
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -164,6 +158,40 @@ pub enum SubscribeReposMessage<'a> {
     Info(Box<crate::com_atproto::sync::subscribe_repos::Info<'a>>),
 }
 
+impl<'a> SubscribeReposMessage<'a> {
+    /// Decode a framed DAG-CBOR message (header + body).
+    pub fn decode_framed<'de: 'a>(
+        bytes: &'de [u8],
+    ) -> Result<SubscribeReposMessage<'a>, jacquard_common::error::DecodeError> {
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
+        match header.t.as_str() {
+            "#commit" => {
+                let variant = serde_ipld_dagcbor::from_slice(body)?;
+                Ok(Self::Commit(Box::new(variant)))
+            }
+            "#sync" => {
+                let variant = serde_ipld_dagcbor::from_slice(body)?;
+                Ok(Self::Sync(Box::new(variant)))
+            }
+            "#identity" => {
+                let variant = serde_ipld_dagcbor::from_slice(body)?;
+                Ok(Self::Identity(Box::new(variant)))
+            }
+            "#account" => {
+                let variant = serde_ipld_dagcbor::from_slice(body)?;
+                Ok(Self::Account(Box::new(variant)))
+            }
+            "#info" => {
+                let variant = serde_ipld_dagcbor::from_slice(body)?;
+                Ok(Self::Info(Box::new(variant)))
+            }
+            unknown => Err(jacquard_common::error::DecodeError::UnknownEventType(
+                unknown.into(),
+            )),
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -174,7 +202,7 @@ pub enum SubscribeReposMessage<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -213,21 +241,29 @@ impl std::fmt::Display for SubscribeReposError<'_> {
 pub struct SubscribeReposStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeReposStream {
     const NSID: &'static str = "com.atproto.sync.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::DagCbor;
     type Message<'de> = SubscribeReposMessage<'de>;
     type Error<'de> = SubscribeReposError<'de>;
+    fn decode_message<'de>(
+        bytes: &'de [u8],
+    ) -> Result<Self::Message<'de>, jacquard_common::error::DecodeError> {
+        SubscribeReposMessage::decode_framed(bytes)
+    }
 }
 
 impl jacquard_common::xrpc::XrpcSubscription for SubscribeRepos {
     const NSID: &'static str = "com.atproto.sync.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::DagCbor;
     type Stream = SubscribeReposStream;
 }
 
 pub struct SubscribeReposEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeReposEndpoint {
     const PATH: &'static str = "/xrpc/com.atproto.sync.subscribeRepos";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding =
+        jacquard_common::xrpc::MessageEncoding::DagCbor;
     type Params<'de> = SubscribeRepos;
     type Stream = SubscribeReposStream;
 }
@@ -242,7 +278,7 @@ impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeReposEndpoint {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    bon::Builder,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoOp<'a> {
@@ -272,7 +308,7 @@ pub struct RepoOp<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    bon::Builder,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Sync<'a> {

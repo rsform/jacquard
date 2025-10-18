@@ -10,6 +10,7 @@ use std::future::Future;
 use std::marker::PhantomData;
 use url::Url;
 
+use crate::error::DecodeError;
 use crate::stream::StreamError;
 use crate::websocket::{WebSocketClient, WebSocketConnection, WsSink, WsStream};
 use crate::{CowStr, Data, IntoStatic, RawData, WsMessage};
@@ -42,6 +43,20 @@ pub trait SubscriptionResp {
 
     /// Error union type
     type Error<'de>: Error + Deserialize<'de> + IntoStatic;
+
+    /// Decode a message from bytes.
+    ///
+    /// Default implementation uses simple deserialization via serde.
+    /// Subscriptions that use framed encoding (header + body) can override
+    /// this to do two-stage deserialization.
+    fn decode_message<'de>(bytes: &'de [u8]) -> Result<Self::Message<'de>, DecodeError> {
+        match Self::ENCODING {
+            MessageEncoding::Json => serde_json::from_slice(bytes).map_err(DecodeError::from),
+            MessageEncoding::DagCbor => {
+                serde_ipld_dagcbor::from_slice(bytes).map_err(DecodeError::from)
+            }
+        }
+    }
 }
 
 /// XRPC subscription (WebSocket)
@@ -56,6 +71,10 @@ pub trait XrpcSubscription: Serialize {
 
     /// Message encoding (JSON or DAG-CBOR)
     const ENCODING: MessageEncoding;
+
+    /// Custom path override (e.g., "/subscribe" for Jetstream).
+    /// If None, defaults to "/xrpc/{NSID}"
+    const CUSTOM_PATH: Option<&'static str> = None;
 
     /// Stream response type (marker struct)
     type Stream: SubscriptionResp;
@@ -79,8 +98,23 @@ pub trait XrpcSubscription: Serialize {
     }
 }
 
+#[derive(Debug, serde::Deserialize)]
+pub struct EventHeader {
+    pub op: i64,
+    pub t: smol_str::SmolStr, // type discriminator like "#commit"
+}
+
+pub fn parse_event_header<'a>(bytes: &'a [u8]) -> Result<(EventHeader, &'a [u8]), DecodeError> {
+    let mut cursor = std::io::Cursor::new(bytes);
+    let header: EventHeader = ciborium::de::from_reader(&mut cursor)?;
+    let position = cursor.position() as usize;
+    drop(cursor); // explicit drop before reborrowing bytes
+
+    Ok((header, &bytes[position..]))
+}
+
 /// Decode JSON messages from a WebSocket stream
-fn decode_json_msg<S: SubscriptionResp>(
+pub fn decode_json_msg<S: SubscriptionResp>(
     msg_result: Result<crate::websocket::WsMessage, StreamError>,
 ) -> Option<Result<StreamMessage<'static, S>, StreamError>>
 where
@@ -88,30 +122,69 @@ where
 {
     use crate::websocket::WsMessage;
 
-    fn parse_msg<'a, S: SubscriptionResp>(
-        bytes: &'a [u8],
-    ) -> Result<S::Message<'a>, serde_json::Error> {
-        serde_json::from_slice(bytes)
-    }
-
     match msg_result {
         Ok(WsMessage::Text(text)) => Some(
-            parse_msg::<S>(text.as_ref())
+            S::decode_message(text.as_ref())
                 .map(|v| v.into_static())
                 .map_err(StreamError::decode),
         ),
-        Ok(WsMessage::Binary(bytes)) => Some(
-            parse_msg::<S>(&bytes)
-                .map(|v| v.into_static())
-                .map_err(StreamError::decode),
-        ),
+        Ok(WsMessage::Binary(bytes)) => {
+            #[cfg(feature = "zstd")]
+            {
+                // Try to decompress with zstd first (Jetstream uses zstd compression)
+                match decompress_zstd(&bytes) {
+                    Ok(decompressed) => Some(
+                        S::decode_message(&decompressed)
+                            .map(|v| v.into_static())
+                            .map_err(StreamError::decode),
+                    ),
+                    Err(_) => {
+                        // Not zstd-compressed, try direct decode
+                        Some(
+                            S::decode_message(&bytes)
+                                .map(|v| v.into_static())
+                                .map_err(StreamError::decode),
+                        )
+                    }
+                }
+            }
+            #[cfg(not(feature = "zstd"))]
+            {
+                Some(
+                    S::decode_message(&bytes)
+                        .map(|v| v.into_static())
+                        .map_err(StreamError::decode),
+                )
+            }
+        }
         Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
         Err(e) => Some(Err(e)),
     }
 }
 
+#[cfg(feature = "zstd")]
+fn decompress_zstd(bytes: &[u8]) -> Result<Vec<u8>, std::io::Error> {
+    use std::sync::OnceLock;
+    use zstd::stream::decode_all;
+
+    static DICTIONARY: OnceLock<Vec<u8>> = OnceLock::new();
+
+    let dict = DICTIONARY.get_or_init(|| {
+        include_bytes!("../../zstd_dictionary").to_vec()
+    });
+
+    decode_all(std::io::Cursor::new(bytes))
+        .or_else(|_| {
+            // Try with dictionary
+            let mut decoder = zstd::Decoder::with_dictionary(std::io::Cursor::new(bytes), dict)?;
+            let mut result = Vec::new();
+            std::io::Read::read_to_end(&mut decoder, &mut result)?;
+            Ok(result)
+        })
+}
+
 /// Decode CBOR messages from a WebSocket stream
-fn decode_cbor_msg<S: SubscriptionResp>(
+pub fn decode_cbor_msg<S: SubscriptionResp>(
     msg_result: Result<crate::websocket::WsMessage, StreamError>,
 ) -> Option<Result<StreamMessage<'static, S>, StreamError>>
 where
@@ -119,17 +192,11 @@ where
 {
     use crate::websocket::WsMessage;
 
-    fn parse_cbor<'a, S: SubscriptionResp>(
-        bytes: &'a [u8],
-    ) -> Result<S::Message<'a>, serde_ipld_dagcbor::DecodeError<std::convert::Infallible>> {
-        serde_ipld_dagcbor::from_slice(bytes)
-    }
-
     match msg_result {
         Ok(WsMessage::Binary(bytes)) => Some(
-            parse_cbor::<S>(&bytes)
+            S::decode_message(&bytes)
                 .map(|v| v.into_static())
-                .map_err(|e| StreamError::decode(crate::error::DecodeError::from(e))),
+                .map_err(StreamError::decode),
         ),
         Ok(WsMessage::Text(_)) => Some(Err(StreamError::wrong_message_format(
             "expected binary frame for CBOR, got text",
@@ -223,11 +290,31 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
                             .map(|v| v.into_static())
                             .map_err(StreamError::decode),
                     ),
-                    Ok(WsMessage::Binary(bytes)) => Some(
-                        parse_msg(&bytes)
-                            .map(|v| v.into_static())
-                            .map_err(StreamError::decode),
-                    ),
+                    Ok(WsMessage::Binary(bytes)) => {
+                        #[cfg(feature = "zstd")]
+                        {
+                            match decompress_zstd(&bytes) {
+                                Ok(decompressed) => Some(
+                                    parse_msg(&decompressed)
+                                        .map(|v| v.into_static())
+                                        .map_err(StreamError::decode),
+                                ),
+                                Err(_) => Some(
+                                    parse_msg(&bytes)
+                                        .map(|v| v.into_static())
+                                        .map_err(StreamError::decode),
+                                ),
+                            }
+                        }
+                        #[cfg(not(feature = "zstd"))]
+                        {
+                            Some(
+                                parse_msg(&bytes)
+                                    .map(|v| v.into_static())
+                                    .map_err(StreamError::decode),
+                            )
+                        }
+                    }
                     Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
                     Err(e) => Some(Err(e)),
                 })
@@ -276,11 +363,31 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
                             .map(|v| v.into_static())
                             .map_err(StreamError::decode),
                     ),
-                    Ok(WsMessage::Binary(bytes)) => Some(
-                        parse_msg(&bytes)
-                            .map(|v| v.into_static())
-                            .map_err(StreamError::decode),
-                    ),
+                    Ok(WsMessage::Binary(bytes)) => {
+                        #[cfg(feature = "zstd")]
+                        {
+                            match decompress_zstd(&bytes) {
+                                Ok(decompressed) => Some(
+                                    parse_msg(&decompressed)
+                                        .map(|v| v.into_static())
+                                        .map_err(StreamError::decode),
+                                ),
+                                Err(_) => Some(
+                                    parse_msg(&bytes)
+                                        .map(|v| v.into_static())
+                                        .map_err(StreamError::decode),
+                                ),
+                            }
+                        }
+                        #[cfg(not(feature = "zstd"))]
+                        {
+                            Some(
+                                parse_msg(&bytes)
+                                    .map(|v| v.into_static())
+                                    .map_err(StreamError::decode),
+                            )
+                        }
+                    }
                     Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
                     Err(e) => Some(Err(e)),
                 })
@@ -439,9 +546,15 @@ impl<'a, C: WebSocketClient> SubscriptionCall<'a, C> {
         Sub: XrpcSubscription,
     {
         let mut url = self.base.clone();
+
+        // Use custom path if provided, otherwise construct from NSID
         let mut path = url.path().trim_end_matches('/').to_owned();
-        path.push_str("/xrpc/");
-        path.push_str(Sub::NSID);
+        if let Some(custom_path) = Sub::CUSTOM_PATH {
+            path.push_str(custom_path);
+        } else {
+            path.push_str("/xrpc/");
+            path.push_str(Sub::NSID);
+        }
         url.set_path(&path);
 
         let query_params = params.query_params();

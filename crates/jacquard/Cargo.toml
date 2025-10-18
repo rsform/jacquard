@@ -110,6 +110,16 @@ name = "app_password_create_post"
 path = "../../examples/app_password_create_post.rs"
 required-features = ["api_bluesky"]
 
+[[example]]
+name = "subscribe_repos"
+path = "../../examples/subscribe_repos.rs"
+required-features = ["api_bluesky", "streaming"]
+
+[[example]]
+name = "subscribe_jetstream"
+path = "../../examples/subscribe_jetstream.rs"
+required-features = ["streaming"]
+
 
 [dependencies]
 jacquard-api = { version = "0.5", path = "../jacquard-api" }
@@ -156,6 +166,7 @@ getrandom = { version = "0.2", features = ["js"] }
 [dev-dependencies]
 clap.workspace = true
 miette = { workspace = true, features = ["fancy"] }
+tokio = { workspace = true, features = ["signal"] }
 viuer = { version =  "0.9", features = ["print-file", "sixel"] }
 tiff = { version = "0.6.0-alpha" }
 image = { version = "0.25" }

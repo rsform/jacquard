@@ -21,6 +21,7 @@ jacquard-common = { version = "0.5", path = "../jacquard-common" }
 jacquard-derive = { version = "0.5", path = "../jacquard-derive" }
 miette.workspace = true
 serde.workspace = true
+serde_ipld_dagcbor.workspace = true
 thiserror.workspace = true
 
 

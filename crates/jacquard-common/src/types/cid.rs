@@ -164,7 +164,6 @@ impl Serialize for Cid<'_> {
     }
 }
 
-// TODO: take another look at this, see if we can do more borrowed and such
 impl<'de, 'a> Deserialize<'de> for Cid<'a>
 where
     'de: 'a,
@@ -173,39 +172,38 @@ where
     where
         D: Deserializer<'de>,
     {
-        struct CidVisitor;
+        if deserializer.is_human_readable() {
+            // JSON: always a string
+            struct StrVisitor;
 
-        impl<'de> Visitor<'de> for CidVisitor {
-            type Value = Cid<'de>;
+            impl<'de> Visitor<'de> for StrVisitor {
+                type Value = Cid<'de>;
 
-            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str("either valid IPLD CID bytes or a str")
+                fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                    formatter.write_str("a CID string")
+                }
+
+                fn visit_borrowed_str<E>(self, v: &'de str) -> Result<Self::Value, E>
+                where
+                    E: serde::de::Error,
+                {
+                    Ok(Cid::str(v))
+                }
+
+                fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+                where
+                    E: serde::de::Error,
+                {
+                    Ok(FromStr::from_str(v).unwrap())
+                }
             }
 
-            fn visit_borrowed_str<E>(self, v: &'de str) -> Result<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                Ok(Cid::str(v))
-            }
-
-            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                Ok(FromStr::from_str(v).unwrap())
-            }
-
-            fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                let hash = cid::multihash::Multihash::from_bytes(v).map_err(|e| E::custom(e))?;
-                Ok(Cid::ipld(IpldCid::new_v1(ATP_CID_CODEC, hash)))
-            }
+            deserializer.deserialize_str(StrVisitor)
+        } else {
+            // CBOR: use IpldCid's deserializer which handles CBOR tag 42
+            let cid = IpldCid::deserialize(deserializer)?;
+            Ok(Cid::ipld(cid))
         }
-
-        deserializer.deserialize_any(CidVisitor)
     }
 }
 

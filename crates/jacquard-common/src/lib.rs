@@ -234,6 +234,9 @@ pub use xrpc::StreamingResponse;
 pub mod websocket;
 
 #[cfg(feature = "websocket")]
+pub mod jetstream;
+
+#[cfg(feature = "websocket")]
 pub use websocket::{
     tungstenite_client::TungsteniteClient, CloseCode, CloseFrame, WebSocketClient,
     WebSocketConnection, WsMessage, WsSink, WsStream, WsText,

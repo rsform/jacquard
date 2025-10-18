@@ -79,6 +79,32 @@ pub enum SubscribeLabelsMessage<'a> {
     Info(Box<crate::com_atproto::label::subscribe_labels::Info<'a>>),
 }
 
+impl<'a> SubscribeLabelsMessage<'a> {
+    /// Decode a framed DAG-CBOR message (header + body).
+    pub fn decode_framed<'de: 'a>(
+        bytes: &'de [u8],
+    ) -> Result<SubscribeLabelsMessage<'a>, jacquard_common::error::DecodeError> {
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
+            bytes,
+        )?;
+        match header.t.as_str() {
+            "#labels" => {
+                let variant = serde_ipld_dagcbor::from_slice(body)?;
+                Ok(Self::Labels(Box::new(variant)))
+            }
+            "#info" => {
+                let variant = serde_ipld_dagcbor::from_slice(body)?;
+                Ok(Self::Info(Box::new(variant)))
+            }
+            unknown => {
+                Err(
+                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
+                )
+            }
+        }
+    }
+}
+
 #[jacquard_derive::open_union]
 #[derive(
     serde::Serialize,
@@ -121,6 +147,11 @@ impl jacquard_common::xrpc::SubscriptionResp for SubscribeLabelsStream {
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::DagCbor;
     type Message<'de> = SubscribeLabelsMessage<'de>;
     type Error<'de> = SubscribeLabelsError<'de>;
+    fn decode_message<'de>(
+        bytes: &'de [u8],
+    ) -> Result<Self::Message<'de>, jacquard_common::error::DecodeError> {
+        SubscribeLabelsMessage::decode_framed(bytes)
+    }
 }
 
 impl jacquard_common::xrpc::XrpcSubscription for SubscribeLabels {

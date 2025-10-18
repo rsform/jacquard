@@ -815,7 +815,7 @@ where
         Sub: XrpcSubscription + Send + Sync,
     {
         use jacquard_common::xrpc::SubscriptionExt;
-        let base = self.base_uri();
+        let base = self.base_uri().await;
         self.subscription(base)
             .with_options(opts)
             .subscribe(params)

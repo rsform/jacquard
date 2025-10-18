@@ -224,6 +224,8 @@ impl<'c> CodeGenerator<'c> {
                 let enum_ident = syn::Ident::new(&enum_name, proc_macro2::Span::call_site());
 
                 let mut variants = Vec::new();
+                let mut decode_arms = Vec::new();
+
                 for ref_str in &union.refs {
                     let ref_str_s = ref_str.as_ref();
 
@@ -255,9 +257,33 @@ impl<'c> CodeGenerator<'c> {
                         #[serde(rename = #ref_str_s)]
                         #variant_ident(Box<#type_path>)
                     });
+
+                    // Generate decode arm for framed decoding
+                    decode_arms.push(quote! {
+                        #ref_str_s => {
+                            let variant = serde_ipld_dagcbor::from_slice(body)?;
+                            Ok(Self::#variant_ident(Box::new(variant)))
+                        }
+                    });
                 }
 
                 let doc = self.generate_doc_comment(union.description.as_ref());
+
+                // Generate decode_framed method for DAG-CBOR subscriptions
+                let decode_framed_impl = quote! {
+                    impl<'a> #enum_ident<'a> {
+                        /// Decode a framed DAG-CBOR message (header + body).
+                        pub fn decode_framed<'de: 'a>(bytes: &'de [u8]) -> Result<#enum_ident<'a>, jacquard_common::error::DecodeError> {
+                            let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
+                            match header.t.as_str() {
+                                #(#decode_arms)*
+                                unknown => Err(jacquard_common::error::DecodeError::UnknownEventType(
+                                    unknown.into()
+                                )),
+                            }
+                        }
+                    }
+                };
 
                 Ok(quote! {
                     #doc
@@ -268,6 +294,8 @@ impl<'c> CodeGenerator<'c> {
                     pub enum #enum_ident<'a> {
                         #(#variants,)*
                     }
+
+                    #decode_framed_impl
                 })
             }
             LexXrpcSubscriptionMessageSchema::Object(obj) => {
@@ -1252,13 +1280,29 @@ impl<'c> CodeGenerator<'c> {
 
         // Determine encoding from nsid convention
         // ATProto subscriptions use DAG-CBOR, community ones might use JSON
-        let encoding = if nsid.starts_with("com.atproto") {
+        let is_dag_cbor = nsid.starts_with("com.atproto");
+        let encoding = if is_dag_cbor {
             quote! { jacquard_common::xrpc::MessageEncoding::DagCbor }
         } else {
             quote! { jacquard_common::xrpc::MessageEncoding::Json }
         };
 
         // Generate SubscriptionResp impl
+        // For DAG-CBOR subscriptions, override decode_message to use framed decoding
+        let decode_message_override = if is_dag_cbor && has_message {
+            let msg_ident = syn::Ident::new(
+                &format!("{}Message", type_base),
+                proc_macro2::Span::call_site(),
+            );
+            quote! {
+                fn decode_message<'de>(bytes: &'de [u8]) -> Result<Self::Message<'de>, jacquard_common::error::DecodeError> {
+                    #msg_ident::decode_framed(bytes)
+                }
+            }
+        } else {
+            quote! {}
+        };
+
         let stream_resp_impl = quote! {
             #[doc = "Stream response type for "]
             #[doc = #nsid]
@@ -1270,6 +1314,8 @@ impl<'c> CodeGenerator<'c> {
 
                 type Message<'de> = #message_type;
                 type Error<'de> = #error_type;
+
+                #decode_message_override
             }
         };
 

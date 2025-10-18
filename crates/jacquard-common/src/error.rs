@@ -98,6 +98,18 @@ pub enum DecodeError {
         #[source]
         serde_ipld_dagcbor::DecodeError<std::convert::Infallible>,
     ),
+    #[cfg(feature = "websocket")]
+    #[error("Failed to deserialize cbor header: {0}")]
+    CborHeader(
+        #[from]
+        #[source]
+        ciborium::de::Error<std::io::Error>,
+    ),
+
+    /// Unknown event type in framed message
+    #[cfg(feature = "websocket")]
+    #[error("Unknown event type: {0}")]
+    UnknownEventType(smol_str::SmolStr),
 }
 
 /// HTTP error response (non-200 status codes outside of XRPC error handling)

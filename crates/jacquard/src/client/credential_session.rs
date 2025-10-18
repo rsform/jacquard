@@ -769,27 +769,10 @@ where
     T: Send + Sync + 'static,
     W: WebSocketClient + Send + Sync,
 {
-    fn base_uri(&self) -> Url {
-        #[cfg(not(target_arch = "wasm32"))]
-        if tokio::runtime::Handle::try_current().is_ok() {
-            tokio::task::block_in_place(|| {
-                self.endpoint.blocking_read().clone().unwrap_or(
-                    Url::parse("https://public.bsky.app")
-                        .expect("public appview should be valid url"),
-                )
-            })
-        } else {
-            self.endpoint.blocking_read().clone().unwrap_or(
-                Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
-            )
-        }
-
-        #[cfg(target_arch = "wasm32")]
-        {
-            self.endpoint.blocking_read().clone().unwrap_or(
-                Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
-            )
-        }
+    async fn base_uri(&self) -> Url {
+        self.endpoint.read().await.clone().unwrap_or(
+            Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
+        )
     }
 
     async fn subscription_opts(&self) -> jacquard_common::xrpc::SubscriptionOptions<'_> {
@@ -825,7 +808,7 @@ where
         Sub: XrpcSubscription + Send + Sync,
     {
         use jacquard_common::xrpc::SubscriptionExt;
-        let base = self.base_uri();
+        let base = self.base_uri().await;
         self.subscription(base)
             .with_options(opts)
             .subscribe(params)

@@ -56,7 +56,7 @@ examples:
 example NAME *ARGS:
     #!/usr/bin/env bash
     if [ -f "examples/{{NAME}}.rs" ]; then
-        cargo run -p jacquard --features=api_bluesky --example {{NAME}} -- {{ARGS}}
+        cargo run -p jacquard --features=api_bluesky,streaming --example {{NAME}} -- {{ARGS}}
     elif cargo metadata --format-version=1 --no-deps | \
          jq -e '.packages[] | select(.name == "jacquard-axum") | .targets[] | select(.kind[] == "example" and .name == "{{NAME}}")' > /dev/null; then
         cargo run -p jacquard-axum --example {{NAME}}  -- {{ARGS}}
