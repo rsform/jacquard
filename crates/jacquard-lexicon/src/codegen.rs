@@ -19,6 +19,8 @@ pub struct CodeGenerator<'c> {
     /// Track namespace dependencies (namespace -> set of namespaces it depends on)
     namespace_deps:
         std::cell::RefCell<std::collections::HashMap<String, std::collections::HashSet<String>>>,
+    /// Track which file paths contain subscription endpoints
+    subscription_files: std::cell::RefCell<std::collections::HashSet<std::path::PathBuf>>,
 }
 
 impl<'c> CodeGenerator<'c> {
@@ -28,6 +30,7 @@ impl<'c> CodeGenerator<'c> {
             corpus,
             root_module: root_module.into(),
             namespace_deps: std::cell::RefCell::new(std::collections::HashMap::new()),
+            subscription_files: std::cell::RefCell::new(std::collections::HashSet::new()),
         }
     }
 
@@ -166,7 +169,12 @@ impl<'c> CodeGenerator<'c> {
                 nsid,
                 None::<String>,
             )),
-            LexUserType::XrpcSubscription(sub) => self.generate_subscription(nsid, def_name, sub),
+            LexUserType::XrpcSubscription(sub) => {
+                // Track this file as containing a subscription
+                let file_path = self.nsid_to_file_path(nsid);
+                self.subscription_files.borrow_mut().insert(file_path);
+                self.generate_subscription(nsid, def_name, sub)
+            }
         }
     }
 }

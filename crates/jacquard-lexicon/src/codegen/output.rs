@@ -46,6 +46,7 @@ impl<'c> CodeGenerator<'c> {
         &self,
         file_map: &BTreeMap<std::path::PathBuf, (TokenStream, Option<String>)>,
         defs_only: &BTreeMap<std::path::PathBuf, (TokenStream, Option<String>)>,
+        subscription_files: &HashSet<std::path::PathBuf>,
     ) -> BTreeMap<std::path::PathBuf, (TokenStream, Option<String>)> {
         // Track what modules each directory needs to declare
         // Key: directory path, Value: set of module names (file stems)
@@ -100,10 +101,22 @@ impl<'c> CodeGenerator<'c> {
                 .iter()
                 .map(|name| {
                     let ident = make_ident(name);
+
+                    // Check if this module is a subscription endpoint
+                    let mut module_path = dir.clone();
+                    module_path.push(format!("{}.rs", name));
+                    let is_subscription = subscription_files.contains(&module_path);
+
                     if is_root {
                         // Top-level modules get feature gates
                         quote! {
                             #[cfg(feature = #name)]
+                            pub mod #ident;
+                        }
+                    } else if is_subscription {
+                        // Subscription modules get streaming feature gate
+                        quote! {
+                            #[cfg(feature = "streaming")]
                             pub mod #ident;
                         }
                     } else {
@@ -134,9 +147,12 @@ impl<'c> CodeGenerator<'c> {
         let defs_files = self.generate_all()?;
         let mut all_files = defs_files.clone();
 
+        // Get subscription files for feature gating
+        let subscription_files = self.subscription_files.borrow();
+
         // Generate module tree iteratively until no new files appear
         loop {
-            let module_map = self.generate_module_tree(&all_files, &defs_files);
+            let module_map = self.generate_module_tree(&all_files, &defs_files, &subscription_files);
             let old_count = all_files.len();
 
             // Merge new module files

@@ -20,6 +20,7 @@ pub mod list_repos;
 pub mod list_repos_by_collection;
 pub mod notify_of_update;
 pub mod request_crawl;
+#[cfg(feature = "streaming")] // manually added temporarily
 pub mod subscribe_repos;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

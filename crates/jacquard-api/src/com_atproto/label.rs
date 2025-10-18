@@ -6,6 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod query_labels;
+#[cfg(feature = "streaming")] // manually added temporarily
 pub mod subscribe_labels;
 
 /// Metadata tag on an atproto resource (eg, repo or record).
@@ -18,7 +19,7 @@ pub mod subscribe_labels;
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    bon::Builder,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Label<'a> {
@@ -188,7 +189,7 @@ impl jacquard_common::IntoStatic for LabelValue<'_> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    bon::Builder,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelValueDefinition<'a> {
@@ -227,7 +228,7 @@ pub struct LabelValueDefinition<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    bon::Builder,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelValueDefinitionStrings<'a> {
@@ -253,7 +254,7 @@ pub struct LabelValueDefinitionStrings<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SelfLabel<'a> {
@@ -272,7 +273,7 @@ pub struct SelfLabel<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder
+    bon::Builder,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SelfLabels<'a> {

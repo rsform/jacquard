@@ -25,7 +25,7 @@ clap.workspace = true
 glob = "0.3"
 heck.workspace = true
 #itertools.workspace = true
-jacquard-api = {  version = "0.5", git = "https://tangled.org/@nonbinary.computer/jacquard" }
+jacquard-api = {  version = "0.6", git = "https://tangled.org/@nonbinary.computer/jacquard" }
 jacquard-common = { version = "0.6", features = [ "reqwest-client" ], git = "https://tangled.org/@nonbinary.computer/jacquard" }
 jacquard-identity = { version = "0.6", git = "https://tangled.org/@nonbinary.computer/jacquard" }
 kdl = "6"
