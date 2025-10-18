@@ -9,19 +9,27 @@ use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::{marker::PhantomData, pin::Pin};
 
+/// Trait for streaming XRPC procedures (bidirectional streaming).
+///
+/// Defines frame encoding/decoding for procedures that send/receive streams of data.
 pub trait XrpcProcedureStream {
     /// The NSID for this XRPC method
     const NSID: &'static str;
     /// The upload encoding
     const ENCODING: &'static str;
 
+    /// Frame type for this streaming procedure
     type Frame<'de>;
 
+    /// Associated request type
     type Request: XrpcRequest;
 
     /// Response type returned from the XRPC call (marker struct)
     type Response: XrpcStreamResp;
 
+    /// Encode a frame into bytes for transmission.
+    ///
+    /// Default implementation uses DAG-CBOR encoding.
     fn encode_frame<'de>(data: Self::Frame<'de>) -> Result<Bytes, StreamError>
     where
         Self::Frame<'de>: Serialize,
@@ -55,6 +63,9 @@ pub trait XrpcStreamResp {
     /// Response output type
     type Frame<'de>: IntoStatic;
 
+    /// Encode a frame into bytes for transmission.
+    ///
+    /// Default implementation uses DAG-CBOR encoding.
     fn encode_frame<'de>(data: Self::Frame<'de>) -> Result<Bytes, StreamError>
     where
         Self::Frame<'de>: Serialize,
@@ -77,13 +88,18 @@ pub trait XrpcStreamResp {
     }
 }
 
+/// A single frame in a streaming XRPC request or response.
+///
+/// Wraps a buffer of bytes with optional type tagging via the phantom parameter.
 #[repr(transparent)]
 pub struct XrpcStreamFrame<F = ()> {
+    /// The frame data
     pub buffer: Bytes,
     _marker: PhantomData<F>,
 }
 
 impl XrpcStreamFrame {
+    /// Create a new untyped stream frame
     pub fn new(buffer: Bytes) -> Self {
         Self {
             buffer,
@@ -93,6 +109,7 @@ impl XrpcStreamFrame {
 }
 
 impl<F> XrpcStreamFrame<F> {
+    /// Create a new typed stream frame
     pub fn new_typed<G>(buffer: Bytes) -> Self {
         Self {
             buffer,
@@ -142,12 +159,16 @@ pub struct XrpcProcedureSink<F = ()>(
     pub Pin<Box<dyn n0_future::Sink<XrpcStreamFrame<F>, Error = StreamError> + Send>>,
 );
 
+/// Typed streaming XRPC response.
+///
+/// Similar to `StreamingResponse` but with optional type-level frame tagging.
 pub struct XrpcResponseStream<F = ()> {
     parts: http::response::Parts,
     body: Boxed<Result<XrpcStreamFrame<F>, StreamError>>,
 }
 
 impl XrpcResponseStream {
+    /// Create from a `StreamingResponse`
     pub fn from_bytestream(StreamingResponse { parts, body }: StreamingResponse) -> Self {
         Self {
             parts,
@@ -158,6 +179,7 @@ impl XrpcResponseStream {
         }
     }
 
+    /// Create from response parts and a byte stream
     pub fn from_parts(parts: http::response::Parts, body: ByteStream) -> Self {
         Self {
             parts,
@@ -168,6 +190,7 @@ impl XrpcResponseStream {
         }
     }
 
+    /// Consume and return parts and body separately
     pub fn into_parts(self) -> (http::response::Parts, ByteStream) {
         (
             self.parts,
@@ -175,12 +198,14 @@ impl XrpcResponseStream {
         )
     }
 
+    /// Consume and return just the body stream
     pub fn into_bytestream(self) -> ByteStream {
         ByteStream::new(self.body.map_ok(|f| f.buffer).boxed())
     }
 }
 
 impl<F: XrpcStreamResp> XrpcResponseStream<F> {
+    /// Create a typed response stream from a `StreamingResponse`
     pub fn from_stream(StreamingResponse { parts, body }: StreamingResponse) -> Self {
         Self {
             parts,
@@ -191,6 +216,7 @@ impl<F: XrpcStreamResp> XrpcResponseStream<F> {
         }
     }
 
+    /// Create a typed response stream from parts and body
     pub fn from_typed_parts(parts: http::response::Parts, body: ByteStream) -> Self {
         Self {
             parts,
@@ -203,6 +229,7 @@ impl<F: XrpcStreamResp> XrpcResponseStream<F> {
 }
 
 impl<F: XrpcStreamResp + 'static> XrpcResponseStream<F> {
+    /// Consume the typed stream and return just the raw byte stream
     pub fn into_bytestream(self) -> ByteStream {
         ByteStream::new(self.body.map_ok(|f| f.buffer).boxed())
     }

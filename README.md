@@ -8,6 +8,25 @@ A suite of Rust crates intended to make it much easier to get started with atpro
 
 It is also designed around zero-copy/borrowed deserialization: types like [`Post<'_>`](https://tangled.org/@nonbinary.computer/jacquard/blob/main/crates/jacquard-api/src/app_bsky/feed/post.rs) can borrow data (via the [`CowStr<'_>`](https://docs.rs/jacquard/latest/jacquard/cowstr/enum.CowStr.html) type and a host of other types built on top of it) directly from the response buffer instead of allocating owned copies. Owned versions are themselves mostly inlined or reference-counted pointers and are therefore still quite efficient. The `IntoStatic` trait (which is derivable) makes it easy to get an owned version and avoid worrying about lifetimes.
 
+## 0.6.0 Release Highlights:
+
+- **WebSocket streaming** (gated behind feature: "streaming" in `jacquard` and "websocket" in `jacquard-common`)
+- Base level HTTP streamed responses and (on non-wasm platforms) request support (gated behind feature: "streaming" in `jacquard-common`)
+- **Support for atproto event stream endpoints** (e.g. subscribeRepos, subscribeLabels, firehose)
+- **Jetstream subscriber support and implementation**
+- **zstd compression support** for JSON websocket endpoints
+- **XRPC streaming procedure traits** for endpoints with large payloads, experimental manual implementations in `jacquard`
+- Fixed blob upload and download bugs, CID link deserialization issues.
+
+### WARNING
+
+A lot of the streaming code is still pretty experimental. The examples work, though.\
+The modules are also less well-documented, and don't have code examples. There are also a lot of utility functions for conveniently working with the streams and transforming them which are lacking. Use [`n0-future`](https://docs.rs/n0-future/latest/n0_future/index.html) to work with them, that is what Jacquard uses internally as much as possible.
+
+### Changelog
+
+[./CHANGELOG.md]
+
 ## Goals and Features
 
 - Validated, spec-compliant, easy to work with, and performant baseline types
@@ -20,7 +39,6 @@ It is also designed around zero-copy/borrowed deserialization: types like [`Post
 - Lexicon Data value type for working with unknown atproto data (dag-cbor or json)
 - An order of magnitude less boilerplate than some existing crates
 - Use as much or as little from the crates as you need
-
 
 ## Example
 
@@ -97,44 +115,6 @@ Jacquard is broken up into several crates for modularity. The correct one to use
 | `jacquard-identity` | Identity resolution | [![Crates.io](https://img.shields.io/crates/v/jacquard-identity.svg)](https://crates.io/crates/jacquard-identity) [![Documentation](https://docs.rs/jacquard-identity/badge.svg)](https://docs.rs/jacquard-identity) |
 | `jacquard-lexicon` | Lexicon parsing and code generation | [![Crates.io](https://img.shields.io/crates/v/jacquard-lexicon.svg)](https://crates.io/crates/jacquard-lexicon) [![Documentation](https://docs.rs/jacquard-lexicon/badge.svg)](https://docs.rs/jacquard-lexicon) |
 | `jacquard-derive` | Macros for lexicon types | [![Crates.io](https://img.shields.io/crates/v/jacquard-derive.svg)](https://crates.io/crates/jacquard-derive) [![Documentation](https://docs.rs/jacquard-derive/badge.svg)](https://docs.rs/jacquard-derive) |
-
-## Changelog
-
-[CHANGELOG.md](./CHANGELOG.md)
-
-Highlights:
-
-- initial streaming support
-- experimental WASM support
-- better value type deserialization helpers
-- service auth implementation
-- XrpcRequest derive Macros
-- more builders in generated api to make constructing things easier (lmk if compile time is awful)
-- `AgentSessionExt` trait with a host of convenience methods for working with records and preferences
-- Improvements to the `Collection` trait, code generation, and addition of the `VecUpdate` trait to enable that
-
-
-## Experimental WASM Support
-
-Core crates (`jacquard-common`, `jacquard-api`, `jacquard-identity`, `jacquard-oauth`) compile for `wasm32-unknown-unknown`. Traits use [`trait-variant`](https://docs.rs/trait-variant) to conditionally exclude `Send` bounds on WASM targets. DNS-based handle resolution is gated behind the `dns` feature and unavailable on WASM (HTTPS well-known and PDS resolution still work).
-
-Test WASM compilation:
-```bash
-just check-wasm
-# or: cargo build --target wasm32-unknown-unknown -p jacquard-common --no-default-features
-```
-
-
-### Initial Streaming Support
-
-Jacquard is building out support for efficient streaming for large payloads:
-
-- **Blob uploads/downloads**: Stream media without loading into memory
-- **CAR file streaming**: Efficient repo sync operations
-- **Thin forwarding**: Pipe data between endpoints
-- **WebSocket support**: Bidirectional streaming connections
-
-Enable with the `streaming` feature flag. See `jacquard-common` documentation for details.
 
 ## Development
 

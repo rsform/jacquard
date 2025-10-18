@@ -98,6 +98,7 @@ pub enum DecodeError {
         #[source]
         serde_ipld_dagcbor::DecodeError<std::convert::Infallible>,
     ),
+    /// CBOR header deserialization failed (framed WebSocket messages)
     #[cfg(feature = "websocket")]
     #[error("Failed to deserialize cbor header: {0}")]
     CborHeader(

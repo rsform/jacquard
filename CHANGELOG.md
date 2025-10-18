@@ -57,15 +57,7 @@
 - `AtUri::from_parts()` constructor for building URIs from components
 - Proper Display and FromStr implementations
 
-**Memory-based credential session** (`jacquard`)
-- `MemoryCredentialSession` for in-memory session storage
-- Useful for short-lived applications or testing
-- No file I/O required
-
-**Collection record fetching improvements** (`jacquard-api`, `jacquard-lexicon`)
-- Generated `fetch_record()` convenience method on all record types
-- Fetches owned record without turbofish syntax: `Post::fetch_record(agent, uri).await`
-- Simplifies common pattern of fetching + converting to owned
+**Memory-based credential session helpers** (`jacquard`) (ty [@vielle.dev](https://tangled.org/@vielle.dev))
 
 **Axum improvements** (`jacquard-axum`)
 - `XrpcError` now implements `IntoResponse` for better error handling
@@ -76,7 +68,7 @@
 - `subscribe_repos.rs`: Subscribe to PDS firehose with typed DAG-CBOR messages
 - `subscribe_jetstream.rs`: Subscribe to Jetstream with typed JSON messages and optional compression
 - `stream_get_blob.rs`: Download blobs using HTTP streaming
-- `app_password_example.rs`: App password authentication example
+- `app_password_example.rs`: App password authentication example (ty [@vielle.dev](https://tangled.org/@vielle.dev))
 
 **CID deserialization improvements** (`jacquard-common`)
 - Fixed `Cid` type to properly deserialize CBOR tag 42 via `IpldCid::deserialize`
@@ -95,12 +87,12 @@
 - Override `decode_message()` in trait impls to use framed decoding
 - All record types now have `fetch_uri()` and `fetch_record()` methods generated
 
-**Dependencies** (`jacquard-axum`)
+**Dependencies** (`jacquard-axum`) (ty [@thoth.ptnote.dev](https://tangled.org/@thoth.ptnote.dev))
 - Disabled default features for `jacquard` dependency to reduce bloat
 
 ### Fixed
 
-**Blob upload** (`jacquard`)
+**Blob upload** (`jacquard`) (ty [@vielle.dev](https://tangled.org/@vielle.dev) for reporting this one)
 - Fixed `upload_blob()` authentication issues
 - Properly authenticates while allowing custom Content-Type headers
 

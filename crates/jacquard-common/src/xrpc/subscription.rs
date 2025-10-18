@@ -98,12 +98,22 @@ pub trait XrpcSubscription: Serialize {
     }
 }
 
+/// Header for framed DAG-CBOR subscription messages.
+///
+/// Used in ATProto subscription streams where each message has a CBOR-encoded header
+/// followed by the message body.
 #[derive(Debug, serde::Deserialize)]
 pub struct EventHeader {
+    /// Operation code
     pub op: i64,
-    pub t: smol_str::SmolStr, // type discriminator like "#commit"
+    /// Event type discriminator (e.g., "#commit", "#identity")
+    pub t: smol_str::SmolStr,
 }
 
+/// Parse a framed DAG-CBOR message header and return the header plus remaining body bytes.
+///
+/// Used for two-stage deserialization of subscription messages in formats like
+/// `com.atproto.sync.subscribeRepos`.
 pub fn parse_event_header<'a>(bytes: &'a [u8]) -> Result<(EventHeader, &'a [u8]), DecodeError> {
     let mut cursor = std::io::Cursor::new(bytes);
     let header: EventHeader = ciborium::de::from_reader(&mut cursor)?;
