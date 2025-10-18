@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.broadcast.syndication",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record created by a Streamplace broadcaster to indicate that they will be replicating a livestream",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "broadcaster",
+          "streamer",
+          "createdAt"
+        ],
+        "properties": {
+          "broadcaster": {
+            "type": "string",
+            "description": "DID of the Streamplace broadcaster that will be replicating the livestream",
+            "format": "did"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Client-declared timestamp when this syndication was created.",
+            "format": "datetime"
+          },
+          "streamer": {
+            "type": "string",
+            "description": "DID of the streamer whose livestream is being replicated",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

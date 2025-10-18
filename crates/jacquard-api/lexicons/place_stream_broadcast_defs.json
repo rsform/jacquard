@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.broadcast.defs",
+  "defs": {
+    "broadcastOriginView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "record"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileViewBasic"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "record": {
+          "type": "unknown"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

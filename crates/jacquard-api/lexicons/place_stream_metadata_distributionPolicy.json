@@ -1,0 +1,16 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.metadata.distributionPolicy",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "Distribution and rebroadcast policy.",
+      "properties": {
+        "deleteAfter": {
+          "type": "integer",
+          "description": "Duration in seconds after which segments should be deleted. Each segment will expire N seconds after its creation time."
+        }
+      }
+    }
+  }
+}

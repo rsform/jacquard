@@ -5,11 +5,13 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod broadcast;
 pub mod chat;
 pub mod graph;
 pub mod key;
 pub mod live;
 pub mod livestream;
+pub mod metadata;
 pub mod richtext;
 pub mod segment;
 pub mod server;
