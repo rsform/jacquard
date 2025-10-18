@@ -179,18 +179,15 @@ fn decompress_zstd(bytes: &[u8]) -> Result<Vec<u8>, std::io::Error> {
 
     static DICTIONARY: OnceLock<Vec<u8>> = OnceLock::new();
 
-    let dict = DICTIONARY.get_or_init(|| {
-        include_bytes!("../../zstd_dictionary").to_vec()
-    });
+    let dict = DICTIONARY.get_or_init(|| include_bytes!("../../zstd_dictionary").to_vec());
 
-    decode_all(std::io::Cursor::new(bytes))
-        .or_else(|_| {
-            // Try with dictionary
-            let mut decoder = zstd::Decoder::with_dictionary(std::io::Cursor::new(bytes), dict)?;
-            let mut result = Vec::new();
-            std::io::Read::read_to_end(&mut decoder, &mut result)?;
-            Ok(result)
-        })
+    decode_all(std::io::Cursor::new(bytes)).or_else(|_| {
+        // Try with dictionary
+        let mut decoder = zstd::Decoder::with_dictionary(std::io::Cursor::new(bytes), dict)?;
+        let mut result = Vec::new();
+        std::io::Read::read_to_end(&mut decoder, &mut result)?;
+        Ok(result)
+    })
 }
 
 /// Decode CBOR messages from a WebSocket stream
@@ -752,7 +749,7 @@ impl<W: WebSocketClient> SubscriptionClient for BasicSubscriptionClient<W> {
     where
         Sub: XrpcSubscription + Send + Sync,
     {
-        let base = self.base_uri();
+        let base = self.base_uri().await;
         self.subscription(base)
             .with_options(opts)
             .subscribe(params)

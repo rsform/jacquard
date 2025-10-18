@@ -364,7 +364,7 @@ impl WsSink {
     /// Create a new message sink
     pub fn new<S>(sink: S) -> Self
     where
-        S: n0_future::Sink<WsMessage, Error = StreamError> + 'static,
+        S: n0_future::Sink<WsMessage, Error = StreamError> + Send + 'static,
     {
         Self(Box::new(sink))
     }
