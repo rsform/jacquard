@@ -78,19 +78,28 @@
           crane = {
             args = {
               buildInputs = commonBuildInputs;
+              nativeBuildInputs = [pkgs.installShellFiles];
               doCheck = false;  # Tests require lexicon corpus files not available in nix build
               postInstall = ''
-                # Install man pages
-                if [ -d "$OUT_DIR/man" ]; then
-                  install -Dm644 $OUT_DIR/man/*.1 -t $out/share/man/man1/
-                fi
+                # Install man pages and completions from build script output
+                for outdir in target/release/build/jacquard-lexicon-*/out; do
+                  if [ -d "$outdir/man" ]; then
+                    installManPage $outdir/man/*.1
+                  fi
+                  if [ -d "$outdir/completions" ]; then
+                    # Install completions for both binaries
+                    for completion in $outdir/completions/*; do
+                      case "$(basename "$completion")" in
+                        *.bash) installShellCompletion --bash "$completion" ;;
+                        *.fish) installShellCompletion --fish "$completion" ;;
+                        _*) installShellCompletion --zsh "$completion" ;;
+                      esac
+                    done
+                  fi
+                done
 
-                # Install shell completions
-                if [ -d "$OUT_DIR/completions" ]; then
-                  install -Dm644 $OUT_DIR/completions/lex-fetch.bash $out/share/bash-completion/completions/lex-fetch
-                  install -Dm644 $OUT_DIR/completions/lex-fetch.fish $out/share/fish/vendor_completions.d/lex-fetch.fish
-                  install -Dm644 $OUT_DIR/completions/_lex-fetch $out/share/zsh/site-functions/_lex-fetch
-                fi
+                # Install example lexicons.kdl config
+                install -Dm644 ${./../../crates/jacquard-lexicon/lexicons.kdl.example} $out/share/doc/jacquard-lexicon/lexicons.kdl.example
               '';
             };
           };

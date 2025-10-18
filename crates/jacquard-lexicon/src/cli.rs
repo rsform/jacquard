@@ -16,3 +16,20 @@ pub struct LexFetchArgs {
     #[arg(short = 'v', long)]
     pub verbose: bool,
 }
+
+#[derive(Parser, Debug)]
+#[command(author, version, about = "Generate Rust code from Lexicon schemas")]
+pub struct CodegenArgs {
+    /// Directory containing Lexicon JSON files
+    #[arg(short = 'i', long)]
+    pub input: PathBuf,
+
+    /// Output directory for generated Rust code
+    #[arg(short = 'o', long)]
+    pub output: PathBuf,
+
+    // TODO: root_module causes issues when set to anything other than "crate", needs rework
+    // /// Root module name (default: "crate")
+    // #[arg(short = 'r', long, default_value = "crate")]
+    // pub root_module: String,
+}

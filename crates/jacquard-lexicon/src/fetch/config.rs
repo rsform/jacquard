@@ -15,7 +15,8 @@ pub struct Config {
 pub struct OutputConfig {
     pub lexicons_dir: PathBuf,
     pub codegen_dir: PathBuf,
-    pub root_module: Option<String>,
+    // TODO: root_module causes issues when set to anything other than "crate", needs rework
+    // pub root_module: Option<String>,
     pub cargo_toml_path: Option<PathBuf>,
 }
 
@@ -58,7 +59,6 @@ fn parse_output(node: &kdl::KdlNode) -> Result<OutputConfig> {
 
     let mut lexicons_dir: Option<PathBuf> = None;
     let mut codegen_dir: Option<PathBuf> = None;
-    let mut root_module: Option<String> = None;
     let mut cargo_toml_path: Option<PathBuf> = None;
 
     for child in children.nodes() {
@@ -79,14 +79,15 @@ fn parse_output(node: &kdl::KdlNode) -> Result<OutputConfig> {
                     .ok_or_else(|| miette!("codegen expects a string value"))?;
                 codegen_dir = Some(PathBuf::from(val));
             }
-            "root-module" => {
-                let val = child
-                    .entries()
-                    .get(0)
-                    .and_then(|e| e.value().as_string())
-                    .ok_or_else(|| miette!("root-module expects a string value"))?;
-                root_module = Some(val.to_string());
-            }
+            // TODO: root-module causes issues, disabled for now
+            // "root-module" => {
+            //     let val = child
+            //         .entries()
+            //         .get(0)
+            //         .and_then(|e| e.value().as_string())
+            //         .ok_or_else(|| miette!("root-module expects a string value"))?;
+            //     root_module = Some(val.to_string());
+            // }
             "cargo-toml" => {
                 let val = child
                     .entries()
@@ -104,7 +105,6 @@ fn parse_output(node: &kdl::KdlNode) -> Result<OutputConfig> {
     Ok(OutputConfig {
         lexicons_dir: lexicons_dir.ok_or_else(|| miette!("Missing lexicons directory"))?,
         codegen_dir: codegen_dir.ok_or_else(|| miette!("Missing codegen directory"))?,
-        root_module,
         cargo_toml_path,
     })
 }

@@ -54,11 +54,7 @@ async fn main() -> Result<()> {
         }
 
         let corpus = LexiconCorpus::load_from_dir(&config.output.lexicons_dir)?;
-        let root_module = config
-            .output
-            .root_module
-            .unwrap_or_else(|| "crate".to_string());
-        let codegen = CodeGenerator::new(&corpus, root_module);
+        let codegen = CodeGenerator::new(&corpus, "crate".to_string());
         std::fs::create_dir_all(&config.output.codegen_dir).into_diagnostic()?;
         codegen.write_to_disk(&config.output.codegen_dir)?;
 

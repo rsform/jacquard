@@ -1,0 +1,71 @@
+// Example lex-fetch configuration file
+// This demonstrates the available source types and configuration options
+
+// Output configuration (required)
+output {
+    // Where to save fetched lexicon JSON files
+    lexicons "lexicons"
+
+    // Where to generate Rust code
+    codegen "src"
+
+    // Path to Cargo.toml for feature generation (optional)
+    // cargo-toml "Cargo.toml"
+
+    // NOTE: root-module option is currently disabled due to issues when set to non-"crate" values
+    // It will always use "crate" as the root module name
+}
+
+// Fetch ATProto and Bluesky lexicons from official repo
+// Higher priority (101) means these override conflicts from other sources
+source "atproto" type="git" priority=101 {
+    repo "https://github.com/bluesky-social/atproto"
+    pattern "lexicons/**/*.json"
+}
+
+// Fetch lexicons from a Git repository
+source "my-lexicons" type="git" priority=100 {
+    repo "https://github.com/example/my-lexicons"
+
+    // Optional: specific branch/tag/commit
+    // ref "main"
+
+    // Glob pattern for finding lexicon files (defaults to **/*.json)
+    pattern "**/*.json"
+}
+
+// Use local directory for custom/in-development lexicons
+source "local-dev" type="local" priority=200 {
+    path "./my-lexicons"
+
+    // Optional pattern (omit to use **/*.json)
+    pattern "*.json"
+}
+
+// Fetch from an AT Protocol endpoint (user's repo)
+source "custom-user" type="atproto" {
+    endpoint "did:plc:example123456789"
+
+    // Optional: specific slice within their repo
+    // slice "app.example.slice"
+}
+
+// Fetch from HTTP endpoint returning lexicon array
+// source "http-lexicons" type="http" {
+//     url "https://api.example.com/lexicons"
+// }
+
+// Fetch from network.slices
+// source "slices-example" type="slices" {
+//     slice "at://did:plc:example/network.slices.slice/record123"
+// }
+
+// Load a single JSON file containing multiple lexicons
+// source "single-file" type="jsonfile" {
+//     path "./lexicons-bundle.json"
+// }
+
+// Priority notes:
+// - Higher numbers override lower numbers when lexicons conflict
+// - Useful for preferring official schemas over community forks
+// - Default priority if not specified: 50
