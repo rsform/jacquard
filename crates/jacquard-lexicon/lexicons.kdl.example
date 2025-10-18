@@ -11,9 +11,6 @@ output {
 
     // Path to Cargo.toml for feature generation (optional)
     // cargo-toml "Cargo.toml"
-
-    // NOTE: root-module option is currently disabled due to issues when set to non-"crate" values
-    // It will always use "crate" as the root module name
 }
 
 // Fetch ATProto and Bluesky lexicons from official repo
