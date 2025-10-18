@@ -25,7 +25,7 @@ The modules are also less well-documented, and don't have code examples. There a
 
 ### Changelog
 
-[./CHANGELOG.md]
+[CHANGELOG.md](./CHANGELOG.md)
 
 ## Goals and Features
 
