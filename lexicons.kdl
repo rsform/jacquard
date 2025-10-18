@@ -99,3 +99,8 @@ source "rocksky" type="git" priority=50 {
     repo "https://github.com/tsirysndr/rocksky-lexicons/"
     pattern "lexicons/**/*.json"
 }
+
+source "teal-fm" type="git" priority=50 {
+    repo "https://github.com/teal-fm/teal"
+    pattern "lexicons/**/*.json"
+}

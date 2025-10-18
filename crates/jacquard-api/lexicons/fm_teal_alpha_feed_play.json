@@ -1,0 +1,108 @@
+{
+  "lexicon": 1,
+  "id": "fm.teal.alpha.feed.play",
+  "description": "This lexicon is in a not officially released state. It is subject to change. | A declaration of a teal.fm play. Plays are submitted as a result of a user listening to a track. Plays should be marked as tracked when a user has listened to the entire track if it's under 2 minutes long, or half of the track's duration up to 4 minutes, whichever is longest.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "trackName"
+        ],
+        "properties": {
+          "artistMbIds": {
+            "type": "array",
+            "description": "Array of Musicbrainz artist IDs. Prefer using 'artists'.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "artistNames": {
+            "type": "array",
+            "description": "Array of artist names in order of original appearance. Prefer using 'artists'.",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "maxGraphemes": 2560
+            }
+          },
+          "artists": {
+            "type": "array",
+            "description": "Array of artists in order of original appearance.",
+            "items": {
+              "type": "ref",
+              "ref": "fm.teal.alpha.feed.defs#artist"
+            }
+          },
+          "duration": {
+            "type": "integer",
+            "description": "The length of the track in seconds"
+          },
+          "isrc": {
+            "type": "string",
+            "description": "The ISRC code associated with the recording"
+          },
+          "musicServiceBaseDomain": {
+            "type": "string",
+            "description": "The base domain of the music service. e.g. music.apple.com, tidal.com, spotify.com. Defaults to 'local' if unavailable or not provided."
+          },
+          "originUrl": {
+            "type": "string",
+            "description": "The URL associated with this track"
+          },
+          "playedTime": {
+            "type": "string",
+            "description": "The unix timestamp of when the track was played",
+            "format": "datetime"
+          },
+          "recordingMbId": {
+            "type": "string",
+            "description": "The Musicbrainz recording ID of the track"
+          },
+          "releaseDiscriminant": {
+            "type": "string",
+            "description": "Distinguishing information for release variants (e.g. 'Deluxe Edition', 'Remastered', '2023 Remaster', 'Special Edition'). Used to differentiate between different versions of the same base release while maintaining grouping capabilities.",
+            "maxLength": 128,
+            "maxGraphemes": 1280
+          },
+          "releaseMbId": {
+            "type": "string",
+            "description": "The Musicbrainz release ID"
+          },
+          "releaseName": {
+            "type": "string",
+            "description": "The name of the release/album",
+            "maxLength": 256,
+            "maxGraphemes": 2560
+          },
+          "submissionClientAgent": {
+            "type": "string",
+            "description": "A metadata string specifying the user agent where the format is `<app-identifier>/<version> (<kernel/OS-base>; <platform/OS-version>; <device-model>)`. If string is provided, only `app-identifier` and `version` are required. `app-identifier` is recommended to be in reverse dns format. Defaults to 'manual/unknown' if unavailable or not provided.",
+            "maxLength": 256,
+            "maxGraphemes": 2560
+          },
+          "trackDiscriminant": {
+            "type": "string",
+            "description": "Distinguishing information for track variants (e.g. 'Acoustic Version', 'Live at Wembley', 'Radio Edit', 'Demo'). Used to differentiate between different versions of the same base track while maintaining grouping capabilities.",
+            "maxLength": 128,
+            "maxGraphemes": 1280
+          },
+          "trackMbId": {
+            "type": "string",
+            "description": "The Musicbrainz ID of the track"
+          },
+          "trackName": {
+            "type": "string",
+            "description": "The name of the track",
+            "minLength": 1,
+            "maxLength": 256,
+            "maxGraphemes": 2560
+          }
+        }
+      }
+    }
+  }
+}

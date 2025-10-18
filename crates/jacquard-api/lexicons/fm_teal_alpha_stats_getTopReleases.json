@@ -1,0 +1,58 @@
+{
+  "lexicon": 1,
+  "id": "fm.teal.alpha.stats.getTopReleases",
+  "description": "Get top releases/albums by play count",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of releases to return",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "period": {
+            "type": "string",
+            "description": "Time period for top releases",
+            "default": "all",
+            "enum": [
+              "all",
+              "30days",
+              "7days"
+            ]
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "releases"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "description": "Next page cursor"
+            },
+            "releases": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "fm.teal.alpha.stats.defs#releaseView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

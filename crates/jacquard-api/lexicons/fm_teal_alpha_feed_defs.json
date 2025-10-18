@@ -1,0 +1,95 @@
+{
+  "lexicon": 1,
+  "id": "fm.teal.alpha.feed.defs",
+  "description": "This lexicon is in a not officially released state. It is subject to change. | Misc. items related to feeds.",
+  "defs": {
+    "artist": {
+      "type": "object",
+      "required": [
+        "artistName"
+      ],
+      "properties": {
+        "artistMbId": {
+          "type": "string",
+          "description": "The Musicbrainz ID of the artist"
+        },
+        "artistName": {
+          "type": "string",
+          "description": "The name of the artist",
+          "minLength": 1,
+          "maxLength": 256,
+          "maxGraphemes": 2560
+        }
+      }
+    },
+    "playView": {
+      "type": "object",
+      "required": [
+        "trackName",
+        "artists"
+      ],
+      "properties": {
+        "artists": {
+          "type": "array",
+          "description": "Array of artists in order of original appearance.",
+          "items": {
+            "type": "ref",
+            "ref": "#artist"
+          }
+        },
+        "duration": {
+          "type": "integer",
+          "description": "The length of the track in seconds"
+        },
+        "isrc": {
+          "type": "string",
+          "description": "The ISRC code associated with the recording"
+        },
+        "musicServiceBaseDomain": {
+          "type": "string",
+          "description": "The base domain of the music service. e.g. music.apple.com, tidal.com, spotify.com. Defaults to 'local' if not provided."
+        },
+        "originUrl": {
+          "type": "string",
+          "description": "The URL associated with this track"
+        },
+        "playedTime": {
+          "type": "string",
+          "description": "The unix timestamp of when the track was played",
+          "format": "datetime"
+        },
+        "recordingMbId": {
+          "type": "string",
+          "description": "The Musicbrainz recording ID of the track"
+        },
+        "releaseMbId": {
+          "type": "string",
+          "description": "The Musicbrainz release ID"
+        },
+        "releaseName": {
+          "type": "string",
+          "description": "The name of the release/album",
+          "maxLength": 256,
+          "maxGraphemes": 2560
+        },
+        "submissionClientAgent": {
+          "type": "string",
+          "description": "A user-agent style string specifying the user agent. e.g. tealtracker/0.0.1b (Linux; Android 13; SM-A715F). Defaults to 'manual/unknown' if not provided.",
+          "maxLength": 256,
+          "maxGraphemes": 2560
+        },
+        "trackMbId": {
+          "type": "string",
+          "description": "The Musicbrainz ID of the track"
+        },
+        "trackName": {
+          "type": "string",
+          "description": "The name of the track",
+          "minLength": 1,
+          "maxLength": 256,
+          "maxGraphemes": 2560
+        }
+      }
+    }
+  }
+}

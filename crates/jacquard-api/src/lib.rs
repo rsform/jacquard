@@ -75,6 +75,9 @@ pub mod dev_regnault;
 #[cfg(feature = "events_smokesignal")]
 pub mod events_smokesignal;
 
+#[cfg(feature = "fm_teal")]
+pub mod fm_teal;
+
 #[cfg(feature = "fyi_frontpage")]
 pub mod fyi_frontpage;
 
