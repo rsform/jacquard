@@ -433,29 +433,10 @@ where
     T: HttpClient + XrpcExt + Send + Sync + 'static,
     W: Send + Sync,
 {
-    fn base_uri(&self) -> Url {
-        // base_uri is a synchronous trait method; avoid `.await` here.
-        // Under Tokio, use `block_in_place` to make a blocking RwLock read safe.
-        #[cfg(not(target_arch = "wasm32"))]
-        if tokio::runtime::Handle::try_current().is_ok() {
-            tokio::task::block_in_place(|| {
-                self.endpoint.blocking_read().clone().unwrap_or(
-                    Url::parse("https://public.bsky.app")
-                        .expect("public appview should be valid url"),
-                )
-            })
-        } else {
-            self.endpoint.blocking_read().clone().unwrap_or(
-                Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
-            )
-        }
-
-        #[cfg(target_arch = "wasm32")]
-        {
-            self.endpoint.blocking_read().clone().unwrap_or(
-                Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
-            )
-        }
+    async fn base_uri(&self) -> Url {
+        self.endpoint.read().await.clone().unwrap_or(
+            Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
+        )
     }
 
     async fn send<R>(&self, request: R) -> XrpcResult<XrpcResponse<R>>
@@ -476,7 +457,7 @@ where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync,
     {
-        let base_uri = self.base_uri();
+        let base_uri = self.base_uri().await;
         let auth = self.access_token().await;
         opts.auth = auth;
         let resp = self
@@ -509,6 +490,218 @@ fn is_expired<R: XrpcResp>(response: &XrpcResult<Response<R>>) -> bool {
             _ => false,
         },
         _ => false,
+    }
+}
+
+#[cfg(feature = "streaming")]
+impl<S, T, W> jacquard_common::http_client::HttpClientExt for CredentialSession<S, T, W>
+where
+    S: SessionStore<SessionKey, AtpSession> + Send + Sync + 'static,
+    T: HttpClient + XrpcExt + jacquard_common::http_client::HttpClientExt + Send + Sync + 'static,
+    W: Send + Sync,
+{
+    async fn send_http_streaming(
+        &self,
+        request: http::Request<Vec<u8>>,
+    ) -> core::result::Result<http::Response<jacquard_common::stream::ByteStream>, Self::Error> {
+        self.client.send_http_streaming(request).await
+    }
+
+    async fn send_http_bidirectional<Str>(
+        &self,
+        parts: http::request::Parts,
+        body: Str,
+    ) -> core::result::Result<http::Response<jacquard_common::stream::ByteStream>, Self::Error>
+    where
+        Str: n0_future::Stream<Item = core::result::Result<bytes::Bytes, jacquard_common::StreamError>>
+            + Send
+            + 'static,
+    {
+        self.client.send_http_bidirectional(parts, body).await
+    }
+}
+
+#[cfg(feature = "streaming")]
+impl<S, T, W> jacquard_common::xrpc::XrpcStreamingClient for CredentialSession<S, T, W>
+where
+    S: SessionStore<SessionKey, AtpSession> + Send + Sync + 'static,
+    T: HttpClient + XrpcExt + jacquard_common::http_client::HttpClientExt + Send + Sync + 'static,
+    W: Send + Sync,
+{
+    async fn download<R>(
+        &self,
+        request: R,
+    ) -> core::result::Result<jacquard_common::xrpc::StreamingResponse, jacquard_common::StreamError>
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+    {
+        use jacquard_common::{StreamError, xrpc::build_http_request};
+
+        let base_uri = <Self as XrpcClient>::base_uri(self).await;
+        let mut opts = self.options.read().await.clone();
+        opts.auth = self.access_token().await;
+
+        let http_request = build_http_request(&base_uri, &request, &opts)
+            .map_err(|e| StreamError::protocol(e.to_string()))?;
+
+        let response = self
+            .client
+            .send_http_streaming(http_request.clone())
+            .await
+            .map_err(StreamError::transport)?;
+
+        let (parts, body) = response.into_parts();
+        let status = parts.status;
+
+        // Check if expired based on status code
+        if status == http::StatusCode::UNAUTHORIZED || status == http::StatusCode::BAD_REQUEST {
+            // Try to refresh
+            let auth = self.refresh().await.map_err(StreamError::transport)?;
+            opts.auth = Some(auth);
+
+            let http_request = build_http_request(&base_uri, &request, &opts)
+                .map_err(|e| StreamError::protocol(e.to_string()))?;
+
+            let response = self
+                .client
+                .send_http_streaming(http_request)
+                .await
+                .map_err(StreamError::transport)?;
+            let (parts, body) = response.into_parts();
+            Ok(jacquard_common::xrpc::StreamingResponse::new(parts, body))
+        } else {
+            Ok(jacquard_common::xrpc::StreamingResponse::new(parts, body))
+        }
+    }
+
+    async fn stream<Str>(
+        &self,
+        stream: jacquard_common::xrpc::streaming::XrpcProcedureSend<Str::Frame<'static>>,
+    ) -> core::result::Result<
+        jacquard_common::xrpc::streaming::XrpcResponseStream<
+            <<Str as jacquard_common::xrpc::streaming::XrpcProcedureStream>::Response as jacquard_common::xrpc::streaming::XrpcStreamResp>::Frame<'static>,
+        >,
+        jacquard_common::StreamError,
+    >
+    where
+        Str: jacquard_common::xrpc::streaming::XrpcProcedureStream + 'static,
+        <<Str as jacquard_common::xrpc::streaming::XrpcProcedureStream>::Response as jacquard_common::xrpc::streaming::XrpcStreamResp>::Frame<'static>: jacquard_common::xrpc::streaming::XrpcStreamResp,
+    {
+        use jacquard_common::StreamError;
+        use n0_future::{StreamExt, TryStreamExt};
+
+        let base_uri = self.base_uri().await;
+        let mut opts = self.options.read().await.clone();
+        opts.auth = self.access_token().await;
+
+        let mut url = base_uri;
+        let mut path = url.path().trim_end_matches('/').to_owned();
+        path.push_str("/xrpc/");
+        path.push_str(<Str::Request as jacquard_common::xrpc::XrpcRequest>::NSID);
+        url.set_path(&path);
+
+        let mut builder = http::Request::post(url.to_string());
+
+        if let Some(token) = &opts.auth {
+            use jacquard_common::AuthorizationToken;
+            let hv = match token {
+                AuthorizationToken::Bearer(t) => {
+                    http::HeaderValue::from_str(&format!("Bearer {}", t.as_ref()))
+                }
+                AuthorizationToken::Dpop(t) => {
+                    http::HeaderValue::from_str(&format!("DPoP {}", t.as_ref()))
+                }
+            }
+            .map_err(|e| StreamError::protocol(format!("Invalid authorization token: {}", e)))?;
+            builder = builder.header(http::header::AUTHORIZATION, hv);
+        }
+
+        if let Some(proxy) = &opts.atproto_proxy {
+            builder = builder.header("atproto-proxy", proxy.as_ref());
+        }
+        if let Some(labelers) = &opts.atproto_accept_labelers {
+            if !labelers.is_empty() {
+                let joined = labelers
+                    .iter()
+                    .map(|s| s.as_ref())
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                builder = builder.header("atproto-accept-labelers", joined);
+            }
+        }
+        for (name, value) in &opts.extra_headers {
+            builder = builder.header(name, value);
+        }
+
+        let (parts, _) = builder
+            .body(())
+            .map_err(|e| StreamError::protocol(e.to_string()))?
+            .into_parts();
+
+        let body_stream =
+            jacquard_common::stream::ByteStream::new(stream.0.map_ok(|f| f.buffer).boxed());
+
+        let response = self
+            .client
+            .send_http_bidirectional(parts.clone(), body_stream.into_inner())
+            .await
+            .map_err(StreamError::transport)?;
+
+        let (resp_parts, resp_body) = response.into_parts();
+        let status = resp_parts.status;
+
+        // Check if expired
+        if status == http::StatusCode::UNAUTHORIZED || status == http::StatusCode::BAD_REQUEST {
+            // Try to refresh
+            let auth = self.refresh().await.map_err(StreamError::transport)?;
+            opts.auth = Some(auth);
+
+            // Rebuild request with new auth
+            let mut builder = http::Request::post(url.to_string());
+            if let Some(token) = &opts.auth {
+                use jacquard_common::AuthorizationToken;
+                let hv = match token {
+                    AuthorizationToken::Bearer(t) => {
+                        http::HeaderValue::from_str(&format!("Bearer {}", t.as_ref()))
+                    }
+                    AuthorizationToken::Dpop(t) => {
+                        http::HeaderValue::from_str(&format!("DPoP {}", t.as_ref()))
+                    }
+                }
+                .map_err(|e| StreamError::protocol(format!("Invalid authorization token: {}", e)))?;
+                builder = builder.header(http::header::AUTHORIZATION, hv);
+            }
+            if let Some(proxy) = &opts.atproto_proxy {
+                builder = builder.header("atproto-proxy", proxy.as_ref());
+            }
+            if let Some(labelers) = &opts.atproto_accept_labelers {
+                if !labelers.is_empty() {
+                    let joined = labelers
+                        .iter()
+                        .map(|s| s.as_ref())
+                        .collect::<Vec<_>>()
+                        .join(", ");
+                    builder = builder.header("atproto-accept-labelers", joined);
+                }
+            }
+            for (name, value) in &opts.extra_headers {
+                builder = builder.header(name, value);
+            }
+
+            let (parts, _) = builder
+                .body(())
+                .map_err(|e| StreamError::protocol(e.to_string()))?
+                .into_parts();
+
+            // Can't retry with the same stream - it's been consumed
+            // This is a limitation of streaming upload with auth refresh
+            return Err(StreamError::protocol("Authentication failed on streaming upload and stream cannot be retried".to_string()));
+        }
+
+        Ok(jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts(
+            resp_parts, resp_body,
+        ))
     }
 }
 
@@ -596,10 +789,8 @@ where
                 AuthorizationToken::Bearer(t) => format!("Bearer {}", t.as_ref()),
                 AuthorizationToken::Dpop(t) => format!("DPoP {}", t.as_ref()),
             };
-            opts.headers.push((
-                CowStr::from("Authorization"),
-                CowStr::from(auth_value),
-            ));
+            opts.headers
+                .push((CowStr::from("Authorization"), CowStr::from(auth_value)));
         }
         opts
     }

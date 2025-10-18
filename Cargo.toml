@@ -61,6 +61,7 @@ reqwest = { version = "0.12", default-features = false }
 
 # Async and runtimes
 tokio = { version = "1", default-features = false }
+n0-future = "0.1"
 
 # Observability
 tracing = "0.1"

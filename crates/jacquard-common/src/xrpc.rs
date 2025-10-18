@@ -15,7 +15,9 @@ pub mod streaming;
 
 use ipld_core::ipld::Ipld;
 #[cfg(feature = "streaming")]
-pub use streaming::StreamingResponse;
+pub use streaming::{
+    StreamingResponse, XrpcProcedureSend, XrpcProcedureStream, XrpcResponseStream, XrpcStreamResp,
+};
 
 #[cfg(feature = "websocket")]
 pub mod subscription;
@@ -44,10 +46,7 @@ use crate::{AuthorizationToken, error::AuthError};
 use crate::{CowStr, error::XrpcResult};
 use crate::{IntoStatic, error::DecodeError};
 #[cfg(feature = "streaming")]
-use crate::{
-    StreamError,
-    xrpc::streaming::{XrpcProcedureSend, XrpcProcedureStream, XrpcResponseStream, XrpcStreamResp},
-};
+use crate::StreamError;
 use crate::{error::TransportError, types::value::RawData};
 
 /// Error type for encoding XRPC requests
@@ -272,7 +271,7 @@ pub type XrpcResponse<R> = Response<<R as XrpcRequest>::Response>;
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait XrpcClient: HttpClient {
     /// Get the base URI for the client.
-    fn base_uri(&self) -> Url;
+    fn base_uri(&self) -> impl Future<Output = Url>;
 
     /// Get the call options for the client.
     fn opts(&self) -> impl Future<Output = CallOptions<'_>> {
@@ -316,6 +315,53 @@ pub trait XrpcClient: HttpClient {
     where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync;
+
+}
+
+/// Stateful XRPC streaming client trait
+#[cfg(feature = "streaming")]
+pub trait XrpcStreamingClient: XrpcClient + HttpClientExt {
+    /// Send an XRPC request and stream the response
+    #[cfg(not(target_arch = "wasm32"))]
+    fn download<R>(
+        &self,
+        request: R,
+    ) -> impl Future<Output = Result<StreamingResponse, StreamError>> + Send
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+        Self: Sync;
+
+    /// Send an XRPC request and stream the response
+    #[cfg(target_arch = "wasm32")]
+    fn download<R>(
+        &self,
+        request: R,
+    ) -> impl Future<Output = Result<StreamingResponse, StreamError>>
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync;
+
+    /// Stream an XRPC procedure call and its response
+    #[cfg(not(target_arch = "wasm32"))]
+    fn stream<S>(
+        &self,
+        stream: XrpcProcedureSend<S::Frame<'static>>,
+    ) -> impl Future<Output = Result<XrpcResponseStream<<<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>>, StreamError>>
+    where
+        S: XrpcProcedureStream + 'static,
+        <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>: XrpcStreamResp,
+        Self: Sync;
+
+    /// Stream an XRPC procedure call and its response
+    #[cfg(target_arch = "wasm32")]
+    fn stream<S>(
+        &self,
+        stream: XrpcProcedureSend<S::Frame<'static>>,
+    ) -> impl Future<Output = Result<XrpcResponseStream<<<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>>, StreamError>>
+    where
+        S: XrpcProcedureStream + 'static,
+        <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>: XrpcStreamResp;
 }
 
 /// Stateless XRPC call builder.
@@ -947,7 +993,7 @@ impl<'a, C: HttpClient + HttpClientExt> XrpcCall<'a, C> {
     /// Stream an XRPC procedure call and its response
     ///
     /// Useful for streaming upload of large payloads, or for "pipe-through" operations
-    /// where you processing a large payload.
+    /// where you are processing a large payload.
     pub async fn stream<S>(
         self,
         stream: XrpcProcedureSend<S::Frame<'static>>,

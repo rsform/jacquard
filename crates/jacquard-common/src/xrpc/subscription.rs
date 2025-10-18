@@ -472,7 +472,7 @@ impl<'a, C: WebSocketClient> SubscriptionCall<'a, C> {
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait SubscriptionClient: WebSocketClient {
     /// Get the base URI for the client.
-    fn base_uri(&self) -> Url;
+    fn base_uri(&self) -> impl Future<Output = Url>;
 
     /// Get the subscription options for the client.
     fn subscription_opts(&self) -> impl Future<Output = SubscriptionOptions<'_>> {
@@ -570,7 +570,7 @@ impl<W: WebSocketClient> WebSocketClient for BasicSubscriptionClient<W> {
 }
 
 impl<W: WebSocketClient> SubscriptionClient for BasicSubscriptionClient<W> {
-    fn base_uri(&self) -> Url {
+    async fn base_uri(&self) -> Url {
         self.base_uri.clone()
     }
 
@@ -613,7 +613,7 @@ impl<W: WebSocketClient> SubscriptionClient for BasicSubscriptionClient<W> {
         Sub: XrpcSubscription + Send + Sync,
         Self: Sync,
     {
-        let base = self.base_uri();
+        let base = self.base_uri().await;
         self.subscription(base)
             .with_options(opts)
             .subscribe(params)

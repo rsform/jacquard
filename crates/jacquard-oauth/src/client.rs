@@ -29,7 +29,7 @@ use jacquard_identity::{
     resolver::{DidDocResponse, IdentityError, IdentityResolver, ResolverOptions},
 };
 use jose_jwk::JwkSet;
-use std::sync::Arc;
+use std::{future::Future, sync::Arc};
 use tokio::sync::RwLock;
 use url::Url;
 
@@ -458,15 +458,8 @@ where
     T: OAuthResolver + DpopExt + XrpcExt + Send + Sync + 'static,
     W: Send + Sync,
 {
-    fn base_uri(&self) -> Url {
-        // base_uri is a synchronous trait method; we must avoid async `.read().await`.
-        // Use `block_in_place` under Tokio runtime to perform a blocking RwLock read safely.
-        #[cfg(not(target_arch = "wasm32"))]
-        if tokio::runtime::Handle::try_current().is_ok() {
-            return tokio::task::block_in_place(|| self.data.blocking_read().host_url.clone());
-        }
-
-        self.data.blocking_read().host_url.clone()
+    async fn base_uri(&self) -> Url {
+        self.data.read().await.host_url.clone()
     }
 
     async fn opts(&self) -> CallOptions<'_> {
@@ -491,7 +484,7 @@ where
         R: XrpcRequest + Send + Sync,
         <R as XrpcRequest>::Response: Send + Sync,
     {
-        let base_uri = self.base_uri();
+        let base_uri = self.base_uri().await;
         opts.auth = Some(self.access_token().await);
         let guard = self.data.read().await;
         let mut dpop = guard.dpop_data.clone();
@@ -520,6 +513,195 @@ where
             process_response(http_response)
         } else {
             resp
+        }
+    }
+}
+
+#[cfg(feature = "streaming")]
+impl<T, S, W> jacquard_common::http_client::HttpClientExt for OAuthSession<T, S, W>
+where
+    S: ClientAuthStore + Send + Sync + 'static,
+    T: OAuthResolver
+        + DpopExt
+        + XrpcExt
+        + jacquard_common::http_client::HttpClientExt
+        + Send
+        + Sync
+        + 'static,
+    W: Send + Sync,
+{
+    async fn send_http_streaming(
+        &self,
+        request: http::Request<Vec<u8>>,
+    ) -> core::result::Result<http::Response<jacquard_common::stream::ByteStream>, Self::Error>
+    {
+        self.client.send_http_streaming(request).await
+    }
+
+    async fn send_http_bidirectional<Str>(
+        &self,
+        parts: http::request::Parts,
+        body: Str,
+    ) -> core::result::Result<http::Response<jacquard_common::stream::ByteStream>, Self::Error>
+    where
+        Str: n0_future::Stream<
+                Item = core::result::Result<bytes::Bytes, jacquard_common::StreamError>,
+            > + Send
+            + 'static,
+    {
+        self.client.send_http_bidirectional(parts, body).await
+    }
+}
+
+#[cfg(feature = "streaming")]
+impl<T, S, W> jacquard_common::xrpc::XrpcStreamingClient for OAuthSession<T, S, W>
+where
+    S: ClientAuthStore + Send + Sync + 'static,
+    T: OAuthResolver
+        + DpopExt
+        + XrpcExt
+        + jacquard_common::http_client::HttpClientExt
+        + Send
+        + Sync
+        + 'static,
+    W: Send + Sync,
+{
+    async fn download<R>(
+        &self,
+        request: R,
+    ) -> core::result::Result<jacquard_common::xrpc::StreamingResponse, jacquard_common::StreamError>
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+    {
+        use jacquard_common::StreamError;
+
+        let base_uri = <Self as XrpcClient>::base_uri(self).await;
+        let mut opts = self.options.read().await.clone();
+        opts.auth = Some(self.access_token().await);
+        let http_request = build_http_request(&base_uri, &request, &opts)
+            .map_err(|e| StreamError::protocol(e.to_string()))?;
+        let guard = self.data.read().await;
+        let mut dpop = guard.dpop_data.clone();
+        let result = self
+            .client
+            .dpop_call(&mut dpop)
+            .send_streaming(http_request)
+            .await;
+        drop(guard);
+
+        match result {
+            Ok(response) => Ok(response),
+            Err(_e) => {
+                // Check if it's an auth error and retry
+                opts.auth = Some(
+                    self.refresh()
+                        .await
+                        .map_err(|e| StreamError::transport(e))?,
+                );
+                let http_request = build_http_request(&base_uri, &request, &opts)
+                    .map_err(|e| StreamError::protocol(e.to_string()))?;
+                let guard = self.data.read().await;
+                let mut dpop = guard.dpop_data.clone();
+                self.client
+                    .dpop_call(&mut dpop)
+                    .send_streaming(http_request)
+                    .await
+                    .map_err(StreamError::transport)
+            }
+        }
+    }
+
+    async fn stream<Str>(
+        &self,
+        stream: jacquard_common::xrpc::streaming::XrpcProcedureSend<Str::Frame<'static>>,
+    ) -> core::result::Result<
+        jacquard_common::xrpc::streaming::XrpcResponseStream<
+            <<Str as jacquard_common::xrpc::streaming::XrpcProcedureStream>::Response as jacquard_common::xrpc::streaming::XrpcStreamResp>::Frame<'static>,
+        >,
+        jacquard_common::StreamError,
+    >
+    where
+        Str: jacquard_common::xrpc::streaming::XrpcProcedureStream + 'static,
+        <<Str as jacquard_common::xrpc::streaming::XrpcProcedureStream>::Response as jacquard_common::xrpc::streaming::XrpcStreamResp>::Frame<'static>: jacquard_common::xrpc::streaming::XrpcStreamResp,
+    {
+        use jacquard_common::StreamError;
+        use n0_future::{StreamExt, TryStreamExt};
+
+        let base_uri = self.base_uri().await;
+        let mut opts = self.options.read().await.clone();
+        opts.auth = Some(self.access_token().await);
+
+        let mut url = base_uri;
+        let mut path = url.path().trim_end_matches('/').to_owned();
+        path.push_str("/xrpc/");
+        path.push_str(<Str::Request as jacquard_common::xrpc::XrpcRequest>::NSID);
+        url.set_path(&path);
+
+        let mut builder = http::Request::post(url.to_string());
+
+        if let Some(token) = &opts.auth {
+            use jacquard_common::AuthorizationToken;
+            let hv = match token {
+                AuthorizationToken::Bearer(t) => {
+                    http::HeaderValue::from_str(&format!("Bearer {}", t.as_ref()))
+                }
+                AuthorizationToken::Dpop(t) => {
+                    http::HeaderValue::from_str(&format!("DPoP {}", t.as_ref()))
+                }
+            }
+            .map_err(|e| StreamError::protocol(format!("Invalid authorization token: {}", e)))?;
+            builder = builder.header(http::header::AUTHORIZATION, hv);
+        }
+
+        if let Some(proxy) = &opts.atproto_proxy {
+            builder = builder.header("atproto-proxy", proxy.as_ref());
+        }
+        if let Some(labelers) = &opts.atproto_accept_labelers {
+            if !labelers.is_empty() {
+                let joined = labelers
+                    .iter()
+                    .map(|s| s.as_ref())
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                builder = builder.header("atproto-accept-labelers", joined);
+            }
+        }
+        for (name, value) in &opts.extra_headers {
+            builder = builder.header(name, value);
+        }
+
+        let (parts, _) = builder
+            .body(())
+            .map_err(|e| StreamError::protocol(e.to_string()))?
+            .into_parts();
+
+        let body_stream =
+            jacquard_common::stream::ByteStream::new(stream.0.map_ok(|f| f.buffer).boxed());
+
+        let guard = self.data.read().await;
+        let mut dpop = guard.dpop_data.clone();
+        let result = self
+            .client
+            .dpop_call(&mut dpop)
+            .send_bidirectional(parts, body_stream)
+            .await;
+        drop(guard);
+
+        match result {
+            Ok(response) => {
+                let (resp_parts, resp_body) = response.into_parts();
+                Ok(
+                    jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts(
+                        resp_parts, resp_body,
+                    ),
+                )
+            }
+            Err(e) => {
+                // OAuth token refresh and retry is handled by dpop wrapper
+                // If we get here, it's a real error
+                Err(StreamError::transport(e))
+            }
         }
     }
 }
@@ -592,7 +774,7 @@ where
     T: OAuthResolver + Send + Sync + 'static,
     W: WebSocketClient + Send + Sync,
 {
-    fn base_uri(&self) -> Url {
+    async fn base_uri(&self) -> Url {
         #[cfg(not(target_arch = "wasm32"))]
         if tokio::runtime::Handle::try_current().is_ok() {
             return tokio::task::block_in_place(|| self.data.blocking_read().host_url.clone());
@@ -608,10 +790,8 @@ where
             AuthorizationToken::Bearer(t) => format!("Bearer {}", t.as_ref()),
             AuthorizationToken::Dpop(t) => format!("DPoP {}", t.as_ref()),
         };
-        opts.headers.push((
-            CowStr::from("Authorization"),
-            CowStr::from(auth_value),
-        ));
+        opts.headers
+            .push((CowStr::from("Authorization"), CowStr::from(auth_value)));
         opts
     }
 

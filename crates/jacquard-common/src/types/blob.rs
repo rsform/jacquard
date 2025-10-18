@@ -1,4 +1,7 @@
-use crate::{CowStr, IntoStatic, types::cid::Cid};
+use crate::{
+    CowStr, IntoStatic,
+    types::cid::{Cid, CidLink},
+};
 #[allow(unused)]
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error};
 use smol_str::ToSmolStr;
@@ -24,7 +27,7 @@ use std::{
 #[serde(rename_all = "camelCase")]
 pub struct Blob<'b> {
     /// CID (Content Identifier) reference to the blob data
-    pub r#ref: Cid<'b>,
+    pub r#ref: CidLink<'b>,
     /// MIME type of the blob (e.g., "image/png", "video/mp4")
     #[serde(borrow)]
     pub mime_type: MimeType<'b>,

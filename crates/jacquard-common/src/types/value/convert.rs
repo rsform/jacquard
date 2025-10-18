@@ -1,4 +1,5 @@
 use crate::IntoStatic;
+use crate::types::cid::CidLink;
 use crate::types::{
     DataModelType,
     cid::Cid,
@@ -298,7 +299,7 @@ impl<'s> TryFrom<RawData<'s>> for Data<'s> {
                                 }
                             };
                             return Ok(Data::Blob(crate::types::blob::Blob {
-                                r#ref: cid.clone(),
+                                r#ref: CidLink::str(cid).into_static(),
                                 mime_type: crate::types::blob::MimeType::from(mime.clone()),
                                 size: size_val,
                             }));

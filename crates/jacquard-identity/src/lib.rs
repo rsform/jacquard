@@ -77,6 +77,8 @@ use crate::resolver::{
 use bytes::Bytes;
 use jacquard_api::com_atproto::identity::resolve_did;
 use jacquard_api::com_atproto::identity::resolve_handle::ResolveHandle;
+#[cfg(feature = "streaming")]
+use jacquard_common::ByteStream;
 use jacquard_common::error::TransportError;
 use jacquard_common::http_client::HttpClient;
 use jacquard_common::types::did::Did;
@@ -89,7 +91,10 @@ use reqwest::StatusCode;
 use url::{ParseError, Url};
 
 #[cfg(all(feature = "dns", not(target_family = "wasm")))]
-use {hickory_resolver::{TokioAsyncResolver, config::ResolverConfig}, std::sync::Arc};
+use {
+    hickory_resolver::{TokioAsyncResolver, config::ResolverConfig},
+    std::sync::Arc,
+};
 
 /// Default resolver implementation with configurable fallback order.
 #[derive(Clone)]
@@ -499,6 +504,31 @@ impl HttpClient for JacquardResolver {
     }
 
     type Error = reqwest::Error;
+}
+
+#[cfg(feature = "streaming")]
+impl jacquard_common::http_client::HttpClientExt for JacquardResolver {
+    /// Send HTTP request and return streaming response
+    fn send_http_streaming(
+        &self,
+        request: http::Request<Vec<u8>>,
+    ) -> impl Future<Output = Result<http::Response<ByteStream>, Self::Error>> {
+        self.http.send_http_streaming(request)
+    }
+
+    /// Send HTTP request with streaming body and receive streaming response
+    fn send_http_bidirectional<S>(
+        &self,
+        parts: http::request::Parts,
+        body: S,
+    ) -> impl Future<Output = Result<http::Response<ByteStream>, Self::Error>>
+    where
+        S: n0_future::Stream<Item = Result<bytes::Bytes, jacquard_common::StreamError>>
+            + Send
+            + 'static,
+    {
+        self.http.send_http_bidirectional(parts, body)
+    }
 }
 
 /// Warnings produced during identity checks that are not fatal

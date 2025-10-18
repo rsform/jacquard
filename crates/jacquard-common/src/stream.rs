@@ -49,9 +49,10 @@ use std::fmt;
 pub type BoxError = Box<dyn Error + Send + Sync + 'static>;
 
 /// Error type for streaming operations
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub struct StreamError {
     kind: StreamErrorKind,
+    #[source]
     source: Option<BoxError>,
 }
 
@@ -156,14 +157,6 @@ impl fmt::Display for StreamError {
     }
 }
 
-impl Error for StreamError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        self.source
-            .as_ref()
-            .map(|e| e.as_ref() as &(dyn Error + 'static))
-    }
-}
-
 use bytes::Bytes;
 use n0_future::stream::Boxed;
 
@@ -203,6 +196,48 @@ impl ByteStream {
     /// Convert into the inner boxed stream
     pub fn into_inner(self) -> Boxed<Result<Bytes, StreamError>> {
         self.inner
+    }
+
+    /// Split this stream into two streams that both receive all chunks
+    ///
+    /// Chunks are cloned (cheaply via Bytes rc). Spawns a forwarder task.
+    /// Both returned streams will receive all chunks from the original stream.
+    /// The forwarder continues as long as at least one stream is alive.
+    /// If the underlying stream errors, both teed streams will end.
+    pub fn tee(self) -> (ByteStream, ByteStream) {
+        use futures::channel::mpsc;
+        use n0_future::StreamExt as _;
+
+        let (tx1, rx1) = mpsc::unbounded();
+        let (tx2, rx2) = mpsc::unbounded();
+
+        n0_future::task::spawn(async move {
+            let mut stream = self.inner;
+            while let Some(result) = stream.next().await {
+                match result {
+                    Ok(chunk) => {
+                        // Clone chunk (cheap - Bytes is rc'd)
+                        let chunk2 = chunk.clone();
+
+                        // Send to both channels, continue if at least one succeeds
+                        let send1 = tx1.unbounded_send(Ok(chunk));
+                        let send2 = tx2.unbounded_send(Ok(chunk2));
+
+                        // Only stop if both channels are closed
+                        if send1.is_err() && send2.is_err() {
+                            break;
+                        }
+                    }
+                    Err(_e) => {
+                        // Underlying stream errored, stop forwarding.
+                        // Both channels will close, ending both streams.
+                        break;
+                    }
+                }
+            }
+        });
+
+        (ByteStream::new(rx1), ByteStream::new(rx2))
     }
 }
 

@@ -219,6 +219,9 @@
 
 pub mod client;
 
+#[cfg(feature = "streaming")]
+pub mod streaming;
+
 pub use common::*;
 #[cfg(feature = "api")]
 pub use jacquard_api as api;

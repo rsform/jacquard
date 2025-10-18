@@ -251,7 +251,7 @@ pub fn cbor_to_blob<'b>(blob: &'b BTreeMap<String, Ipld>) -> Option<Blob<'b>> {
         });
         if let (Some(mime_type), Some(size)) = (mime_type, size) {
             return Some(Blob {
-                r#ref: Cid::ipld(*value),
+                r#ref: CidLink::ipld(*value),
                 mime_type: MimeType::raw(mime_type),
                 size: size as usize,
             });
@@ -259,7 +259,7 @@ pub fn cbor_to_blob<'b>(blob: &'b BTreeMap<String, Ipld>) -> Option<Blob<'b>> {
     } else if let Some(Ipld::String(value)) = blob.get("cid") {
         if let Some(mime_type) = mime_type {
             return Some(Blob {
-                r#ref: Cid::str(value),
+                r#ref: CidLink::str(value),
                 mime_type: MimeType::raw(mime_type),
                 size: 0,
             });
@@ -281,7 +281,7 @@ pub fn json_to_blob<'b>(blob: &'b serde_json::Map<String, serde_json::Value>) ->
             let size = blob.get("size").and_then(|v| v.as_u64());
             if let (Some(mime_type), Some(size)) = (mime_type, size) {
                 return Some(Blob {
-                    r#ref: Cid::str(value),
+                    r#ref: CidLink::str(value),
                     mime_type: MimeType::raw(mime_type),
                     size: size as usize,
                 });
@@ -290,7 +290,7 @@ pub fn json_to_blob<'b>(blob: &'b serde_json::Map<String, serde_json::Value>) ->
     } else if let Some(value) = blob.get("cid").and_then(|v| v.as_str()) {
         if let Some(mime_type) = mime_type {
             return Some(Blob {
-                r#ref: Cid::str(value),
+                r#ref: CidLink::str(value),
                 mime_type: MimeType::raw(mime_type),
                 size: 0,
             });

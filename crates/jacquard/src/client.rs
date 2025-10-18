@@ -789,6 +789,8 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                 })?,
             ));
             let response = self.send_with_opts(request, opts).await?;
+            let debug: serde_json::Value = serde_json::from_slice(response.buffer()).unwrap();
+            println!("json: {}", serde_json::to_string_pretty(&debug).unwrap());
             let output = response.into_output().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::Auth(auth),
                 XrpcError::Generic(g) => AgentError::Generic(g),
@@ -912,9 +914,80 @@ impl<A: AgentSession> HttpClient for Agent<A> {
     }
 }
 
+#[cfg(feature = "streaming")]
+impl<A> jacquard_common::http_client::HttpClientExt for Agent<A>
+where
+    A: AgentSession + jacquard_common::http_client::HttpClientExt,
+{
+    #[cfg(not(target_arch = "wasm32"))]
+    fn send_http_streaming(
+        &self,
+        request: http::Request<Vec<u8>>,
+    ) -> impl Future<
+        Output = core::result::Result<
+            http::Response<jacquard_common::stream::ByteStream>,
+            Self::Error,
+        >,
+    > + Send {
+        self.inner.send_http_streaming(request)
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    fn send_http_streaming(
+        &self,
+        request: http::Request<Vec<u8>>,
+    ) -> impl Future<
+        Output = core::result::Result<
+            http::Response<jacquard_common::stream::ByteStream>,
+            Self::Error,
+        >,
+    > {
+        self.inner.send_http_streaming(request)
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    fn send_http_bidirectional<Str>(
+        &self,
+        parts: http::request::Parts,
+        body: Str,
+    ) -> impl Future<
+        Output = core::result::Result<
+            http::Response<jacquard_common::stream::ByteStream>,
+            Self::Error,
+        >,
+    > + Send
+    where
+        Str: n0_future::Stream<
+                Item = core::result::Result<bytes::Bytes, jacquard_common::StreamError>,
+            > + Send
+            + 'static,
+    {
+        self.inner.send_http_bidirectional(parts, body)
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    fn send_http_bidirectional<Str>(
+        &self,
+        parts: http::request::Parts,
+        body: Str,
+    ) -> impl Future<
+        Output = core::result::Result<
+            http::Response<jacquard_common::stream::ByteStream>,
+            Self::Error,
+        >,
+    >
+    where
+        Str: n0_future::Stream<
+                Item = core::result::Result<bytes::Bytes, jacquard_common::StreamError>,
+            > + 'static,
+    {
+        self.inner.send_http_bidirectional(parts, body)
+    }
+}
+
 impl<A: AgentSession> XrpcClient for Agent<A> {
-    fn base_uri(&self) -> url::Url {
-        self.inner.base_uri()
+    async fn base_uri(&self) -> url::Url {
+        self.inner.base_uri().await
     }
     fn opts(&self) -> impl Future<Output = CallOptions<'_>> {
         self.inner.opts()
@@ -940,6 +1013,82 @@ impl<A: AgentSession> XrpcClient for Agent<A> {
         <R as XrpcRequest>::Response: Send + Sync,
     {
         self.inner.send_with_opts(request, opts).await
+    }
+}
+
+#[cfg(feature = "streaming")]
+impl<A> jacquard_common::xrpc::XrpcStreamingClient for Agent<A>
+where
+    A: AgentSession + jacquard_common::xrpc::XrpcStreamingClient,
+{
+    #[cfg(not(target_arch = "wasm32"))]
+    fn download<R>(
+        &self,
+        request: R,
+    ) -> impl Future<
+        Output = core::result::Result<
+            jacquard_common::xrpc::StreamingResponse,
+            jacquard_common::StreamError,
+        >,
+    > + Send
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+        Self: Sync,
+    {
+        self.inner.download(request)
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    fn download<R>(
+        &self,
+        request: R,
+    ) -> impl Future<
+        Output = core::result::Result<
+            jacquard_common::xrpc::StreamingResponse,
+            jacquard_common::StreamError,
+        >,
+    >
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+    {
+        self.inner.download(request)
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    fn stream<S>(
+        &self,
+        stream: jacquard_common::xrpc::XrpcProcedureSend<S::Frame<'static>>,
+    ) -> impl Future<
+        Output = core::result::Result<
+            jacquard_common::xrpc::XrpcResponseStream<<<S as jacquard_common::xrpc::XrpcProcedureStream>::Response as jacquard_common::xrpc::XrpcStreamResp>::Frame<'static>>,
+            jacquard_common::StreamError,
+        >,
+    >
+    where
+        S: jacquard_common::xrpc::XrpcProcedureStream + 'static,
+        <<S as jacquard_common::xrpc::XrpcProcedureStream>::Response as jacquard_common::xrpc::XrpcStreamResp>::Frame<'static>: jacquard_common::xrpc::XrpcStreamResp,
+        Self: Sync,
+    {
+        self.inner.stream::<S>(stream)
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    fn stream<S>(
+        &self,
+        stream: jacquard_common::xrpc::XrpcProcedureSend<S::Frame<'static>>,
+    ) -> impl Future<
+        Output = core::result::Result<
+            jacquard_common::xrpc::XrpcResponseStream<<<S as jacquard_common::xrpc::XrpcProcedureStream>::Response as jacquard_common::xrpc::XrpcStreamResp>::Frame<'static>>,
+            jacquard_common::StreamError,
+        >,
+    >
+    where
+        S: jacquard_common::xrpc::XrpcProcedureStream + 'static,
+        <<S as jacquard_common::xrpc::XrpcProcedureStream>::Response as jacquard_common::xrpc::XrpcStreamResp>::Frame<'static>: jacquard_common::xrpc::XrpcStreamResp,
+    {
+        self.inner.stream::<S>(stream)
     }
 }
 

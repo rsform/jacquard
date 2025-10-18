@@ -208,7 +208,7 @@ impl<F: XrpcStreamResp + 'static> XrpcResponseStream<F> {
     }
 }
 
-/// XRPC streaming response
+/// HTTP streaming response
 ///
 /// Similar to `Response<R>` but holds a streaming body instead of a buffer.
 pub struct StreamingResponse {

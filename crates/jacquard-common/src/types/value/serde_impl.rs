@@ -320,7 +320,7 @@ fn apply_type_inference<'s>(mut map: BTreeMap<SmolStr, Data<'s>>) -> Result<Data
 
             if let (Some(ref_cid), Some(mime_cowstr), Some(size)) = (ref_cid, mime_type, size) {
                 return Ok(Data::Blob(Blob {
-                    r#ref: ref_cid,
+                    r#ref: CidLink::str(ref_cid.as_str()).into_static(),
                     mime_type: MimeType::from(mime_cowstr),
                     size,
                 }));
@@ -749,7 +749,7 @@ fn apply_raw_type_inference<'s>(
 
             if let (Some(ref_cid), Some(mime_cowstr), Some(size)) = (ref_cid, mime_type, size) {
                 return Ok(RawData::Blob(Blob {
-                    r#ref: ref_cid,
+                    r#ref: CidLink::str(ref_cid.as_str()).into_static(),
                     mime_type: MimeType::from(mime_cowstr),
                     size,
                 }));
