@@ -5,25 +5,31 @@
     # Get the filtered source from rust-project
     src = config.rust-project.src;
 
+    # Import nixpkgs with rust-overlay for getting rust toolchains (not cross)
+    pkgs-rust = import inputs.nixpkgs {
+      inherit system;
+      overlays = [(import inputs.rust-overlay)];
+    };
+
     # Helper to create a cross-compiled package
     mkCrossPackage = {
       crossSystem,
       rustTarget,
       extraArgs ? {}
     }: let
-      # Import nixpkgs with cross-compilation configured
+      # Import nixpkgs with cross-compilation configured (no overlays)
       pkgs-cross = import inputs.nixpkgs {
         inherit crossSystem;
         localSystem = system;
-        overlays = [(import inputs.rust-overlay)];
       };
 
-      # Set up crane with rust-overlay toolchain for the target
-      craneLib = (inputs.crane.mkLib pkgs-cross).overrideToolchain (p:
-        p.rust-bin.stable.latest.default.override {
-          targets = [rustTarget];
-        }
-      );
+      # Get rust toolchain from host system with the cross target added
+      rustToolchain = pkgs-rust.rust-bin.stable.latest.default.override {
+        targets = [rustTarget];
+      };
+
+      # Set up crane with the rust toolchain
+      craneLib = (inputs.crane.mkLib pkgs-cross).overrideToolchain rustToolchain;
 
       # Common crane args
       commonArgs = {
@@ -101,13 +107,17 @@
         rustTarget = "x86_64-pc-windows-gnu";
       };
 
-      jacquard-lexicon-aarch64-windows = mkCrossPackage {
-        crossSystem = {
-          config = "aarch64-w64-mingw32";
-          libc = "msvcrt";
-        };
-        rustTarget = "aarch64-pc-windows-gnullvm";
-      };
+      # TODO: aarch64-windows cross-compilation broken in nixpkgs
+      # Issue: mingw-w64-pthreads build fails with missing winver.h header
+      # The aarch64-w64-mingw32 toolchain setup in nixpkgs is incomplete
+      # Workaround: build on actual Windows with MSVC or wait for nixpkgs fix
+      # jacquard-lexicon-aarch64-windows = mkCrossPackage {
+      #   crossSystem = {
+      #     config = "aarch64-w64-mingw32";
+      #     useLLVM = true;
+      #   };
+      #   rustTarget = "aarch64-pc-windows-gnullvm";
+      # };
     };
   };
 }

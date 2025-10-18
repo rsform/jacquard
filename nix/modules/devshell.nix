@@ -21,6 +21,7 @@
         cargo-semver-checks
         cargo-binstall
         cargo-dist
+        zip
       ];
     };
   };

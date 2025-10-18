@@ -9,6 +9,11 @@
     #process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
     #cargo-doc-live.url = "github:srid/cargo-doc-live";
 
+    # For cross-compilation
+    crane.url = "github:ipetkov/crane";
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
+
     git-hooks.url = "github:cachix/git-hooks.nix";
     git-hooks.flake = false;
   };
