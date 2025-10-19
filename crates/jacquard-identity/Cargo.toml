@@ -1,7 +1,7 @@
 [package]
 name = "jacquard-identity"
 edition.workspace = true
-version = "0.6.0"
+version = "0.7.0"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -21,7 +21,7 @@ streaming = ["jacquard-common/streaming", "dep:n0-future"]
 trait-variant.workspace = true
 bon.workspace = true
 bytes.workspace = true
-jacquard-common = { version = "0.6", path = "../jacquard-common", features = ["reqwest-client"] }
+jacquard-common = { version = "0.7", path = "../jacquard-common", features = ["reqwest-client"] }
 jacquard-api = {  version = "0.6", path = "../jacquard-api", default-features = false, features = ["minimal"] }
 percent-encoding.workspace = true
 reqwest.workspace = true

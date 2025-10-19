@@ -2242,7 +2242,7 @@ checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 
 [[package]]
 name = "jacquard"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "bon",
  "bytes",
@@ -2251,9 +2251,9 @@ dependencies = [
  "getrandom 0.2.16",
  "http",
  "image",
- "jacquard-api 0.6.1",
+ "jacquard-api 0.6.2",
  "jacquard-common 0.6.0",
- "jacquard-derive 0.6.0",
+ "jacquard-derive 0.6.1",
  "jacquard-identity 0.6.0",
  "jacquard-oauth",
  "jose-jwk",
@@ -2287,7 +2287,7 @@ dependencies = [
  "bon",
  "bytes",
  "jacquard-common 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
- "jacquard-derive 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-derive 0.6.0",
  "miette",
  "serde",
  "serde_ipld_dagcbor",
@@ -2296,12 +2296,12 @@ dependencies = [
 
 [[package]]
 name = "jacquard-api"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "bon",
  "bytes",
  "jacquard-common 0.6.0",
- "jacquard-derive 0.6.0",
+ "jacquard-derive 0.6.1",
  "miette",
  "serde",
  "serde_ipld_dagcbor",
@@ -2320,7 +2320,7 @@ dependencies = [
  "chrono",
  "jacquard",
  "jacquard-common 0.6.0",
- "jacquard-derive 0.6.0",
+ "jacquard-derive 0.6.1",
  "jacquard-identity 0.6.0",
  "k256",
  "miette",
@@ -2423,22 +2423,22 @@ dependencies = [
 [[package]]
 name = "jacquard-derive"
 version = "0.6.0"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#861d9e86c582939ed1d50201954ef1368a91f9b7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.106",
+]
+
+[[package]]
+name = "jacquard-derive"
+version = "0.6.1"
 dependencies = [
  "jacquard-common 0.6.0",
  "proc-macro2",
  "quote",
  "serde",
  "serde_json",
- "syn 2.0.106",
-]
-
-[[package]]
-name = "jacquard-derive"
-version = "0.6.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#861d9e86c582939ed1d50201954ef1368a91f9b7"
-dependencies = [
- "proc-macro2",
- "quote",
  "syn 2.0.106",
 ]
 
@@ -2450,7 +2450,7 @@ dependencies = [
  "bytes",
  "hickory-resolver",
  "http",
- "jacquard-api 0.6.1",
+ "jacquard-api 0.6.2",
  "jacquard-common 0.6.0",
  "miette",
  "n0-future",
@@ -2492,7 +2492,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-lexicon"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "async-trait",
  "clap",

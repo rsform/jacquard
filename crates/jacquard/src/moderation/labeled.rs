@@ -14,6 +14,22 @@ pub trait Labeled<'a> {
     }
 }
 
+/// Record with applied labels
+///
+/// Exists as a bare minimum RecordView type primarily for testing/demonstration.
+pub struct LabeledRecord<'a, C> {
+    /// The record we grabbed labels for
+    pub record: C,
+    /// The labels applied to the record
+    pub labels: Vec<Label<'a>>,
+}
+
+impl<'a, C> Labeled<'a> for LabeledRecord<'a, C> {
+    fn labels(&self) -> &[Label<'a>] {
+        &self.labels
+    }
+}
+
 // Implementations for common Bluesky types
 #[cfg(feature = "api_bluesky")]
 mod bluesky_impls {

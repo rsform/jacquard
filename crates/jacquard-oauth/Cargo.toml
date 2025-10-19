@@ -21,8 +21,8 @@ websocket = ["jacquard-common/websocket"]
 streaming = ["jacquard-common/streaming", "dep:n0-future"]
 
 [dependencies]
-jacquard-common = { version = "0.6", path = "../jacquard-common", features = ["reqwest-client"] }
-jacquard-identity = { version = "0.6", path = "../jacquard-identity" }
+jacquard-common = { version = "0.7", path = "../jacquard-common", features = ["reqwest-client"] }
+jacquard-identity = { version = "0.7", path = "../jacquard-identity" }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 url = { workspace = true }

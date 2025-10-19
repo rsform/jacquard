@@ -5,10 +5,21 @@
 
 #[cfg(feature = "api_bluesky")]
 use crate::api::app_bsky::richtext::facet::Facet;
+#[cfg(feature = "api_bluesky")]
+use crate::api::com_atproto::repo::strong_ref::StrongRef;
 use crate::common::CowStr;
+#[cfg(feature = "api_bluesky")]
+use crate::types::aturi::AtUri;
 use jacquard_common::IntoStatic;
+#[cfg(feature = "api_bluesky")]
+use jacquard_common::http_client::HttpClient;
 use jacquard_common::types::did::{DID_REGEX, Did};
 use jacquard_common::types::handle::HANDLE_REGEX;
+use jacquard_common::types::string::AtStrError;
+use jacquard_common::types::uri::UriParseError;
+use jacquard_identity::resolver::IdentityError;
+#[cfg(feature = "api_bluesky")]
+use jacquard_identity::resolver::IdentityResolver;
 use regex::Regex;
 use std::marker::PhantomData;
 use std::ops::Range;
@@ -101,9 +112,9 @@ pub enum EmbedCandidate<'a> {
     /// Bluesky record (post, list, starterpack, feed)
     Record {
         /// The at:// URI identifying the record
-        at_uri: crate::types::aturi::AtUri<'a>,
+        at_uri: AtUri<'a>,
         /// Strong reference (repo + CID) if resolved
-        strong_ref: Option<crate::api::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        strong_ref: Option<StrongRef<'a>>,
     },
     /// External link embed
     External {
@@ -221,7 +232,7 @@ fn sanitize_text(text: &str) -> String {
 
 /// Entry point for parsing text with automatic facet detection
 ///
-/// Uses default embed domains (bsky.app, deer.social) for at-URI extraction.
+/// Uses default embed domains (bsky.app, deer.social, blacksky.community, catsky.social) for at-URI extraction.
 /// For custom domains, use [`parse_with_domains`].
 pub fn parse(text: impl AsRef<str>) -> RichTextBuilder<Unresolved> {
     #[cfg(feature = "api_bluesky")]
@@ -230,13 +241,13 @@ pub fn parse(text: impl AsRef<str>) -> RichTextBuilder<Unresolved> {
     }
     #[cfg(not(feature = "api_bluesky"))]
     {
-        parse_with_domains(text, &[])
+        parse_with_domains(text)
     }
 }
 
 /// Parse text with custom embed domains for at-URI extraction
 ///
-/// This allows specifying additional domains (beyond bsky.app and deer.social)
+/// This allows specifying additional domains (beyond the defaults)
 /// that use the same URL patterns for records (e.g., /profile/{actor}/post/{rkey}).
 #[cfg(feature = "api_bluesky")]
 pub fn parse_with_domains(
@@ -300,10 +311,7 @@ pub fn parse_with_domains(
 
 /// Parse text without embed detection (no api_bluesky feature)
 #[cfg(not(feature = "api_bluesky"))]
-pub fn parse_with_domains(
-    text: impl AsRef<str>,
-    _embed_domains: &[&str],
-) -> RichTextBuilder<Unresolved> {
+pub fn parse_with_domains(text: impl AsRef<str>) -> RichTextBuilder<Unresolved> {
     // Step 0: Sanitize text (remove invisible chars, normalize newlines)
     let text = sanitize_text(text.as_ref());
 
@@ -378,7 +386,7 @@ impl<S> RichTextBuilder<S> {
     }
 
     /// Add a mention facet with a resolved DID (requires explicit range)
-    pub fn mention(mut self, did: &crate::types::did::Did<'_>, range: Range<usize>) -> Self {
+    pub fn mention(mut self, did: &Did<'_>, range: Range<usize>) -> Self {
         self.facet_candidates.push(FacetCandidate::Mention {
             range,
             did: Some(did.clone().into_static()),
@@ -424,8 +432,8 @@ impl<S> RichTextBuilder<S> {
     /// Add a record embed candidate
     pub fn embed_record(
         mut self,
-        at_uri: crate::types::aturi::AtUri<'static>,
-        strong_ref: Option<crate::api::com_atproto::repo::strong_ref::StrongRef<'static>>,
+        at_uri: AtUri<'static>,
+        strong_ref: Option<StrongRef<'static>>,
     ) -> Self {
         self.embed_candidates
             .get_or_insert_with(Vec::new)
@@ -607,8 +615,6 @@ fn detect_tags(text: &str) -> Vec<FacetCandidate> {
 /// Classifies a URL or at-URI as an embed candidate
 #[cfg(feature = "api_bluesky")]
 fn classify_embed(url: &str, embed_domains: &[&str]) -> Option<EmbedCandidate<'static>> {
-    use crate::types::aturi::AtUri;
-
     // Check if it's an at:// URI
     if url.starts_with("at://") {
         if let Ok(at_uri) = AtUri::new(url) {
@@ -650,12 +656,7 @@ fn classify_embed(url: &str, embed_domains: &[&str]) -> Option<EmbedCandidate<'s
 ///
 /// Only works for domains in the provided `embed_domains` list.
 #[cfg(feature = "api_bluesky")]
-fn extract_at_uri_from_url(
-    url: &str,
-    embed_domains: &[&str],
-) -> Option<crate::types::aturi::AtUri<'static>> {
-    use crate::types::aturi::AtUri;
-
+fn extract_at_uri_from_url(url: &str, embed_domains: &[&str]) -> Option<AtUri<'static>> {
     // Parse URL
     let url_parsed = url::Url::parse(url).ok()?;
 
@@ -693,11 +694,8 @@ fn extract_at_uri_from_url(
     AtUri::new(&at_uri_str).ok().map(|u| u.into_static())
 }
 
-use jacquard_common::types::string::AtStrError;
-use thiserror::Error;
-
 /// Errors that can occur during richtext building
-#[derive(Debug, Error)]
+#[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub enum RichTextError {
     /// Handle found that needs resolution but no resolver provided
     #[error("Handle '{0}' requires resolution - use build_async() with an IdentityResolver")]
@@ -709,7 +707,7 @@ pub enum RichTextError {
 
     /// Identity resolution failed
     #[error("Failed to resolve identity")]
-    IdentityResolution(#[from] jacquard_identity::resolver::IdentityError),
+    IdentityResolution(#[from] IdentityError),
 
     /// Invalid byte range
     #[error("Invalid byte range {start}..{end} for text of length {text_len}")]
@@ -728,7 +726,7 @@ pub enum RichTextError {
 
     /// Invalid URI
     #[error("Invalid URI")]
-    Uri(#[from] jacquard_common::types::uri::UriParseError),
+    Uri(#[from] UriParseError),
 }
 
 #[cfg(feature = "api_bluesky")]
@@ -758,18 +756,19 @@ impl RichTextBuilder<Resolved> {
         let text_len = self.text.len();
 
         for candidate in candidates {
-            use crate::api::app_bsky::richtext::facet::{ByteSlice, Facet};
+            use crate::api::app_bsky::richtext::facet::{
+                ByteSlice, FacetFeaturesItem, Link, Mention, Tag,
+            };
+            use crate::types::uri::Uri;
 
             let (range, feature) = match candidate {
                 FacetCandidate::MarkdownLink { display_range, url } => {
                     // MarkdownLink stores URL directly, use display_range for index
 
-                    let feature = crate::api::app_bsky::richtext::facet::FacetFeaturesItem::Link(
-                        Box::new(crate::api::app_bsky::richtext::facet::Link {
-                            uri: crate::types::uri::Uri::new_owned(&url)?,
-                            extra_data: BTreeMap::new(),
-                        }),
-                    );
+                    let feature = FacetFeaturesItem::Link(Box::new(Link {
+                        uri: Uri::new_owned(&url)?,
+                        extra_data: BTreeMap::new(),
+                    }));
                     (display_range, feature)
                 }
                 FacetCandidate::Mention { range, did } => {
@@ -784,12 +783,10 @@ impl RichTextBuilder<Resolved> {
                         RichTextError::HandleNeedsResolution(handle.to_string())
                     })?;
 
-                    let feature = crate::api::app_bsky::richtext::facet::FacetFeaturesItem::Mention(
-                        Box::new(crate::api::app_bsky::richtext::facet::Mention {
-                            did,
-                            extra_data: BTreeMap::new(),
-                        }),
-                    );
+                    let feature = FacetFeaturesItem::Mention(Box::new(Mention {
+                        did,
+                        extra_data: BTreeMap::new(),
+                    }));
                     (range, feature)
                 }
                 FacetCandidate::Link { range } => {
@@ -809,12 +806,10 @@ impl RichTextBuilder<Resolved> {
                         url = format!("https://{}", url);
                     }
 
-                    let feature = crate::api::app_bsky::richtext::facet::FacetFeaturesItem::Link(
-                        Box::new(crate::api::app_bsky::richtext::facet::Link {
-                            uri: crate::types::uri::Uri::new_owned(&url)?,
-                            extra_data: BTreeMap::new(),
-                        }),
-                    );
+                    let feature = FacetFeaturesItem::Link(Box::new(Link {
+                        uri: Uri::new_owned(&url)?,
+                        extra_data: BTreeMap::new(),
+                    }));
                     (range, feature)
                 }
                 FacetCandidate::Tag { range } => {
@@ -835,12 +830,10 @@ impl RichTextBuilder<Resolved> {
                         .trim_start_matches('#')
                         .trim_start_matches('＃');
 
-                    let feature = crate::api::app_bsky::richtext::facet::FacetFeaturesItem::Tag(
-                        Box::new(crate::api::app_bsky::richtext::facet::Tag {
-                            tag: CowStr::from(tag.to_smolstr()),
-                            extra_data: BTreeMap::new(),
-                        }),
-                    );
+                    let feature = FacetFeaturesItem::Tag(Box::new(Tag {
+                        tag: CowStr::from(tag.to_smolstr()),
+                        extra_data: BTreeMap::new(),
+                    }));
                     (range, feature)
                 }
             };
@@ -884,7 +877,7 @@ impl RichTextBuilder<Unresolved> {
     /// Build richtext, resolving handles to DIDs using the provided resolver
     pub async fn build_async<R>(self, resolver: &R) -> Result<RichText<'static>, RichTextError>
     where
-        R: jacquard_identity::resolver::IdentityResolver + Sync,
+        R: IdentityResolver + Sync,
     {
         use crate::api::app_bsky::richtext::facet::{
             ByteSlice, FacetFeaturesItem, Link, Mention, Tag,
@@ -1040,9 +1033,7 @@ impl RichTextBuilder<Unresolved> {
         client: &C,
     ) -> Result<(RichText<'static>, Option<Vec<EmbedCandidate<'static>>>), RichTextError>
     where
-        C: jacquard_common::http_client::HttpClient
-            + jacquard_identity::resolver::IdentityResolver
-            + Sync,
+        C: HttpClient + IdentityResolver + Sync,
     {
         // Extract embed candidates
         let embed_candidates = self.embed_candidates.take().unwrap_or_default();
@@ -1096,7 +1087,7 @@ async fn fetch_opengraph_metadata<C>(
     url: &str,
 ) -> Result<Option<ExternalMetadata<'static>>, Box<dyn std::error::Error + Send + Sync>>
 where
-    C: jacquard_common::http_client::HttpClient,
+    C: HttpClient,
 {
     // Build HTTP GET request
     let request = http::Request::builder()

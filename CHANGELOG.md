@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.7.0] - 2025-10-19
+
+### Added
+
+**Bluesky-style rich text utilities** (`jacquard`)
+- Rich text parsing with automatic facet detection (mentions, links, hashtags)
+- Compatible with Bluesky, with the addition of support for markdown-style links (`[display](url)` syntax)
+- Embed candidate detection from URLs and at-URIs
+  - Record embeds (posts, lists, starter packs, feeds)
+  - External embeds with optional OpenGraph metadata fetching
+- Configurable embed domains for at-URI extraction (default: bsky.app, deer.social, blacksky.community, catsky.social)
+- Overlap detection and validation for facet byte ranges
+
+**Moderation/labeling client utilities** (`jacquard`)
+- Trait-based content moderation with `Labeled` and `Moderateable` traits
+- Generic moderation decision making via `moderate()` and `moderate_all()`
+- User preference handling (`ModerationPrefs`) with global and per-labeler overrides
+- `ModerationIterExt` trait for filtering/mapping moderation over iterators
+- `Labeled` implementations for Bluesky types (PostView, ProfileView, ListView, Generator, Notification, etc.)
+- `Labeled` implementations for community lexicons (net.anisota, social.grain)
+- `fetch_labels()` and `fetch_labeled_record()` helpers for retrieving labels via XRPC
+- `fetch_labeler_defs()` and `fetch_labeler_defs_direct()` for fetching labeler definitions
+
+**Subscription control** (`jacquard-common`)
+- `SubscriptionControlMessage` trait for dynamic subscription configuration
+- `SubscriptionController` for sending control messages to active WebSocket subscriptions
+- Enables runtime reconfiguration of subscriptions (e.g., Jetstream filtering)
+
+**Lexicons** (`jacquard-api`)
+- teal.fm alpha lexicons for music sharing (fm.teal.alpha.*)
+  - Actor profiles with music service status
+  - Feed generation from play history
+  - Statistics endpoints (top artists, top releases, user stats)
+
+**Examples**
+- Updated `create_post.rs` to demonstrate richtext parsing with automatic facet detection
+
+
 ## [0.6.0] - 2025-10-18
 
 ### Added

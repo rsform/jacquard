@@ -1,15 +1,24 @@
-//! Moderation decision making for AT Protocol content
+//! Moderation
 //!
-//! This module provides protocol-agnostic moderation logic for applying label-based
-//! content filtering. It takes labels from various sources (labeler services, self-labels)
-//! and user preferences to produce moderation decisions.
+//! This is an attempt to semi-generalize the Bluesky moderation system. It avoids
+//! depending on their lexicons as much as reasonably possible. This works via a
+//! trait, [`Labeled`], which represents things that have labels for moderation
+//! applied to them. This way the moderation application functions can operate
+//! primarily via the trait, and are thus generic over lexicon types, and are
+//! easy to use with your own types.
 //!
-//! # Core Concepts
+//! For more complex types which might have labels applied to components,
+//! there is the [`Moderateable`] trait. A mostly complete implementation for
+//! `FeedViewPost` is available for reference. The trait method outputs a `Vec`
+//! of tuples, where the first element is a string tag and the second is the
+//! moderation decision for the tagged element. This lets application developers
+//! change behaviour based on what part of the content got a label. The functions
+//! mostly match Bluesky behaviour (respecting "!hide", and such) by default.
 //!
-//! - **Labels**: Metadata tags applied to content by labelers or authors (see [`Label`](jacquard_api::com_atproto::label::Label))
-//! - **Preferences**: User-configured responses to specific label values (hide, warn, ignore)
-//! - **Definitions**: Labeler-provided metadata about what labels mean and how they should be displayed
-//! - **Decisions**: The output of moderation logic indicating what actions to take
+//! I've taken the time to go through the generated API bindings and implement
+//! the [`Labeled`] trait for a number of types. It's a fairly easy trait to
+//! implement, just not really automatable.
+//!
 //!
 //! # Example
 //!
@@ -27,7 +36,7 @@
 //! ```
 
 mod decision;
-#[cfg(feature = "api_bluesky")]
+#[cfg(feature = "api")]
 mod fetch;
 mod labeled;
 mod moderatable;
@@ -37,9 +46,11 @@ mod types;
 mod tests;
 
 pub use decision::{ModerationIterExt, moderate, moderate_all};
+#[cfg(feature = "api")]
+pub use fetch::{fetch_labeled_record, fetch_labels};
 #[cfg(feature = "api_bluesky")]
 pub use fetch::{fetch_labeler_defs, fetch_labeler_defs_direct};
-pub use labeled::Labeled;
+pub use labeled::{Labeled, LabeledRecord};
 pub use moderatable::Moderateable;
 pub use types::{
     Blur, LabelCause, LabelPref, LabelTarget, LabelerDefs, ModerationDecision, ModerationPrefs,
