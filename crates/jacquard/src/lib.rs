@@ -227,6 +227,10 @@ pub mod streaming;
 /// Rich text utilities for Bluesky posts
 pub mod richtext;
 
+#[cfg(feature = "api")]
+/// Moderation decision making for labeled content
+pub mod moderation;
+
 pub use common::*;
 #[cfg(feature = "api")]
 pub use jacquard_api as api;
