@@ -409,6 +409,26 @@ impl WsSink {
     pub fn into_inner(self) -> Pin<Box<dyn n0_future::Sink<WsMessage, Error = StreamError>>> {
         self.0
     }
+
+    /// get a mutable reference to the inner boxed sink
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn get_mut(
+        &mut self,
+    ) -> &mut Pin<Box<dyn n0_future::Sink<WsMessage, Error = StreamError> + Send>> {
+        use std::borrow::BorrowMut;
+
+        self.0.borrow_mut()
+    }
+
+    /// get a mutable reference to the inner boxed sink
+    #[cfg(target_arch = "wasm32")]
+    pub fn get_mut(
+        &mut self,
+    ) -> &mut Pin<Box<dyn n0_future::Sink<WsMessage, Error = StreamError> + 'static>> {
+        use std::borrow::BorrowMut;
+
+        self.0.borrow_mut()
+    }
 }
 
 impl fmt::Debug for WsSink {

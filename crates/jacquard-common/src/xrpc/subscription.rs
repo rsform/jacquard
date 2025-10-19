@@ -216,6 +216,62 @@ where
     }
 }
 
+/// Websocket subscriber-sent control message
+///
+/// Note: this is not meaningful for atproto event stream endpoints as
+/// those do not support control after the fact. Jetstream does, however.
+///
+/// If you wish to control an ongoing Jetstream connection, wrap the [`WsSink`]
+/// returned from one of the `into_*` methods of the [`SubscriptionStream`]
+/// in a [`SubscriptionController`] with the corresponding message implementing
+/// this trait as a generic parameter.
+pub trait SubscriptionControlMessage: Serialize {
+    /// The subscription this is associated with
+    type Subscription: XrpcSubscription;
+
+    /// Encode the control message for transmission
+    ///
+    /// Defaults to json text (matches Jetstream)
+    fn encode(&self) -> Result<WsMessage, StreamError> {
+        Ok(WsMessage::from(
+            serde_json::to_string(&self).map_err(StreamError::encode)?,
+        ))
+    }
+
+    /// Decode the control message
+    fn decode<'de>(frame: &'de [u8]) -> Result<Self, StreamError>
+    where
+        Self: Deserialize<'de>,
+    {
+        Ok(serde_json::from_slice(frame).map_err(StreamError::decode)?)
+    }
+}
+
+/// Control a websocket stream with a given subscription control message
+pub struct SubscriptionController<S: SubscriptionControlMessage> {
+    controller: WsSink,
+    _marker: PhantomData<fn() -> S>,
+}
+
+impl<S: SubscriptionControlMessage> SubscriptionController<S> {
+    /// Create a new subscription controller from a WebSocket sink.
+    pub fn new(controller: WsSink) -> Self {
+        Self {
+            controller,
+            _marker: PhantomData,
+        }
+    }
+
+    /// Configure the upstream connection via the websocket
+    pub async fn configure(&mut self, params: &S) -> Result<(), StreamError> {
+        let message = params.encode()?;
+
+        n0_future::SinkExt::send(self.controller.get_mut(), message)
+            .await
+            .map_err(StreamError::transport)
+    }
+}
+
 /// Typed subscription stream wrapping a WebSocket connection.
 ///
 /// Analogous to `Response<R>` for XRPC but for subscription streams.
