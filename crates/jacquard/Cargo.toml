@@ -147,6 +147,7 @@ url.workspace = true
 smol_str.workspace = true
 percent-encoding.workspace = true
 regex.workspace = true
+webpage.workspace = true
 jose-jwk = { workspace = true, features = ["p256"] }
 p256 = { workspace = true, features = ["ecdsa"] }
 rand_core.workspace = true

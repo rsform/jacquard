@@ -46,6 +46,31 @@ pub struct Resolved;
 /// Marker type indicating some facets may need resolution (handles → DIDs)
 pub struct Unresolved;
 
+/// Rich text with facets (mentions, links, tags)
+#[derive(Debug, Clone)]
+#[cfg(feature = "api_bluesky")]
+pub struct RichText<'a> {
+    /// The text content
+    pub text: CowStr<'a>,
+    /// Facets (mentions, links, tags)
+    pub facets: Option<Vec<Facet<'a>>>,
+}
+
+#[cfg(feature = "api_bluesky")]
+impl RichText<'static> {
+    /// Entry point for parsing text with automatic facet detection
+    ///
+    /// Uses default embed domains (bsky.app, deer.social) for at-URI extraction.
+    pub fn parse(text: impl Into<String>) -> RichTextBuilder<Unresolved> {
+        parse(text)
+    }
+
+    /// Entry point for manual richtext construction
+    pub fn builder() -> RichTextBuilder<Resolved> {
+        RichTextBuilder::builder()
+    }
+}
+
 /// Detected embed candidate from URL or at-URI
 #[derive(Debug, Clone)]
 #[cfg(feature = "api_bluesky")]
@@ -84,7 +109,7 @@ pub struct RichTextBuilder<State> {
     text: String,
     facet_candidates: Vec<FacetCandidate>,
     #[cfg(feature = "api_bluesky")]
-    embed_candidates: Vec<EmbedCandidate<'static>>,
+    embed_candidates: Option<Vec<EmbedCandidate<'static>>>,
     _state: PhantomData<State>,
 }
 
@@ -193,7 +218,11 @@ pub fn parse_with_domains(
     RichTextBuilder {
         text: text_processed,
         facet_candidates,
-        embed_candidates,
+        embed_candidates: if embed_candidates.is_empty() {
+            None
+        } else {
+            Some(embed_candidates)
+        },
         _state: PhantomData,
     }
 }
@@ -237,14 +266,14 @@ impl RichTextBuilder<Resolved> {
             text: String::new(),
             facet_candidates: Vec::new(),
             #[cfg(feature = "api_bluesky")]
-            embed_candidates: Vec::new(),
+            embed_candidates: None,
             _state: PhantomData,
         }
     }
 
     /// Add a mention by handle (transitions to Unresolved state)
     pub fn mention_handle(
-        self,
+        mut self,
         handle: impl AsRef<str>,
         range: Option<Range<usize>>,
     ) -> RichTextBuilder<Unresolved> {
@@ -255,12 +284,12 @@ impl RichTextBuilder<Resolved> {
             self.find_substring(&search).unwrap_or(0..0)
         });
 
-        let mut facet_candidates = self.facet_candidates;
-        facet_candidates.push(FacetCandidate::Mention { range, did: None });
+        self.facet_candidates
+            .push(FacetCandidate::Mention { range, did: None });
 
         RichTextBuilder {
             text: self.text,
-            facet_candidates,
+            facet_candidates: self.facet_candidates,
             #[cfg(feature = "api_bluesky")]
             embed_candidates: self.embed_candidates,
             _state: PhantomData,
@@ -326,6 +355,7 @@ impl<S> RichTextBuilder<S> {
         strong_ref: Option<crate::api::com_atproto::repo::strong_ref::StrongRef<'static>>,
     ) -> Self {
         self.embed_candidates
+            .get_or_insert_with(Vec::new)
             .push(EmbedCandidate::Record { at_uri, strong_ref });
         self
     }
@@ -337,10 +367,12 @@ impl<S> RichTextBuilder<S> {
         url: impl Into<CowStr<'static>>,
         metadata: Option<ExternalMetadata<'static>>,
     ) -> Self {
-        self.embed_candidates.push(EmbedCandidate::External {
-            url: url.into(),
-            metadata,
-        });
+        self.embed_candidates
+            .get_or_insert_with(Vec::new)
+            .push(EmbedCandidate::External {
+                url: url.into(),
+                metadata,
+            });
         self
     }
 
@@ -620,10 +652,13 @@ pub enum RichTextError {
 #[cfg(feature = "api_bluesky")]
 impl RichTextBuilder<Resolved> {
     /// Build the richtext (sync - all facets must be resolved)
-    pub fn build(self) -> Result<(String, Option<Vec<Facet<'static>>>), RichTextError> {
+    pub fn build(self) -> Result<RichText<'static>, RichTextError> {
         use std::collections::BTreeMap;
         if self.facet_candidates.is_empty() {
-            return Ok((self.text, None));
+            return Ok(RichText {
+                text: CowStr::from(self.text),
+                facets: None,
+            });
         }
 
         // Sort facets by start position
@@ -755,7 +790,10 @@ impl RichTextBuilder<Resolved> {
             last_end = range.end;
         }
 
-        Ok((self.text, Some(facets.into_static())))
+        Ok(RichText {
+            text: CowStr::from(self.text),
+            facets: Some(facets.into_static()),
+        })
     }
 }
 
@@ -765,7 +803,7 @@ impl RichTextBuilder<Unresolved> {
     pub async fn build_async<R>(
         self,
         resolver: &R,
-    ) -> Result<(String, Option<Vec<Facet<'static>>>), RichTextError>
+    ) -> Result<RichText<'static>, RichTextError>
     where
         R: jacquard_identity::resolver::IdentityResolver + Sync,
     {
@@ -775,7 +813,10 @@ impl RichTextBuilder<Unresolved> {
         use std::collections::BTreeMap;
 
         if self.facet_candidates.is_empty() {
-            return Ok((self.text, None));
+            return Ok(RichText {
+                text: CowStr::from(self.text),
+                facets: None,
+            });
         }
 
         // Sort facets by start position
@@ -906,6 +947,121 @@ impl RichTextBuilder<Unresolved> {
             last_end = range.end;
         }
 
-        Ok((self.text, Some(facets.into_static())))
+        Ok(RichText {
+            text: CowStr::from(self.text),
+            facets: Some(facets.into_static()),
+        })
     }
+
+    /// Build richtext with embed resolution using HttpClient
+    ///
+    /// This resolves handles to DIDs and fetches OpenGraph metadata for external links.
+    pub async fn build_with_embeds_async<C>(
+        mut self,
+        client: &C,
+    ) -> Result<(RichText<'static>, Option<Vec<EmbedCandidate<'static>>>), RichTextError>
+    where
+        C: jacquard_common::http_client::HttpClient
+            + jacquard_identity::resolver::IdentityResolver
+            + Sync,
+    {
+        // Extract embed candidates
+        let embed_candidates = self.embed_candidates.take().unwrap_or_default();
+
+        // Build facets (resolves handles)
+        let richtext = self.build_async(client).await?;
+
+        // Now resolve embed candidates
+        let mut resolved_embeds = Vec::new();
+
+        for candidate in embed_candidates {
+            match candidate {
+                EmbedCandidate::Record { at_uri, strong_ref } => {
+                    // TODO: could fetch the record to get CID for strong_ref
+                    // For now, just pass through
+                    resolved_embeds.push(EmbedCandidate::Record { at_uri, strong_ref });
+                }
+                EmbedCandidate::External {
+                    url,
+                    metadata: None,
+                } => {
+                    // Fetch OpenGraph metadata
+                    match fetch_opengraph_metadata(client, &url).await {
+                        Ok(Some(metadata)) => {
+                            resolved_embeds.push(EmbedCandidate::External {
+                                url,
+                                metadata: Some(metadata),
+                            });
+                        }
+                        Ok(None) | Err(_) => {
+                            // If we fail to fetch metadata, include embed without metadata
+                            resolved_embeds.push(EmbedCandidate::External {
+                                url,
+                                metadata: None,
+                            });
+                        }
+                    }
+                }
+                other => resolved_embeds.push(other),
+            }
+        }
+
+        Ok((richtext, Some(resolved_embeds).filter(|v| !v.is_empty())))
+    }
+}
+
+/// Fetch OpenGraph metadata from a URL using the webpage crate
+#[cfg(feature = "api_bluesky")]
+async fn fetch_opengraph_metadata<C>(
+    client: &C,
+    url: &str,
+) -> Result<Option<ExternalMetadata<'static>>, Box<dyn std::error::Error + Send + Sync>>
+where
+    C: jacquard_common::http_client::HttpClient,
+{
+    // Build HTTP GET request
+    let request = http::Request::builder()
+        .method("GET")
+        .uri(url)
+        .header("User-Agent", "jacquard/0.6")
+        .body(Vec::new())
+        .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)?;
+
+    // Fetch the page
+    let response = client
+        .send_http(request)
+        .await
+        .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)?;
+
+    // Parse HTML body
+    let html = String::from_utf8_lossy(response.body());
+
+    // Use webpage crate to extract OpenGraph metadata
+    let info = webpage::HTML::from_string(html.to_string(), Some(url.to_string()))
+        .ok()
+        .map(|html| html.opengraph);
+
+    if let Some(og) = info {
+        // Extract title, description, and thumbnail
+
+        use jacquard_common::cowstr::ToCowStr;
+        let title = og.properties.get("title").map(|s| s.to_cowstr());
+
+        let description = og.properties.get("description").map(|s| s.to_cowstr());
+
+        let thumbnail = og.images.first().map(|img| CowStr::from(img.url.clone()));
+
+        // Only return metadata if we have at least a title
+        if let Some(title) = title {
+            return Ok(Some(ExternalMetadata {
+                title: title.into_static(),
+                description: description
+                    .unwrap_or_else(|| CowStr::new_static(""))
+                    .into_static(),
+                thumbnail: thumbnail.into_static(),
+            }));
+        }
+    }
+
+    Ok(None)
 }

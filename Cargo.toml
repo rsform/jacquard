@@ -83,3 +83,4 @@ jose-jwk = "0.1"
 
 # Text processing
 regex = "1.11"
+webpage = { version = "2.0", default-features = false }
