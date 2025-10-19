@@ -7,31 +7,7 @@ use jacquard_common::error::ClientError;
 use jacquard_common::types::string::Did;
 use jacquard_common::xrpc::{XrpcClient, XrpcError};
 
-/// Fetch labeler definitions from app.bsky.labeler.getServices
-///
-/// This is a convenience helper for fetching labeler service records from Bluesky's
-/// labeler service. You can also fetch these from other indexes or sources and
-/// construct a `LabelerDefs` manually.
-///
-/// # Arguments
-///
-/// * `client` - Any XRPC client (Agent, stateless client, etc.)
-/// * `dids` - List of labeler DIDs to fetch definitions for
-///
-/// # Example
-///
-/// ```no_run
-/// # use jacquard::moderation::fetch_labeler_defs;
-/// # use jacquard::client::BasicClient;
-/// # use jacquard_common::types::string::Did;
-/// # #[tokio::main]
-/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// let client = BasicClient::unauthenticated();
-/// let labeler_did = Did::new_static("did:plc:ar7c4by46qjdydhdevvrndac").unwrap();
-/// let defs = fetch_labeler_defs(&client, vec![labeler_did]).await?;
-/// # Ok(())
-/// # }
-/// ```
+/// Fetch labeler definitions from Bluesky's AppView (or a compatible one)
 pub async fn fetch_labeler_defs(
     client: &(impl XrpcClient + Sync),
     dids: Vec<Did<'_>>,
@@ -85,26 +61,6 @@ pub async fn fetch_labeler_defs(
 /// This fetches the `app.bsky.labeler.service` record directly from the PDS where
 /// the labeler is hosted.
 ///
-/// # Arguments
-///
-/// * `client` - Any XRPC client with fetch_record support (Agent, etc.)
-/// * `dids` - List of labeler DIDs to fetch definitions for
-///
-/// # Example
-///
-/// ```no_run
-/// # use jacquard::moderation::fetch_labeler_defs_direct;
-/// # use jacquard::client::BasicClient;
-/// # use jacquard::prelude::*;
-/// # use jacquard_common::types::string::Did;
-/// # #[tokio::main]
-/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// # let client = BasicClient::unauthenticated();
-/// let labeler_did = Did::new_static("did:plc:ar7c4by46qjdydhdevvrndac").unwrap();
-/// let defs = fetch_labeler_defs_direct(&client, vec![labeler_did]).await?;
-/// # Ok(())
-/// # }
-/// ```
 pub async fn fetch_labeler_defs_direct(
     client: &(impl AgentSessionExt + Sync),
     dids: Vec<Did<'_>>,

@@ -707,7 +707,7 @@ fn test_moderatable_trait() {
     // Use the Moderateable trait with empty accepted_labelers to trust all labels
     let decisions = labeled_post.moderate_all(&prefs, &defs, &[]);
 
-    println!("Moderateable decisions for labeled post:");
+    println!("Moderation decisions for labeled post:");
     for (tag, decision) in &decisions {
         if !decision.causes.is_empty() {
             println!(

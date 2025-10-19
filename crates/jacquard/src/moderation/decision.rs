@@ -11,13 +11,6 @@ use jacquard_common::types::string::{Datetime, Did};
 /// Takes the content, user preferences, labeler definitions, and list of accepted labelers,
 /// and produces a moderation decision indicating what actions to take.
 ///
-/// # Arguments
-///
-/// * `item` - The content to moderate
-/// * `prefs` - User's moderation preferences
-/// * `defs` - Labeler definitions describing what labels mean
-/// * `accepted_labelers` - Which labelers to trust (usually from CallOptions)
-///
 /// # Example
 ///
 /// ```ignore
