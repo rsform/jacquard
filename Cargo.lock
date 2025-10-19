@@ -2238,6 +2238,7 @@ dependencies = [
  "p256",
  "percent-encoding",
  "rand_core 0.6.4",
+ "regex",
  "reqwest",
  "serde",
  "serde_html_form",

@@ -80,3 +80,6 @@ chrono = "0.4"
 # Crypto curves and JOSE
 p256 = "0.13"
 jose-jwk = "0.1"
+
+# Text processing
+regex = "1.11"
