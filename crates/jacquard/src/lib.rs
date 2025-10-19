@@ -223,6 +223,10 @@ pub mod client;
 /// Experimental streaming endpoints
 pub mod streaming;
 
+#[cfg(feature = "api_bluesky")]
+/// Rich text utilities for Bluesky posts
+pub mod richtext;
+
 pub use common::*;
 #[cfg(feature = "api")]
 pub use jacquard_api as api;
