@@ -160,6 +160,7 @@ pub struct AtpSession {
     pub handle: Handle<'static>,
 }
 
+#[cfg(feature = "api")]
 impl From<CreateSessionOutput<'_>> for AtpSession {
     fn from(output: CreateSessionOutput<'_>) -> Self {
         Self {
@@ -171,6 +172,7 @@ impl From<CreateSessionOutput<'_>> for AtpSession {
     }
 }
 
+#[cfg(feature = "api")]
 impl From<RefreshSessionOutput<'_>> for AtpSession {
     fn from(output: RefreshSessionOutput<'_>) -> Self {
         Self {
@@ -891,6 +893,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     }
 }
 
+#[cfg(feature = "api")]
 impl<T: AgentSession + IdentityResolver> AgentSessionExt for T {}
 
 impl<A: AgentSession> HttpClient for Agent<A> {

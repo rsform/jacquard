@@ -242,6 +242,7 @@ pub use jacquard_oauth as oauth;
 /// Prelude with the extension traits you're likely to want and some other stuff
 pub mod prelude {
     pub use crate::client::AgentSession;
+    #[cfg(feature = "api")]
     pub use crate::client::AgentSessionExt;
     pub use crate::client::BasicClient;
     pub use crate::common::http_client::HttpClient;

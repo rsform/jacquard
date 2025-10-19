@@ -3,6 +3,8 @@
 //! Provides parsing and building of rich text with facets (mentions, links, tags)
 //! and detection of embed candidates (record and external embeds).
 
+#[cfg(feature = "api_bluesky")]
+use crate::api::app_bsky::richtext::facet::Facet;
 use crate::common::CowStr;
 use jacquard_common::IntoStatic;
 use jacquard_common::types::did::{DID_REGEX, Did};
@@ -32,6 +34,11 @@ static MARKDOWN_LINK_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\[([^\]]+)\]\(([^)]+)\)").unwrap());
 
 static TRAILING_PUNCT_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\p{P}+$").unwrap());
+
+/// Default domains that support at-URI extraction from URLs
+/// (bsky.app URL patterns like /profile/{actor}/post/{rkey})
+#[cfg(feature = "api_bluesky")]
+static DEFAULT_EMBED_DOMAINS: &[&str] = &["bsky.app", "deer.social"];
 
 /// Marker type indicating all facets are resolved (no handles pending DID resolution)
 pub struct Resolved;
@@ -119,7 +126,84 @@ enum FacetCandidate {
 }
 
 /// Entry point for parsing text with automatic facet detection
+///
+/// Uses default embed domains (bsky.app, deer.social) for at-URI extraction.
+/// For custom domains, use [`parse_with_domains`].
 pub fn parse(text: impl Into<String>) -> RichTextBuilder<Unresolved> {
+    #[cfg(feature = "api_bluesky")]
+    {
+        parse_with_domains(text, DEFAULT_EMBED_DOMAINS)
+    }
+    #[cfg(not(feature = "api_bluesky"))]
+    {
+        parse_with_domains(text, &[])
+    }
+}
+
+/// Parse text with custom embed domains for at-URI extraction
+///
+/// This allows specifying additional domains (beyond bsky.app and deer.social)
+/// that use the same URL patterns for records (e.g., /profile/{actor}/post/{rkey}).
+#[cfg(feature = "api_bluesky")]
+pub fn parse_with_domains(
+    text: impl Into<String>,
+    embed_domains: &[&str],
+) -> RichTextBuilder<Unresolved> {
+    let text = text.into();
+    let mut facet_candidates = Vec::new();
+    let mut embed_candidates = Vec::new();
+
+    // Step 1: Detect and strip markdown links first
+    let (text_processed, markdown_facets) = detect_markdown_links(&text);
+
+    // Check markdown links for embed candidates
+    for facet in &markdown_facets {
+        if let FacetCandidate::MarkdownLink { url, .. } = facet {
+            if let Some(embed) = classify_embed(url, embed_domains) {
+                embed_candidates.push(embed);
+            }
+        }
+    }
+
+    facet_candidates.extend(markdown_facets);
+
+    // Step 2: Detect mentions
+    let mention_facets = detect_mentions(&text_processed);
+    facet_candidates.extend(mention_facets);
+
+    // Step 3: Detect URLs
+    let url_facets = detect_urls(&text_processed);
+
+    // Check URLs for embed candidates
+    for facet in &url_facets {
+        if let FacetCandidate::Link { range } = facet {
+            let url = &text_processed[range.clone()];
+            if let Some(embed) = classify_embed(url, embed_domains) {
+                embed_candidates.push(embed);
+            }
+        }
+    }
+
+    facet_candidates.extend(url_facets);
+
+    // Step 4: Detect tags
+    let tag_facets = detect_tags(&text_processed);
+    facet_candidates.extend(tag_facets);
+
+    RichTextBuilder {
+        text: text_processed,
+        facet_candidates,
+        embed_candidates,
+        _state: PhantomData,
+    }
+}
+
+/// Parse text without embed detection (no api_bluesky feature)
+#[cfg(not(feature = "api_bluesky"))]
+pub fn parse_with_domains(
+    text: impl Into<String>,
+    _embed_domains: &[&str],
+) -> RichTextBuilder<Unresolved> {
     let text = text.into();
     let mut facet_candidates = Vec::new();
 
@@ -142,8 +226,6 @@ pub fn parse(text: impl Into<String>) -> RichTextBuilder<Unresolved> {
     RichTextBuilder {
         text: text_processed,
         facet_candidates,
-        #[cfg(feature = "api_bluesky")]
-        embed_candidates: Vec::new(),
         _state: PhantomData,
     }
 }
@@ -408,6 +490,95 @@ fn detect_tags(text: &str) -> Vec<FacetCandidate> {
     facets
 }
 
+/// Classifies a URL or at-URI as an embed candidate
+#[cfg(feature = "api_bluesky")]
+fn classify_embed(url: &str, embed_domains: &[&str]) -> Option<EmbedCandidate<'static>> {
+    use crate::types::aturi::AtUri;
+
+    // Check if it's an at:// URI
+    if url.starts_with("at://") {
+        if let Ok(at_uri) = AtUri::new(url) {
+            return Some(EmbedCandidate::Record {
+                at_uri: at_uri.into_static(),
+                strong_ref: None,
+            });
+        }
+    }
+
+    // Check if it's an HTTP(S) URL
+    if url.starts_with("http://") || url.starts_with("https://") {
+        // Try to extract at-uri from configured domain URL patterns
+        if let Some(at_uri) = extract_at_uri_from_url(url, embed_domains) {
+            return Some(EmbedCandidate::Record {
+                at_uri,
+                strong_ref: None,
+            });
+        }
+
+        // Otherwise, it's an external embed
+        return Some(EmbedCandidate::External {
+            url: CowStr::from(url.to_string()),
+            metadata: None,
+        });
+    }
+
+    None
+}
+
+/// Extracts an at-URI from a URL with bsky.app-style path patterns
+///
+/// Supports these patterns:
+/// - https://{domain}/profile/{handle|did}/post/{rkey} → at://{actor}/app.bsky.feed.post/{rkey}
+/// - https://{domain}/profile/{handle|did}/lists/{rkey} → at://{actor}/app.bsky.graph.list/{rkey}
+/// - https://{domain}/profile/{handle|did}/feed/{rkey} → at://{actor}/app.bsky.feed.generator/{rkey}
+/// - https://{domain}/starter-pack/{handle|did}/{rkey} → at://{actor}/app.bsky.graph.starterpack/{rkey}
+/// - https://{domain}/profile/{handle|did}/{collection}/{rkey} → at://{actor}/{collection}/{rkey} (if collection looks like NSID)
+///
+/// Only works for domains in the provided `embed_domains` list.
+#[cfg(feature = "api_bluesky")]
+fn extract_at_uri_from_url(
+    url: &str,
+    embed_domains: &[&str],
+) -> Option<crate::types::aturi::AtUri<'static>> {
+    use crate::types::aturi::AtUri;
+
+    // Parse URL
+    let url_parsed = url::Url::parse(url).ok()?;
+
+    // Check if domain is in allowed list
+    let domain = url_parsed.domain()?;
+    if !embed_domains.contains(&domain) {
+        return None;
+    }
+
+    let path = url_parsed.path();
+    let segments: Vec<&str> = path.split('/').filter(|s| !s.is_empty()).collect();
+
+    let at_uri_str = match segments.as_slice() {
+        // Known shortcuts
+        ["profile", actor, "post", rkey] => {
+            format!("at://{}/app.bsky.feed.post/{}", actor, rkey)
+        }
+        ["profile", actor, "lists", rkey] => {
+            format!("at://{}/app.bsky.graph.list/{}", actor, rkey)
+        }
+        ["profile", actor, "feed", rkey] => {
+            format!("at://{}/app.bsky.feed.generator/{}", actor, rkey)
+        }
+        ["starter-pack", actor, rkey] => {
+            format!("at://{}/app.bsky.graph.starterpack/{}", actor, rkey)
+        }
+        // Generic pattern: /profile/{actor}/{collection}/{rkey}
+        // Accept if collection looks like it could be an NSID (contains dots)
+        ["profile", actor, collection, rkey] if collection.contains('.') => {
+            format!("at://{}/{}/{}", actor, collection, rkey)
+        }
+        _ => return None,
+    };
+
+    AtUri::new(&at_uri_str).ok().map(|u| u.into_static())
+}
+
 use jacquard_common::types::string::AtStrError;
 use thiserror::Error;
 
@@ -429,8 +600,11 @@ pub enum RichTextError {
     /// Invalid byte range
     #[error("Invalid byte range {start}..{end} for text of length {text_len}")]
     InvalidRange {
+        /// Range start position
         start: usize,
+        /// Range end position
         end: usize,
+        /// Total text length
         text_len: usize,
     },
 
@@ -446,15 +620,7 @@ pub enum RichTextError {
 #[cfg(feature = "api_bluesky")]
 impl RichTextBuilder<Resolved> {
     /// Build the richtext (sync - all facets must be resolved)
-    pub fn build(
-        self,
-    ) -> Result<
-        (
-            String,
-            Option<Vec<crate::api::app_bsky::richtext::facet::Facet<'static>>>,
-        ),
-        RichTextError,
-    > {
+    pub fn build(self) -> Result<(String, Option<Vec<Facet<'static>>>), RichTextError> {
         use std::collections::BTreeMap;
         if self.facet_candidates.is_empty() {
             return Ok((self.text, None));
@@ -475,6 +641,8 @@ impl RichTextBuilder<Resolved> {
         let text_len = self.text.len();
 
         for candidate in candidates {
+            use crate::api::app_bsky::richtext::facet::{ByteSlice, Facet};
+
             let (range, feature) = match candidate {
                 FacetCandidate::MarkdownLink { display_range, url } => {
                     // MarkdownLink stores URL directly, use display_range for index
@@ -574,8 +742,159 @@ impl RichTextBuilder<Resolved> {
                 });
             }
 
-            facets.push(crate::api::app_bsky::richtext::facet::Facet {
-                index: crate::api::app_bsky::richtext::facet::ByteSlice {
+            facets.push(Facet {
+                index: ByteSlice {
+                    byte_start: range.start as i64,
+                    byte_end: range.end as i64,
+                    extra_data: BTreeMap::new(),
+                },
+                features: vec![feature],
+                extra_data: BTreeMap::new(),
+            });
+
+            last_end = range.end;
+        }
+
+        Ok((self.text, Some(facets.into_static())))
+    }
+}
+
+#[cfg(feature = "api_bluesky")]
+impl RichTextBuilder<Unresolved> {
+    /// Build richtext, resolving handles to DIDs using the provided resolver
+    pub async fn build_async<R>(
+        self,
+        resolver: &R,
+    ) -> Result<(String, Option<Vec<Facet<'static>>>), RichTextError>
+    where
+        R: jacquard_identity::resolver::IdentityResolver + Sync,
+    {
+        use crate::api::app_bsky::richtext::facet::{
+            ByteSlice, FacetFeaturesItem, Link, Mention, Tag,
+        };
+        use std::collections::BTreeMap;
+
+        if self.facet_candidates.is_empty() {
+            return Ok((self.text, None));
+        }
+
+        // Sort facets by start position
+        let mut candidates = self.facet_candidates;
+        candidates.sort_by_key(|fc| match fc {
+            FacetCandidate::MarkdownLink { display_range, .. } => display_range.start,
+            FacetCandidate::Mention { range, .. } => range.start,
+            FacetCandidate::Link { range } => range.start,
+            FacetCandidate::Tag { range } => range.start,
+        });
+
+        // Resolve handles and convert to Facet types
+        let mut facets = Vec::with_capacity(candidates.len());
+        let mut last_end = 0;
+        let text_len = self.text.len();
+
+        for candidate in candidates {
+            let (range, feature) = match candidate {
+                FacetCandidate::MarkdownLink { display_range, url } => {
+                    // MarkdownLink stores URL directly, use display_range for index
+
+                    let feature = FacetFeaturesItem::Link(Box::new(Link {
+                        uri: crate::types::uri::Uri::new_owned(&url)?,
+                        extra_data: BTreeMap::new(),
+                    }));
+                    (display_range, feature)
+                }
+                FacetCandidate::Mention { range, did } => {
+                    let did = if let Some(did) = did {
+                        // Already resolved
+                        did
+                    } else {
+                        // Extract handle from text and resolve
+                        if range.end > text_len {
+                            return Err(RichTextError::InvalidRange {
+                                start: range.start,
+                                end: range.end,
+                                text_len,
+                            });
+                        }
+
+                        let handle_str = self.text[range.clone()].trim_start_matches('@');
+                        let handle = jacquard_common::types::handle::Handle::new(handle_str)?;
+
+                        resolver.resolve_handle(&handle).await?
+                    };
+
+                    let feature = FacetFeaturesItem::Mention(Box::new(Mention {
+                        did,
+                        extra_data: BTreeMap::new(),
+                    }));
+                    (range, feature)
+                }
+                FacetCandidate::Link { range } => {
+                    // Extract URL from text[range] and normalize
+
+                    if range.end > text_len {
+                        return Err(RichTextError::InvalidRange {
+                            start: range.start,
+                            end: range.end,
+                            text_len,
+                        });
+                    }
+
+                    let mut url = self.text[range.clone()].to_string();
+
+                    // Prepend https:// if URL doesn't have a scheme
+                    if !url.starts_with("http://") && !url.starts_with("https://") {
+                        url = format!("https://{}", url);
+                    }
+
+                    let feature = FacetFeaturesItem::Link(Box::new(Link {
+                        uri: crate::types::uri::Uri::new_owned(&url)?,
+                        extra_data: BTreeMap::new(),
+                    }));
+                    (range, feature)
+                }
+                FacetCandidate::Tag { range } => {
+                    // Extract tag from text[range] (includes #), strip # and trailing punct
+
+                    use smol_str::ToSmolStr;
+                    if range.end > text_len {
+                        return Err(RichTextError::InvalidRange {
+                            start: range.start,
+                            end: range.end,
+                            text_len,
+                        });
+                    }
+
+                    let tag_with_hash = &self.text[range.clone()];
+                    // Strip # prefix (could be # or ＃)
+                    let tag = tag_with_hash
+                        .trim_start_matches('#')
+                        .trim_start_matches('＃');
+
+                    let feature = FacetFeaturesItem::Tag(Box::new(Tag {
+                        tag: CowStr::from(tag.to_smolstr()),
+                        extra_data: BTreeMap::new(),
+                    }));
+                    (range, feature)
+                }
+            };
+
+            // Check overlap
+            if range.start < last_end {
+                return Err(RichTextError::OverlappingFacets(range.start, range.end));
+            }
+
+            // Validate range
+            if range.end > text_len {
+                return Err(RichTextError::InvalidRange {
+                    start: range.start,
+                    end: range.end,
+                    text_len,
+                });
+            }
+
+            facets.push(Facet {
+                index: ByteSlice {
                     byte_start: range.start as i64,
                     byte_end: range.end as i64,
                     extra_data: BTreeMap::new(),
