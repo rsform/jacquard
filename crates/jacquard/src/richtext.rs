@@ -4,6 +4,9 @@
 //! and detection of embed candidates (record and external embeds).
 
 use crate::common::CowStr;
+use jacquard_common::IntoStatic;
+use jacquard_common::types::did::{DID_REGEX, Did};
+use jacquard_common::types::handle::HANDLE_REGEX;
 use regex::Regex;
 use std::marker::PhantomData;
 use std::ops::Range;
@@ -73,6 +76,8 @@ pub struct ExternalMetadata<'a> {
 pub struct RichTextBuilder<State> {
     text: String,
     facet_candidates: Vec<FacetCandidate>,
+    #[cfg(feature = "api_bluesky")]
+    embed_candidates: Vec<EmbedCandidate<'static>>,
     _state: PhantomData<State>,
 }
 
@@ -401,4 +406,187 @@ fn detect_tags(text: &str) -> Vec<FacetCandidate> {
     }
 
     facets
+}
+
+use jacquard_common::types::string::AtStrError;
+use thiserror::Error;
+
+/// Errors that can occur during richtext building
+#[derive(Debug, Error)]
+pub enum RichTextError {
+    /// Handle found that needs resolution but no resolver provided
+    #[error("Handle '{0}' requires resolution - use build_async() with an IdentityResolver")]
+    HandleNeedsResolution(String),
+
+    /// Facets overlap (not allowed by spec)
+    #[error("Facets overlap at byte range {0}..{1}")]
+    OverlappingFacets(usize, usize),
+
+    /// Identity resolution failed
+    #[error("Failed to resolve identity")]
+    IdentityResolution(#[from] jacquard_identity::resolver::IdentityError),
+
+    /// Invalid byte range
+    #[error("Invalid byte range {start}..{end} for text of length {text_len}")]
+    InvalidRange {
+        start: usize,
+        end: usize,
+        text_len: usize,
+    },
+
+    /// Invalid AT Protocol string (URI, DID, or Handle)
+    #[error("Invalid AT Protocol string")]
+    InvalidAtStr(#[from] AtStrError),
+
+    /// Invalid URI
+    #[error("Invalid URI")]
+    Uri(#[from] jacquard_common::types::uri::UriParseError),
+}
+
+#[cfg(feature = "api_bluesky")]
+impl RichTextBuilder<Resolved> {
+    /// Build the richtext (sync - all facets must be resolved)
+    pub fn build(
+        self,
+    ) -> Result<
+        (
+            String,
+            Option<Vec<crate::api::app_bsky::richtext::facet::Facet<'static>>>,
+        ),
+        RichTextError,
+    > {
+        use std::collections::BTreeMap;
+        if self.facet_candidates.is_empty() {
+            return Ok((self.text, None));
+        }
+
+        // Sort facets by start position
+        let mut candidates = self.facet_candidates;
+        candidates.sort_by_key(|fc| match fc {
+            FacetCandidate::MarkdownLink { display_range, .. } => display_range.start,
+            FacetCandidate::Mention { range, .. } => range.start,
+            FacetCandidate::Link { range } => range.start,
+            FacetCandidate::Tag { range } => range.start,
+        });
+
+        // Check for overlaps and convert to Facet types
+        let mut facets = Vec::with_capacity(candidates.len());
+        let mut last_end = 0;
+        let text_len = self.text.len();
+
+        for candidate in candidates {
+            let (range, feature) = match candidate {
+                FacetCandidate::MarkdownLink { display_range, url } => {
+                    // MarkdownLink stores URL directly, use display_range for index
+
+                    let feature = crate::api::app_bsky::richtext::facet::FacetFeaturesItem::Link(
+                        Box::new(crate::api::app_bsky::richtext::facet::Link {
+                            uri: crate::types::uri::Uri::new_owned(&url)?,
+                            extra_data: BTreeMap::new(),
+                        }),
+                    );
+                    (display_range, feature)
+                }
+                FacetCandidate::Mention { range, did } => {
+                    // In Resolved state, DID must be present
+                    let did = did.ok_or_else(|| {
+                        // Extract handle from text for error message
+                        let handle = if range.end <= text_len {
+                            self.text[range.clone()].trim_start_matches('@')
+                        } else {
+                            "<invalid range>"
+                        };
+                        RichTextError::HandleNeedsResolution(handle.to_string())
+                    })?;
+
+                    let feature = crate::api::app_bsky::richtext::facet::FacetFeaturesItem::Mention(
+                        Box::new(crate::api::app_bsky::richtext::facet::Mention {
+                            did,
+                            extra_data: BTreeMap::new(),
+                        }),
+                    );
+                    (range, feature)
+                }
+                FacetCandidate::Link { range } => {
+                    // Extract URL from text[range] and normalize
+                    if range.end > text_len {
+                        return Err(RichTextError::InvalidRange {
+                            start: range.start,
+                            end: range.end,
+                            text_len,
+                        });
+                    }
+
+                    let mut url = self.text[range.clone()].to_string();
+
+                    // Prepend https:// if URL doesn't have a scheme
+                    if !url.starts_with("http://") && !url.starts_with("https://") {
+                        url = format!("https://{}", url);
+                    }
+
+                    let feature = crate::api::app_bsky::richtext::facet::FacetFeaturesItem::Link(
+                        Box::new(crate::api::app_bsky::richtext::facet::Link {
+                            uri: crate::types::uri::Uri::new_owned(&url)?,
+                            extra_data: BTreeMap::new(),
+                        }),
+                    );
+                    (range, feature)
+                }
+                FacetCandidate::Tag { range } => {
+                    // Extract tag from text[range] (includes #), strip # and trailing punct
+
+                    use smol_str::ToSmolStr;
+                    if range.end > text_len {
+                        return Err(RichTextError::InvalidRange {
+                            start: range.start,
+                            end: range.end,
+                            text_len,
+                        });
+                    }
+
+                    let tag_with_hash = &self.text[range.clone()];
+                    // Strip # prefix (could be # or ＃)
+                    let tag = tag_with_hash
+                        .trim_start_matches('#')
+                        .trim_start_matches('＃');
+
+                    let feature = crate::api::app_bsky::richtext::facet::FacetFeaturesItem::Tag(
+                        Box::new(crate::api::app_bsky::richtext::facet::Tag {
+                            tag: CowStr::from(tag.to_smolstr()),
+                            extra_data: BTreeMap::new(),
+                        }),
+                    );
+                    (range, feature)
+                }
+            };
+
+            // Check overlap
+            if range.start < last_end {
+                return Err(RichTextError::OverlappingFacets(range.start, range.end));
+            }
+
+            // Validate range
+            if range.end > text_len {
+                return Err(RichTextError::InvalidRange {
+                    start: range.start,
+                    end: range.end,
+                    text_len,
+                });
+            }
+
+            facets.push(crate::api::app_bsky::richtext::facet::Facet {
+                index: crate::api::app_bsky::richtext::facet::ByteSlice {
+                    byte_start: range.start as i64,
+                    byte_end: range.end as i64,
+                    extra_data: BTreeMap::new(),
+                },
+                features: vec![feature],
+                extra_data: BTreeMap::new(),
+            });
+
+            last_end = range.end;
+        }
+
+        Ok((self.text, Some(facets.into_static())))
+    }
 }
