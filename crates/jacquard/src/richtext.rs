@@ -26,8 +26,20 @@ static URL_REGEX: LazyLock<Regex> = LazyLock::new(|| {
 });
 
 static TAG_REGEX: LazyLock<Regex> = LazyLock::new(|| {
-    // Simplified version - full unicode handling would need more work
-    Regex::new(r"(^|\s)[#＃]([^\s\x{00AD}\x{2060}\x{200A}\x{200B}\x{200C}\x{200D}]+)").unwrap()
+    // Pattern: (^|\s)[#＃](prefix* core+ suffix*)?
+    //
+    // - prefix: [^\s\u{00AD}...]* - any chars except spaces/zero-width (optional)
+    // - core: [^\d\s\p{P}\u{00AD}...]+ - at least one char that's not digit/space/punct/zero-width (required)
+    // - suffix: [^\s\u{00AD}...]* - any chars except spaces/zero-width (optional)
+    //
+    // Zero-width chars excluded: \u{00AD} (soft hyphen), \u{2060} (word joiner),
+    //   \u{200A}-\u{200D} (hair space, zero-width space/joiner/non-joiner), \u{20e2} (combining mark)
+    //
+    // Note: emoji modifier (\ufe0f) is filtered in detect_tags() since Rust regex
+    // doesn't support negative lookahead
+    Regex::new(
+        r"(^|\s)[#＃]([^\s\u{00AD}\u{2060}\u{200A}\u{200B}\u{200C}\u{200D}\u{20e2}]*[^\d\s\p{P}\u{00AD}\u{2060}\u{200A}\u{200B}\u{200C}\u{200D}\u{20e2}]+[^\s\u{00AD}\u{2060}\u{200A}\u{200B}\u{200C}\u{200D}\u{20e2}]*)?"
+    ).unwrap()
 });
 
 static MARKDOWN_LINK_REGEX: LazyLock<Regex> =
@@ -552,8 +564,17 @@ fn detect_tags(text: &str) -> Vec<FacetCandidate> {
     let mut facets = Vec::new();
 
     for cap in TAG_REGEX.captures_iter(text) {
-        let tag_match = cap.get(2).unwrap();
+        // capture group 2 is optional, skip if empty (just # with nothing after)
+        let tag_match = match cap.get(2) {
+            Some(m) => m,
+            None => continue,
+        };
         let tag_str = tag_match.as_str();
+
+        // Filter out tags starting with emoji modifier (since regex can't do negative lookahead)
+        if tag_str.starts_with('\u{fe0f}') {
+            continue;
+        }
 
         // Calculate trimmed length after stripping trailing punctuation
         let trimmed_len = if let Some(trimmed) = TRAILING_PUNCT_REGEX.find(tag_str) {
