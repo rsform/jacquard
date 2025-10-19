@@ -18,7 +18,7 @@ use std::sync::LazyLock;
 // https://github.com/bluesky-social/atproto/blob/main/packages/api/src/rich-text/util.ts
 
 static MENTION_REGEX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(^|\s|\()(@)([a-zA-Z0-9.-]+)(\b)").unwrap());
+    LazyLock::new(|| Regex::new(r"(^|\s|\()(@)([a-zA-Z0-9.:-]+)(\b)").unwrap());
 
 static URL_REGEX: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(^|\s|\()((https?://[\S]+)|((?<domain>[a-z][a-z0-9]*(\.[a-z0-9]+)+)[\S]*))")
@@ -34,6 +34,13 @@ static MARKDOWN_LINK_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\[([^\]]+)\]\(([^)]+)\)").unwrap());
 
 static TRAILING_PUNCT_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\p{P}+$").unwrap());
+
+// Sanitization regex - removes soft hyphens, zero-width chars, normalizes newlines
+// Matches one of the special chars, optionally followed by whitespace, repeated
+// This ensures at least one special char is in the match (won't match pure spaces)
+static SANITIZE_NEWLINES_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"([\r\n\u{00AD}\u{2060}\u{200D}\u{200C}\u{200B}]\s*)+").unwrap()
+});
 
 /// Default domains that support at-URI extraction from URLs
 /// (bsky.app URL patterns like /profile/{actor}/post/{rkey})
@@ -61,7 +68,7 @@ impl RichText<'static> {
     /// Entry point for parsing text with automatic facet detection
     ///
     /// Uses default embed domains (bsky.app, deer.social) for at-URI extraction.
-    pub fn parse(text: impl Into<String>) -> RichTextBuilder<Unresolved> {
+    pub fn parse(text: impl AsRef<str>) -> RichTextBuilder<Unresolved> {
         parse(text)
     }
 
@@ -150,11 +157,57 @@ enum FacetCandidate {
     },
 }
 
+/// Sanitize text by removing invisible characters and normalizing newlines
+///
+/// This removes:
+/// - Soft hyphens (\u{00AD})
+/// - Zero-width non-joiner (\u{200C})
+/// - Zero-width joiner (\u{200D})
+/// - Zero-width space (\u{200B})
+/// - Word joiner (\u{2060})
+///
+/// And normalizes all newline variants (\r\n, \r, \n) to \n, while collapsing
+/// runs of newlines and invisible chars to at most two newlines.
+fn sanitize_text(text: &str) -> String {
+    SANITIZE_NEWLINES_REGEX
+        .replace_all(text, |caps: &regex::Captures| {
+            let matched = caps.get(0).unwrap().as_str();
+
+            // Count newline sequences, treating \r\n as one unit
+            let mut newline_sequences = 0;
+            let mut chars = matched.chars().peekable();
+
+            while let Some(c) = chars.next() {
+                if c == '\r' {
+                    // Check if followed by \n
+                    if chars.peek() == Some(&'\n') {
+                        chars.next(); // consume the \n
+                    }
+                    newline_sequences += 1;
+                } else if c == '\n' {
+                    newline_sequences += 1;
+                }
+                // Skip invisible chars (they don't increment count)
+            }
+
+            if newline_sequences == 0 {
+                // Only invisible chars, remove them
+                ""
+            } else if newline_sequences == 1 {
+                "\n"
+            } else {
+                // Multiple newlines, collapse to \n\n (paragraph break)
+                "\n\n"
+            }
+        })
+        .to_string()
+}
+
 /// Entry point for parsing text with automatic facet detection
 ///
 /// Uses default embed domains (bsky.app, deer.social) for at-URI extraction.
 /// For custom domains, use [`parse_with_domains`].
-pub fn parse(text: impl Into<String>) -> RichTextBuilder<Unresolved> {
+pub fn parse(text: impl AsRef<str>) -> RichTextBuilder<Unresolved> {
     #[cfg(feature = "api_bluesky")]
     {
         parse_with_domains(text, DEFAULT_EMBED_DOMAINS)
@@ -171,10 +224,12 @@ pub fn parse(text: impl Into<String>) -> RichTextBuilder<Unresolved> {
 /// that use the same URL patterns for records (e.g., /profile/{actor}/post/{rkey}).
 #[cfg(feature = "api_bluesky")]
 pub fn parse_with_domains(
-    text: impl Into<String>,
+    text: impl AsRef<str>,
     embed_domains: &[&str],
 ) -> RichTextBuilder<Unresolved> {
-    let text = text.into();
+    // Step 0: Sanitize text (remove invisible chars, normalize newlines)
+    let text = sanitize_text(text.as_ref());
+
     let mut facet_candidates = Vec::new();
     let mut embed_candidates = Vec::new();
 
@@ -230,10 +285,12 @@ pub fn parse_with_domains(
 /// Parse text without embed detection (no api_bluesky feature)
 #[cfg(not(feature = "api_bluesky"))]
 pub fn parse_with_domains(
-    text: impl Into<String>,
+    text: impl AsRef<str>,
     _embed_domains: &[&str],
 ) -> RichTextBuilder<Unresolved> {
-    let text = text.into();
+    // Step 0: Sanitize text (remove invisible chars, normalize newlines)
+    let text = sanitize_text(text.as_ref());
+
     let mut facet_candidates = Vec::new();
 
     // Step 1: Detect and strip markdown links first
@@ -299,8 +356,8 @@ impl RichTextBuilder<Resolved> {
 
 impl<S> RichTextBuilder<S> {
     /// Set the text content
-    pub fn text(mut self, text: impl Into<String>) -> Self {
-        self.text = text.into();
+    pub fn text(mut self, text: impl AsRef<str>) -> Self {
+        self.text = sanitize_text(text.as_ref());
         self
     }
 
@@ -800,10 +857,7 @@ impl RichTextBuilder<Resolved> {
 #[cfg(feature = "api_bluesky")]
 impl RichTextBuilder<Unresolved> {
     /// Build richtext, resolving handles to DIDs using the provided resolver
-    pub async fn build_async<R>(
-        self,
-        resolver: &R,
-    ) -> Result<RichText<'static>, RichTextError>
+    pub async fn build_async<R>(self, resolver: &R) -> Result<RichText<'static>, RichTextError>
     where
         R: jacquard_identity::resolver::IdentityResolver + Sync,
     {
@@ -1065,3 +1119,6 @@ where
 
     Ok(None)
 }
+
+#[cfg(test)]
+mod tests;
