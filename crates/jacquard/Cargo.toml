@@ -20,8 +20,7 @@ api = ["jacquard-api/minimal"]
 api_bluesky = ["api", "jacquard-api/bluesky"]
 # Bluesky API bindings, plus a curated selection of community lexicons
 api_full = [
-    "api",
-    "jacquard-api/bluesky",
+    "api_bluesky",
     "jacquard-api/other",
     "jacquard-api/lexicon_community",
 ]

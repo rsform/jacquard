@@ -38,7 +38,7 @@ mod tests;
 
 pub use decision::{ModerationIterExt, moderate, moderate_all};
 #[cfg(feature = "api_bluesky")]
-pub use fetch::fetch_labeler_defs;
+pub use fetch::{fetch_labeler_defs, fetch_labeler_defs_direct};
 pub use labeled::Labeled;
 pub use moderatable::Moderateable;
 pub use types::{
