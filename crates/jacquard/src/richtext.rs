@@ -38,14 +38,18 @@ static TRAILING_PUNCT_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\p{
 // Sanitization regex - removes soft hyphens, zero-width chars, normalizes newlines
 // Matches one of the special chars, optionally followed by whitespace, repeated
 // This ensures at least one special char is in the match (won't match pure spaces)
-static SANITIZE_NEWLINES_REGEX: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"([\r\n\u{00AD}\u{2060}\u{200D}\u{200C}\u{200B}]\s*)+").unwrap()
-});
+static SANITIZE_NEWLINES_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"([\r\n\u{00AD}\u{2060}\u{200D}\u{200C}\u{200B}]\s*)+").unwrap());
 
 /// Default domains that support at-URI extraction from URLs
 /// (bsky.app URL patterns like /profile/{actor}/post/{rkey})
 #[cfg(feature = "api_bluesky")]
-static DEFAULT_EMBED_DOMAINS: &[&str] = &["bsky.app", "deer.social"];
+static DEFAULT_EMBED_DOMAINS: &[&str] = &[
+    "bsky.app",
+    "deer.social",
+    "blacksky.community",
+    "catsky.social",
+];
 
 /// Marker type indicating all facets are resolved (no handles pending DID resolution)
 pub struct Resolved;
