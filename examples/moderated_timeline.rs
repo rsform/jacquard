@@ -6,12 +6,13 @@ use jacquard::api::app_bsky::labeler::get_services::GetServicesOutput;
 use jacquard::client::{Agent, FileAuthStore};
 use jacquard::cowstr::ToCowStr;
 use jacquard::from_data;
-use jacquard::moderation::{Moderateable, ModerationPrefs, fetch_labeler_defs};
+use jacquard::moderation::{Blur, Moderateable, ModerationPrefs, fetch_labeler_defs};
 use jacquard::oauth::atproto::AtprotoClientMetadata;
 use jacquard::oauth::client::OAuthClient;
 use jacquard::oauth::loopback::LoopbackConfig;
 use jacquard::xrpc::{CallOptions, XrpcClient};
 use jacquard_api::app_bsky::feed::{ReplyRefParent, ReplyRefRoot};
+use jacquard_api::app_bsky::labeler::get_services::GetServicesOutputViewsItem;
 
 // To save having to fetch prefs, etc., we're borrowing some from our test cases.
 const LABELER_SERVICES_JSON: &str =
@@ -45,7 +46,6 @@ async fn main() -> miette::Result<()> {
         serde_json::from_str(LABELER_SERVICES_JSON).expect("failed to parse labeler services");
 
     let mut accepted_labelers = Vec::new();
-    use jacquard::api::app_bsky::labeler::get_services::GetServicesOutputViewsItem;
 
     for view in services.views {
         if let GetServicesOutputViewsItem::LabelerViewDetailed(detailed) = view {
@@ -115,7 +115,7 @@ async fn main() -> miette::Result<()> {
             filtered += 1;
         } else if decisions
             .iter()
-            .any(|(_, d)| d.blur != jacquard::moderation::Blur::None || d.alert)
+            .any(|(_, d)| d.blur != Blur::None || d.alert)
         {
             warned += 1;
         } else {
@@ -162,7 +162,7 @@ async fn main() -> miette::Result<()> {
                 );
                 if decision.filter {
                     println!("      → Would be hidden");
-                } else if decision.blur != jacquard::moderation::Blur::None {
+                } else if decision.blur != Blur::None {
                     println!("      → Would be blurred ({:?})", decision.blur);
                 }
                 if decision.alert {
