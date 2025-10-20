@@ -20,7 +20,9 @@ It is also designed around zero-copy/borrowed deserialization: types like [`Post
   - Generic implementation of atproto moderation/labeling client-side filtering/tagging via traits
   - Implementations for Bluesky and other types on best-effort basis
   - Demonstration options for use while avoiding Bluesky namespace or AppView infrastructure
-- Fixed some Data value type deserialization issues
+- **Websocket Subscriber-sent message control traits/code**
+  - Primarily useful for Jetstream or other custom Websocket services
+- Fixed some `Data` value type deserialization issues
 
 > [!WARNING]
 > A lot of the streaming code is still pretty experimental. The examples work, though.\
