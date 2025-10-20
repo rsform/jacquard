@@ -2,7 +2,7 @@
 name = "jacquard-api"
 description = "Generated AT Protocol API bindings for Jacquard"
 edition.workspace = true
-version = "0.7.0"
+version = "0.7.1"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -12,7 +12,7 @@ exclude.workspace = true
 license.workspace = true
 
 [package.metadata.docs.rs]
-features = [ "bluesky", "other", "lexicon_community", "streaming" ]
+features = [ "bluesky", "other", "streaming" ]
 
 [dependencies]
 bon.workspace = true
@@ -33,8 +33,8 @@ non_snake_case = "allow"
 default = [ "minimal"]
 minimal =  [ "com_atproto", "com_bad_example"]
 bluesky = [ "com_atproto", "app_bsky", "chat_bsky", "tools_ozone", "minimal"]
-other = ["sh_tangled", "sh_weaver", "pub_leaflet", "net_anisota", "network_slices", "tools_smokesignal", "com_whtwnd", "community_lexicon", "place_stream", "blue__2048", "minimal" ]
-lexicon_community = ["community_lexicon", "my_skylights", "com_whtwnd", "social_psky", "blue_linkat", "minimal"]
+other = ["sh_tangled", "sh_weaver", "pub_leaflet", "net_anisota", "network_slices", "com_whtwnd", "place_stream", "blue__2048", "minimal" ]
+lexicon_community = ["community_lexicon", "my_skylights", "com_whtwnd", "social_psky", "blue_linkat", "tools_smokesignal", "minimal"]
 ufos = [ "moe_karashiiro", "dev_regnault", "buzz_bookhive", "uk_ewancroft",  "win_tomo_x", "dev_fudgeu", "dev_ocbwoy3", "blog_pckt",  "net_bnewbold", "club_stellz", "dev_baileytownsend", "net_aftertheinter", "org_devcon","org_robocracy", "garden_lexicon", "social_clippr", "social_grain", "social_pmsky", "com_crabdance", "app_blebbit", "app_ocho", "uk_skyblur", "us_polhem", "blue_atplane", "net_mmatt", "minimal", "app_rocksky"]
 
 streaming = ["jacquard-common/websocket"]
