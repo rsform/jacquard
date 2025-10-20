@@ -263,7 +263,7 @@ impl<'s> ClientSession<'s> {
             server_metadata: client
                 .get_authorization_server_metadata(&self.session_data.authserver_url)
                 .await
-                .map_err(|e| Error::ServerAgent(crate::request::RequestError::ResolverError(e)))?,
+                .map_err(|e| Error::ServerAgent(crate::request::RequestError::resolver(e)))?,
             client_metadata: atproto_client_metadata(self.config.clone(), &self.keyset)
                 .unwrap()
                 .into_static(),

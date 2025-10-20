@@ -64,6 +64,9 @@ zstd = { version = "0.13", optional = true }
 [target.'cfg(target_family = "wasm")'.dependencies]
 getrandom = { version = "0.3.4", features = ["wasm_js"] }
 
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom_02 = { package = "getrandom", version = "0.2", features = ["js"] }
+
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 reqwest = { workspace = true, optional = true, features = [ "http2", "system-proxy", "rustls-tls"] }
 tokio-util = { version = "0.7.16", features = ["io"] }

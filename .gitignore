@@ -6,10 +6,8 @@
 /.pre-commit-config.yaml
 CLAUDE.md
 AGENTS.md
-crates/jacquard-lexicon/tests/fixtures/lexicons/atproto
 crates/jacquard-lexicon/target
-codegen_plan.md
-/lex_js
 /plans
 /docs
 /binaries/releases/
+rustdoc-host.nix

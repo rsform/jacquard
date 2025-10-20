@@ -79,7 +79,6 @@ use jacquard_api::com_atproto::identity::resolve_did;
 use jacquard_api::com_atproto::identity::resolve_handle::ResolveHandle;
 #[cfg(feature = "streaming")]
 use jacquard_common::ByteStream;
-use jacquard_common::error::TransportError;
 use jacquard_common::http_client::HttpClient;
 use jacquard_common::types::did::Did;
 use jacquard_common::types::did_doc::DidDocument;
@@ -169,17 +168,17 @@ impl JacquardResolver {
     ///
     /// - `did:web:example.com` → `https://example.com/.well-known/did.json`
     /// - `did:web:example.com:user:alice` → `https://example.com/user/alice/did.json`
-    fn did_web_url(&self, did: &Did<'_>) -> Result<Url, IdentityError> {
+    fn did_web_url(&self, did: &Did<'_>) -> resolver::Result<Url> {
         // did:web:example.com[:path:segments]
         let s = did.as_str();
         let rest = s
             .strip_prefix("did:web:")
-            .ok_or_else(|| IdentityError::UnsupportedDidMethod(s.to_string()))?;
+            .ok_or_else(|| IdentityError::unsupported_did_method(s))?;
         let mut parts = rest.split(':');
         let host = parts
             .next()
-            .ok_or_else(|| IdentityError::UnsupportedDidMethod(s.to_string()))?;
-        let mut url = Url::parse(&format!("https://{host}/")).map_err(IdentityError::Url)?;
+            .ok_or_else(|| IdentityError::unsupported_did_method(s))?;
+        let mut url = Url::parse(&format!("https://{host}/"))?;
         let path: Vec<&str> = parts.collect();
         if path.is_empty() {
             url.set_path(".well-known/did.json");
@@ -187,7 +186,7 @@ impl JacquardResolver {
             // Append path segments and did.json
             let mut segments = url
                 .path_segments_mut()
-                .map_err(|_| IdentityError::Url(ParseError::SetHostOnCannotBeABaseUrl))?;
+                .map_err(|_| IdentityError::url(ParseError::SetHostOnCannotBeABaseUrl))?;
             for seg in path {
                 // Minimally percent-decode each segment per spec guidance
                 let decoded = percent_decode_str(seg).decode_utf8_lossy();
@@ -205,36 +204,26 @@ impl JacquardResolver {
         self.did_web_url(&did).unwrap().to_string()
     }
 
-    async fn get_json_bytes(&self, url: Url) -> Result<(Bytes, StatusCode), IdentityError> {
-        let resp = self
-            .http
-            .get(url)
-            .send()
-            .await
-            .map_err(TransportError::from)?;
+    async fn get_json_bytes(&self, url: Url) -> resolver::Result<(Bytes, StatusCode)> {
+        let resp = self.http.get(url).send().await?;
         let status = resp.status();
-        let buf = resp.bytes().await.map_err(TransportError::from)?;
+        let buf = resp.bytes().await?;
         Ok((buf, status))
     }
 
-    async fn get_text(&self, url: Url) -> Result<String, IdentityError> {
-        let resp = self
-            .http
-            .get(url)
-            .send()
-            .await
-            .map_err(TransportError::from)?;
+    async fn get_text(&self, url: Url) -> resolver::Result<String> {
+        let resp = self.http.get(url).send().await?;
         if resp.status() == StatusCode::OK {
-            Ok(resp.text().await.map_err(TransportError::from)?)
+            Ok(resp.text().await?)
         } else {
-            Err(IdentityError::Http(
-                resp.error_for_status().unwrap_err().into(),
+            Err(IdentityError::transport(
+                resp.error_for_status().unwrap_err(),
             ))
         }
     }
 
     #[cfg(feature = "dns")]
-    async fn dns_txt(&self, name: &str) -> Result<Vec<String>, IdentityError> {
+    async fn dns_txt(&self, name: &str) -> resolver::Result<Vec<String>> {
         let Some(dns) = &self.dns else {
             return Ok(vec![]);
         };
@@ -249,12 +238,12 @@ impl JacquardResolver {
         Ok(out)
     }
 
-    fn parse_atproto_did_body(body: &str) -> Result<Did<'static>, IdentityError> {
+    fn parse_atproto_did_body(body: &str) -> resolver::Result<Did<'static>> {
         let line = body
             .lines()
             .find(|l| !l.trim().is_empty())
-            .ok_or(IdentityError::InvalidWellKnown)?;
-        let did = Did::new(line.trim()).map_err(|_| IdentityError::InvalidWellKnown)?;
+            .ok_or_else(|| IdentityError::invalid_well_known())?;
+        let did = Did::new(line.trim()).map_err(|_| IdentityError::invalid_well_known())?;
         Ok(did.into_static())
     }
 }
@@ -264,10 +253,10 @@ impl JacquardResolver {
     pub async fn resolve_handle_via_pds(
         &self,
         handle: &Handle<'_>,
-    ) -> Result<Did<'static>, IdentityError> {
+    ) -> resolver::Result<Did<'static>> {
         let pds = match &self.opts.pds_fallback {
             Some(u) => u.clone(),
-            None => return Err(IdentityError::InvalidWellKnown),
+            None => return Err(IdentityError::invalid_well_known()),
         };
         let req = ResolveHandle::new()
             .handle(handle.clone().into_static())
@@ -277,23 +266,23 @@ impl JacquardResolver {
             .xrpc(pds)
             .send(&req)
             .await
-            .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
+            .map_err(|e| IdentityError::xrpc(e.to_string()))?;
         let out = resp
             .parse()
-            .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
+            .map_err(|e| IdentityError::xrpc(e.to_string()))?;
         Did::new_owned(out.did.as_str())
             .map(|d| d.into_static())
-            .map_err(|_| IdentityError::InvalidWellKnown)
+            .map_err(|_| IdentityError::invalid_well_known())
     }
 
     /// Fetch DID document via PDS resolveDid (returns owned DidDocument)
     pub async fn fetch_did_doc_via_pds_owned(
         &self,
         did: &Did<'_>,
-    ) -> Result<DidDocument<'static>, IdentityError> {
+    ) -> resolver::Result<DidDocument<'static>> {
         let pds = match &self.opts.pds_fallback {
             Some(u) => u.clone(),
-            None => return Err(IdentityError::InvalidWellKnown),
+            None => return Err(IdentityError::invalid_well_known()),
         };
         let req = resolve_did::ResolveDid::new().did(did.clone()).build();
         let resp = self
@@ -301,10 +290,10 @@ impl JacquardResolver {
             .xrpc(pds)
             .send(&req)
             .await
-            .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
+            .map_err(|e| IdentityError::xrpc(e.to_string()))?;
         let out = resp
             .parse()
-            .map_err(|e| IdentityError::Xrpc(e.to_string()))?;
+            .map_err(|e| IdentityError::xrpc(e.to_string()))?;
         let doc_json = serde_json::to_value(&out.did_doc)?;
         let s = serde_json::to_string(&doc_json)?;
         let doc_borrowed: DidDocument<'_> = serde_json::from_str(&s)?;
@@ -316,12 +305,12 @@ impl JacquardResolver {
     pub async fn fetch_mini_doc_via_slingshot(
         &self,
         did: &Did<'_>,
-    ) -> Result<DidDocResponse, IdentityError> {
+    ) -> resolver::Result<DidDocResponse> {
         let base = match &self.opts.plc_source {
             PlcSource::Slingshot { base } => base.clone(),
             _ => {
-                return Err(IdentityError::UnsupportedDidMethod(
-                    "mini-doc requires Slingshot source".into(),
+                return Err(IdentityError::unsupported_did_method(
+                    "mini-doc requires Slingshot source",
                 ));
             }
         };
@@ -348,7 +337,7 @@ impl IdentityResolver for JacquardResolver {
         &self.opts
     }
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self), fields(handle = %handle)))]
-    async fn resolve_handle(&self, handle: &Handle<'_>) -> Result<Did<'static>, IdentityError> {
+    async fn resolve_handle(&self, handle: &Handle<'_>) -> resolver::Result<Did<'static>> {
         let host = handle.as_str();
         for step in &self.opts.handle_order {
             match step {
@@ -433,11 +422,11 @@ impl IdentityResolver for JacquardResolver {
                 }
             }
         }
-        Err(IdentityError::InvalidWellKnown)
+        Err(IdentityError::invalid_well_known())
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self), fields(did = %did)))]
-    async fn resolve_did_doc(&self, did: &Did<'_>) -> Result<DidDocResponse, IdentityError> {
+    async fn resolve_did_doc(&self, did: &Did<'_>) -> resolver::Result<DidDocResponse> {
         let s = did.as_str();
         for step in &self.opts.did_order {
             match step {
@@ -491,7 +480,7 @@ impl IdentityResolver for JacquardResolver {
                 _ => {}
             }
         }
-        Err(IdentityError::UnsupportedDidMethod(s.to_string()))
+        Err(IdentityError::unsupported_did_method(s))
     }
 }
 
@@ -517,6 +506,7 @@ impl jacquard_common::http_client::HttpClientExt for JacquardResolver {
     }
 
     /// Send HTTP request with streaming body and receive streaming response
+    #[cfg(not(target_arch = "wasm32"))]
     fn send_http_bidirectional<S>(
         &self,
         parts: http::request::Parts,
@@ -526,6 +516,19 @@ impl jacquard_common::http_client::HttpClientExt for JacquardResolver {
         S: n0_future::Stream<Item = Result<bytes::Bytes, jacquard_common::StreamError>>
             + Send
             + 'static,
+    {
+        self.http.send_http_bidirectional(parts, body)
+    }
+
+    /// Send HTTP request with streaming body and receive streaming response (WASM)
+    #[cfg(target_arch = "wasm32")]
+    fn send_http_bidirectional<S>(
+        &self,
+        parts: http::request::Parts,
+        body: S,
+    ) -> impl Future<Output = Result<http::Response<ByteStream>, Self::Error>>
+    where
+        S: n0_future::Stream<Item = Result<bytes::Bytes, jacquard_common::StreamError>> + 'static,
     {
         self.http.send_http_bidirectional(parts, body)
     }
@@ -547,16 +550,16 @@ impl JacquardResolver {
     pub async fn resolve_handle_and_doc(
         &self,
         handle: &Handle<'_>,
-    ) -> Result<(Did<'static>, DidDocResponse, Vec<IdentityWarning>), IdentityError> {
+    ) -> resolver::Result<(Did<'static>, DidDocResponse, Vec<IdentityWarning>)> {
         let did = self.resolve_handle(handle).await?;
         let resp = self.resolve_did_doc(&did).await?;
         let resp_for_parse = resp.clone();
         let doc_borrowed = resp_for_parse.parse()?;
         if self.opts.validate_doc_id && doc_borrowed.id.as_str() != did.as_str() {
-            return Err(IdentityError::DocIdMismatch {
-                expected: did.clone().into_static(),
-                doc: doc_borrowed.clone().into_static(),
-            });
+            return Err(IdentityError::doc_id_mismatch(
+                did.clone().into_static(),
+                doc_borrowed.clone().into_static(),
+            ));
         }
         let mut warnings = Vec::new();
         // Check handle alias presence (soft warning)
@@ -575,7 +578,7 @@ impl JacquardResolver {
     }
 
     /// Build Slingshot mini-doc URL for an identifier (handle or DID)
-    fn slingshot_mini_doc_url(&self, base: &Url, identifier: &str) -> Result<Url, IdentityError> {
+    fn slingshot_mini_doc_url(&self, base: &Url, identifier: &str) -> resolver::Result<Url> {
         let mut url = base.clone();
         url.set_path("/xrpc/com.bad-example.identity.resolveMiniDoc");
         url.set_query(Some(&format!(
@@ -589,12 +592,12 @@ impl JacquardResolver {
     pub async fn fetch_mini_doc_via_slingshot_identifier(
         &self,
         identifier: &AtIdentifier<'_>,
-    ) -> Result<MiniDocResponse, IdentityError> {
+    ) -> resolver::Result<MiniDocResponse> {
         let base = match &self.opts.plc_source {
             PlcSource::Slingshot { base } => base.clone(),
             _ => {
-                return Err(IdentityError::UnsupportedDidMethod(
-                    "mini-doc requires Slingshot source".into(),
+                return Err(IdentityError::unsupported_did_method(
+                    "mini-doc requires Slingshot source",
                 ));
             }
         };
@@ -616,11 +619,11 @@ pub struct MiniDocResponse {
 
 impl MiniDocResponse {
     /// Parse borrowed MiniDoc
-    pub fn parse<'b>(&'b self) -> Result<MiniDoc<'b>, IdentityError> {
+    pub fn parse<'b>(&'b self) -> resolver::Result<MiniDoc<'b>> {
         if self.status.is_success() {
             serde_json::from_slice::<MiniDoc<'b>>(&self.buffer).map_err(IdentityError::from)
         } else {
-            Err(IdentityError::HttpStatus(self.status))
+            Err(IdentityError::http_status(self.status))
         }
     }
 }
@@ -726,7 +729,12 @@ mod tests {
             status: StatusCode::BAD_REQUEST,
         };
         match resp.parse() {
-            Err(IdentityError::HttpStatus(s)) => assert_eq!(s, StatusCode::BAD_REQUEST),
+            Err(e) => match e.kind() {
+                resolver::IdentityErrorKind::HttpStatus(s) => {
+                    assert_eq!(*s, StatusCode::BAD_REQUEST)
+                }
+                _ => panic!("unexpected error kind: {:?}", e),
+            },
             other => panic!("unexpected: {:?}", other),
         }
     }

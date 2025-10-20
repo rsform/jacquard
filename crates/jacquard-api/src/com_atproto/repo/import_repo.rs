@@ -40,9 +40,7 @@ impl jacquard_common::xrpc::XrpcRequest for ImportRepo {
     fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
         Ok(self.body.to_vec())
     }
-    fn decode_body<'de>(
-        body: &'de [u8],
-    ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
+    fn decode_body<'de>(body: &'de [u8]) -> jacquard_common::error::XrpcResult<Box<Self>>
     where
         Self: serde::Deserialize<'de>,
     {

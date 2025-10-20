@@ -24,14 +24,14 @@ pub mod subscription;
 
 #[cfg(feature = "streaming")]
 use crate::StreamError;
+use crate::error::DecodeError;
 use crate::http_client::HttpClient;
 #[cfg(feature = "streaming")]
 use crate::http_client::HttpClientExt;
 use crate::types::value::Data;
 use crate::{AuthorizationToken, error::AuthError};
 use crate::{CowStr, error::XrpcResult};
-use crate::{IntoStatic, error::DecodeError};
-use crate::{error::TransportError, types::value::RawData};
+use crate::{IntoStatic, types::value::RawData};
 use bytes::Bytes;
 use http::{
     HeaderName, HeaderValue, Request, StatusCode,
@@ -124,11 +124,12 @@ pub trait XrpcRequest: Serialize {
     /// Decode the request body for procedures.
     ///
     /// Default implementation deserializes from JSON. Override for non-JSON encodings.
-    fn decode_body<'de>(body: &'de [u8]) -> Result<Box<Self>, DecodeError>
+    fn decode_body<'de>(body: &'de [u8]) -> XrpcResult<Box<Self>>
     where
         Self: Deserialize<'de>,
     {
-        let body: Self = serde_json::from_slice(body).map_err(|e| DecodeError::Json(e))?;
+        let body: Self = serde_json::from_slice(body)
+            .map_err(|e| crate::error::ClientError::decode(format!("{:?}", e)))?;
 
         Ok(Box::new(body))
     }
@@ -148,7 +149,7 @@ pub trait XrpcResp {
     type Output<'de>: Serialize + Deserialize<'de> + IntoStatic;
 
     /// Error type for this request
-    type Err<'de>: Error + Deserialize<'de> + IntoStatic;
+    type Err<'de>: Error + Deserialize<'de> + Serialize + IntoStatic;
 
     /// Output body encoding function, similar to the request-side type
     fn encode_output(output: &Self::Output<'_>) -> Result<Vec<u8>, EncodeError> {
@@ -158,10 +159,11 @@ pub trait XrpcResp {
     /// Decode the response output body.
     ///
     /// Default implementation deserializes from JSON. Override for non-JSON encodings.
-    fn decode_output<'de>(body: &'de [u8]) -> Result<Self::Output<'de>, DecodeError>
+    fn decode_output<'de>(body: &'de [u8]) -> core::result::Result<Self::Output<'de>, DecodeError>
     where
         Self::Output<'de>: Deserialize<'de>,
     {
+        #[allow(deprecated)]
         let body = serde_json::from_slice(body).map_err(|e| DecodeError::Json(e))?;
 
         Ok(body)
@@ -444,14 +446,13 @@ impl<'a, C: HttpClient> XrpcCall<'a, C> {
         R: XrpcRequest,
         <R as XrpcRequest>::Response: Send + Sync,
     {
-        let http_request = build_http_request(&self.base, request, &self.opts)
-            .map_err(crate::error::TransportError::from)?;
+        let http_request = build_http_request(&self.base, request, &self.opts)?;
 
         let http_response = self
             .client
             .send_http(http_request)
             .await
-            .map_err(|e| crate::error::TransportError::Other(Box::new(e)))?;
+            .map_err(|e| crate::error::ClientError::transport(e))?;
 
         process_response(http_response)
     }
@@ -468,9 +469,10 @@ where
     let status = http_response.status();
     // If the server returned 401 with a WWW-Authenticate header, expose it so higher layers
     // (e.g., DPoP handling) can detect `error="invalid_token"` and trigger refresh.
+    #[allow(deprecated)]
     if status.as_u16() == 401 {
         if let Some(hv) = http_response.headers().get(http::header::WWW_AUTHENTICATE) {
-            return Err(crate::error::ClientError::Auth(
+            return Err(crate::error::ClientError::auth(
                 crate::error::AuthError::Other(hv.clone()),
             ));
         }
@@ -518,10 +520,12 @@ pub fn build_http_request<'s, R>(
     base: &Url,
     req: &R,
     opts: &CallOptions<'_>,
-) -> core::result::Result<Request<Vec<u8>>, crate::error::TransportError>
+) -> XrpcResult<Request<Vec<u8>>>
 where
     R: XrpcRequest,
 {
+    use crate::error::ClientError;
+
     let mut url = base.clone();
     let mut path = url.path().trim_end_matches('/').to_owned();
     path.push_str("/xrpc/");
@@ -529,8 +533,9 @@ where
     url.set_path(&path);
 
     if let XrpcMethod::Query = <R as XrpcRequest>::METHOD {
-        let qs = serde_html_form::to_string(&req)
-            .map_err(|e| crate::error::TransportError::InvalidRequest(e.to_string()))?;
+        let qs = serde_html_form::to_string(&req).map_err(|e| {
+            ClientError::invalid_request(format!("Failed to serialize query: {}", e))
+        })?;
         if !qs.is_empty() {
             url.set_query(Some(&qs));
         } else {
@@ -558,9 +563,7 @@ where
             }
             AuthorizationToken::Dpop(t) => HeaderValue::from_str(&format!("DPoP {}", t.as_ref())),
         }
-        .map_err(|e| {
-            TransportError::InvalidRequest(format!("Invalid authorization token: {}", e))
-        })?;
+        .map_err(|e| ClientError::invalid_request(format!("Invalid authorization token: {}", e)))?;
         builder = builder.header(Header::Authorization, hv);
     }
 
@@ -583,14 +586,14 @@ where
 
     let body = if let XrpcMethod::Procedure(_) = R::METHOD {
         req.encode_body()
-            .map_err(|e| TransportError::InvalidRequest(e.to_string()))?
+            .map_err(|e| ClientError::invalid_request(format!("Failed to encode body: {}", e)))?
     } else {
         vec![]
     };
 
     builder
         .body(body)
-        .map_err(|e| TransportError::InvalidRequest(e.to_string()))
+        .map_err(|e| ClientError::invalid_request(format!("Failed to build request: {}", e)))
 }
 
 /// XRPC response wrapper that owns the response buffer
@@ -980,6 +983,59 @@ where
     }
 }
 
+impl<E> Serialize for XrpcError<E>
+where
+    E: std::error::Error + IntoStatic + Serialize,
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+
+        match self {
+            // Typed errors already serialize to correct atproto format
+            XrpcError::Xrpc(e) => e.serialize(serializer),
+            // Generic errors already have correct format
+            XrpcError::Generic(g) => g.serialize(serializer),
+            // Auth and Decode need manual mapping to {"error": "...", "message": ...}
+            XrpcError::Auth(auth) => {
+                let mut state = serializer.serialize_struct("XrpcError", 2)?;
+                let (error, message) = match auth {
+                    AuthError::TokenExpired => ("ExpiredToken", Some("Access token has expired")),
+                    AuthError::InvalidToken => {
+                        ("InvalidToken", Some("Access token is invalid or malformed"))
+                    }
+                    AuthError::RefreshFailed => {
+                        ("RefreshFailed", Some("Token refresh request failed"))
+                    }
+                    AuthError::NotAuthenticated => (
+                        "AuthenticationRequired",
+                        Some("Request requires authentication but none was provided"),
+                    ),
+                    AuthError::Other(hv) => {
+                        let msg = hv.to_str().unwrap_or("[non-utf8 header]");
+                        ("AuthenticationError", Some(msg))
+                    }
+                };
+                state.serialize_field("error", error)?;
+                if let Some(msg) = message {
+                    state.serialize_field("message", msg)?;
+                }
+                state.end()
+            }
+            XrpcError::Decode(decode_err) => {
+                let mut state = serializer.serialize_struct("XrpcError", 2)?;
+                state.serialize_field("error", "ResponseDecodeError")?;
+                // Convert DecodeError to string for message field
+                let msg = format!("{:?}", decode_err);
+                state.serialize_field("message", &msg)?;
+                state.end()
+            }
+        }
+    }
+}
+
 #[cfg(feature = "streaming")]
 impl<'a, C: HttpClient + HttpClientExt> XrpcCall<'a, C> {
     /// Send an XRPC call and stream the binary response.
@@ -1016,7 +1072,6 @@ impl<'a, C: HttpClient + HttpClientExt> XrpcCall<'a, C> {
         <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>: XrpcStreamResp,
     {
         use futures::TryStreamExt;
-        use n0_future::StreamExt;
 
         let mut url = self.base;
         let mut path = url.path().trim_end_matches('/').to_owned();
@@ -1061,7 +1116,7 @@ impl<'a, C: HttpClient + HttpClientExt> XrpcCall<'a, C> {
             .map_err(|e| StreamError::protocol(e.to_string()))?
             .into_parts();
 
-        let body_stream = stream.0.map_ok(|f| f.buffer).boxed();
+        let body_stream = Box::pin(stream.0.map_ok(|f| f.buffer));
 
         let resp = self
             .client
@@ -1086,7 +1141,7 @@ mod tests {
     #[allow(dead_code)]
     struct DummyReq;
 
-    #[derive(Deserialize, Debug, thiserror::Error)]
+    #[derive(Deserialize, Serialize, Debug, thiserror::Error)]
     #[error("{0}")]
     struct DummyErr<'a>(#[serde(borrow)] CowStr<'a>);
 
@@ -1153,7 +1208,7 @@ mod tests {
     fn no_double_slash_in_path() {
         #[derive(Serialize, Deserialize)]
         struct Req;
-        #[derive(Deserialize, Debug, thiserror::Error)]
+        #[derive(Deserialize, Serialize, Debug, thiserror::Error)]
         #[error("{0}")]
         struct Err<'a>(#[serde(borrow)] CowStr<'a>);
         impl IntoStatic for Err<'_> {

@@ -159,7 +159,14 @@ impl fmt::Display for StreamError {
 }
 
 use bytes::Bytes;
-use n0_future::stream::Boxed;
+
+/// Boxed stream type with proper Send bounds for native, no Send for WASM
+#[cfg(not(target_arch = "wasm32"))]
+type Boxed<T> = Pin<Box<dyn n0_future::Stream<Item = T> + Send>>;
+
+/// Boxed stream type without Send bound for WASM
+#[cfg(target_arch = "wasm32")]
+type Boxed<T> = Pin<Box<dyn n0_future::Stream<Item = T>>>;
 
 /// Platform-agnostic byte stream abstraction
 pub struct ByteStream {
@@ -168,9 +175,21 @@ pub struct ByteStream {
 
 impl ByteStream {
     /// Create a new byte stream from any compatible stream
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn new<S>(stream: S) -> Self
     where
         S: n0_future::Stream<Item = Result<Bytes, StreamError>> + Unpin + Send + 'static,
+    {
+        Self {
+            inner: Box::pin(stream),
+        }
+    }
+
+    /// Create a new byte stream from any compatible stream (WASM)
+    #[cfg(target_arch = "wasm32")]
+    pub fn new<S>(stream: S) -> Self
+    where
+        S: n0_future::Stream<Item = Result<Bytes, StreamError>> + Unpin + 'static,
     {
         Self {
             inner: Box::pin(stream),

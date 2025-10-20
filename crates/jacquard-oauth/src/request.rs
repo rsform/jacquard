@@ -14,7 +14,6 @@ use jacquard_identity::resolver::IdentityError;
 use serde::Serialize;
 use serde_json::Value;
 use smol_str::ToSmolStr;
-use thiserror::Error;
 
 use crate::{
     FALLBACK_ALG,
@@ -40,17 +39,43 @@ use crate::{
 const CLIENT_ASSERTION_TYPE_JWT_BEARER: &str =
     "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
 
-#[derive(Error, Debug, miette::Diagnostic)]
-pub enum RequestError {
+use smol_str::SmolStr;
+
+pub type BoxError = Box<dyn std::error::Error + Send + Sync + 'static>;
+
+/// OAuth request error for token operations and auth flows
+#[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[error("{kind}")]
+pub struct RequestError {
+    #[diagnostic_source]
+    kind: RequestErrorKind,
+    #[source]
+    source: Option<BoxError>,
+    #[help]
+    help: Option<SmolStr>,
+    context: Option<SmolStr>,
+    url: Option<SmolStr>,
+    details: Option<SmolStr>,
+    location: Option<SmolStr>,
+}
+
+/// Error categories for OAuth request operations
+#[derive(Debug, thiserror::Error, miette::Diagnostic)]
+pub enum RequestErrorKind {
+    /// No endpoint available
     #[error("no {0} endpoint available")]
     #[diagnostic(
         code(jacquard_oauth::request::no_endpoint),
         help("server does not advertise this endpoint")
     )]
-    NoEndpoint(CowStr<'static>),
+    NoEndpoint(SmolStr),
+
+    /// Token response verification failed
     #[error("token response verification failed")]
     #[diagnostic(code(jacquard_oauth::request::token_verification))]
     TokenVerification,
+
+    /// Unsupported authentication method
     #[error("unsupported authentication method")]
     #[diagnostic(
         code(jacquard_oauth::request::unsupported_auth_method),
@@ -59,54 +84,316 @@ pub enum RequestError {
         )
     )]
     UnsupportedAuthMethod,
+
+    /// No refresh token available
     #[error("no refresh token available")]
     #[diagnostic(code(jacquard_oauth::request::no_refresh_token))]
     NoRefreshToken,
-    #[error("failed to parse DID: {0}")]
-    #[diagnostic(code(jacquard_oauth::request::invalid_did))]
-    InvalidDid(#[from] AtStrError),
-    #[error(transparent)]
-    #[diagnostic(code(jacquard_oauth::request::dpop))]
-    DpopClient(#[from] crate::dpop::Error),
-    #[error(transparent)]
-    #[diagnostic(code(jacquard_oauth::request::storage))]
-    Storage(#[from] SessionStoreError),
 
-    #[error(transparent)]
+    /// Invalid DID
+    #[error("failed to parse DID")]
+    #[diagnostic(code(jacquard_oauth::request::invalid_did))]
+    InvalidDid,
+
+    /// DPoP client error
+    #[error("dpop error")]
+    #[diagnostic(code(jacquard_oauth::request::dpop))]
+    Dpop,
+
+    /// Session storage error
+    #[error("storage error")]
+    #[diagnostic(code(jacquard_oauth::request::storage))]
+    Storage,
+
+    /// Resolver error
+    #[error("resolver error")]
     #[diagnostic(code(jacquard_oauth::request::resolver))]
-    ResolverError(#[from] crate::resolver::ResolverError),
-    // #[error(transparent)]
-    // OAuthSession(#[from] crate::oauth_session::Error),
-    #[error(transparent)]
+    Resolver,
+
+    /// HTTP build error
+    #[error("http build error")]
     #[diagnostic(code(jacquard_oauth::request::http_build))]
-    Http(#[from] http::Error),
+    HttpBuild,
+
+    /// HTTP status error
     #[error("http status: {0}")]
     #[diagnostic(
         code(jacquard_oauth::request::http_status),
         help("see server response for details")
     )]
     HttpStatus(StatusCode),
-    #[error("http status: {0}, body: {1:?}")]
+
+    /// HTTP status with error body
+    #[error("http status: {status}, body: {body:?}")]
     #[diagnostic(
         code(jacquard_oauth::request::http_status_body),
         help("server returned error JSON; inspect fields like `error`, `error_description`")
     )]
-    HttpStatusWithBody(StatusCode, Value),
-    #[error(transparent)]
+    HttpStatusWithBody { status: StatusCode, body: Value },
+
+    /// Identity resolution error
+    #[error("identity error")]
     #[diagnostic(code(jacquard_oauth::request::identity))]
-    Identity(#[from] IdentityError),
-    #[error(transparent)]
+    Identity,
+
+    /// Keyset error
+    #[error("keyset error")]
     #[diagnostic(code(jacquard_oauth::request::keyset))]
-    Keyset(#[from] crate::keyset::Error),
-    #[error(transparent)]
+    Keyset,
+
+    /// Form serialization error
+    #[error("form serialization error")]
     #[diagnostic(code(jacquard_oauth::request::serde_form))]
-    SerdeHtmlForm(#[from] serde_html_form::ser::Error),
-    #[error(transparent)]
+    SerdeHtmlForm,
+
+    /// JSON error
+    #[error("json error")]
     #[diagnostic(code(jacquard_oauth::request::serde_json))]
-    SerdeJson(#[from] serde_json::Error),
-    #[error(transparent)]
+    SerdeJson,
+
+    /// Atproto metadata error
+    #[error("atproto error")]
     #[diagnostic(code(jacquard_oauth::request::atproto))]
-    Atproto(#[from] crate::atproto::Error),
+    Atproto,
+}
+
+impl RequestError {
+    /// Create a new error with the given kind and optional source
+    pub fn new(kind: RequestErrorKind, source: Option<BoxError>) -> Self {
+        Self {
+            kind,
+            source,
+            help: None,
+            context: None,
+            url: None,
+            details: None,
+            location: None,
+        }
+    }
+
+    /// Get the error kind
+    pub fn kind(&self) -> &RequestErrorKind {
+        &self.kind
+    }
+
+    /// Get the source error if present
+    pub fn source_err(&self) -> Option<&BoxError> {
+        self.source.as_ref()
+    }
+
+    /// Get the context string if present
+    pub fn context(&self) -> Option<&str> {
+        self.context.as_ref().map(|s| s.as_str())
+    }
+
+    /// Get the URL if present
+    pub fn url(&self) -> Option<&str> {
+        self.url.as_ref().map(|s| s.as_str())
+    }
+
+    /// Get the details if present
+    pub fn details(&self) -> Option<&str> {
+        self.details.as_ref().map(|s| s.as_str())
+    }
+
+    /// Get the location if present
+    pub fn location(&self) -> Option<&str> {
+        self.location.as_ref().map(|s| s.as_str())
+    }
+
+    /// Add help text to this error
+    pub fn with_help(mut self, help: impl Into<SmolStr>) -> Self {
+        self.help = Some(help.into());
+        self
+    }
+
+    /// Add context to this error
+    pub fn with_context(mut self, context: impl Into<SmolStr>) -> Self {
+        self.context = Some(context.into());
+        self
+    }
+
+    /// Add URL to this error
+    pub fn with_url(mut self, url: impl Into<SmolStr>) -> Self {
+        self.url = Some(url.into());
+        self
+    }
+
+    /// Add details to this error
+    pub fn with_details(mut self, details: impl Into<SmolStr>) -> Self {
+        self.details = Some(details.into());
+        self
+    }
+
+    /// Add location to this error
+    pub fn with_location(mut self, location: impl Into<SmolStr>) -> Self {
+        self.location = Some(location.into());
+        self
+    }
+
+    // Constructors for each kind
+
+    /// Create a no endpoint error
+    pub fn no_endpoint(endpoint: impl Into<SmolStr>) -> Self {
+        Self::new(RequestErrorKind::NoEndpoint(endpoint.into()), None)
+    }
+
+    /// Create a token verification error
+    pub fn token_verification() -> Self {
+        Self::new(RequestErrorKind::TokenVerification, None)
+    }
+
+    /// Create an unsupported authentication method error
+    pub fn unsupported_auth_method() -> Self {
+        Self::new(RequestErrorKind::UnsupportedAuthMethod, None)
+    }
+
+    /// Create a no refresh token error
+    pub fn no_refresh_token() -> Self {
+        Self::new(RequestErrorKind::NoRefreshToken, None)
+    }
+
+    /// Create an invalid DID error
+    pub fn invalid_did(source: impl std::error::Error + Send + Sync + 'static) -> Self {
+        Self::new(RequestErrorKind::InvalidDid, Some(Box::new(source)))
+    }
+
+    /// Create a DPoP error
+    pub fn dpop(source: impl std::error::Error + Send + Sync + 'static) -> Self {
+        Self::new(RequestErrorKind::Dpop, Some(Box::new(source)))
+    }
+
+    /// Create a storage error
+    pub fn storage(source: impl std::error::Error + Send + Sync + 'static) -> Self {
+        Self::new(RequestErrorKind::Storage, Some(Box::new(source)))
+    }
+
+    /// Create a resolver error
+    pub fn resolver(source: impl std::error::Error + Send + Sync + 'static) -> Self {
+        Self::new(RequestErrorKind::Resolver, Some(Box::new(source)))
+    }
+
+    /// Create an HTTP build error
+    pub fn http_build(source: impl std::error::Error + Send + Sync + 'static) -> Self {
+        Self::new(RequestErrorKind::HttpBuild, Some(Box::new(source)))
+    }
+
+    /// Create an HTTP status error
+    pub fn http_status(status: StatusCode) -> Self {
+        Self::new(RequestErrorKind::HttpStatus(status), None)
+    }
+
+    /// Create an HTTP status with body error
+    pub fn http_status_with_body(status: StatusCode, body: Value) -> Self {
+        Self::new(RequestErrorKind::HttpStatusWithBody { status, body }, None)
+    }
+
+    /// Create an identity error
+    pub fn identity(source: impl std::error::Error + Send + Sync + 'static) -> Self {
+        Self::new(RequestErrorKind::Identity, Some(Box::new(source)))
+    }
+
+    /// Create a keyset error
+    pub fn keyset(source: impl std::error::Error + Send + Sync + 'static) -> Self {
+        Self::new(RequestErrorKind::Keyset, Some(Box::new(source)))
+    }
+
+    /// Create an atproto metadata error
+    pub fn atproto(source: impl std::error::Error + Send + Sync + 'static) -> Self {
+        Self::new(RequestErrorKind::Atproto, Some(Box::new(source)))
+    }
+}
+
+// From impls for common error types
+
+impl From<AtStrError> for RequestError {
+    fn from(e: AtStrError) -> Self {
+        let msg = smol_str::format_smolstr!("{:?}", e);
+        Self::new(RequestErrorKind::InvalidDid, Some(Box::new(e)))
+            .with_context(msg)
+            .with_help("ensure DID is correctly formatted (e.g., did:plc:abc123)")
+    }
+}
+
+impl From<crate::dpop::Error> for RequestError {
+    fn from(e: crate::dpop::Error) -> Self {
+        let msg = smol_str::format_smolstr!("{:?}", e);
+        Self::new(RequestErrorKind::Dpop, Some(Box::new(e)))
+            .with_context(msg)
+            .with_help("check DPoP key configuration and nonce handling")
+    }
+}
+
+impl From<SessionStoreError> for RequestError {
+    fn from(e: SessionStoreError) -> Self {
+        let msg = smol_str::format_smolstr!("{:?}", e);
+        Self::new(RequestErrorKind::Storage, Some(Box::new(e)))
+            .with_context(msg)
+            .with_help("verify session store is accessible and writable")
+    }
+}
+
+impl From<crate::resolver::ResolverError> for RequestError {
+    fn from(e: crate::resolver::ResolverError) -> Self {
+        let msg = smol_str::format_smolstr!("{:?}", e);
+        Self::new(RequestErrorKind::Resolver, Some(Box::new(e)))
+            .with_context(msg)
+            .with_help("check identity resolution and OAuth metadata endpoints")
+    }
+}
+
+impl From<http::Error> for RequestError {
+    fn from(e: http::Error) -> Self {
+        let msg = smol_str::format_smolstr!("{:?}", e);
+        Self::new(RequestErrorKind::HttpBuild, Some(Box::new(e)))
+            .with_context(msg)
+            .with_help("verify request URIs and headers are valid")
+    }
+}
+
+impl From<IdentityError> for RequestError {
+    fn from(e: IdentityError) -> Self {
+        let msg = smol_str::format_smolstr!("{:?}", e);
+        Self::new(RequestErrorKind::Identity, Some(Box::new(e)))
+            .with_context(msg)
+            .with_help("check handle/DID is valid and identity resolver is configured")
+    }
+}
+
+impl From<crate::keyset::Error> for RequestError {
+    fn from(e: crate::keyset::Error) -> Self {
+        let msg = smol_str::format_smolstr!("{:?}", e);
+        Self::new(RequestErrorKind::Keyset, Some(Box::new(e)))
+            .with_context(msg)
+            .with_help("verify keyset configuration and signing algorithm support")
+    }
+}
+
+impl From<serde_html_form::ser::Error> for RequestError {
+    fn from(e: serde_html_form::ser::Error) -> Self {
+        let msg = smol_str::format_smolstr!("{:?}", e);
+        Self::new(RequestErrorKind::SerdeHtmlForm, Some(Box::new(e)))
+            .with_context(msg)
+            .with_help("check OAuth request parameters are serializable")
+    }
+}
+
+impl From<serde_json::Error> for RequestError {
+    fn from(e: serde_json::Error) -> Self {
+        let msg = smol_str::format_smolstr!("{:?}", e);
+        Self::new(RequestErrorKind::SerdeJson, Some(Box::new(e)))
+            .with_context(msg)
+            .with_help("verify OAuth response body is valid JSON")
+    }
+}
+
+impl From<crate::atproto::Error> for RequestError {
+    fn from(e: crate::atproto::Error) -> Self {
+        let msg = smol_str::format_smolstr!("{:?}", e);
+        Self::new(RequestErrorKind::Atproto, Some(Box::new(e)))
+            .with_context(msg)
+            .with_help("ensure client metadata matches atproto requirements")
+    }
 }
 
 pub type Result<T> = core::result::Result<T, RequestError>;
@@ -191,7 +478,7 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
     let (code_challenge, verifier) = generate_pkce();
 
     let Some(dpop_key) = generate_dpop_key(&metadata.server_metadata) else {
-        return Err(RequestError::TokenVerification);
+        return Err(RequestError::token_verification());
     };
     let mut dpop_data = DpopReqData {
         dpop_key,
@@ -247,9 +534,7 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
         .require_pushed_authorization_requests
         == Some(true)
     {
-        Err(RequestError::NoEndpoint(CowStr::new_static(
-            "pushed_authorization_request",
-        )))
+        Err(RequestError::no_endpoint("pushed_authorization_request"))
     } else {
         todo!("use of PAR is mandatory")
     }
@@ -265,7 +550,7 @@ where
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
 {
     let Some(refresh_token) = session_data.token_set.refresh_token.as_ref() else {
-        return Err(RequestError::NoRefreshToken);
+        return Err(RequestError::no_refresh_token());
     };
 
     // /!\ IMPORTANT /!\
@@ -343,7 +628,7 @@ where
     )
     .await?;
     let Some(sub) = token_response.sub else {
-        return Err(RequestError::TokenVerification);
+        return Err(RequestError::token_verification());
     };
     let sub = Did::new_owned(sub)?;
     let iss = metadata.server_metadata.issuer.clone();
@@ -408,7 +693,7 @@ where
     D: DpopDataSource,
 {
     let Some(url) = endpoint_for_req(&metadata.server_metadata, &request) else {
-        return Err(RequestError::NoEndpoint(request.name()));
+        return Err(RequestError::no_endpoint(request.name()));
     };
     let client_assertions = build_auth(
         metadata.keyset.as_ref(),
@@ -429,11 +714,7 @@ where
         .method(Method::POST)
         .header("Content-Type", "application/x-www-form-urlencoded")
         .body(body.into_bytes())?;
-    let res = client
-        .dpop_server_call(data_source)
-        .send(req)
-        .await
-        .map_err(RequestError::DpopClient)?;
+    let res = client.dpop_server_call(data_source).send(req).await?;
     if res.status() == request.expected_status() {
         let body = res.body();
         if body.is_empty() {
@@ -444,12 +725,12 @@ where
             Ok(output)
         }
     } else if res.status().is_client_error() {
-        Err(RequestError::HttpStatusWithBody(
+        Err(RequestError::http_status_with_body(
             res.status(),
             serde_json::from_slice(res.body())?,
         ))
     } else {
-        Err(RequestError::HttpStatus(res.status()))
+        Err(RequestError::http_status(res.status()))
     }
 }
 
@@ -560,7 +841,7 @@ fn build_auth<'a>(
         }
     }
 
-    Err(RequestError::UnsupportedAuthMethod)
+    Err(RequestError::unsupported_auth_method())
 }
 
 #[cfg(test)]
@@ -642,6 +923,7 @@ mod tests {
         server.issuer = CowStr::from("https://issuer");
         server.authorization_endpoint = CowStr::from("https://issuer/authorize");
         server.token_endpoint = CowStr::from("https://issuer/token");
+        server.token_endpoint_auth_methods_supported = Some(vec![CowStr::from("none")]);
         OAuthMetadata {
             server_metadata: server,
             client_metadata: OAuthClientMetadata {
@@ -669,12 +951,9 @@ mod tests {
         let err = super::par(&MockClient::default(), None, None, &meta)
             .await
             .unwrap_err();
-        match err {
-            RequestError::NoEndpoint(name) => {
-                assert_eq!(name.as_ref(), "pushed_authorization_request");
-            }
-            other => panic!("unexpected: {other:?}"),
-        }
+        assert!(
+            matches!(err.kind(), RequestErrorKind::NoEndpoint(name) if name == "pushed_authorization_request")
+        );
     }
 
     #[tokio::test]
@@ -706,7 +985,7 @@ mod tests {
             },
         };
         let err = super::refresh(&client, session, &meta).await.unwrap_err();
-        matches!(err, RequestError::NoRefreshToken);
+        assert!(matches!(err.kind(), RequestErrorKind::NoRefreshToken));
     }
 
     #[tokio::test]
@@ -734,6 +1013,6 @@ mod tests {
         let err = super::exchange_code(&client, &mut dpop, "abc", "verifier", &meta)
             .await
             .unwrap_err();
-        matches!(err, RequestError::TokenVerification);
+        assert!(matches!(err.kind(), RequestErrorKind::TokenVerification));
     }
 }

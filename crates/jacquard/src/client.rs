@@ -18,14 +18,27 @@
 
 /// App-password session implementation with auto-refresh
 pub mod credential_session;
+/// Agent error type
+pub mod error;
 /// Token storage and on-disk persistence formats
 pub mod token;
 /// Trait for fetch-modify-put patterns on array-based endpoints
 pub mod vec_update;
 
+use crate::client::credential_session::{CredentialSession, SessionKey};
+use crate::client::vec_update::VecUpdate;
 use core::future::Future;
-use jacquard_common::error::TransportError;
-pub use jacquard_common::error::{ClientError, XrpcResult};
+pub use error::*;
+#[cfg(feature = "api")]
+use jacquard_api::com_atproto::{
+    repo::{
+        create_record::CreateRecordOutput, delete_record::DeleteRecordOutput,
+        get_record::GetRecordResponse, put_record::PutRecordOutput,
+    },
+    server::{create_session::CreateSessionOutput, refresh_session::RefreshSessionOutput},
+};
+use jacquard_common::error::XrpcResult;
+pub use jacquard_common::error::{ClientError, XrpcResult as ClientResult};
 use jacquard_common::http_client::HttpClient;
 pub use jacquard_common::session::{MemorySessionStore, SessionStore, SessionStoreError};
 use jacquard_common::types::blob::{Blob, MimeType};
@@ -49,99 +62,149 @@ use jacquard_oauth::authstore::ClientAuthStore;
 use jacquard_oauth::client::OAuthSession;
 use jacquard_oauth::dpop::DpopExt;
 use jacquard_oauth::resolver::OAuthResolver;
-
 use serde::Serialize;
+#[cfg(feature = "api")]
+use std::marker::Send;
+use std::option::Option;
 pub use token::FileAuthStore;
 
-use crate::client::credential_session::{CredentialSession, SessionKey};
-use crate::client::vec_update::VecUpdate;
-
-use jacquard_common::error::{AuthError, DecodeError};
-use jacquard_common::types::nsid::Nsid;
-use jacquard_common::xrpc::GenericXrpcError;
-
-/// Error type for Agent convenience methods
-#[derive(Debug, thiserror::Error, miette::Diagnostic)]
-pub enum AgentError {
-    /// Transport/network layer failure
-    #[error(transparent)]
-    #[diagnostic(transparent)]
-    Client(#[from] ClientError),
-
-    /// No session available for operations requiring authentication
-    #[error("No session available - cannot determine repo")]
-    NoSession,
-
-    /// Authentication error from XRPC layer
-    #[error("Authentication error: {0}")]
-    #[diagnostic(transparent)]
-    Auth(
-        #[from]
-        #[diagnostic_source]
-        AuthError,
-    ),
-
-    /// Generic XRPC error (InvalidRequest, etc.)
-    #[error("XRPC error: {0}")]
-    Generic(GenericXrpcError),
-
-    /// Response deserialization failed
-    #[error("Failed to decode response: {0}")]
-    #[diagnostic(transparent)]
-    Decode(
-        #[from]
-        #[diagnostic_source]
-        DecodeError,
-    ),
-
-    /// Record operation failed with typed error from endpoint
-    /// Context: which repo/collection/rkey we were operating on
-    #[error("Record operation failed on {collection}/{rkey:?} in repo {repo}: {error}")]
-    RecordOperation {
-        /// The repository DID
-        repo: Did<'static>,
-        /// The collection NSID
-        collection: Nsid<'static>,
-        /// The record key
-        rkey: RecordKey<Rkey<'static>>,
-        /// The underlying error
-        error: Box<dyn std::error::Error + Send + Sync>,
-    },
-
-    /// Multi-step operation failed at sub-step (e.g., get failed in update_record)
-    #[error("Operation failed at step '{step}': {error}")]
-    SubOperation {
-        /// Description of which step failed
-        step: &'static str,
-        /// The underlying error
-        error: Box<dyn std::error::Error + Send + Sync>,
-    },
+/// Identifies the active authentication mode for an agent/session.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AgentKind {
+    /// App password (Bearer) session
+    AppPassword,
+    /// OAuth (DPoP) session
+    OAuth,
 }
 
-impl IntoStatic for AgentError {
-    type Output = AgentError;
+/// Common interface for stateful sessions used by the Agent wrapper.
+///
+/// Implemented by `CredentialSession` (app‑password) and `OAuthSession` (DPoP).
+#[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
+pub trait AgentSession: XrpcClient + HttpClient + Send + Sync {
+    /// Identify the kind of session.
+    fn session_kind(&self) -> AgentKind;
+    /// Return current DID and an optional session id (always Some for OAuth).
+    fn session_info(&self)
+    -> impl Future<Output = Option<(Did<'static>, Option<CowStr<'static>>)>>;
+    /// Current base endpoint.
+    fn endpoint(&self) -> impl Future<Output = url::Url>;
+    /// Override per-session call options.
+    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()>;
+    /// Refresh the session and return a fresh AuthorizationToken.
+    fn refresh(&self) -> impl Future<Output = ClientResult<AuthorizationToken<'static>>>;
+}
 
-    fn into_static(self) -> Self::Output {
-        match self {
-            AgentError::RecordOperation {
-                repo,
-                collection,
-                rkey,
-                error,
-            } => AgentError::RecordOperation {
-                repo: repo.into_static(),
-                collection: collection.into_static(),
-                rkey: rkey.into_static(),
-                error,
-            },
-            AgentError::SubOperation { step, error } => AgentError::SubOperation { step, error },
-            // Error types are already 'static
-            AgentError::Client(e) => AgentError::Client(e),
-            AgentError::NoSession => AgentError::NoSession,
-            AgentError::Auth(e) => AgentError::Auth(e),
-            AgentError::Generic(e) => AgentError::Generic(e),
-            AgentError::Decode(e) => AgentError::Decode(e),
-        }
+/// Alias for an agent over a credential (app‑password) session.
+pub type CredentialAgent<S, T> = Agent<CredentialSession<S, T>>;
+/// Alias for an agent over an OAuth (DPoP) session.
+pub type OAuthAgent<T, S> = Agent<OAuthSession<T, S>>;
+
+/// BasicClient: in-memory store + public resolver over a credential session.
+pub type BasicClient = Agent<
+    CredentialSession<
+        MemorySessionStore<SessionKey, AtpSession>,
+        jacquard_identity::PublicResolver,
+    >,
+>;
+
+impl BasicClient {
+    /// Create an unauthenticated BasicClient for public API access.
+    ///
+    /// Uses an in-memory session store and public resolver. Suitable for
+    /// read-only operations on public data without authentication.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use jacquard::client::BasicClient;
+    /// # use jacquard::types::string::AtUri;
+    /// # use jacquard_api::app_bsky::feed::post::Post;
+    /// use crate::jacquard::client::AgentSessionExt;
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = BasicClient::unauthenticated();
+    /// let uri = AtUri::new_static("at://did:plc:xyz/app.bsky.feed.post/3l5abc").unwrap();
+    /// let response = client.get_record::<Post<'_>>(&uri).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn unauthenticated() -> Self {
+        use std::sync::Arc;
+        let http = reqwest::Client::new();
+        let resolver = jacquard_identity::PublicResolver::new(http, Default::default());
+        let store = MemorySessionStore::default();
+        let session = CredentialSession::new(Arc::new(store), Arc::new(resolver));
+        Agent::new(session)
+    }
+}
+
+impl Default for BasicClient {
+    fn default() -> Self {
+        Self::unauthenticated()
+    }
+}
+
+/// MemoryCredentialSession: credential session with in memory store and identity resolver
+pub type MemoryCredentialSession = CredentialSession<
+    MemorySessionStore<SessionKey, AtpSession>,
+    jacquard_identity::PublicResolver,
+>;
+
+impl MemoryCredentialSession {
+    /// Create an unauthenticated MemoryCredentialSession.
+    ///
+    /// Uses an in memory store and a public resolver.
+    /// Equivalent to a BasicClient that isn't wrapped in Agent
+    pub fn unauthenticated() -> Self {
+        use std::sync::Arc;
+        let http = reqwest::Client::new();
+        let resolver = jacquard_identity::PublicResolver::new(http, Default::default());
+        let store = MemorySessionStore::default();
+        CredentialSession::new(Arc::new(store), Arc::new(resolver))
+    }
+
+    /// Create a MemoryCredentialSession and authenticate with the provided details
+    ///
+    /// - `identifier`: handle (preferred), DID, or `https://` PDS base URL.
+    /// - `session_id`: optional session label; defaults to "session".
+    /// - Persists and activates the session, and updates the base endpoint to the user's PDS.
+    ///
+    /// # Example
+    /// ```no_run
+    /// # use jacquard::client::BasicClient;
+    /// # use jacquard::types::string::AtUri;
+    /// # use jacquard::api::app_bsky::feed::post::Post;
+    /// # use jacquard::types::string::Datetime;
+    /// # use jacquard::CowStr;
+    /// use jacquard::client::MemoryCredentialSession;
+    /// use jacquard::client::{Agent, AgentSessionExt};
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let (identifier, password, post_text): (CowStr<'_>, CowStr<'_>, CowStr<'_>)  = todo!();
+    /// let (session, _) = MemoryCredentialSession::authenticated(identifier, password, None).await?;
+    /// let agent = Agent::from(session);
+    /// let post = Post::builder().text(post_text).created_at(Datetime::now()).build();
+    /// let output = agent.create_record(post, None).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn authenticated(
+        identifier: CowStr<'_>,
+        password: CowStr<'_>,
+        session_id: Option<CowStr<'_>>,
+    ) -> ClientResult<(Self, AtpSession)> {
+        let session = MemoryCredentialSession::unauthenticated();
+        let auth = session
+            .login(identifier, password, session_id, None, None)
+            .await?;
+        Ok((session, auth))
+    }
+}
+
+impl Default for MemoryCredentialSession {
+    fn default() -> Self {
+        MemoryCredentialSession::unauthenticated()
     }
 }
 
@@ -184,109 +247,6 @@ impl From<RefreshSessionOutput<'_>> for AtpSession {
     }
 }
 
-/// Identifies the active authentication mode for an agent/session.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AgentKind {
-    /// App password (Bearer) session
-    AppPassword,
-    /// OAuth (DPoP) session
-    OAuth,
-}
-
-/// Common interface for stateful sessions used by the Agent wrapper.
-///
-/// Implemented by `CredentialSession` (app‑password) and `OAuthSession` (DPoP).
-#[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
-pub trait AgentSession: XrpcClient + HttpClient + Send + Sync {
-    /// Identify the kind of session.
-    fn session_kind(&self) -> AgentKind;
-    /// Return current DID and an optional session id (always Some for OAuth).
-    fn session_info(&self)
-    -> impl Future<Output = Option<(Did<'static>, Option<CowStr<'static>>)>>;
-    /// Current base endpoint.
-    fn endpoint(&self) -> impl Future<Output = url::Url>;
-    /// Override per-session call options.
-    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()>;
-    /// Refresh the session and return a fresh AuthorizationToken.
-    fn refresh(&self) -> impl Future<Output = Result<AuthorizationToken<'static>, ClientError>>;
-}
-
-impl<S, T, W> AgentSession for CredentialSession<S, T, W>
-where
-    S: SessionStore<SessionKey, AtpSession> + Send + Sync + 'static,
-    T: IdentityResolver + HttpClient + XrpcExt + Send + Sync + 'static,
-    W: Send + Sync,
-{
-    fn session_kind(&self) -> AgentKind {
-        AgentKind::AppPassword
-    }
-    fn session_info(
-        &self,
-    ) -> impl Future<
-        Output = std::option::Option<(
-            jacquard_common::types::did::Did<'static>,
-            std::option::Option<CowStr<'static>>,
-        )>,
-    > {
-        async move {
-            CredentialSession::<S, T, W>::session_info(self)
-                .await
-                .map(|(did, sid)| (did, Some(sid)))
-        }
-    }
-    fn endpoint(&self) -> impl Future<Output = url::Url> {
-        async move { CredentialSession::<S, T, W>::endpoint(self).await }
-    }
-    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
-        async move { CredentialSession::<S, T, W>::set_options(self, opts).await }
-    }
-    fn refresh(&self) -> impl Future<Output = Result<AuthorizationToken<'static>, ClientError>> {
-        async move {
-            Ok(CredentialSession::<S, T, W>::refresh(self)
-                .await?
-                .into_static())
-        }
-    }
-}
-
-impl<T, S, W> AgentSession for OAuthSession<T, S, W>
-where
-    S: ClientAuthStore + Send + Sync + 'static,
-    T: OAuthResolver + DpopExt + XrpcExt + Send + Sync + 'static,
-    W: Send + Sync,
-{
-    fn session_kind(&self) -> AgentKind {
-        AgentKind::OAuth
-    }
-    fn session_info(
-        &self,
-    ) -> impl Future<
-        Output = std::option::Option<(
-            jacquard_common::types::did::Did<'static>,
-            std::option::Option<CowStr<'static>>,
-        )>,
-    > {
-        async {
-            let (did, sid) = OAuthSession::<T, S, W>::session_info(self).await;
-            Some((did.into_static(), Some(sid.into_static())))
-        }
-    }
-    fn endpoint(&self) -> impl Future<Output = url::Url> {
-        async { self.endpoint().await }
-    }
-    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
-        async { self.set_options(opts).await }
-    }
-    fn refresh(&self) -> impl Future<Output = Result<AuthorizationToken<'static>, ClientError>> {
-        async {
-            self.refresh()
-                .await
-                .map(|t| t.into_static())
-                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))
-        }
-    }
-}
-
 /// Thin wrapper over a stateful session providing a uniform `XrpcClient`.
 pub struct Agent<A: AgentSession> {
     inner: A,
@@ -319,28 +279,27 @@ impl<A: AgentSession> Agent<A> {
     }
 
     /// Refresh the session and return a fresh token.
-    pub async fn refresh(&self) -> Result<AuthorizationToken<'static>, ClientError> {
+    pub async fn refresh(&self) -> ClientResult<AuthorizationToken<'static>> {
         self.inner.refresh().await
     }
 }
 
-#[cfg(feature = "api")]
-use jacquard_api::com_atproto::{
-    repo::{
-        create_record::CreateRecordOutput, delete_record::DeleteRecordOutput,
-        get_record::GetRecordResponse, put_record::PutRecordOutput,
-    },
-    server::{create_session::CreateSessionOutput, refresh_session::RefreshSessionOutput},
-};
-
-/// doc
+/// Output type for a collection record retrieval operation
 pub type CollectionOutput<'a, R> = <<R as Collection>::Record as XrpcResp>::Output<'a>;
-/// doc
+/// Error type for a collection record retrieval operation
 pub type CollectionErr<'a, R> = <<R as Collection>::Record as XrpcResp>::Err<'a>;
-/// doc
+/// Response type for the get request of a vec update operation
 pub type VecGetResponse<U> = <<U as VecUpdate>::GetRequest as XrpcRequest>::Response;
-/// doc
+/// Response type for the put request of a vec update operation
 pub type VecPutResponse<U> = <<U as VecUpdate>::PutRequest as XrpcRequest>::Response;
+
+type CollectionError<'a, R> = <<R as Collection>::Record as XrpcResp>::Err<'a>;
+
+type VecUpdateGetError<'a, U> =
+    <<<U as VecUpdate>::GetRequest as XrpcRequest>::Response as XrpcResp>::Err<'a>;
+
+type VecUpdatePutError<'a, U> =
+    <<<U as VecUpdate>::PutRequest as XrpcRequest>::Response as XrpcResp>::Err<'a>;
 
 /// Extension trait providing convenience methods for common repository operations.
 ///
@@ -423,7 +382,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         &self,
         record: R,
         rkey: Option<RecordKey<Rkey<'_>>>,
-    ) -> impl Future<Output = Result<CreateRecordOutput<'static>, AgentError>>
+    ) -> impl Future<Output = Result<CreateRecordOutput<'static>>>
     where
         R: Collection + serde::Serialize,
     {
@@ -435,12 +394,13 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             use jacquard_common::types::ident::AtIdentifier;
             use jacquard_common::types::value::to_data;
 
-            let (did, _) = self.session_info().await.ok_or(AgentError::NoSession)?;
+            let (did, _) = self
+                .session_info()
+                .await
+                .ok_or_else(AgentError::no_session)?;
 
-            let data = to_data(&record).map_err(|e| AgentError::SubOperation {
-                step: "serialize record",
-                error: Box::new(e),
-            })?;
+            let data =
+                to_data(&record).map_err(|e| AgentError::sub_operation("serialize record", e))?;
 
             let request = CreateRecord::new()
                 .repo(AtIdentifier::Did(did))
@@ -451,13 +411,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
 
             let response = self.send(request).await?;
             response.into_output().map_err(|e| match e {
-                XrpcError::Auth(auth) => AgentError::Auth(auth),
-                XrpcError::Generic(g) => AgentError::Generic(g),
-                XrpcError::Decode(e) => AgentError::Decode(e),
-                XrpcError::Xrpc(typed) => AgentError::SubOperation {
-                    step: "create record",
-                    error: Box::new(typed),
-                },
+                XrpcError::Auth(auth) => AgentError::from(auth),
+                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
+                XrpcError::Xrpc(typed) => AgentError::sub_operation("create record", typed),
             })
         }
     }
@@ -491,7 +447,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     fn get_record<R>(
         &self,
         uri: &AtUri<'_>,
-    ) -> impl Future<Output = Result<Response<R::Record>, ClientError>>
+    ) -> impl Future<Output = ClientResult<Response<R::Record>>>
     where
         R: Collection,
     {
@@ -503,19 +459,18 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             // Validate that URI's collection matches the expected type
             if let Some(uri_collection) = uri.collection() {
                 if uri_collection.as_str() != R::nsid().as_str() {
-                    return Err(ClientError::Transport(TransportError::Other(
-                    format!(
+                    return Err(ClientError::invalid_request(format!(
                         "Collection mismatch: URI contains '{}' but type parameter expects '{}'",
                         uri_collection,
                         R::nsid()
-                    )
-                    .into(),
-                )));
+                    ))
+                    .with_help("ensure the URI collection matches the record type"));
                 }
             }
 
             let rkey = uri.rkey().ok_or_else(|| {
-                ClientError::Transport(TransportError::Other("AtUri missing rkey".into()))
+                ClientError::invalid_request("AtUri missing rkey")
+                    .with_help("ensure the URI includes a record key after the collection")
             })?;
 
             // Resolve authority (DID or handle) to get DID and PDS
@@ -523,16 +478,14 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             let (repo_did, pds_url) = match uri.authority() {
                 AtIdentifier::Did(did) => {
                     let pds = self.pds_for_did(did).await.map_err(|e| {
-                        ClientError::Transport(TransportError::Other(
-                            format!("Failed to resolve PDS for {}: {}", did, e).into(),
-                        ))
+                        ClientError::from(e)
+                            .with_context("DID document resolution failed during record retrieval")
                     })?;
                     (did.clone(), pds)
                 }
                 AtIdentifier::Handle(handle) => self.pds_for_handle(handle).await.map_err(|e| {
-                    ClientError::Transport(TransportError::Other(
-                        format!("Failed to resolve handle {}: {}", handle, e).into(),
-                    ))
+                    ClientError::from(e)
+                        .with_context("handle resolution failed during record retrieval")
                 })?,
             };
 
@@ -545,13 +498,13 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                 .build();
 
             let response: Response<GetRecordResponse> = {
-                let http_request = xrpc::build_http_request(&pds_url, &request, &self.opts().await)
-                    .map_err(|e| ClientError::Transport(TransportError::from(e)))?;
+                let http_request =
+                    xrpc::build_http_request(&pds_url, &request, &self.opts().await)?;
 
                 let http_response = self
                     .send_http(http_request)
                     .await
-                    .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
+                    .map_err(|e| ClientError::transport(e))?;
 
                 xrpc::process_response(http_response)
             }?;
@@ -566,20 +519,24 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     fn fetch_record<R>(
         &self,
         uri: &RecordUri<'_, R>,
-    ) -> impl Future<Output = Result<CollectionOutput<'static, R>, ClientError>>
+    ) -> impl Future<Output = Result<CollectionOutput<'static, R>>>
     where
         R: Collection,
         for<'a> CollectionOutput<'a, R>: IntoStatic<Output = CollectionOutput<'static, R>>,
-        for<'a> CollectionErr<'a, R>: IntoStatic<Output = CollectionErr<'static, R>>,
+        for<'a> CollectionErr<'a, R>: IntoStatic<Output = CollectionErr<'static, R>> + Send + Sync,
     {
         let uri = uri.as_uri();
         async move {
             let response = self.get_record::<R>(uri).await?;
             let response: Response<R::Record> = response.transmute();
-            let output = response
-                .into_output()
-                .map_err(|e| ClientError::Transport(TransportError::Other(e.to_string().into())))?;
-            // TODO: fix this to use a better error lol
+            let output = response.into_output().map_err(|e| match e {
+                XrpcError::Auth(auth) => AgentError::from(auth),
+                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
+                XrpcError::Xrpc(typed) => {
+                    AgentError::new(AgentErrorKind::SubOperation { step: "get record" }, None)
+                        .with_details(typed.to_string())
+                }
+            })?;
             Ok(output)
         }
     }
@@ -614,10 +571,13 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         &self,
         uri: &AtUri<'_>,
         f: impl FnOnce(&mut R),
-    ) -> impl Future<Output = Result<PutRecordOutput<'static>, AgentError>>
+    ) -> impl Future<Output = Result<PutRecordOutput<'static>>>
     where
         R: Collection + Serialize,
         R: for<'a> From<CollectionOutput<'a, R>>,
+        for<'a> <CollectionError<'a, R> as IntoStatic>::Output:
+            IntoStatic + std::error::Error + Send + Sync,
+        for<'a> CollectionError<'a, R>: Send + Sync + std::error::Error + IntoStatic,
     {
         async move {
             #[cfg(feature = "tracing")]
@@ -629,13 +589,12 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
 
             // Parse to get R<'_> borrowing from response buffer
             let record = response.parse().map_err(|e| match e {
-                XrpcError::Auth(auth) => AgentError::Auth(auth),
-                XrpcError::Generic(g) => AgentError::Generic(g),
-                XrpcError::Decode(e) => AgentError::Decode(e),
-                XrpcError::Xrpc(typed) => AgentError::SubOperation {
-                    step: "get record",
-                    error: format!("{:?}", typed).into(),
-                },
+                XrpcError::Auth(auth) => AgentError::from(auth),
+                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
+                XrpcError::Xrpc(typed) => {
+                    AgentError::new(AgentErrorKind::SubOperation { step: "get record" }, None)
+                        .with_details(typed.to_string())
+                }
             })?;
 
             // Convert to owned
@@ -647,9 +606,11 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             // Put it back
             let rkey = uri
                 .rkey()
-                .ok_or(AgentError::SubOperation {
-                    step: "extract rkey",
-                    error: "AtUri missing rkey".into(),
+                .ok_or_else(|| {
+                    AgentError::sub_operation(
+                        "extract rkey",
+                        std::io::Error::new(std::io::ErrorKind::InvalidInput, "AtUri missing rkey"),
+                    )
                 })?
                 .clone()
                 .into_static();
@@ -664,7 +625,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     fn delete_record<R>(
         &self,
         rkey: RecordKey<Rkey<'_>>,
-    ) -> impl Future<Output = Result<DeleteRecordOutput<'static>, AgentError>>
+    ) -> impl Future<Output = Result<DeleteRecordOutput<'static>>>
     where
         R: Collection,
     {
@@ -675,7 +636,10 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             use jacquard_api::com_atproto::repo::delete_record::DeleteRecord;
             use jacquard_common::types::ident::AtIdentifier;
 
-            let (did, _) = self.session_info().await.ok_or(AgentError::NoSession)?;
+            let (did, _) = self
+                .session_info()
+                .await
+                .ok_or_else(AgentError::no_session)?;
 
             let request = DeleteRecord::new()
                 .repo(AtIdentifier::Did(did))
@@ -685,13 +649,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
 
             let response = self.send(request).await?;
             response.into_output().map_err(|e| match e {
-                XrpcError::Auth(auth) => AgentError::Auth(auth),
-                XrpcError::Generic(g) => AgentError::Generic(g),
-                XrpcError::Decode(e) => AgentError::Decode(e),
-                XrpcError::Xrpc(typed) => AgentError::SubOperation {
-                    step: "delete record",
-                    error: Box::new(typed),
-                },
+                XrpcError::Auth(auth) => AgentError::from(auth),
+                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
+                XrpcError::Xrpc(typed) => AgentError::sub_operation("delete record", typed),
             })
         }
     }
@@ -704,7 +664,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         &self,
         rkey: RecordKey<Rkey<'static>>,
         record: R,
-    ) -> impl Future<Output = Result<PutRecordOutput<'static>, AgentError>>
+    ) -> impl Future<Output = Result<PutRecordOutput<'static>>>
     where
         R: Collection + serde::Serialize,
     {
@@ -716,12 +676,13 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             use jacquard_common::types::ident::AtIdentifier;
             use jacquard_common::types::value::to_data;
 
-            let (did, _) = self.session_info().await.ok_or(AgentError::NoSession)?;
+            let (did, _) = self
+                .session_info()
+                .await
+                .ok_or_else(AgentError::no_session)?;
 
-            let data = to_data(&record).map_err(|e| AgentError::SubOperation {
-                step: "serialize record",
-                error: Box::new(e),
-            })?;
+            let data =
+                to_data(&record).map_err(|e| AgentError::sub_operation("serialize record", e))?;
 
             let request = PutRecord::new()
                 .repo(AtIdentifier::Did(did))
@@ -732,13 +693,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
 
             let response = self.send(request).await?;
             response.into_output().map_err(|e| match e {
-                XrpcError::Auth(auth) => AgentError::Auth(auth),
-                XrpcError::Generic(g) => AgentError::Generic(g),
-                XrpcError::Decode(e) => AgentError::Decode(e),
-                XrpcError::Xrpc(typed) => AgentError::SubOperation {
-                    step: "put record",
-                    error: Box::new(typed),
-                },
+                XrpcError::Auth(auth) => AgentError::from(auth),
+                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
+                XrpcError::Xrpc(typed) => AgentError::sub_operation("put record", typed),
             })
         }
     }
@@ -767,7 +724,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         &self,
         data: impl Into<bytes::Bytes>,
         mime_type: MimeType<'_>,
-    ) -> impl Future<Output = Result<Blob<'static>, AgentError>> {
+    ) -> impl Future<Output = Result<Blob<'static>>> {
         async move {
             #[cfg(feature = "tracing")]
             let _span = tracing::debug_span!("upload_blob", mime_type = %mime_type).entered();
@@ -783,24 +740,16 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
 
             opts.extra_headers.push((
                 CONTENT_TYPE,
-                http::HeaderValue::from_str(mime_type.as_str()).map_err(|e| {
-                    AgentError::SubOperation {
-                        step: "set Content-Type header",
-                        error: Box::new(e),
-                    }
-                })?,
+                http::HeaderValue::from_str(mime_type.as_str())
+                    .map_err(|e| AgentError::sub_operation("set Content-Type header", e))?,
             ));
             let response = self.send_with_opts(request, opts).await?;
             let debug: serde_json::Value = serde_json::from_slice(response.buffer()).unwrap();
             println!("json: {}", serde_json::to_string_pretty(&debug).unwrap());
             let output = response.into_output().map_err(|e| match e {
-                XrpcError::Auth(auth) => AgentError::Auth(auth),
-                XrpcError::Generic(g) => AgentError::Generic(g),
-                XrpcError::Decode(e) => AgentError::Decode(e),
-                XrpcError::Xrpc(typed) => AgentError::SubOperation {
-                    step: "upload blob",
-                    error: Box::new(typed),
-                },
+                XrpcError::Auth(auth) => AgentError::from(auth),
+                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
+                XrpcError::Xrpc(typed) => AgentError::sub_operation("upload blob", typed),
             })?;
             Ok(output.blob.blob().clone().into_static())
         }
@@ -822,26 +771,30 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     fn update_vec<U>(
         &self,
         modify: impl FnOnce(&mut Vec<<U as VecUpdate>::Item>),
-    ) -> impl Future<Output = Result<xrpc::Response<VecPutResponse<U>>, AgentError>>
+    ) -> impl Future<Output = Result<xrpc::Response<VecPutResponse<U>>>>
     where
         U: VecUpdate,
         <U as VecUpdate>::PutRequest: Send + Sync,
         <U as VecUpdate>::GetRequest: Send + Sync,
         VecGetResponse<U>: Send + Sync,
         VecPutResponse<U>: Send + Sync,
+        for<'a> VecUpdateGetError<'a, U>: Send + Sync + std::error::Error + IntoStatic,
+        for<'a> VecUpdatePutError<'a, U>: Send + Sync + std::error::Error + IntoStatic,
+        for<'a> <VecUpdateGetError<'a, U> as IntoStatic>::Output:
+            Send + Sync + std::error::Error + IntoStatic + 'static,
+        for<'a> <VecUpdatePutError<'a, U> as IntoStatic>::Output:
+            Send + Sync + std::error::Error + IntoStatic + 'static,
     {
         async {
             // Fetch current data
             let get_request = U::build_get();
             let response = self.send(get_request).await?;
             let output = response.parse().map_err(|e| match e {
-                XrpcError::Auth(auth) => AgentError::Auth(auth),
-                XrpcError::Generic(g) => AgentError::Generic(g),
-                XrpcError::Decode(e) => AgentError::Decode(e),
-                XrpcError::Xrpc(_) => AgentError::SubOperation {
-                    step: "get vec",
-                    error: format!("{:?}", e).into(),
-                },
+                XrpcError::Auth(auth) => AgentError::from(auth),
+                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
+                XrpcError::Xrpc(typed) => {
+                    AgentError::sub_operation("update vec", typed.into_static())
+                }
             })?;
 
             // Extract vec (converts to owned via IntoStatic)
@@ -872,13 +825,19 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     fn update_vec_item<U>(
         &self,
         item: <U as VecUpdate>::Item,
-    ) -> impl Future<Output = Result<xrpc::Response<VecPutResponse<U>>, AgentError>>
+    ) -> impl Future<Output = Result<xrpc::Response<VecPutResponse<U>>>>
     where
         U: VecUpdate,
         <U as VecUpdate>::PutRequest: Send + Sync,
         <U as VecUpdate>::GetRequest: Send + Sync,
         VecGetResponse<U>: Send + Sync,
         VecPutResponse<U>: Send + Sync,
+        for<'a> VecUpdateGetError<'a, U>: Send + Sync + std::error::Error + IntoStatic,
+        for<'a> VecUpdatePutError<'a, U>: Send + Sync + std::error::Error + IntoStatic,
+        for<'a> <VecUpdateGetError<'a, U> as IntoStatic>::Output:
+            Send + Sync + std::error::Error + IntoStatic + 'static,
+        for<'a> <VecUpdatePutError<'a, U> as IntoStatic>::Output:
+            Send + Sync + std::error::Error + IntoStatic + 'static,
     {
         async {
             self.update_vec::<U>(|vec| {
@@ -895,6 +854,72 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
 
 #[cfg(feature = "api")]
 impl<T: AgentSession + IdentityResolver> AgentSessionExt for T {}
+
+impl<S, T, W> AgentSession for CredentialSession<S, T, W>
+where
+    S: SessionStore<SessionKey, AtpSession> + Send + Sync + 'static,
+    T: IdentityResolver + HttpClient + XrpcExt + Send + Sync + 'static,
+    W: Send + Sync,
+{
+    fn session_kind(&self) -> AgentKind {
+        AgentKind::AppPassword
+    }
+    fn session_info(
+        &self,
+    ) -> impl Future<Output = Option<(Did<'static>, Option<CowStr<'static>>)>> {
+        async move {
+            CredentialSession::<S, T, W>::session_info(self)
+                .await
+                .map(|(did, sid)| (did, Some(sid)))
+        }
+    }
+    fn endpoint(&self) -> impl Future<Output = url::Url> {
+        async move { CredentialSession::<S, T, W>::endpoint(self).await }
+    }
+    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
+        async move { CredentialSession::<S, T, W>::set_options(self, opts).await }
+    }
+    fn refresh(&self) -> impl Future<Output = ClientResult<AuthorizationToken<'static>>> {
+        async move {
+            Ok(CredentialSession::<S, T, W>::refresh(self)
+                .await?
+                .into_static())
+        }
+    }
+}
+
+impl<T, S, W> AgentSession for OAuthSession<T, S, W>
+where
+    S: ClientAuthStore + Send + Sync + 'static,
+    T: OAuthResolver + DpopExt + XrpcExt + Send + Sync + 'static,
+    W: Send + Sync,
+{
+    fn session_kind(&self) -> AgentKind {
+        AgentKind::OAuth
+    }
+    fn session_info(
+        &self,
+    ) -> impl Future<Output = Option<(Did<'static>, Option<CowStr<'static>>)>> {
+        async {
+            let (did, sid) = OAuthSession::<T, S, W>::session_info(self).await;
+            Some((did.into_static(), Some(sid.into_static())))
+        }
+    }
+    fn endpoint(&self) -> impl Future<Output = url::Url> {
+        async { self.endpoint().await }
+    }
+    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
+        async { self.set_options(opts).await }
+    }
+    fn refresh(&self) -> impl Future<Output = ClientResult<AuthorizationToken<'static>>> {
+        async {
+            self.refresh()
+                .await
+                .map(|t| t.into_static())
+                .map_err(|e| ClientError::transport(e).with_context("OAuth token refresh failed"))
+        }
+    }
+}
 
 impl<A: AgentSession> HttpClient for Agent<A> {
     type Error = <A as HttpClient>::Error;
@@ -1103,14 +1128,14 @@ impl<A: AgentSession + IdentityResolver> IdentityResolver for Agent<A> {
     fn resolve_handle(
         &self,
         handle: &Handle<'_>,
-    ) -> impl Future<Output = Result<Did<'static>, IdentityError>> {
+    ) -> impl Future<Output = core::result::Result<Did<'static>, IdentityError>> {
         async { self.inner.resolve_handle(handle).await }
     }
 
     fn resolve_did_doc(
         &self,
         did: &Did<'_>,
-    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>> {
+    ) -> impl Future<Output = core::result::Result<DidDocResponse, IdentityError>> {
         async { self.inner.resolve_did_doc(did).await }
     }
 }
@@ -1134,7 +1159,7 @@ impl<A: AgentSession> AgentSession for Agent<A> {
         async { self.set_options(opts).await }
     }
 
-    fn refresh(&self) -> impl Future<Output = Result<AuthorizationToken<'static>, ClientError>> {
+    fn refresh(&self) -> impl Future<Output = ClientResult<AuthorizationToken<'static>>> {
         async { self.refresh().await }
     }
 }
@@ -1142,118 +1167,5 @@ impl<A: AgentSession> AgentSession for Agent<A> {
 impl<A: AgentSession> From<A> for Agent<A> {
     fn from(inner: A) -> Self {
         Self::new(inner)
-    }
-}
-
-/// Alias for an agent over a credential (app‑password) session.
-pub type CredentialAgent<S, T> = Agent<CredentialSession<S, T>>;
-/// Alias for an agent over an OAuth (DPoP) session.
-pub type OAuthAgent<T, S> = Agent<OAuthSession<T, S>>;
-
-/// BasicClient: in-memory store + public resolver over a credential session.
-pub type BasicClient = Agent<
-    CredentialSession<
-        MemorySessionStore<SessionKey, AtpSession>,
-        jacquard_identity::PublicResolver,
-    >,
->;
-
-impl BasicClient {
-    /// Create an unauthenticated BasicClient for public API access.
-    ///
-    /// Uses an in-memory session store and public resolver. Suitable for
-    /// read-only operations on public data without authentication.
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// # use jacquard::client::BasicClient;
-    /// # use jacquard::types::string::AtUri;
-    /// # use jacquard_api::app_bsky::feed::post::Post;
-    /// use crate::jacquard::client::AgentSessionExt;
-    /// # #[tokio::main]
-    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = BasicClient::unauthenticated();
-    /// let uri = AtUri::new_static("at://did:plc:xyz/app.bsky.feed.post/3l5abc").unwrap();
-    /// let response = client.get_record::<Post<'_>>(&uri).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn unauthenticated() -> Self {
-        use std::sync::Arc;
-        let http = reqwest::Client::new();
-        let resolver = jacquard_identity::PublicResolver::new(http, Default::default());
-        let store = MemorySessionStore::default();
-        let session = CredentialSession::new(Arc::new(store), Arc::new(resolver));
-        Agent::new(session)
-    }
-}
-
-impl Default for BasicClient {
-    fn default() -> Self {
-        Self::unauthenticated()
-    }
-}
-
-/// MemoryCredentialSession: credential session with in memory store and identity resolver
-pub type MemoryCredentialSession = CredentialSession<
-    MemorySessionStore<SessionKey, AtpSession>,
-    jacquard_identity::PublicResolver,
->;
-
-impl MemoryCredentialSession {
-    /// Create an unauthenticated MemoryCredentialSession.
-    ///
-    /// Uses an in memory store and a public resolver.
-    /// Equivalent to a BasicClient that isn't wrapped in Agent
-    pub fn unauthenticated() -> Self {
-        use std::sync::Arc;
-        let http = reqwest::Client::new();
-        let resolver = jacquard_identity::PublicResolver::new(http, Default::default());
-        let store = MemorySessionStore::default();
-        CredentialSession::new(Arc::new(store), Arc::new(resolver))
-    }
-
-    /// Create a MemoryCredentialSession and authenticate with the provided details
-    ///
-    /// - `identifier`: handle (preferred), DID, or `https://` PDS base URL.
-    /// - `session_id`: optional session label; defaults to "session".
-    /// - Persists and activates the session, and updates the base endpoint to the user's PDS.
-    ///
-    /// # Example
-    /// ```no_run
-    /// # use jacquard::client::BasicClient;
-    /// # use jacquard::types::string::AtUri;
-    /// # use jacquard::api::app_bsky::feed::post::Post;
-    /// # use jacquard::types::string::Datetime;
-    /// # use jacquard::CowStr;
-    /// use jacquard::client::MemoryCredentialSession;
-    /// use jacquard::client::{Agent, AgentSessionExt};
-    /// # #[tokio::main]
-    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let (identifier, password, post_text): (CowStr<'_>, CowStr<'_>, CowStr<'_>)  = todo!();
-    /// let (session, _) = MemoryCredentialSession::authenticated(identifier, password, None).await?;
-    /// let agent = Agent::from(session);
-    /// let post = Post::builder().text(post_text).created_at(Datetime::now()).build();
-    /// let output = agent.create_record(post, None).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub async fn authenticated(
-        identifier: CowStr<'_>,
-        password: CowStr<'_>,
-        session_id: Option<CowStr<'_>>,
-    ) -> Result<(Self, AtpSession), ClientError> {
-        let session = MemoryCredentialSession::unauthenticated();
-        let auth = session
-            .login(identifier, password, session_id, None, None)
-            .await?;
-        Ok((session, auth))
-    }
-}
-
-impl Default for MemoryCredentialSession {
-    fn default() -> Self {
-        MemoryCredentialSession::unauthenticated()
     }
 }

@@ -11,7 +11,7 @@ use crate::{
 };
 use jacquard_common::{
     AuthorizationToken, CowStr, IntoStatic,
-    error::{AuthError, ClientError, TransportError, XrpcResult},
+    error::{AuthError, ClientError, XrpcResult},
     http_client::HttpClient,
     types::{did::Did, string::Handle},
     xrpc::{
@@ -493,14 +493,14 @@ where
             .dpop_call(&mut dpop)
             .send(build_http_request(&base_uri, &request, &opts)?)
             .await
-            .map_err(|e| TransportError::Other(Box::new(e)))?;
+            .map_err(|e| ClientError::transport(e))?;
         let resp = process_response(http_response);
         drop(guard);
         if is_invalid_token_response(&resp) {
             opts.auth = Some(
                 self.refresh()
                     .await
-                    .map_err(|e| ClientError::Transport(TransportError::Other(e.into())))?,
+                    .map_err(|e| ClientError::transport(e))?,
             );
             let guard = self.data.read().await;
             let mut dpop = guard.dpop_data.clone();
@@ -509,7 +509,7 @@ where
                 .dpop_call(&mut dpop)
                 .send(build_http_request(&base_uri, &request, &opts)?)
                 .await
-                .map_err(|e| TransportError::Other(Box::new(e)))?;
+                .map_err(|e| ClientError::transport(e))?;
             process_response(http_response)
         } else {
             resp
@@ -538,6 +538,7 @@ where
         self.client.send_http_streaming(request).await
     }
 
+    #[cfg(not(target_arch = "wasm32"))]
     async fn send_http_bidirectional<Str>(
         &self,
         parts: http::request::Parts,
@@ -548,6 +549,20 @@ where
                 Item = core::result::Result<bytes::Bytes, jacquard_common::StreamError>,
             > + Send
             + 'static,
+    {
+        self.client.send_http_bidirectional(parts, body).await
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    async fn send_http_bidirectional<Str>(
+        &self,
+        parts: http::request::Parts,
+        body: Str,
+    ) -> core::result::Result<http::Response<jacquard_common::stream::ByteStream>, Self::Error>
+    where
+        Str: n0_future::Stream<
+                Item = core::result::Result<bytes::Bytes, jacquard_common::StreamError>,
+            > + 'static,
     {
         self.client.send_http_bidirectional(parts, body).await
     }
@@ -626,7 +641,7 @@ where
         <<Str as jacquard_common::xrpc::streaming::XrpcProcedureStream>::Response as jacquard_common::xrpc::streaming::XrpcStreamResp>::Frame<'static>: jacquard_common::xrpc::streaming::XrpcStreamResp,
     {
         use jacquard_common::StreamError;
-        use n0_future::{StreamExt, TryStreamExt};
+        use n0_future::TryStreamExt;
 
         let base_uri = self.base_uri().await;
         let mut opts = self.options.read().await.clone();
@@ -677,7 +692,7 @@ where
             .into_parts();
 
         let body_stream =
-            jacquard_common::stream::ByteStream::new(stream.0.map_ok(|f| f.buffer).boxed());
+            jacquard_common::stream::ByteStream::new(Box::pin(stream.0.map_ok(|f| f.buffer)));
 
         let guard = self.data.read().await;
         let mut dpop = guard.dpop_data.clone();
@@ -707,16 +722,20 @@ where
 }
 
 fn is_invalid_token_response<R: XrpcResp>(response: &XrpcResult<Response<R>>) -> bool {
+    use jacquard_common::error::ClientErrorKind;
+
     match response {
-        Err(ClientError::Auth(AuthError::InvalidToken)) => true,
-        Err(ClientError::Auth(AuthError::Other(value))) => value
-            .to_str()
-            .is_ok_and(|s| s.starts_with("DPoP ") && s.contains("error=\"invalid_token\"")),
+        Err(e) => match e.kind() {
+            ClientErrorKind::Auth(AuthError::InvalidToken) => true,
+            ClientErrorKind::Auth(AuthError::Other(value)) => value
+                .to_str()
+                .is_ok_and(|s| s.starts_with("DPoP ") && s.contains("error=\"invalid_token\"")),
+            _ => false,
+        },
         Ok(resp) => match resp.parse() {
             Err(XrpcError::Auth(AuthError::InvalidToken)) => true,
             _ => false,
         },
-        _ => false,
     }
 }
 

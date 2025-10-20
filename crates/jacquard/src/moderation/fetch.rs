@@ -9,7 +9,7 @@ use jacquard_api::app_bsky::labeler::{
 };
 use jacquard_api::com_atproto::label::{Label, query_labels::QueryLabels};
 use jacquard_common::cowstr::ToCowStr;
-use jacquard_common::error::{ClientError, TransportError};
+use jacquard_common::error::ClientError;
 use jacquard_common::types::collection::Collection;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::uri::RecordUri;
@@ -30,14 +30,10 @@ pub async fn fetch_labeler_defs(
 
     let response = client.send(request).await?;
     let output: GetServicesOutput<'static> = response.into_output().map_err(|e| match e {
-        XrpcError::Auth(auth) => ClientError::Auth(auth),
-        XrpcError::Generic(g) => {
-            ClientError::Transport(TransportError::Other(g.to_string().into()))
-        }
-        XrpcError::Decode(e) => ClientError::Decode(e),
-        XrpcError::Xrpc(typed) => {
-            ClientError::Transport(TransportError::Other(format!("{:?}", typed).into()))
-        }
+        XrpcError::Auth(auth) => ClientError::auth(auth),
+        XrpcError::Generic(g) => ClientError::decode(g.to_string()),
+        XrpcError::Decode(e) => ClientError::decode(format!("{:?}", e)),
+        XrpcError::Xrpc(typed) => ClientError::decode(format!("{:?}", typed)),
     })?;
 
     let mut defs = LabelerDefs::new();
@@ -81,7 +77,7 @@ pub async fn fetch_labeler_defs(
 pub async fn fetch_labeler_defs_direct(
     client: &(impl AgentSessionExt + Sync),
     dids: Vec<Did<'_>>,
-) -> Result<LabelerDefs<'static>, ClientError> {
+) -> Result<LabelerDefs<'static>, AgentError> {
     #[cfg(feature = "tracing")]
     let _span = tracing::debug_span!("fetch_labeler_defs_direct", count = dids.len()).entered();
 
@@ -90,7 +86,7 @@ pub async fn fetch_labeler_defs_direct(
     for did in dids {
         let uri = format!("at://{}/app.bsky.labeler.service/self", did.as_str());
         let record_uri = Service::uri(uri).map_err(|e| {
-            ClientError::Transport(TransportError::Other(format!("Invalid URI: {}", e).into()))
+            AgentError::from(ClientError::invalid_request(format!("Invalid URI: {}", e)))
         })?;
 
         let output = client.fetch_record(&record_uri).await?;
@@ -135,8 +131,9 @@ pub async fn fetch_labels(
         .await?
         .into_output()
         .map_err(|e| match e {
-            XrpcError::Generic(e) => AgentError::Generic(e),
-            _ => unimplemented!(), // We know the error at this point is always GenericXrpcError
+            XrpcError::Auth(auth) => AgentError::from(auth),
+            e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
+            XrpcError::Xrpc(typed) => AgentError::xrpc(XrpcError::Xrpc(typed)),
         })?;
     Ok((labels.labels, labels.cursor))
 }
@@ -157,7 +154,7 @@ pub async fn fetch_labeled_record<R>(
 where
     R: Collection + From<CollectionOutput<'static, R>>,
     for<'a> CollectionOutput<'a, R>: IntoStatic<Output = CollectionOutput<'static, R>>,
-    for<'a> CollectionErr<'a, R>: IntoStatic<Output = CollectionErr<'static, R>>,
+    for<'a> CollectionErr<'a, R>: IntoStatic<Output = CollectionErr<'static, R>> + Send + Sync,
 {
     let record: R = client.fetch_record(record_uri).await?.into();
     let (labels, _) =

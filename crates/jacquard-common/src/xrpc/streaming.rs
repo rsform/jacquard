@@ -3,11 +3,19 @@
 use crate::{IntoStatic, StreamError, stream::ByteStream, xrpc::XrpcRequest};
 use bytes::Bytes;
 use http::StatusCode;
-use n0_future::{StreamExt, TryStreamExt, stream::Boxed};
+use n0_future::{StreamExt, TryStreamExt};
 use serde::{Deserialize, Serialize};
 #[cfg(not(target_arch = "wasm32"))]
 use std::path::Path;
 use std::{marker::PhantomData, pin::Pin};
+
+/// Boxed stream type with proper Send bounds for native, no Send for WASM
+#[cfg(not(target_arch = "wasm32"))]
+type Boxed<T> = Pin<Box<dyn n0_future::Stream<Item = T> + Send>>;
+
+/// Boxed stream type without Send bound for WASM
+#[cfg(target_arch = "wasm32")]
+type Boxed<T> = Pin<Box<dyn n0_future::Stream<Item = T>>>;
 
 /// Trait for streaming XRPC procedures (bidirectional streaming).
 ///
@@ -145,10 +153,9 @@ where
     <P as XrpcProcedureStream>::Frame<'static>: Serialize,
 {
     let stream = s
-        .map(|f| P::encode_frame(f).map(|b| XrpcStreamFrame::new_typed::<P::Frame<'_>>(b)))
-        .boxed();
+        .map(|f| P::encode_frame(f).map(|b| XrpcStreamFrame::new_typed::<P::Frame<'_>>(b)));
 
-    XrpcProcedureSend(stream)
+    XrpcProcedureSend(Box::pin(stream))
 }
 
 /// Sending stream for streaming XRPC procedure uplink.
@@ -172,10 +179,9 @@ impl XrpcResponseStream {
     pub fn from_bytestream(StreamingResponse { parts, body }: StreamingResponse) -> Self {
         Self {
             parts,
-            body: body
+            body: Box::pin(body
                 .into_inner()
-                .map_ok(|b| XrpcStreamFrame::new(b))
-                .boxed(),
+                .map_ok(|b| XrpcStreamFrame::new(b))),
         }
     }
 
@@ -183,10 +189,9 @@ impl XrpcResponseStream {
     pub fn from_parts(parts: http::response::Parts, body: ByteStream) -> Self {
         Self {
             parts,
-            body: body
+            body: Box::pin(body
                 .into_inner()
-                .map_ok(|b| XrpcStreamFrame::new(b))
-                .boxed(),
+                .map_ok(|b| XrpcStreamFrame::new(b))),
         }
     }
 
@@ -194,13 +199,13 @@ impl XrpcResponseStream {
     pub fn into_parts(self) -> (http::response::Parts, ByteStream) {
         (
             self.parts,
-            ByteStream::new(self.body.map_ok(|f| f.buffer).boxed()),
+            ByteStream::new(Box::pin(self.body.map_ok(|f| f.buffer))),
         )
     }
 
     /// Consume and return just the body stream
     pub fn into_bytestream(self) -> ByteStream {
-        ByteStream::new(self.body.map_ok(|f| f.buffer).boxed())
+        ByteStream::new(Box::pin(self.body.map_ok(|f| f.buffer)))
     }
 }
 
@@ -209,10 +214,9 @@ impl<F: XrpcStreamResp> XrpcResponseStream<F> {
     pub fn from_stream(StreamingResponse { parts, body }: StreamingResponse) -> Self {
         Self {
             parts,
-            body: body
+            body: Box::pin(body
                 .into_inner()
-                .map_ok(|b| XrpcStreamFrame::new_typed::<F::Frame<'_>>(b))
-                .boxed(),
+                .map_ok(|b| XrpcStreamFrame::new_typed::<F::Frame<'_>>(b))),
         }
     }
 
@@ -220,10 +224,9 @@ impl<F: XrpcStreamResp> XrpcResponseStream<F> {
     pub fn from_typed_parts(parts: http::response::Parts, body: ByteStream) -> Self {
         Self {
             parts,
-            body: body
+            body: Box::pin(body
                 .into_inner()
-                .map_ok(|b| XrpcStreamFrame::new_typed::<F::Frame<'_>>(b))
-                .boxed(),
+                .map_ok(|b| XrpcStreamFrame::new_typed::<F::Frame<'_>>(b))),
         }
     }
 }
@@ -231,7 +234,7 @@ impl<F: XrpcStreamResp> XrpcResponseStream<F> {
 impl<F: XrpcStreamResp + 'static> XrpcResponseStream<F> {
     /// Consume the typed stream and return just the raw byte stream
     pub fn into_bytestream(self) -> ByteStream {
-        ByteStream::new(self.body.map_ok(|f| f.buffer).boxed())
+        ByteStream::new(Box::pin(self.body.map_ok(|f| f.buffer)))
     }
 }
 

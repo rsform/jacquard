@@ -5,7 +5,7 @@ use jacquard_api::com_atproto::server::{
 };
 use jacquard_common::{
     AuthorizationToken, CowStr, IntoStatic,
-    error::{AuthError, ClientError, TransportError, XrpcResult},
+    error::{AuthError, ClientError, XrpcResult},
     http_client::HttpClient,
     session::SessionStore,
     types::{did::Did, string::Handle},
@@ -144,13 +144,13 @@ where
     T: HttpClient,
 {
     /// Refresh the active session by calling `com.atproto.server.refreshSession`.
-    pub async fn refresh(&self) -> Result<AuthorizationToken<'_>, ClientError> {
+    pub async fn refresh(&self) -> std::result::Result<AuthorizationToken<'_>, ClientError> {
         let key = self
             .key
             .read()
             .await
             .clone()
-            .ok_or(ClientError::Auth(AuthError::NotAuthenticated))?;
+            .ok_or_else(|| ClientError::auth(AuthError::NotAuthenticated))?;
         let session = self.store.get(&key).await;
         let endpoint = self.endpoint().await;
         let mut opts = self.options.read().await.clone();
@@ -163,14 +163,17 @@ where
             .await?;
         let refresh = response
             .parse()
-            .map_err(|_| ClientError::Auth(AuthError::RefreshFailed))?;
+            .map_err(|_| ClientError::auth(AuthError::RefreshFailed)
+                .with_help("ensure refresh token is valid and not expired")
+                .with_url("com.atproto.server.refreshSession"))?;
 
         let new_session: AtpSession = refresh.into();
         let token = AuthorizationToken::Bearer(new_session.access_jwt.clone());
         self.store
             .set(key, new_session)
             .await
-            .map_err(|_| ClientError::Auth(AuthError::RefreshFailed))?;
+            .map_err(|e| ClientError::from(e)
+                .with_context("failed to persist refreshed session to store"))?;
 
         Ok(token)
     }
@@ -193,7 +196,7 @@ where
         session_id: Option<CowStr<'_>>,
         allow_takendown: Option<bool>,
         auth_factor_token: Option<CowStr<'_>>,
-    ) -> Result<AtpSession, ClientError>
+    ) -> std::result::Result<AtpSession, ClientError>
     where
         S: Any + 'static,
     {
@@ -205,56 +208,44 @@ where
         let pds = if identifier.as_ref().starts_with("http://")
             || identifier.as_ref().starts_with("https://")
         {
-            Url::parse(identifier.as_ref()).map_err(|e| {
-                ClientError::Transport(TransportError::InvalidRequest(e.to_string()))
-            })?
+            Url::parse(identifier.as_ref())
+                .map_err(|e: url::ParseError| ClientError::from(e)
+                    .with_help("identifier should be a valid https:// URL, handle, or DID"))?
         } else if identifier.as_ref().starts_with("did:") {
-            let did = Did::new(identifier.as_ref()).map_err(|e| {
-                ClientError::Transport(TransportError::InvalidRequest(format!(
-                    "invalid did: {:?}",
-                    e
-                )))
-            })?;
+            let did = Did::new(identifier.as_ref())
+                .map_err(|e| ClientError::invalid_request(format!("invalid did: {:?}", e))
+                    .with_help("DID format should be did:method:identifier (e.g., did:plc:abc123)"))?;
             let resp = self
                 .client
                 .resolve_did_doc(&did)
                 .await
-                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
-            resp.into_owned()
-                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?
+                .map_err(|e| ClientError::from(e)
+                    .with_context("DID document resolution failed during login"))?;
+            resp.into_owned()?
                 .pds_endpoint()
-                .ok_or_else(|| {
-                    ClientError::Transport(TransportError::InvalidRequest(
-                        "missing PDS endpoint".into(),
-                    ))
-                })?
+                .ok_or_else(|| ClientError::invalid_request("missing PDS endpoint")
+                    .with_help("DID document must include a PDS service endpoint"))?
         } else {
             // treat as handle
-            let handle =
-                jacquard_common::types::string::Handle::new(identifier.as_ref()).map_err(|e| {
-                    ClientError::Transport(TransportError::InvalidRequest(format!(
-                        "invalid handle: {:?}",
-                        e
-                    )))
-                })?;
+            let handle = jacquard_common::types::string::Handle::new(identifier.as_ref())
+                .map_err(|e| ClientError::invalid_request(format!("invalid handle: {:?}", e))
+                    .with_help("handle format should be domain.tld (e.g., alice.bsky.social)"))?;
             let did = self
                 .client
                 .resolve_handle(&handle)
                 .await
-                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
+                .map_err(|e| ClientError::from(e)
+                    .with_context("handle resolution failed during login"))?;
             let resp = self
                 .client
                 .resolve_did_doc(&did)
                 .await
-                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
-            resp.into_owned()
-                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?
+                .map_err(|e| ClientError::from(e)
+                    .with_context("DID document resolution failed during login"))?;
+            resp.into_owned()?
                 .pds_endpoint()
-                .ok_or_else(|| {
-                    ClientError::Transport(TransportError::InvalidRequest(
-                        "missing PDS endpoint".into(),
-                    ))
-                })?
+                .ok_or_else(|| ClientError::invalid_request("missing PDS endpoint")
+                    .with_help("DID document must include a PDS service endpoint"))?
         };
 
         // Build and send createSession
@@ -275,7 +266,9 @@ where
             .await?;
         let out = resp
             .parse()
-            .map_err(|_| ClientError::Auth(AuthError::NotAuthenticated))?;
+            .map_err(|_| ClientError::auth(AuthError::NotAuthenticated)
+                .with_help("check identifier and password are correct")
+                .with_url("com.atproto.server.createSession"))?;
         let session = AtpSession::from(out);
 
         let sid = session_id.unwrap_or_else(|| CowStr::new_static("session"));
@@ -283,7 +276,8 @@ where
         self.store
             .set(key.clone(), session.clone())
             .await
-            .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
+            .map_err(|e| ClientError::from(e)
+                .with_context("failed to persist session to store"))?;
         // If using FileAuthStore, persist PDS for faster resume
         if let Some(file_store) =
             (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
@@ -298,7 +292,11 @@ where
     }
 
     /// Restore a previously persisted app-password session and set base endpoint.
-    pub async fn restore(&self, did: Did<'_>, session_id: CowStr<'_>) -> Result<(), ClientError>
+    pub async fn restore(
+        &self,
+        did: Did<'_>,
+        session_id: CowStr<'_>,
+    ) -> std::result::Result<(), ClientError>
     where
         S: Any + 'static,
     {
@@ -309,7 +307,7 @@ where
 
         let key = (did.clone().into_static(), session_id.clone().into_static());
         let Some(sess) = self.store.get(&key).await else {
-            return Err(ClientError::Auth(AuthError::NotAuthenticated));
+            return Err(ClientError::auth(AuthError::NotAuthenticated));
         };
         // Try to read cached PDS; otherwise resolve via DID
         let pds = if let Some(file_store) =
@@ -323,16 +321,11 @@ where
             let resp = self
                 .client
                 .resolve_did_doc(&did)
-                .await
-                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
-            resp.into_owned()
-                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?
+                .await?;
+            resp.into_owned()?
                 .pds_endpoint()
-                .ok_or_else(|| {
-                    ClientError::Transport(TransportError::InvalidRequest(
-                        "missing PDS endpoint".into(),
-                    ))
-                })?
+                .ok_or_else(|| ClientError::invalid_request("missing PDS endpoint")
+                    .with_help("DID document must include a PDS service endpoint"))?
         });
 
         // Activate
@@ -341,8 +334,7 @@ where
         // ensure store has the session (no-op if it existed)
         self.store
             .set((sess.did.clone(), session_id.into_static()), sess)
-            .await
-            .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
+            .await?;
         if let Some(file_store) =
             (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
         {
@@ -356,13 +348,13 @@ where
         &self,
         did: Did<'_>,
         session_id: CowStr<'_>,
-    ) -> Result<(), ClientError>
+    ) -> std::result::Result<(), ClientError>
     where
         S: Any + 'static,
     {
         let key = (did.clone().into_static(), session_id.into_static());
         if self.store.get(&key).await.is_none() {
-            return Err(ClientError::Auth(AuthError::NotAuthenticated));
+            return Err(ClientError::auth(AuthError::NotAuthenticated));
         }
         // Endpoint from store if cached, else resolve
         let pds = if let Some(file_store) =
@@ -376,16 +368,11 @@ where
             let resp = self
                 .client
                 .resolve_did_doc(&did)
-                .await
-                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
-            resp.into_owned()
-                .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?
+                .await?;
+            resp.into_owned()?
                 .pds_endpoint()
-                .ok_or_else(|| {
-                    ClientError::Transport(TransportError::InvalidRequest(
-                        "missing PDS endpoint".into(),
-                    ))
-                })?
+                .ok_or_else(|| ClientError::invalid_request("missing PDS endpoint")
+                    .with_help("DID document must include a PDS service endpoint"))?
         });
         *self.key.write().await = Some(key.clone());
         *self.endpoint.write().await = Some(pds);
@@ -398,14 +385,13 @@ where
     }
 
     /// Clear and delete the current session from the store.
-    pub async fn logout(&self) -> Result<(), ClientError> {
+    pub async fn logout(&self) -> std::result::Result<(), ClientError> {
         let Some(key) = self.key.read().await.clone() else {
             return Ok(());
         };
         self.store
             .del(&key)
-            .await
-            .map_err(|e| ClientError::Transport(TransportError::Other(Box::new(e))))?;
+            .await?;
         *self.key.write().await = None;
         Ok(())
     }
@@ -484,7 +470,14 @@ where
 #[inline]
 fn is_expired<R: XrpcResp>(response: &XrpcResult<Response<R>>) -> bool {
     match response {
-        Err(ClientError::Auth(AuthError::TokenExpired)) => true,
+        Err(e)
+            if matches!(
+                e.kind(),
+                jacquard_common::error::ClientErrorKind::Auth(AuthError::TokenExpired)
+            ) =>
+        {
+            true
+        }
         Ok(resp) => match resp.parse() {
             Err(XrpcError::Auth(AuthError::TokenExpired)) => true,
             _ => false,
@@ -503,19 +496,36 @@ where
     async fn send_http_streaming(
         &self,
         request: http::Request<Vec<u8>>,
-    ) -> core::result::Result<http::Response<jacquard_common::stream::ByteStream>, Self::Error> {
+    ) -> core::result::Result<http::Response<jacquard_common::stream::ByteStream>, Self::Error>
+    {
         self.client.send_http_streaming(request).await
     }
 
+    #[cfg(not(target_arch = "wasm32"))]
     async fn send_http_bidirectional<Str>(
         &self,
         parts: http::request::Parts,
         body: Str,
     ) -> core::result::Result<http::Response<jacquard_common::stream::ByteStream>, Self::Error>
     where
-        Str: n0_future::Stream<Item = core::result::Result<bytes::Bytes, jacquard_common::StreamError>>
-            + Send
+        Str: n0_future::Stream<
+                Item = core::result::Result<bytes::Bytes, jacquard_common::StreamError>,
+            > + Send
             + 'static,
+    {
+        self.client.send_http_bidirectional(parts, body).await
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    async fn send_http_bidirectional<Str>(
+        &self,
+        parts: http::request::Parts,
+        body: Str,
+    ) -> core::result::Result<http::Response<jacquard_common::stream::ByteStream>, Self::Error>
+    where
+        Str: n0_future::Stream<
+                Item = core::result::Result<bytes::Bytes, jacquard_common::StreamError>,
+            > + 'static,
     {
         self.client.send_http_bidirectional(parts, body).await
     }
@@ -589,7 +599,7 @@ where
         <<Str as jacquard_common::xrpc::streaming::XrpcProcedureStream>::Response as jacquard_common::xrpc::streaming::XrpcStreamResp>::Frame<'static>: jacquard_common::xrpc::streaming::XrpcStreamResp,
     {
         use jacquard_common::StreamError;
-        use n0_future::{StreamExt, TryStreamExt};
+        use n0_future::TryStreamExt;
 
         let base_uri = self.base_uri().await;
         let mut opts = self.options.read().await.clone();
@@ -640,7 +650,7 @@ where
             .into_parts();
 
         let body_stream =
-            jacquard_common::stream::ByteStream::new(stream.0.map_ok(|f| f.buffer).boxed());
+            jacquard_common::stream::ByteStream::new(Box::pin(stream.0.map_ok(|f| f.buffer)));
 
         // Clone the stream for potential retry
         let (body1, body2) = body_stream.tee();
@@ -672,7 +682,9 @@ where
                         http::HeaderValue::from_str(&format!("DPoP {}", t.as_ref()))
                     }
                 }
-                .map_err(|e| StreamError::protocol(format!("Invalid authorization token: {}", e)))?;
+                .map_err(|e| {
+                    StreamError::protocol(format!("Invalid authorization token: {}", e))
+                })?;
                 builder = builder.header(http::header::AUTHORIZATION, hv);
             }
             if let Some(proxy) = &opts.atproto_proxy {
@@ -704,13 +716,17 @@ where
                 .await
                 .map_err(StreamError::transport)?;
             let (resp_parts, resp_body) = response.into_parts();
-            Ok(jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts(
-                resp_parts, resp_body,
-            ))
+            Ok(
+                jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts(
+                    resp_parts, resp_body,
+                ),
+            )
         } else {
-            Ok(jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts(
-                resp_parts, resp_body,
-            ))
+            Ok(
+                jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts(
+                    resp_parts, resp_body,
+                ),
+            )
         }
     }
 }
