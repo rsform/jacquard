@@ -752,3 +752,64 @@ fn test_to_data_with_inference() {
         _ => panic!("expected object"),
     }
 }
+
+#[test]
+fn test_option_vec_deserialization() {
+    use serde::Deserialize;
+
+    // Regression test for Option<Vec<T>> deserialization bug
+    // Previously failed with "invalid type: sequence, expected option"
+    #[derive(Debug, PartialEq, Deserialize)]
+    struct WithOptionalArray<'a> {
+        #[serde(borrow)]
+        text: &'a str,
+        langs: Option<Vec<Language>>,
+        tags: Option<Vec<CowStr<'a>>>,
+    }
+
+    // Test with langs present
+    let mut map_with_langs = BTreeMap::new();
+    map_with_langs.insert(
+        SmolStr::new_static("text"),
+        Data::String(AtprotoStr::String("hello".into())),
+    );
+    map_with_langs.insert(
+        SmolStr::new_static("langs"),
+        Data::Array(Array(vec![
+            Data::String(AtprotoStr::Language(Language::new("en").unwrap())),
+            Data::String(AtprotoStr::Language(Language::new("fr").unwrap())),
+        ])),
+    );
+    let data_with_langs = Data::Object(Object(map_with_langs));
+
+    let result: WithOptionalArray = from_data(&data_with_langs).unwrap();
+    assert_eq!(result.text, "hello");
+    assert_eq!(result.langs.as_ref().map(|v| v.len()), Some(2));
+    assert_eq!(result.tags, None);
+
+    // Test with langs absent (None)
+    let mut map_without_langs = BTreeMap::new();
+    map_without_langs.insert(
+        SmolStr::new_static("text"),
+        Data::String(AtprotoStr::String("world".into())),
+    );
+    let data_without_langs = Data::Object(Object(map_without_langs));
+
+    let result: WithOptionalArray = from_data(&data_without_langs).unwrap();
+    assert_eq!(result.text, "world");
+    assert_eq!(result.langs, None);
+    assert_eq!(result.tags, None);
+
+    // Test with null explicitly set
+    let mut map_with_null = BTreeMap::new();
+    map_with_null.insert(
+        SmolStr::new_static("text"),
+        Data::String(AtprotoStr::String("null test".into())),
+    );
+    map_with_null.insert(SmolStr::new_static("langs"), Data::Null);
+    let data_with_null = Data::Object(Object(map_with_null));
+
+    let result: WithOptionalArray = from_data(&data_with_null).unwrap();
+    assert_eq!(result.text, "null test");
+    assert_eq!(result.langs, None);
+}

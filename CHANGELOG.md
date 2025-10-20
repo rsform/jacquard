@@ -36,6 +36,14 @@
 
 **Examples**
 - Updated `create_post.rs` to demonstrate richtext parsing with automatic facet detection
+- New `moderated_timeline.rs` to demonstrate fetching timeline with labelers enabled and applying moderation decisions
+
+### Fixed
+
+**Data deserialization** (`jacquard-common`)
+- Fixed `Option<Vec<T>>` deserialization from `Data` values
+- Implemented explicit `deserialize_option` for `Data` and `RawData` deserializers
+- Properly handles null vs present array values when deserializing into optional fields
 
 
 ## [0.6.0] - 2025-10-18

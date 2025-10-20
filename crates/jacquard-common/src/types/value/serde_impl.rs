@@ -775,55 +775,12 @@ impl<'de> serde::Deserializer<'de> for &'de Data<'de> {
             Data::Boolean(b) => visitor.visit_bool(*b),
             Data::Integer(i) => visitor.visit_i64(*i),
             Data::String(s) => {
-                // Get the string with 'de lifetime first
+                // Get the string with 'de lifetime - this borrows from the Data itself
+                // and is valid for the full 'de lifetime since Data<'de> owns/borrows the string
                 let string_ref: &'de str = s.as_str();
 
-                // Try to borrow from types that contain CowStr
-                match s {
-                    AtprotoStr::String(cow) => match cow {
-                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
-                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
-                    },
-                    AtprotoStr::Did(Did(cow)) => match cow {
-                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
-                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
-                    },
-                    AtprotoStr::Handle(Handle(cow)) => match cow {
-                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
-                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
-                    },
-                    AtprotoStr::Nsid(Nsid(cow)) => match cow {
-                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
-                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
-                    },
-                    AtprotoStr::Uri(Uri::Did(Did(cow))) => match cow {
-                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
-                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
-                    },
-                    AtprotoStr::Uri(Uri::Any(cow)) => match cow {
-                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
-                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
-                    },
-                    AtprotoStr::Cid(Cid::Str(cow)) => match cow {
-                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
-                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
-                    },
-                    AtprotoStr::AtIdentifier(AtIdentifier::Did(Did(cow))) => match cow {
-                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
-                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
-                    },
-                    AtprotoStr::AtIdentifier(AtIdentifier::Handle(Handle(cow))) => match cow {
-                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
-                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
-                    },
-                    AtprotoStr::RecordKey(RecordKey(Rkey(cow))) => match cow {
-                        CowStr::Borrowed(b) => visitor.visit_borrowed_str(b),
-                        CowStr::Owned(_) => visitor.visit_str(cow.as_ref()),
-                    },
-                    // All other types (Tid, Datetime, Language, AtUri with SmolStr):
-                    // use visit_borrowed_str with the &'de str so they can borrow if needed
-                    _ => visitor.visit_borrowed_str(string_ref),
-                }
+                // Use string_ref for ALL cases to ensure proper 'de lifetime borrowing
+                visitor.visit_borrowed_str(string_ref)
             }
             Data::Bytes(b) => visitor.visit_bytes(b),
             Data::CidLink(cid) => visitor.visit_str(cid.as_str()),
@@ -836,9 +793,19 @@ impl<'de> serde::Deserializer<'de> for &'de Data<'de> {
         }
     }
 
+    fn deserialize_option<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::Visitor<'de>,
+    {
+        match self {
+            Data::Null => visitor.visit_none(),
+            _ => visitor.visit_some(self),
+        }
+    }
+
     serde::forward_to_deserialize_any! {
         bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
-        bytes byte_buf option unit unit_struct newtype_struct seq tuple
+        bytes byte_buf unit unit_struct newtype_struct seq tuple
         tuple_struct map struct enum identifier ignored_any
     }
 }
@@ -867,9 +834,19 @@ impl<'de> serde::Deserializer<'de> for Data<'static> {
         }
     }
 
+    fn deserialize_option<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::Visitor<'de>,
+    {
+        match self {
+            Data::Null => visitor.visit_none(),
+            _ => visitor.visit_some(self),
+        }
+    }
+
     serde::forward_to_deserialize_any! {
         bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
-        bytes byte_buf option unit unit_struct newtype_struct seq tuple
+        bytes byte_buf unit unit_struct newtype_struct seq tuple
         tuple_struct map struct enum identifier ignored_any
     }
 }
@@ -902,9 +879,19 @@ impl<'de> serde::Deserializer<'de> for &'de RawData<'de> {
         }
     }
 
+    fn deserialize_option<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::Visitor<'de>,
+    {
+        match self {
+            RawData::Null => visitor.visit_none(),
+            _ => visitor.visit_some(self),
+        }
+    }
+
     serde::forward_to_deserialize_any! {
         bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
-        bytes byte_buf option unit unit_struct newtype_struct seq tuple
+        bytes byte_buf unit unit_struct newtype_struct seq tuple
         tuple_struct map struct enum identifier ignored_any
     }
 }
@@ -937,9 +924,19 @@ impl<'de> serde::Deserializer<'de> for RawData<'static> {
         }
     }
 
+    fn deserialize_option<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: serde::de::Visitor<'de>,
+    {
+        match self {
+            RawData::Null => visitor.visit_none(),
+            _ => visitor.visit_some(self),
+        }
+    }
+
     serde::forward_to_deserialize_any! {
         bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
-        bytes byte_buf option unit unit_struct newtype_struct seq tuple
+        bytes byte_buf unit unit_struct newtype_struct seq tuple
         tuple_struct map struct enum identifier ignored_any
     }
 }

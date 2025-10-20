@@ -8,19 +8,22 @@ A suite of Rust crates intended to make it much easier to get started with atpro
 
 It is also designed around zero-copy/borrowed deserialization: types like [`Post<'_>`](https://tangled.org/@nonbinary.computer/jacquard/blob/main/crates/jacquard-api/src/app_bsky/feed/post.rs) can borrow data (via the [`CowStr<'_>`](https://docs.rs/jacquard/latest/jacquard/cowstr/enum.CowStr.html) type and a host of other types built on top of it) directly from the response buffer instead of allocating owned copies. Owned versions are themselves mostly inlined or reference-counted pointers and are therefore still quite efficient. The `IntoStatic` trait (which is derivable) makes it easy to get an owned version and avoid worrying about lifetimes.
 
-## 0.6.0 Release Highlights:
+## 0.7.0 Release Highlights:
 
-- **WebSocket streaming** (gated behind feature: "streaming" in `jacquard` and "websocket" in `jacquard-common`)
-- Base level HTTP streamed responses and (on non-wasm platforms) request support (gated behind feature: "streaming" in `jacquard-common`)
-- **Support for atproto event stream endpoints** (e.g. subscribeRepos, subscribeLabels, firehose)
-- **Jetstream subscriber support and implementation**
-- **zstd compression support** for JSON websocket endpoints
-- **XRPC streaming procedure traits** for endpoints with large payloads, experimental manual implementations in `jacquard`
-- Fixed blob upload and download bugs, CID link deserialization issues.
+- **Bluesky-style rich text support**
+  - Parses from supplied text as well as explicit builder
+  - Sanitizes input text
+  - Also handles \[]() Markdown-style links
+  - Optionally pulls out candidates for link/record embedding
+  - Optionally fetches Opengraph link data for external links
+- **Moderation label application**
+  - Generic implementation of atproto moderation/labeling client-side filtering/tagging via traits
+  - Implementations for Bluesky and other types on best-effort basis
+  - Demonstration options for use while avoiding Bluesky namespace or AppView infrastructure
+- Fixed some Data value type deserialization issues
 
-### WARNING
-
-A lot of the streaming code is still pretty experimental. The examples work, though.\
+> [!WARNING]
+> A lot of the streaming code is still pretty experimental. The examples work, though.\
 The modules are also less well-documented, and don't have code examples. There are also a lot of utility functions for conveniently working with the streams and transforming them which are lacking. Use [`n0-future`](https://docs.rs/n0-future/latest/n0_future/index.html) to work with them, that is what Jacquard uses internally as much as possible.
 
 ### Changelog

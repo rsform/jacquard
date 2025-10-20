@@ -1291,7 +1291,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -1940,7 +1940,7 @@ dependencies = [
  "libc",
  "percent-encoding",
  "pin-project-lite",
- "socket2 0.6.1",
+ "socket2 0.5.10",
  "system-configuration",
  "tokio",
  "tower-service",
@@ -1960,7 +1960,7 @@ dependencies = [
  "js-sys",
  "log",
  "wasm-bindgen",
- "windows-core 0.62.2",
+ "windows-core",
 ]
 
 [[package]]
@@ -2242,7 +2242,7 @@ checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 
 [[package]]
 name = "jacquard"
-version = "0.6.1"
+version = "0.7.0"
 dependencies = [
  "bon",
  "bytes",
@@ -2251,10 +2251,10 @@ dependencies = [
  "getrandom 0.2.16",
  "http",
  "image",
- "jacquard-api 0.6.2",
- "jacquard-common 0.6.0",
- "jacquard-derive 0.6.1",
- "jacquard-identity 0.6.0",
+ "jacquard-api 0.7.0",
+ "jacquard-common 0.7.0",
+ "jacquard-derive 0.7.0",
+ "jacquard-identity 0.7.0",
  "jacquard-oauth",
  "jose-jwk",
  "miette",
@@ -2281,13 +2281,12 @@ dependencies = [
 
 [[package]]
 name = "jacquard-api"
-version = "0.6.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#861d9e86c582939ed1d50201954ef1368a91f9b7"
+version = "0.7.0"
 dependencies = [
  "bon",
  "bytes",
- "jacquard-common 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
- "jacquard-derive 0.6.0",
+ "jacquard-common 0.7.0",
+ "jacquard-derive 0.7.0",
  "miette",
  "serde",
  "serde_ipld_dagcbor",
@@ -2296,12 +2295,13 @@ dependencies = [
 
 [[package]]
 name = "jacquard-api"
-version = "0.6.2"
+version = "0.7.0"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#ef09feb782cf34eda616c9511fa12e439e1062c6"
 dependencies = [
  "bon",
  "bytes",
- "jacquard-common 0.6.0",
- "jacquard-derive 0.6.1",
+ "jacquard-common 0.7.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-derive 0.7.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
  "miette",
  "serde",
  "serde_ipld_dagcbor",
@@ -2319,9 +2319,9 @@ dependencies = [
  "bytes",
  "chrono",
  "jacquard",
- "jacquard-common 0.6.0",
- "jacquard-derive 0.6.1",
- "jacquard-identity 0.6.0",
+ "jacquard-common 0.7.0",
+ "jacquard-derive 0.7.0",
+ "jacquard-identity 0.7.0",
  "k256",
  "miette",
  "multibase",
@@ -2341,7 +2341,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-common"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "base64 0.22.1",
  "bon",
@@ -2385,8 +2385,8 @@ dependencies = [
 
 [[package]]
 name = "jacquard-common"
-version = "0.6.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#861d9e86c582939ed1d50201954ef1368a91f9b7"
+version = "0.7.0"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#ef09feb782cf34eda616c9511fa12e439e1062c6"
 dependencies = [
  "base64 0.22.1",
  "bon",
@@ -2422,19 +2422,9 @@ dependencies = [
 
 [[package]]
 name = "jacquard-derive"
-version = "0.6.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#861d9e86c582939ed1d50201954ef1368a91f9b7"
+version = "0.7.0"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.106",
-]
-
-[[package]]
-name = "jacquard-derive"
-version = "0.6.1"
-dependencies = [
- "jacquard-common 0.6.0",
+ "jacquard-common 0.7.0",
  "proc-macro2",
  "quote",
  "serde",
@@ -2443,15 +2433,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "jacquard-derive"
+version = "0.7.0"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#ef09feb782cf34eda616c9511fa12e439e1062c6"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.106",
+]
+
+[[package]]
 name = "jacquard-identity"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "bon",
  "bytes",
  "hickory-resolver",
  "http",
- "jacquard-api 0.6.2",
- "jacquard-common 0.6.0",
+ "jacquard-api 0.7.0",
+ "jacquard-common 0.7.0",
  "miette",
  "n0-future",
  "percent-encoding",
@@ -2469,14 +2469,14 @@ dependencies = [
 
 [[package]]
 name = "jacquard-identity"
-version = "0.6.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#861d9e86c582939ed1d50201954ef1368a91f9b7"
+version = "0.7.0"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#ef09feb782cf34eda616c9511fa12e439e1062c6"
 dependencies = [
  "bon",
  "bytes",
  "http",
- "jacquard-api 0.6.0",
- "jacquard-common 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-api 0.7.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-common 0.7.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
  "miette",
  "percent-encoding",
  "reqwest",
@@ -2492,7 +2492,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-lexicon"
-version = "0.6.1"
+version = "0.7.0"
 dependencies = [
  "async-trait",
  "clap",
@@ -2500,9 +2500,9 @@ dependencies = [
  "clap_mangen",
  "glob",
  "heck 0.5.0",
- "jacquard-api 0.6.0",
- "jacquard-common 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
- "jacquard-identity 0.6.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-api 0.7.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-common 0.7.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-identity 0.7.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
  "kdl",
  "miette",
  "prettyplease",
@@ -2522,7 +2522,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-oauth"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -2530,8 +2530,8 @@ dependencies = [
  "dashmap",
  "elliptic-curve",
  "http",
- "jacquard-common 0.6.0",
- "jacquard-identity 0.6.0",
+ "jacquard-common 0.7.0",
+ "jacquard-identity 0.7.0",
  "jose-jwa",
  "jose-jwk",
  "miette",
@@ -3071,7 +3071,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -3648,7 +3648,7 @@ dependencies = [
  "quinn-udp",
  "rustc-hash",
  "rustls",
- "socket2 0.6.1",
+ "socket2 0.5.10",
  "thiserror 2.0.17",
  "tokio",
  "tracing",
@@ -3685,9 +3685,9 @@ dependencies = [
  "cfg_aliases",
  "libc",
  "once_cell",
- "socket2 0.6.1",
+ "socket2 0.5.10",
  "tracing",
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -4106,7 +4106,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.11.0",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -4769,7 +4769,7 @@ dependencies = [
  "getrandom 0.3.4",
  "once_cell",
  "rustix 1.1.2",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -5628,7 +5628,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
@@ -5644,7 +5644,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9babd3a767a4c1aef6900409f85f5d53ce2544ccdfaa86dad48c91782c6d6893"
 dependencies = [
  "windows-collections",
- "windows-core 0.61.2",
+ "windows-core",
  "windows-future",
  "windows-link 0.1.3",
  "windows-numerics",
@@ -5656,7 +5656,7 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3beeceb5e5cfd9eb1d76b381630e82c4241ccd0d27f1a39ed41b2760b255c5e8"
 dependencies = [
- "windows-core 0.61.2",
+ "windows-core",
 ]
 
 [[package]]
@@ -5668,21 +5668,8 @@ dependencies = [
  "windows-implement",
  "windows-interface",
  "windows-link 0.1.3",
- "windows-result 0.3.4",
- "windows-strings 0.4.2",
-]
-
-[[package]]
-name = "windows-core"
-version = "0.62.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8e83a14d34d0623b51dce9581199302a221863196a1dde71a7663a4c2be9deb"
-dependencies = [
- "windows-implement",
- "windows-interface",
- "windows-link 0.2.1",
- "windows-result 0.4.1",
- "windows-strings 0.5.1",
+ "windows-result",
+ "windows-strings",
 ]
 
 [[package]]
@@ -5691,7 +5678,7 @@ version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc6a41e98427b19fe4b73c550f060b59fa592d7d686537eebf9385621bfbad8e"
 dependencies = [
- "windows-core 0.61.2",
+ "windows-core",
  "windows-link 0.1.3",
  "windows-threading",
 ]
@@ -5736,7 +5723,7 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9150af68066c4c5c07ddc0ce30421554771e528bde427614c61038bc2c92c2b1"
 dependencies = [
- "windows-core 0.61.2",
+ "windows-core",
  "windows-link 0.1.3",
 ]
 
@@ -5747,8 +5734,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b8a9ed28765efc97bbc954883f4e6796c33a06546ebafacbabee9696967499e"
 dependencies = [
  "windows-link 0.1.3",
- "windows-result 0.3.4",
- "windows-strings 0.4.2",
+ "windows-result",
+ "windows-strings",
 ]
 
 [[package]]
@@ -5761,30 +5748,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "windows-result"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7781fa89eaf60850ac3d2da7af8e5242a5ea78d1a11c49bf2910bb5a73853eb5"
-dependencies = [
- "windows-link 0.2.1",
-]
-
-[[package]]
 name = "windows-strings"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56e6c93f3a0c3b36176cb1327a4958a0353d5d166c2a35cb268ace15e91d3b57"
 dependencies = [
  "windows-link 0.1.3",
-]
-
-[[package]]
-name = "windows-strings"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7837d08f69c77cf6b07689544538e017c1bfcf57e34b4c0ff58e6c2cd3b37091"
-dependencies = [
- "windows-link 0.2.1",
 ]
 
 [[package]]

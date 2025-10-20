@@ -13,7 +13,7 @@ use jacquard_common::error::{ClientError, TransportError};
 use jacquard_common::types::collection::Collection;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::uri::RecordUri;
-use jacquard_common::xrpc::{XrpcClient, XrpcError, XrpcResp};
+use jacquard_common::xrpc::{XrpcClient, XrpcError};
 use jacquard_common::{CowStr, IntoStatic};
 use std::convert::From;
 
