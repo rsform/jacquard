@@ -11,3 +11,4 @@ crates/jacquard-lexicon/target
 /docs
 /binaries/releases/
 rustdoc-host.nix
+**/**.car

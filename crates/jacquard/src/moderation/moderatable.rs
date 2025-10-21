@@ -36,6 +36,40 @@ pub trait Moderateable<'a> {
     ) -> Vec<(&'static str, ModerationDecision)>;
 }
 
+/// Extension trait for applying moderation to iterators
+///
+/// Provides convenience methods for filtering and mapping moderation decisions
+/// over collections.
+pub trait ModeratableIterExt<'a, T: Moderateable<'a> + 'a>: Iterator<Item = &'a T> + Sized {
+    /// Map each item to a tuple of (item, decision)
+    fn with_moderation(
+        self,
+        prefs: &'a ModerationPrefs<'_>,
+        defs: &'a LabelerDefs<'_>,
+        accepted_labelers: &'a [Did<'_>],
+    ) -> impl Iterator<Item = (&'a T, Vec<(&'static str, ModerationDecision)>)> {
+        self.map(move |item| {
+            let scoped_decisions = item.moderate_all(prefs, defs, accepted_labelers);
+            (item, scoped_decisions)
+        })
+    }
+
+    /// Filter out items that should be hidden
+    fn filter_moderated(
+        self,
+        prefs: &'a ModerationPrefs<'_>,
+        defs: &'a LabelerDefs<'_>,
+        accepted_labelers: &'a [Did<'_>],
+    ) -> impl Iterator<Item = &'a T> {
+        self.filter(move |item| {
+            let scoped_decisions = item.moderate_all(prefs, defs, accepted_labelers);
+            !scoped_decisions.iter().any(|(_, decision)| decision.filter)
+        })
+    }
+}
+
+impl<'a, T: Moderateable<'a> + 'a, I: Iterator<Item = &'a T>> ModeratableIterExt<'a, T> for I {}
+
 // Implementations for common Bluesky types
 #[cfg(feature = "api_bluesky")]
 mod bluesky_impls {

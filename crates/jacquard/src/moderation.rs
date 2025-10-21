@@ -51,7 +51,7 @@ pub use fetch::{fetch_labeled_record, fetch_labels};
 #[cfg(feature = "api_bluesky")]
 pub use fetch::{fetch_labeler_defs, fetch_labeler_defs_direct};
 pub use labeled::{Labeled, LabeledRecord};
-pub use moderatable::Moderateable;
+pub use moderatable::{ModeratableIterExt, Moderateable};
 pub use types::{
     Blur, LabelCause, LabelPref, LabelTarget, LabelerDefs, ModerationDecision, ModerationPrefs,
 };

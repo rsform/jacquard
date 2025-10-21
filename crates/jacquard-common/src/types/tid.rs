@@ -120,12 +120,10 @@ impl Tid {
 
     /// Construct a TID from a timestamp (in microseconds) and clock ID
     pub fn from_time(timestamp: u64, clkid: u32) -> Self {
-        let str = smol_str::format_smolstr!(
-            "{0}{1:2>2}",
-            s32_encode(timestamp as u64),
-            s32_encode(Into::<u32>::into(clkid) as u64)
-        );
-        Self(str)
+        // Combine timestamp and clock ID into single u64: 53 bits timestamp + 10 bits clock ID
+        // 0TTTTTTTTTTTTTTT TTTTTTTTTTTTTTTT TTTTTTTTTTTTTTTT TTTTTTCCCCCCCCCC
+        let tid = (timestamp << 10) & 0x7FFF_FFFF_FFFF_FC00 | (clkid as u64 & 0x3FF);
+        Self(s32_encode(tid))
     }
 
     /// Extract the timestamp component (microseconds since UNIX epoch)

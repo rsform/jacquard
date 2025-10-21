@@ -1,0 +1,64 @@
+[package]
+name = "jacquard-repo"
+description = "AT Protocol repository primitives: MST, commits, CAR I/O"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme.workspace = true
+exclude.workspace = true
+license.workspace = true
+
+[features]
+default = []
+
+[dependencies]
+# Internal
+jacquard-common = { path = "../jacquard-common", version = "0.7.0", features = ["crypto-ed25519", "crypto-k256", "crypto-p256"] }
+jacquard-derive = { path = "../jacquard-derive", version = "0.7.0" }
+
+# Serialization
+serde.workspace = true
+serde_ipld_dagcbor.workspace = true
+serde_bytes = "0.11"
+
+# IPLD primitives (match jacquard-common versions)
+cid = { version = "0.11.1", features = ["serde", "std"] }
+ipld-core = { version = "0.4.2", features = ["serde"] }
+multihash = "0.19.3"
+
+# CAR file I/O
+iroh-car = "0.5"
+
+# Data types
+bytes.workspace = true
+smol_str.workspace = true
+
+# Hashing
+sha2 = "0.10"
+
+# Error handling
+thiserror.workspace = true
+miette.workspace = true
+
+# Async
+trait-variant.workspace = true
+n0-future.workspace = true
+tokio = { workspace = true, default-features = false, features = ["fs", "io-util"] }
+
+# Crypto (for commit signing/verification)
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+k256 = { version = "0.13", features = ["ecdsa", "sha256"] }
+p256 = { version = "0.13", features = ["ecdsa", "sha256"] }
+
+[dev-dependencies]
+serde_ipld_dagjson = "0.2"
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
+tempfile = "3.14"
+rand = "0.8"
+hex = "0.4"
+
+[package.metadata.docs.rs]
+all-features = true

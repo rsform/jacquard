@@ -20,6 +20,12 @@
 use crate::IntoStatic;
 use std::borrow::Cow;
 
+/// Multicodec code for SHA2-256 hash
+pub const SHA2_256: u64 = 0x12;
+
+/// Multicodec code for DAG-CBOR codec
+pub const DAG_CBOR: u64 = 0x71;
+
 /// Known multicodec key codecs for Multikey public keys
 ///
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -186,7 +192,7 @@ impl IntoStatic for PublicKey<'_> {
     }
 }
 
-fn decode_uvarint(data: &[u8]) -> Option<(u64, usize)> {
+pub fn decode_uvarint(data: &[u8]) -> Option<(u64, usize)> {
     let mut x: u64 = 0;
     let mut s: u32 = 0;
     for (i, b) in data.iter().copied().enumerate() {
@@ -202,26 +208,26 @@ fn decode_uvarint(data: &[u8]) -> Option<(u64, usize)> {
     None
 }
 
+pub fn encode_uvarint(mut x: u64) -> Vec<u8> {
+    let mut out = Vec::new();
+    while x >= 0x80 {
+        out.push(((x as u8) & 0x7F) | 0x80);
+        x >>= 7;
+    }
+    out.push(x as u8);
+    out
+}
+
+pub fn multikey(code: u64, key: &[u8]) -> String {
+    let mut buf = encode_uvarint(code);
+    buf.extend_from_slice(key);
+    multibase::encode(multibase::Base::Base58Btc, buf)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use multibase;
-
-    fn encode_uvarint(mut x: u64) -> Vec<u8> {
-        let mut out = Vec::new();
-        while x >= 0x80 {
-            out.push(((x as u8) & 0x7F) | 0x80);
-            x >>= 7;
-        }
-        out.push(x as u8);
-        out
-    }
-
-    fn multikey(code: u64, key: &[u8]) -> String {
-        let mut buf = encode_uvarint(code);
-        buf.extend_from_slice(key);
-        multibase::encode(multibase::Base::Base58Btc, buf)
-    }
 
     #[test]
     fn decode_ed25519() {
