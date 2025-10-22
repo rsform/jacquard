@@ -42,7 +42,7 @@ impl<S: BlockStore> fmt::Debug for NodeEntry<S> {
     }
 }
 
-impl<S: BlockStore> NodeEntry<S> {
+impl<S> NodeEntry<S> {
     /// Check if this is a tree entry
     pub fn is_tree(&self) -> bool {
         matches!(self, NodeEntry::Tree(_))

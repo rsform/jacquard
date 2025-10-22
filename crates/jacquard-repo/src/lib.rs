@@ -15,6 +15,8 @@
 //! - Zero-copy deserialization where possible
 //! - Support for both current and future sync protocol versions
 //!
+//! Note: thank you very much to Rudy and Clinton, rsky was very helpful in figuring this all out.
+//!
 //! # Example
 //!
 //! ```rust,ignore

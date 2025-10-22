@@ -5,6 +5,7 @@ use super::util;
 use crate::error::{RepoError, Result};
 use crate::mst::util::validate_key;
 use crate::storage::BlockStore;
+use bytes::Bytes;
 use cid::Cid as IpldCid;
 use core::fmt;
 use jacquard_common::types::recordkey::Rkey;
@@ -12,6 +13,7 @@ use jacquard_common::types::string::{Nsid, RecordKey};
 use jacquard_common::types::value::RawData;
 use n0_future::try_join_all;
 use smol_str::SmolStr;
+use std::collections::BTreeMap;
 use std::fmt::{Display, Formatter};
 use std::future::Future;
 use std::pin::Pin;
@@ -220,8 +222,9 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     ) -> Result<Self> {
         // Serialize and compute CID (don't persist yet)
         let node_data = util::serialize_node_data(&entries).await?;
-        let cbor = serde_ipld_dagcbor::to_vec(&node_data)
-            .map_err(|e| RepoError::serialization(e).with_context("serializing MST node during creation"))?;
+        let cbor = serde_ipld_dagcbor::to_vec(&node_data).map_err(|e| {
+            RepoError::serialization(e).with_context("serializing MST node during creation")
+        })?;
         let cid = util::compute_cid(&cbor)?;
 
         let mst = Self {
@@ -282,7 +285,10 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
             })?;
 
         let node_data: super::node::NodeData = serde_ipld_dagcbor::from_slice(&node_bytes)
-            .map_err(|e| RepoError::serialization(e).with_context(format!("deserializing MST node from storage: {}", pointer)))?;
+            .map_err(|e| {
+                RepoError::serialization(e)
+                    .with_context(format!("deserializing MST node from storage: {}", pointer))
+            })?;
 
         let entries = util::deserialize_node_data(self.storage.clone(), &node_data, self.layer)?;
 
@@ -333,8 +339,9 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
 
             // Now serialize and compute CID with fresh child CIDs
             let node_data = util::serialize_node_data(&entries).await?;
-            let cbor = serde_ipld_dagcbor::to_vec(&node_data)
-                .map_err(|e| RepoError::serialization(e).with_context("serializing MST node for CID computation"))?;
+            let cbor = serde_ipld_dagcbor::to_vec(&node_data).map_err(|e| {
+                RepoError::serialization(e).with_context("serializing MST node for CID computation")
+            })?;
             let cid = util::compute_cid(&cbor)?;
 
             // Update pointer and mark as fresh
@@ -447,6 +454,12 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
 
             Ok(None)
         })
+    }
+
+    /// Add a key-value pair, mutating the current tree
+    pub async fn add_mut<'a>(&'a mut self, key: &'a str, cid: IpldCid) -> Result<()> {
+        *self = self.add(key, cid).await?;
+        Ok(())
     }
 
     /// Add a key-value pair (returns new tree)
@@ -573,6 +586,24 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
         })
     }
 
+    /// invert an update function, returning the previous cid
+    pub async fn check_update(&mut self, key: &str, cid: IpldCid) -> Result<IpldCid> {
+        validate_key(key)?;
+
+        // Check key exists
+        let Ok(Some(prev)) = self.get(key).await else {
+            return Err(RepoError::not_found("key", key));
+        };
+
+        if prev == cid {
+            return Ok(prev);
+        }
+
+        // Update is just add (which replaces)
+        *self = self.add(key, cid).await?;
+        Ok(prev)
+    }
+
     /// Delete a key (returns new tree)
     pub fn delete<'a>(
         &'a self,
@@ -583,6 +614,23 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
 
             let altered = self.delete_recurse(key).await?;
             altered.trim_top().await
+        })
+    }
+
+    /// mutates a tree in place to delete, returns the CID of what was deleted
+    ///
+    /// Used to invert tree operations for verification
+    pub fn delete_cid<'a>(
+        &'a mut self,
+        key: &'a str,
+    ) -> Pin<Box<dyn Future<Output = Result<IpldCid>> + Send + 'a>> {
+        Box::pin(async move {
+            let cid = self
+                .get(key)
+                .await?
+                .ok_or(RepoError::not_found("cid for key", key))?;
+            *self = self.delete(key).await?;
+            Ok(cid)
         })
     }
 
@@ -924,6 +972,49 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
         self.new_tree(entries).await
     }
 
+    /// invert a tree operation in-place for validation
+    pub async fn invert_op(&mut self, op: VerifiedWriteOp) -> Result<bool> {
+        //println!("tree before op inversion:\n{}", self);
+        match op {
+            VerifiedWriteOp::Create { key, cid: expected } => {
+                let Ok(found) = self.delete_cid(&key).await else {
+                    //println!("tree at failure:\n{}", self);
+                    return Ok(false);
+                };
+                if found == expected {
+                    Ok(true)
+                } else {
+                    //println!("tree at failure:\n{}", self);
+                    Ok(false)
+                }
+            }
+            VerifiedWriteOp::Update {
+                key,
+                cid: expected,
+                prev,
+            } => {
+                let Ok(found) = self.check_update(&key, prev).await else {
+                    //println!("tree at failure:\n{}", self);
+                    return Ok(false);
+                };
+                if found == expected {
+                    Ok(true)
+                } else {
+                    //println!("tree at failure:\n{}", self);
+                    Ok(false)
+                }
+            }
+            VerifiedWriteOp::Delete { key, prev } => {
+                if let Ok(Some(_)) = self.get(&key).await {
+                    Ok(false)
+                } else {
+                    self.add_mut(&key, prev).await?;
+                    Ok(true)
+                }
+            }
+        }
+    }
+
     /// Apply batch of verified write operations (returns new tree)
     ///
     /// More efficient than individual operations as it only rebuilds
@@ -1038,8 +1129,10 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
             // Serialize this node
             let entries = self.get_entries().await?;
             let node_data = util::serialize_node_data(&entries).await?;
-            let cbor = serde_ipld_dagcbor::to_vec(&node_data)
-                .map_err(|e| RepoError::serialization(e).with_context("serializing MST node for block collection"))?;
+            let cbor = serde_ipld_dagcbor::to_vec(&node_data).map_err(|e| {
+                RepoError::serialization(e)
+                    .with_context("serializing MST node for block collection")
+            })?;
             blocks.insert(pointer, Bytes::from(cbor));
 
             // Recursively collect from subtrees
@@ -1119,33 +1212,102 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
 
             let mut cids = vec![self.get_pointer().await?];
             let entries = self.get_entries().await?;
-            let index = Self::find_gt_or_equal_leaf_index_in(&entries, key);
+            let index = Self::find_gt_or_equal_leaf_index_in(&entries, key) as isize;
 
-            // Check if we found exact match at this level
-            if index < entries.len() {
-                if let NodeEntry::Leaf {
-                    key: leaf_key,
-                    value,
-                } = &entries[index]
-                {
-                    if leaf_key.as_str() == key {
-                        cids.push(*value);
-                        return Ok(cids);
-                    }
-                }
-            }
+            let found = self.at_index(index).await?;
 
-            // Not found at this level - check subtree before this index
-            if index > 0 {
-                if let NodeEntry::Tree(subtree) = &entries[index - 1] {
-                    let mut subtree_cids = subtree.cids_for_path(key).await?;
-                    cids.append(&mut subtree_cids);
+            if let Some(NodeEntry::Leaf {
+                key: leaf_key,
+                value,
+            }) = found
+            {
+                if leaf_key.as_str() == key {
+                    cids.push(value);
                     return Ok(cids);
                 }
             }
 
+            // Not found at this level - check subtree before this index
+            if let Some(NodeEntry::Tree(subtree)) = self.at_index(index - 1).await? {
+                let mut subtree_cids = subtree.cids_for_path(key).await?;
+                cids.append(&mut subtree_cids);
+                return Ok(cids);
+            }
+
             // Key not found in tree
             Ok(cids)
+        })
+    }
+
+    /// serialize the tree as car bytes, returning the cid of the car and the car bytes
+    pub fn serialize_tree<'a>(
+        &'a self,
+    ) -> Pin<Box<dyn Future<Output = Result<(IpldCid, Bytes)>> + Send + 'a>> {
+        Box::pin(async move {
+            let mut entries = self.get_entries().await?;
+            let mut outdated: Vec<Self> = Vec::new();
+            for entry in &entries {
+                if let NodeEntry::Tree(mst) = entry {
+                    let is_outdated = *mst.outdated_pointer.read().await;
+                    if is_outdated {
+                        outdated.push(mst.clone());
+                    }
+                }
+            }
+
+            if outdated.len() > 0 {
+                for outdated_entry in &outdated {
+                    let _ = outdated_entry.get_pointer().await?;
+                }
+                entries = self.get_entries().await?
+            }
+            let data = util::serialize_node_data(entries.as_slice()).await?;
+            let bytes = serde_ipld_dagcbor::to_vec(&data).map_err(|e| RepoError::car(e))?;
+            let cid = util::compute_cid(&bytes)?;
+
+            Ok((cid, Bytes::from_owner(bytes)))
+        })
+    }
+
+    /// Find the node at the given index if any
+    pub async fn at_index(&self, index: isize) -> Result<Option<NodeEntry<S>>> {
+        let entries = self.get_entries().await?;
+        if index < 0 || index as usize >= entries.len() {
+            return Ok(None);
+        }
+        Ok(entries
+            .into_iter()
+            .nth(index as usize)
+            .map(|entry| entry.clone()))
+    }
+
+    /// Add any relevant blocks along the path to the given key to the map
+    pub fn blocks_for_path<'a>(
+        &'a self,
+        key: &'a str,
+        blocks: &'a mut BTreeMap<IpldCid, bytes::Bytes>,
+    ) -> Pin<Box<dyn Future<Output = Result<()>> + Send + 'a>> {
+        Box::pin(async move {
+            validate_key(key)?;
+            let (cid, bytes) = self.serialize_tree().await?;
+            blocks.insert(cid, bytes);
+
+            let entries = self.get_entries().await?;
+            let index = Self::find_gt_or_equal_leaf_index_in(&entries, key) as isize;
+            let found = self.at_index(index).await?;
+
+            if let Some(NodeEntry::Leaf { key: leaf_key, .. }) = found {
+                if leaf_key.as_str() == key {
+                    return Ok(());
+                }
+            }
+            if let Some(NodeEntry::Tree(subtree)) = self.at_index(index - 1).await? {
+                subtree.blocks_for_path(key, blocks).await?;
+                return Ok(());
+            }
+
+            // Key not found in tree
+            Ok(())
         })
     }
 
@@ -1334,8 +1496,10 @@ fn collect_blocks_parallel<S: BlockStore + Sync + Send + 'static>(
         // Serialize this node
         let entries = tree.get_entries().await?;
         let node_data = util::serialize_node_data(&entries).await?;
-        let cbor = serde_ipld_dagcbor::to_vec(&node_data)
-            .map_err(|e| RepoError::serialization(e).with_context("serializing MST node for parallel block collection"))?;
+        let cbor = serde_ipld_dagcbor::to_vec(&node_data).map_err(|e| {
+            RepoError::serialization(e)
+                .with_context("serializing MST node for parallel block collection")
+        })?;
         blocks.insert(pointer, Bytes::from(cbor));
 
         // Spawn tasks for each subtree

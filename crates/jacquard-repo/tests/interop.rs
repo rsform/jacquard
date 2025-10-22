@@ -888,12 +888,8 @@ async fn test_real_repo_mst_determinism() {
     let blocks = read_car(fixture_path).await.expect("Failed to read CAR");
     let storage = Arc::new(MemoryBlockStore::new());
 
-    let mut block_vec = Vec::new();
-    for (cid, data) in blocks.iter() {
-        block_vec.push((*cid, data.clone()));
-    }
     storage
-        .put_many(block_vec)
+        .put_many(blocks)
         .await
         .expect("Failed to store blocks");
 

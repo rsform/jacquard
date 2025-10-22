@@ -8,6 +8,7 @@ use crate::commit::{Commit, SigningKey};
 use crate::error::{RepoError, Result};
 use crate::mst::{Mst, MstDiff, RecordWriteOp};
 use crate::storage::BlockStore;
+use bytes::Bytes;
 use cid::Cid as IpldCid;
 use jacquard_common::IntoStatic;
 use jacquard_common::types::cid::CidLink;
@@ -16,6 +17,7 @@ use jacquard_common::types::string::{Datetime, Did, Nsid, RecordKey, Tid};
 use jacquard_common::types::tid::Ticker;
 use smol_str::format_smolstr;
 use std::collections::BTreeMap;
+use std::fmt::{self, Display, Formatter};
 use std::path::Path;
 use std::sync::Arc;
 
@@ -71,9 +73,10 @@ impl CommitData {
         ops: Vec<RepoOp<'static>>,
         blobs: Vec<CidLink<'static>>,
     ) -> Result<FirehoseCommit<'static>> {
+        let mut proof_blocks = self.blocks.clone();
+        proof_blocks.append(&mut self.relevant_blocks.clone());
         // Convert relevant blocks to CAR format
-        let blocks_car =
-            crate::car::write_car_bytes(self.cid, self.relevant_blocks.clone()).await?;
+        let blocks_car = crate::car::write_car_bytes(self.cid, proof_blocks).await?;
 
         Ok(FirehoseCommit {
             repo: repo.clone().into_static(),
@@ -161,6 +164,102 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
             commit: commit.into_static(),
             commit_cid: *commit_cid,
         })
+    }
+
+    /// Format an initial commit for a new repository
+    ///
+    /// Creates an empty MST, optionally applies initial record writes, signs the commit,
+    /// and returns CommitData ready to apply to storage.
+    ///
+    /// This does NOT persist to storage - use `create_from_commit` or `create` for that.
+    pub async fn format_init_commit<K>(
+        storage: Arc<S>,
+        did: Did<'static>,
+        signing_key: &K,
+        initial_writes: Option<&[RecordWriteOp<'_>]>,
+    ) -> Result<CommitData>
+    where
+        K: SigningKey,
+    {
+        let mut mst = Mst::new(storage.clone());
+        let mut blocks = BTreeMap::new();
+
+        // Apply initial writes if provided
+        if let Some(ops) = initial_writes {
+            for op in ops {
+                let key = format_smolstr!("{}/{}", op.collection().as_ref(), op.rkey().as_ref());
+
+                match op {
+                    RecordWriteOp::Create { record, .. } => {
+                        // Serialize and store record
+                        let cbor = serde_ipld_dagcbor::to_vec(record)
+                            .map_err(|e| RepoError::serialization(e))?;
+                        let cid = storage.put(&cbor).await?;
+                        blocks.insert(cid, bytes::Bytes::from(cbor));
+
+                        mst = mst.add(key.as_str(), cid).await?;
+                    }
+                    RecordWriteOp::Update { .. } | RecordWriteOp::Delete { .. } => {
+                        return Err(RepoError::invalid_commit(
+                            "Initial commit can only contain creates",
+                        ));
+                    }
+                }
+            }
+        }
+
+        // Persist MST and collect blocks
+        let data = mst.persist().await?;
+        let diff = Mst::new(storage.clone()).diff(&mst).await?;
+        blocks.extend(diff.new_mst_blocks);
+
+        // Create and sign initial commit
+        let rev = Ticker::new().next(None);
+        let commit = Commit::new_unsigned(did, data, rev.clone(), None).sign(signing_key)?;
+
+        let commit_cbor = commit.to_cbor()?;
+        let commit_cid = crate::mst::util::compute_cid(&commit_cbor)?;
+        let commit_bytes = bytes::Bytes::from(commit_cbor);
+
+        blocks.insert(commit_cid, commit_bytes.clone());
+
+        Ok(CommitData {
+            cid: commit_cid,
+            rev,
+            since: None,
+            prev: None,
+            data,
+            prev_data: None,
+            blocks: blocks.clone(),
+            relevant_blocks: blocks,
+            deleted_cids: Vec::new(),
+        })
+    }
+
+    /// Create repository from CommitData
+    ///
+    /// Applies the commit to storage and loads the repository from it.
+    pub async fn create_from_commit(storage: Arc<S>, commit_data: CommitData) -> Result<Self> {
+        let commit_cid = commit_data.cid;
+        storage.apply_commit(commit_data).await?;
+        Self::from_commit(storage, &commit_cid).await
+    }
+
+    /// Create a new repository
+    ///
+    /// Convenience method that formats an initial commit and applies it to storage.
+    pub async fn create<K>(
+        storage: Arc<S>,
+        did: Did<'static>,
+        signing_key: &K,
+        initial_writes: Option<&[RecordWriteOp<'_>]>,
+    ) -> Result<Self>
+    where
+        K: SigningKey,
+    {
+        let commit =
+            Self::format_init_commit(storage.clone(), did, signing_key, initial_writes).await?;
+        Self::create_from_commit(storage, commit).await
     }
 
     /// Get a record by collection and rkey
@@ -268,8 +367,13 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                     let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
 
                     // Serialize record to DAG-CBOR
-                    let cbor = serde_ipld_dagcbor::to_vec(record)
-                        .map_err(|e| RepoError::serialization(e).with_context(format!("serializing record data for {}/{}", collection.as_ref(), rkey.as_ref())))?;
+                    let cbor = serde_ipld_dagcbor::to_vec(record).map_err(|e| {
+                        RepoError::serialization(e).with_context(format!(
+                            "serializing record data for {}/{}",
+                            collection.as_ref(),
+                            rkey.as_ref()
+                        ))
+                    })?;
 
                     // Compute CID and store data
                     let cid = self.storage.put(&cbor).await?;
@@ -285,8 +389,13 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                     let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
 
                     // Serialize record to DAG-CBOR
-                    let cbor = serde_ipld_dagcbor::to_vec(record)
-                        .map_err(|e| RepoError::serialization(e).with_context(format!("serializing record data for {}/{}", collection.as_ref(), rkey.as_ref())))?;
+                    let cbor = serde_ipld_dagcbor::to_vec(record).map_err(|e| {
+                        RepoError::serialization(e).with_context(format!(
+                            "serializing record data for {}/{}",
+                            collection.as_ref(),
+                            rkey.as_ref()
+                        ))
+                    })?;
 
                     // Compute CID and store data
                     let cid = self.storage.put(&cbor).await?;
@@ -335,9 +444,11 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
         // Compute diff before updating
         let diff = self.mst.diff(&updated_tree).await?;
 
+        println!("Repo before:\n{}", self);
         // Update mst
         self.mst = updated_tree;
 
+        println!("Repo after:\n{}", self);
         Ok(diff)
     }
 
@@ -360,8 +471,9 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     where
         K: SigningKey,
     {
-        // Step 1: Apply all write operations to build new MST
+        // Step 1: Apply all write operations to build new MST and collect leaf blocks
         let mut updated_tree = self.mst.clone();
+        let mut leaf_blocks = BTreeMap::new();
 
         for op in ops {
             updated_tree = match op {
@@ -373,11 +485,17 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                     let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
 
                     // Serialize record to DAG-CBOR
-                    let cbor = serde_ipld_dagcbor::to_vec(record)
-                        .map_err(|e| RepoError::serialization(e).with_context(format!("serializing record data for {}/{}", collection.as_ref(), rkey.as_ref())))?;
+                    let cbor = serde_ipld_dagcbor::to_vec(record).map_err(|e| {
+                        RepoError::serialization(e).with_context(format!(
+                            "serializing record data for {}/{}",
+                            collection.as_ref(),
+                            rkey.as_ref()
+                        ))
+                    })?;
 
                     // Compute CID and store data
                     let cid = self.storage.put(&cbor).await?;
+                    leaf_blocks.insert(cid.clone(), Bytes::from(cbor));
 
                     updated_tree.add(key.as_str(), cid).await?
                 }
@@ -390,8 +508,13 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                     let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
 
                     // Serialize record to DAG-CBOR
-                    let cbor = serde_ipld_dagcbor::to_vec(record)
-                        .map_err(|e| RepoError::serialization(e).with_context(format!("serializing record data for {}/{}", collection.as_ref(), rkey.as_ref())))?;
+                    let cbor = serde_ipld_dagcbor::to_vec(record).map_err(|e| {
+                        RepoError::serialization(e).with_context(format!(
+                            "serializing record data for {}/{}",
+                            collection.as_ref(),
+                            rkey.as_ref()
+                        ))
+                    })?;
 
                     // Compute CID and store data
                     let cid = self.storage.put(&cbor).await?;
@@ -406,6 +529,8 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                         }
                     }
 
+                    leaf_blocks.insert(cid.clone(), Bytes::from(cbor));
+
                     updated_tree.add(key.as_str(), cid).await?
                 }
                 RecordWriteOp::Delete {
@@ -415,15 +540,14 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                 } => {
                     let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
 
-                    // Check exists
-                    let current = self
-                        .mst
-                        .get(key.as_str())
-                        .await?
-                        .ok_or_else(|| RepoError::not_found("record", key.as_str()))?;
-
                     // Validate prev if provided
                     if let Some(prev_cid) = prev {
+                        // Check exists
+                        let current = self
+                            .mst
+                            .get(key.as_str())
+                            .await?
+                            .ok_or_else(|| RepoError::not_found("record", key.as_str()))?;
                         if &current != prev_cid {
                             return Err(RepoError::cid_mismatch(format!(
                                 "Delete prev CID mismatch for key {}: expected {}, got {}",
@@ -442,8 +566,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
         let prev_data = *self.commit.data();
         let diff = self.mst.diff(&updated_tree).await?;
 
-        // Step 3: Extract everything we need from diff before moving it
-        let new_leaf_blocks = diff.fetch_new_blocks(self.storage.as_ref()).await?;
+        // Step 3: Extract everything we need from diff
         let repo_ops = diff
             .to_repo_ops()
             .into_iter()
@@ -451,31 +574,35 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
             .collect();
         let deleted_cids = diff.removed_cids;
 
-        // Step 4: Use diff.new_mst_blocks instead of collect_blocks()
+        // Step 4: Build blocks and relevant_blocks collections
         let mut blocks = diff.new_mst_blocks;
-
-        // Step 5: Build relevant_blocks by walking paths for ORIGINAL operations
         let mut relevant_blocks = BTreeMap::new();
+
+        // Add the previous MST root block (needed to load prev_data in validation)
+        if let Some(prev_root_block) = self.storage.get(&prev_data).await? {
+            relevant_blocks.insert(prev_data, prev_root_block);
+        }
+
+        // Walk paths in both old and new trees for each operation
         for op in ops {
             let key = format_smolstr!("{}/{}", op.collection().as_ref(), op.rkey().as_ref());
-            let path_cids = updated_tree.cids_for_path(key.as_str()).await?;
 
-            for path_cid in path_cids {
-                if let Some(block) = blocks.get(&path_cid) {
-                    relevant_blocks.insert(path_cid, block.clone());
-                } else if let Some(block) = self.storage.get(&path_cid).await? {
-                    relevant_blocks.insert(path_cid, block);
-                }
+            updated_tree
+                .blocks_for_path(&key, &mut relevant_blocks)
+                .await?;
+
+            self.mst.blocks_for_path(&key, &mut relevant_blocks).await?;
+        }
+
+        // Add new leaf blocks to both collections (single iteration)
+        for (cid, block) in &leaf_blocks {
+            if diff.new_leaf_cids.contains(cid) {
+                blocks.insert(*cid, block.clone());
+                relevant_blocks.insert(*cid, block.clone());
             }
         }
 
-        // Step 6: Add new leaf blocks (record data) to both collections
-        for (cid, block) in new_leaf_blocks {
-            blocks.insert(cid, block.clone());
-            relevant_blocks.insert(cid, block);
-        }
-
-        // Step 7: Create and sign commit
+        // Step 6: Create and sign commit
         let rev = Ticker::new().next(Some(self.commit.rev.clone()));
         let commit = Commit::new_unsigned(did.clone().into_static(), data, rev.clone(), prev)
             .sign(signing_key)?;
@@ -484,11 +611,11 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
         let commit_cid = crate::mst::util::compute_cid(&commit_cbor)?;
         let commit_bytes = bytes::Bytes::from(commit_cbor);
 
-        // Step 8: Add commit block to both collections
+        // Step 7: Add commit block to both collections
         blocks.insert(commit_cid, commit_bytes.clone());
         relevant_blocks.insert(commit_cid, commit_bytes);
 
-        // Step 9: Update internal MST state
+        // Step 8: Update internal MST state
         self.mst = updated_tree;
 
         Ok((
@@ -583,6 +710,27 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     /// Get the DID from the current commit
     pub fn did(&self) -> &Did<'_> {
         self.commit.did()
+    }
+}
+
+impl<S: BlockStore> Display for Repository<S> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        use crate::mst::tree::short_cid;
+
+        writeln!(f, "Repository {{")?;
+        writeln!(f, "  DID: {}", self.commit.did())?;
+        writeln!(f, "  Commit: {}", short_cid(&self.commit_cid))?;
+        writeln!(f, "  Rev: {}", self.commit.rev)?;
+        writeln!(f, "  Data: {}", short_cid(self.commit.data()))?;
+        writeln!(f, "  MST:")?;
+
+        // Format MST with indentation
+        let mst_display = format!("{}", self.mst);
+        for line in mst_display.lines() {
+            writeln!(f, "    {}", line)?;
+        }
+
+        write!(f, "}}")
     }
 }
 
