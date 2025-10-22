@@ -145,7 +145,10 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
         let commit_bytes = storage
             .get(commit_cid)
             .await?
-            .ok_or_else(|| RepoError::not_found("commit", commit_cid))?;
+            .ok_or_else(|| {
+                RepoError::not_found("commit", commit_cid)
+                    .with_help("Commit must be applied to storage before loading repository - use apply_commit() or ensure commit is persisted")
+            })?;
 
         let commit = Commit::from_cbor(&commit_bytes)?;
         let mst_root = commit.data();
@@ -266,7 +269,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
 
                     // Serialize record to DAG-CBOR
                     let cbor = serde_ipld_dagcbor::to_vec(record)
-                        .map_err(|e| RepoError::serialization(e))?;
+                        .map_err(|e| RepoError::serialization(e).with_context(format!("serializing record data for {}/{}", collection.as_ref(), rkey.as_ref())))?;
 
                     // Compute CID and store data
                     let cid = self.storage.put(&cbor).await?;
@@ -283,7 +286,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
 
                     // Serialize record to DAG-CBOR
                     let cbor = serde_ipld_dagcbor::to_vec(record)
-                        .map_err(|e| RepoError::serialization(e))?;
+                        .map_err(|e| RepoError::serialization(e).with_context(format!("serializing record data for {}/{}", collection.as_ref(), rkey.as_ref())))?;
 
                     // Compute CID and store data
                     let cid = self.storage.put(&cbor).await?;
@@ -291,7 +294,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                     // Validate prev if provided
                     if let Some(prev_cid) = prev {
                         if &cid != prev_cid {
-                            return Err(RepoError::invalid(format!(
+                            return Err(RepoError::cid_mismatch(format!(
                                 "Update prev CID mismatch for key {}: expected {}, got {}",
                                 key, prev_cid, cid
                             )));
@@ -317,7 +320,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                     // Validate prev if provided
                     if let Some(prev_cid) = prev {
                         if &current != prev_cid {
-                            return Err(RepoError::invalid(format!(
+                            return Err(RepoError::cid_mismatch(format!(
                                 "Delete prev CID mismatch for key {}: expected {}, got {}",
                                 key, prev_cid, current
                             )));
@@ -371,7 +374,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
 
                     // Serialize record to DAG-CBOR
                     let cbor = serde_ipld_dagcbor::to_vec(record)
-                        .map_err(|e| RepoError::serialization(e))?;
+                        .map_err(|e| RepoError::serialization(e).with_context(format!("serializing record data for {}/{}", collection.as_ref(), rkey.as_ref())))?;
 
                     // Compute CID and store data
                     let cid = self.storage.put(&cbor).await?;
@@ -388,7 +391,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
 
                     // Serialize record to DAG-CBOR
                     let cbor = serde_ipld_dagcbor::to_vec(record)
-                        .map_err(|e| RepoError::serialization(e))?;
+                        .map_err(|e| RepoError::serialization(e).with_context(format!("serializing record data for {}/{}", collection.as_ref(), rkey.as_ref())))?;
 
                     // Compute CID and store data
                     let cid = self.storage.put(&cbor).await?;
@@ -396,7 +399,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                     // Validate prev if provided
                     if let Some(prev_cid) = prev {
                         if &cid != prev_cid {
-                            return Err(RepoError::invalid(format!(
+                            return Err(RepoError::cid_mismatch(format!(
                                 "Update prev CID mismatch for key {}: expected {}, got {}",
                                 key, prev_cid, cid
                             )));
@@ -422,7 +425,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                     // Validate prev if provided
                     if let Some(prev_cid) = prev {
                         if &current != prev_cid {
-                            return Err(RepoError::invalid(format!(
+                            return Err(RepoError::cid_mismatch(format!(
                                 "Delete prev CID mismatch for key {}: expected {}, got {}",
                                 key, prev_cid, current
                             )));
@@ -519,7 +522,10 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
             .storage
             .get(&commit_cid)
             .await?
-            .ok_or_else(|| RepoError::not_found("commit block", &commit_cid))?;
+            .ok_or_else(|| {
+                RepoError::not_found("commit block", &commit_cid)
+                    .with_help("Commit block should have been persisted by apply_commit() - this indicates a storage inconsistency")
+            })?;
         let commit = Commit::from_cbor(&commit_bytes)?;
 
         self.commit = commit.into_static();

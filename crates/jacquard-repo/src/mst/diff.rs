@@ -409,7 +409,8 @@ async fn serialize_and_track_mst<S: BlockStore + Sync + 'static>(
     // Serialize the MST node
     let entries = tree.get_entries().await?;
     let node_data = serialize_node_data(&entries).await?;
-    let cbor = serde_ipld_dagcbor::to_vec(&node_data).map_err(|e| RepoError::serialization(e))?;
+    let cbor = serde_ipld_dagcbor::to_vec(&node_data)
+        .map_err(|e| RepoError::serialization(e).with_context(format!("serializing MST node for diff tracking: {}", tree_cid)))?;
 
     // Track the serialized block
     diff.new_mst_blocks.insert(tree_cid, Bytes::from(cbor));

@@ -220,8 +220,8 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     ) -> Result<Self> {
         // Serialize and compute CID (don't persist yet)
         let node_data = util::serialize_node_data(&entries).await?;
-        let cbor =
-            serde_ipld_dagcbor::to_vec(&node_data).map_err(|e| RepoError::serialization(e))?;
+        let cbor = serde_ipld_dagcbor::to_vec(&node_data)
+            .map_err(|e| RepoError::serialization(e).with_context("serializing MST node during creation"))?;
         let cid = util::compute_cid(&cbor)?;
 
         let mst = Self {
@@ -276,10 +276,13 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
             .storage
             .get(&pointer)
             .await?
-            .ok_or_else(|| RepoError::not_found("MST node", &pointer))?;
+            .ok_or_else(|| {
+                RepoError::not_found("MST node", &pointer)
+                    .with_help("MST node missing from storage - ensure all blocks were properly persisted or that the tree CID is correct")
+            })?;
 
-        let node_data: super::node::NodeData =
-            serde_ipld_dagcbor::from_slice(&node_bytes).map_err(|e| RepoError::serialization(e))?;
+        let node_data: super::node::NodeData = serde_ipld_dagcbor::from_slice(&node_bytes)
+            .map_err(|e| RepoError::serialization(e).with_context(format!("deserializing MST node from storage: {}", pointer)))?;
 
         let entries = util::deserialize_node_data(self.storage.clone(), &node_data, self.layer)?;
 
@@ -322,7 +325,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
             if !outdated_children.is_empty() {
                 try_join_all(outdated_children)
                     .await
-                    .map_err(|e| RepoError::invalid(format!("Task join error: {}", e)))?;
+                    .map_err(|e| RepoError::task_failed(e))?;
 
                 // Re-fetch entries with updated child CIDs
                 entries = self.get_entries().await?;
@@ -330,8 +333,8 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
 
             // Now serialize and compute CID with fresh child CIDs
             let node_data = util::serialize_node_data(&entries).await?;
-            let cbor =
-                serde_ipld_dagcbor::to_vec(&node_data).map_err(|e| RepoError::serialization(e))?;
+            let cbor = serde_ipld_dagcbor::to_vec(&node_data)
+                .map_err(|e| RepoError::serialization(e).with_context("serializing MST node for CID computation"))?;
             let cid = util::compute_cid(&cbor)?;
 
             // Update pointer and mark as fresh
@@ -957,7 +960,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
                         .ok_or_else(|| RepoError::not_found("key", key.as_str()))?;
 
                     if &current != prev {
-                        return Err(RepoError::invalid_mst(format!(
+                        return Err(RepoError::cid_mismatch(format!(
                             "Update prev CID mismatch for key {}: expected {}, got {}",
                             key, prev, current
                         )));
@@ -974,7 +977,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
                         .ok_or_else(|| RepoError::not_found("key", key.as_str()))?;
 
                     if &current != prev {
-                        return Err(RepoError::invalid_mst(format!(
+                        return Err(RepoError::cid_mismatch(format!(
                             "Delete prev CID mismatch for key {}: expected {}, got {}",
                             key, prev, current
                         )));
@@ -1035,8 +1038,8 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
             // Serialize this node
             let entries = self.get_entries().await?;
             let node_data = util::serialize_node_data(&entries).await?;
-            let cbor =
-                serde_ipld_dagcbor::to_vec(&node_data).map_err(|e| RepoError::serialization(e))?;
+            let cbor = serde_ipld_dagcbor::to_vec(&node_data)
+                .map_err(|e| RepoError::serialization(e).with_context("serializing MST node for block collection"))?;
             blocks.insert(pointer, Bytes::from(cbor));
 
             // Recursively collect from subtrees
@@ -1331,8 +1334,8 @@ fn collect_blocks_parallel<S: BlockStore + Sync + Send + 'static>(
         // Serialize this node
         let entries = tree.get_entries().await?;
         let node_data = util::serialize_node_data(&entries).await?;
-        let cbor =
-            serde_ipld_dagcbor::to_vec(&node_data).map_err(|e| RepoError::serialization(e))?;
+        let cbor = serde_ipld_dagcbor::to_vec(&node_data)
+            .map_err(|e| RepoError::serialization(e).with_context("serializing MST node for parallel block collection"))?;
         blocks.insert(pointer, Bytes::from(cbor));
 
         // Spawn tasks for each subtree

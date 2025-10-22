@@ -22,7 +22,10 @@ pub async fn write_car(
     roots: Vec<IpldCid>,
     blocks: BTreeMap<IpldCid, Bytes>,
 ) -> Result<()> {
-    let file = File::create(path).await.map_err(|e| RepoError::io(e))?;
+    let path = path.as_ref();
+    let file = File::create(path)
+        .await
+        .map_err(|e| RepoError::io(e).with_context(format!("creating CAR file: {}", path.display())))?;
 
     let header = iroh_car::CarHeader::new_v1(roots);
     let mut writer = CarWriter::new(header, file);
@@ -31,10 +34,10 @@ pub async fn write_car(
         writer
             .write(cid, data.as_ref())
             .await
-            .map_err(|e| RepoError::car(e))?;
+            .map_err(|e| RepoError::car(e).with_context(format!("writing block {}", cid)))?;
     }
 
-    writer.finish().await.map_err(|e| RepoError::car(e))?;
+    writer.finish().await.map_err(|e| RepoError::car(e).with_context("finalizing CAR file"))?;
 
     Ok(())
 }
@@ -52,12 +55,12 @@ pub async fn write_car_bytes(root: IpldCid, blocks: BTreeMap<IpldCid, Bytes>) ->
         writer
             .write(cid, data.as_ref())
             .await
-            .map_err(|e| RepoError::car(e))?;
+            .map_err(|e| RepoError::car(e).with_context(format!("writing block {}", cid)))?;
     }
 
-    writer.finish().await.map_err(|e| RepoError::car(e))?;
+    writer.finish().await.map_err(|e| RepoError::car(e).with_context("finalizing CAR bytes"))?;
 
-    buffer.flush().await.map_err(|e| RepoError::io(e))?;
+    buffer.flush().await.map_err(|e| RepoError::io(e).with_context("flushing CAR buffer"))?;
 
     Ok(buffer)
 }
@@ -75,7 +78,10 @@ pub async fn export_repo_car<S: BlockStore + Sync + 'static>(
     commit_cid: IpldCid,
     mst: &Mst<S>,
 ) -> Result<()> {
-    let file = File::create(path).await.map_err(|e| RepoError::io(e))?;
+    let path = path.as_ref();
+    let file = File::create(path)
+        .await
+        .map_err(|e| RepoError::io(e).with_context(format!("creating CAR export file: {}", path.display())))?;
 
     let header = iroh_car::CarHeader::new_v1(vec![commit_cid]);
     let mut writer = CarWriter::new(header, file);
@@ -85,18 +91,21 @@ pub async fn export_repo_car<S: BlockStore + Sync + 'static>(
     let commit_data = storage
         .get(&commit_cid)
         .await?
-        .ok_or_else(|| RepoError::not_found("commit", &commit_cid))?;
+        .ok_or_else(|| {
+            RepoError::not_found("commit", &commit_cid)
+                .with_help("Commit must be persisted to storage before exporting - ensure apply_commit() was called")
+        })?;
 
     writer
         .write(commit_cid, &commit_data)
         .await
-        .map_err(|e| RepoError::car(e))?;
+        .map_err(|e| RepoError::car(e).with_context("writing commit block"))?;
 
     // Stream MST and record blocks
     mst.write_blocks_to_car(&mut writer).await?;
 
     // Finish writing
-    writer.finish().await.map_err(|e| RepoError::car(e))?;
+    writer.finish().await.map_err(|e| RepoError::car(e).with_context("finalizing CAR export"))?;
 
     Ok(())
 }

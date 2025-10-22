@@ -190,7 +190,7 @@ impl<'a> FirehoseCommit<'a> {
         let commit_cid: IpldCid = self
             .commit
             .to_ipld()
-            .map_err(|e| RepoError::invalid(format!("Invalid commit CID: {}", e)))?;
+            .map_err(|e| RepoError::invalid_cid_conversion(e, "commit CID"))?;
         let commit_bytes = temp_storage
             .get(&commit_cid)
             .await?
@@ -204,7 +204,8 @@ impl<'a> FirehoseCommit<'a> {
                 "DID mismatch: commit has {}, message has {}",
                 commit.did(),
                 self.repo
-            )));
+            ))
+            .with_help("DID mismatch indicates the commit was signed by a different identity - verify the commit is from the expected repository"));
         }
 
         // Verify signature
@@ -234,7 +235,7 @@ impl<'a> FirehoseCommit<'a> {
         let computed_root = computed_mst.get_pointer().await?;
 
         if computed_root != expected_root {
-            return Err(RepoError::invalid_commit(format!(
+            return Err(RepoError::cid_mismatch(format!(
                 "MST root mismatch: expected {}, got {}",
                 expected_root, computed_root
             )));
@@ -270,7 +271,7 @@ impl<'a> FirehoseCommit<'a> {
                 RepoError::invalid_commit("Sync v1.1 validation requires prev_data field")
             })?
             .to_ipld()
-            .map_err(|e| RepoError::invalid(format!("Invalid prev_data CID: {}", e)))?;
+            .map_err(|e| RepoError::invalid_cid_conversion(e, "prev_data CID"))?;
 
         // 2. Parse CAR blocks from the firehose message into temporary storage
         let parsed = parse_car_bytes(&self.blocks).await?;
@@ -280,7 +281,7 @@ impl<'a> FirehoseCommit<'a> {
         let commit_cid: IpldCid = self
             .commit
             .to_ipld()
-            .map_err(|e| RepoError::invalid(format!("Invalid commit CID: {}", e)))?;
+            .map_err(|e| RepoError::invalid_cid_conversion(e, "commit CID"))?;
         let commit_bytes = temp_storage
             .get(&commit_cid)
             .await?
@@ -294,7 +295,8 @@ impl<'a> FirehoseCommit<'a> {
                 "DID mismatch: commit has {}, message has {}",
                 commit.did(),
                 self.repo
-            )));
+            ))
+            .with_help("DID mismatch indicates the commit was signed by a different identity - verify the commit is from the expected repository"));
         }
 
         // Verify signature
@@ -318,7 +320,7 @@ impl<'a> FirehoseCommit<'a> {
         let computed_root = computed_mst.get_pointer().await?;
 
         if computed_root != expected_root {
-            return Err(RepoError::invalid_commit(format!(
+            return Err(RepoError::cid_mismatch(format!(
                 "MST root mismatch: expected {}, got {}",
                 expected_root, computed_root
             )));

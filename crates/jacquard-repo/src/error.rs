@@ -33,6 +33,10 @@ pub enum RepoErrorKind {
     InvalidKey,
     /// Invalid CID
     InvalidCid,
+    /// Invalid CID conversion (string/bytes to CID)
+    InvalidCidConversion,
+    /// CID mismatch during validation (prev, data, etc.)
+    CidMismatch,
     /// Resource not found
     NotFound,
     /// Cryptographic operation failed
@@ -45,6 +49,8 @@ pub enum RepoErrorKind {
     Car,
     /// I/O error
     Io,
+    /// Background task failed (panic or cancellation)
+    TaskFailed,
 }
 
 impl RepoError {
@@ -152,6 +158,32 @@ impl RepoError {
     /// Create a generic invalid error
     pub fn invalid(msg: impl Into<String>) -> Self {
         Self::new(RepoErrorKind::InvalidMst, Some(msg.into().into()))
+    }
+
+    /// Create an invalid CID conversion error
+    pub fn invalid_cid_conversion(source: impl Error + Send + Sync + 'static, context: &str) -> Self {
+        Self::new(RepoErrorKind::InvalidCidConversion, Some(Box::new(source)))
+            .with_context(context.to_string())
+            .with_help("CID conversion failed - check that the source data is a valid CIDv1 string or bytes. Common causes: malformed base32 encoding, incorrect multicodec prefix, or invalid multihash.")
+    }
+
+    /// Create a CID mismatch error (for validation failures)
+    pub fn cid_mismatch(context: impl Into<String>) -> Self {
+        Self::new(RepoErrorKind::CidMismatch, None)
+            .with_context(context.into())
+            .with_help("CID validation failed - the expected and actual CIDs don't match. This typically indicates: data was modified unexpectedly, incorrect prev CID provided for update/delete, or MST root doesn't match commit data field.")
+    }
+
+    /// Create a task failure error (background operations)
+    pub fn task_failed(source: impl Error + Send + Sync + 'static) -> Self {
+        Self::new(RepoErrorKind::TaskFailed, Some(Box::new(source)))
+            .with_help("Background task failed - this usually indicates a panic in concurrent MST operations or task cancellation. Check for logic errors in tree traversal or storage operations.")
+    }
+
+    /// Create a CAR invalid structure error (without wrapping an error)
+    pub fn car_invalid(msg: impl Into<String>) -> Self {
+        Self::new(RepoErrorKind::Car, Some(msg.into().into()))
+            .with_help("CAR file structure is invalid - check that the file has required root CIDs in header and follows CAR v1 format.")
     }
 }
 
@@ -383,7 +415,7 @@ pub enum ProofError {
 impl From<ProofError> for RepoError {
     fn from(e: ProofError) -> Self {
         match &e {
-            ProofError::NoRoot => RepoError::invalid("CAR file has no root CID"),
+            ProofError::NoRoot => RepoError::car_invalid("CAR file has no root CID"),
             ProofError::CommitNotFound => {
                 RepoError::new(RepoErrorKind::NotFound, Some(Box::new(e)))
             }
