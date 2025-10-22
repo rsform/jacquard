@@ -30,8 +30,8 @@ bon.workspace = true
 base64.workspace = true
 bytes.workspace = true
 chrono.workspace = true
-cid = { version = "0.11.1", features = ["serde", "std"] }
-ipld-core = { version = "0.4.2", features = ["serde"] }
+cid.workspace = true
+ipld-core.workspace = true
 langtag = { version = "0.4.0", features = ["serde"] }
 miette.workspace = true
 multibase = "0.9.1"
@@ -58,7 +58,6 @@ n0-future = { workspace = true, optional = true }
 futures = { version = "0.3", optional = true }
 tokio-tungstenite-wasm = { version = "0.4", features = ["rustls-tls-native-roots"], optional = true }
 ciborium = {version = "0.2.0", optional = true }
-genawaiter = { version = "0.99.1", features = ["futures03"] }
 zstd = { version = "0.13", optional = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]

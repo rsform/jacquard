@@ -24,9 +24,9 @@ serde.workspace = true
 serde_ipld_dagcbor.workspace = true
 serde_bytes = "0.11"
 
-# IPLD primitives (match jacquard-common versions)
-cid = { version = "0.11.1", features = ["serde", "std"] }
-ipld-core = { version = "0.4.2", features = ["serde"] }
+# IPLD primitives
+cid.workspace = true
+ipld-core.workspace = true
 multihash = "0.19.3"
 
 # CAR file I/O
@@ -47,6 +47,7 @@ miette.workspace = true
 trait-variant.workspace = true
 n0-future.workspace = true
 tokio = { workspace = true, default-features = false, features = ["fs", "io-util"] }
+
 
 # Crypto (for commit signing/verification)
 ed25519-dalek = { version = "2", features = ["rand_core"] }

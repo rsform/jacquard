@@ -1153,6 +1153,8 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     /// - All leaf record blocks (read from storage)
     ///
     /// This is suitable for CAR export and avoids loading all blocks into memory.
+    ///
+    /// TODO: get rid of tokio dependency here if possible
     pub async fn write_blocks_to_car<W: tokio::io::AsyncWrite + Send + Unpin>(
         &self,
         writer: &mut iroh_car::CarWriter<W>,
@@ -1177,6 +1179,8 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     }
 
     /// Recursively write MST nodes to CAR and collect leaf CIDs
+    ///
+    /// TODO: get rid of tokio dependency here if possible
     fn write_mst_nodes_to_car<'a, W: tokio::io::AsyncWrite + Send + Unpin>(
         &'a self,
         writer: &'a mut iroh_car::CarWriter<W>,
