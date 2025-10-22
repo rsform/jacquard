@@ -1,11 +1,14 @@
 //! MST diff calculation
 
+use std::collections::BTreeMap;
+
+use super::cursor::{CursorPosition, MstCursor};
 use super::tree::Mst;
 use crate::error::Result;
 use crate::storage::BlockStore;
+use bytes::Bytes;
 use cid::Cid as IpldCid;
 use smol_str::SmolStr;
-use std::collections::HashMap;
 
 /// Diff between two MST states
 ///
@@ -21,6 +24,36 @@ pub struct MstDiff {
 
     /// Records deleted (key, old CID)
     pub deletes: Vec<(SmolStr, IpldCid)>,
+
+    /// Record CIDs that are newly referenced (from creates + updates)
+    ///
+    /// This includes:
+    /// - CIDs from created records
+    /// - New CIDs from updated records
+    ///
+    /// These need to be available in storage for the new tree.
+    pub new_leaf_cids: Vec<IpldCid>,
+
+    /// Record CIDs that are no longer referenced (from deletes + updates)
+    ///
+    /// This includes:
+    /// - CIDs from deleted records
+    /// - Old CIDs from updated records
+    ///
+    /// These can be garbage collected if not referenced elsewhere.
+    pub removed_cids: Vec<IpldCid>,
+
+    /// MST node blocks that are newly created
+    ///
+    /// When modifying a tree, new MST nodes are created along changed paths.
+    /// This tracks those nodes for persistence/commit inclusion.
+    pub new_mst_blocks: BTreeMap<IpldCid, Bytes>,
+
+    /// MST node blocks that are no longer needed
+    ///
+    /// When modifying a tree, old MST nodes along changed paths become unreachable.
+    /// This tracks those nodes for garbage collection.
+    pub removed_mst_blocks: Vec<IpldCid>,
 }
 
 use super::tree::VerifiedWriteOp;
@@ -32,6 +65,10 @@ impl MstDiff {
             creates: Vec::new(),
             updates: Vec::new(),
             deletes: Vec::new(),
+            new_leaf_cids: Vec::new(),
+            removed_cids: Vec::new(),
+            new_mst_blocks: BTreeMap::new(),
+            removed_mst_blocks: Vec::new(),
         }
     }
 
@@ -94,6 +131,27 @@ impl MstDiff {
         ops
     }
 
+    /// Fetch new record data blocks from storage
+    ///
+    /// Returns a map of CID → bytes for all new record data (creates + updates).
+    /// This is useful for including record data in commits and firehose messages.
+    pub async fn fetch_new_blocks<S: BlockStore>(
+        &self,
+        storage: &S,
+    ) -> Result<std::collections::BTreeMap<IpldCid, bytes::Bytes>> {
+        use std::collections::BTreeMap;
+
+        let mut blocks = BTreeMap::new();
+
+        for cid in &self.new_leaf_cids {
+            if let Some(block) = storage.get(cid).await? {
+                blocks.insert(*cid, block);
+            }
+        }
+
+        Ok(blocks)
+    }
+
     /// Convert diff to firehose repository operations
     ///
     /// Returns operations in the format used by `com.atproto.sync.subscribeRepos`.
@@ -150,56 +208,311 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     /// - Creates: keys in `other` but not in `self`
     /// - Updates: keys in both but with different CIDs
     /// - Deletes: keys in `self` but not in `other`
+    ///
+    /// Uses an efficient walker-based algorithm that only visits changed subtrees.
+    /// When two subtrees have the same CID, the entire subtree is skipped.
     pub async fn diff(&self, other: &Mst<S>) -> Result<MstDiff> {
-        // Collect all leaves from both trees
-        let self_leaves = self.leaves().await?;
-        let other_leaves = other.leaves().await?;
-
-        // Build hashmaps for efficient lookup
-        let self_map: HashMap<SmolStr, IpldCid> = self_leaves.into_iter().collect();
-        let other_map: HashMap<SmolStr, IpldCid> = other_leaves.into_iter().collect();
-
         let mut diff = MstDiff::new();
-
-        // Find creates and updates
-        for (key, new_cid) in &other_map {
-            match self_map.get(key) {
-                Some(old_cid) => {
-                    // Key exists in both - check if CID changed
-                    if old_cid != new_cid {
-                        diff.updates.push((key.clone(), *new_cid, *old_cid));
-                    }
-                }
-                None => {
-                    // Key only in other - create
-                    diff.creates.push((key.clone(), *new_cid));
-                }
-            }
-        }
-
-        // Find deletes
-        for (key, old_cid) in &self_map {
-            if !other_map.contains_key(key) {
-                // Key only in self - delete
-                diff.deletes.push((key.clone(), *old_cid));
-            }
-        }
-
+        diff_recursive(self, other, &mut diff).await?;
         Ok(diff)
     }
+}
 
+/// Recursively diff two MST nodes using cursors
+fn diff_recursive<'a, S: BlockStore + Sync + 'static>(
+    old: &'a Mst<S>,
+    new: &'a Mst<S>,
+    diff: &'a mut MstDiff,
+) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<()>> + Send + 'a>> {
+    Box::pin(async move {
+        // If CIDs are equal, trees are identical - skip entire subtree
+        let old_cid = old.get_pointer().await?;
+        let new_cid = new.get_pointer().await?;
+        if old_cid == new_cid {
+            return Ok(());
+        }
+
+        // CIDs differ - use cursors to walk both trees
+        let mut old_cursor = MstCursor::new(old.clone());
+        let mut new_cursor = MstCursor::new(new.clone());
+
+        // Don't advance yet - let loop handle roots like any other tree comparison
+        loop {
+            match (old_cursor.current(), new_cursor.current()) {
+                (CursorPosition::End, CursorPosition::End) => break,
+
+                // Only new entries remain - all adds
+                (CursorPosition::End, CursorPosition::Leaf { key, cid }) => {
+                    diff.creates.push((key.clone(), *cid));
+                    diff.new_leaf_cids.push(*cid);
+                    new_cursor.advance().await?;
+                }
+                (CursorPosition::End, CursorPosition::Tree { mst }) => {
+                    track_added_tree(mst, diff).await?;
+                    new_cursor.skip_subtree().await?;
+                }
+
+                // Only old entries remain - all deletes
+                (CursorPosition::Leaf { key, cid }, CursorPosition::End) => {
+                    diff.deletes.push((key.clone(), *cid));
+                    diff.removed_cids.push(*cid);
+                    old_cursor.advance().await?;
+                }
+                (CursorPosition::Tree { mst }, CursorPosition::End) => {
+                    track_removed_tree(mst, diff).await?;
+                    old_cursor.skip_subtree().await?;
+                }
+
+                // Both have entries - compare them
+                (old_pos, new_pos) => {
+                    // Handle Leaf/Leaf comparison FIRST (before layer checks)
+                    // This matches rsky's logic - key comparison takes precedence
+                    if let (
+                        CursorPosition::Leaf {
+                            key: old_key,
+                            cid: old_cid,
+                        },
+                        CursorPosition::Leaf {
+                            key: new_key,
+                            cid: new_cid,
+                        },
+                    ) = (old_pos, new_pos)
+                    {
+                        match old_key.as_str().cmp(new_key.as_str()) {
+                            std::cmp::Ordering::Equal => {
+                                // Same key - check if value changed
+                                if old_cid != new_cid {
+                                    diff.updates.push((old_key.clone(), *new_cid, *old_cid));
+                                    diff.new_leaf_cids.push(*new_cid);
+                                    diff.removed_cids.push(*old_cid);
+                                }
+                                old_cursor.advance().await?;
+                                new_cursor.advance().await?;
+                            }
+                            std::cmp::Ordering::Less => {
+                                // Old key < new key - old was deleted
+                                diff.deletes.push((old_key.clone(), *old_cid));
+                                diff.removed_cids.push(*old_cid);
+                                old_cursor.advance().await?;
+                            }
+                            std::cmp::Ordering::Greater => {
+                                // Old key > new key - new was created
+                                diff.creates.push((new_key.clone(), *new_cid));
+                                diff.new_leaf_cids.push(*new_cid);
+                                new_cursor.advance().await?;
+                            }
+                        }
+                        continue;
+                    }
+
+                    // Now check layers for Tree comparisons
+                    let old_layer = old_cursor.layer().await?;
+                    let new_layer = new_cursor.layer().await?;
+
+                    match (old_pos, new_pos) {
+                        // Both trees at same layer - check if CIDs match, skip or recurse
+                        (
+                            CursorPosition::Tree { mst: old_tree },
+                            CursorPosition::Tree { mst: new_tree },
+                        ) if old_layer == new_layer => {
+                            let old_tree_cid = old_tree.get_pointer().await?;
+                            let new_tree_cid = new_tree.get_pointer().await?;
+
+                            if old_tree_cid == new_tree_cid {
+                                // Same subtree - skip both
+                                old_cursor.skip_subtree().await?;
+                                new_cursor.skip_subtree().await?;
+                            } else {
+                                // Different subtrees - serialize and track MST blocks, then step in to find leaf diff
+                                serialize_and_track_mst(new_tree, diff).await?;
+                                diff.removed_mst_blocks.push(old_tree_cid);
+                                // Don't track recursively - step in to compare leaves
+                                old_cursor.advance().await?;
+                                new_cursor.advance().await?;
+                            }
+                        }
+
+                        // Layer mismatch handling (rsky pattern)
+                        _ if old_layer > new_layer => {
+                            // Old is at higher layer - need to descend or advance appropriately
+                            match old_pos {
+                                CursorPosition::Leaf { .. } => {
+                                    // Higher layer leaf - serialize and track new node, advance new to continue comparing
+                                    if let CursorPosition::Tree { mst } = new_pos {
+                                        serialize_and_track_mst(mst, diff).await?;
+                                    }
+                                    new_cursor.advance().await?; // Don't blindly add - let loop compare
+                                }
+                                CursorPosition::Tree { mst } => {
+                                    // Higher layer tree - track MST block removal, then step into to find leaves
+                                    let tree_cid = mst.get_pointer().await?;
+                                    diff.removed_mst_blocks.push(tree_cid);
+                                    old_cursor.advance().await?; // Step into to continue comparing
+                                }
+                                _ => {}
+                            }
+                        }
+
+                        _ if old_layer < new_layer => {
+                            // New is at higher layer
+                            match new_pos {
+                                CursorPosition::Leaf { .. } => {
+                                    // Higher layer leaf - track old node, advance old to continue comparing
+                                    if let CursorPosition::Tree { mst } = old_pos {
+                                        let tree_cid = mst.get_pointer().await?;
+                                        diff.removed_mst_blocks.push(tree_cid);
+                                    }
+                                    old_cursor.advance().await?; // Don't blindly delete - let loop compare
+                                }
+                                CursorPosition::Tree { mst } => {
+                                    // Higher layer tree - serialize and track MST block addition, then step into to find leaves
+                                    serialize_and_track_mst(mst, diff).await?;
+                                    new_cursor.advance().await?; // Step into to continue comparing
+                                }
+                                _ => {}
+                            }
+                        }
+
+                        // Same layer, mixed Leaf/Tree - step into tree to compare
+                        (CursorPosition::Leaf { .. }, CursorPosition::Tree { mst }) => {
+                            // Old has leaf, new has tree - serialize and track new MST block, step in to compare leaves
+                            serialize_and_track_mst(mst, diff).await?;
+                            new_cursor.advance().await?;
+                        }
+
+                        (CursorPosition::Tree { mst }, CursorPosition::Leaf { .. }) => {
+                            // Old has tree, new has leaf - track removed MST block, step in to compare leaves
+                            let tree_cid = mst.get_pointer().await?;
+                            diff.removed_mst_blocks.push(tree_cid);
+                            old_cursor.advance().await?;
+                        }
+
+                        _ => {}
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    })
+}
+
+/// Serialize MST node and add to new_mst_blocks
+async fn serialize_and_track_mst<S: BlockStore + Sync + 'static>(
+    tree: &Mst<S>,
+    diff: &mut MstDiff,
+) -> Result<()> {
+    let tree_cid = tree.get_pointer().await?;
+
+    // Serialize the MST node
+    let entries = tree.get_entries().await?;
+    let node_data = super::util::serialize_node_data(&entries).await?;
+    let cbor = serde_ipld_dagcbor::to_vec(&node_data)
+        .map_err(|e| crate::error::RepoError::serialization(e))?;
+
+    // Track the serialized block
+    diff.new_mst_blocks.insert(tree_cid, Bytes::from(cbor));
+
+    Ok(())
+}
+
+/// Track entire tree as added (all leaves and nodes)
+fn track_added_tree<'a, S: BlockStore + Sync + 'static>(
+    tree: &'a Mst<S>,
+    diff: &'a mut MstDiff,
+) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<()>> + Send + 'a>> {
+    Box::pin(async move {
+        use super::node::NodeEntry;
+
+        // Serialize and track this MST node
+        serialize_and_track_mst(tree, diff).await?;
+
+        let entries = tree.get_entries().await?;
+        for entry in &entries {
+            match entry {
+                NodeEntry::Leaf { key, value } => {
+                    diff.creates.push((key.clone(), *value));
+                    diff.new_leaf_cids.push(*value);
+                }
+                NodeEntry::Tree(subtree) => {
+                    track_added_tree(subtree, diff).await?;
+                }
+            }
+        }
+
+        Ok(())
+    })
+}
+
+/// Track entire tree as removed (all leaves and nodes)
+fn track_removed_tree<'a, S: BlockStore + Sync + 'static>(
+    tree: &'a Mst<S>,
+    diff: &'a mut MstDiff,
+) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<()>> + Send + 'a>> {
+    Box::pin(async move {
+        use super::node::NodeEntry;
+
+        // Track this MST node as removed
+        let tree_cid = tree.get_pointer().await?;
+        diff.removed_mst_blocks.push(tree_cid);
+
+        // Recursively remove all leaves and nodes
+        let entries = tree.get_entries().await?;
+        for entry in &entries {
+            match entry {
+                NodeEntry::Leaf { key, value } => {
+                    diff.deletes.push((key.clone(), *value));
+                    diff.removed_cids.push(*value);
+                }
+                NodeEntry::Tree(subtree) => {
+                    track_removed_tree(subtree, diff).await?;
+                }
+            }
+        }
+
+        Ok(())
+    })
+}
+
+impl<S: BlockStore + Sync + 'static> Mst<S> {
     /// Compute diff from this tree to empty (all deletes)
     ///
     /// Returns diff representing deletion of all records in this tree.
     pub async fn diff_to_empty(&self) -> Result<MstDiff> {
-        let leaves = self.leaves().await?;
-
-        Ok(MstDiff {
-            creates: Vec::new(),
-            updates: Vec::new(),
-            deletes: leaves,
-        })
+        let mut diff = MstDiff::new();
+        track_removed_tree_all(self, &mut diff).await?;
+        Ok(diff)
     }
+}
+
+/// Track entire tree as removed (all nodes and leaves)
+fn track_removed_tree_all<'a, S: BlockStore + Sync + 'static>(
+    tree: &'a Mst<S>,
+    diff: &'a mut MstDiff,
+) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<()>> + Send + 'a>> {
+    Box::pin(async move {
+        use super::node::NodeEntry;
+
+        // Track this node as removed
+        let tree_cid = tree.get_pointer().await?;
+        diff.removed_mst_blocks.push(tree_cid);
+
+        // Recurse through entries
+        let entries = tree.get_entries().await?;
+        for entry in &entries {
+            match entry {
+                NodeEntry::Leaf { key, value } => {
+                    diff.deletes.push((key.clone(), *value));
+                    diff.removed_cids.push(*value);
+                }
+                NodeEntry::Tree(subtree) => {
+                    track_removed_tree_all(subtree, diff).await?;
+                }
+            }
+        }
+
+        Ok(())
+    })
 }
 
 #[cfg(test)]

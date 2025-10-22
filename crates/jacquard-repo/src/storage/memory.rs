@@ -119,6 +119,22 @@ impl BlockStore for MemoryBlockStore {
         }
         Ok(results)
     }
+
+    async fn apply_commit(&self, commit: crate::repo::CommitData) -> Result<()> {
+        let mut store = self.blocks.write().unwrap();
+
+        // First, insert all new blocks
+        for (cid, data) in commit.blocks {
+            store.insert(cid, data);
+        }
+
+        // Then, delete all garbage-collected blocks
+        for cid in commit.deleted_cids {
+            store.remove(&cid);
+        }
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]

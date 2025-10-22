@@ -8,8 +8,8 @@ use crate::error::Result;
 ///
 /// Provides CID-keyed block storage for MST nodes, commits, and record data.
 /// Implementations might use:
-/// - In-memory HashMap ([`MemoryBlockStore`](memory::MemoryBlockStore))
-/// - CAR file ([`FileBlockStore`](file::FileBlockStore))
+/// - In-memory HashMap ([`MemoryBlockStore`])
+/// - CAR file ([`FileBlockStore`])
 /// - SQLite/RocksDB (user-provided)
 /// - Remote HTTP storage (user-provided)
 ///
@@ -77,6 +77,17 @@ pub trait BlockStore: Clone {
     ///
     /// Returns a vec of the same length as the input, with `None` for missing blocks.
     async fn get_many(&self, cids: &[IpldCid]) -> Result<Vec<Option<Bytes>>>;
+
+    /// Apply a commit (atomic write + delete)
+    ///
+    /// Performs validated commit operations on the underlying storage:
+    /// - Persists all blocks from `commit.blocks`
+    /// - Deletes blocks listed in `commit.deleted_cids` (garbage collection)
+    ///
+    /// This should be atomic where possible - either both operations succeed or both fail.
+    /// For implementations that don't support atomic operations, writes should happen first,
+    /// then deletes.
+    async fn apply_commit(&self, commit: crate::repo::CommitData) -> Result<()>;
 }
 
 pub mod file;

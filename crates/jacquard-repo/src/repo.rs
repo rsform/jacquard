@@ -3,10 +3,9 @@
 //! Optional convenience layer over MST primitives. Provides type-safe record operations,
 //! batch writes, commit creation, and CAR export.
 
-use crate::MstDiff;
 use crate::commit::Commit;
 use crate::error::Result;
-use crate::mst::{Mst, WriteOp};
+use crate::mst::Mst;
 use crate::storage::BlockStore;
 use cid::Cid as IpldCid;
 use jacquard_common::IntoStatic;
@@ -40,10 +39,11 @@ pub struct CommitData {
     /// Previous MST root CID (for sync v1.1)
     pub prev_data: Option<IpldCid>,
 
-    /// All blocks to persist (MST nodes + commit block)
+    /// All blocks to persist (MST nodes + record data + commit block)
     ///
     /// Includes:
-    /// - All new MST node blocks from `mst.collect_blocks()`
+    /// - All new MST node blocks from `diff.new_mst_blocks`
+    /// - All new record data blocks (from creates + updates)
     /// - The commit block itself
     pub blocks: BTreeMap<IpldCid, bytes::Bytes>,
 
@@ -54,6 +54,22 @@ pub struct CommitData {
     /// - MST node blocks along paths for all changed keys
     /// - Includes "adjacent" blocks needed for operation inversion
     pub relevant_blocks: BTreeMap<IpldCid, bytes::Bytes>,
+
+    /// CIDs of blocks to delete from storage
+    ///
+    /// Contains CIDs that are no longer referenced by the current tree:
+    /// - Record CIDs from deleted records
+    /// - Old record CIDs from updated records
+    ///
+    /// **Note:** Actual deletion should consider whether previous commits still
+    /// reference these CIDs. A proper GC strategy might:
+    /// - Only delete if previous commits are also being GC'd
+    /// - Use reference counting across all retained commits
+    /// - Perform periodic reachability analysis
+    ///
+    /// For simple single-commit repos or when old commits are discarded, direct
+    /// deletion is safe.
+    pub deleted_cids: Vec<IpldCid>,
 }
 
 impl CommitData {
@@ -224,42 +240,73 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
         Ok(old_cid)
     }
 
-    /// Apply write operations individually (validates existence/prev)
-    pub async fn create_writes(&mut self, ops: &[WriteOp]) -> Result<crate::mst::MstDiff> {
-        let old_mst = self.mst.clone();
+    /// Apply record write operations with inline data
+    ///
+    /// Serializes record data to DAG-CBOR, computes CIDs, stores data blocks,
+    /// then applies write operations to the MST. Returns the diff for inspection.
+    ///
+    /// For creating commits with operations, use `create_commit()` instead.
+    pub async fn apply_record_writes(
+        &mut self,
+        ops: &[crate::mst::RecordWriteOp<'_>],
+    ) -> Result<crate::mst::MstDiff> {
+        use crate::mst::RecordWriteOp;
+        use smol_str::format_smolstr;
 
-        // Apply operations individually (add/update/delete verify existence)
+        let mut updated_tree = self.mst.clone();
+
         for op in ops {
-            self.mst = match op {
-                WriteOp::Create { key, cid } => {
-                    // Check doesn't exist
-                    if self.mst.get(key.as_str()).await?.is_some() {
-                        return Err(crate::error::RepoError::already_exists(
-                            "record",
-                            key.as_str(),
-                        ));
-                    }
-                    self.mst.add(key.as_str(), *cid).await?
+            updated_tree = match op {
+                RecordWriteOp::Create {
+                    collection,
+                    rkey,
+                    record,
+                } => {
+                    let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
+
+                    // Serialize record to DAG-CBOR
+                    let cbor = serde_ipld_dagcbor::to_vec(record)
+                        .map_err(|e| crate::error::RepoError::serialization(e))?;
+
+                    // Compute CID and store data
+                    let cid = self.storage.put(&cbor).await?;
+
+                    updated_tree.add(key.as_str(), cid).await?
                 }
-                WriteOp::Update { key, cid, prev } => {
-                    // Check exists
-                    let current = self.mst.get(key.as_str()).await?.ok_or_else(|| {
-                        crate::error::RepoError::not_found("record", key.as_str())
-                    })?;
+                RecordWriteOp::Update {
+                    collection,
+                    rkey,
+                    record,
+                    prev,
+                } => {
+                    let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
+
+                    // Serialize record to DAG-CBOR
+                    let cbor = serde_ipld_dagcbor::to_vec(record)
+                        .map_err(|e| crate::error::RepoError::serialization(e))?;
+
+                    // Compute CID and store data
+                    let cid = self.storage.put(&cbor).await?;
 
                     // Validate prev if provided
                     if let Some(prev_cid) = prev {
-                        if &current != prev_cid {
+                        if &cid != prev_cid {
                             return Err(crate::error::RepoError::invalid(format!(
                                 "Update prev CID mismatch for key {}: expected {}, got {}",
-                                key, prev_cid, current
+                                key, prev_cid, cid
                             )));
                         }
                     }
 
-                    self.mst.add(key.as_str(), *cid).await?
+                    updated_tree.add(key.as_str(), cid).await?
                 }
-                WriteOp::Delete { key, prev } => {
+                RecordWriteOp::Delete {
+                    collection,
+                    rkey,
+                    prev,
+                } => {
+                    let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
+
                     // Check exists
                     let current = self.mst.get(key.as_str()).await?.ok_or_else(|| {
                         crate::error::RepoError::not_found("record", key.as_str())
@@ -275,38 +322,32 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                         }
                     }
 
-                    self.mst.delete(key.as_str()).await?
+                    updated_tree.delete(key.as_str()).await?
                 }
             };
         }
 
-        old_mst.diff(&self.mst).await
-    }
+        // Compute diff before updating
+        let diff = self.mst.diff(&updated_tree).await?;
 
-    /// Apply write operations and create a commit
-    ///
-    /// Convenience method that calls `create_writes()` and `commit()`.
-    pub async fn apply_writes<K>(&mut self, ops: &[WriteOp], signing_key: &K) -> Result<MstDiff>
-    where
-        K: crate::commit::SigningKey,
-    {
-        let did = &self.commit.did.clone();
-        let cid = &self.commit_cid.clone();
-        let diff = self.create_writes(ops).await?;
-        self.commit(&did, Some(*cid), signing_key).await?;
+        // Update mst
+        self.mst = updated_tree;
+
         Ok(diff)
     }
 
-    /// Format a commit (create signed commit + collect blocks)
+    /// Create a commit from record write operations
     ///
-    /// Creates signed commit and collects blocks for persistence and firehose:
-    /// - All MST node blocks from `mst.collect_blocks()`
-    /// - Commit block itself
-    /// - Relevant blocks for sync v1.1 (walks paths for all changed keys)
+    /// Applies write operations, creates signed commit, and collects blocks:
+    /// - Serializes records to DAG-CBOR and stores data blocks
+    /// - Applies operations to MST and computes diff
+    /// - Uses `diff.new_mst_blocks` for efficient block tracking
+    /// - Walks paths for original operations to build relevant_blocks (sync v1.1)
     ///
     /// Returns `(ops, CommitData)` - ops are needed for `to_firehose_commit()`.
-    pub async fn format_commit<K>(
-        &self,
+    pub async fn create_commit<K>(
+        &mut self,
+        ops: &[crate::mst::RecordWriteOp<'_>],
         did: &Did<'_>,
         prev: Option<IpldCid>,
         signing_key: &K,
@@ -314,76 +355,140 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     where
         K: crate::commit::SigningKey,
     {
-        let rev = Ticker::new().next(Some(self.commit.rev.clone()));
-        let data = self.mst.root().await?;
+        use crate::mst::RecordWriteOp;
+        use smol_str::format_smolstr;
+
+        // Step 1: Apply all write operations to build new MST
+        let mut updated_tree = self.mst.clone();
+
+        for op in ops {
+            updated_tree = match op {
+                RecordWriteOp::Create {
+                    collection,
+                    rkey,
+                    record,
+                } => {
+                    let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
+
+                    // Serialize record to DAG-CBOR
+                    let cbor = serde_ipld_dagcbor::to_vec(record)
+                        .map_err(|e| crate::error::RepoError::serialization(e))?;
+
+                    // Compute CID and store data
+                    let cid = self.storage.put(&cbor).await?;
+
+                    updated_tree.add(key.as_str(), cid).await?
+                }
+                RecordWriteOp::Update {
+                    collection,
+                    rkey,
+                    record,
+                    prev,
+                } => {
+                    let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
+
+                    // Serialize record to DAG-CBOR
+                    let cbor = serde_ipld_dagcbor::to_vec(record)
+                        .map_err(|e| crate::error::RepoError::serialization(e))?;
+
+                    // Compute CID and store data
+                    let cid = self.storage.put(&cbor).await?;
+
+                    // Validate prev if provided
+                    if let Some(prev_cid) = prev {
+                        if &cid != prev_cid {
+                            return Err(crate::error::RepoError::invalid(format!(
+                                "Update prev CID mismatch for key {}: expected {}, got {}",
+                                key, prev_cid, cid
+                            )));
+                        }
+                    }
+
+                    updated_tree.add(key.as_str(), cid).await?
+                }
+                RecordWriteOp::Delete {
+                    collection,
+                    rkey,
+                    prev,
+                } => {
+                    let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
+
+                    // Check exists
+                    let current = self.mst.get(key.as_str()).await?.ok_or_else(|| {
+                        crate::error::RepoError::not_found("record", key.as_str())
+                    })?;
+
+                    // Validate prev if provided
+                    if let Some(prev_cid) = prev {
+                        if &current != prev_cid {
+                            return Err(crate::error::RepoError::invalid(format!(
+                                "Delete prev CID mismatch for key {}: expected {}, got {}",
+                                key, prev_cid, current
+                            )));
+                        }
+                    }
+
+                    updated_tree.delete(key.as_str()).await?
+                }
+            };
+        }
+
+        // Step 2: Compute diff and get new MST root
+        let data = updated_tree.root().await?;
         let prev_data = *self.commit.data();
+        let diff = self.mst.diff(&updated_tree).await?;
 
-        // Create signed commit
-        let commit = Commit::new_unsigned(did.clone().into_static(), data, rev.clone(), prev)
-            .sign(signing_key)?;
-
-        // Load previous MST to compute diff
-        let prev_mst = Mst::load(self.storage.clone(), prev_data, None);
-        let diff = prev_mst.diff(&self.mst).await?;
-
-        // Collect all MST blocks for persistence
-        let (_root_cid, mut blocks) = self.mst.collect_blocks().await?;
-
-        // Collect relevant blocks for firehose (walk paths for all changed keys)
-        let mut relevant_blocks = BTreeMap::new();
-
-        // Walk paths for creates
-        for (key, _cid) in &diff.creates {
-            let path_cids = self.mst.cids_for_path(key.as_str()).await?;
-            for path_cid in path_cids {
-                if let Some(block) = blocks.get(&path_cid) {
-                    relevant_blocks.insert(path_cid, block.clone());
-                } else if let Some(block) = self.storage.get(&path_cid).await? {
-                    relevant_blocks.insert(path_cid, block);
-                }
-            }
-        }
-
-        // Walk paths for updates
-        for (key, _new_cid, _old_cid) in &diff.updates {
-            let path_cids = self.mst.cids_for_path(key.as_str()).await?;
-            for path_cid in path_cids {
-                if let Some(block) = blocks.get(&path_cid) {
-                    relevant_blocks.insert(path_cid, block.clone());
-                } else if let Some(block) = self.storage.get(&path_cid).await? {
-                    relevant_blocks.insert(path_cid, block);
-                }
-            }
-        }
-
-        // Walk paths for deletes (path may not exist in new tree, but walk as far as possible)
-        for (key, _old_cid) in &diff.deletes {
-            let path_cids = self.mst.cids_for_path(key.as_str()).await?;
-            for path_cid in path_cids {
-                if let Some(block) = blocks.get(&path_cid) {
-                    relevant_blocks.insert(path_cid, block.clone());
-                } else if let Some(block) = self.storage.get(&path_cid).await? {
-                    relevant_blocks.insert(path_cid, block);
-                }
-            }
-        }
-
-        // Add commit block to both collections
-        let commit_cbor = commit.to_cbor()?;
-        let commit_cid = crate::mst::util::compute_cid(&commit_cbor)?;
-        let commit_bytes = bytes::Bytes::from(commit_cbor);
-        blocks.insert(commit_cid, commit_bytes.clone());
-        relevant_blocks.insert(commit_cid, commit_bytes);
-
-        // Convert diff to repository operations
-        let ops = diff
+        // Step 3: Extract everything we need from diff before moving it
+        let new_leaf_blocks = diff.fetch_new_blocks(self.storage.as_ref()).await?;
+        let repo_ops = diff
             .to_repo_ops()
             .into_iter()
             .map(|op| op.into_static())
             .collect();
+        let deleted_cids = diff.removed_cids;
+
+        // Step 4: Use diff.new_mst_blocks instead of collect_blocks()
+        let mut blocks = diff.new_mst_blocks;
+
+        // Step 5: Build relevant_blocks by walking paths for ORIGINAL operations
+        let mut relevant_blocks = BTreeMap::new();
+        for op in ops {
+            let key = format_smolstr!("{}/{}", op.collection().as_ref(), op.rkey().as_ref());
+            let path_cids = updated_tree.cids_for_path(key.as_str()).await?;
+
+            for path_cid in path_cids {
+                if let Some(block) = blocks.get(&path_cid) {
+                    relevant_blocks.insert(path_cid, block.clone());
+                } else if let Some(block) = self.storage.get(&path_cid).await? {
+                    relevant_blocks.insert(path_cid, block);
+                }
+            }
+        }
+
+        // Step 6: Add new leaf blocks (record data) to both collections
+        for (cid, block) in new_leaf_blocks {
+            blocks.insert(cid, block.clone());
+            relevant_blocks.insert(cid, block);
+        }
+
+        // Step 7: Create and sign commit
+        let rev = Ticker::new().next(Some(self.commit.rev.clone()));
+        let commit = Commit::new_unsigned(did.clone().into_static(), data, rev.clone(), prev)
+            .sign(signing_key)?;
+
+        let commit_cbor = commit.to_cbor()?;
+        let commit_cid = crate::mst::util::compute_cid(&commit_cbor)?;
+        let commit_bytes = bytes::Bytes::from(commit_cbor);
+
+        // Step 8: Add commit block to both collections
+        blocks.insert(commit_cid, commit_bytes.clone());
+        relevant_blocks.insert(commit_cid, commit_bytes);
+
+        // Step 9: Update internal MST state
+        self.mst = updated_tree;
 
         Ok((
-            ops,
+            repo_ops,
             CommitData {
                 cid: commit_cid,
                 rev,
@@ -393,6 +498,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                 prev_data: Some(prev_data),
                 blocks,
                 relevant_blocks,
+                deleted_cids,
             },
         ))
     }
@@ -400,11 +506,12 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     /// Apply a commit (persist blocks to storage)
     ///
     /// Persists all blocks from `CommitData` and updates internal state.
+    /// Uses `BlockStore::apply_commit()` to perform atomic write+delete operations.
     pub async fn apply_commit(&mut self, commit_data: CommitData) -> Result<IpldCid> {
         let commit_cid = commit_data.cid;
 
-        // Persist all blocks (MST + commit)
-        self.storage.put_many(commit_data.blocks).await?;
+        // Apply commit to storage (writes new blocks, deletes garbage)
+        self.storage.apply_commit(commit_data).await?;
 
         // Load and update internal state
         let commit_bytes = self
@@ -425,7 +532,9 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
 
     /// Create a commit for the current repository state
     ///
-    /// Convenience method that calls `format_commit()` and `apply_commit()`.
+    /// Convenience method that calls `create_commit()` with no additional operations
+    /// and `apply_commit()`. Use this after manually updating the MST with individual
+    /// record operations (e.g., `create_record()`, `update_record()`, `delete_record()`).
     pub async fn commit<K>(
         &mut self,
         did: &Did<'_>,
@@ -435,7 +544,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     where
         K: crate::commit::SigningKey,
     {
-        let (ops, commit_data) = self.format_commit(did, prev, signing_key).await?;
+        let (ops, commit_data) = self.create_commit(&[], did, prev, signing_key).await?;
         Ok((ops, self.apply_commit(commit_data).await?))
     }
 
@@ -477,6 +586,7 @@ mod tests {
     use super::*;
     use crate::storage::MemoryBlockStore;
     use jacquard_common::types::recordkey::Rkey;
+    use smol_str::SmolStr;
 
     fn make_test_cid(value: u8) -> IpldCid {
         use crate::DAG_CBOR_CID_CODEC;
@@ -486,6 +596,28 @@ mod tests {
         let hash = Sha256::digest(&[value]);
         let mh = multihash::Multihash::wrap(SHA2_256, &hash).unwrap();
         IpldCid::new_v1(DAG_CBOR_CID_CODEC, mh)
+    }
+
+    fn make_test_record(
+        n: u32,
+    ) -> std::collections::BTreeMap<SmolStr, jacquard_common::types::value::RawData<'static>> {
+        use jacquard_common::types::value::RawData;
+        use smol_str::SmolStr;
+
+        let mut record = std::collections::BTreeMap::new();
+        record.insert(
+            SmolStr::new("$type"),
+            RawData::String("app.bsky.feed.post".into()),
+        );
+        record.insert(
+            SmolStr::new("text"),
+            RawData::String(format!("Test post #{}", n).into()),
+        );
+        record.insert(
+            SmolStr::new("createdAt"),
+            RawData::String("2024-01-01T00:00:00Z".to_string().into()),
+        );
+        record
     }
 
     async fn create_test_repo(storage: Arc<MemoryBlockStore>) -> Repository<MemoryBlockStore> {
@@ -508,17 +640,41 @@ mod tests {
 
     #[tokio::test]
     async fn test_create_and_get_record() {
+        use crate::mst::RecordWriteOp;
+
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
         let collection = Nsid::new("app.bsky.feed.post").unwrap();
         let rkey = RecordKey(Rkey::new("abc123").unwrap());
-        let cid = make_test_cid(1);
 
-        repo.create_record(&collection, &rkey, cid).await.unwrap();
+        let ops = vec![RecordWriteOp::Create {
+            collection: collection.clone().into_static(),
+            rkey: rkey.clone(),
+            record: make_test_record(1),
+        }];
+
+        let did = Did::new("did:plc:test").unwrap();
+        let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
+        let (repo_ops, commit_data) = repo
+            .create_commit(
+                &ops,
+                &did,
+                Some(repo.current_commit_cid().clone()),
+                &signing_key,
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(repo_ops.len(), 1);
+        assert_eq!(repo_ops[0].action.as_ref(), "create");
 
         let retrieved = repo.get_record(&collection, &rkey).await.unwrap();
-        assert_eq!(retrieved, Some(cid));
+        assert!(retrieved.is_some());
+
+        // Verify data is actually in storage (from commit_data blocks)
+        let cid = retrieved.unwrap();
+        assert!(commit_data.blocks.contains_key(&cid));
     }
 
     #[tokio::test]
@@ -598,28 +754,6 @@ mod tests {
 
         let result = repo.delete_record(&collection, &rkey).await;
         assert!(result.is_err());
-    }
-
-    #[tokio::test]
-    async fn test_apply_writes() {
-        let storage = Arc::new(MemoryBlockStore::new());
-        let mut repo = create_test_repo(storage).await;
-
-        let ops = vec![
-            WriteOp::Create {
-                key: "app.bsky.feed.post/abc123".into(),
-                cid: make_test_cid(1),
-            },
-            WriteOp::Create {
-                key: "app.bsky.feed.post/def456".into(),
-                cid: make_test_cid(2),
-            },
-        ];
-
-        let diff = repo.create_writes(&ops).await.unwrap();
-        assert_eq!(diff.creates.len(), 2);
-        assert_eq!(diff.updates.len(), 0);
-        assert_eq!(diff.deletes.len(), 0);
     }
 
     #[tokio::test]
@@ -827,7 +961,147 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_commit_tracks_deleted_cids() {
+        use crate::mst::RecordWriteOp;
+
+        let storage = Arc::new(MemoryBlockStore::new());
+        let mut repo = create_test_repo(storage.clone()).await;
+
+        let collection = Nsid::new("app.bsky.feed.post").unwrap();
+        let rkey1 = RecordKey(Rkey::new("test1").unwrap());
+        let rkey2 = RecordKey(Rkey::new("test2").unwrap());
+
+        let did = Did::new("did:plc:test").unwrap();
+        let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
+
+        // Create records with actual data
+        let create_ops = vec![
+            RecordWriteOp::Create {
+                collection: collection.clone(),
+                rkey: rkey1.clone(),
+                record: make_test_record(1),
+            },
+            RecordWriteOp::Create {
+                collection: collection.clone(),
+                rkey: rkey2.clone(),
+                record: make_test_record(2),
+            },
+        ];
+
+        let (_repo_ops, commit_data) = repo
+            .create_commit(
+                &create_ops,
+                &did,
+                Some(repo.current_commit_cid().clone()),
+                &signing_key,
+            )
+            .await
+            .unwrap();
+
+        let cid1 = repo.get_record(&collection, &rkey1).await.unwrap().unwrap();
+
+        repo.apply_commit(commit_data).await.unwrap();
+
+        // Delete one record and format commit (don't apply yet)
+        let delete_ops = vec![RecordWriteOp::Delete {
+            collection: collection.clone(),
+            rkey: rkey1.clone(),
+            prev: None,
+        }];
+
+        let (_, commit_data) = repo
+            .create_commit(
+                &delete_ops,
+                &did,
+                Some(repo.current_commit_cid().clone()),
+                &signing_key,
+            )
+            .await
+            .unwrap();
+
+        // Verify deleted_cids contains the deleted record CID
+        assert_eq!(commit_data.deleted_cids.len(), 1);
+        assert_eq!(commit_data.deleted_cids[0], cid1);
+    }
+
+    #[tokio::test]
+    async fn test_record_writes_with_commit_includes_data_blocks() {
+        use crate::mst::RecordWriteOp;
+
+        let storage = Arc::new(MemoryBlockStore::new());
+        let mut repo = create_test_repo(storage.clone()).await;
+
+        let collection = Nsid::new("app.bsky.feed.post").unwrap();
+        let rkey1 = RecordKey(Rkey::new("post1").unwrap());
+        let rkey2 = RecordKey(Rkey::new("post2").unwrap());
+
+        // Create records with actual data
+        let ops = vec![
+            RecordWriteOp::Create {
+                collection: collection.clone(),
+                rkey: rkey1.clone(),
+                record: make_test_record(1),
+            },
+            RecordWriteOp::Create {
+                collection: collection.clone(),
+                rkey: rkey2.clone(),
+                record: make_test_record(2),
+            },
+        ];
+
+        // Format commit
+        let did = Did::new("did:plc:test").unwrap();
+        let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
+        let (repo_ops, commit_data) = repo
+            .create_commit(
+                &ops,
+                &did,
+                Some(repo.current_commit_cid().clone()),
+                &signing_key,
+            )
+            .await
+            .unwrap();
+
+        let cid1 = repo.get_record(&collection, &rkey1).await.unwrap().unwrap();
+        let cid2 = repo.get_record(&collection, &rkey2).await.unwrap().unwrap();
+
+        // Verify commit data includes record data blocks
+        assert!(
+            commit_data.blocks.contains_key(&cid1),
+            "blocks should contain record 1 data"
+        );
+        assert!(
+            commit_data.blocks.contains_key(&cid2),
+            "blocks should contain record 2 data"
+        );
+        assert!(
+            commit_data.relevant_blocks.contains_key(&cid1),
+            "relevant_blocks should contain record 1 data"
+        );
+        assert!(
+            commit_data.relevant_blocks.contains_key(&cid2),
+            "relevant_blocks should contain record 2 data"
+        );
+
+        // Verify we can deserialize the record data
+        let record1_bytes = commit_data.blocks.get(&cid1).unwrap();
+        let record1: std::collections::BTreeMap<SmolStr, jacquard_common::types::value::RawData> =
+            serde_ipld_dagcbor::from_slice(record1_bytes).unwrap();
+        assert_eq!(
+            record1.get(&SmolStr::new("text")).unwrap(),
+            &jacquard_common::types::value::RawData::String("Test post #1".to_string().into())
+        );
+
+        // Verify firehose ops
+        assert_eq!(repo_ops.len(), 2);
+        assert_eq!(repo_ops[0].action.as_ref(), "create");
+        assert_eq!(repo_ops[1].action.as_ref(), "create");
+    }
+
+    #[tokio::test]
     async fn test_batch_mixed_operations() {
+        use crate::mst::RecordWriteOp;
+
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
@@ -837,52 +1111,94 @@ mod tests {
         let rkey1 = RecordKey(Rkey::new("existing1").unwrap());
         let rkey2 = RecordKey(Rkey::new("existing2").unwrap());
         let rkey3 = RecordKey(Rkey::new("existing3").unwrap());
-        repo.create_record(&collection, &rkey1, make_test_cid(1))
-            .await
-            .unwrap();
-        repo.create_record(&collection, &rkey2, make_test_cid(2))
-            .await
-            .unwrap();
-        repo.create_record(&collection, &rkey3, make_test_cid(3))
+
+        let did = Did::new("did:plc:test").unwrap();
+        let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
+
+        let create_ops = vec![
+            RecordWriteOp::Create {
+                collection: collection.clone(),
+                rkey: rkey1.clone(),
+                record: make_test_record(1),
+            },
+            RecordWriteOp::Create {
+                collection: collection.clone(),
+                rkey: rkey2.clone(),
+                record: make_test_record(2),
+            },
+            RecordWriteOp::Create {
+                collection: collection.clone(),
+                rkey: rkey3.clone(),
+                record: make_test_record(3),
+            },
+        ];
+
+        let (_, commit_data) = repo
+            .create_commit(
+                &create_ops,
+                &did,
+                Some(repo.current_commit_cid().clone()),
+                &signing_key,
+            )
             .await
             .unwrap();
 
+        // Get the CID of existing1 so we can verify it changed
+        let old_cid1 = repo.get_record(&collection, &rkey1).await.unwrap().unwrap();
+
+        repo.apply_commit(commit_data).await.unwrap();
+
         // Batch operation: create new, update existing, delete existing
+        let new_rkey = RecordKey(Rkey::new("new1").unwrap());
         let ops = vec![
-            WriteOp::Create {
-                key: format!("{}/{}", collection.as_ref(), "new1").into(),
-                cid: make_test_cid(10),
+            RecordWriteOp::Create {
+                collection: collection.clone(),
+                rkey: new_rkey.clone(),
+                record: make_test_record(10),
             },
-            WriteOp::Update {
-                key: format!("{}/{}", collection.as_ref(), "existing1").into(),
-                cid: make_test_cid(11),
+            RecordWriteOp::Update {
+                collection: collection.clone(),
+                rkey: rkey1.clone(),
+                record: make_test_record(11),
                 prev: None,
             },
-            WriteOp::Delete {
-                key: format!("{}/{}", collection.as_ref(), "existing2").into(),
+            RecordWriteOp::Delete {
+                collection: collection.clone(),
+                rkey: rkey2.clone(),
                 prev: None,
             },
         ];
 
-        let diff = repo.create_writes(&ops).await.unwrap();
-        assert_eq!(diff.creates.len(), 1);
-        assert_eq!(diff.updates.len(), 1);
-        assert_eq!(diff.deletes.len(), 1);
+        let (repo_ops, _commit_data) = repo
+            .create_commit(
+                &ops,
+                &did,
+                Some(repo.current_commit_cid().clone()),
+                &signing_key,
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(repo_ops.len(), 3);
 
         // Verify final state
-        let new_rkey = RecordKey(Rkey::new("new1").unwrap());
-        assert_eq!(
-            repo.get_record(&collection, &new_rkey).await.unwrap(),
-            Some(make_test_cid(10))
+        let new_cid = repo.get_record(&collection, &new_rkey).await.unwrap();
+        assert!(new_cid.is_some(), "new record should exist");
+
+        let updated_cid1 = repo.get_record(&collection, &rkey1).await.unwrap();
+        assert!(updated_cid1.is_some(), "updated record should exist");
+        assert_ne!(
+            updated_cid1.unwrap(),
+            old_cid1,
+            "record should have new CID"
         );
-        assert_eq!(
-            repo.get_record(&collection, &rkey1).await.unwrap(),
-            Some(make_test_cid(11))
-        );
+
         assert_eq!(repo.get_record(&collection, &rkey2).await.unwrap(), None);
-        assert_eq!(
-            repo.get_record(&collection, &rkey3).await.unwrap(),
-            Some(make_test_cid(3))
+        assert!(
+            repo.get_record(&collection, &rkey3)
+                .await
+                .unwrap()
+                .is_some()
         );
     }
 }

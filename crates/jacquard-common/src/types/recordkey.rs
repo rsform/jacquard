@@ -32,12 +32,37 @@ pub unsafe trait RecordKeyType: Clone + Serialize {
 #[repr(transparent)]
 pub struct RecordKey<T: RecordKeyType>(pub T);
 
+impl<'a> RecordKey<Rkey<'a>> {
+    /// Create a new `RecordKey` from a string slice
+    pub fn any(str: &'a str) -> Result<Self, AtStrError> {
+        Ok(RecordKey(Rkey::new(str)?))
+    }
+
+    /// Create a new `RecordKey` from a CowStr
+    pub fn any_cow(str: CowStr<'a>) -> Result<Self, AtStrError> {
+        Ok(RecordKey(Rkey::new_cow(str)?))
+    }
+
+    /// Create a new `RecordKey` from a static string slice
+    pub fn any_static(str: &'static str) -> Result<Self, AtStrError> {
+        Ok(RecordKey(Rkey::new_static(str)?))
+    }
+}
+
 impl<T> From<T> for RecordKey<Rkey<'_>>
 where
     T: RecordKeyType,
 {
     fn from(value: T) -> Self {
         RecordKey(Rkey::from_str(value.as_str()).expect("Invalid rkey"))
+    }
+}
+
+impl FromStr for RecordKey<Rkey<'_>> {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(RecordKey(Rkey::from_str(s)?))
     }
 }
 

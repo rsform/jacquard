@@ -110,6 +110,11 @@ impl<W: BlockStore + Sync + 'static, B: BlockStore + Sync + 'static> BlockStore
 
         Ok(results)
     }
+
+    async fn apply_commit(&self, commit: crate::repo::CommitData) -> Result<()> {
+        // All operations go to writable layer only (base layer is read-only)
+        self.writable.apply_commit(commit).await
+    }
 }
 
 #[cfg(test)]

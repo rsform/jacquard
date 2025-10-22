@@ -192,6 +192,10 @@ impl IntoStatic for PublicKey<'_> {
     }
 }
 
+/// Decode unsigned varint from bytes
+///
+/// Returns `Some((value, bytes_read))` on success, `None` on invalid input.
+/// Used for decoding multicodec prefixes in multibase-encoded keys.
 pub fn decode_uvarint(data: &[u8]) -> Option<(u64, usize)> {
     let mut x: u64 = 0;
     let mut s: u32 = 0;
@@ -208,6 +212,10 @@ pub fn decode_uvarint(data: &[u8]) -> Option<(u64, usize)> {
     None
 }
 
+/// Encode unsigned varint to bytes
+///
+/// Encodes a u64 value as a multicodec-style varint.
+/// Used for encoding multicodec prefixes in multibase-encoded keys.
 pub fn encode_uvarint(mut x: u64) -> Vec<u8> {
     let mut out = Vec::new();
     while x >= 0x80 {
@@ -218,6 +226,10 @@ pub fn encode_uvarint(mut x: u64) -> Vec<u8> {
     out
 }
 
+/// Encode public key as multibase multikey string
+///
+/// Creates a multikey string with the given multicodec code and key bytes.
+/// Returns base58btc-encoded string with varint prefix.
 pub fn multikey(code: u64, key: &[u8]) -> String {
     let mut buf = encode_uvarint(code);
     buf.extend_from_slice(key);

@@ -1,5 +1,7 @@
 //! MST node data structures
 
+use std::fmt;
+
 use bytes::Bytes;
 use cid::Cid as IpldCid;
 use smol_str::SmolStr;
@@ -11,7 +13,7 @@ use smol_str::SmolStr;
 /// `[Tree, Leaf, Tree, Leaf, Leaf, Tree]` etc.
 ///
 /// The wire format (CBOR) is different - see `NodeData` and `TreeEntry`.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub enum NodeEntry<S: crate::storage::BlockStore> {
     /// Subtree reference
     ///
@@ -25,6 +27,17 @@ pub enum NodeEntry<S: crate::storage::BlockStore> {
         /// CID of the record value
         value: IpldCid,
     },
+}
+
+impl<S: crate::storage::BlockStore> fmt::Debug for NodeEntry<S> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            NodeEntry::Tree(t) => write!(f, "{:?}", t),
+            NodeEntry::Leaf { key, value } => {
+                write!(f, "Leaf {{ key: {}, value: {} }}", key, value)
+            }
+        }
+    }
 }
 
 impl<S: crate::storage::BlockStore> NodeEntry<S> {

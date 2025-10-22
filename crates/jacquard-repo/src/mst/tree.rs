@@ -5,7 +5,13 @@ use super::util;
 use crate::error::{RepoError, Result};
 use crate::storage::BlockStore;
 use cid::Cid as IpldCid;
+use core::fmt;
+use jacquard_common::types::recordkey::Rkey;
+use jacquard_common::types::string::{Nsid, RecordKey};
+use jacquard_common::types::value::RawData;
 use smol_str::SmolStr;
+use std::fmt::{Display, Formatter};
+use std::pin::Pin;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -44,6 +50,66 @@ pub enum WriteOp {
         /// Previous CID (optional for validation)
         prev: Option<IpldCid>,
     },
+}
+
+/// Record write operation with inline data
+///
+/// Used for high-level record operations where the actual record data
+/// needs to be serialized and stored. The data is a generic IPLD map
+/// (similar to rsky's `RepoRecord = BTreeMap<String, Lex>`).
+#[derive(Debug, Clone, PartialEq)]
+pub enum RecordWriteOp<'a> {
+    /// Create new record with data
+    Create {
+        /// Collection NSID
+        collection: Nsid<'a>,
+        /// Record key
+        rkey: RecordKey<Rkey<'a>>,
+        /// Record data (will be serialized to DAG-CBOR and CID computed)
+        record: std::collections::BTreeMap<SmolStr, RawData<'a>>,
+    },
+
+    /// Update existing record with new data
+    Update {
+        /// Collection NSID
+        collection: Nsid<'a>,
+        /// Record key
+        rkey: RecordKey<Rkey<'a>>,
+        /// New record data
+        record: std::collections::BTreeMap<SmolStr, RawData<'a>>,
+        /// Previous CID (optional for validation)
+        prev: Option<IpldCid>,
+    },
+
+    /// Delete record
+    Delete {
+        /// Collection NSID
+        collection: Nsid<'a>,
+        /// Record key
+        rkey: RecordKey<Rkey<'a>>,
+        /// Previous CID (optional for validation)
+        prev: Option<IpldCid>,
+    },
+}
+
+impl<'a> RecordWriteOp<'a> {
+    /// Get the collection NSID for this operation
+    pub fn collection(&self) -> &Nsid<'a> {
+        match self {
+            RecordWriteOp::Create { collection, .. } => collection,
+            RecordWriteOp::Update { collection, .. } => collection,
+            RecordWriteOp::Delete { collection, .. } => collection,
+        }
+    }
+
+    /// Get the record key for this operation
+    pub fn rkey(&self) -> &RecordKey<Rkey<'a>> {
+        match self {
+            RecordWriteOp::Create { rkey, .. } => rkey,
+            RecordWriteOp::Update { rkey, .. } => rkey,
+            RecordWriteOp::Delete { rkey, .. } => rkey,
+        }
+    }
 }
 
 /// Verified write operation with required prev fields
@@ -101,7 +167,7 @@ pub enum VerifiedWriteOp {
 /// - More leading zeros = higher layer (deeper in tree)
 /// - Layer = floor(leading_zeros / 2) for ~4 fanout
 /// - Deterministic and insertion-order independent
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Mst<S: BlockStore> {
     /// Block storage for loading/saving nodes (shared via Arc)
     storage: Arc<S>,
@@ -186,14 +252,14 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
         Ok(Self {
             storage: self.storage.clone(),
             entries: Arc::new(RwLock::new(Some(entries))),
-            pointer: self.pointer.clone(),
+            pointer: Arc::new(RwLock::new(self.pointer.read().await.clone())),
             outdated_pointer: Arc::new(RwLock::new(true)),
             layer: self.layer,
         })
     }
 
     /// Get entries (lazy load if needed)
-    async fn get_entries(&self) -> Result<Vec<NodeEntry<S>>> {
+    pub(crate) async fn get_entries(&self) -> Result<Vec<NodeEntry<S>>> {
         {
             let entries_guard = self.entries.read().await;
             if let Some(ref entries) = *entries_guard {
@@ -227,30 +293,53 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     ///
     /// Computes CID from current entries but doesn't persist to storage.
     /// Use `collect_blocks()` to gather blocks for persistence.
-    pub async fn get_pointer(&self) -> Result<IpldCid> {
-        let outdated = *self.outdated_pointer.read().await;
-        if !outdated {
-            return Ok(*self.pointer.read().await);
-        }
+    pub fn get_pointer<'a>(&'a self) -> Pin<Box<dyn Future<Output = Result<IpldCid>> + Send + 'a>> {
+        Box::pin(async move {
+            let outdated = *self.outdated_pointer.read().await;
+            if !outdated {
+                return Ok(*self.pointer.read().await);
+            }
 
-        // Serialize and compute CID (don't persist yet)
-        let entries = self.get_entries().await?;
-        let node_data = util::serialize_node_data(&entries).await?;
-        let cbor =
-            serde_ipld_dagcbor::to_vec(&node_data).map_err(|e| RepoError::serialization(e))?;
-        let cid = util::compute_cid(&cbor)?;
+            // Check for outdated children and recursively update them first
+            let mut entries = self.get_entries().await?;
+            let mut outdated_children = Vec::new();
 
-        // Update pointer and mark as fresh
-        {
-            let mut pointer_guard = self.pointer.write().await;
-            *pointer_guard = cid;
-        }
-        {
-            let mut outdated_guard = self.outdated_pointer.write().await;
-            *outdated_guard = false;
-        }
+            for entry in &entries {
+                if let NodeEntry::Tree(mst) = entry {
+                    let is_outdated = *mst.outdated_pointer.read().await;
+                    if is_outdated {
+                        outdated_children.push(mst.clone());
+                    }
+                }
+            }
 
-        Ok(cid)
+            // Recursively update outdated children
+            if !outdated_children.is_empty() {
+                for child in &outdated_children {
+                    let _ = child.get_pointer().await?;
+                }
+                // Re-fetch entries with updated child CIDs
+                entries = self.get_entries().await?;
+            }
+
+            // Now serialize and compute CID with fresh child CIDs
+            let node_data = util::serialize_node_data(&entries).await?;
+            let cbor =
+                serde_ipld_dagcbor::to_vec(&node_data).map_err(|e| RepoError::serialization(e))?;
+            let cid = util::compute_cid(&cbor)?;
+
+            // Update pointer and mark as fresh
+            {
+                let mut pointer_guard = self.pointer.write().await;
+                *pointer_guard = cid;
+            }
+            {
+                let mut outdated_guard = self.outdated_pointer.write().await;
+                *outdated_guard = false;
+            }
+
+            Ok(cid)
+        })
     }
 
     /// Get root CID (alias for get_pointer)
@@ -269,7 +358,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     ///
     /// Layer is the maximum layer of any leaf key in this node.
     /// For nodes with no leaves, recursively checks subtrees.
-    fn get_layer<'a>(
+    pub(crate) fn get_layer<'a>(
         &'a self,
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<usize>> + Send + 'a>> {
         Box::pin(async move {
@@ -818,6 +907,14 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
         })
     }
 
+    /// Copy tree with same entries (marking pointer as outdated)
+    ///
+    /// Internal helper for creating modified tree copies.
+    pub async fn copy_tree(&self) -> Result<Self> {
+        let entries = self.get_entries().await?;
+        self.new_tree(entries).await
+    }
+
     /// Apply batch of verified write operations (returns new tree)
     ///
     /// More efficient than individual operations as it only rebuilds
@@ -946,6 +1043,26 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
         Ok(root_cid)
     }
 
+    /// Collect all MST node CIDs in this tree
+    ///
+    /// Returns all CIDs for MST nodes (internal nodes), not leaves.
+    /// Used for diff calculation to determine which MST blocks are removed.
+    pub async fn collect_node_cids(&self) -> Result<Vec<IpldCid>> {
+        let mut cids = Vec::new();
+        let pointer = self.get_pointer().await?;
+        cids.push(pointer);
+
+        let entries = self.get_entries().await?;
+        for entry in &entries {
+            if let NodeEntry::Tree(subtree) = entry {
+                let subtree_cids = subtree.collect_node_cids().await?;
+                cids.extend(subtree_cids);
+            }
+        }
+
+        Ok(cids)
+    }
+
     /// Get all CIDs in the merkle path to a key
     ///
     /// Returns a list of CIDs representing the proof path from root to the target key:
@@ -1070,6 +1187,97 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
 
             Ok(())
         })
+    }
+}
+
+impl<S: BlockStore> std::fmt::Debug for Mst<S> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_struct("MST")
+            .field("entries", &self.entries.try_read().unwrap())
+            .field("layer", &self.layer)
+            .field("pointer", &self.pointer.try_read().unwrap().to_string())
+            .field(
+                "outdated_pointer",
+                &self.outdated_pointer.try_read().unwrap(),
+            )
+            .finish()
+    }
+}
+
+/// Format a CID for display (shortens long CIDs)
+///
+/// Truncates long CIDs to first 7 and last 8 characters with `...` in between.
+pub fn short_cid(cid: &IpldCid) -> String {
+    let cid_string = cid.to_string();
+    let len = cid_string.len();
+    if len > 15 {
+        let first = &cid_string[0..7];
+        let last = &cid_string[len - 8..];
+        format!("{}...{}", first, last)
+    } else {
+        cid_string
+    }
+}
+
+impl<S: BlockStore> Display for Mst<S> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        fn pointer_str<S: BlockStore>(mst: &Mst<S>) -> String {
+            let cid_guard = mst.pointer.try_read().unwrap();
+            format!("*({})", short_cid(&*cid_guard))
+        }
+
+        fn fmt_mst<S: BlockStore>(
+            mst: &Mst<S>,
+            f: &mut Formatter<'_>,
+            prefix: &str,
+            is_last: bool,
+        ) -> fmt::Result {
+            // Print MST pointer using our helper
+            writeln!(
+                f,
+                "{}{}── {}",
+                prefix,
+                if is_last { "└" } else { "├" },
+                pointer_str(mst),
+            )?;
+
+            // Prepare the child prefix
+            let child_prefix = format!("{}{}", prefix, if is_last { "   " } else { "│  " });
+
+            let entries_guard = mst.entries.try_read().unwrap();
+            let entries = match &*entries_guard {
+                Some(e) => e,
+                None => {
+                    writeln!(f, "{}(virtual node)", child_prefix)?;
+                    return Ok(());
+                }
+            };
+
+            for (i, entry) in entries.iter().enumerate() {
+                let last_child = i == entries.len() - 1;
+                match entry {
+                    NodeEntry::Leaf { key, value } => {
+                        // Print leaf key and (short) leaf value
+                        writeln!(
+                            f,
+                            "{}{}── {} -> {}",
+                            child_prefix,
+                            if last_child { "└" } else { "├" },
+                            key,
+                            short_cid(&value)
+                        )?;
+                    }
+                    NodeEntry::Tree(child_mst) => {
+                        // Recurse
+                        fmt_mst(child_mst, f, &child_prefix, last_child)?;
+                    }
+                }
+            }
+            Ok(())
+        }
+
+        // Start with empty prefix for the root
+        fmt_mst(self, f, "", true)
     }
 }
 

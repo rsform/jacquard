@@ -46,7 +46,7 @@ pub async fn write_car(
 
 /// Write blocks to CAR bytes (in-memory)
 ///
-/// Like `write_car()` but writes to a Vec<u8> instead of a file.
+/// Like `write_car()` but writes to a `Vec<u8>` instead of a file.
 /// Useful for tests and proof generation.
 pub async fn write_car_bytes(
     root: IpldCid,
