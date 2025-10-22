@@ -10,8 +10,10 @@ use core::fmt;
 use jacquard_common::types::recordkey::Rkey;
 use jacquard_common::types::string::{Nsid, RecordKey};
 use jacquard_common::types::value::RawData;
+use n0_future::try_join_all;
 use smol_str::SmolStr;
 use std::fmt::{Display, Formatter};
+use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -307,18 +309,21 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
 
             for entry in &entries {
                 if let NodeEntry::Tree(mst) = entry {
-                    let is_outdated = *mst.outdated_pointer.read().await;
-                    if is_outdated {
-                        outdated_children.push(mst.clone());
+                    if *mst.outdated_pointer.read().await {
+                        let child = mst.clone();
+                        outdated_children.push(n0_future::task::spawn(async move {
+                            child.get_pointer().await
+                        }));
                     }
                 }
             }
 
-            // Recursively update outdated children
+            // Recursively update outdated children concurrently
             if !outdated_children.is_empty() {
-                for child in &outdated_children {
-                    let _ = child.get_pointer().await?;
-                }
+                try_join_all(outdated_children)
+                    .await
+                    .map_err(|e| RepoError::invalid(format!("Task join error: {}", e)))?;
+
                 // Re-fetch entries with updated child CIDs
                 entries = self.get_entries().await?;
             }
@@ -869,7 +874,20 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     ///
     /// Recursively traverses the tree to collect all leaves.
     /// Used for diff calculation and tree listing.
+    ///
+    /// Uses parallel traversal to collect leaves from independent subtrees concurrently.
     pub fn leaves<'a>(
+        &'a self,
+    ) -> std::pin::Pin<
+        Box<
+            dyn std::future::Future<Output = Result<Vec<(smol_str::SmolStr, IpldCid)>>> + Send + 'a,
+        >,
+    > {
+        Box::pin(async move { collect_leaves_parallel(self.clone()).await })
+    }
+
+    /// Get all leaf entries sequentially (for benchmarking)
+    pub fn leaves_sequential<'a>(
         &'a self,
     ) -> std::pin::Pin<
         Box<
@@ -878,13 +896,13 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     > {
         Box::pin(async move {
             let mut result = Vec::new();
-            self.collect_leaves(&mut result).await?;
+            self.collect_leaves_sequential(&mut result).await?;
             Ok(result)
         })
     }
 
-    /// Recursively collect all leaves into the result vector
-    fn collect_leaves<'a>(
+    /// Recursively collect all leaves into the result vector (sequential)
+    fn collect_leaves_sequential<'a>(
         &'a self,
         result: &'a mut Vec<(smol_str::SmolStr, IpldCid)>,
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<()>> + Send + 'a>> {
@@ -895,7 +913,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
                 match entry {
                     NodeEntry::Tree(subtree) => {
                         // Recurse into subtree
-                        subtree.collect_leaves(result).await?;
+                        subtree.collect_leaves_sequential(result).await?;
                     }
                     NodeEntry::Leaf { key, value } => {
                         // Add leaf to result
@@ -989,7 +1007,23 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     /// that aren't already in storage. Skips nodes that are already persisted.
     ///
     /// Returns (root_cid, blocks) where blocks is a map of CID → bytes.
+    ///
+    /// Uses parallel traversal to collect blocks from independent subtrees concurrently.
     pub fn collect_blocks<'a>(
+        &'a self,
+    ) -> std::pin::Pin<
+        Box<
+            dyn std::future::Future<
+                    Output = Result<(IpldCid, std::collections::BTreeMap<IpldCid, bytes::Bytes>)>,
+                > + Send
+                + 'a,
+        >,
+    > {
+        Box::pin(async move { collect_blocks_parallel(self.clone()).await })
+    }
+
+    /// Collect all blocks sequentially (for benchmarking)
+    pub fn collect_blocks_sequential<'a>(
         &'a self,
     ) -> std::pin::Pin<
         Box<
@@ -1021,7 +1055,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
             // Recursively collect from subtrees
             for entry in &entries {
                 if let NodeEntry::Tree(subtree) = entry {
-                    let (_, subtree_blocks) = subtree.collect_blocks().await?;
+                    let (_, subtree_blocks) = subtree.collect_blocks_sequential().await?;
                     blocks.extend(subtree_blocks);
                 }
             }
@@ -1048,7 +1082,14 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     ///
     /// Returns all CIDs for MST nodes (internal nodes), not leaves.
     /// Used for diff calculation to determine which MST blocks are removed.
+    ///
+    /// Uses parallel traversal to collect CIDs from independent subtrees concurrently.
     pub async fn collect_node_cids(&self) -> Result<Vec<IpldCid>> {
+        collect_node_cids_parallel(self.clone()).await
+    }
+
+    /// Collect all MST node CIDs sequentially (for benchmarking)
+    pub async fn collect_node_cids_sequential(&self) -> Result<Vec<IpldCid>> {
         let mut cids = Vec::new();
         let pointer = self.get_pointer().await?;
         cids.push(pointer);
@@ -1056,11 +1097,10 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
         let entries = self.get_entries().await?;
         for entry in &entries {
             if let NodeEntry::Tree(subtree) = entry {
-                let subtree_cids = subtree.collect_node_cids().await?;
+                let subtree_cids = subtree.collect_node_cids_sequential().await?;
                 cids.extend(subtree_cids);
             }
         }
-
         Ok(cids)
     }
 
@@ -1189,6 +1229,150 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
             Ok(())
         })
     }
+}
+
+/// Recursively collect MST node CIDs in parallel
+///
+/// Spawns concurrent tasks for each subtree branch, then merges results.
+fn collect_node_cids_parallel<S: BlockStore + Sync + Send + 'static>(
+    tree: Mst<S>,
+) -> Pin<Box<dyn Future<Output = Result<Vec<IpldCid>>> + Send>> {
+    Box::pin(async move {
+        let pointer = tree.get_pointer().await?;
+        let entries = tree.get_entries().await?;
+
+        // Spawn tasks for each subtree
+        let tasks: Vec<_> = entries
+            .into_iter()
+            .filter_map(|entry| {
+                if let NodeEntry::Tree(subtree) = entry {
+                    Some(n0_future::task::spawn(async move {
+                        collect_node_cids_parallel(subtree).await
+                    }))
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        // Await all tasks concurrently
+        let results = try_join_all(tasks)
+            .await
+            .map_err(|e| RepoError::invalid(format!("Task join error: {}", e)))?;
+
+        // Flatten results
+        let mut cids = vec![pointer];
+        for subtree_cids in results {
+            cids.extend(subtree_cids?);
+        }
+
+        Ok(cids)
+    })
+}
+
+/// Recursively collect leaves in parallel
+///
+/// Spawns concurrent tasks for each subtree branch, preserving lexicographic order.
+fn collect_leaves_parallel<S: BlockStore + Sync + Send + 'static>(
+    tree: Mst<S>,
+) -> Pin<Box<dyn Future<Output = Result<Vec<(smol_str::SmolStr, IpldCid)>>> + Send>> {
+    Box::pin(async move {
+        let entries = tree.get_entries().await?;
+        let mut result = Vec::new();
+
+        // Collect tasks and immediate leaves in order
+        let mut tasks = Vec::new();
+        let mut task_positions = Vec::new();
+
+        for (i, entry) in entries.into_iter().enumerate() {
+            match entry {
+                NodeEntry::Tree(subtree) => {
+                    task_positions.push(i);
+                    tasks.push(n0_future::task::spawn(async move {
+                        collect_leaves_parallel(subtree).await
+                    }));
+                }
+                NodeEntry::Leaf { key, value } => {
+                    result.push((i, vec![(key, value)]));
+                }
+            }
+        }
+
+        // Await all tasks concurrently
+        if !tasks.is_empty() {
+            let subtree_results = try_join_all(tasks)
+                .await
+                .map_err(|e| RepoError::invalid(format!("Task join error: {}", e)))?;
+
+            for (pos, leaves) in task_positions.into_iter().zip(subtree_results) {
+                result.push((pos, leaves?));
+            }
+        }
+
+        // Sort by position and flatten
+        result.sort_by_key(|(pos, _)| *pos);
+        Ok(result.into_iter().flat_map(|(_, leaves)| leaves).collect())
+    })
+}
+
+/// Recursively collect blocks in parallel
+///
+/// Spawns concurrent tasks for each subtree branch, then merges results.
+fn collect_blocks_parallel<S: BlockStore + Sync + Send + 'static>(
+    tree: Mst<S>,
+) -> Pin<
+    Box<
+        dyn Future<Output = Result<(IpldCid, std::collections::BTreeMap<IpldCid, bytes::Bytes>)>>
+            + Send,
+    >,
+> {
+    Box::pin(async move {
+        use bytes::Bytes;
+        use std::collections::BTreeMap;
+
+        let pointer = tree.get_pointer().await?;
+        let mut blocks = BTreeMap::new();
+
+        // Check if already in storage
+        if tree.storage.has(&pointer).await? {
+            return Ok((pointer, blocks));
+        }
+
+        // Serialize this node
+        let entries = tree.get_entries().await?;
+        let node_data = util::serialize_node_data(&entries).await?;
+        let cbor =
+            serde_ipld_dagcbor::to_vec(&node_data).map_err(|e| RepoError::serialization(e))?;
+        blocks.insert(pointer, Bytes::from(cbor));
+
+        // Spawn tasks for each subtree
+        let tasks: Vec<_> = entries
+            .into_iter()
+            .filter_map(|entry| {
+                if let NodeEntry::Tree(subtree) = entry {
+                    Some(n0_future::task::spawn(async move {
+                        collect_blocks_parallel(subtree).await
+                    }))
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        // Await all tasks concurrently
+        if !tasks.is_empty() {
+            let results = try_join_all(tasks)
+                .await
+                .map_err(|e| RepoError::invalid(format!("Task join error: {}", e)))?;
+
+            for subtree_result in results {
+                let (_, subtree_blocks) = subtree_result?;
+                blocks.extend(subtree_blocks);
+            }
+        }
+
+        Ok((pointer, blocks))
+    })
 }
 
 impl<S: BlockStore> std::fmt::Debug for Mst<S> {
