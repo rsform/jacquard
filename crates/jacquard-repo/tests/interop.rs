@@ -2,24 +2,6 @@
 //!
 //! See: https://github.com/bluesky-social/atproto-interop-tests/tree/main/mst
 //!
-//! ## Current Status (Determinism Bug)
-//!
-//! ### Fixed Issues
-//! 1. **split_around bug**: When split_idx=0 (all entries go right), node.left wasn't being split
-//!    - Fixed in tree.rs:640-649 by checking node.left when left_entries is empty
-//! 2. **insert_entry_at_layer bug**: When insert_idx=0 with node.left, left pointer wasn't split
-//!    - Fixed in tree.rs:520-565 by splitting node.left around new key
-//!
-//! ### Remaining Issues
-//! - **Non-deterministic tree structure**: Forward vs reverse insertion produces different root CIDs
-//! - All keys are retrievable (no corruption)
-//! - But tree structure differs (different node layouts/pointers)
-//! - Fails even with just 10 keys (test_first_10_keys_determinism)
-//!
-//! ### Next Steps
-//! - Compare tree architecture with rsky-repo and atproto implementations
-//! - May need to restructure how nodes/splits are handled to match reference implementations
-//! - Possible issues: recompress logic, subtree attachment, split handling at different layers
 
 use std::sync::Arc;
 
