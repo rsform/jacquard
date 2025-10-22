@@ -3,6 +3,7 @@
 use super::node::NodeEntry;
 use super::util;
 use crate::error::{RepoError, Result};
+use crate::mst::util::validate_key;
 use crate::storage::BlockStore;
 use cid::Cid as IpldCid;
 use core::fmt;
@@ -412,7 +413,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Option<IpldCid>>> + Send + 'a>>
     {
         Box::pin(async move {
-            util::validate_key(key)?;
+            validate_key(key)?;
 
             let entries = self.get_entries().await?;
             let index = Self::find_gt_or_equal_leaf_index_in(&entries, key);
@@ -448,7 +449,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
         cid: IpldCid,
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Mst<S>>> + Send + 'a>> {
         Box::pin(async move {
-            util::validate_key(key)?;
+            validate_key(key)?;
 
             let key_layer = util::layer_for_key(key);
             let node_layer = self.get_layer().await?;
@@ -571,7 +572,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
         key: &'a str,
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Mst<S>>> + Send + 'a>> {
         Box::pin(async move {
-            util::validate_key(key)?;
+            validate_key(key)?;
 
             let altered = self.delete_recurse(key).await?;
             altered.trim_top().await
@@ -645,7 +646,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
 
     /// Update an existing key (returns new tree)
     pub async fn update(&self, key: &str, cid: IpldCid) -> Result<Mst<S>> {
-        util::validate_key(key)?;
+        validate_key(key)?;
 
         // Check key exists
         if self.get(key).await?.is_none() {
@@ -1085,7 +1086,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Vec<IpldCid>>> + Send + 'a>>
     {
         Box::pin(async move {
-            util::validate_key(key)?;
+            validate_key(key)?;
 
             let mut cids = vec![self.get_pointer().await?];
             let entries = self.get_entries().await?;
@@ -1308,7 +1309,7 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mst = Mst::new(storage);
 
-        let result = mst.get("test/key").await.unwrap();
+        let result = mst.get("com.example.test/key").await.unwrap();
         assert!(result.is_none());
     }
 
@@ -1319,25 +1320,103 @@ mod tests {
 
         let entries = vec![
             NodeEntry::Leaf {
-                key: SmolStr::new("a"),
+                key: SmolStr::new("com.example.test/a"),
                 value: test_cid(1),
             },
             NodeEntry::Leaf {
-                key: SmolStr::new("b"),
+                key: SmolStr::new("com.example.test/b"),
                 value: test_cid(2),
             },
             NodeEntry::Leaf {
-                key: SmolStr::new("c"),
+                key: SmolStr::new("com.example.test/c"),
                 value: test_cid(3),
             },
         ];
 
         let mst = Mst::create(storage, entries, Some(0)).await.unwrap();
 
-        assert_eq!(mst.get("a").await.unwrap(), Some(test_cid(1)));
-        assert_eq!(mst.get("b").await.unwrap(), Some(test_cid(2)));
-        assert_eq!(mst.get("c").await.unwrap(), Some(test_cid(3)));
-        assert_eq!(mst.get("d").await.unwrap(), None);
+        assert_eq!(
+            mst.get("com.example.test/a").await.unwrap(),
+            Some(test_cid(1))
+        );
+        assert_eq!(
+            mst.get("com.example.test/b").await.unwrap(),
+            Some(test_cid(2))
+        );
+        assert_eq!(
+            mst.get("com.example.test/c").await.unwrap(),
+            Some(test_cid(3))
+        );
+        assert_eq!(mst.get("com.example.test/d").await.unwrap(), None);
+    }
+
+    #[tokio::test]
+    async fn test_allowed_keys() -> Result<()> {
+        let cid1str = "bafyreie5cvv4h45feadgeuwhbcutmh6t2ceseocckahdoe6uat64zmz454";
+        let cid1 = IpldCid::try_from(cid1str).unwrap();
+
+        let storage = Arc::new(MemoryBlockStore::new());
+        let mst = Mst::new(storage);
+        // Rejects empty key
+        let result = mst.add(&"".to_string(), cid1).await;
+        assert!(result.is_err());
+
+        // Rejects a key with no collection
+        let result = mst.add(&"asdf".to_string(), cid1).await;
+        assert!(result.is_err());
+
+        // Rejects a key with a nested collection
+        let result = mst.add(&"nested/collection/asdf".to_string(), cid1).await;
+        assert!(result.is_err());
+
+        // Rejects on empty coll or rkey
+        let result = mst.add(&"coll/".to_string(), cid1).await;
+        assert!(result.is_err());
+        let result = mst.add(&"/rkey".to_string(), cid1).await;
+        assert!(result.is_err());
+
+        // Rejects non-ascii chars
+        let result = mst.add(&"coll/jalapeñoA".to_string(), cid1).await;
+        assert!(result.is_err());
+        let result = mst.add(&"coll/coöperative".to_string(), cid1).await;
+        assert!(result.is_err());
+        let result = mst.add(&"coll/abc💩".to_string(), cid1).await;
+        assert!(result.is_err());
+
+        // Rejects ascii that we don't support
+        let invalid_chars = vec!["$", "%", "(", ")", "+", "="];
+        for ch in invalid_chars {
+            let key = format!("coll/key{}", ch);
+            let result = mst.add(&key, cid1).await;
+            assert!(result.is_err(), "Key '{}' should be invalid", key);
+        }
+
+        // Rejects keys over 256 chars
+        let long_key: String = "a".repeat(253);
+        let key = format!("coll/{}", long_key);
+        let result = mst.add(&key, cid1).await;
+        assert!(result.is_err());
+
+        // Allows long key under 256 chars
+        let long_key: String = "a".repeat(250);
+        let key = format!("coll/{}", long_key);
+        let result = mst.add(&key, cid1).await;
+        assert!(result.is_ok());
+
+        // Allows URL-safe chars
+        let valid_keys = vec![
+            "coll/key0",
+            "coll/key_",
+            "coll/key:",
+            "coll/key.",
+            "coll/key-",
+        ];
+        for key in valid_keys {
+            let result = mst.add(&key.to_string(), cid1).await;
+            assert!(result.is_ok(), "Key '{}' should be valid", key);
+        }
+
+        Ok(())
     }
 
     #[tokio::test]
@@ -1345,9 +1424,12 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mst = Mst::new(storage);
 
-        let updated = mst.add("test/key", test_cid(1)).await.unwrap();
+        let updated = mst.add("com.example.test/key", test_cid(1)).await.unwrap();
 
-        assert_eq!(updated.get("test/key").await.unwrap(), Some(test_cid(1)));
+        assert_eq!(
+            updated.get("com.example.test/key").await.unwrap(),
+            Some(test_cid(1))
+        );
     }
 
     #[tokio::test]
@@ -1355,13 +1437,22 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mst = Mst::new(storage);
 
-        let mst = mst.add("a", test_cid(1)).await.unwrap();
-        let mst = mst.add("b", test_cid(2)).await.unwrap();
-        let mst = mst.add("c", test_cid(3)).await.unwrap();
+        let mst = mst.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let mst = mst.add("com.example.test/b", test_cid(2)).await.unwrap();
+        let mst = mst.add("com.example.test/c", test_cid(3)).await.unwrap();
 
-        assert_eq!(mst.get("a").await.unwrap(), Some(test_cid(1)));
-        assert_eq!(mst.get("b").await.unwrap(), Some(test_cid(2)));
-        assert_eq!(mst.get("c").await.unwrap(), Some(test_cid(3)));
+        assert_eq!(
+            mst.get("com.example.test/a").await.unwrap(),
+            Some(test_cid(1))
+        );
+        assert_eq!(
+            mst.get("com.example.test/b").await.unwrap(),
+            Some(test_cid(2))
+        );
+        assert_eq!(
+            mst.get("com.example.test/c").await.unwrap(),
+            Some(test_cid(3))
+        );
     }
 
     #[tokio::test]
@@ -1369,10 +1460,13 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mst = Mst::new(storage);
 
-        let mst = mst.add("test", test_cid(1)).await.unwrap();
-        let mst = mst.add("test", test_cid(2)).await.unwrap();
+        let mst = mst.add("com.example.test/key1", test_cid(1)).await.unwrap();
+        let mst = mst.add("com.example.test/key1", test_cid(2)).await.unwrap();
 
-        assert_eq!(mst.get("test").await.unwrap(), Some(test_cid(2)));
+        assert_eq!(
+            mst.get("com.example.test/key1").await.unwrap(),
+            Some(test_cid(2))
+        );
     }
 
     #[tokio::test]
@@ -1380,10 +1474,10 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mst = Mst::new(storage);
 
-        let mst = mst.add("test", test_cid(1)).await.unwrap();
-        let mst = mst.delete("test").await.unwrap();
+        let mst = mst.add("com.example.test/key1", test_cid(1)).await.unwrap();
+        let mst = mst.delete("com.example.test/key1").await.unwrap();
 
-        assert_eq!(mst.get("test").await.unwrap(), None);
+        assert_eq!(mst.get("com.example.test/key1").await.unwrap(), None);
         assert_eq!(mst.get_entries().await.unwrap().len(), 0);
     }
 
@@ -1392,15 +1486,21 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mst = Mst::new(storage);
 
-        let mst = mst.add("a", test_cid(1)).await.unwrap();
-        let mst = mst.add("b", test_cid(2)).await.unwrap();
-        let mst = mst.add("c", test_cid(3)).await.unwrap();
+        let mst = mst.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let mst = mst.add("com.example.test/b", test_cid(2)).await.unwrap();
+        let mst = mst.add("com.example.test/c", test_cid(3)).await.unwrap();
 
-        let mst = mst.delete("b").await.unwrap();
+        let mst = mst.delete("com.example.test/b").await.unwrap();
 
-        assert_eq!(mst.get("a").await.unwrap(), Some(test_cid(1)));
-        assert_eq!(mst.get("b").await.unwrap(), None);
-        assert_eq!(mst.get("c").await.unwrap(), Some(test_cid(3)));
+        assert_eq!(
+            mst.get("com.example.test/a").await.unwrap(),
+            Some(test_cid(1))
+        );
+        assert_eq!(mst.get("com.example.test/b").await.unwrap(), None);
+        assert_eq!(
+            mst.get("com.example.test/c").await.unwrap(),
+            Some(test_cid(3))
+        );
     }
 
     #[tokio::test]
@@ -1408,9 +1508,9 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mst = Mst::new(storage);
 
-        let mst = mst.add("a", test_cid(1)).await.unwrap();
+        let mst = mst.add("com.example.test/a", test_cid(1)).await.unwrap();
 
-        let result = mst.delete("b").await;
+        let result = mst.delete("com.example.test/b").await;
         assert!(result.is_err());
     }
 
@@ -1419,9 +1519,9 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mst = Mst::new(storage.clone());
 
-        let mst = mst.add("a", test_cid(1)).await.unwrap();
-        let mst = mst.add("b", test_cid(2)).await.unwrap();
-        let mst = mst.add("c", test_cid(3)).await.unwrap();
+        let mst = mst.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let mst = mst.add("com.example.test/b", test_cid(2)).await.unwrap();
+        let mst = mst.add("com.example.test/c", test_cid(3)).await.unwrap();
 
         // Persist to storage
         let cid = mst.persist().await.unwrap();
@@ -1430,9 +1530,18 @@ mod tests {
         let reloaded = Mst::load(storage, cid, Some(0));
 
         // Verify all keys are present
-        assert_eq!(reloaded.get("a").await.unwrap(), Some(test_cid(1)));
-        assert_eq!(reloaded.get("b").await.unwrap(), Some(test_cid(2)));
-        assert_eq!(reloaded.get("c").await.unwrap(), Some(test_cid(3)));
+        assert_eq!(
+            reloaded.get("com.example.test/a").await.unwrap(),
+            Some(test_cid(1))
+        );
+        assert_eq!(
+            reloaded.get("com.example.test/b").await.unwrap(),
+            Some(test_cid(2))
+        );
+        assert_eq!(
+            reloaded.get("com.example.test/c").await.unwrap(),
+            Some(test_cid(3))
+        );
     }
 
     #[tokio::test]
@@ -1440,16 +1549,16 @@ mod tests {
         // Same keys inserted in same order should produce same CID
         let storage1 = Arc::new(MemoryBlockStore::new());
         let mst1 = Mst::new(storage1);
-        let mst1 = mst1.add("a", test_cid(1)).await.unwrap();
-        let mst1 = mst1.add("b", test_cid(2)).await.unwrap();
-        let mst1 = mst1.add("c", test_cid(3)).await.unwrap();
+        let mst1 = mst1.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let mst1 = mst1.add("com.example.test/b", test_cid(2)).await.unwrap();
+        let mst1 = mst1.add("com.example.test/c", test_cid(3)).await.unwrap();
         let cid1 = mst1.get_pointer().await.unwrap();
 
         let storage2 = Arc::new(MemoryBlockStore::new());
         let mst2 = Mst::new(storage2);
-        let mst2 = mst2.add("a", test_cid(1)).await.unwrap();
-        let mst2 = mst2.add("b", test_cid(2)).await.unwrap();
-        let mst2 = mst2.add("c", test_cid(3)).await.unwrap();
+        let mst2 = mst2.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let mst2 = mst2.add("com.example.test/b", test_cid(2)).await.unwrap();
+        let mst2 = mst2.add("com.example.test/c", test_cid(3)).await.unwrap();
         let cid2 = mst2.get_pointer().await.unwrap();
 
         assert_eq!(cid1, cid2);
@@ -1460,16 +1569,16 @@ mod tests {
         // Different insertion orders should produce same CID
         let storage1 = Arc::new(MemoryBlockStore::new());
         let mst1 = Mst::new(storage1);
-        let mst1 = mst1.add("a", test_cid(1)).await.unwrap();
-        let mst1 = mst1.add("b", test_cid(2)).await.unwrap();
-        let mst1 = mst1.add("c", test_cid(3)).await.unwrap();
+        let mst1 = mst1.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let mst1 = mst1.add("com.example.test/b", test_cid(2)).await.unwrap();
+        let mst1 = mst1.add("com.example.test/c", test_cid(3)).await.unwrap();
         let cid1 = mst1.get_pointer().await.unwrap();
 
         let storage2 = Arc::new(MemoryBlockStore::new());
         let mst2 = Mst::new(storage2);
-        let mst2 = mst2.add("c", test_cid(3)).await.unwrap();
-        let mst2 = mst2.add("a", test_cid(1)).await.unwrap();
-        let mst2 = mst2.add("b", test_cid(2)).await.unwrap();
+        let mst2 = mst2.add("com.example.test/c", test_cid(3)).await.unwrap();
+        let mst2 = mst2.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let mst2 = mst2.add("com.example.test/b", test_cid(2)).await.unwrap();
         let cid2 = mst2.get_pointer().await.unwrap();
 
         assert_eq!(cid1, cid2);
@@ -1482,24 +1591,33 @@ mod tests {
 
         let ops = vec![
             VerifiedWriteOp::Create {
-                key: SmolStr::new("a"),
+                key: SmolStr::new("com.example.test/a"),
                 cid: test_cid(1),
             },
             VerifiedWriteOp::Create {
-                key: SmolStr::new("b"),
+                key: SmolStr::new("com.example.test/b"),
                 cid: test_cid(2),
             },
             VerifiedWriteOp::Create {
-                key: SmolStr::new("c"),
+                key: SmolStr::new("com.example.test/c"),
                 cid: test_cid(3),
             },
         ];
 
         let mst = mst.batch(&ops).await.unwrap();
 
-        assert_eq!(mst.get("a").await.unwrap(), Some(test_cid(1)));
-        assert_eq!(mst.get("b").await.unwrap(), Some(test_cid(2)));
-        assert_eq!(mst.get("c").await.unwrap(), Some(test_cid(3)));
+        assert_eq!(
+            mst.get("com.example.test/a").await.unwrap(),
+            Some(test_cid(1))
+        );
+        assert_eq!(
+            mst.get("com.example.test/b").await.unwrap(),
+            Some(test_cid(2))
+        );
+        assert_eq!(
+            mst.get("com.example.test/c").await.unwrap(),
+            Some(test_cid(3))
+        );
     }
 
     #[tokio::test]
@@ -1508,52 +1626,64 @@ mod tests {
         let mst = Mst::new(storage);
 
         // Start with some keys
-        let mst = mst.add("a", test_cid(1)).await.unwrap();
-        let mst = mst.add("b", test_cid(2)).await.unwrap();
-        let mst = mst.add("c", test_cid(3)).await.unwrap();
+        let mst = mst.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let mst = mst.add("com.example.test/b", test_cid(2)).await.unwrap();
+        let mst = mst.add("com.example.test/c", test_cid(3)).await.unwrap();
 
         let ops = vec![
             VerifiedWriteOp::Create {
-                key: SmolStr::new("d"),
+                key: SmolStr::new("com.example.test/d"),
                 cid: test_cid(4),
             },
             VerifiedWriteOp::Update {
-                key: SmolStr::new("a"),
+                key: SmolStr::new("com.example.test/a"),
                 cid: test_cid(10),
                 prev: test_cid(1),
             },
             VerifiedWriteOp::Delete {
-                key: SmolStr::new("b"),
+                key: SmolStr::new("com.example.test/b"),
                 prev: test_cid(2),
             },
         ];
 
         let mst = mst.batch(&ops).await.unwrap();
 
-        assert_eq!(mst.get("a").await.unwrap(), Some(test_cid(10))); // Updated
-        assert_eq!(mst.get("b").await.unwrap(), None); // Deleted
-        assert_eq!(mst.get("c").await.unwrap(), Some(test_cid(3))); // Unchanged
-        assert_eq!(mst.get("d").await.unwrap(), Some(test_cid(4))); // Created
+        assert_eq!(
+            mst.get("com.example.test/a").await.unwrap(),
+            Some(test_cid(10))
+        ); // Updated
+        assert_eq!(mst.get("com.example.test/b").await.unwrap(), None); // Deleted
+        assert_eq!(
+            mst.get("com.example.test/c").await.unwrap(),
+            Some(test_cid(3))
+        ); // Unchanged
+        assert_eq!(
+            mst.get("com.example.test/d").await.unwrap(),
+            Some(test_cid(4))
+        ); // Created
     }
 
     #[tokio::test]
     async fn test_batch_with_prev_validation() {
         let storage = Arc::new(MemoryBlockStore::new());
         let mst = Mst::new(storage);
-        let mst = mst.add("a", test_cid(1)).await.unwrap();
+        let mst = mst.add("com.example.test/a", test_cid(1)).await.unwrap();
 
         // Update with correct prev - should succeed
         let ops = vec![VerifiedWriteOp::Update {
-            key: SmolStr::new("a"),
+            key: SmolStr::new("com.example.test/a"),
             cid: test_cid(2),
             prev: test_cid(1),
         }];
         let mst = mst.batch(&ops).await.unwrap();
-        assert_eq!(mst.get("a").await.unwrap(), Some(test_cid(2)));
+        assert_eq!(
+            mst.get("com.example.test/a").await.unwrap(),
+            Some(test_cid(2))
+        );
 
         // Update with wrong prev - should fail
         let ops = vec![VerifiedWriteOp::Update {
-            key: SmolStr::new("a"),
+            key: SmolStr::new("com.example.test/a"),
             cid: test_cid(3),
             prev: test_cid(99), // Wrong CID
         }];
@@ -1561,21 +1691,21 @@ mod tests {
 
         // Delete with correct prev - should succeed
         let ops = vec![VerifiedWriteOp::Delete {
-            key: SmolStr::new("a"),
+            key: SmolStr::new("com.example.test/a"),
             prev: test_cid(2),
         }];
         let mst = mst.batch(&ops).await.unwrap();
-        assert_eq!(mst.get("a").await.unwrap(), None);
+        assert_eq!(mst.get("com.example.test/a").await.unwrap(), None);
     }
 
     #[tokio::test]
     async fn test_batch_create_duplicate_error() {
         let storage = Arc::new(MemoryBlockStore::new());
         let mst = Mst::new(storage);
-        let mst = mst.add("a", test_cid(1)).await.unwrap();
+        let mst = mst.add("com.example.test/a", test_cid(1)).await.unwrap();
 
         let ops = vec![VerifiedWriteOp::Create {
-            key: SmolStr::new("a"),
+            key: SmolStr::new("com.example.test/a"),
             cid: test_cid(2),
         }];
 
@@ -1589,7 +1719,7 @@ mod tests {
         let mst = Mst::new(storage);
 
         let ops = vec![VerifiedWriteOp::Update {
-            key: SmolStr::new("a"),
+            key: SmolStr::new("com.example.test/a"),
             cid: test_cid(1),
             prev: test_cid(99), // Doesn't matter since key doesn't exist
         }];
@@ -1604,7 +1734,7 @@ mod tests {
         let mst = Mst::new(storage);
 
         let ops = vec![VerifiedWriteOp::Delete {
-            key: SmolStr::new("a"),
+            key: SmolStr::new("com.example.test/a"),
             prev: test_cid(99), // Doesn't matter since key doesn't exist
         }];
 
@@ -1616,13 +1746,16 @@ mod tests {
     async fn test_batch_empty() {
         let storage = Arc::new(MemoryBlockStore::new());
         let mst = Mst::new(storage);
-        let mst = mst.add("a", test_cid(1)).await.unwrap();
+        let mst = mst.add("com.example.test/a", test_cid(1)).await.unwrap();
 
         let ops = vec![];
         let mst = mst.batch(&ops).await.unwrap();
 
         // Should be unchanged
-        assert_eq!(mst.get("a").await.unwrap(), Some(test_cid(1)));
+        assert_eq!(
+            mst.get("com.example.test/a").await.unwrap(),
+            Some(test_cid(1))
+        );
     }
 
     #[tokio::test]
@@ -1631,12 +1764,12 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mst = Mst::new(storage);
 
-        let mst = mst.add("a", test_cid(1)).await.unwrap();
-        let mst = mst.add("b", test_cid(2)).await.unwrap();
-        let mst = mst.add("c", test_cid(3)).await.unwrap();
+        let mst = mst.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let mst = mst.add("com.example.test/b", test_cid(2)).await.unwrap();
+        let mst = mst.add("com.example.test/c", test_cid(3)).await.unwrap();
 
         // Get proof path for key "b"
-        let cids = mst.cids_for_path("b").await.unwrap();
+        let cids = mst.cids_for_path("com.example.test/b").await.unwrap();
 
         // Should contain: root CID, record CID
         assert_eq!(cids.len(), 2);
@@ -1650,11 +1783,11 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mst = Mst::new(storage);
 
-        let mst = mst.add("a", test_cid(1)).await.unwrap();
-        let mst = mst.add("c", test_cid(3)).await.unwrap();
+        let mst = mst.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let mst = mst.add("com.example.test/c", test_cid(3)).await.unwrap();
 
         // Get proof path for nonexistent key "b"
-        let cids = mst.cids_for_path("b").await.unwrap();
+        let cids = mst.cids_for_path("com.example.test/b").await.unwrap();
 
         // Should contain root CID first, and NOT contain the record CID (proves absence)
         assert!(cids.len() >= 1, "Should have at least the root CID");

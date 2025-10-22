@@ -548,8 +548,8 @@ mod tests {
 
         let storage2 = Arc::new(MemoryBlockStore::new());
         let tree2 = Mst::new(storage2);
-        let tree2 = tree2.add("a", test_cid(1)).await.unwrap();
-        let tree2 = tree2.add("b", test_cid(2)).await.unwrap();
+        let tree2 = tree2.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let tree2 = tree2.add("com.example.test/b", test_cid(2)).await.unwrap();
 
         let diff = tree1.diff(&tree2).await.unwrap();
 
@@ -562,12 +562,12 @@ mod tests {
         assert!(
             diff.creates
                 .iter()
-                .any(|(k, c)| k == "a" && *c == test_cid(1))
+                .any(|(k, c)| k == "com.example.test/a" && *c == test_cid(1))
         );
         assert!(
             diff.creates
                 .iter()
-                .any(|(k, c)| k == "b" && *c == test_cid(2))
+                .any(|(k, c)| k == "com.example.test/b" && *c == test_cid(2))
         );
     }
 
@@ -575,8 +575,8 @@ mod tests {
     async fn test_diff_deletes() {
         let storage1 = Arc::new(MemoryBlockStore::new());
         let tree1 = Mst::new(storage1);
-        let tree1 = tree1.add("a", test_cid(1)).await.unwrap();
-        let tree1 = tree1.add("b", test_cid(2)).await.unwrap();
+        let tree1 = tree1.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let tree1 = tree1.add("com.example.test/b", test_cid(2)).await.unwrap();
 
         let storage2 = Arc::new(MemoryBlockStore::new());
         let tree2 = Mst::new(storage2);
@@ -592,12 +592,12 @@ mod tests {
         assert!(
             diff.deletes
                 .iter()
-                .any(|(k, c)| k == "a" && *c == test_cid(1))
+                .any(|(k, c)| k == "com.example.test/a" && *c == test_cid(1))
         );
         assert!(
             diff.deletes
                 .iter()
-                .any(|(k, c)| k == "b" && *c == test_cid(2))
+                .any(|(k, c)| k == "com.example.test/b" && *c == test_cid(2))
         );
     }
 
@@ -605,13 +605,13 @@ mod tests {
     async fn test_diff_updates() {
         let storage1 = Arc::new(MemoryBlockStore::new());
         let tree1 = Mst::new(storage1);
-        let tree1 = tree1.add("a", test_cid(1)).await.unwrap();
-        let tree1 = tree1.add("b", test_cid(2)).await.unwrap();
+        let tree1 = tree1.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let tree1 = tree1.add("com.example.test/b", test_cid(2)).await.unwrap();
 
         let storage2 = Arc::new(MemoryBlockStore::new());
         let tree2 = Mst::new(storage2);
-        let tree2 = tree2.add("a", test_cid(10)).await.unwrap(); // Changed CID
-        let tree2 = tree2.add("b", test_cid(2)).await.unwrap(); // Same CID
+        let tree2 = tree2.add("com.example.test/a", test_cid(10)).await.unwrap(); // Changed CID
+        let tree2 = tree2.add("com.example.test/b", test_cid(2)).await.unwrap(); // Same CID
 
         let diff = tree1.diff(&tree2).await.unwrap();
 
@@ -621,7 +621,7 @@ mod tests {
         assert_eq!(diff.op_count(), 1);
 
         // Check update content
-        assert_eq!(diff.updates[0].0, "a");
+        assert_eq!(diff.updates[0].0, "com.example.test/a");
         assert_eq!(diff.updates[0].1, test_cid(10)); // new CID
         assert_eq!(diff.updates[0].2, test_cid(1)); // old CID
     }
@@ -630,16 +630,16 @@ mod tests {
     async fn test_diff_mixed_operations() {
         let storage1 = Arc::new(MemoryBlockStore::new());
         let tree1 = Mst::new(storage1);
-        let tree1 = tree1.add("a", test_cid(1)).await.unwrap();
-        let tree1 = tree1.add("b", test_cid(2)).await.unwrap();
-        let tree1 = tree1.add("c", test_cid(3)).await.unwrap();
+        let tree1 = tree1.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let tree1 = tree1.add("com.example.test/b", test_cid(2)).await.unwrap();
+        let tree1 = tree1.add("com.example.test/c", test_cid(3)).await.unwrap();
 
         let storage2 = Arc::new(MemoryBlockStore::new());
         let tree2 = Mst::new(storage2);
-        let tree2 = tree2.add("a", test_cid(10)).await.unwrap(); // Updated
-        let tree2 = tree2.add("b", test_cid(2)).await.unwrap(); // Unchanged
+        let tree2 = tree2.add("com.example.test/a", test_cid(10)).await.unwrap(); // Updated
+        let tree2 = tree2.add("com.example.test/b", test_cid(2)).await.unwrap(); // Unchanged
         // "c" deleted
-        let tree2 = tree2.add("d", test_cid(4)).await.unwrap(); // Created
+        let tree2 = tree2.add("com.example.test/d", test_cid(4)).await.unwrap(); // Created
 
         let diff = tree1.diff(&tree2).await.unwrap();
 
@@ -653,9 +653,9 @@ mod tests {
     async fn test_diff_to_empty() {
         let storage = Arc::new(MemoryBlockStore::new());
         let tree = Mst::new(storage);
-        let tree = tree.add("a", test_cid(1)).await.unwrap();
-        let tree = tree.add("b", test_cid(2)).await.unwrap();
-        let tree = tree.add("c", test_cid(3)).await.unwrap();
+        let tree = tree.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let tree = tree.add("com.example.test/b", test_cid(2)).await.unwrap();
+        let tree = tree.add("com.example.test/c", test_cid(3)).await.unwrap();
 
         let diff = tree.diff_to_empty().await.unwrap();
 
@@ -688,13 +688,13 @@ mod tests {
         // diff(A, B) should be inverse of diff(B, A)
         let storage1 = Arc::new(MemoryBlockStore::new());
         let tree1 = Mst::new(storage1);
-        let tree1 = tree1.add("a", test_cid(1)).await.unwrap();
-        let tree1 = tree1.add("b", test_cid(2)).await.unwrap();
+        let tree1 = tree1.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let tree1 = tree1.add("com.example.test/b", test_cid(2)).await.unwrap();
 
         let storage2 = Arc::new(MemoryBlockStore::new());
         let tree2 = Mst::new(storage2);
-        let tree2 = tree2.add("b", test_cid(2)).await.unwrap();
-        let tree2 = tree2.add("c", test_cid(3)).await.unwrap();
+        let tree2 = tree2.add("com.example.test/b", test_cid(2)).await.unwrap();
+        let tree2 = tree2.add("com.example.test/c", test_cid(3)).await.unwrap();
 
         let diff1 = tree1.diff(&tree2).await.unwrap();
         let diff2 = tree2.diff(&tree1).await.unwrap();

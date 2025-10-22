@@ -242,7 +242,7 @@ mod tests {
     async fn test_cursor_single_leaf() {
         let storage = Arc::new(MemoryBlockStore::new());
         let tree = Mst::new(storage);
-        let tree = tree.add("key1", test_cid(1)).await.unwrap();
+        let tree = tree.add("com.example.test/key1", test_cid(1)).await.unwrap();
 
         let mut cursor = MstCursor::new(tree);
 
@@ -251,7 +251,7 @@ mod tests {
 
         // Advance to first leaf
         cursor.advance().await.unwrap();
-        assert_eq!(cursor.key(), Some("key1"));
+        assert_eq!(cursor.key(), Some("com.example.test/key1"));
 
         // Advance past last leaf
         cursor.advance().await.unwrap();
@@ -262,9 +262,9 @@ mod tests {
     async fn test_cursor_multiple_leaves() {
         let storage = Arc::new(MemoryBlockStore::new());
         let tree = Mst::new(storage);
-        let tree = tree.add("a", test_cid(1)).await.unwrap();
-        let tree = tree.add("b", test_cid(2)).await.unwrap();
-        let tree = tree.add("c", test_cid(3)).await.unwrap();
+        let tree = tree.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let tree = tree.add("com.example.test/b", test_cid(2)).await.unwrap();
+        let tree = tree.add("com.example.test/c", test_cid(3)).await.unwrap();
 
         let mut cursor = MstCursor::new(tree);
 
@@ -280,7 +280,7 @@ mod tests {
             cursor.advance().await.unwrap();
         }
 
-        assert_eq!(keys, vec!["a", "b", "c"]);
+        assert_eq!(keys, vec!["com.example.test/a", "com.example.test/b", "com.example.test/c"]);
     }
 
     #[tokio::test]
@@ -289,9 +289,9 @@ mod tests {
         let tree = Mst::new(storage);
 
         // Add enough keys to create subtrees
-        let tree = tree.add("a", test_cid(1)).await.unwrap();
-        let tree = tree.add("b", test_cid(2)).await.unwrap();
-        let tree = tree.add("c", test_cid(3)).await.unwrap();
+        let tree = tree.add("com.example.test/a", test_cid(1)).await.unwrap();
+        let tree = tree.add("com.example.test/b", test_cid(2)).await.unwrap();
+        let tree = tree.add("com.example.test/c", test_cid(3)).await.unwrap();
 
         let mut cursor = MstCursor::new(tree);
 

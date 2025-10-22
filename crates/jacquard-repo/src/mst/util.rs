@@ -60,8 +60,6 @@ fn leading_zeros(hash: &[u8]) -> usize {
 
 /// Validate MST key format
 ///
-/// Keys must match: [a-zA-Z0-9._:~-]+
-/// Max length: 256 bytes (atproto limit)
 pub fn validate_key(key: &str) -> Result<()> {
     if key.is_empty() {
         return Err(MstError::EmptyKey.into());
@@ -85,7 +83,16 @@ pub fn validate_key(key: &str) -> Result<()> {
         .into());
     }
 
-    Ok(())
+    let split: Vec<&str> = key.split("/").collect();
+
+    return if split.len() == 2 && split[0].len() > 0 && split[1].len() > 0 {
+        Ok(())
+    } else {
+        Err(MstError::InvalidKeyChars {
+            key: key.to_string(),
+        }
+        .into())
+    };
 }
 
 /// Count shared prefix length between two strings
@@ -223,8 +230,8 @@ mod tests {
     #[test]
     fn test_validate_key_valid() {
         assert!(validate_key("app.bsky.feed.post/abc123").is_ok());
-        assert!(validate_key("foo.bar/test-key_2024").is_ok());
-        assert!(validate_key("a").is_ok());
+        assert!(validate_key("foo.bar.baz/test-key_2024").is_ok());
+        assert!(validate_key("com.example.test/a").is_ok());
     }
 
     #[test]
