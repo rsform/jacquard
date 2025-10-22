@@ -5,8 +5,10 @@
 //! which are DISTINCT from repository commit objects.
 
 use bytes::Bytes;
-use jacquard_common::IntoStatic;
-use jacquard_common::types::string::{Did, Tid};
+use jacquard_common::types::cid::CidLink;
+use jacquard_common::types::crypto::PublicKey;
+use jacquard_common::types::string::{Datetime, Did, Tid};
+use jacquard_common::{CowStr, IntoStatic};
 
 /// Firehose commit message (sync v1.0 and v1.1)
 ///
@@ -33,14 +35,14 @@ pub struct FirehoseCommit<'a> {
     pub since: Tid,
 
     /// Timestamp of when this message was originally broadcast
-    pub time: jacquard_common::types::string::Datetime,
+    pub time: Datetime,
 
     /// Repo commit object CID
     ///
     /// This CID points to the repository commit block (with did, version, data, rev, prev, sig).
     /// It must be the first entry in the CAR header 'roots' list.
     #[serde(borrow)]
-    pub commit: jacquard_common::types::cid::CidLink<'a>,
+    pub commit: CidLink<'a>,
 
     /// CAR file containing relevant blocks
     ///
@@ -70,11 +72,11 @@ pub struct FirehoseCommit<'a> {
     /// - Consumers must have previous repository state
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub prev_data: Option<jacquard_common::types::cid::CidLink<'a>>,
+    pub prev_data: Option<CidLink<'a>>,
 
     /// Blob CIDs referenced in this commit
     #[serde(borrow)]
-    pub blobs: Vec<jacquard_common::types::cid::CidLink<'a>>,
+    pub blobs: Vec<CidLink<'a>>,
 
     /// DEPRECATED: Replaced by #sync event and data limits
     ///
@@ -92,16 +94,16 @@ pub struct FirehoseCommit<'a> {
 pub struct RepoOp<'a> {
     /// Operation type: "create", "update", or "delete"
     #[serde(borrow)]
-    pub action: jacquard_common::CowStr<'a>,
+    pub action: CowStr<'a>,
 
     /// Collection/rkey path (e.g., "app.bsky.feed.post/abc123")
     #[serde(borrow)]
-    pub path: jacquard_common::CowStr<'a>,
+    pub path: CowStr<'a>,
 
     /// For creates and updates, the new record CID. For deletions, None (null).
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: Option<jacquard_common::types::cid::CidLink<'a>>,
+    pub cid: Option<CidLink<'a>>,
 
     /// For updates and deletes, the previous record CID
     ///
@@ -109,7 +111,7 @@ pub struct RepoOp<'a> {
     /// For creates, this field should not be defined.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub prev: Option<jacquard_common::types::cid::CidLink<'a>>,
+    pub prev: Option<CidLink<'a>>,
 }
 
 impl IntoStatic for FirehoseCommit<'_> {
@@ -146,12 +148,13 @@ impl IntoStatic for RepoOp<'_> {
     }
 }
 
+use crate::car::parse_car_bytes;
 /// Validation functions for firehose commit messages
 ///
 /// These functions validate commits from the `com.atproto.sync.subscribeRepos` firehose.
-use crate::error::Result;
+use crate::error::{RepoError, Result};
 use crate::mst::Mst;
-use crate::storage::BlockStore;
+use crate::storage::{BlockStore, LayeredBlockStore, MemoryBlockStore};
 use cid::Cid as IpldCid;
 use std::sync::Arc;
 
@@ -173,32 +176,31 @@ impl<'a> FirehoseCommit<'a> {
         &self,
         prev_mst_root: Option<IpldCid>,
         prev_storage: Arc<S>,
-        pubkey: &jacquard_common::types::crypto::PublicKey<'_>,
+        pubkey: &PublicKey<'_>,
     ) -> Result<IpldCid> {
         // 1. Parse CAR blocks from the firehose message into temporary storage
-        let parsed = crate::car::parse_car_bytes(&self.blocks).await?;
-        let temp_storage = crate::storage::MemoryBlockStore::new_from_blocks(parsed.blocks);
+        let parsed = parse_car_bytes(&self.blocks).await?;
+        let temp_storage = MemoryBlockStore::new_from_blocks(parsed.blocks);
 
         // 2. Create layered storage: reads from temp first, then prev; writes to temp only
         // This avoids copying all previous MST blocks
-        let layered_storage =
-            crate::storage::LayeredBlockStore::new(temp_storage.clone(), prev_storage);
+        let layered_storage = LayeredBlockStore::new(temp_storage.clone(), prev_storage);
 
         // 3. Extract and verify commit object from temporary storage
         let commit_cid: IpldCid = self
             .commit
             .to_ipld()
-            .map_err(|e| crate::error::RepoError::invalid(format!("Invalid commit CID: {}", e)))?;
+            .map_err(|e| RepoError::invalid(format!("Invalid commit CID: {}", e)))?;
         let commit_bytes = temp_storage
             .get(&commit_cid)
             .await?
-            .ok_or_else(|| crate::error::RepoError::not_found("commit block", &commit_cid))?;
+            .ok_or_else(|| RepoError::not_found("commit block", &commit_cid))?;
 
         let commit = super::Commit::from_cbor(&commit_bytes)?;
 
         // Verify DID matches
         if commit.did().as_ref() != self.repo.as_ref() {
-            return Err(crate::error::RepoError::invalid_commit(format!(
+            return Err(RepoError::invalid_commit(format!(
                 "DID mismatch: commit has {}, message has {}",
                 commit.did(),
                 self.repo
@@ -232,7 +234,7 @@ impl<'a> FirehoseCommit<'a> {
         let computed_root = computed_mst.get_pointer().await?;
 
         if computed_root != expected_root {
-            return Err(crate::error::RepoError::invalid_commit(format!(
+            return Err(RepoError::invalid_commit(format!(
                 "MST root mismatch: expected {}, got {}",
                 expected_root, computed_root
             )));
@@ -259,45 +261,36 @@ impl<'a> FirehoseCommit<'a> {
     /// **Inductive property:** Can validate without any external state besides the blocks
     /// in this message. The `prev_data` field provides the starting MST root, and operations
     /// include `prev` CIDs for validation. All necessary blocks must be in the CAR bytes.
-    pub async fn validate_v1_1(
-        &self,
-        pubkey: &jacquard_common::types::crypto::PublicKey<'_>,
-    ) -> Result<IpldCid> {
+    pub async fn validate_v1_1(&self, pubkey: &PublicKey<'_>) -> Result<IpldCid> {
         // 1. Require prev_data for v1.1
         let prev_data_cid: IpldCid = self
             .prev_data
             .as_ref()
             .ok_or_else(|| {
-                crate::error::RepoError::invalid_commit(
-                    "Sync v1.1 validation requires prev_data field",
-                )
+                RepoError::invalid_commit("Sync v1.1 validation requires prev_data field")
             })?
             .to_ipld()
-            .map_err(|e| {
-                crate::error::RepoError::invalid(format!("Invalid prev_data CID: {}", e))
-            })?;
+            .map_err(|e| RepoError::invalid(format!("Invalid prev_data CID: {}", e)))?;
 
         // 2. Parse CAR blocks from the firehose message into temporary storage
-        let parsed = crate::car::parse_car_bytes(&self.blocks).await?;
-        let temp_storage = Arc::new(crate::storage::MemoryBlockStore::new_from_blocks(
-            parsed.blocks,
-        ));
+        let parsed = parse_car_bytes(&self.blocks).await?;
+        let temp_storage = Arc::new(MemoryBlockStore::new_from_blocks(parsed.blocks));
 
         // 3. Extract and verify commit object from temporary storage
         let commit_cid: IpldCid = self
             .commit
             .to_ipld()
-            .map_err(|e| crate::error::RepoError::invalid(format!("Invalid commit CID: {}", e)))?;
+            .map_err(|e| RepoError::invalid(format!("Invalid commit CID: {}", e)))?;
         let commit_bytes = temp_storage
             .get(&commit_cid)
             .await?
-            .ok_or_else(|| crate::error::RepoError::not_found("commit block", &commit_cid))?;
+            .ok_or_else(|| RepoError::not_found("commit block", &commit_cid))?;
 
         let commit = super::Commit::from_cbor(&commit_bytes)?;
 
         // Verify DID matches
         if commit.did().as_ref() != self.repo.as_ref() {
-            return Err(crate::error::RepoError::invalid_commit(format!(
+            return Err(RepoError::invalid_commit(format!(
                 "DID mismatch: commit has {}, message has {}",
                 commit.did(),
                 self.repo
@@ -325,7 +318,7 @@ impl<'a> FirehoseCommit<'a> {
         let computed_root = computed_mst.get_pointer().await?;
 
         if computed_root != expected_root {
-            return Err(crate::error::RepoError::invalid_commit(format!(
+            return Err(RepoError::invalid_commit(format!(
                 "MST root mismatch: expected {}, got {}",
                 expected_root, computed_root
             )));

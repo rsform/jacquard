@@ -1,8 +1,8 @@
 //! Block storage abstraction for MST nodes and records
 
+use crate::{error::Result, repo::CommitData};
 use bytes::Bytes;
 use cid::Cid as IpldCid;
-use crate::error::Result;
 
 /// Async block storage trait
 ///
@@ -68,7 +68,10 @@ pub trait BlockStore: Clone {
     ///
     /// The provided CIDs should match the data, but implementations may choose to
     /// recalculate and validate them.
-    async fn put_many(&self, blocks: impl IntoIterator<Item = (IpldCid, Bytes)> + Send) -> Result<()>;
+    async fn put_many(
+        &self,
+        blocks: impl IntoIterator<Item = (IpldCid, Bytes)> + Send,
+    ) -> Result<()>;
 
     /// Get multiple blocks at once (optimization for batch reads)
     ///
@@ -87,7 +90,7 @@ pub trait BlockStore: Clone {
     /// This should be atomic where possible - either both operations succeed or both fail.
     /// For implementations that don't support atomic operations, writes should happen first,
     /// then deletes.
-    async fn apply_commit(&self, commit: crate::repo::CommitData) -> Result<()>;
+    async fn apply_commit(&self, commit: CommitData) -> Result<()>;
 }
 
 pub mod file;

@@ -3,14 +3,18 @@
 //! Optional convenience layer over MST primitives. Provides type-safe record operations,
 //! batch writes, commit creation, and CAR export.
 
-use crate::commit::Commit;
-use crate::error::Result;
-use crate::mst::Mst;
+use crate::commit::firehose::{FirehoseCommit, RepoOp};
+use crate::commit::{Commit, SigningKey};
+use crate::error::{RepoError, Result};
+use crate::mst::{Mst, MstDiff, RecordWriteOp};
 use crate::storage::BlockStore;
 use cid::Cid as IpldCid;
 use jacquard_common::IntoStatic;
-use jacquard_common::types::string::{Did, Nsid, RecordKey, Tid};
+use jacquard_common::types::cid::CidLink;
+use jacquard_common::types::recordkey::RecordKeyType;
+use jacquard_common::types::string::{Datetime, Did, Nsid, RecordKey, Tid};
 use jacquard_common::types::tid::Ticker;
+use smol_str::format_smolstr;
 use std::collections::BTreeMap;
 use std::path::Path;
 use std::sync::Arc;
@@ -39,12 +43,7 @@ pub struct CommitData {
     /// Previous MST root CID (for sync v1.1)
     pub prev_data: Option<IpldCid>,
 
-    /// All blocks to persist (MST nodes + record data + commit block)
-    ///
-    /// Includes:
-    /// - All new MST node blocks from `diff.new_mst_blocks`
-    /// - All new record data blocks (from creates + updates)
-    /// - The commit block itself
+    /// New blocks to persist (MST nodes + record data + commit block)
     pub blocks: BTreeMap<IpldCid, bytes::Bytes>,
 
     /// Relevant blocks for firehose (sync v1.1 inductive validation)
@@ -55,20 +54,7 @@ pub struct CommitData {
     /// - Includes "adjacent" blocks needed for operation inversion
     pub relevant_blocks: BTreeMap<IpldCid, bytes::Bytes>,
 
-    /// CIDs of blocks to delete from storage
-    ///
-    /// Contains CIDs that are no longer referenced by the current tree:
-    /// - Record CIDs from deleted records
-    /// - Old record CIDs from updated records
-    ///
-    /// **Note:** Actual deletion should consider whether previous commits still
-    /// reference these CIDs. A proper GC strategy might:
-    /// - Only delete if previous commits are also being GC'd
-    /// - Use reference counting across all retained commits
-    /// - Perform periodic reachability analysis
-    ///
-    /// For simple single-commit repos or when old commits are discarded, direct
-    /// deletion is safe.
+    /// CIDs of blocks to delete
     pub deleted_cids: Vec<IpldCid>,
 }
 
@@ -81,17 +67,15 @@ impl CommitData {
         &self,
         repo: &Did<'_>,
         seq: i64,
-        time: jacquard_common::types::string::Datetime,
-        ops: Vec<crate::commit::firehose::RepoOp<'static>>,
-        blobs: Vec<jacquard_common::types::cid::CidLink<'static>>,
-    ) -> Result<crate::commit::firehose::FirehoseCommit<'static>> {
-        use jacquard_common::types::cid::CidLink;
-
+        time: Datetime,
+        ops: Vec<RepoOp<'static>>,
+        blobs: Vec<CidLink<'static>>,
+    ) -> Result<FirehoseCommit<'static>> {
         // Convert relevant blocks to CAR format
         let blocks_car =
             crate::car::write_car_bytes(self.cid, self.relevant_blocks.clone()).await?;
 
-        Ok(crate::commit::firehose::FirehoseCommit {
+        Ok(FirehoseCommit {
             repo: repo.clone().into_static(),
             rev: self.rev.clone(),
             seq,
@@ -161,7 +145,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
         let commit_bytes = storage
             .get(commit_cid)
             .await?
-            .ok_or_else(|| crate::error::RepoError::not_found("commit", commit_cid))?;
+            .ok_or_else(|| RepoError::not_found("commit", commit_cid))?;
 
         let commit = Commit::from_cbor(&commit_bytes)?;
         let mst_root = commit.data();
@@ -177,7 +161,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     }
 
     /// Get a record by collection and rkey
-    pub async fn get_record<T: jacquard_common::types::recordkey::RecordKeyType>(
+    pub async fn get_record<T: RecordKeyType>(
         &self,
         collection: &Nsid<'_>,
         rkey: &RecordKey<T>,
@@ -187,7 +171,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     }
 
     /// Create a record (error if exists)
-    pub async fn create_record<T: jacquard_common::types::recordkey::RecordKeyType>(
+    pub async fn create_record<T: RecordKeyType>(
         &mut self,
         collection: &Nsid<'_>,
         rkey: &RecordKey<T>,
@@ -196,7 +180,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
         let key = format!("{}/{}", collection.as_ref(), rkey.as_ref());
 
         if self.mst.get(&key).await?.is_some() {
-            return Err(crate::error::RepoError::already_exists("record", &key));
+            return Err(RepoError::already_exists("record", &key));
         }
 
         self.mst = self.mst.add(&key, record_cid).await?;
@@ -204,7 +188,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     }
 
     /// Update a record (error if not exists, returns previous CID)
-    pub async fn update_record<T: jacquard_common::types::recordkey::RecordKeyType>(
+    pub async fn update_record<T: RecordKeyType>(
         &mut self,
         collection: &Nsid<'_>,
         rkey: &RecordKey<T>,
@@ -216,14 +200,14 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
             .mst
             .get(&key)
             .await?
-            .ok_or_else(|| crate::error::RepoError::not_found("record", &key))?;
+            .ok_or_else(|| RepoError::not_found("record", &key))?;
 
         self.mst = self.mst.update(&key, record_cid).await?;
         Ok(old_cid)
     }
 
     /// Delete a record (error if not exists, returns deleted CID)
-    pub async fn delete_record<T: jacquard_common::types::recordkey::RecordKeyType>(
+    pub async fn delete_record<T: RecordKeyType>(
         &mut self,
         collection: &Nsid<'_>,
         rkey: &RecordKey<T>,
@@ -234,11 +218,31 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
             .mst
             .get(&key)
             .await?
-            .ok_or_else(|| crate::error::RepoError::not_found("record", &key))?;
+            .ok_or_else(|| RepoError::not_found("record", &key))?;
 
         self.mst = self.mst.delete(&key).await?;
         Ok(old_cid)
     }
+
+    // TODO(cursor-based queries): Potential future API additions
+    //
+    // The current API is purely single-record CRUD. Cursor-based traversal (see mst/cursor.rs)
+    // would enable efficient collection/range queries:
+    //
+    // - list_collection(collection: &Nsid) -> Vec<(RecordKey, IpldCid)>
+    //   Enumerate all records in a collection via prefix search on "collection/"
+    //   Uses cursor.advance() + cursor.skip_subtree() to skip irrelevant branches
+    //
+    // - list_collection_range(collection: &Nsid, start: &Rkey, end: &Rkey) -> Vec<...>
+    //   Range query: advance to start key, collect until > end, skip subtrees outside range
+    //   Useful for pagination / time-bounded queries (since Rkeys are often TIDs)
+    //
+    // - list_all_collections() -> Vec<Nsid>
+    //   Walk tree, track collection prefixes, skip subtrees once prefix changes
+    //
+    // Current single-key get() is already optimal (O(log n) targeted lookup).
+    // But these bulk operations would benefit significantly from cursor's skip_subtree()
+    // to avoid traversing unrelated branches when searching lexicographically-organized data.
 
     /// Apply record write operations with inline data
     ///
@@ -246,11 +250,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     /// then applies write operations to the MST. Returns the diff for inspection.
     ///
     /// For creating commits with operations, use `create_commit()` instead.
-    pub async fn apply_record_writes(
-        &mut self,
-        ops: &[crate::mst::RecordWriteOp<'_>],
-    ) -> Result<crate::mst::MstDiff> {
-        use crate::mst::RecordWriteOp;
+    pub async fn apply_record_writes(&mut self, ops: &[RecordWriteOp<'_>]) -> Result<MstDiff> {
         use smol_str::format_smolstr;
 
         let mut updated_tree = self.mst.clone();
@@ -266,7 +266,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
 
                     // Serialize record to DAG-CBOR
                     let cbor = serde_ipld_dagcbor::to_vec(record)
-                        .map_err(|e| crate::error::RepoError::serialization(e))?;
+                        .map_err(|e| RepoError::serialization(e))?;
 
                     // Compute CID and store data
                     let cid = self.storage.put(&cbor).await?;
@@ -283,7 +283,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
 
                     // Serialize record to DAG-CBOR
                     let cbor = serde_ipld_dagcbor::to_vec(record)
-                        .map_err(|e| crate::error::RepoError::serialization(e))?;
+                        .map_err(|e| RepoError::serialization(e))?;
 
                     // Compute CID and store data
                     let cid = self.storage.put(&cbor).await?;
@@ -291,7 +291,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                     // Validate prev if provided
                     if let Some(prev_cid) = prev {
                         if &cid != prev_cid {
-                            return Err(crate::error::RepoError::invalid(format!(
+                            return Err(RepoError::invalid(format!(
                                 "Update prev CID mismatch for key {}: expected {}, got {}",
                                 key, prev_cid, cid
                             )));
@@ -308,14 +308,16 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                     let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
 
                     // Check exists
-                    let current = self.mst.get(key.as_str()).await?.ok_or_else(|| {
-                        crate::error::RepoError::not_found("record", key.as_str())
-                    })?;
+                    let current = self
+                        .mst
+                        .get(key.as_str())
+                        .await?
+                        .ok_or_else(|| RepoError::not_found("record", key.as_str()))?;
 
                     // Validate prev if provided
                     if let Some(prev_cid) = prev {
                         if &current != prev_cid {
-                            return Err(crate::error::RepoError::invalid(format!(
+                            return Err(RepoError::invalid(format!(
                                 "Delete prev CID mismatch for key {}: expected {}, got {}",
                                 key, prev_cid, current
                             )));
@@ -347,17 +349,14 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     /// Returns `(ops, CommitData)` - ops are needed for `to_firehose_commit()`.
     pub async fn create_commit<K>(
         &mut self,
-        ops: &[crate::mst::RecordWriteOp<'_>],
+        ops: &[RecordWriteOp<'_>],
         did: &Did<'_>,
         prev: Option<IpldCid>,
         signing_key: &K,
-    ) -> Result<(Vec<crate::commit::firehose::RepoOp<'static>>, CommitData)>
+    ) -> Result<(Vec<RepoOp<'static>>, CommitData)>
     where
-        K: crate::commit::SigningKey,
+        K: SigningKey,
     {
-        use crate::mst::RecordWriteOp;
-        use smol_str::format_smolstr;
-
         // Step 1: Apply all write operations to build new MST
         let mut updated_tree = self.mst.clone();
 
@@ -372,7 +371,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
 
                     // Serialize record to DAG-CBOR
                     let cbor = serde_ipld_dagcbor::to_vec(record)
-                        .map_err(|e| crate::error::RepoError::serialization(e))?;
+                        .map_err(|e| RepoError::serialization(e))?;
 
                     // Compute CID and store data
                     let cid = self.storage.put(&cbor).await?;
@@ -389,7 +388,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
 
                     // Serialize record to DAG-CBOR
                     let cbor = serde_ipld_dagcbor::to_vec(record)
-                        .map_err(|e| crate::error::RepoError::serialization(e))?;
+                        .map_err(|e| RepoError::serialization(e))?;
 
                     // Compute CID and store data
                     let cid = self.storage.put(&cbor).await?;
@@ -397,7 +396,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                     // Validate prev if provided
                     if let Some(prev_cid) = prev {
                         if &cid != prev_cid {
-                            return Err(crate::error::RepoError::invalid(format!(
+                            return Err(RepoError::invalid(format!(
                                 "Update prev CID mismatch for key {}: expected {}, got {}",
                                 key, prev_cid, cid
                             )));
@@ -414,14 +413,16 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                     let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
 
                     // Check exists
-                    let current = self.mst.get(key.as_str()).await?.ok_or_else(|| {
-                        crate::error::RepoError::not_found("record", key.as_str())
-                    })?;
+                    let current = self
+                        .mst
+                        .get(key.as_str())
+                        .await?
+                        .ok_or_else(|| RepoError::not_found("record", key.as_str()))?;
 
                     // Validate prev if provided
                     if let Some(prev_cid) = prev {
                         if &current != prev_cid {
-                            return Err(crate::error::RepoError::invalid(format!(
+                            return Err(RepoError::invalid(format!(
                                 "Delete prev CID mismatch for key {}: expected {}, got {}",
                                 key, prev_cid, current
                             )));
@@ -518,7 +519,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
             .storage
             .get(&commit_cid)
             .await?
-            .ok_or_else(|| crate::error::RepoError::not_found("commit block", &commit_cid))?;
+            .ok_or_else(|| RepoError::not_found("commit block", &commit_cid))?;
         let commit = Commit::from_cbor(&commit_bytes)?;
 
         self.commit = commit.into_static();
@@ -540,9 +541,9 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
         did: &Did<'_>,
         prev: Option<IpldCid>,
         signing_key: &K,
-    ) -> Result<(Vec<crate::commit::firehose::RepoOp<'static>>, IpldCid)>
+    ) -> Result<(Vec<RepoOp<'static>>, IpldCid)>
     where
-        K: crate::commit::SigningKey,
+        K: SigningKey,
     {
         let (ops, commit_data) = self.create_commit(&[], did, prev, signing_key).await?;
         Ok((ops, self.apply_commit(commit_data).await?))
@@ -581,11 +582,15 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
+    use std::{collections::BTreeMap, str::FromStr};
 
     use super::*;
     use crate::storage::MemoryBlockStore;
-    use jacquard_common::types::recordkey::Rkey;
+    use jacquard_common::types::{
+        crypto::{KeyCodec, PublicKey},
+        recordkey::Rkey,
+        value::RawData,
+    };
     use smol_str::SmolStr;
 
     fn make_test_cid(value: u8) -> IpldCid {
@@ -598,13 +603,8 @@ mod tests {
         IpldCid::new_v1(DAG_CBOR_CID_CODEC, mh)
     }
 
-    fn make_test_record(
-        n: u32,
-    ) -> std::collections::BTreeMap<SmolStr, jacquard_common::types::value::RawData<'static>> {
-        use jacquard_common::types::value::RawData;
-        use smol_str::SmolStr;
-
-        let mut record = std::collections::BTreeMap::new();
+    fn make_test_record(n: u32) -> BTreeMap<SmolStr, RawData<'static>> {
+        let mut record = BTreeMap::new();
         record.insert(
             SmolStr::new("$type"),
             RawData::String("app.bsky.feed.post".into()),
@@ -887,8 +887,6 @@ mod tests {
 
     #[tokio::test]
     async fn test_commit_signature_verification() {
-        use jacquard_common::types::crypto::{KeyCodec, PublicKey};
-
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
@@ -1085,7 +1083,7 @@ mod tests {
 
         // Verify we can deserialize the record data
         let record1_bytes = commit_data.blocks.get(&cid1).unwrap();
-        let record1: std::collections::BTreeMap<SmolStr, jacquard_common::types::value::RawData> =
+        let record1: BTreeMap<SmolStr, RawData> =
             serde_ipld_dagcbor::from_slice(record1_bytes).unwrap();
         assert_eq!(
             record1.get(&SmolStr::new("text")).unwrap(),

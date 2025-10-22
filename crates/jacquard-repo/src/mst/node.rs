@@ -6,6 +6,8 @@ use bytes::Bytes;
 use cid::Cid as IpldCid;
 use smol_str::SmolStr;
 
+use crate::{mst::Mst, storage::BlockStore};
+
 /// Entry in an MST node - either a subtree or a leaf
 ///
 /// This is the in-memory representation used for tree operations.
@@ -14,11 +16,11 @@ use smol_str::SmolStr;
 ///
 /// The wire format (CBOR) is different - see `NodeData` and `TreeEntry`.
 #[derive(Clone)]
-pub enum NodeEntry<S: crate::storage::BlockStore> {
+pub enum NodeEntry<S> {
     /// Subtree reference
     ///
     /// Will be lazily loaded from storage when needed.
-    Tree(crate::mst::Mst<S>),
+    Tree(Mst<S>),
 
     /// Leaf node with key-value pair
     Leaf {
@@ -29,7 +31,7 @@ pub enum NodeEntry<S: crate::storage::BlockStore> {
     },
 }
 
-impl<S: crate::storage::BlockStore> fmt::Debug for NodeEntry<S> {
+impl<S: BlockStore> fmt::Debug for NodeEntry<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             NodeEntry::Tree(t) => write!(f, "{:?}", t),
@@ -40,7 +42,7 @@ impl<S: crate::storage::BlockStore> fmt::Debug for NodeEntry<S> {
     }
 }
 
-impl<S: crate::storage::BlockStore> NodeEntry<S> {
+impl<S: BlockStore> NodeEntry<S> {
     /// Check if this is a tree entry
     pub fn is_tree(&self) -> bool {
         matches!(self, NodeEntry::Tree(_))

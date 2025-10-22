@@ -22,6 +22,7 @@ use crate::error::ProofError;
 use crate::mst::Mst;
 use crate::storage::MemoryBlockStore;
 use cid::Cid as IpldCid;
+use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
 use smol_str::format_smolstr;
 use std::sync::Arc;
@@ -30,10 +31,10 @@ use std::sync::Arc;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RecordClaim<'a> {
     /// Collection NSID (e.g., "app.bsky.feed.post")
-    pub collection: jacquard_common::CowStr<'a>,
+    pub collection: CowStr<'a>,
 
     /// Record key (TID or other identifier)
-    pub rkey: jacquard_common::CowStr<'a>,
+    pub rkey: CowStr<'a>,
 
     /// Expected CID of the record
     /// - Some(cid): claiming record exists with this CID

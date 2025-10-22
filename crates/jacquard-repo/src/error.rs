@@ -269,7 +269,7 @@ impl From<CommitError> for RepoError {
 }
 
 /// Diff-specific errors
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub enum DiffError {
     /// Too many operations
     #[error("Too many operations: {count} (max {max})")]

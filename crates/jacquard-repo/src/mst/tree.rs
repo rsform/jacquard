@@ -171,7 +171,7 @@ pub enum VerifiedWriteOp {
 /// - Layer = floor(leading_zeros / 2) for ~4 fanout
 /// - Deterministic and insertion-order independent
 #[derive(Clone)]
-pub struct Mst<S: BlockStore> {
+pub struct Mst<S> {
     /// Block storage for loading/saving nodes (shared via Arc)
     storage: Arc<S>,
 
@@ -366,7 +366,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     /// For nodes with no leaves, recursively checks subtrees.
     pub(crate) fn get_layer<'a>(
         &'a self,
-    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<usize>> + Send + 'a>> {
+    ) -> Pin<Box<dyn Future<Output = Result<usize>> + Send + 'a>> {
         Box::pin(async move {
             if let Some(layer) = self.layer {
                 return Ok(layer);
@@ -415,8 +415,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     pub fn get<'a>(
         &'a self,
         key: &'a str,
-    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Option<IpldCid>>> + Send + 'a>>
-    {
+    ) -> Pin<Box<dyn Future<Output = Result<Option<IpldCid>>> + Send + 'a>> {
         Box::pin(async move {
             validate_key(key)?;
 
@@ -452,7 +451,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
         &'a self,
         key: &'a str,
         cid: IpldCid,
-    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Mst<S>>> + Send + 'a>> {
+    ) -> Pin<Box<dyn Future<Output = Result<Mst<S>>> + Send + 'a>> {
         Box::pin(async move {
             validate_key(key)?;
 
@@ -575,7 +574,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     pub fn delete<'a>(
         &'a self,
         key: &'a str,
-    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Mst<S>>> + Send + 'a>> {
+    ) -> Pin<Box<dyn Future<Output = Result<Mst<S>>> + Send + 'a>> {
         Box::pin(async move {
             validate_key(key)?;
 
@@ -588,7 +587,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     fn delete_recurse<'a>(
         &'a self,
         key: &'a str,
-    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Mst<S>>> + Send + 'a>> {
+    ) -> Pin<Box<dyn Future<Output = Result<Mst<S>>> + Send + 'a>> {
         Box::pin(async move {
             let entries = self.get_entries().await?;
             let index = Self::find_gt_or_equal_leaf_index_in(&entries, key);
@@ -704,9 +703,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     }
 
     /// Trim top node if it only contains one subtree
-    fn trim_top(
-        self,
-    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Mst<S>>> + Send>> {
+    fn trim_top(self) -> Pin<Box<dyn Future<Output = Result<Mst<S>>> + Send>> {
         Box::pin(async move {
             let entries = self.get_entries().await?;
 
@@ -730,9 +727,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     pub fn split_around<'a>(
         &'a self,
         key: &'a str,
-    ) -> std::pin::Pin<
-        Box<dyn std::future::Future<Output = Result<(Option<Mst<S>>, Option<Mst<S>>)>> + Send + 'a>,
-    > {
+    ) -> Pin<Box<dyn Future<Output = Result<(Option<Mst<S>>, Option<Mst<S>>)>> + Send + 'a>> {
         Box::pin(async move {
             let entries = self.get_entries().await?;
             let index = Self::find_gt_or_equal_leaf_index_in(&entries, key);
@@ -783,7 +778,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     pub fn append_merge<'a>(
         &'a self,
         to_merge: &'a Mst<S>,
-    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Mst<S>>> + Send + 'a>> {
+    ) -> Pin<Box<dyn Future<Output = Result<Mst<S>>> + Send + 'a>> {
         Box::pin(async move {
             // Check same layer
             let self_layer = self.get_layer().await?;
@@ -878,22 +873,14 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     /// Uses parallel traversal to collect leaves from independent subtrees concurrently.
     pub fn leaves<'a>(
         &'a self,
-    ) -> std::pin::Pin<
-        Box<
-            dyn std::future::Future<Output = Result<Vec<(smol_str::SmolStr, IpldCid)>>> + Send + 'a,
-        >,
-    > {
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<(smol_str::SmolStr, IpldCid)>>> + Send + 'a>> {
         Box::pin(async move { collect_leaves_parallel(self.clone()).await })
     }
 
     /// Get all leaf entries sequentially (for benchmarking)
     pub fn leaves_sequential<'a>(
         &'a self,
-    ) -> std::pin::Pin<
-        Box<
-            dyn std::future::Future<Output = Result<Vec<(smol_str::SmolStr, IpldCid)>>> + Send + 'a,
-        >,
-    > {
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<(smol_str::SmolStr, IpldCid)>>> + Send + 'a>> {
         Box::pin(async move {
             let mut result = Vec::new();
             self.collect_leaves_sequential(&mut result).await?;
@@ -905,7 +892,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     fn collect_leaves_sequential<'a>(
         &'a self,
         result: &'a mut Vec<(smol_str::SmolStr, IpldCid)>,
-    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<()>> + Send + 'a>> {
+    ) -> Pin<Box<dyn Future<Output = Result<()>> + Send + 'a>> {
         Box::pin(async move {
             let entries = self.get_entries().await?;
 
@@ -1011,9 +998,9 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     /// Uses parallel traversal to collect blocks from independent subtrees concurrently.
     pub fn collect_blocks<'a>(
         &'a self,
-    ) -> std::pin::Pin<
+    ) -> Pin<
         Box<
-            dyn std::future::Future<
+            dyn Future<
                     Output = Result<(IpldCid, std::collections::BTreeMap<IpldCid, bytes::Bytes>)>,
                 > + Send
                 + 'a,
@@ -1025,9 +1012,9 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     /// Collect all blocks sequentially (for benchmarking)
     pub fn collect_blocks_sequential<'a>(
         &'a self,
-    ) -> std::pin::Pin<
+    ) -> Pin<
         Box<
-            dyn std::future::Future<
+            dyn Future<
                     Output = Result<(IpldCid, std::collections::BTreeMap<IpldCid, bytes::Bytes>)>,
                 > + Send
                 + 'a,
@@ -1123,8 +1110,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     pub fn cids_for_path<'a>(
         &'a self,
         key: &'a str,
-    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Vec<IpldCid>>> + Send + 'a>>
-    {
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<IpldCid>>> + Send + 'a>> {
         Box::pin(async move {
             validate_key(key)?;
 
@@ -1195,7 +1181,7 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
         &'a self,
         writer: &'a mut iroh_car::CarWriter<W>,
         leaf_cids: &'a mut Vec<IpldCid>,
-    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<()>> + Send + 'a>> {
+    ) -> Pin<Box<dyn Future<Output = Result<()>> + Send + 'a>> {
         Box::pin(async move {
             let pointer = self.get_pointer().await?;
 

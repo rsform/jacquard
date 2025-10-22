@@ -3,13 +3,14 @@
 //! Provides functions for reading CAR (Content Addressable aRchive) files into memory
 //! or streaming them for large repositories.
 
-use crate::error::Result;
+use crate::error::{RepoError, Result};
 use bytes::Bytes;
 use cid::Cid as IpldCid;
 use iroh_car::CarReader;
-use n0_future::stream::StreamExt;
+use n0_future::stream::{Stream, StreamExt};
 use std::collections::BTreeMap;
 use std::path::Path;
+use std::pin::Pin;
 use tokio::fs::File;
 
 /// Parsed CAR file data
@@ -26,20 +27,16 @@ pub struct ParsedCar {
 /// Returns BTreeMap of CID -> block data (sorted order for determinism).
 /// For large CAR files, consider using `stream_car()` instead.
 pub async fn read_car(path: impl AsRef<Path>) -> Result<BTreeMap<IpldCid, Bytes>> {
-    let file = File::open(path)
-        .await
-        .map_err(|e| crate::error::RepoError::io(e))?;
+    let file = File::open(path).await.map_err(|e| RepoError::io(e))?;
 
-    let reader = CarReader::new(file)
-        .await
-        .map_err(|e| crate::error::RepoError::car(e))?;
+    let reader = CarReader::new(file).await.map_err(|e| RepoError::car(e))?;
 
     let mut blocks = BTreeMap::new();
     let stream = reader.stream();
     n0_future::pin!(stream);
 
     while let Some(result) = stream.next().await {
-        let (cid, data) = result.map_err(|e| crate::error::RepoError::car_parse(e))?;
+        let (cid, data) = result.map_err(|e| RepoError::car_parse(e))?;
         blocks.insert(cid, Bytes::from(data));
     }
 
@@ -50,13 +47,9 @@ pub async fn read_car(path: impl AsRef<Path>) -> Result<BTreeMap<IpldCid, Bytes>
 ///
 /// Useful for checking roots without loading all blocks.
 pub async fn read_car_header(path: impl AsRef<Path>) -> Result<Vec<IpldCid>> {
-    let file = File::open(path)
-        .await
-        .map_err(|e| crate::error::RepoError::io(e))?;
+    let file = File::open(path).await.map_err(|e| RepoError::io(e))?;
 
-    let reader = CarReader::new(file)
-        .await
-        .map_err(|e| crate::error::RepoError::car(e))?;
+    let reader = CarReader::new(file).await.map_err(|e| RepoError::car(e))?;
 
     Ok(reader.header().roots().to_vec())
 }
@@ -68,20 +61,20 @@ pub async fn read_car_header(path: impl AsRef<Path>) -> Result<Vec<IpldCid>> {
 pub async fn parse_car_bytes(data: &[u8]) -> Result<ParsedCar> {
     let reader = CarReader::new(data)
         .await
-        .map_err(|e| crate::error::RepoError::car_parse(e))?;
+        .map_err(|e| RepoError::car_parse(e))?;
 
     let roots = reader.header().roots();
     let root = roots
         .first()
         .copied()
-        .ok_or_else(|| crate::error::RepoError::invalid("CAR file has no roots"))?;
+        .ok_or_else(|| RepoError::invalid("CAR file has no roots"))?;
 
     let mut blocks = BTreeMap::new();
     let stream = reader.stream();
     n0_future::pin!(stream);
 
     while let Some(result) = stream.next().await {
-        let (cid, data) = result.map_err(|e| crate::error::RepoError::car_parse(e))?;
+        let (cid, data) = result.map_err(|e| RepoError::car_parse(e))?;
         blocks.insert(cid, Bytes::from(data));
     }
 
@@ -92,13 +85,9 @@ pub async fn parse_car_bytes(data: &[u8]) -> Result<ParsedCar> {
 ///
 /// Useful for processing large CAR files incrementally.
 pub async fn stream_car(path: impl AsRef<Path>) -> Result<CarBlockStream> {
-    let file = File::open(path)
-        .await
-        .map_err(|e| crate::error::RepoError::io(e))?;
+    let file = File::open(path).await.map_err(|e| RepoError::io(e))?;
 
-    let reader = CarReader::new(file)
-        .await
-        .map_err(|e| crate::error::RepoError::car(e))?;
+    let reader = CarReader::new(file).await.map_err(|e| RepoError::car(e))?;
 
     let roots = reader.header().roots().to_vec();
     let stream = Box::pin(reader.stream());
@@ -110,12 +99,8 @@ pub async fn stream_car(path: impl AsRef<Path>) -> Result<CarBlockStream> {
 ///
 /// Iterates through CAR blocks without loading entire file into memory.
 pub struct CarBlockStream {
-    stream: std::pin::Pin<
-        Box<
-            dyn n0_future::stream::Stream<
-                    Item = std::result::Result<(IpldCid, Vec<u8>), iroh_car::Error>,
-                > + Send,
-        >,
+    stream: Pin<
+        Box<dyn Stream<Item = std::result::Result<(IpldCid, Vec<u8>), iroh_car::Error>> + Send>,
     >,
     roots: Vec<IpldCid>,
 }
@@ -127,7 +112,7 @@ impl CarBlockStream {
     pub async fn next(&mut self) -> Result<Option<(IpldCid, Bytes)>> {
         match self.stream.next().await {
             Some(result) => {
-                let (cid, data) = result.map_err(|e| crate::error::RepoError::car_parse(e))?;
+                let (cid, data) = result.map_err(|e| RepoError::car_parse(e))?;
                 Ok(Some((cid, Bytes::from(data))))
             }
             None => Ok(None),

@@ -2,7 +2,7 @@
 //!
 //! Provides functions for writing blocks to CAR (Content Addressable aRchive) files.
 
-use crate::error::Result;
+use crate::error::{RepoError, Result};
 use crate::mst::tree::Mst;
 use crate::storage::BlockStore;
 use bytes::Bytes;
@@ -22,9 +22,7 @@ pub async fn write_car(
     roots: Vec<IpldCid>,
     blocks: BTreeMap<IpldCid, Bytes>,
 ) -> Result<()> {
-    let file = File::create(path)
-        .await
-        .map_err(|e| crate::error::RepoError::io(e))?;
+    let file = File::create(path).await.map_err(|e| RepoError::io(e))?;
 
     let header = iroh_car::CarHeader::new_v1(roots);
     let mut writer = CarWriter::new(header, file);
@@ -33,13 +31,10 @@ pub async fn write_car(
         writer
             .write(cid, data.as_ref())
             .await
-            .map_err(|e| crate::error::RepoError::car(e))?;
+            .map_err(|e| RepoError::car(e))?;
     }
 
-    writer
-        .finish()
-        .await
-        .map_err(|e| crate::error::RepoError::car(e))?;
+    writer.finish().await.map_err(|e| RepoError::car(e))?;
 
     Ok(())
 }
@@ -48,10 +43,7 @@ pub async fn write_car(
 ///
 /// Like `write_car()` but writes to a `Vec<u8>` instead of a file.
 /// Useful for tests and proof generation.
-pub async fn write_car_bytes(
-    root: IpldCid,
-    blocks: BTreeMap<IpldCid, Bytes>,
-) -> Result<Vec<u8>> {
+pub async fn write_car_bytes(root: IpldCid, blocks: BTreeMap<IpldCid, Bytes>) -> Result<Vec<u8>> {
     let mut buffer = Vec::new();
     let header = iroh_car::CarHeader::new_v1(vec![root]);
     let mut writer = CarWriter::new(header, &mut buffer);
@@ -60,15 +52,12 @@ pub async fn write_car_bytes(
         writer
             .write(cid, data.as_ref())
             .await
-            .map_err(|e| crate::error::RepoError::car(e))?;
+            .map_err(|e| RepoError::car(e))?;
     }
 
-    writer
-        .finish()
-        .await
-        .map_err(|e| crate::error::RepoError::car(e))?;
+    writer.finish().await.map_err(|e| RepoError::car(e))?;
 
-    buffer.flush().await.map_err(|e| crate::error::RepoError::io(e))?;
+    buffer.flush().await.map_err(|e| RepoError::io(e))?;
 
     Ok(buffer)
 }
@@ -86,9 +75,7 @@ pub async fn export_repo_car<S: BlockStore + Sync + 'static>(
     commit_cid: IpldCid,
     mst: &Mst<S>,
 ) -> Result<()> {
-    let file = File::create(path)
-        .await
-        .map_err(|e| crate::error::RepoError::io(e))?;
+    let file = File::create(path).await.map_err(|e| RepoError::io(e))?;
 
     let header = iroh_car::CarHeader::new_v1(vec![commit_cid]);
     let mut writer = CarWriter::new(header, file);
@@ -98,21 +85,18 @@ pub async fn export_repo_car<S: BlockStore + Sync + 'static>(
     let commit_data = storage
         .get(&commit_cid)
         .await?
-        .ok_or_else(|| crate::error::RepoError::not_found("commit", &commit_cid))?;
+        .ok_or_else(|| RepoError::not_found("commit", &commit_cid))?;
 
     writer
         .write(commit_cid, &commit_data)
         .await
-        .map_err(|e| crate::error::RepoError::car(e))?;
+        .map_err(|e| RepoError::car(e))?;
 
     // Stream MST and record blocks
     mst.write_blocks_to_car(&mut writer).await?;
 
     // Finish writing
-    writer
-        .finish()
-        .await
-        .map_err(|e| crate::error::RepoError::car(e))?;
+    writer.finish().await.map_err(|e| RepoError::car(e))?;
 
     Ok(())
 }

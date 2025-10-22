@@ -1,13 +1,19 @@
 //! MST diff calculation
 
 use std::collections::BTreeMap;
+use std::future::Future;
+use std::pin::Pin;
 
 use super::cursor::{CursorPosition, MstCursor};
 use super::tree::Mst;
-use crate::error::Result;
+use super::util::serialize_node_data;
+use crate::commit::firehose::RepoOp;
+use crate::error::{RepoError, Result};
+use crate::mst::NodeEntry;
 use crate::storage::BlockStore;
 use bytes::Bytes;
 use cid::Cid as IpldCid;
+use jacquard_common::types::cid::CidLink;
 use smol_str::SmolStr;
 
 /// Diff between two MST states
@@ -87,7 +93,7 @@ impl MstDiff {
     /// The sync protocol has a 200 operation limit per commit.
     pub fn validate_limits(&self) -> Result<()> {
         if self.op_count() > 200 {
-            return Err(crate::error::RepoError::too_large(
+            return Err(RepoError::too_large(
                 "diff operation count",
                 self.op_count(),
                 200,
@@ -139,8 +145,6 @@ impl MstDiff {
         &self,
         storage: &S,
     ) -> Result<std::collections::BTreeMap<IpldCid, bytes::Bytes>> {
-        use std::collections::BTreeMap;
-
         let mut blocks = BTreeMap::new();
 
         for cid in &self.new_leaf_cids {
@@ -156,14 +160,12 @@ impl MstDiff {
     ///
     /// Returns operations in the format used by `com.atproto.sync.subscribeRepos`.
     /// All update/delete operations include prev CIDs for sync v1.1 validation.
-    pub fn to_repo_ops(&self) -> Vec<crate::commit::firehose::RepoOp<'_>> {
-        use jacquard_common::types::cid::CidLink;
-
+    pub fn to_repo_ops(&self) -> Vec<RepoOp<'_>> {
         let mut ops = Vec::with_capacity(self.op_count());
 
         // Add creates
         for (key, cid) in &self.creates {
-            ops.push(crate::commit::firehose::RepoOp {
+            ops.push(RepoOp {
                 action: "create".into(),
                 path: key.as_str().into(),
                 cid: Some(CidLink::from(*cid)),
@@ -173,7 +175,7 @@ impl MstDiff {
 
         // Add updates
         for (key, new_cid, old_cid) in &self.updates {
-            ops.push(crate::commit::firehose::RepoOp {
+            ops.push(RepoOp {
                 action: "update".into(),
                 path: key.as_str().into(),
                 cid: Some(CidLink::from(*new_cid)),
@@ -183,7 +185,7 @@ impl MstDiff {
 
         // Add deletes
         for (key, old_cid) in &self.deletes {
-            ops.push(crate::commit::firehose::RepoOp {
+            ops.push(RepoOp {
                 action: "delete".into(),
                 path: key.as_str().into(),
                 cid: None, // null for deletes
@@ -223,7 +225,7 @@ fn diff_recursive<'a, S: BlockStore + Sync + 'static>(
     old: &'a Mst<S>,
     new: &'a Mst<S>,
     diff: &'a mut MstDiff,
-) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<()>> + Send + 'a>> {
+) -> Pin<Box<dyn Future<Output = Result<()>> + Send + 'a>> {
     Box::pin(async move {
         // If CIDs are equal, trees are identical - skip entire subtree
         let old_cid = old.get_pointer().await?;
@@ -406,9 +408,8 @@ async fn serialize_and_track_mst<S: BlockStore + Sync + 'static>(
 
     // Serialize the MST node
     let entries = tree.get_entries().await?;
-    let node_data = super::util::serialize_node_data(&entries).await?;
-    let cbor = serde_ipld_dagcbor::to_vec(&node_data)
-        .map_err(|e| crate::error::RepoError::serialization(e))?;
+    let node_data = serialize_node_data(&entries).await?;
+    let cbor = serde_ipld_dagcbor::to_vec(&node_data).map_err(|e| RepoError::serialization(e))?;
 
     // Track the serialized block
     diff.new_mst_blocks.insert(tree_cid, Bytes::from(cbor));
@@ -420,10 +421,8 @@ async fn serialize_and_track_mst<S: BlockStore + Sync + 'static>(
 fn track_added_tree<'a, S: BlockStore + Sync + 'static>(
     tree: &'a Mst<S>,
     diff: &'a mut MstDiff,
-) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<()>> + Send + 'a>> {
+) -> Pin<Box<dyn Future<Output = Result<()>> + Send + 'a>> {
     Box::pin(async move {
-        use super::node::NodeEntry;
-
         // Serialize and track this MST node
         serialize_and_track_mst(tree, diff).await?;
 
@@ -448,10 +447,8 @@ fn track_added_tree<'a, S: BlockStore + Sync + 'static>(
 fn track_removed_tree<'a, S: BlockStore + Sync + 'static>(
     tree: &'a Mst<S>,
     diff: &'a mut MstDiff,
-) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<()>> + Send + 'a>> {
+) -> Pin<Box<dyn Future<Output = Result<()>> + Send + 'a>> {
     Box::pin(async move {
-        use super::node::NodeEntry;
-
         // Track this MST node as removed
         let tree_cid = tree.get_pointer().await?;
         diff.removed_mst_blocks.push(tree_cid);
@@ -489,10 +486,8 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
 fn track_removed_tree_all<'a, S: BlockStore + Sync + 'static>(
     tree: &'a Mst<S>,
     diff: &'a mut MstDiff,
-) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<()>> + Send + 'a>> {
+) -> Pin<Box<dyn Future<Output = Result<()>> + Send + 'a>> {
     Box::pin(async move {
-        use super::node::NodeEntry;
-
         // Track this node as removed
         let tree_cid = tree.get_pointer().await?;
         diff.removed_mst_blocks.push(tree_cid);

@@ -1,6 +1,11 @@
 //! MST utility functions
 
+use std::future::Future;
+use std::pin::Pin;
+use std::sync::Arc;
+
 use super::node::{NodeData, NodeEntry, TreeEntry};
+use crate::Mst;
 use crate::error::{MstError, Result};
 use crate::storage::BlockStore;
 use bytes::Bytes;
@@ -108,7 +113,7 @@ pub fn common_prefix_len(a: &str, b: &str) -> usize {
 /// - `Tree` after `Leaf` → that leaf's `tree` pointer
 pub fn serialize_node_data<'a, S: BlockStore + Sync + 'static>(
     entries: &'a [NodeEntry<S>],
-) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<NodeData>> + Send + 'a>> {
+) -> Pin<Box<dyn Future<Output = Result<NodeData>> + Send + 'a>> {
     Box::pin(async move {
         let mut data = NodeData {
             left: None,
@@ -174,12 +179,10 @@ pub fn serialize_node_data<'a, S: BlockStore + Sync + 'static>(
 /// - Each entry → `Leaf` with reconstructed full key
 /// - `tree` pointer → append `Tree` entry
 pub fn deserialize_node_data<S: BlockStore + Sync + 'static>(
-    storage: std::sync::Arc<S>,
+    storage: Arc<S>,
     data: &NodeData,
     layer: Option<usize>,
 ) -> Result<Vec<NodeEntry<S>>> {
-    use crate::mst::Mst;
-
     let mut entries = Vec::new();
 
     // Left pointer → prepend Tree

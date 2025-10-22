@@ -96,7 +96,10 @@ impl<W: BlockStore + Sync + 'static, B: BlockStore + Sync + 'static> BlockStore
         self.base.has(cid).await
     }
 
-    async fn put_many(&self, blocks: impl IntoIterator<Item = (IpldCid, Bytes)> + Send) -> Result<()> {
+    async fn put_many(
+        &self,
+        blocks: impl IntoIterator<Item = (IpldCid, Bytes)> + Send,
+    ) -> Result<()> {
         // All writes go to writable layer
         self.writable.put_many(blocks).await
     }
@@ -119,12 +122,14 @@ impl<W: BlockStore + Sync + 'static, B: BlockStore + Sync + 'static> BlockStore
 
 #[cfg(test)]
 mod tests {
+    use std::sync::Arc;
+
     use super::*;
     use crate::storage::MemoryBlockStore;
 
     #[tokio::test]
     async fn test_layered_read_from_writable() {
-        let base = std::sync::Arc::new(MemoryBlockStore::new());
+        let base = Arc::new(MemoryBlockStore::new());
         let writable = MemoryBlockStore::new();
 
         // Put data in writable layer
@@ -139,7 +144,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_layered_fallback_to_base() {
-        let base = std::sync::Arc::new(MemoryBlockStore::new());
+        let base = Arc::new(MemoryBlockStore::new());
         let writable = MemoryBlockStore::new();
 
         // Put data in base layer
@@ -154,7 +159,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_layered_writable_overrides_base() {
-        let base = std::sync::Arc::new(MemoryBlockStore::new());
+        let base = Arc::new(MemoryBlockStore::new());
         let writable = MemoryBlockStore::new();
 
         // Put same content in both layers (will have same CID)
@@ -183,7 +188,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_layered_writes_to_writable_only() {
-        let base = std::sync::Arc::new(MemoryBlockStore::new());
+        let base = Arc::new(MemoryBlockStore::new());
         let writable = MemoryBlockStore::new();
 
         let layered = LayeredBlockStore::new(writable.clone(), base.clone());
@@ -200,7 +205,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_layered_has_checks_both_layers() {
-        let base = std::sync::Arc::new(MemoryBlockStore::new());
+        let base = Arc::new(MemoryBlockStore::new());
         let writable = MemoryBlockStore::new();
 
         let base_cid = base.put(b"base").await.unwrap();
