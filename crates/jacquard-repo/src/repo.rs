@@ -351,8 +351,9 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     /// Applies write operations, creates signed commit, and collects blocks:
     /// - Serializes records to DAG-CBOR and stores data blocks
     /// - Applies operations to MST and computes diff
-    /// - Uses `diff.new_mst_blocks` for efficient block tracking
-    /// - Walks paths for original operations to build relevant_blocks (sync v1.1)
+    /// - Walks paths to include blocks required for sync v1.1 inductive proof
+    /// - Opts to overprovide blocks slightly so that a proof consistently succeeds
+    /// - Empirical heuristic rather than mathematical assurance, but it works
     ///
     /// Returns `(ops, CommitData)` - ops are needed for `to_firehose_commit()`.
     pub async fn create_commit<K>(
