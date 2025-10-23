@@ -6,7 +6,7 @@
 use crate::commit::firehose::{FirehoseCommit, RepoOp};
 use crate::commit::{Commit, SigningKey};
 use crate::error::{RepoError, Result};
-use crate::mst::{Mst, MstDiff, RecordWriteOp};
+use crate::mst::{Mst, RecordWriteOp};
 use crate::storage::BlockStore;
 use bytes::Bytes;
 use cid::Cid as IpldCid;
@@ -58,14 +58,6 @@ pub struct CommitData {
 
     /// CIDs of blocks to delete
     pub deleted_cids: Vec<IpldCid>,
-
-    /// Debug: block sources for validation analysis
-    #[cfg(debug_assertions)]
-    pub block_sources: BTreeMap<IpldCid, String>,
-    #[cfg(debug_assertions)]
-    pub excluded_blocks: BTreeMap<IpldCid, Bytes>, // blocks we skipped
-    #[cfg(debug_assertions)]
-    pub excluded_metadata: BTreeMap<IpldCid, Vec<String>>, // context about excluded blocks
 }
 
 impl CommitData {
@@ -99,16 +91,6 @@ impl CommitData {
             blobs,
             too_big: false,
             rebase: false,
-            #[cfg(debug_assertions)]
-            block_sources: self.block_sources.clone(),
-            #[cfg(debug_assertions)]
-            excluded_blocks: self
-                .excluded_blocks
-                .iter()
-                .map(|(cid, b)| (cid.clone(), b.to_vec()))
-                .collect(),
-            #[cfg(debug_assertions)]
-            excluded_metadata: self.excluded_metadata.clone(),
         })
     }
 }
@@ -251,12 +233,6 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
             blocks: blocks.clone(),
             relevant_blocks: blocks,
             deleted_cids: Vec::new(),
-            #[cfg(debug_assertions)]
-            block_sources: BTreeMap::new(),
-            #[cfg(debug_assertions)]
-            excluded_blocks: BTreeMap::new(),
-            #[cfg(debug_assertions)]
-            excluded_metadata: BTreeMap::new(),
         })
     }
 
@@ -490,98 +466,30 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
             .into_iter()
             .map(|op| op.into_static())
             .collect();
-        let deleted_cids = diff.removed_cids;
 
-        // Step 4: Build blocks and relevant_blocks collections
+        // Step 4: Build blocks and relevant_blocks collections using diff tracking
         let mut blocks = diff.new_mst_blocks;
         let mut relevant_blocks = BTreeMap::new();
 
-        #[cfg(debug_assertions)]
-        let mut block_sources: BTreeMap<IpldCid, &str> = BTreeMap::new();
-
-        // // Add the previous MST root block (needed to load prev_data in validation)
-        // if let Some(prev_root_block) = self.storage.get(&prev_data).await? {
-        //     #[cfg(debug_assertions)]
-        //     block_sources.insert(prev_data, "prev_root");
-        //     relevant_blocks.insert(prev_data, prev_root_block);
-        // }
-
-        let mut new_tree_cids = std::collections::HashSet::new();
         for op in ops {
             let key = format_smolstr!("{}/{}", op.collection().as_ref(), op.rkey().as_ref());
             updated_tree
                 .blocks_for_path(&key, &mut relevant_blocks)
                 .await?;
 
-            let new_path_cids = updated_tree.cids_for_path(&key).await?;
-            for cid in &new_path_cids {
-                new_tree_cids.insert(*cid);
-                #[cfg(debug_assertions)]
-                block_sources.insert(*cid, "new_tree_path");
-            }
-        }
-        let mut old_path_blocks = BTreeMap::new();
-        let mut old_path_cids = std::collections::HashSet::new();
-
-        // Step 2: Walk OLD tree, only add blocks NOT in new tree (changed nodes)
-        for op in ops {
-            let key = format_smolstr!("{}/{}", op.collection().as_ref(), op.rkey().as_ref());
-
-            self.mst.blocks_for_path(&key, &mut old_path_blocks).await?;
-            for cid in updated_tree.cids_for_path(&key).await? {
-                old_path_cids.insert(cid);
+            // For CREATE ops in multi-op commits, include old tree paths.
+            // Empirically necessary: tree restructuring from multiple creates
+            // can access old MST nodes during inversion (reason TBD).
+            if let RecordWriteOp::Create { .. } = op
+                && ops.len() > 1
+            {
+                self.mst.blocks_for_path(&key, &mut relevant_blocks).await?;
             }
         }
 
-        let mut excluded_blocks = BTreeMap::new();
-        #[cfg(debug_assertions)]
-        let mut excluded_metadata: BTreeMap<IpldCid, Vec<String>> = BTreeMap::new();
+        let deleted_cids = diff.removed_cids;
 
-        // Re-walk old tree paths to collect metadata about excluded blocks
-        #[cfg(debug_assertions)]
-        for (op_idx, op) in ops.iter().enumerate() {
-            let key = format_smolstr!("{}/{}", op.collection().as_ref(), op.rkey().as_ref());
-            let old_path_cids = self.mst.cids_for_path(&key).await?;
-
-            for (depth, cid) in old_path_cids.iter().enumerate() {
-                if !new_tree_cids.contains(cid) {
-                    let metadata = format!("op#{} ({}) path depth {}", op_idx, key, depth);
-                    excluded_metadata.entry(*cid).or_insert_with(Vec::new).push(metadata);
-                }
-            }
-        }
-
-        for (cid, block) in old_path_blocks.into_iter() {
-            // Only include if this block CHANGED (different CID in new tree)
-            if !new_tree_cids.contains(&cid) {
-                //relevant_blocks.insert(cid, block);
-                excluded_blocks.insert(cid, block);
-                #[cfg(debug_assertions)]
-                block_sources.insert(cid, "old_tree_changed");
-            }
-        }
-
-        // // Add new leaf blocks to both collections (single iteration)
-        // for (cid, block) in &leaf_blocks {
-        //     if diff.new_leaf_cids.contains(cid) {
-        //         blocks.insert(*cid, block.clone());
-        //         #[cfg(debug_assertions)]
-        //         block_sources.insert(*cid, "new_leaf");
-        //         relevant_blocks.insert(*cid, block.clone());
-        //     }
-        // }
-
-        // For DELETE operations, we need the deleted record blocks for inversion
-        // (when inverting a delete, we insert the prev CID back)
-        // for cid in &deleted_cids {
-        //     if let Some(block) = self.storage.get(cid).await? {
-        //         #[cfg(debug_assertions)]
-        //         block_sources.insert(*cid, "deleted_leaf");
-        //         relevant_blocks.insert(*cid, block);
-        //     }
-        // }
-
-        // Step 6: Create and sign commit
+        // Step 5: Create and sign commit
         let rev = Ticker::new().next(Some(self.commit.rev.clone()));
         let commit = Commit::new_unsigned(did.clone().into_static(), data, rev.clone(), prev)
             .sign(signing_key)?;
@@ -590,26 +498,11 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
         let commit_cid = crate::mst::util::compute_cid(&commit_cbor)?;
         let commit_bytes = bytes::Bytes::from(commit_cbor);
 
-        // Step 7: Add commit block to both collections
+        // Step 6: Add commit block to both collections
         blocks.insert(commit_cid, commit_bytes.clone());
-        #[cfg(debug_assertions)]
-        block_sources.insert(commit_cid, "commit");
         relevant_blocks.insert(commit_cid, commit_bytes);
 
-        #[cfg(debug_assertions)]
-        {
-            let mut by_source: BTreeMap<&str, usize> = BTreeMap::new();
-            for source in block_sources.values() {
-                *by_source.entry(source).or_insert(0) += 1;
-            }
-            println!("[commit creation] relevant_blocks by source:");
-            for (source, count) in by_source {
-                println!("  {}: {}", source, count);
-            }
-            println!("  TOTAL: {}", relevant_blocks.len());
-        }
-
-        // Step 8: Update internal MST state
+        // Step 7: Update internal MST state
         self.mst = updated_tree;
 
         Ok((
@@ -624,15 +517,6 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                 blocks,
                 relevant_blocks,
                 deleted_cids,
-                #[cfg(debug_assertions)]
-                block_sources: block_sources
-                    .into_iter()
-                    .map(|(k, v)| (k, v.to_string()))
-                    .collect(),
-                #[cfg(debug_assertions)]
-                excluded_blocks,
-                #[cfg(debug_assertions)]
-                excluded_metadata,
             },
         ))
     }
