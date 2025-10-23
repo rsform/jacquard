@@ -338,7 +338,7 @@ async fn test_stress_large_batches() {
 
     firehose_commit.validate_v1_1(&pubkey).await.unwrap();
 
-    for batch_num in 1..=2000 {
+    for batch_num in 1..=5000 {
         let batch_size = rng.gen_range(1..=20);
         let ops = generate_random_ops(&mut rng, &mut tracker, batch_size);
         let record_writes = test_ops_to_record_writes(ops, &collection);

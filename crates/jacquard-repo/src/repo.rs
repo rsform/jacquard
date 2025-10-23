@@ -58,6 +58,14 @@ pub struct CommitData {
 
     /// CIDs of blocks to delete
     pub deleted_cids: Vec<IpldCid>,
+
+    /// Debug: block sources for validation analysis
+    #[cfg(debug_assertions)]
+    pub block_sources: BTreeMap<IpldCid, String>,
+    #[cfg(debug_assertions)]
+    pub excluded_blocks: BTreeMap<IpldCid, Bytes>, // blocks we skipped
+    #[cfg(debug_assertions)]
+    pub excluded_metadata: BTreeMap<IpldCid, Vec<String>>, // context about excluded blocks
 }
 
 impl CommitData {
@@ -91,6 +99,16 @@ impl CommitData {
             blobs,
             too_big: false,
             rebase: false,
+            #[cfg(debug_assertions)]
+            block_sources: self.block_sources.clone(),
+            #[cfg(debug_assertions)]
+            excluded_blocks: self
+                .excluded_blocks
+                .iter()
+                .map(|(cid, b)| (cid.clone(), b.to_vec()))
+                .collect(),
+            #[cfg(debug_assertions)]
+            excluded_metadata: self.excluded_metadata.clone(),
         })
     }
 }
@@ -233,6 +251,12 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
             blocks: blocks.clone(),
             relevant_blocks: blocks,
             deleted_cids: Vec::new(),
+            #[cfg(debug_assertions)]
+            block_sources: BTreeMap::new(),
+            #[cfg(debug_assertions)]
+            excluded_blocks: BTreeMap::new(),
+            #[cfg(debug_assertions)]
+            excluded_metadata: BTreeMap::new(),
         })
     }
 
@@ -345,112 +369,6 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     // Current single-key get() is already optimal (O(log n) targeted lookup).
     // But these bulk operations would benefit significantly from cursor's skip_subtree()
     // to avoid traversing unrelated branches when searching lexicographically-organized data.
-
-    /// Apply record write operations with inline data
-    ///
-    /// Serializes record data to DAG-CBOR, computes CIDs, stores data blocks,
-    /// then applies write operations to the MST. Returns the diff for inspection.
-    ///
-    /// For creating commits with operations, use `create_commit()` instead.
-    pub async fn apply_record_writes(&mut self, ops: &[RecordWriteOp<'_>]) -> Result<MstDiff> {
-        use smol_str::format_smolstr;
-
-        let mut updated_tree = self.mst.clone();
-
-        for op in ops {
-            updated_tree = match op {
-                RecordWriteOp::Create {
-                    collection,
-                    rkey,
-                    record,
-                } => {
-                    let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
-
-                    // Serialize record to DAG-CBOR
-                    let cbor = serde_ipld_dagcbor::to_vec(record).map_err(|e| {
-                        RepoError::serialization(e).with_context(format!(
-                            "serializing record data for {}/{}",
-                            collection.as_ref(),
-                            rkey.as_ref()
-                        ))
-                    })?;
-
-                    // Compute CID and store data
-                    let cid = self.storage.put(&cbor).await?;
-
-                    updated_tree.add(key.as_str(), cid).await?
-                }
-                RecordWriteOp::Update {
-                    collection,
-                    rkey,
-                    record,
-                    prev,
-                } => {
-                    let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
-
-                    // Serialize record to DAG-CBOR
-                    let cbor = serde_ipld_dagcbor::to_vec(record).map_err(|e| {
-                        RepoError::serialization(e).with_context(format!(
-                            "serializing record data for {}/{}",
-                            collection.as_ref(),
-                            rkey.as_ref()
-                        ))
-                    })?;
-
-                    // Compute CID and store data
-                    let cid = self.storage.put(&cbor).await?;
-
-                    // Validate prev if provided
-                    if let Some(prev_cid) = prev {
-                        if &cid != prev_cid {
-                            return Err(RepoError::cid_mismatch(format!(
-                                "Update prev CID mismatch for key {}: expected {}, got {}",
-                                key, prev_cid, cid
-                            )));
-                        }
-                    }
-
-                    updated_tree.add(key.as_str(), cid).await?
-                }
-                RecordWriteOp::Delete {
-                    collection,
-                    rkey,
-                    prev,
-                } => {
-                    let key = format_smolstr!("{}/{}", collection.as_ref(), rkey.as_ref());
-
-                    // Check exists
-                    let current = self
-                        .mst
-                        .get(key.as_str())
-                        .await?
-                        .ok_or_else(|| RepoError::not_found("record", key.as_str()))?;
-
-                    // Validate prev if provided
-                    if let Some(prev_cid) = prev {
-                        if &current != prev_cid {
-                            return Err(RepoError::cid_mismatch(format!(
-                                "Delete prev CID mismatch for key {}: expected {}, got {}",
-                                key, prev_cid, current
-                            )));
-                        }
-                    }
-
-                    updated_tree.delete(key.as_str()).await?
-                }
-            };
-        }
-
-        // Compute diff before updating
-        let diff = self.mst.diff(&updated_tree).await?;
-
-        println!("Repo before:\n{}", self);
-        // Update mst
-        self.mst = updated_tree;
-
-        println!("Repo after:\n{}", self);
-        Ok(diff)
-    }
 
     /// Create a commit from record write operations
     ///
@@ -578,29 +496,90 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
         let mut blocks = diff.new_mst_blocks;
         let mut relevant_blocks = BTreeMap::new();
 
-        // Add the previous MST root block (needed to load prev_data in validation)
-        if let Some(prev_root_block) = self.storage.get(&prev_data).await? {
-            relevant_blocks.insert(prev_data, prev_root_block);
-        }
+        #[cfg(debug_assertions)]
+        let mut block_sources: BTreeMap<IpldCid, &str> = BTreeMap::new();
 
-        // Walk paths in both old and new trees for each operation
+        // // Add the previous MST root block (needed to load prev_data in validation)
+        // if let Some(prev_root_block) = self.storage.get(&prev_data).await? {
+        //     #[cfg(debug_assertions)]
+        //     block_sources.insert(prev_data, "prev_root");
+        //     relevant_blocks.insert(prev_data, prev_root_block);
+        // }
+
+        let mut new_tree_cids = std::collections::HashSet::new();
         for op in ops {
             let key = format_smolstr!("{}/{}", op.collection().as_ref(), op.rkey().as_ref());
-
             updated_tree
                 .blocks_for_path(&key, &mut relevant_blocks)
                 .await?;
 
-            self.mst.blocks_for_path(&key, &mut relevant_blocks).await?;
-        }
-
-        // Add new leaf blocks to both collections (single iteration)
-        for (cid, block) in &leaf_blocks {
-            if diff.new_leaf_cids.contains(cid) {
-                blocks.insert(*cid, block.clone());
-                relevant_blocks.insert(*cid, block.clone());
+            let new_path_cids = updated_tree.cids_for_path(&key).await?;
+            for cid in &new_path_cids {
+                new_tree_cids.insert(*cid);
+                #[cfg(debug_assertions)]
+                block_sources.insert(*cid, "new_tree_path");
             }
         }
+        let mut old_path_blocks = BTreeMap::new();
+        let mut old_path_cids = std::collections::HashSet::new();
+
+        // Step 2: Walk OLD tree, only add blocks NOT in new tree (changed nodes)
+        for op in ops {
+            let key = format_smolstr!("{}/{}", op.collection().as_ref(), op.rkey().as_ref());
+
+            self.mst.blocks_for_path(&key, &mut old_path_blocks).await?;
+            for cid in updated_tree.cids_for_path(&key).await? {
+                old_path_cids.insert(cid);
+            }
+        }
+
+        let mut excluded_blocks = BTreeMap::new();
+        #[cfg(debug_assertions)]
+        let mut excluded_metadata: BTreeMap<IpldCid, Vec<String>> = BTreeMap::new();
+
+        // Re-walk old tree paths to collect metadata about excluded blocks
+        #[cfg(debug_assertions)]
+        for (op_idx, op) in ops.iter().enumerate() {
+            let key = format_smolstr!("{}/{}", op.collection().as_ref(), op.rkey().as_ref());
+            let old_path_cids = self.mst.cids_for_path(&key).await?;
+
+            for (depth, cid) in old_path_cids.iter().enumerate() {
+                if !new_tree_cids.contains(cid) {
+                    let metadata = format!("op#{} ({}) path depth {}", op_idx, key, depth);
+                    excluded_metadata.entry(*cid).or_insert_with(Vec::new).push(metadata);
+                }
+            }
+        }
+
+        for (cid, block) in old_path_blocks.into_iter() {
+            // Only include if this block CHANGED (different CID in new tree)
+            if !new_tree_cids.contains(&cid) {
+                //relevant_blocks.insert(cid, block);
+                excluded_blocks.insert(cid, block);
+                #[cfg(debug_assertions)]
+                block_sources.insert(cid, "old_tree_changed");
+            }
+        }
+
+        // // Add new leaf blocks to both collections (single iteration)
+        // for (cid, block) in &leaf_blocks {
+        //     if diff.new_leaf_cids.contains(cid) {
+        //         blocks.insert(*cid, block.clone());
+        //         #[cfg(debug_assertions)]
+        //         block_sources.insert(*cid, "new_leaf");
+        //         relevant_blocks.insert(*cid, block.clone());
+        //     }
+        // }
+
+        // For DELETE operations, we need the deleted record blocks for inversion
+        // (when inverting a delete, we insert the prev CID back)
+        // for cid in &deleted_cids {
+        //     if let Some(block) = self.storage.get(cid).await? {
+        //         #[cfg(debug_assertions)]
+        //         block_sources.insert(*cid, "deleted_leaf");
+        //         relevant_blocks.insert(*cid, block);
+        //     }
+        // }
 
         // Step 6: Create and sign commit
         let rev = Ticker::new().next(Some(self.commit.rev.clone()));
@@ -613,7 +592,22 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
 
         // Step 7: Add commit block to both collections
         blocks.insert(commit_cid, commit_bytes.clone());
+        #[cfg(debug_assertions)]
+        block_sources.insert(commit_cid, "commit");
         relevant_blocks.insert(commit_cid, commit_bytes);
+
+        #[cfg(debug_assertions)]
+        {
+            let mut by_source: BTreeMap<&str, usize> = BTreeMap::new();
+            for source in block_sources.values() {
+                *by_source.entry(source).or_insert(0) += 1;
+            }
+            println!("[commit creation] relevant_blocks by source:");
+            for (source, count) in by_source {
+                println!("  {}: {}", source, count);
+            }
+            println!("  TOTAL: {}", relevant_blocks.len());
+        }
 
         // Step 8: Update internal MST state
         self.mst = updated_tree;
@@ -630,6 +624,15 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                 blocks,
                 relevant_blocks,
                 deleted_cids,
+                #[cfg(debug_assertions)]
+                block_sources: block_sources
+                    .into_iter()
+                    .map(|(k, v)| (k, v.to_string()))
+                    .collect(),
+                #[cfg(debug_assertions)]
+                excluded_blocks,
+                #[cfg(debug_assertions)]
+                excluded_metadata,
             },
         ))
     }

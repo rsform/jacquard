@@ -7,6 +7,11 @@ use crate::storage::BlockStore;
 use cid::Cid as IpldCid;
 use smol_str::SmolStr;
 
+#[cfg(debug_assertions)]
+use std::collections::HashSet;
+#[cfg(debug_assertions)]
+use std::sync::{Arc, RwLock};
+
 /// Position within an MST traversal
 #[derive(Debug, Clone)]
 pub enum CursorPosition<S: BlockStore> {
@@ -65,6 +70,10 @@ pub struct MstCursor<S: BlockStore> {
 
     /// Current position in traversal
     current: CursorPosition<S>,
+
+    /// Track CIDs accessed during traversal (debug only)
+    #[cfg(debug_assertions)]
+    accessed_cids: Option<Arc<RwLock<HashSet<IpldCid>>>>,
 }
 
 impl<S: BlockStore + Sync + 'static> MstCursor<S> {
@@ -76,6 +85,20 @@ impl<S: BlockStore + Sync + 'static> MstCursor<S> {
         Self {
             path: Vec::new(),
             current: CursorPosition::Tree { mst: root },
+            #[cfg(debug_assertions)]
+            accessed_cids: None,
+        }
+    }
+
+    /// Create new cursor with dirty tracking enabled
+    ///
+    /// Records all CIDs accessed during traversal in the provided set.
+    #[cfg(debug_assertions)]
+    pub fn new_with_tracking(root: Mst<S>, tracking: Arc<RwLock<HashSet<IpldCid>>>) -> Self {
+        Self {
+            path: Vec::new(),
+            current: CursorPosition::Tree { mst: root },
+            accessed_cids: Some(tracking),
         }
     }
 
@@ -103,6 +126,14 @@ impl<S: BlockStore + Sync + 'static> MstCursor<S> {
     /// If at the root level (before stepping in), returns root's layer + 1.
     pub async fn layer(&self) -> Result<usize> {
         if let Some((walking_node, _, _)) = self.path.last() {
+            // Track CID access
+            #[cfg(debug_assertions)]
+            if let Some(ref tracking) = self.accessed_cids {
+                if let Ok(cid) = walking_node.get_pointer().await {
+                    tracking.write().unwrap().insert(cid);
+                }
+            }
+
             // We're inside a node - return its layer
             walking_node.get_layer().await
         } else {
@@ -111,6 +142,14 @@ impl<S: BlockStore + Sync + 'static> MstCursor<S> {
             // is one layer higher than being "inside" the root
             match &self.current {
                 CursorPosition::Tree { mst } => {
+                    // Track CID access
+                    #[cfg(debug_assertions)]
+                    if let Some(ref tracking) = self.accessed_cids {
+                        if let Ok(cid) = mst.get_pointer().await {
+                            tracking.write().unwrap().insert(cid);
+                        }
+                    }
+
                     let root_layer = mst.get_layer().await?;
                     Ok(root_layer + 1)
                 }
@@ -186,6 +225,14 @@ impl<S: BlockStore + Sync + 'static> MstCursor<S> {
 
     /// Descend into a tree node
     async fn step_into(&mut self, mst: Mst<S>) -> Result<()> {
+        // Track CID access
+        #[cfg(debug_assertions)]
+        if let Some(ref tracking) = self.accessed_cids {
+            if let Ok(cid) = mst.get_pointer().await {
+                tracking.write().unwrap().insert(cid);
+            }
+        }
+
         let entries = mst.get_entries().await?;
 
         if entries.is_empty() {

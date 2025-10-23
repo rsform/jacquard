@@ -23,9 +23,9 @@ pub async fn write_car(
     blocks: BTreeMap<IpldCid, Bytes>,
 ) -> Result<()> {
     let path = path.as_ref();
-    let file = File::create(path)
-        .await
-        .map_err(|e| RepoError::io(e).with_context(format!("creating CAR file: {}", path.display())))?;
+    let file = File::create(path).await.map_err(|e| {
+        RepoError::io(e).with_context(format!("creating CAR file: {}", path.display()))
+    })?;
 
     let header = iroh_car::CarHeader::new_v1(roots);
     let mut writer = CarWriter::new(header, file);
@@ -37,7 +37,10 @@ pub async fn write_car(
             .map_err(|e| RepoError::car(e).with_context(format!("writing block {}", cid)))?;
     }
 
-    writer.finish().await.map_err(|e| RepoError::car(e).with_context("finalizing CAR file"))?;
+    writer
+        .finish()
+        .await
+        .map_err(|e| RepoError::car(e).with_context("finalizing CAR file"))?;
 
     Ok(())
 }
@@ -58,9 +61,15 @@ pub async fn write_car_bytes(root: IpldCid, blocks: BTreeMap<IpldCid, Bytes>) ->
             .map_err(|e| RepoError::car(e).with_context(format!("writing block {}", cid)))?;
     }
 
-    writer.finish().await.map_err(|e| RepoError::car(e).with_context("finalizing CAR bytes"))?;
+    writer
+        .finish()
+        .await
+        .map_err(|e| RepoError::car(e).with_context("finalizing CAR bytes"))?;
 
-    buffer.flush().await.map_err(|e| RepoError::io(e).with_context("flushing CAR buffer"))?;
+    buffer
+        .flush()
+        .await
+        .map_err(|e| RepoError::io(e).with_context("flushing CAR buffer"))?;
 
     Ok(buffer)
 }
@@ -73,15 +82,17 @@ pub async fn write_car_bytes(root: IpldCid, blocks: BTreeMap<IpldCid, Bytes>) ->
 /// - All record blocks (from storage)
 ///
 /// Uses streaming to avoid loading all blocks into memory.
+///
+/// Should write in the correct order for [streaming car processing](https://github.com/bluesky-social/proposals/blob/main/0006-sync-iteration/README.md#streaming-car-processing) from sync v1.1
 pub async fn export_repo_car<S: BlockStore + Sync + 'static>(
     path: impl AsRef<Path>,
     commit_cid: IpldCid,
     mst: &Mst<S>,
 ) -> Result<()> {
     let path = path.as_ref();
-    let file = File::create(path)
-        .await
-        .map_err(|e| RepoError::io(e).with_context(format!("creating CAR export file: {}", path.display())))?;
+    let file = File::create(path).await.map_err(|e| {
+        RepoError::io(e).with_context(format!("creating CAR export file: {}", path.display()))
+    })?;
 
     let header = iroh_car::CarHeader::new_v1(vec![commit_cid]);
     let mut writer = CarWriter::new(header, file);
@@ -105,7 +116,10 @@ pub async fn export_repo_car<S: BlockStore + Sync + 'static>(
     mst.write_blocks_to_car(&mut writer).await?;
 
     // Finish writing
-    writer.finish().await.map_err(|e| RepoError::car(e).with_context("finalizing CAR export"))?;
+    writer
+        .finish()
+        .await
+        .map_err(|e| RepoError::car(e).with_context("finalizing CAR export"))?;
 
     Ok(())
 }

@@ -87,6 +87,16 @@ pub struct FirehoseCommit<'a> {
 
     /// DEPRECATED: Unused
     pub rebase: bool,
+
+    /// Debug: block sources for validation analysis
+    #[cfg(debug_assertions)]
+    pub block_sources: BTreeMap<IpldCid, String>,
+
+    #[cfg(debug_assertions)]
+    pub excluded_blocks: BTreeMap<IpldCid, Vec<u8>>, // blocks we skipped
+
+    #[cfg(debug_assertions)]
+    pub excluded_metadata: BTreeMap<IpldCid, Vec<String>>, // context about excluded blocks
 }
 
 /// A repository operation (mutation of a single record)
@@ -193,6 +203,12 @@ impl IntoStatic for FirehoseCommit<'_> {
             blobs: self.blobs.into_iter().map(|b| b.into_static()).collect(),
             too_big: self.too_big,
             rebase: self.rebase,
+            #[cfg(debug_assertions)]
+            block_sources: self.block_sources,
+            #[cfg(debug_assertions)]
+            excluded_blocks: self.excluded_blocks,
+            #[cfg(debug_assertions)]
+            excluded_metadata: self.excluded_metadata,
         }
     }
 }
@@ -218,6 +234,7 @@ use crate::error::{RepoError, Result};
 use crate::mst::{Mst, VerifiedWriteOp};
 use crate::storage::{BlockStore, LayeredBlockStore, MemoryBlockStore};
 use cid::Cid as IpldCid;
+use std::collections::BTreeMap;
 use std::sync::Arc;
 
 impl<'a> FirehoseCommit<'a> {
@@ -324,6 +341,11 @@ impl<'a> FirehoseCommit<'a> {
     /// **Inductive property:** Can validate without any external state besides the blocks
     /// in this message. The `prev_data` field provides the starting MST root, and operations
     /// include `prev` CIDs for validation. All necessary blocks must be in the CAR bytes.
+    ///
+    /// Note: Because this uses the same merkle search tree struct as the repository itself,
+    /// this is far from the most efficient possible validation function possible. The repo
+    /// tree struct carries extra information. However,
+    /// it has the virtue of making everything self-validating.
     pub async fn validate_v1_1(&self, pubkey: &PublicKey<'_>) -> Result<IpldCid> {
         // 1. Require prev_data for v1.1
         let prev_data_cid: IpldCid = self
@@ -337,14 +359,99 @@ impl<'a> FirehoseCommit<'a> {
 
         // 2. Parse CAR blocks from the firehose message into temporary storage
         let parsed = parse_car_bytes(&self.blocks).await?;
+
+        #[cfg(debug_assertions)]
+        let provided_blocks = parsed
+            .blocks
+            .keys()
+            .cloned()
+            .collect::<std::collections::HashSet<_>>();
+        #[cfg(debug_assertions)]
+        let accessed_blocks = Arc::new(std::sync::RwLock::new(std::collections::HashSet::new()));
+
+        #[cfg(debug_assertions)]
+        let missing_blocks = Arc::new(std::sync::RwLock::new(Vec::new()));
+
+        #[cfg(debug_assertions)]
+        let block_categories = self.block_sources.clone();
+
+        #[cfg(debug_assertions)]
+        let excluded_blocks_ref = self.excluded_blocks.clone();
+
         let temp_storage = Arc::new(MemoryBlockStore::new_from_blocks(parsed.blocks));
+
+        #[cfg(debug_assertions)]
+        let tracking_storage = {
+            use crate::storage::BlockStore;
+            #[derive(Clone)]
+            struct TrackingStorage {
+                inner: Arc<MemoryBlockStore>,
+                accessed: Arc<std::sync::RwLock<std::collections::HashSet<IpldCid>>>,
+                missing: Arc<std::sync::RwLock<Vec<IpldCid>>>,
+                excluded: BTreeMap<IpldCid, Vec<u8>>,
+            }
+            impl BlockStore for TrackingStorage {
+                async fn get(&self, cid: &IpldCid) -> Result<Option<Bytes>> {
+                    self.accessed.write().unwrap().insert(*cid);
+                    let result = self.inner.get(cid).await?;
+
+                    if result.is_none() {
+                        // Check if this block was excluded
+                        if let Some(excluded_block) = self.excluded.get(cid) {
+                            self.missing.write().unwrap().push(*cid);
+                            eprintln!(
+                                "[MISS] Block {} was EXCLUDED but needed during validation",
+                                cid
+                            );
+                            // Return the excluded block so validation can continue
+                            return Ok(Some(Bytes::copy_from_slice(&excluded_block)));
+                        } else {
+                            self.missing.write().unwrap().push(*cid);
+                            eprintln!(
+                                "[MISS] Block {} not found (never seen during commit creation)",
+                                cid
+                            );
+                        }
+                    }
+
+                    Ok(result)
+                }
+                async fn put(&self, data: &[u8]) -> Result<IpldCid> {
+                    self.inner.put(data).await
+                }
+                async fn has(&self, cid: &IpldCid) -> Result<bool> {
+                    self.inner.has(cid).await
+                }
+                async fn put_many(
+                    &self,
+                    blocks: impl IntoIterator<Item = (IpldCid, Bytes)> + Send,
+                ) -> Result<()> {
+                    self.inner.put_many(blocks).await
+                }
+                async fn get_many(&self, cids: &[IpldCid]) -> Result<Vec<Option<Bytes>>> {
+                    self.inner.get_many(cids).await
+                }
+                async fn apply_commit(&self, commit: crate::repo::CommitData) -> Result<()> {
+                    self.inner.apply_commit(commit).await
+                }
+            }
+            Arc::new(TrackingStorage {
+                inner: temp_storage.clone(),
+                accessed: accessed_blocks.clone(),
+                missing: missing_blocks.clone(),
+                excluded: excluded_blocks_ref,
+            })
+        };
+
+        #[cfg(not(debug_assertions))]
+        let tracking_storage = temp_storage.clone();
 
         // 3. Extract and verify commit object from temporary storage
         let commit_cid: IpldCid = self
             .commit
             .to_ipld()
             .map_err(|e| RepoError::invalid_cid_conversion(e, "commit CID"))?;
-        let commit_bytes = temp_storage
+        let commit_bytes = tracking_storage
             .get(&commit_cid)
             .await?
             .ok_or_else(|| RepoError::not_found("commit block", &commit_cid))?;
@@ -366,7 +473,8 @@ impl<'a> FirehoseCommit<'a> {
 
         // 5. Load new MST from commit.data (claimed result)
         let expected_root = *commit.data();
-        let mut new_mst = Mst::load(temp_storage, expected_root, None);
+
+        let mut new_mst = Mst::load(tracking_storage, expected_root, None);
 
         let verified_ops = self
             .ops
@@ -401,6 +509,82 @@ impl<'a> FirehoseCommit<'a> {
             )));
         }
 
+        #[cfg(debug_assertions)]
+        {
+            let accessed = accessed_blocks.read().unwrap();
+            let missing = missing_blocks.read().unwrap();
+            let unused: Vec<_> = provided_blocks.difference(&*accessed).copied().collect();
+
+            println!("[validation stats]");
+            println!("  provided: {} blocks", provided_blocks.len());
+            println!("  accessed: {} blocks", accessed.len());
+
+            if !missing.is_empty() {
+                println!(
+                    "  MISSING: {} blocks NEEDED but not provided!",
+                    missing.len()
+                );
+
+                // Show operation breakdown for this commit
+                let mut op_counts: BTreeMap<&str, usize> = BTreeMap::new();
+                for op in &self.ops {
+                    *op_counts.entry(op.action.as_ref()).or_insert(0) += 1;
+                }
+                println!("  operations in this commit:");
+                for (action, count) in op_counts {
+                    println!("    {}: {}", action, count);
+                }
+
+                println!("  missing block CIDs:");
+                for cid in missing.iter() {
+                    if self.excluded_blocks.contains_key(cid) {
+                        println!("    {} (was excluded)", cid);
+                        if let Some(metadata) = self.excluded_metadata.get(cid) {
+                            for context in metadata {
+                                println!("      -> {}", context);
+                            }
+                        }
+                    } else {
+                        println!("    {} (never seen)", cid);
+                    }
+                }
+            }
+
+            if !unused.is_empty() {
+                println!(
+                    "  UNUSED: {} blocks ({}%)",
+                    unused.len(),
+                    (unused.len() * 100) / provided_blocks.len()
+                );
+
+                // Show breakdown by category
+                let mut category_stats: BTreeMap<&str, (usize, usize)> = BTreeMap::new();
+                for (cid, category) in &block_categories {
+                    let stats = category_stats.entry(category).or_insert((0, 0));
+                    stats.0 += 1; // total provided
+                    if accessed.contains(cid) {
+                        stats.1 += 1; // accessed
+                    }
+                }
+
+                println!("\n  breakdown by category:");
+                for (category, (total, accessed_count)) in category_stats {
+                    let unused_count = total - accessed_count;
+                    let unused_pct = if total > 0 {
+                        (unused_count * 100) / total
+                    } else {
+                        0
+                    };
+                    println!(
+                        "    {}: {} total, {} accessed, {} unused ({}%)",
+                        category, total, accessed_count, unused_count, unused_pct
+                    );
+                }
+            } else {
+                println!("  ✓ all blocks were used");
+            }
+        }
+
         Ok(expected_root)
     }
 }
@@ -408,10 +592,10 @@ impl<'a> FirehoseCommit<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::commit::{Commit, SigningKey as _};
+    use crate::Repository;
+    use crate::commit::Commit;
     use crate::mst::{Mst, RecordWriteOp};
     use crate::storage::MemoryBlockStore;
-    use crate::{CommitData, Repository};
     use jacquard_common::types::crypto::{KeyCodec, PublicKey};
     use jacquard_common::types::recordkey::Rkey;
     use jacquard_common::types::string::{Nsid, RecordKey};
@@ -720,7 +904,7 @@ mod tests {
         let parsed = parse_car_bytes(&firehose_commit.blocks).await.unwrap();
         let commit_cid: IpldCid = firehose_commit.commit.to_ipld().unwrap();
 
-        let mut blocks_without_commit: BTreeMap<IpldCid, bytes::Bytes> = parsed
+        let blocks_without_commit: BTreeMap<IpldCid, bytes::Bytes> = parsed
             .blocks
             .into_iter()
             .filter(|(cid, _)| cid != &commit_cid)
@@ -851,7 +1035,7 @@ mod tests {
             .insert(fake_commit_cid, bytes::Bytes::from(fake_commit_cbor));
         commit_data.cid = fake_commit_cid;
 
-        let mut firehose_commit = commit_data
+        let firehose_commit = commit_data
             .to_firehose_commit(&did, 1, Datetime::now(), repo_ops, vec![])
             .await
             .unwrap();

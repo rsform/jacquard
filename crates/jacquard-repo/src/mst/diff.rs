@@ -4,6 +4,11 @@ use std::collections::BTreeMap;
 use std::future::Future;
 use std::pin::Pin;
 
+#[cfg(debug_assertions)]
+use std::collections::HashSet;
+#[cfg(debug_assertions)]
+use std::sync::{Arc, RwLock};
+
 use super::cursor::{CursorPosition, MstCursor};
 use super::tree::Mst;
 use super::util::serialize_node_data;
@@ -60,6 +65,17 @@ pub struct MstDiff {
     /// When modifying a tree, old MST nodes along changed paths become unreachable.
     /// This tracks those nodes for garbage collection.
     pub removed_mst_blocks: Vec<IpldCid>,
+
+    /// CIDs accessed from old tree during diff (debug only)
+    ///
+    /// Tracks all blocks touched when walking the old tree during diff.
+    /// This is the precise set of blocks needed for validation.
+    #[cfg(debug_assertions)]
+    pub old_tree_accessed: Vec<IpldCid>,
+
+    /// CIDs accessed from new tree during diff (debug only)
+    #[cfg(debug_assertions)]
+    pub new_tree_accessed: Vec<IpldCid>,
 }
 
 use super::tree::VerifiedWriteOp;
@@ -75,6 +91,10 @@ impl MstDiff {
             removed_cids: Vec::new(),
             new_mst_blocks: BTreeMap::new(),
             removed_mst_blocks: Vec::new(),
+            #[cfg(debug_assertions)]
+            old_tree_accessed: Vec::new(),
+            #[cfg(debug_assertions)]
+            new_tree_accessed: Vec::new(),
         }
     }
 
@@ -234,8 +254,20 @@ fn diff_recursive<'a, S: BlockStore + Sync + 'static>(
             return Ok(());
         }
 
-        // CIDs differ - use cursors to walk both trees
+        // CIDs differ - use cursors to walk both trees with tracking
+        #[cfg(debug_assertions)]
+        let old_tracking = Arc::new(RwLock::new(HashSet::new()));
+        #[cfg(debug_assertions)]
+        let new_tracking = Arc::new(RwLock::new(HashSet::new()));
+
+        #[cfg(debug_assertions)]
+        let mut old_cursor = MstCursor::new_with_tracking(old.clone(), old_tracking.clone());
+        #[cfg(debug_assertions)]
+        let mut new_cursor = MstCursor::new_with_tracking(new.clone(), new_tracking.clone());
+
+        #[cfg(not(debug_assertions))]
         let mut old_cursor = MstCursor::new(old.clone());
+        #[cfg(not(debug_assertions))]
         let mut new_cursor = MstCursor::new(new.clone());
 
         // Don't advance yet - let loop handle roots like any other tree comparison
@@ -393,6 +425,13 @@ fn diff_recursive<'a, S: BlockStore + Sync + 'static>(
                     }
                 }
             }
+        }
+
+        // Collect tracking data
+        #[cfg(debug_assertions)]
+        {
+            diff.old_tree_accessed = old_tracking.read().unwrap().iter().copied().collect();
+            diff.new_tree_accessed = new_tracking.read().unwrap().iter().copied().collect();
         }
 
         Ok(())
