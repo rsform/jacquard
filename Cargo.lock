@@ -2579,6 +2579,7 @@ dependencies = [
 name = "jacquard-repo"
 version = "0.7.0"
 dependencies = [
+ "anyhow",
  "bytes",
  "cid",
  "ed25519-dalek",
@@ -2597,6 +2598,7 @@ dependencies = [
  "serde_bytes",
  "serde_ipld_dagcbor",
  "serde_ipld_dagjson",
+ "serde_json",
  "sha2",
  "smol_str",
  "tempfile",

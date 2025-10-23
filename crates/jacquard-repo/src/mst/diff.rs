@@ -216,6 +216,17 @@ impl<S: BlockStore + Sync + 'static> Mst<S> {
     pub async fn diff(&self, other: &Mst<S>) -> Result<MstDiff> {
         let mut diff = MstDiff::new();
         diff_recursive(self, other, &mut diff).await?;
+
+        // Remove duplicate blocks: nodes that appear in both new_mst_blocks and removed_mst_blocks
+        // are unchanged nodes that were traversed during the diff but shouldn't be counted as created/deleted.
+        // This happens when we step into subtrees with different parent CIDs but encounter identical child nodes.
+        let created_set: std::collections::HashSet<_> = diff.new_mst_blocks.keys().copied().collect();
+        let removed_set: std::collections::HashSet<_> = diff.removed_mst_blocks.iter().copied().collect();
+        let duplicates: std::collections::HashSet<_> = created_set.intersection(&removed_set).copied().collect();
+
+        diff.new_mst_blocks.retain(|cid, _| !duplicates.contains(cid));
+        diff.removed_mst_blocks.retain(|cid| !duplicates.contains(cid));
+
         Ok(diff)
     }
 }

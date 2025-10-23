@@ -469,24 +469,37 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
             .collect();
 
         // Step 4: Build blocks and relevant_blocks collections using diff tracking
+        //
+        // CRITICAL: This logic is validated against 16384 test cases in tests/mst_diff_suite.rs
+        // Any changes here MUST pass that test (zero missing blocks required for inductive validation)
+        //
+        // Inductive validation requirements (sync v1.1):
+        // - Include MST nodes along operation paths in BOTH old and new trees
+        // - Filter out deleted MST blocks (they're in removed_mst_blocks)
+        // - Include all new record data (leaf_blocks)
         let mut blocks = diff.new_mst_blocks;
+        blocks.extend(leaf_blocks.clone()); // Include record data blocks
         let mut relevant_blocks = BTreeMap::new();
+        relevant_blocks.extend(leaf_blocks); // Include record data in relevant blocks too
 
         for op in ops {
             let key = format_smolstr!("{}/{}", op.collection().as_ref(), op.rkey().as_ref());
+            // New tree path (inclusion proof for creates/updates, exclusion for deletes)
             updated_tree
                 .blocks_for_path(&key, &mut relevant_blocks)
                 .await?;
 
-            // For CREATE ops in multi-op commits, include old tree paths.
-            // Empirically necessary: tree restructuring from multiple creates
-            // can access old MST nodes during inversion (reason TBD).
-            if let RecordWriteOp::Create { .. } = op
-                && ops.len() > 1
-            {
-                self.mst.blocks_for_path(&key, &mut relevant_blocks).await?;
-            }
+            // Old tree path (needed for inductive validation)
+            // - CREATE: exclusion proof (key didn't exist)
+            // - UPDATE: show what changed
+            // - DELETE: show what was deleted
+            self.mst.blocks_for_path(&key, &mut relevant_blocks).await?;
         }
+
+        // Filter out deleted blocks before combining
+        let removed_set: std::collections::HashSet<_> =
+            diff.removed_mst_blocks.iter().copied().collect();
+        relevant_blocks.retain(|cid, _| !removed_set.contains(cid));
 
         let deleted_cids = diff.removed_cids;
 
