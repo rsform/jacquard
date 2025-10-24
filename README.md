@@ -19,7 +19,7 @@ It is also designed around zero-copy/borrowed deserialization: types like [`Post
 
 > [!WARNING]
 > A lot of the streaming code is still pretty experimental. The examples work, though.\
-The modules are also less well-documented, and don't have code examples. There are also a lot of utility functions for conveniently working with the streams and transforming them which are lacking. Use [`n0-future`](https://docs.rs/n0-future/latest/n0_future/index.html) to work with them, that is what Jacquard uses internally as much as possible.
+The modules are also less well-documented, and don't have code examples. There are also a lot of utility functions for conveniently working with the streams and transforming them which are lacking. Use [`n0-future`](https://docs.rs/n0-future/latest/n0_future/index.html) to work with them, that is what Jacquard uses internally as much as possible. I would also note the same for the repository crate until I've had more third parties test it.
 
 ### Changelog
 
