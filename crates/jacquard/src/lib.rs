@@ -9,19 +9,19 @@
 //! It is also designed around zero-copy/borrowed deserialization: types like [`Post<'_>`](https://docs.rs/jacquard-api/latest/jacquard_api/app_bsky/feed/post/struct.Post.html) can borrow data (via the [`CowStr<'_>`](https://docs.rs/jacquard/latest/jacquard/cowstr/enum.CowStr.html) type and a host of other types built on top of it) directly from the response buffer instead of allocating owned copies. Owned versions are themselves mostly inlined or reference-counted pointers and are therefore still quite efficient. The `IntoStatic` trait (which is derivable) makes it easy to get an owned version and avoid worrying about lifetimes.
 //!
 //!
-//! ## Goals and Features
+//! ## Features
 //!
 //! - Validated, spec-compliant, easy to work with, and performant baseline types
-//! - Batteries-included, but easily replaceable batteries.
-//!    - Easy to extend with custom lexicons using code generation or handwritten api types
-//!    - Straightforward OAuth
-//!    - Stateless options (or options where you handle the state) for rolling your own
-//!    - All the building blocks of the convenient abstractions are available
-//!    - Server-side convenience features
+//! - Designed such that you can just work with generated API bindings easily
+//! - Straightforward OAuth
+//! - Server-side convenience features
 //! - Lexicon Data value type for working with unknown atproto data (dag-cbor or json)
 //! - An order of magnitude less boilerplate than some existing crates
-//! - Use as much or as little from the crates as you need
-//!
+//! - Batteries-included, but easily replaceable batteries.
+//!    - Easy to extend with custom lexicons using code generation or handwritten api types
+//!    - Stateless options (or options where you handle the state) for rolling your own
+//!    - All the building blocks of the convenient abstractions are available
+//!    - Use as much or as little from the crates as you need
 //!
 //!
 //!

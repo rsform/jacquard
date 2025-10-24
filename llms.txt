@@ -1,0 +1,1114 @@
+# Jacquard: AT Protocol Library for Rust
+
+> Simple and powerful AT Protocol (Bluesky) client library emphasizing spec compliance, zero-copy deserialization, and minimal boilerplate.
+
+## Core Philosophy
+
+**Zero-copy by default, owned when needed.** All API types support borrowed deserialization via lifetimes, with `IntoStatic` trait for conversion to `'static` when needed. This avoids the performance penalty of `DeserializeOwned` while giving you control over ownership.
+
+**Validated types everywhere.** DIDs, handles, AT-URIs, NSIDs, TIDs, CIDs—all have strongly-typed, validated wrappers. Invalid inputs fail at construction time, not deep in your application logic.
+
+**Batteries included, but replaceable.** High-level `Agent` for convenience, or use stateless `XrpcCall` builder for full control. Mix and match as needed.
+
+---
+
+## Critical Patterns to Internalize
+
+### String Type Constructors
+
+ALL validated string types (Did, Handle, AtUri, Nsid, etc.) follow this pattern:
+
+```rust
+// ✅ PREFERRED: Zero-allocation for borrowed strings
+let did = Did::new("did:plc:abc123")?;  // Borrows from input
+
+// ✅ BEST: Zero-allocation for static strings
+let nsid = Nsid::new_static("com.atproto.repo.getRecord")?;
+
+// ✅ When you need ownership
+let owned = Did::new_owned("did:plc:abc123")?;
+
+// ❌ AVOID: FromStr always allocates
+let did: Did = "did:plc:abc123".parse()?;  // Always allocates!
+
+// ❌ NEVER: Roundtripping through String
+let s = did.as_str().to_string();
+let did2 = Did::new(&s)?;  // Pointless allocation
+```
+
+**Rule**: Use `new()` for borrowed, `new_static()` for `'static` strings, `new_owned()` when you have ownership. Avoid `FromStr::parse()` unless you don't care about allocations.
+
+### Response Parsing: Borrow vs Own
+
+XRPC responses wrap a `Bytes` buffer. You choose when to parse and whether to own the data:
+
+```rust
+let response = agent.send(request).await?;
+
+// Option 1: Borrow from response buffer (zero-copy)
+let output: GetPostOutput<'_> = response.parse()?;
+// ⚠️  `output` borrows from `response`, both must stay in scope
+
+// Option 2: Convert to owned (allocates, but can outlive response)
+let output: GetPostOutput<'static> = response.into_output()?;
+drop(response);  // OK, output is now fully owned
+
+// ❌ WRONG: Can't drop response while holding borrowed parse
+let output = response.parse()?;
+drop(response);  // ERROR: output borrows from response
+```
+
+**Rule**: Use `.parse()` when processing immediately in the same scope. Use `.into_output()` when returning from functions or storing long-term.
+
+### Lifetime Pattern: GATs Not HRTBs
+
+Jacquard uses **Generic Associated Types** on `XrpcResp` to avoid Higher-Rank Trait Bounds:
+
+```rust
+// ✅ Jacquard's approach (GAT)
+trait XrpcResp {
+    type Output<'de>: Deserialize<'de> + IntoStatic;
+    type Err<'de>: Error + Deserialize<'de> + IntoStatic;
+}
+
+// ❌ Alternative that forces DeserializeOwned semantics
+trait BadXrpcResp<'de> {
+    type Output: Deserialize<'de>;
+}
+// Would require: where R: for<'any> BadXrpcResp<'any>
+// This forces owned deserialization!
+```
+
+**Why this matters**: Async methods return `Response<R>` that owns the buffer. Caller controls lifetime by choosing `.parse()` (borrow) or `.into_output()` (owned). No HRTB needed, zero-copy works in async contexts.
+
+**When implementing custom types**: Use method-level lifetime generics (`<'de>`), not trait-level lifetimes.
+
+### CRITICAL: Never Use `for<'de> Deserialize<'de>` Bounds
+
+**The bound `T: for<'de> Deserialize<'de>` is EQUIVALENT to `T: DeserializeOwned`** and will break all Jacquard types.
+
+```rust
+// ❌ CATASTROPHIC - No Jacquard type can satisfy this
+fn bad<T>(data: &[u8]) -> Result<T>
+where
+    T: for<'de> Deserialize<'de>  // Forces owned deserialization!
+{
+    serde_json::from_slice(data)  // Can't borrow from data
+}
+
+// ✅ CORRECT - Use method-level lifetime
+fn good<'de, T>(data: &'de [u8]) -> Result<T>
+where
+    T: Deserialize<'de>  // Can borrow from data
+{
+    serde_json::from_slice(data)
+}
+```
+
+**Why this breaks**: `CowStr<'a>` and all Jacquard types need to borrow from the input buffer. The HRTB `for<'de>` means "must work with ANY lifetime", which forces the deserializer to allocate owned copies instead of borrowing.
+
+**What to do instead**: Always use method-level lifetime parameters (`<'de>`) and pass the lifetime through to the `Deserialize` bound. Jacquard's entire design (GATs, Response wrapper, IntoStatic) exists to make this pattern work in async contexts.
+
+---
+
+## Crate-by-Crate Guide
+
+### jacquard (Main Crate)
+
+**Primary entry point**: `Agent<A: AgentSession>`
+
+```rust
+use jacquard::client::{Agent, CredentialSession, MemorySessionStore};
+use jacquard::identity::PublicResolver;
+
+// App password auth
+let (session, _info) = CredentialSession::authenticated(
+    "alice.bsky.social".into(),
+    "app-password".into(),
+    None,  // session_id
+).await?;
+let agent = Agent::from(session);
+
+// Make typed XRPC calls
+use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
+let response = agent.send(&GetTimeline::new().limit(50).build()).await?;
+let timeline = response.into_output()?;
+```
+
+**Auto-refresh**: Both `CredentialSession` and `OAuthSession` automatically refresh tokens on 401/expired errors. One retry per request.
+
+**Typed record operations** (via `AgentSessionExt` trait):
+
+```rust
+use jacquard::api::app_bsky::feed::post::Post;
+
+// Create
+let post = Post::builder()
+    .text("Hello ATProto!")
+    .created_at(Datetime::now())
+    .build();
+agent.create_record(post, None).await?;
+
+// Get (type-safe!)
+let uri = Post::uri("at://did:plc:abc/app.bsky.feed.post/123")?;
+let response = agent.get_record::<Post>(&uri).await?;
+let post_output = response.parse()?;
+
+// Update with fetch-modify-put pattern
+agent.update_record::<Profile>(&uri, |profile| {
+    profile.display_name = Some("New Name".into());
+}).await?;
+```
+
+**Key traits**:
+- `AgentSession`: Common interface for both auth types
+- `XrpcClient`: Stateful XRPC (has base URI, auth tokens)
+- `HttpClient`: Low-level HTTP abstraction
+
+**Common mistake**: Not converting to owned when returning from functions. If your function returns `Post<'_>`, caller can't use it after function returns. Return `Post<'static>` and call `.into_static()` on the value.
+
+### jacquard-common (Foundation)
+
+**Core types**: `Did`, `Handle`, `AtUri`, `Nsid`, `Tid`, `Cid`, `CowStr`, `Data`, `RawData`
+
+**String type traits** (ALL validated types implement these):
+- `new(&str)` - Validates, borrows (zero alloc)
+- `new_static(&'static str)` - Validates, zero alloc
+- `new_owned(impl Into<String>)` - Validates, takes ownership
+- `raw(&str)` - Panics on invalid (use when you KNOW it's valid)
+- `unchecked(&str)` - Unsafe, no validation
+- `as_str(&self) -> &str` - Get string reference
+- `Display`, `FromStr`, `Serialize`, `Deserialize`, `IntoStatic`
+
+**CowStr internals**: Uses `SmolStr` for owned variant (inline storage ≤23 bytes), so most AT Protocol strings (handles, DIDs) don't heap allocate when owned, or are O(1) copy (due to the allocated variant using Arc<str>).
+
+**XRPC layer**:
+
+```rust
+// Stateless XRPC (with any HttpClient)
+use jacquard::common::xrpc::XrpcExt;
+let http = reqwest::Client::new();
+let response = http
+    .xrpc(Url::parse("https://bsky.social")?)
+    .auth(AuthorizationToken::Bearer(token))
+    .proxy(did)
+    .send(&request)
+    .await?;
+
+// Stateful XRPC (implement XrpcClient trait)
+let response = agent.send(request).await?;
+```
+
+**Data vs RawData**:
+- `Data<'a>`: Validated, type-inferred atproto values (strings parsed to Did/Handle/etc.)
+- `RawData<'a>`: Minimal validation, suitable for pass-through/relay use cases
+
+```rust
+// Convert typed → untyped → typed
+let post = Post::builder().text("test").build();
+let data: Data = to_data(&post)?;
+let post2: Post = from_data(&data)?;
+
+// NEVER use serde_json::Value
+// ❌ let value: serde_json::Value = ...;
+// ✅ let data: Data = ...;
+```
+
+**Streaming** (feature: `streaming`):
+- `ByteStream` / `ByteSink`: Platform-agnostic (works on WASM via `n0-future`)
+- `HttpClientExt::send_http_streaming()`: Stream response
+- `HttpClientExt::send_http_bidirectional()`: Stream both request and response
+
+**WebSocket** (feature: `websocket`):
+- `WebSocketClient` trait, `WebSocketConnection`
+- Native + WASM: tokio-tungstenite-wasm
+
+**Collection trait** (for record types):
+
+```rust
+pub trait Collection {
+    const NSID: &'static str;
+    type Record: XrpcResp;  // Marker type for get_record()
+}
+
+// Enables typed record retrieval:
+let response: Response<Post::Record> = agent.get_record(did, rkey).await?;
+```
+
+**Critical error**: Using types that don't implement `IntoStatic` in response positions. All generated API types do, but custom types need `#[derive(jacquard_derive::IntoStatic)]`.
+
+### jacquard-api (Generated Bindings)
+
+**764 lexicon schemas** across 52+ namespaces.
+
+**Feature organization**:
+- `minimal`: Core atproto only
+- `bluesky`: Bluesky app + chat + ozone
+- `other`: Curated third-party lexicons
+- `lexicon_community`: Community extensions
+- `ufos`: Experimental/niche
+
+**Generated patterns**:
+- All types have `'a` lifetime for zero-copy deserialization
+- All implement `IntoStatic`, `Serialize`, `Deserialize`, `Clone`, `PartialEq`, `Eq`
+- Builders (`bon::Builder`) on types with 2+ fields (some required)
+- Open unions have `Unknown(Data<'a>)` variant via `#[open_union]` macro
+- Objects have `extra_data: BTreeMap<SmolStr, Data<'a>>` via `#[lexicon]` macro
+
+**Union collision detection**: When multiple namespaces define similar types, foreign refs get prefixed:
+```rust
+// If both app.bsky.embed.images and sh.custom.embed.images exist:
+pub enum SomeUnion<'a> {
+    BskyImages(Box<app_bsky::embed::images::View<'a>>),
+    CustomImages(Box<sh_custom::embed::images::View<'a>>),
+}
+```
+
+**For each collection (record type)**, generated code includes:
+1. Main record struct (e.g., `Post<'a>`)
+2. `GetRecordOutput` wrapper (`PostGetRecordOutput<'a>` with uri, cid, value)
+3. Marker struct (`PostRecord`) implementing `XrpcResp`
+4. `Collection` trait impl
+5. Helper: `Post::uri()` for constructing typed URIs
+
+**For each XRPC endpoint**:
+1. Request struct with builder
+2. Output struct
+3. Error enum (open union, includes `Unknown` variant)
+4. Response marker implementing `XrpcResp`
+5. Request marker implementing `XrpcRequest`
+6. Endpoint marker implementing `XrpcEndpoint` (server-side)
+
+**Common mistakes**:
+- Not handling `Unknown` variant in union matches (non-exhaustive!)
+- Forgetting that when not using the builder pattern, or Default construction, you must supply `extra_data: BTreeMap::new()` in the constructor, in addition to explicitly named fields.
+- Calling `.into_static()` in tight loops (it clones all borrowed data)
+
+### jacquard-derive (Macros)
+
+**`#[lexicon]`**: Adds `extra_data` field to capture unknown fields during deserialization.
+
+```rust
+#[lexicon]
+#[derive(Serialize, Deserialize)]
+struct MyType<'a> {
+    known_field: CowStr<'a>,
+    // Macro adds: pub extra_data: BTreeMap<SmolStr, Data<'a>>
+}
+```
+
+With `bon::Builder`: Automatically adds `#[builder(default)]` to `extra_data`.
+
+**`#[open_union]`**: Adds `Unknown(Data<'a>)` variant to enums.
+
+```rust
+#[open_union]
+#[serde(tag = "$type")]
+enum MyUnion<'a> {
+    KnownVariant(Foo<'a>),
+    // Macro adds: #[serde(untagged)] Unknown(Data<'a>)
+}
+```
+
+**`#[derive(IntoStatic)]`**: Generates owned conversion.
+
+```rust
+#[derive(IntoStatic)]
+struct Post<'a> {
+    text: CowStr<'a>,
+    likes: u32,
+}
+
+// Generates:
+impl IntoStatic for Post<'_> {
+    type Output = Post<'static>;
+    fn into_static(self) -> Post<'static> {
+        Post {
+            text: self.text.into_static(),  // Converts to owned
+            likes: self.likes.into_static(),  // Passthrough (Copy)
+        }
+    }
+}
+```
+
+**`#[derive(XrpcRequest)]`**: Generates XRPC boilerplate for custom endpoints.
+
+```rust
+#[derive(Serialize, Deserialize, XrpcRequest)]
+#[xrpc(
+    nsid = "com.example.getThing",
+    method = Query,
+    output = GetThingOutput,
+    error = GetThingError,  // Optional, defaults to GenericError
+    server  // Optional, generates XrpcEndpoint marker
+)]
+struct GetThing<'a> {
+    #[serde(borrow)]
+    pub id: CowStr<'a>,
+}
+```
+
+**Critical**: All custom types with lifetimes MUST derive `IntoStatic` or manually implement it. Otherwise, you can't use them with `.into_output()`.
+
+### jacquard-oauth (OAuth/DPoP)
+
+**OAuth flow**:
+
+```rust
+use jacquard::oauth::client::OAuthClient;
+use jacquard::client::FileAuthStore;
+
+let oauth = OAuthClient::with_default_config(
+    FileAuthStore::new("./auth.json")
+);
+
+// Loopback flow (feature: loopback)
+let session = oauth.login_with_local_server(
+    "alice.bsky.social",
+    Default::default(),
+    LoopbackConfig::default(),
+).await?;
+
+let agent = Agent::from(session);
+```
+
+**DPoP proofs**: Automatically generated for every request. Include:
+- `jti`: Unique token ID (random)
+- `htm`: HTTP method
+- `htu`: Target URI
+- `iat`: Issued at timestamp
+- `nonce`: Server-provided (cached and retried on `use_dpop_nonce` error)
+- `ath`: SHA-256 hash of access token (when present)
+
+**Nonce handling**: Automatic retry on `use_dpop_nonce` errors (400 for auth server, 401 for PDS). Max one retry per request.
+
+**Nonce storage**:
+- `dpop_authserver_nonce`: For token endpoint
+- `dpop_host_nonce`: For PDS XRPC requests
+
+**Token refresh**: Automatic on `invalid_token` errors. Uses `SessionRegistry` with per-DID+session_id locks to prevent concurrent refresh races.
+
+**private_key_jwt**: For non-loopback clients. Automatically used if server supports it.
+
+**Issuer verification**: ALWAYS verify issuer has authority over the DID before trusting tokens. This is a **critical security check**.
+
+```rust
+// In callback flow, after exchanging code:
+let token_response = exchange_code(...).await?;
+// ⚠️  MUST verify before using token
+let pds = resolver.verify_issuer(&server_metadata, &token_response.sub).await?;
+```
+
+**Common mistakes**:
+- Skipping issuer verification (security vulnerability!)
+- Not updating session after refresh (next request uses expired token)
+- Reusing DPoP proofs across requests (each request needs a fresh proof with new jti/iat)
+- Mixing auth server and host nonces (they're tracked separately)
+- Forgetting `ath` claim when including access token in PDS requests
+
+### jacquard-identity (Identity Resolution)
+
+**Resolution chains** (configurable fallback order):
+
+**Handle → DID**:
+1. DNS TXT `_atproto.<handle>` (feature: `dns`, skipped on WASM)
+2. HTTPS `https://<handle>/.well-known/atproto-did`
+3. PDS XRPC `com.atproto.identity.resolveHandle`
+4. Public API fallback `https://public.api.bsky.app` (if enabled)
+5. Slingshot mini-doc (if configured)
+
+**DID → Document**:
+1. `did:web`: HTTPS `.well-known/did.json`
+2. `did:plc`: PLC directory or Slingshot
+3. PDS XRPC `com.atproto.identity.resolveDid`
+
+```rust
+use jacquard::identity::{JacquardResolver, PublicResolver};
+
+let resolver = PublicResolver::default();  // DNS + public fallbacks enabled
+
+// Handle → DID
+let did: Did<'static> = resolver.resolve_handle(&handle).await?;
+
+// DID → Document
+let response = resolver.resolve_did_doc(&did).await?;
+let doc = response.parse_validated()?;  // Validates doc.id matches requested DID
+
+// Combined: Get PDS endpoint
+let pds_url = resolver.pds_for_did(&did).await?;
+```
+
+**DidDocResponse pattern** (same as XRPC responses):
+
+```rust
+let response = resolver.resolve_did_doc(&did).await?;
+
+// Borrow from buffer
+let doc: DidDocument<'_> = response.parse()?;
+
+// Validate doc ID
+let doc = response.parse_validated()?;  // Error if doc.id != requested DID
+
+// Convert to owned
+let doc: DidDocument<'static> = response.into_owned()?;
+```
+
+**Mini-doc fallback**: If full DID document parsing fails, automatically tries parsing as `MiniDoc` (Slingshot's minimal format) and synthesizes a minimal `DidDocument`. This is transparent to caller.
+
+**OAuthResolver trait**: Auto-implemented for `JacquardResolver`. Adds OAuth metadata resolution:
+
+```rust
+// High-level: accepts handle, DID, or HTTPS URL
+let (server_metadata, doc_opt) = resolver.resolve_oauth("alice.bsky.social").await?;
+
+// From identity (handle or DID)
+let (server_metadata, doc) = resolver.resolve_from_identity("alice.bsky.social").await?;
+
+// From service URL (PDS or entryway)
+let server_metadata = resolver.resolve_from_service(&pds_url).await?;
+
+// Verify issuer authority over DID
+let pds = resolver.verify_issuer(&server_metadata, &sub_did).await?;
+```
+
+**Common mistakes**:
+- Not validating doc ID (use `.parse_validated()`, not just `.parse()`)
+- Assuming DNS resolution works on WASM (it doesn't)
+- Comparing issuer URLs with string equality (use `issuer_equivalent()` for trailing slash tolerance)
+- Trusting DID documents without checking `alsoKnownAs` for handle aliases
+- Not caching resolver (it's `Clone`, cheap to share)
+
+### jacquard-axum (Server-Side)
+
+**ExtractXrpc**: Type-safe XRPC request extraction.
+
+```rust
+use jacquard_axum::{ExtractXrpc, IntoRouter};
+use jacquard::api::com_atproto::identity::resolve_handle::ResolveHandleRequest;
+
+async fn handle_resolve(
+    ExtractXrpc(req): ExtractXrpc<ResolveHandleRequest>
+) -> Json<ResolveHandleOutput<'static>> {
+    let did = resolve_handle_logic(&req.handle).await;
+    Json(ResolveHandleOutput { did, extra_data: Default::default() })
+}
+
+// Automatic routing
+let app = Router::new()
+    .merge(ResolveHandleRequest::into_router(handle_resolve));
+```
+
+**Query vs Procedure**:
+- Query (GET): Extracts from query string via `serde_html_form`
+- Procedure (POST): Calls `Request::decode_body()` (default: JSON, override for CBOR)
+
+**Zero-copy → owned conversion**: Extractor borrows during deserialization, then converts to `'static` via `IntoStatic`. This is why all request types must implement `IntoStatic`.
+
+**Custom encodings**:
+
+```rust
+impl XrpcRequest for MyRequest<'_> {
+    fn decode_body<'de>(body: &'de [u8]) -> Result<Box<Self>> {
+        let req = serde_ipld_dagcbor::from_slice(body)?;
+        Ok(Box::new(req))
+    }
+}
+```
+
+**Service auth** (feature: `service-auth`):
+
+```rust
+use jacquard_axum::service_auth::{ServiceAuthConfig, ExtractServiceAuth};
+
+let config = ServiceAuthConfig::new(
+    Did::new_static("did:web:feedgen.example.com")?,
+    resolver,
+);
+
+async fn handler(
+    ExtractServiceAuth(auth): ExtractServiceAuth,
+) -> String {
+    format!("Authenticated as {}", auth.did())
+}
+
+let app = Router::new()
+    .route("/xrpc/app.bsky.feed.getFeedSkeleton", get(handler))
+    .with_state(config);
+```
+
+**Method binding (`lxm` claim)**: Default enabled. Binds JWTs to specific XRPC methods to prevent token reuse across endpoints.
+
+**JTI replay protection**: NOT built-in. You must implement:
+
+```rust
+if let Some(jti) = auth.jti() {
+    if state.seen_jtis.contains(jti) {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+    state.seen_jtis.insert(jti.to_string(), auth.exp);
+}
+```
+
+**Common mistakes**:
+- Forgetting `IntoStatic` derive on custom request types
+- Using wrong trait (use `XrpcEndpoint` marker, not `XrpcRequest`)
+- Not implementing JTI tracking (allows replay attacks)
+- Disabling method binding without understanding security implications
+
+### jacquard-repo (Repository Primitives)
+
+**MST (Merkle Search Tree)**: Immutable, persistent data structure.
+
+```rust
+use jacquard_repo::mst::Mst;
+use jacquard_repo::storage::MemoryBlockStore;
+
+let storage = MemoryBlockStore::new();
+let mst = Mst::new(storage.clone());
+
+// ⚠️  IMMUTABLE: Always reassign
+let mst = mst.add("app.bsky.feed.post/abc", record_cid).await?;
+let mst = mst.add("app.bsky.feed.post/xyz", record_cid2).await?;
+
+// Persist and get root CID
+let root_cid = mst.persist().await?;
+```
+
+**Key validation**: `[a-zA-Z0-9._:~-]+` with exactly one `/` separator. Max 256 bytes. Format: `collection/rkey`.
+
+**Diff operations**:
+
+```rust
+let diff = old_mst.diff(&new_mst).await?;
+diff.validate_limits()?;  // Enforce 200 op limit (protocol)
+
+// Convert to different formats
+let verified_ops = diff.to_verified_ops();  // For batch()
+let repo_ops = diff.to_repo_ops();  // For firehose
+```
+
+**Commits**:
+
+```rust
+use jacquard_repo::commit::Commit;
+
+// Create and sign
+let commit = Commit::new_unsigned(did, data_cid, rev, prev_cid)
+    .sign(&signing_key)?;
+
+// Verify
+commit.verify(&public_key)?;
+```
+
+**Supported signature algorithms**: Ed25519, ECDSA P-256, ECDSA secp256k1.
+
+**Firehose validation**:
+
+```rust
+// Sync v1.0 (requires prev MST state)
+let new_root = commit.validate_v1_0(prev_mst_root, prev_storage, pubkey).await?;
+
+// Sync v1.1 (inductive, requires prev_data field + op prev CIDs)
+let new_root = commit.validate_v1_1(pubkey).await?;
+```
+
+**v1.1 inductive validation**: Inverts operations on claimed result, verifies inverted result matches `prev_data`. Requires:
+- `prev_data` field in commit
+- All operations have `prev` CIDs for updates/deletes
+- All required MST blocks in CAR
+
+**CAR I/O**:
+
+```rust
+// Read
+let parsed = parse_car_bytes(&bytes)?;
+let root_cid = parsed.root;
+let blocks = parsed.blocks;  // BTreeMap<CID, Bytes>
+
+// Write
+let bytes = write_car_bytes(root_cid, blocks)?;
+```
+
+**BlockStore trait**: Pluggable storage backend.
+
+```rust
+#[trait_variant::make(Send)]  // Conditionally Send on non-WASM
+pub trait BlockStore: Clone {
+    async fn get(&self, cid: &CID) -> Result<Option<Bytes>>;
+    async fn put(&self, data: &[u8]) -> Result<CID>;
+    async fn apply_commit(&self, commit: CommitData) -> Result<()>;  // Atomic
+}
+```
+
+**Implementations**:
+- `MemoryBlockStore`: In-memory (testing)
+- `FileBlockStore`: File-based (persistent)
+- `LayeredBlockStore`: Read-through cache (e.g., temp over persistent for firehose)
+
+**Repository API** (high-level):
+
+```rust
+use jacquard_repo::repo::Repository;
+
+let repo = Repository::create(storage, did, signing_key, None).await?;
+
+// Single operations (don't auto-commit)
+repo.create_record(collection, rkey, cid).await?;
+let old_cid = repo.update_record(collection, rkey, new_cid).await?;
+let deleted_cid = repo.delete_record(collection, rkey).await?;
+
+// Batch commit
+let ops = vec![
+    RecordWriteOp::Create { collection, rkey, record },
+    RecordWriteOp::Update { collection, rkey, record, prev },
+];
+let (repo_ops, commit_data) = repo.create_commit(&ops, &did, prev, &key).await?;
+repo.apply_commit(commit_data).await?;
+```
+
+**Common mistakes**:
+- Forgetting immutability (not reassigning MST operations)
+- Not calling `validate_limits()` before creating commits (protocol violation)
+- Using v1.1 validation without `prev_data` field (will fail)
+- Missing `prev` CIDs on update/delete operations for v1.1
+- Not implementing `Clone` cheaply on custom `BlockStore` (use `Arc` internally)
+- Ignoring CID mismatch errors (indicates data corruption)
+
+### jacquard-lexicon (Code Generation)
+
+**ONLY use `just` commands** for code generation:
+
+```bash
+just lex-gen      # Fetch + generate
+just lex-fetch    # Fetch only
+just codegen      # Generate from existing lexicons
+```
+
+**Union collision detection**: When multiple namespaces have similar type names in a union, foreign refs get prefixed with second NSID segment:
+
+```
+app.bsky.embed.images → BskyImages
+sh.custom.embed.images → CustomImages
+```
+
+**Builder heuristics**:
+- Has builder: 1+ required fields, not all bare `CowStr`
+- Has `Default`: 0 required fields OR all required are bare `CowStr`
+
+**Empty objects**: Generate as empty structs with `#[lexicon]` attribute (adds `extra_data`), not as `Data<'a>`.
+
+**Local refs**: `#fragment` normalized to `{current_nsid}#fragment` during generation.
+
+**Feature generation**: Tracks cross-namespace dependencies:
+
+```toml
+net_anisota = ["app_bsky"]  # Uses Bluesky embeds
+```
+
+**Token types**: Unit structs with `Display` impl:
+
+```rust
+pub struct ClickthroughAuthor;
+impl Display for ClickthroughAuthor {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "clickthroughAuthor")
+    }
+}
+```
+
+**Common mistakes**: Running codegen commands manually without `just` (wrong flags, paths).
+
+---
+
+## Anti-Patterns to Avoid
+
+### ❌ Roundtripping through String
+
+```rust
+// ❌ BAD
+let did_str = did.as_str().to_string();
+let did2 = Did::new(&did_str)?;
+
+// ✅ GOOD
+let did2 = did.clone();
+// or
+let did2 = did.into_static();  // If you need 'static
+```
+
+### ❌ Using serde_json::Value
+
+```rust
+// ❌ NEVER
+let value: serde_json::Value = serde_json::from_slice(bytes)?;
+let post: Post = serde_json::from_value(value)?;
+
+// ✅ ALWAYS
+let data: Data = serde_json::from_slice(bytes)?;
+let post: Post = from_data(&data)?;
+```
+
+### ❌ Using FromStr for validated types
+
+```rust
+// ❌ SLOW (always allocates)
+let did: Did = "did:plc:abc".parse()?;
+
+// ✅ FAST (zero allocation)
+let did = Did::new("did:plc:abc")?;
+```
+
+### ❌ Not deriving IntoStatic on custom types
+
+```rust
+// ❌ WILL NOT COMPILE with XRPC responses
+struct MyOutput<'a> {
+    field: CowStr<'a>,
+}
+
+// ✅ REQUIRED
+#[derive(jacquard_derive::IntoStatic)]
+struct MyOutput<'a> {
+    field: CowStr<'a>,
+}
+```
+
+### ❌ Dropping response while holding borrowed parse
+
+```rust
+// ❌ WILL NOT COMPILE
+let output = {
+    let response = agent.send(request).await?;
+    response.parse()?  // Borrows from response!
+};
+
+// ✅ Keep response alive OR convert to owned
+let response = agent.send(request).await?;
+let output = response.parse()?;
+// OR
+let output = agent.send(request).await?.into_output()?;
+```
+
+### ❌ Calling .into_static() in tight loops
+
+```rust
+// ❌ WASTEFUL (clones all borrowed data every iteration)
+for post in timeline.feed {
+    let owned = post.into_static();
+    process(owned);
+}
+
+// ✅ EFFICIENT (borrow when possible)
+for post in &timeline.feed {
+    process(post);
+}
+
+// Only convert to static if storing long-term:
+let stored: Vec<Post<'static>> = timeline.feed.into_iter()
+    .map(|p| p.into_static())
+    .collect();
+```
+
+### ❌ Non-exhaustive union matches
+
+```rust
+// ❌ WILL NOT COMPILE (missing Unknown variant)
+match embed {
+    PostEmbed::Images(img) => { /* ... */ }
+    PostEmbed::Video(vid) => { /* ... */ }
+}
+
+// ✅ HANDLE ALL VARIANTS
+match embed {
+    PostEmbed::Images(img) => { /* ... */ }
+    PostEmbed::Video(vid) => { /* ... */ }
+    _ => { /* Unknown or other variants */ }
+}
+```
+
+### ❌ Forgetting MST immutability
+
+```rust
+// ❌ WRONG (loses result)
+mst.add(key, cid).await?;
+
+// ✅ CORRECT (reassign)
+let mst = mst.add(key, cid).await?;
+```
+
+### ❌ Skipping issuer verification in OAuth
+
+```rust
+// ❌ SECURITY VULNERABILITY
+let token_response = exchange_code(...).await?;
+// Immediately trusting token_response.sub without verification!
+
+// ✅ ALWAYS VERIFY
+let token_response = exchange_code(...).await?;
+let pds = resolver.verify_issuer(&server_metadata, &token_response.sub).await?;
+// Now safe to use token_response
+```
+
+### ❌ Using `for<'de> Deserialize<'de>` bounds (CATASTROPHIC)
+
+**This is the SINGLE MOST COMMON mistake LLMs make with Jacquard.** The HRTB `for<'de>` forces owned deserialization and breaks ALL Jacquard types.
+
+```rust
+// ❌ CATASTROPHIC - Breaks all Jacquard types
+fn deserialize_anything<T>(data: &[u8]) -> Result<T>
+where
+    T: for<'de> Deserialize<'de>  // Equivalent to DeserializeOwned!
+{
+    serde_json::from_slice(data)
+}
+
+// Attempting to use:
+let post: Post = deserialize_anything(&bytes)?;  // ERROR: Post<'_> doesn't satisfy bound
+
+// ❌ Also breaks in generic contexts
+struct MyContainer<T>
+where
+    T: for<'de> Deserialize<'de>  // No Jacquard type can be stored here!
+{
+    value: T,
+}
+
+// ❌ Even if you think you need it for async
+async fn fetch<T>(url: &str) -> Result<T>
+where
+    T: for<'de> Deserialize<'de>  // Still wrong! Use Response<R> pattern instead
+{
+    let bytes = http_get(url).await?;
+    serde_json::from_slice(&bytes)  // Can't borrow, bytes about to be dropped
+}
+```
+
+```rust
+// ✅ CORRECT - Method-level lifetime
+fn deserialize_anything<'de, T>(data: &'de [u8]) -> Result<T>
+where
+    T: Deserialize<'de>
+{
+    serde_json::from_slice(data)
+}
+
+// ✅ CORRECT - With IntoStatic for async
+fn deserialize_owned<'de, T>(data: &'de [u8]) -> Result<T::Output>
+where
+    T: Deserialize<'de> + IntoStatic,
+    T::Output: 'static,
+{
+    let borrowed: T = serde_json::from_slice(data)?;
+    Ok(borrowed.into_static())
+}
+
+// ✅ CORRECT - Use Jacquard's Response pattern for async
+async fn fetch<R: XrpcRequest>(url: &str) -> Result<Response<R::Response>> {
+    let bytes = http_get(url).await?;
+    Ok(Response::new(bytes))  // Caller chooses .parse() or .into_output()
+}
+```
+
+**Why `for<'de>` breaks**: It means "T must deserialize from ANY lifetime", which is impossible if T contains borrowed data. The deserializer can't satisfy "any lifetime" including lifetimes shorter than the input buffer, so it forces owned allocation.
+
+**Rule**: If you see `for<'de> Deserialize<'de>` anywhere in your code with Jacquard types, it's wrong. Use method-level `<'de>` parameters and propagate lifetimes explicitly.
+
+---
+
+## WASM Compatibility
+
+Core crates support `wasm32-unknown-unknown` target:
+- jacquard-common
+- jacquard-api
+- jacquard-identity (no DNS resolution)
+- jacquard-oauth
+
+**Pattern**: `#[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]`
+
+**What's different on WASM**:
+- No `Send` bounds on traits
+- DNS resolution skipped in handle→DID chain
+- Tokio-specific features disabled
+
+**Test WASM compilation**:
+
+```bash
+just check-wasm
+# or
+cargo build --target wasm32-unknown-unknown -p jacquard-common --no-default-features
+```
+
+---
+
+## Quick Reference
+
+### String Type Constructors
+
+| Method | Allocates? | Use When |
+|--------|-----------|----------|
+| `new(&str)` | No | Borrowed string |
+| `new_static(&'static str)` | No | Static string literal |
+| `new_owned(String)` | Reuses | Already have owned String |
+| `FromStr::parse()` | Yes | Don't care about performance |
+
+### Response Parsing
+
+| Method | Lifetime | Allocates? |
+|--------|----------|-----------|
+| `.parse()` | `<'_>` | No (zero-copy) |
+| `.into_output()` | `'static` | Yes (converts to owned) |
+
+### XRPC Traits
+
+| Trait | Side | Purpose |
+|-------|------|---------|
+| `XrpcRequest` | Client + Server | Request with NSID, method, encode/decode |
+| `XrpcResp` | Client + Server | Response marker with GAT Output/Err |
+| `XrpcEndpoint` | Server | Routing marker with PATH, METHOD |
+| `XrpcClient` | Client | Stateful XRPC with base_uri, send() |
+| `XrpcExt` | Client | Stateless XRPC builder on any HttpClient |
+
+### Session Types
+
+| Type | Auth Method | Auto-Refresh | Storage |
+|------|------------|--------------|---------|
+| `CredentialSession` | Bearer (app password) | Via refreshSession | SessionStore |
+| `OAuthSession` | DPoP (OAuth) | Via token endpoint | ClientAuthStore |
+
+### BlockStore Implementations
+
+| Type | Persistent? | Use Case |
+|------|------------|----------|
+| `MemoryBlockStore` | No | Testing |
+| `FileBlockStore` | Yes | Production |
+| `LayeredBlockStore` | Depends | Read-through cache |
+
+---
+
+## Common Operations
+
+### Making an XRPC call
+
+```rust
+use jacquard::api::app_bsky::feed::get_author_feed::GetAuthorFeed;
+
+let request = GetAuthorFeed::new()
+    .actor("alice.bsky.social".into())
+    .limit(50)
+    .build();
+
+let response = agent.send(request).await?;
+let output = response.into_output()?;
+
+for post in output.feed {
+    println!("{}: {}", post.post.author.handle, post.post.uri);
+}
+```
+
+### Creating a record
+
+```rust
+use jacquard::api::app_bsky::feed::post::Post;
+use jacquard::common::types::string::Datetime;
+
+let post = Post::builder()
+    .text("Hello ATProto from Jacquard!")
+    .created_at(Datetime::now())
+    .build();
+
+agent.create_record(post, None).await?;
+```
+
+### Resolving identity
+
+```rust
+use jacquard::identity::PublicResolver;
+
+let resolver = PublicResolver::default();
+
+// Handle → DID
+let did = resolver.resolve_handle(&handle).await?;
+
+// DID → PDS endpoint
+let pds = resolver.pds_for_did(&did).await?;
+
+// Combined
+let (did, pds) = resolver.pds_for_handle(&handle).await?;
+```
+
+### OAuth login
+
+```rust
+use jacquard::oauth::client::OAuthClient;
+use jacquard::client::FileAuthStore;
+
+let oauth = OAuthClient::with_default_config(
+    FileAuthStore::new("./auth.json")
+);
+
+let session = oauth.login_with_local_server(
+    "alice.bsky.social",
+    Default::default(),
+    Default::default(),
+).await?;
+
+let agent = Agent::from(session);
+```
+
+### Server-side XRPC handler
+
+```rust
+use jacquard_axum::{ExtractXrpc, IntoRouter};
+use axum::{Router, Json};
+
+async fn handler(
+    ExtractXrpc(req): ExtractXrpc<MyRequest>
+) -> Json<MyOutput<'static>> {
+    // Process request
+    Json(output)
+}
+
+let app = Router::new()
+    .merge(MyRequest::into_router(handler));
+```
+
+### MST operations
+
+```rust
+use jacquard_repo::mst::Mst;
+use jacquard_repo::storage::MemoryBlockStore;
+
+let storage = MemoryBlockStore::new();
+let mst = Mst::new(storage.clone());
+
+let mst = mst.add("app.bsky.feed.post/abc123", record_cid).await?;
+let mst = mst.add("app.bsky.feed.post/xyz789", record_cid2).await?;
+
+let root_cid = mst.persist().await?;
+```
+
+---
+
+## Documentation Links
+
+- [docs.rs/jacquard](https://docs.rs/jacquard/latest/jacquard/)
+- [docs.rs/jacquard-common](https://docs.rs/jacquard-common/latest/jacquard_common/)
+- [docs.rs/jacquard-api](https://docs.rs/jacquard-api/latest/jacquard_api/)
+- [docs.rs/jacquard-oauth](https://docs.rs/jacquard-oauth/latest/jacquard_oauth/)
+- [docs.rs/jacquard-identity](https://docs.rs/jacquard-identity/latest/jacquard_identity/)
+- [docs.rs/jacquard-repo](https://docs.rs/jacquard-repo/latest/jacquard_repo/)
+- [docs.rs/jacquard-axum](https://docs.rs/jacquard-axum/latest/jacquard_axum/)
+- [Repository](https://tangled.org/@nonbinary.computer/jacquard)
+
+---
+
+## Philosophy Summary
+
+Jacquard is designed for **correctness**, **performance**, and **ergonomics** in that order. It favors:
+
+1. **Validation at construction time** - Invalid inputs fail fast, not deep in your code
+2. **Zero-copy by default** - Borrow from buffers, convert to owned only when needed
+3. **Explicit lifetime control** - You choose when to allocate via `.into_static()` or `.into_output()`
+4. **Type safety without boilerplate** - Generated bindings just work, with strong typing
+5. **Batteries included, but replaceable** - High-level `Agent` for convenience, low-level primitives for control
+
+**When in doubt**: Read the documentation, use the validated types, respect the lifetimes, and trust the zero-copy patterns. Jacquard is designed to guide you toward correct, performant code.

@@ -8,6 +8,20 @@ A suite of Rust crates intended to make it much easier to get started with atpro
 
 It is also designed around zero-copy/borrowed deserialization: types like [`Post<'_>`](https://tangled.org/@nonbinary.computer/jacquard/blob/main/crates/jacquard-api/src/app_bsky/feed/post.rs) can borrow data (via the [`CowStr<'_>`](https://docs.rs/jacquard/latest/jacquard/cowstr/enum.CowStr.html) type and a host of other types built on top of it) directly from the response buffer instead of allocating owned copies. Owned versions are themselves mostly inlined or reference-counted pointers and are therefore still quite efficient. The `IntoStatic` trait (which is derivable) makes it easy to get an owned version and avoid worrying about lifetimes.
 
+## Features
+
+- Validated, spec-compliant, easy to work with, and performant baseline types
+- Designed such that you can just work with generated API bindings easily
+- Straightforward OAuth
+- Server-side convenience features
+- Lexicon Data value type for working with unknown atproto data (dag-cbor or json)
+- An order of magnitude less boilerplate than some existing crates
+- Batteries-included, but easily replaceable batteries.
+   - Easy to extend with custom lexicons using code generation or handwritten api types
+   - Stateless options (or options where you handle the state) for rolling your own
+   - All the building blocks of the convenient abstractions are available
+   - Use as much or as little from the crates as you need
+
 ## 0.8.0 Release Highlights:
 
 **`jacquard-repo` crate**
@@ -17,28 +31,6 @@ It is also designed around zero-copy/borrowed deserialization: types like [`Post
  - CAR file write order compatible with streaming mode from the [sync iteration proposal](https://github.com/bluesky-social/proposals/blob/main/0006-sync-iteration/README.md#streaming-car-processing)
  - Big rewrite of all the errors in the crate, improvements to context and overall structure
  - Made handle parsing a bit more permissive for a common case ('handle.invalid' when someone has a messed up handle), added a method to confirm syntactic validity (the correct way to confirm validity is resolve_handle() from the  IdentityResolver trait, then fetching and comparing to the DID document).
-
-> [!WARNING]
-> A lot of the streaming code is still pretty experimental. The examples work, though.\
-The modules are also less well-documented, and don't have code examples. There are also a lot of utility functions for conveniently working with the streams and transforming them which are lacking. Use [`n0-future`](https://docs.rs/n0-future/latest/n0_future/index.html) to work with them, that is what Jacquard uses internally as much as possible.\
->I would also note the same for the repository crate until I've had more third parties test it.
-
-### Changelog
-
-[CHANGELOG.md](./CHANGELOG.md)
-
-## Goals and Features
-
-- Validated, spec-compliant, easy to work with, and performant baseline types
-- Batteries-included, but easily replaceable batteries.
-   - Easy to extend with custom lexicons using code generation or handwritten api types
-   - Straightforward OAuth
-   - Stateless options (or options where you handle the state) for rolling your own
-   - All the building blocks of the convenient abstractions are available
-   - Server-side convenience features
-- Lexicon Data value type for working with unknown atproto data (dag-cbor or json)
-- An order of magnitude less boilerplate than some existing crates
-- Use as much or as little from the crates as you need
 
 ## Example
 
@@ -100,6 +92,26 @@ async fn main() -> miette::Result<()> {
 ```
 
 If you have `just` installed, you can run the [examples](https://tangled.org/@nonbinary.computer/jacquard/tree/main/examples) using `just example {example-name} {ARGS}` or `just examples` to see what's available.
+
+> [!WARNING]
+> A lot of the streaming code is still pretty experimental. The examples work, though.\
+The modules are also less well-documented, and don't have code examples. There are also a lot of utility functions for conveniently working with the streams and transforming them which are lacking. Use [`n0-future`](https://docs.rs/n0-future/latest/n0_future/index.html) to work with them, that is what Jacquard uses internally as much as possible.\
+>I would also note the same for the repository crate until I've had more third parties test it.
+
+### Changelog
+
+[CHANGELOG.md](./CHANGELOG.md)
+
+<!--### Testimonials
+
+- ["the most straightforward interface to atproto I've encountered so far."](https://bsky.app/profile/offline.mountainherder.xyz/post/3m3xwewzs3k2v) - @offline.mountainherder.xyz
+
+- "It has saved me a lot of time already! Well worth a few beers and or microcontrollers" - [@baileytownsend.dev](https://bsky.app/profile/baileytownsend.dev)-->
+
+### Projects using Jacquard
+
+- [skywatch-phash-rs](https://tangled.org/@skywatch.blue/skywatch-phash-rs)
+- [PDS MOOver](https://pdsmoover.com/) - [tangled repository](https://tangled.org/@baileytownsend.dev/pds-moover)
 
 ## Component crates
 
