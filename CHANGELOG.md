@@ -27,9 +27,9 @@
 
 ### Changed
 
-- Import cleanup across all crates
 - Dependency updates (upgraded various crypto and serialization dependencies)
 - Documentation improvements throughout
+- Made handle parsing a bit more permissive for a common case ('handle.invalid' when someone has a messed up handle), added a method to confirm syntactic validity (the correct way to confirm validity is resolve_handle() from IdentityResolver, and comparing to the DID document).
 
 ## [0.7.0] - 2025-10-19
 

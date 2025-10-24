@@ -58,10 +58,24 @@ impl<'h> Handle<'h> {
                 SmolStr::new_static("invalid"),
             ))
         } else if ends_with(stripped, DISALLOWED_TLDS) {
-            Err(AtStrError::disallowed("handle", stripped, DISALLOWED_TLDS))
+            // speicifically pass this through as it is returned in instances where someone
+            // has screwed up their handle, and it's awkward to fail so early
+            if handle == "handle.invalid" {
+                Ok(Self(CowStr::Borrowed(stripped)))
+            } else {
+                Err(AtStrError::disallowed("handle", stripped, DISALLOWED_TLDS))
+            }
         } else {
             Ok(Self(CowStr::Borrowed(stripped)))
         }
+    }
+
+    /// confirm that this is a (syntactically) valid handle (as we pass-through
+    /// "handle.invalid" during construction)
+    pub fn is_valid(&self) -> bool {
+        self.0.len() <= 253
+            && HANDLE_REGEX.is_match(&self.0)
+            && !ends_with(&self.0, DISALLOWED_TLDS)
     }
 
     /// Fallible constructor, validates, takes ownership

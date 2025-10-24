@@ -47,7 +47,7 @@ pub trait Literal: Clone + Copy + PartialEq + Eq + Send + Sync + 'static {
 pub const DISALLOWED_TLDS: &[&str] = &[
     ".local",
     ".arpa",
-    ".invalid",
+    ".invalid", // NOTE: if someone has a screwed up handle, this is what's returned
     ".localhost",
     ".internal",
     ".example",
