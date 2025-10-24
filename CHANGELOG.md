@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.8.0] - 2025-10-23
+
+### Breaking Changes
+
+**Error type refactor** (`jacquard-common`, `jacquard-identity`, `jacquard-oauth`, `jacquard`)
+- Better error messages with contextual information and help text
+- Breaking: Error variant names and structures changed across all crates
+
+### Added
+
+**New crate: `jacquard-repo`**
+- AT Protocol repository primitives for working with atproto data structures
+- **MST (Merkle Search Tree)**: Immutable, deterministic tree operations with proper fanout
+  - Optimized block allocation (4.5% oversupply, validated against retr0id's test suite)
+  - Diff operations with protocol limit enforcement
+  - Cursor-based traversal
+- **Commits**:
+  - Proof generation and validation for Sync v1 and v1.1 Relay protocol
+- **CAR I/O**:
+  - Proof CAR validation with MST path verification
+- **Storage**: Pluggable block storage abstraction
+  - `MemoryBlockStore`: In-memory storage for testing
+  - `FileBlockStore`: Persistent file-based storage
+  - `LayeredBlockStore`: Layered read-through cache (memory over file, etc.)
+
+### Changed
+
+- Import cleanup across all crates
+- Dependency updates (upgraded various crypto and serialization dependencies)
+- Documentation improvements throughout
+
 ## [0.7.0] - 2025-10-19
 
 ### Added

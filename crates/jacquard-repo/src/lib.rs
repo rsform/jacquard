@@ -3,7 +3,7 @@
 //! This crate provides building blocks for working with AT Protocol repositories:
 //!
 //! - **MST (Merkle Search Tree)**: Immutable tree operations with deterministic structure
-//! - **Commits**: Signed commit structures for Sync v1 (version 2) and v1.1 (version 3)
+//! - **Commits**: Signed commit structures (versions 2 and 3) with signature verification
 //! - **CAR I/O**: Import and export repositories in CAR (Content Addressable aRchive) format
 //! - **Storage**: Pluggable block storage abstraction with in-memory and file-backed implementations
 //!

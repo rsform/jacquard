@@ -82,11 +82,6 @@ async fn load_car(path: &Path) -> anyhow::Result<(IpldCid, BTreeMap<IpldCid, Byt
     Ok((parsed.root, parsed.blocks))
 }
 
-/// Convert base32 CID string to IpldCid
-fn parse_cid(cid_str: &str) -> anyhow::Result<IpldCid> {
-    Ok(cid_str.parse()?)
-}
-
 /// Convert IpldCid to base32 string (for comparison)
 fn cid_to_string(cid: &IpldCid) -> String {
     cid.to_string()
@@ -139,8 +134,6 @@ async fn run_test_case(test_path: &Path, suite_root: &Path) -> anyhow::Result<Te
 
     // Replicate create_commit's relevant_blocks logic (from repo.rs:276-290)
     let mut relevant_blocks = BTreeMap::new();
-    let ops_count = diff.creates.len() + diff.updates.len() + diff.deletes.len();
-
     // For each operation, collect blocks along the path in BOTH trees for inductive validation
     for (key, _cid) in &diff.creates {
         mst_b
@@ -346,7 +339,6 @@ enum MatchStatus {
     Subset,    // actual is subset of expected (missing blocks)
     Superset,  // actual is superset of expected (extra blocks)
     Different, // neither subset nor superset
-    NotImplemented,
 }
 
 /// Summary statistics across all tests
@@ -481,7 +473,8 @@ async fn run_mst_diff_suite() {
             Ok(result) => {
                 if let Some(ref info) = result.inductive_proof_nodes_info {
                     if matches!(info.match_status, MatchStatus::Subset) {
-                        let missing: Vec<_> = info.expected.difference(&info.actual).cloned().collect();
+                        let missing: Vec<_> =
+                            info.expected.difference(&info.actual).cloned().collect();
                         missing_block_cases.push((result.test_name, missing));
                     }
                 }

@@ -2262,7 +2262,7 @@ checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 
 [[package]]
 name = "jacquard"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "bon",
  "bytes",
@@ -2271,10 +2271,10 @@ dependencies = [
  "getrandom 0.2.16",
  "http",
  "image",
- "jacquard-api 0.7.1",
- "jacquard-common 0.7.0",
- "jacquard-derive 0.7.0",
- "jacquard-identity 0.7.0",
+ "jacquard-api 0.8.0",
+ "jacquard-common 0.8.0",
+ "jacquard-derive 0.8.0",
+ "jacquard-identity 0.8.0",
  "jacquard-oauth",
  "jose-jwk",
  "miette",
@@ -2306,8 +2306,8 @@ source = "git+https://tangled.org/@nonbinary.computer/jacquard#ef09feb782cf34eda
 dependencies = [
  "bon",
  "bytes",
- "jacquard-common 0.7.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
- "jacquard-derive 0.7.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-common 0.7.0",
+ "jacquard-derive 0.7.0",
  "miette",
  "serde",
  "serde_ipld_dagcbor",
@@ -2316,12 +2316,12 @@ dependencies = [
 
 [[package]]
 name = "jacquard-api"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "bon",
  "bytes",
- "jacquard-common 0.7.0",
- "jacquard-derive 0.7.0",
+ "jacquard-common 0.8.0",
+ "jacquard-derive 0.8.0",
  "miette",
  "serde",
  "serde_ipld_dagcbor",
@@ -2330,7 +2330,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-axum"
-version = "0.6.0"
+version = "0.8.0"
 dependencies = [
  "axum",
  "axum-macros",
@@ -2339,9 +2339,9 @@ dependencies = [
  "bytes",
  "chrono",
  "jacquard",
- "jacquard-common 0.7.0",
- "jacquard-derive 0.7.0",
- "jacquard-identity 0.7.0",
+ "jacquard-common 0.8.0",
+ "jacquard-derive 0.8.0",
+ "jacquard-identity 0.8.0",
  "k256",
  "miette",
  "multibase",
@@ -2362,6 +2362,43 @@ dependencies = [
 [[package]]
 name = "jacquard-common"
 version = "0.7.0"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#ef09feb782cf34eda616c9511fa12e439e1062c6"
+dependencies = [
+ "base64 0.22.1",
+ "bon",
+ "bytes",
+ "chrono",
+ "cid",
+ "genawaiter",
+ "getrandom 0.3.4",
+ "http",
+ "ipld-core",
+ "k256",
+ "langtag",
+ "miette",
+ "multibase",
+ "multihash",
+ "ouroboros",
+ "p256",
+ "rand 0.9.2",
+ "regex",
+ "reqwest",
+ "serde",
+ "serde_html_form",
+ "serde_ipld_dagcbor",
+ "serde_json",
+ "signature",
+ "smol_str",
+ "thiserror 2.0.17",
+ "tokio",
+ "tokio-util",
+ "trait-variant",
+ "url",
+]
+
+[[package]]
+name = "jacquard-common"
+version = "0.8.0"
 dependencies = [
  "base64 0.22.1",
  "bon",
@@ -2404,74 +2441,60 @@ dependencies = [
 ]
 
 [[package]]
-name = "jacquard-common"
+name = "jacquard-derive"
 version = "0.7.0"
 source = "git+https://tangled.org/@nonbinary.computer/jacquard#ef09feb782cf34eda616c9511fa12e439e1062c6"
 dependencies = [
- "base64 0.22.1",
- "bon",
- "bytes",
- "chrono",
- "cid",
- "genawaiter",
- "getrandom 0.3.4",
- "http",
- "ipld-core",
- "k256",
- "langtag",
- "miette",
- "multibase",
- "multihash",
- "ouroboros",
- "p256",
- "rand 0.9.2",
- "regex",
- "reqwest",
- "serde",
- "serde_html_form",
- "serde_ipld_dagcbor",
- "serde_json",
- "signature",
- "smol_str",
- "thiserror 2.0.17",
- "tokio",
- "tokio-util",
- "trait-variant",
- "url",
-]
-
-[[package]]
-name = "jacquard-derive"
-version = "0.7.0"
-dependencies = [
- "jacquard-common 0.7.0",
  "proc-macro2",
  "quote",
- "serde",
- "serde_json",
  "syn 2.0.106",
 ]
 
 [[package]]
 name = "jacquard-derive"
-version = "0.7.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#ef09feb782cf34eda616c9511fa12e439e1062c6"
+version = "0.8.0"
 dependencies = [
+ "jacquard-common 0.8.0",
  "proc-macro2",
  "quote",
+ "serde",
+ "serde_json",
  "syn 2.0.106",
 ]
 
 [[package]]
 name = "jacquard-identity"
 version = "0.7.0"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#ef09feb782cf34eda616c9511fa12e439e1062c6"
+dependencies = [
+ "bon",
+ "bytes",
+ "http",
+ "jacquard-api 0.7.0",
+ "jacquard-common 0.7.0",
+ "miette",
+ "percent-encoding",
+ "reqwest",
+ "serde",
+ "serde_html_form",
+ "serde_json",
+ "thiserror 2.0.17",
+ "tokio",
+ "trait-variant",
+ "url",
+ "urlencoding",
+]
+
+[[package]]
+name = "jacquard-identity"
+version = "0.8.0"
 dependencies = [
  "bon",
  "bytes",
  "hickory-resolver",
  "http",
- "jacquard-api 0.7.1",
- "jacquard-common 0.7.0",
+ "jacquard-api 0.8.0",
+ "jacquard-common 0.8.0",
  "miette",
  "n0-future",
  "percent-encoding",
@@ -2488,31 +2511,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "jacquard-identity"
-version = "0.7.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#ef09feb782cf34eda616c9511fa12e439e1062c6"
-dependencies = [
- "bon",
- "bytes",
- "http",
- "jacquard-api 0.7.0",
- "jacquard-common 0.7.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
- "miette",
- "percent-encoding",
- "reqwest",
- "serde",
- "serde_html_form",
- "serde_json",
- "thiserror 2.0.17",
- "tokio",
- "trait-variant",
- "url",
- "urlencoding",
-]
-
-[[package]]
 name = "jacquard-lexicon"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "clap",
@@ -2521,8 +2521,8 @@ dependencies = [
  "glob",
  "heck 0.5.0",
  "jacquard-api 0.7.0",
- "jacquard-common 0.7.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
- "jacquard-identity 0.7.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-common 0.7.0",
+ "jacquard-identity 0.7.0",
  "kdl",
  "miette",
  "prettyplease",
@@ -2542,7 +2542,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-oauth"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -2550,8 +2550,8 @@ dependencies = [
  "dashmap",
  "elliptic-curve",
  "http",
- "jacquard-common 0.7.0",
- "jacquard-identity 0.7.0",
+ "jacquard-common 0.8.0",
+ "jacquard-identity 0.8.0",
  "jose-jwa",
  "jose-jwk",
  "miette",
@@ -2577,7 +2577,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-repo"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "bytes",
@@ -2586,8 +2586,8 @@ dependencies = [
  "hex",
  "ipld-core",
  "iroh-car",
- "jacquard-common 0.7.0",
- "jacquard-derive 0.7.0",
+ "jacquard-common 0.8.0",
+ "jacquard-derive 0.8.0",
  "k256",
  "miette",
  "multihash",

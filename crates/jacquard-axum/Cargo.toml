@@ -1,7 +1,7 @@
 [package]
 name = "jacquard-axum"
 edition.workspace = true
-version = "0.6.0"
+version = "0.8.0"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -22,10 +22,10 @@ path = "../../examples/axum_server.rs"
 [dependencies]
 axum = "0.8.6"
 bytes.workspace = true
-jacquard = { version = "0.7", path = "../jacquard", default-features = false, features = ["api"] }
-jacquard-common = { version = "0.7", path = "../jacquard-common", features = ["reqwest-client"] }
-jacquard-derive = { version = "0.7", path = "../jacquard-derive" }
-jacquard-identity = { version = "0.7", path = "../jacquard-identity", optional = true }
+jacquard = { version = "0.8", path = "../jacquard", default-features = false, features = ["api"] }
+jacquard-common = { version = "0.8", path = "../jacquard-common", features = ["reqwest-client"] }
+jacquard-derive = { version = "0.8", path = "../jacquard-derive" }
+jacquard-identity = { version = "0.8", path = "../jacquard-identity", optional = true }
 miette.workspace = true
 multibase = { version = "0.9.1", optional = true }
 serde.workspace = true

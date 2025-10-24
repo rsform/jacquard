@@ -1,6 +1,6 @@
 [package]
 name = "jacquard-oauth"
-version = "0.7.0"
+version = "0.8.0"
 edition.workspace = true
 description = "AT Protocol OAuth 2.1 core types and helpers for Jacquard"
 authors.workspace = true
@@ -21,8 +21,8 @@ websocket = ["jacquard-common/websocket"]
 streaming = ["jacquard-common/streaming", "dep:n0-future"]
 
 [dependencies]
-jacquard-common = { version = "0.7", path = "../jacquard-common", features = ["reqwest-client"] }
-jacquard-identity = { version = "0.7", path = "../jacquard-identity" }
+jacquard-common = { version = "0.8", path = "../jacquard-common", features = ["reqwest-client"] }
+jacquard-identity = { version = "0.8", path = "../jacquard-identity" }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 url = { workspace = true }

@@ -126,13 +126,13 @@ path = "../../examples/moderated_timeline.rs"
 required-features = ["api_bluesky", "loopback"]
 
 [dependencies]
-jacquard-api = { version = "0.7", path = "../jacquard-api" }
-jacquard-common = { version = "0.7", path = "../jacquard-common", features = [
+jacquard-api = { version = "0.8", path = "../jacquard-api" }
+jacquard-common = { version = "0.8", path = "../jacquard-common", features = [
     "reqwest-client",
 ] }
-jacquard-oauth = { version = "0.7", path = "../jacquard-oauth" }
-jacquard-derive = { version = "0.7", path = "../jacquard-derive", optional = true }
-jacquard-identity = { version = "0.7", path = "../jacquard-identity" }
+jacquard-oauth = { version = "0.8", path = "../jacquard-oauth" }
+jacquard-derive = { version = "0.8", path = "../jacquard-derive", optional = true }
+jacquard-identity = { version = "0.8", path = "../jacquard-identity" }
 
 bon.workspace = true
 trait-variant.workspace = true
