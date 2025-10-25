@@ -9,6 +9,7 @@
 //! - [`codegen`] - Rust code generation from parsed schemas
 //! - [`corpus`] - Lexicon corpus management and namespace organization
 //! - [`lexicon`] - Schema parsing and validation
+//! - [`schema`] - Schema generation from Rust types (reverse codegen)
 //! - [`union_registry`] - Tracks union types for collision detection
 //! - [`fs`] - Filesystem utilities for lexicon storage
 
@@ -17,4 +18,5 @@ pub mod corpus;
 pub mod error;
 pub mod fs;
 pub mod lexicon;
+pub mod schema;
 pub mod union_registry;
