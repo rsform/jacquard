@@ -1,5 +1,5 @@
 use clap::Parser;
-use jacquard_lexicon::cli::CodegenArgs;
+use jacquard_lexgen::cli::CodegenArgs;
 use jacquard_lexicon::codegen::CodeGenerator;
 use jacquard_lexicon::corpus::LexiconCorpus;
 

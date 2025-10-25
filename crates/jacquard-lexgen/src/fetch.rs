@@ -5,7 +5,7 @@ pub use config::Config;
 use jacquard_common::IntoStatic;
 pub use sources::{LexiconSource, SourceType};
 
-use crate::lexicon::LexiconDoc;
+use jacquard_lexicon::lexicon::LexiconDoc;
 use miette::Result;
 use std::collections::HashMap;
 

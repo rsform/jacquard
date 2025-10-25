@@ -1,5 +1,5 @@
 use super::LexiconSource;
-use crate::lexicon::LexiconDoc;
+use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_api::com_atproto::repo::list_records::ListRecords;
 use jacquard_common::IntoStatic;
 use jacquard_common::types::ident::AtIdentifier;

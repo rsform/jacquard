@@ -1,5 +1,5 @@
 use super::LexiconSource;
-use crate::lexicon::LexiconDoc;
+use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_common::IntoStatic;
 use miette::{Result, miette};
 use serde::{Deserialize, Serialize};

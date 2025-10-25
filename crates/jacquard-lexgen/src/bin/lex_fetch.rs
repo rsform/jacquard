@@ -1,8 +1,8 @@
 use clap::Parser;
-use jacquard_lexicon::cli::LexFetchArgs;
+use jacquard_lexgen::cli::LexFetchArgs;
+use jacquard_lexgen::fetch::{Config, Fetcher};
 use jacquard_lexicon::codegen::CodeGenerator;
 use jacquard_lexicon::corpus::LexiconCorpus;
-use jacquard_lexicon::fetch::{Config, Fetcher};
 use miette::{IntoDiagnostic, Result};
 use std::path::PathBuf;
 

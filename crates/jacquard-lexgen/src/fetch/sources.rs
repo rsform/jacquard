@@ -13,7 +13,7 @@ pub use jsonfile::JsonFileSource;
 pub use local::LocalSource;
 pub use slices::SlicesSource;
 
-use crate::lexicon::LexiconDoc;
+use jacquard_lexicon::lexicon::LexiconDoc;
 use miette::{IntoDiagnostic, Result};
 use std::collections::HashMap;
 use std::future::Future;

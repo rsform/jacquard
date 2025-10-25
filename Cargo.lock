@@ -2288,7 +2288,7 @@ dependencies = [
 [[package]]
 name = "jacquard-api"
 version = "0.8.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#46f8b7fef44831413798068a56771a1f52126301"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#b8978f162ed3306519ec3155a5fd01fbda2390a3"
 dependencies = [
  "bon",
  "bytes",
@@ -2378,7 +2378,7 @@ dependencies = [
 [[package]]
 name = "jacquard-common"
 version = "0.8.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#46f8b7fef44831413798068a56771a1f52126301"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#b8978f162ed3306519ec3155a5fd01fbda2390a3"
 dependencies = [
  "base64 0.22.1",
  "bon",
@@ -2427,7 +2427,7 @@ dependencies = [
 [[package]]
 name = "jacquard-derive"
 version = "0.8.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#46f8b7fef44831413798068a56771a1f52126301"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#b8978f162ed3306519ec3155a5fd01fbda2390a3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2462,7 +2462,7 @@ dependencies = [
 [[package]]
 name = "jacquard-identity"
 version = "0.8.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#46f8b7fef44831413798068a56771a1f52126301"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#b8978f162ed3306519ec3155a5fd01fbda2390a3"
 dependencies = [
  "bon",
  "bytes",
@@ -2483,8 +2483,54 @@ dependencies = [
 ]
 
 [[package]]
+name = "jacquard-lexgen"
+version = "0.8.0"
+dependencies = [
+ "async-trait",
+ "clap",
+ "clap_complete",
+ "clap_mangen",
+ "glob",
+ "jacquard-api 0.8.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-common 0.8.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-identity 0.8.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "jacquard-lexicon 0.8.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
+ "kdl",
+ "miette",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.17",
+ "tokio",
+ "walkdir",
+]
+
+[[package]]
 name = "jacquard-lexicon"
 version = "0.8.0"
+dependencies = [
+ "glob",
+ "heck 0.5.0",
+ "jacquard-common 0.8.0",
+ "miette",
+ "prettyplease",
+ "proc-macro2",
+ "quote",
+ "serde",
+ "serde_json",
+ "serde_repr",
+ "serde_with",
+ "syn 2.0.108",
+ "tempfile",
+ "thiserror 2.0.17",
+ "walkdir",
+]
+
+[[package]]
+name = "jacquard-lexicon"
+version = "0.8.0"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#b8978f162ed3306519ec3155a5fd01fbda2390a3"
 dependencies = [
  "async-trait",
  "clap",
