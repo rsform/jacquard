@@ -79,7 +79,7 @@ impl jacquard::xrpc::XrpcEndpoint for TestQueryRequest<'_> {
 async fn test_handler(ExtractXrpc(req): ExtractXrpc<TestQueryRequest<'_>>) -> impl IntoResponse {
     Json(TestQueryResponse {
         did: req.did,
-        extra_data: BTreeMap::new(),
+        extra_data: None,
     })
 }
 

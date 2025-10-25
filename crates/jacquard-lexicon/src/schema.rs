@@ -59,7 +59,7 @@
 pub mod builder;
 pub mod type_mapping;
 
-use crate::lexicon::{Lexicon, LexiconDoc, LexObjectProperty, LexRef, LexUserType};
+use crate::lexicon::{LexObjectProperty, LexRef, LexUserType, Lexicon, LexiconDoc};
 use jacquard_common::smol_str::SmolStr;
 use std::borrow::Cow;
 use std::collections::{BTreeMap, HashSet};

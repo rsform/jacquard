@@ -161,19 +161,17 @@ where
             .with_options(opts)
             .send(&RefreshSession)
             .await?;
-        let refresh = response
-            .parse()
-            .map_err(|_| ClientError::auth(AuthError::RefreshFailed)
+        let refresh = response.parse().map_err(|_| {
+            ClientError::auth(AuthError::RefreshFailed)
                 .with_help("ensure refresh token is valid and not expired")
-                .with_url("com.atproto.server.refreshSession"))?;
+                .with_url("com.atproto.server.refreshSession")
+        })?;
 
         let new_session: AtpSession = refresh.into();
         let token = AuthorizationToken::Bearer(new_session.access_jwt.clone());
-        self.store
-            .set(key, new_session)
-            .await
-            .map_err(|e| ClientError::from(e)
-                .with_context("failed to persist refreshed session to store"))?;
+        self.store.set(key, new_session).await.map_err(|e| {
+            ClientError::from(e).with_context("failed to persist refreshed session to store")
+        })?;
 
         Ok(token)
     }
@@ -208,44 +206,39 @@ where
         let pds = if identifier.as_ref().starts_with("http://")
             || identifier.as_ref().starts_with("https://")
         {
-            Url::parse(identifier.as_ref())
-                .map_err(|e: url::ParseError| ClientError::from(e)
-                    .with_help("identifier should be a valid https:// URL, handle, or DID"))?
+            Url::parse(identifier.as_ref()).map_err(|e: url::ParseError| {
+                ClientError::from(e)
+                    .with_help("identifier should be a valid https:// URL, handle, or DID")
+            })?
         } else if identifier.as_ref().starts_with("did:") {
-            let did = Did::new(identifier.as_ref())
-                .map_err(|e| ClientError::invalid_request(format!("invalid did: {:?}", e))
-                    .with_help("DID format should be did:method:identifier (e.g., did:plc:abc123)"))?;
-            let resp = self
-                .client
-                .resolve_did_doc(&did)
-                .await
-                .map_err(|e| ClientError::from(e)
-                    .with_context("DID document resolution failed during login"))?;
-            resp.into_owned()?
-                .pds_endpoint()
-                .ok_or_else(|| ClientError::invalid_request("missing PDS endpoint")
-                    .with_help("DID document must include a PDS service endpoint"))?
+            let did = Did::new(identifier.as_ref()).map_err(|e| {
+                ClientError::invalid_request(format!("invalid did: {:?}", e))
+                    .with_help("DID format should be did:method:identifier (e.g., did:plc:abc123)")
+            })?;
+            let resp = self.client.resolve_did_doc(&did).await.map_err(|e| {
+                ClientError::from(e).with_context("DID document resolution failed during login")
+            })?;
+            resp.into_owned()?.pds_endpoint().ok_or_else(|| {
+                ClientError::invalid_request("missing PDS endpoint")
+                    .with_help("DID document must include a PDS service endpoint")
+            })?
         } else {
             // treat as handle
-            let handle = jacquard_common::types::string::Handle::new(identifier.as_ref())
-                .map_err(|e| ClientError::invalid_request(format!("invalid handle: {:?}", e))
-                    .with_help("handle format should be domain.tld (e.g., alice.bsky.social)"))?;
-            let did = self
-                .client
-                .resolve_handle(&handle)
-                .await
-                .map_err(|e| ClientError::from(e)
-                    .with_context("handle resolution failed during login"))?;
-            let resp = self
-                .client
-                .resolve_did_doc(&did)
-                .await
-                .map_err(|e| ClientError::from(e)
-                    .with_context("DID document resolution failed during login"))?;
-            resp.into_owned()?
-                .pds_endpoint()
-                .ok_or_else(|| ClientError::invalid_request("missing PDS endpoint")
-                    .with_help("DID document must include a PDS service endpoint"))?
+            let handle =
+                jacquard_common::types::string::Handle::new(identifier.as_ref()).map_err(|e| {
+                    ClientError::invalid_request(format!("invalid handle: {:?}", e))
+                        .with_help("handle format should be domain.tld (e.g., alice.bsky.social)")
+                })?;
+            let did = self.client.resolve_handle(&handle).await.map_err(|e| {
+                ClientError::from(e).with_context("handle resolution failed during login")
+            })?;
+            let resp = self.client.resolve_did_doc(&did).await.map_err(|e| {
+                ClientError::from(e).with_context("DID document resolution failed during login")
+            })?;
+            resp.into_owned()?.pds_endpoint().ok_or_else(|| {
+                ClientError::invalid_request("missing PDS endpoint")
+                    .with_help("DID document must include a PDS service endpoint")
+            })?
         };
 
         // Build and send createSession
@@ -255,7 +248,7 @@ where
             auth_factor_token,
             identifier: identifier.clone().into_static(),
             password: password.into_static(),
-            extra_data: BTreeMap::new(),
+            extra_data: None,
         };
 
         let resp = self
@@ -264,11 +257,11 @@ where
             .with_options(self.options.read().await.clone())
             .send(&req)
             .await?;
-        let out = resp
-            .parse()
-            .map_err(|_| ClientError::auth(AuthError::NotAuthenticated)
+        let out = resp.parse().map_err(|_| {
+            ClientError::auth(AuthError::NotAuthenticated)
                 .with_help("check identifier and password are correct")
-                .with_url("com.atproto.server.createSession"))?;
+                .with_url("com.atproto.server.createSession")
+        })?;
         let session = AtpSession::from(out);
 
         let sid = session_id.unwrap_or_else(|| CowStr::new_static("session"));
@@ -276,8 +269,7 @@ where
         self.store
             .set(key.clone(), session.clone())
             .await
-            .map_err(|e| ClientError::from(e)
-                .with_context("failed to persist session to store"))?;
+            .map_err(|e| ClientError::from(e).with_context("failed to persist session to store"))?;
         // If using FileAuthStore, persist PDS for faster resume
         if let Some(file_store) =
             (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
@@ -318,14 +310,11 @@ where
             None
         }
         .unwrap_or({
-            let resp = self
-                .client
-                .resolve_did_doc(&did)
-                .await?;
-            resp.into_owned()?
-                .pds_endpoint()
-                .ok_or_else(|| ClientError::invalid_request("missing PDS endpoint")
-                    .with_help("DID document must include a PDS service endpoint"))?
+            let resp = self.client.resolve_did_doc(&did).await?;
+            resp.into_owned()?.pds_endpoint().ok_or_else(|| {
+                ClientError::invalid_request("missing PDS endpoint")
+                    .with_help("DID document must include a PDS service endpoint")
+            })?
         });
 
         // Activate
@@ -365,14 +354,11 @@ where
             None
         }
         .unwrap_or({
-            let resp = self
-                .client
-                .resolve_did_doc(&did)
-                .await?;
-            resp.into_owned()?
-                .pds_endpoint()
-                .ok_or_else(|| ClientError::invalid_request("missing PDS endpoint")
-                    .with_help("DID document must include a PDS service endpoint"))?
+            let resp = self.client.resolve_did_doc(&did).await?;
+            resp.into_owned()?.pds_endpoint().ok_or_else(|| {
+                ClientError::invalid_request("missing PDS endpoint")
+                    .with_help("DID document must include a PDS service endpoint")
+            })?
         });
         *self.key.write().await = Some(key.clone());
         *self.endpoint.write().await = Some(pds);
@@ -389,9 +375,7 @@ where
         let Some(key) = self.key.read().await.clone() else {
             return Ok(());
         };
-        self.store
-            .del(&key)
-            .await?;
+        self.store.del(&key).await?;
         *self.key.write().await = None;
         Ok(())
     }

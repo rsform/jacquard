@@ -12,9 +12,11 @@
 //! - [`schema`] - Schema generation from Rust types (reverse codegen)
 //! - [`union_registry`] - Tracks union types for collision detection
 //! - [`fs`] - Filesystem utilities for lexicon storage
+//! - [`derive_impl`] - Implementation functions for derive macros (used by jacquard-derive)
 
 pub mod codegen;
 pub mod corpus;
+pub mod derive_impl;
 pub mod error;
 pub mod fs;
 pub mod lexicon;

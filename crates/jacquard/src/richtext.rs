@@ -767,7 +767,7 @@ impl RichTextBuilder<Resolved> {
 
                     let feature = FacetFeaturesItem::Link(Box::new(Link {
                         uri: Uri::new_owned(&url)?,
-                        extra_data: BTreeMap::new(),
+                        extra_data: None,
                     }));
                     (display_range, feature)
                 }
@@ -785,7 +785,7 @@ impl RichTextBuilder<Resolved> {
 
                     let feature = FacetFeaturesItem::Mention(Box::new(Mention {
                         did,
-                        extra_data: BTreeMap::new(),
+                        extra_data: None,
                     }));
                     (range, feature)
                 }
@@ -808,7 +808,7 @@ impl RichTextBuilder<Resolved> {
 
                     let feature = FacetFeaturesItem::Link(Box::new(Link {
                         uri: Uri::new_owned(&url)?,
-                        extra_data: BTreeMap::new(),
+                        extra_data: None,
                     }));
                     (range, feature)
                 }
@@ -832,7 +832,7 @@ impl RichTextBuilder<Resolved> {
 
                     let feature = FacetFeaturesItem::Tag(Box::new(Tag {
                         tag: CowStr::from(tag.to_smolstr()),
-                        extra_data: BTreeMap::new(),
+                        extra_data: None,
                     }));
                     (range, feature)
                 }
@@ -856,10 +856,10 @@ impl RichTextBuilder<Resolved> {
                 index: ByteSlice {
                     byte_start: range.start as i64,
                     byte_end: range.end as i64,
-                    extra_data: BTreeMap::new(),
+                    extra_data: None,
                 },
                 features: vec![feature],
-                extra_data: BTreeMap::new(),
+                extra_data: None,
             });
 
             last_end = range.end;
@@ -912,7 +912,7 @@ impl RichTextBuilder<Unresolved> {
 
                     let feature = FacetFeaturesItem::Link(Box::new(Link {
                         uri: crate::types::uri::Uri::new_owned(&url)?,
-                        extra_data: BTreeMap::new(),
+                        extra_data: None,
                     }));
                     (display_range, feature)
                 }
@@ -938,7 +938,7 @@ impl RichTextBuilder<Unresolved> {
 
                     let feature = FacetFeaturesItem::Mention(Box::new(Mention {
                         did,
-                        extra_data: BTreeMap::new(),
+                        extra_data: None,
                     }));
                     (range, feature)
                 }
@@ -962,7 +962,7 @@ impl RichTextBuilder<Unresolved> {
 
                     let feature = FacetFeaturesItem::Link(Box::new(Link {
                         uri: crate::types::uri::Uri::new_owned(&url)?,
-                        extra_data: BTreeMap::new(),
+                        extra_data: None,
                     }));
                     (range, feature)
                 }
@@ -986,7 +986,7 @@ impl RichTextBuilder<Unresolved> {
 
                     let feature = FacetFeaturesItem::Tag(Box::new(Tag {
                         tag: CowStr::from(tag.to_smolstr()),
-                        extra_data: BTreeMap::new(),
+                        extra_data: None,
                     }));
                     (range, feature)
                 }
@@ -1010,10 +1010,10 @@ impl RichTextBuilder<Unresolved> {
                 index: ByteSlice {
                     byte_start: range.start as i64,
                     byte_end: range.end as i64,
-                    extra_data: BTreeMap::new(),
+                    extra_data: None,
                 },
                 features: vec![feature],
-                extra_data: BTreeMap::new(),
+                extra_data: None,
             });
 
             last_end = range.end;

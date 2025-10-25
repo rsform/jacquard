@@ -17,9 +17,11 @@ fn test_lexicon_adds_extra_data_field() {
 
     assert_eq!(record.text, "hello");
     assert_eq!(record.count, 42);
-    assert_eq!(record.extra_data.len(), 2);
-    assert!(record.extra_data.contains_key("unknown"));
-    assert!(record.extra_data.contains_key("another"));
+
+    let extra_data = record.extra_data.unwrap();
+    assert_eq!(extra_data.len(), 2);
+    assert!(extra_data.contains_key("unknown"));
+    assert!(extra_data.contains_key("another"));
 }
 
 #[test]
@@ -35,18 +37,12 @@ fn test_lexicon_roundtrip() {
             CowStr::Borrowed("value"),
         )),
     );
-    extra.insert(
-        "number".into(),
-        Data::Integer(42),
-    );
+    extra.insert("number".into(), Data::Integer(42));
     extra.insert(
         "nested".into(),
         Data::Object(jacquard_common::types::value::Object({
             let mut nested_map = BTreeMap::new();
-            nested_map.insert(
-                "inner".into(),
-                Data::Boolean(true),
-            );
+            nested_map.insert("inner".into(), Data::Boolean(true));
             nested_map
         })),
     );
@@ -54,34 +50,35 @@ fn test_lexicon_roundtrip() {
     let record = TestRecord {
         text: "test",
         count: 100,
-        extra_data: extra,
+        extra_data: Some(extra),
     };
 
     let json = serde_json::to_string(&record).unwrap();
     let parsed: TestRecord = serde_json::from_str(&json).unwrap();
 
     assert_eq!(record, parsed);
-    assert_eq!(parsed.extra_data.len(), 3);
+    let extra_data = parsed.extra_data.unwrap();
+    assert_eq!(extra_data.len(), 3);
 
     // Verify the extra fields were preserved
-    assert!(parsed.extra_data.contains_key("custom"));
-    assert!(parsed.extra_data.contains_key("number"));
-    assert!(parsed.extra_data.contains_key("nested"));
+    assert!(extra_data.contains_key("custom"));
+    assert!(extra_data.contains_key("number"));
+    assert!(extra_data.contains_key("nested"));
 
     // Verify the values
-    if let Some(Data::String(s)) = parsed.extra_data.get("custom") {
+    if let Some(Data::String(s)) = extra_data.get("custom") {
         assert_eq!(s.as_str(), "value");
     } else {
         panic!("expected custom field to be a string");
     }
 
-    if let Some(Data::Integer(n)) = parsed.extra_data.get("number") {
+    if let Some(Data::Integer(n)) = extra_data.get("number") {
         assert_eq!(*n, 42);
     } else {
         panic!("expected number field to be an integer");
     }
 
-    if let Some(Data::Object(obj)) = parsed.extra_data.get("nested") {
+    if let Some(Data::Object(obj)) = extra_data.get("nested") {
         assert!(obj.0.contains_key("inner"));
     } else {
         panic!("expected nested field to be an object");

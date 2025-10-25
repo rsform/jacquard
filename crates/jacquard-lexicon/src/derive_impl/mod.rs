@@ -1,0 +1,16 @@
+//! Implementation functions for derive macros
+//!
+//! These functions are used by the `jacquard-derive` proc-macro crate but are also
+//! available for runtime code generation in `jacquard-lexicon`.
+
+pub mod helpers;
+pub mod into_static;
+pub mod lexicon_attr;
+pub mod open_union_attr;
+pub mod xrpc_request;
+
+// Re-export the main entry points
+pub use into_static::impl_derive_into_static;
+pub use lexicon_attr::impl_lexicon;
+pub use open_union_attr::impl_open_union;
+pub use xrpc_request::impl_derive_xrpc_request;

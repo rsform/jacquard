@@ -16,15 +16,13 @@ pub mod get_scrobbles_chart;
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ChartsView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub scrobbles: std::option::Option<
-        Vec<crate::app_rocksky::charts::ScrobbleViewBasic<'a>>,
-    >,
+    pub scrobbles: std::option::Option<Vec<crate::app_rocksky::charts::ScrobbleViewBasic<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -36,7 +34,7 @@ pub struct ChartsView<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ScrobbleViewBasic<'a> {

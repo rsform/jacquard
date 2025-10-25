@@ -57,7 +57,7 @@ fn test_moderate_with_default_hide() {
         default_setting: Some(CowStr::from("hide")),
         adult_only: Some(false),
         locales: vec![],
-        extra_data: BTreeMap::new(),
+        extra_data: None,
     };
 
     defs.insert(labeler_did.clone(), vec![spam_def]);
@@ -109,7 +109,7 @@ fn test_moderate_with_user_preference() {
         default_setting: Some(CowStr::from("hide")),
         adult_only: Some(false),
         locales: vec![],
-        extra_data: BTreeMap::new(),
+        extra_data: None,
     };
 
     defs.insert(labeler_did.clone(), vec![def]);
@@ -228,7 +228,7 @@ fn test_blur_media_vs_content() {
         default_setting: Some(CowStr::from("warn")),
         adult_only: Some(false),
         locales: vec![],
-        extra_data: BTreeMap::new(),
+        extra_data: None,
     };
 
     // Content blur
@@ -239,7 +239,7 @@ fn test_blur_media_vs_content() {
         default_setting: Some(CowStr::from("warn")),
         adult_only: Some(false),
         locales: vec![],
-        extra_data: BTreeMap::new(),
+        extra_data: None,
     };
 
     defs.insert(labeler_did.clone(), vec![media_def, content_def]);
@@ -308,7 +308,7 @@ fn test_adult_only_labels_require_adult_content_enabled() {
         default_setting: Some(CowStr::from("warn")),
         adult_only: Some(true),
         locales: vec![],
-        extra_data: BTreeMap::new(),
+        extra_data: None,
     };
 
     defs.insert(labeler_did.clone(), vec![adult_def]);
