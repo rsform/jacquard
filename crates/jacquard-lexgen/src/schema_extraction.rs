@@ -1,16 +1,138 @@
+//! # Schema Extraction
+//!
+//! Extract AT Protocol lexicon schemas from Rust types via `inventory` discovery.
+//!
+//! ## Usage Pattern
+//!
+//! This module provides schema extraction for types implementing `LexiconSchema`.
+//! The extraction binary discovers schemas at **link time** via `inventory`, so you need
+//! to create a binary in your workspace that links your schema types.
+//!
+//! ### Simple Usage
+//!
+//! ```rust,no_run
+//! // bin/extract_schemas.rs
+//! use jacquard_lexgen::schema_extraction;
+//!
+//! // Import your types so they get linked
+//! use my_app::models::*;
+//!
+//! fn main() -> miette::Result<()> {
+//!     schema_extraction::run(
+//!         "lexicons",  // output directory
+//!         true,        // verbose
+//!     )
+//! }
+//! ```
+//!
+//! ### Advanced Usage
+//!
+//! ```rust,no_run
+//! use jacquard_lexgen::schema_extraction::{ExtractOptions, SchemaExtractor};
+//! use my_app::models::*;  // Your schema types
+//!
+//! fn main() -> miette::Result<()> {
+//!     let options = ExtractOptions {
+//!         output_dir: "lexicons".into(),
+//!         verbose: true,
+//!         filter: Some("app.bsky".into()),  // Only extract app.bsky.* schemas
+//!         validate: true,
+//!         pretty: true,
+//!     };
+//!
+//!     SchemaExtractor::new(options).extract_all()
+//! }
+//! ```
+//!
+//! ### Integration with Build Tools
+//!
+//! **Just:**
+//! ```justfile
+//! # Generate lexicon schemas from Rust types
+//! extract-schemas:
+//!     cargo run --bin extract-schemas
+//! ```
+//!
+//! **Cargo xtask:**
+//! ```rust,ignore
+//! // xtask/src/main.rs
+//! match args {
+//!     "codegen" => {
+//!         run_command("cargo", &["run", "--bin", "extract-schemas"])?;
+//!     }
+//! }
+//! ```
+//!
+//! **Pre-commit hook:**
+//! ```bash
+//! #!/bin/bash
+//! # Regenerate schemas when Rust files change
+//! if git diff --cached --name-only | grep -E '\.rs$'; then
+//!     cargo run --bin extract-schemas
+//!     git add lexicons/*.json
+//! fi
+//! ```
+
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchemaRef;
 use miette::{IntoDiagnostic, Result};
 use std::collections::BTreeMap;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
+/// Options for schema extraction
 pub struct ExtractOptions {
+    /// Output directory for generated schema files
     pub output_dir: PathBuf,
+    /// Enable verbose output
     pub verbose: bool,
+    /// Filter by NSID prefix (e.g., "app.bsky")
     pub filter: Option<String>,
+    /// Validate schemas before writing
     pub validate: bool,
+    /// Pretty-print JSON output
     pub pretty: bool,
+}
+
+impl Default for ExtractOptions {
+    fn default() -> Self {
+        Self {
+            output_dir: PathBuf::from("lexicons"),
+            verbose: false,
+            filter: None,
+            validate: true,
+            pretty: true,
+        }
+    }
+}
+
+/// Run schema extraction with simple defaults
+///
+/// Convenience function for the common case. For more control, use [`SchemaExtractor`].
+///
+/// # Arguments
+///
+/// * `output_dir` - Directory to write schema files (will be created if needed)
+/// * `verbose` - Print progress information
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use jacquard_lexgen::schema_extraction;
+/// use my_app::models::*;  // Your types with #[derive(LexiconSchema)]
+///
+/// fn main() -> miette::Result<()> {
+///     schema_extraction::run("lexicons", true)
+/// }
+/// ```
+pub fn run(output_dir: impl AsRef<Path>, verbose: bool) -> Result<()> {
+    let options = ExtractOptions {
+        output_dir: output_dir.as_ref().to_path_buf(),
+        verbose,
+        ..Default::default()
+    };
+
+    SchemaExtractor::new(options).extract_all()
 }
 
 pub struct SchemaExtractor {
@@ -147,12 +269,8 @@ impl SchemaExtractor {
             self.validate_schema(&final_doc)?;
         }
 
-        // Serialize to JSON
-        let json = if self.options.pretty {
-            serde_json::to_string_pretty(&final_doc).into_diagnostic()?
-        } else {
-            serde_json::to_string(&final_doc).into_diagnostic()?
-        };
+        // Serialize to JSON with "main" def first
+        let json = self.serialize_with_main_first(&final_doc)?;
 
         // Write to file
         let filename = base_nsid.replace('.', "_") + ".json";
@@ -203,6 +321,50 @@ impl SchemaExtractor {
         println!("Watch mode not yet implemented");
         println!("Run with --help to see available options");
         Ok(())
+    }
+
+    /// Serialize a lexicon doc with "main" def first
+    fn serialize_with_main_first(&self, doc: &LexiconDoc) -> Result<String> {
+        use serde_json::{json, Map, Value};
+
+        // Build defs map with main first
+        let mut defs_map = Map::new();
+
+        // Insert main first if it exists
+        if let Some(main_def) = doc.defs.get("main") {
+            let main_value = serde_json::to_value(main_def).into_diagnostic()?;
+            defs_map.insert("main".to_string(), main_value);
+        }
+
+        // Insert all other defs in sorted order
+        for (name, def) in &doc.defs {
+            if name != "main" {
+                let def_value = serde_json::to_value(def).into_diagnostic()?;
+                defs_map.insert(name.to_string(), def_value);
+            }
+        }
+
+        // Build final JSON object
+        let mut obj = Map::new();
+        obj.insert("lexicon".to_string(), json!(1));
+        obj.insert("id".to_string(), json!(doc.id.as_ref()));
+
+        if let Some(rev) = &doc.revision {
+            obj.insert("revision".to_string(), json!(rev));
+        }
+
+        if let Some(desc) = &doc.description {
+            obj.insert("description".to_string(), json!(desc));
+        }
+
+        obj.insert("defs".to_string(), Value::Object(defs_map));
+
+        // Serialize with or without pretty printing
+        if self.options.pretty {
+            serde_json::to_string_pretty(&Value::Object(obj)).into_diagnostic()
+        } else {
+            serde_json::to_string(&Value::Object(obj)).into_diagnostic()
+        }
     }
 }
 

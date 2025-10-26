@@ -29,10 +29,12 @@
 //!
 //! - [`fetch`] - Ingests lexicons from git, atproto, http fetch, and other sources
 //! - [`cli`] - CLI argument parsing utilities
-//! - [`schema_extraction`] - Extract lexicon schemas from Rust types via inventory
+//! - [`schema_extraction`] - Extract lexicon schemas from Rust types via inventory (link-time discovery)
+//! - [`schema_discovery`] - Discover schemas by scanning workspace source files (no linking required)
 
 pub mod cli;
 pub mod fetch;
+pub mod schema_discovery;
 pub mod schema_extraction;
 #[cfg(any(test, debug_assertions))]
 pub mod test_schemas;

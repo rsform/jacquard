@@ -57,6 +57,7 @@
 //! - **Validation**: Runtime constraint checking via `validate()` method
 
 pub mod builder;
+pub mod from_ast;
 pub mod type_mapping;
 
 use crate::lexicon::{LexObjectProperty, LexRef, LexUserType, Lexicon, LexiconDoc};
