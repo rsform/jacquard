@@ -1,0 +1,121 @@
+{
+  "lexicon": 1,
+  "id": "social.flockfeeds.lexical.monetaryamount",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A monetary value or range. This type can be used to describe an amount of money such as $50 USD, or a range as in describing a bank account being suitable for a balance between £1,000 and £1,000,000 GBP, or the value of a salary, etc. It is recommended to use [[PriceSpecification]] Types to describe the price of an Offer, Invoice, etc.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "properties": {
+          "additionalType": {
+            "type": "string",
+            "description": "An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the\n    use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href=\"https://schema.org/docs/styleguide.html\">style guide</a>."
+          },
+          "alternateName": {
+            "type": "string",
+            "description": "An alias for the item."
+          },
+          "currency": {
+            "type": "string",
+            "description": "The currency in which the monetary amount is expressed.\\n\\nUse standard formats: [ISO 4217 currency format](http://en.wikipedia.org/wiki/ISO_4217), e.g. \"USD\"; [Ticker symbol](https://en.wikipedia.org/wiki/List_of_cryptocurrencies) for cryptocurrencies, e.g. \"BTC\"; well known names for [Local Exchange Trading Systems](https://en.wikipedia.org/wiki/Local_exchange_trading_system) (LETS) and other currency types, e.g. \"Ithaca HOUR\"."
+          },
+          "description": {
+            "type": "union",
+            "description": "A description of the item.",
+            "refs": [
+              "social.flockfeeds.lexical.textobject",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "disambiguatingDescription": {
+            "type": "string",
+            "description": "A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation."
+          },
+          "identifier": {
+            "type": "union",
+            "description": "The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.",
+            "refs": [
+              "social.flockfeeds.lexical.propertyvalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "image": {
+            "type": "union",
+            "description": "An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].",
+            "refs": [
+              "social.flockfeeds.lexical.imageobject",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "mainEntityOfPage": {
+            "type": "union",
+            "description": "Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.",
+            "refs": [
+              "social.flockfeeds.lexical.creativework",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "maxValue": {
+            "type": "integer",
+            "description": "The upper value of some characteristic or property."
+          },
+          "minValue": {
+            "type": "integer",
+            "description": "The lower value of some characteristic or property."
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the item."
+          },
+          "potentialAction": {
+            "type": "union",
+            "description": "Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.",
+            "refs": [
+              "social.flockfeeds.lexical.action",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "sameAs": {
+            "type": "string",
+            "description": "URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.",
+            "format": "uri"
+          },
+          "subjectOf": {
+            "type": "union",
+            "description": "A CreativeWork or Event about this Thing.",
+            "refs": [
+              "social.flockfeeds.lexical.event",
+              "social.flockfeeds.lexical.creativework",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "description": "URL of the item.",
+            "format": "uri"
+          },
+          "validFrom": {
+            "type": "string",
+            "description": "The date when the item becomes valid.",
+            "format": "datetime"
+          },
+          "validThrough": {
+            "type": "string",
+            "description": "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
+            "format": "datetime"
+          },
+          "value": {
+            "type": "union",
+            "description": "The value of a [[QuantitativeValue]] (including [[Observation]]) or property value node.\\n\\n* For [[QuantitativeValue]] and [[MonetaryAmount]], the recommended type for values is 'Number'.\\n* For [[PropertyValue]], it can be 'Text', 'Number', 'Boolean', or 'StructuredValue'.\\n* Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similar Unicode symbols.\\n* Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.",
+            "refs": [
+              "social.flockfeeds.lexical.structuredvalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

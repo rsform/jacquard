@@ -8,6 +8,7 @@ pub mod comment;
 pub mod document;
 pub mod graph;
 pub mod pages;
+pub mod poll;
 pub mod publication;
 pub mod richtext;
 pub mod theme;

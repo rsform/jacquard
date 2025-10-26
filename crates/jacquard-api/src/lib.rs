@@ -30,6 +30,9 @@ pub mod blue_atplane;
 #[cfg(feature = "blue_linkat")]
 pub mod blue_linkat;
 
+#[cfg(feature = "blue_rito")]
+pub mod blue_rito;
+
 #[cfg(feature = "blue_zio")]
 pub mod blue_zio;
 
@@ -134,6 +137,9 @@ pub mod sh_weaver;
 
 #[cfg(feature = "social_clippr")]
 pub mod social_clippr;
+
+#[cfg(feature = "social_flockfeeds")]
+pub mod social_flockfeeds;
 
 #[cfg(feature = "social_grain")]
 pub mod social_grain;

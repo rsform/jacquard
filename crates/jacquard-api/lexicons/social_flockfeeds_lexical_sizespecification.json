@@ -1,0 +1,219 @@
+{
+  "lexicon": 1,
+  "id": "social.flockfeeds.lexical.sizespecification",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Size related properties of a product, typically a size code ([[name]]) and optionally a [[sizeSystem]], [[sizeGroup]], and product measurements ([[hasMeasurement]]). In addition, the intended audience can be defined through [[suggestedAge]], [[suggestedGender]], and suggested body measurements ([[suggestedMeasurement]]).",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "properties": {
+          "additionalProperty": {
+            "type": "union",
+            "description": "A property-value pair representing an additional characteristic of the entity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.\\n\\nNote: Publishers should be aware that applications designed to use specific schema.org properties (e.g. https://schema.org/width, https://schema.org/color, https://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.",
+            "refs": [
+              "social.flockfeeds.lexical.propertyvalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "additionalType": {
+            "type": "string",
+            "description": "An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the\n    use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href=\"https://schema.org/docs/styleguide.html\">style guide</a>."
+          },
+          "alternateName": {
+            "type": "string",
+            "description": "An alias for the item."
+          },
+          "description": {
+            "type": "union",
+            "description": "A description of the item.",
+            "refs": [
+              "social.flockfeeds.lexical.textobject",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "disambiguatingDescription": {
+            "type": "string",
+            "description": "A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation."
+          },
+          "equal": {
+            "type": "union",
+            "description": "This ordering relation for qualitative values indicates that the subject is equal to the object.",
+            "refs": [
+              "social.flockfeeds.lexical.qualitativevalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "greater": {
+            "type": "union",
+            "description": "This ordering relation for qualitative values indicates that the subject is greater than the object.",
+            "refs": [
+              "social.flockfeeds.lexical.qualitativevalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "greaterOrEqual": {
+            "type": "union",
+            "description": "This ordering relation for qualitative values indicates that the subject is greater than or equal to the object.",
+            "refs": [
+              "social.flockfeeds.lexical.qualitativevalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "hasMeasurement": {
+            "type": "union",
+            "description": "A measurement of an item, For example, the inseam of pants, the wheel size of a bicycle, the gauge of a screw, or the carbon footprint measured for certification by an authority. Usually an exact measurement, but can also be a range of measurements for adjustable products, for example belts and ski bindings.",
+            "refs": [
+              "social.flockfeeds.lexical.quantitativevalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "identifier": {
+            "type": "union",
+            "description": "The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.",
+            "refs": [
+              "social.flockfeeds.lexical.propertyvalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "image": {
+            "type": "union",
+            "description": "An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].",
+            "refs": [
+              "social.flockfeeds.lexical.imageobject",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "lesser": {
+            "type": "union",
+            "description": "This ordering relation for qualitative values indicates that the subject is lesser than the object.",
+            "refs": [
+              "social.flockfeeds.lexical.qualitativevalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "lesserOrEqual": {
+            "type": "union",
+            "description": "This ordering relation for qualitative values indicates that the subject is lesser than or equal to the object.",
+            "refs": [
+              "social.flockfeeds.lexical.qualitativevalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "mainEntityOfPage": {
+            "type": "union",
+            "description": "Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.",
+            "refs": [
+              "social.flockfeeds.lexical.creativework",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the item."
+          },
+          "nonEqual": {
+            "type": "union",
+            "description": "This ordering relation for qualitative values indicates that the subject is not equal to the object.",
+            "refs": [
+              "social.flockfeeds.lexical.qualitativevalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "potentialAction": {
+            "type": "union",
+            "description": "Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.",
+            "refs": [
+              "social.flockfeeds.lexical.action",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "sameAs": {
+            "type": "string",
+            "description": "URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.",
+            "format": "uri"
+          },
+          "sizeGroup": {
+            "type": "union",
+            "description": "The size group (also known as \"size type\") for a product's size. Size groups are common in the fashion industry to define size segments and suggested audiences for wearable products. Multiple values can be combined, for example \"men's big and tall\", \"petite maternity\" or \"regular\".",
+            "refs": [
+              "social.flockfeeds.lexical.sizegroupenumeration",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "sizeSystem": {
+            "type": "union",
+            "description": "The size system used to identify a product's size. Typically either a standard (for example, \"GS1\" or \"ISO-EN13402\"), country code (for example \"US\" or \"JP\"), or a measuring system (for example \"Metric\" or \"Imperial\").",
+            "refs": [
+              "social.flockfeeds.lexical.sizesystemenumeration",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "subjectOf": {
+            "type": "union",
+            "description": "A CreativeWork or Event about this Thing.",
+            "refs": [
+              "social.flockfeeds.lexical.event",
+              "social.flockfeeds.lexical.creativework",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "suggestedAge": {
+            "type": "union",
+            "description": "The age or age range for the intended audience or person, for example 3-12 months for infants, 1-5 years for toddlers.",
+            "refs": [
+              "social.flockfeeds.lexical.quantitativevalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "suggestedGender": {
+            "type": "union",
+            "description": "The suggested gender of the intended person or audience, for example \"male\", \"female\", or \"unisex\".",
+            "refs": [
+              "social.flockfeeds.lexical.gendertype",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "suggestedMeasurement": {
+            "type": "union",
+            "description": "A suggested range of body measurements for the intended audience or person, for example inseam between 32 and 34 inches or height between 170 and 190 cm. Typically found on a size chart for wearable products.",
+            "refs": [
+              "social.flockfeeds.lexical.quantitativevalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "supersededBy": {
+            "type": "union",
+            "description": "Relates a term (i.e. a property, class or enumeration) to one that supersedes it.",
+            "refs": [
+              "social.flockfeeds.lexical.enumeration",
+              "social.flockfeeds.lexical.class",
+              "social.flockfeeds.lexical.property",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "description": "URL of the item.",
+            "format": "uri"
+          },
+          "valueReference": {
+            "type": "union",
+            "description": "A secondary value that provides additional information on the original value, e.g. a reference temperature or a type of measurement.",
+            "refs": [
+              "social.flockfeeds.lexical.definedterm",
+              "social.flockfeeds.lexical.measurementtypeenumeration",
+              "social.flockfeeds.lexical.enumeration",
+              "social.flockfeeds.lexical.qualitativevalue",
+              "social.flockfeeds.lexical.quantitativevalue",
+              "social.flockfeeds.lexical.propertyvalue",
+              "social.flockfeeds.lexical.structuredvalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

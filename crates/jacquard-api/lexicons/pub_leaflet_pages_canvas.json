@@ -1,0 +1,111 @@
+{
+  "lexicon": 1,
+  "id": "pub.leaflet.pages.canvas",
+  "defs": {
+    "block": {
+      "type": "object",
+      "required": [
+        "block",
+        "x",
+        "y",
+        "width"
+      ],
+      "properties": {
+        "block": {
+          "type": "union",
+          "refs": [
+            "pub.leaflet.blocks.iframe",
+            "pub.leaflet.blocks.text",
+            "pub.leaflet.blocks.blockquote",
+            "pub.leaflet.blocks.header",
+            "pub.leaflet.blocks.image",
+            "pub.leaflet.blocks.unorderedList",
+            "pub.leaflet.blocks.website",
+            "pub.leaflet.blocks.math",
+            "pub.leaflet.blocks.code",
+            "pub.leaflet.blocks.horizontalRule",
+            "pub.leaflet.blocks.bskyPost",
+            "pub.leaflet.blocks.page"
+          ]
+        },
+        "height": {
+          "type": "integer"
+        },
+        "rotation": {
+          "type": "integer"
+        },
+        "width": {
+          "type": "integer"
+        },
+        "x": {
+          "type": "integer"
+        },
+        "y": {
+          "type": "integer"
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "required": [
+        "blocks"
+      ],
+      "properties": {
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#block"
+          }
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "position": {
+      "type": "object",
+      "required": [
+        "block",
+        "offset"
+      ],
+      "properties": {
+        "block": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "offset": {
+          "type": "integer"
+        }
+      }
+    },
+    "quote": {
+      "type": "object",
+      "required": [
+        "start",
+        "end"
+      ],
+      "properties": {
+        "end": {
+          "type": "ref",
+          "ref": "#position"
+        },
+        "start": {
+          "type": "ref",
+          "ref": "#position"
+        }
+      }
+    },
+    "textAlignCenter": {
+      "type": "token"
+    },
+    "textAlignLeft": {
+      "type": "token"
+    },
+    "textAlignRight": {
+      "type": "token"
+    }
+  }
+}

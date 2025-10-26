@@ -109,3 +109,141 @@ pub struct SparklineEntry<'a> {
     #[builder(into)]
     pub slice_uri: jacquard_common::CowStr<'a>,
 }
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparklineEntry<'a> {
+    fn nsid() -> &'static str {
+        "network.slices.slice.getSparklines"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "network.slices.slice.getSparklines".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
+                        description: None,
+                        parameters: None,
+                        input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
+                            description: None,
+                            encoding: "application/json".into(),
+                            schema: Some(
+                                ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
+                                    description: None,
+                                    required: Some(vec!["slices".into()]),
+                                    nullable: None,
+                                    properties: {
+                                        let mut map = ::std::collections::BTreeMap::new();
+                                        map.insert(
+                                            "duration".into(),
+                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                                description: None,
+                                                format: None,
+                                                default: None,
+                                                min_length: None,
+                                                max_length: None,
+                                                min_graphemes: None,
+                                                max_graphemes: None,
+                                                r#enum: None,
+                                                r#const: None,
+                                                known_values: None,
+                                            }),
+                                        );
+                                        map.insert(
+                                            "interval".into(),
+                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                                description: None,
+                                                format: None,
+                                                default: None,
+                                                min_length: None,
+                                                max_length: None,
+                                                min_graphemes: None,
+                                                max_graphemes: None,
+                                                r#enum: None,
+                                                r#const: None,
+                                                known_values: None,
+                                            }),
+                                        );
+                                        map.insert(
+                                            "slices".into(),
+                                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                                description: None,
+                                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                                    description: None,
+                                                    format: None,
+                                                    default: None,
+                                                    min_length: None,
+                                                    max_length: None,
+                                                    min_graphemes: None,
+                                                    max_graphemes: None,
+                                                    r#enum: None,
+                                                    r#const: None,
+                                                    known_values: None,
+                                                }),
+                                                min_length: None,
+                                                max_length: None,
+                                            }),
+                                        );
+                                        map
+                                    },
+                                }),
+                            ),
+                        }),
+                        output: None,
+                        errors: None,
+                    }),
+                );
+                map.insert(
+                    "sparklineEntry".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["sliceUri".into(), "points".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "points".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "network.slices.slice.defs#sparklinePoint".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "sliceUri".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
+}

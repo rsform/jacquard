@@ -18,19 +18,19 @@ watch *ARGS:
 	bacon --job run -- -- {{ ARGS }}
 
 update-api:
-    cargo run -p jacquard-lexicon --bin lex-fetch -- -v
+    cargo run -p jacquard-lexgen --bin lex-fetch -- -v
 
 generate-api:
-    cargo run -p jacquard-lexicon --bin jacquard-codegen -- -i crates/jacquard-api/lexicons -o crates/jacquard-api/src -r crate
+    cargo run -p jacquard-lexgen --bin jacquard-codegen -- -i crates/jacquard-api/lexicons -o crates/jacquard-api/src -r crate
 
 lex-gen *ARGS:
-    cargo run -p jacquard-lexicon --bin lex-fetch -- {{ARGS}}
+    cargo run -p jacquard-lexgen --bin lex-fetch -- {{ARGS}}
 
 lex-fetch *ARGS:
-    cargo run -p jacquard-lexicon --bin lex-fetch -- --no-codegen {{ARGS}}
+    cargo run -p jacquard-lexgen --bin lex-fetch -- --no-codegen {{ARGS}}
 
 codegen *ARGS:
-    cargo run -p jacquard-lexicon --bin jacquard-codegen -- -r crate {{ARGS}}
+    cargo run -p jacquard-lexgen --bin jacquard-codegen -- -r crate {{ARGS}}
 
 # Package binaries for distribution (creates tar.xz archives)
 package-binaries:

@@ -86,8 +86,8 @@ fn extract_object_validations(obj: &LexObject) -> Vec<ValidationCheck> {
     let mut checks = Vec::new();
 
     for (schema_name, prop) in &obj.properties {
-        // Convert schema name to field name (snake_case)
-        let field_name = to_snake_case(schema_name);
+        // Convert schema name to field name (snake_case, with r# prefix for keywords)
+        let field_name = field_name_from_schema(schema_name);
 
         // Check if required
         let is_required = obj
@@ -246,25 +246,23 @@ fn extract_integer_validations(
     checks
 }
 
-/// Convert camelCase/PascalCase to snake_case
-fn to_snake_case(s: &str) -> String {
-    let mut result = String::new();
-    let mut prev_is_lower = false;
+/// Convert schema field name to the Rust field identifier as it appears in generated code
+///
+/// This matches the codegen logic: snake_case + keyword handling
+fn field_name_from_schema(schema_name: &str) -> String {
+    use heck::ToSnakeCase;
 
-    for (i, ch) in s.chars().enumerate() {
-        if ch.is_uppercase() {
-            if i > 0 && prev_is_lower {
-                result.push('_');
-            }
-            result.push(ch.to_ascii_lowercase());
-            prev_is_lower = false;
-        } else {
-            result.push(ch);
-            prev_is_lower = ch.is_lowercase();
+    let snake = schema_name.to_snake_case();
+
+    // Check if it's a Rust keyword that needs r# prefix
+    // Using syn to parse will tell us if it needs raw identifier
+    match syn::parse_str::<syn::Ident>(&snake) {
+        Ok(_) => snake, // Not a keyword
+        Err(_) => {
+            // It's a keyword, need r# prefix
+            format!("r#{}", snake)
         }
     }
-
-    result
 }
 
 #[cfg(test)]
@@ -272,10 +270,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_to_snake_case() {
-        assert_eq!(to_snake_case("createdAt"), "created_at");
-        assert_eq!(to_snake_case("maxLength"), "max_length");
-        assert_eq!(to_snake_case("text"), "text");
-        assert_eq!(to_snake_case("FooBar"), "foo_bar");
+    fn test_field_name_from_schema() {
+        assert_eq!(field_name_from_schema("createdAt"), "created_at");
+        assert_eq!(field_name_from_schema("maxLength"), "max_length");
+        assert_eq!(field_name_from_schema("text"), "text");
+        assert_eq!(field_name_from_schema("ref"), "r#ref");
+        assert_eq!(field_name_from_schema("type"), "r#type");
     }
 }
