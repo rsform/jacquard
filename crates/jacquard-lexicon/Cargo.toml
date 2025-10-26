@@ -16,7 +16,7 @@ glob = "0.3"
 heck.workspace = true
 inventory = "0.3"
 jacquard-common = { version = "0.8", path = "../jacquard-common" }
-miette = { workspace = true, features = ["fancy"] }
+miette = { workspace = true }
 prettyplease.workspace = true
 proc-macro2.workspace = true
 quote.workspace = true

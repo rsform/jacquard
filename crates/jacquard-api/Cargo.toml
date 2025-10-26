@@ -24,6 +24,7 @@ miette.workspace = true
 serde.workspace = true
 serde_ipld_dagcbor.workspace = true
 thiserror.workspace = true
+unicode-segmentation = "1.12"
 
 
 [lints.rust]
