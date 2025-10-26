@@ -2,8 +2,8 @@
 //!
 //! This crate provides attribute and derive macros for working with Jacquard types.
 //! The code generator uses `#[lexicon]` and `#[open_union]` to add lexicon-specific behavior.
-//! You'll use `#[derive(IntoStatic)]` frequently, and `#[derive(XrpcRequest)]` when defining
-//! custom XRPC endpoints.
+//! You'll use `#[derive(IntoStatic)]` frequently, `#[derive(XrpcRequest)]` when defining
+//! custom XRPC endpoints, and `#[derive(LexiconSchema)]` for reverse codegen (Rust → lexicon).
 //!
 //! ## Macros
 //!
@@ -76,6 +76,51 @@
 //! // - impl XrpcResp for GetThingResponse
 //! // - impl XrpcRequest for GetThing
 //! ```
+//!
+//! ### `#[derive(LexiconSchema)]`
+//!
+//! Derives `LexiconSchema` trait for reverse codegen (Rust → lexicon JSON). Generate
+//! lexicon schemas from your Rust types for rapid prototyping and custom lexicons.
+//!
+//! **Type-level attributes** (`#[lexicon(...)]`):
+//! - `nsid = "..."`: The lexicon NSID (required)
+//! - `record`: Mark as a record type (requires `key`)
+//! - `object`: Mark as an object type (default if neither record/procedure/query)
+//! - `key = "..."`: Record key type (`"tid"`, `"literal:self"`, or custom)
+//! - `fragment = "..."`: Fragment name for non-main defs
+//!
+//! **Field-level attributes** (`#[lexicon(...)]`):
+//! - `max_length = N`: Max byte length for strings
+//! - `max_graphemes = N`: Max grapheme count for strings
+//! - `min_length = N`, `min_graphemes = N`: Minimum constraints
+//! - `minimum = N`, `maximum = N`: Integer range constraints
+//!
+//! **Serde integration**: Respects `#[serde(rename)]`, `#[serde(rename_all)]`, and
+//! `#[serde(skip)]`. Defaults to camelCase for field names (lexicon standard).
+//!
+//! **Enums**: Closed unions by default. Add `#[open_union]` for open unions. Variant
+//! refs resolved via `#[nsid = "..."]` > `#[serde(rename = "...")]` > fragment inference.
+//!
+//! ```ignore
+//! // Record with constraints
+//! #[derive(LexiconSchema)]
+//! #[lexicon(nsid = "app.bsky.feed.post", record, key = "tid")]
+//! struct Post<'a> {
+//!     #[lexicon(max_graphemes = 300, max_length = 3000)]
+//!     pub text: CowStr<'a>,
+//!     pub created_at: Datetime,  // -> "createdAt" (camelCase)
+//! }
+//!
+//! // Closed union
+//! #[derive(LexiconSchema)]
+//! #[lexicon(nsid = "app.bsky.feed.defs")]
+//! enum FeedViewPref {
+//!     #[nsid = "app.bsky.feed.defs#feedViewPref"]
+//!     Feed,
+//!     #[nsid = "app.bsky.feed.defs#threadViewPref"]
+//!     Thread,
+//! }
+//! ```
 
 use proc_macro::TokenStream;
 
@@ -112,4 +157,21 @@ pub fn derive_into_static(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(XrpcRequest, attributes(xrpc))]
 pub fn derive_xrpc_request(input: TokenStream) -> TokenStream {
     jacquard_lexicon::derive_impl::impl_derive_xrpc_request(input.into()).into()
+}
+
+/// Derive macro for `LexiconSchema` trait.
+///
+/// Generates `LexiconSchema` trait impl from Rust types for reverse codegen (Rust → lexicon JSON).
+/// Produces lexicon schema definitions and runtime validation code from your type definitions.
+///
+/// **What it generates:**
+/// - `impl LexiconSchema` with `nsid()`, `schema_id()`, and `lexicon_doc()` methods
+/// - `validate()` method that checks constraints at runtime
+/// - `inventory::submit!` registration for schema discovery (Phase 3)
+///
+/// **Attributes:** `#[lexicon(...)]` and `#[nsid = "..."]` on types and fields.
+/// See crate docs for full attribute reference and examples.
+#[proc_macro_derive(LexiconSchema, attributes(lexicon, nsid))]
+pub fn derive_lexicon_schema(input: TokenStream) -> TokenStream {
+    jacquard_lexicon::derive_impl::impl_derive_lexicon_schema(input.into()).into()
 }

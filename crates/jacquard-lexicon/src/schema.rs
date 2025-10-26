@@ -74,8 +74,8 @@ pub trait LexiconSchema {
     /// The schema ID for this type
     ///
     /// Defaults to NSID. Override for fragments to include `#fragment` suffix.
-    fn schema_id() -> Cow<'static, str> {
-        Cow::Borrowed(Self::nsid())
+    fn schema_id() -> jacquard_common::CowStr<'static> {
+        jacquard_common::CowStr::new_static(Self::nsid())
     }
 
     /// Whether this type should be inlined vs referenced
@@ -308,6 +308,19 @@ pub enum GeneratorError {
     #[error("invalid NSID: {nsid}")]
     InvalidNsid { nsid: String },
 }
+
+/// Registry entry for schema discovery via inventory
+///
+/// Generated automatically by `#[derive(LexiconSchema)]` to enable runtime schema discovery.
+/// Phase 3 will use this to extract all schemas from a binary.
+pub struct LexiconSchemaRef {
+    /// The NSID for this schema
+    pub nsid: &'static str,
+    /// Function that generates the lexicon document
+    pub provider: fn() -> crate::lexicon::LexiconDoc<'static>,
+}
+
+inventory::collect!(LexiconSchemaRef);
 
 #[cfg(test)]
 mod tests {

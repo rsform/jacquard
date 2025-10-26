@@ -406,6 +406,8 @@ pub enum LexUserType<'s> {
     CidLink(LexCidLink<'s>),
     // lexUnknown
     Unknown(LexUnknown<'s>),
+    // lexRefUnion
+    Union(LexRefUnion<'s>),
 }
 
 // IntoStatic implementations for all lexicon types
@@ -839,6 +841,7 @@ impl IntoStatic for LexUserType<'_> {
             Self::Bytes(x) => LexUserType::Bytes(x.into_static()),
             Self::CidLink(x) => LexUserType::CidLink(x.into_static()),
             Self::Unknown(x) => LexUserType::Unknown(x.into_static()),
+            Self::Union(x) => LexUserType::Union(x.into_static()),
         }
     }
 }

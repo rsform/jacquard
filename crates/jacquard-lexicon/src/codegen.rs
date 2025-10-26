@@ -175,6 +175,12 @@ impl<'c> CodeGenerator<'c> {
                 self.subscription_files.borrow_mut().insert(file_path);
                 self.generate_subscription(nsid, def_name, sub)
             }
+            LexUserType::Union(union) => {
+                // Top-level union generates an enum
+                let type_name = self.def_to_type_name(nsid, def_name);
+                let refs: Vec<_> = union.refs.iter().cloned().collect();
+                self.generate_union(nsid, &type_name, &refs, union.description.as_ref().map(|d| d.as_ref()), union.closed)
+            }
         }
     }
 }

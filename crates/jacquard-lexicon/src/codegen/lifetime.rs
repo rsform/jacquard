@@ -1,7 +1,5 @@
 use super::CodeGenerator;
-use crate::lexicon::{
-    LexArrayItem, LexObjectProperty, LexString, LexStringFormat, LexUserType,
-};
+use crate::lexicon::{LexArrayItem, LexObjectProperty, LexString, LexStringFormat, LexUserType};
 
 impl<'c> CodeGenerator<'c> {
     /// Check if a property type needs a lifetime parameter
@@ -60,7 +58,6 @@ impl<'c> CodeGenerator<'c> {
     /// Check if a lexicon def needs a lifetime parameter
     pub(super) fn def_needs_lifetime(&self, def: &LexUserType<'static>) -> bool {
         match def {
-            // Records and Objects always have lifetimes now since they get #[lexicon] attribute
             LexUserType::Record(_) => true,
             LexUserType::Object(_) => true,
             LexUserType::Token(_) => false,
@@ -85,11 +82,15 @@ impl<'c> CodeGenerator<'c> {
                 // Shouldn't be referenced directly
                 true
             }
+            LexUserType::Union(_) => false, // Unions are just refs, no lifetime needed
         }
     }
 
     /// Check if xrpc params need a lifetime parameter
-    pub(super) fn params_need_lifetime(&self, params: &crate::lexicon::LexXrpcParameters<'static>) -> bool {
+    pub(super) fn params_need_lifetime(
+        &self,
+        params: &crate::lexicon::LexXrpcParameters<'static>,
+    ) -> bool {
         params.properties.values().any(|prop| {
             use crate::lexicon::LexXrpcParametersProperty;
             match prop {

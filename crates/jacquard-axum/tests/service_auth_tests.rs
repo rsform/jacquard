@@ -88,10 +88,10 @@ fn create_test_did_doc(did: &str, public_key: &k256::ecdsa::VerifyingKey) -> Did
             r#type: CowStr::new_static("Multikey"),
             controller: Some(CowStr::Owned(did.into())),
             public_key_multibase: Some(CowStr::Owned(multibase_key.into())),
-            extra_data: None,
+            extra_data: BTreeMap::new(),
         }]),
         service: None,
-        extra_data: None,
+        extra_data: BTreeMap::new(),
     }
 }
 

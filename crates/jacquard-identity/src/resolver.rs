@@ -97,9 +97,9 @@ impl DidDocResponse {
                         service_endpoint: Some(Data::String(AtprotoStr::Uri(Uri::Https(
                             Url::from_str(&mini_doc.pds).unwrap(),
                         )))),
-                        extra_data: None,
+                        extra_data: BTreeMap::new(),
                     }]),
-                    extra_data: None,
+                    extra_data: BTreeMap::new(),
                 })
             } else {
                 Err(IdentityError::missing_pds_endpoint())
@@ -141,9 +141,9 @@ impl DidDocResponse {
                         service_endpoint: Some(Data::String(AtprotoStr::Uri(Uri::Https(
                             Url::from_str(&mini_doc.pds).unwrap(),
                         )))),
-                        extra_data: None,
+                        extra_data: BTreeMap::new(),
                     }]),
-                    extra_data: None,
+                    extra_data: BTreeMap::new(),
                 }
                 .into_static())
             } else {
