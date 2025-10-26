@@ -1,14 +1,9 @@
 //! Implementation of #[derive(LexiconSchema)] macro
 
-use crate::lexicon::{
-    LexArray, LexBlob, LexBoolean, LexBytes, LexCidLink, LexInteger, LexObject, LexObjectProperty,
-    LexRef, LexRefUnion, LexString, LexStringFormat, LexUnknown, LexUserType,
-};
 use crate::schema::type_mapping::{LexiconPrimitiveType, StringFormat, rust_type_to_lexicon_type};
 use heck::{ToKebabCase, ToLowerCamelCase, ToPascalCase, ToShoutySnakeCase, ToSnakeCase};
-use jacquard_common::smol_str::{SmolStr, ToSmolStr};
 use proc_macro2::TokenStream;
-use quote::{ToTokens, quote};
+use quote::quote;
 use syn::{Attribute, Data, DeriveInput, Fields, Ident, LitStr, Type, parse2};
 
 /// Implementation for the LexiconSchema derive macro
@@ -422,7 +417,7 @@ fn impl_for_struct(
                 nsid: #nsid,
                 provider: || {
                     let mut generator = ::jacquard_lexicon::schema::LexiconGenerator::new(#nsid);
-                    #name::lexicon_doc(&mut generator)
+                    <#name as ::jacquard_lexicon::schema::LexiconSchema>::lexicon_doc(&mut generator)
                 },
             }
         }
@@ -1202,7 +1197,7 @@ fn impl_for_enum(
                 nsid: #nsid,
                 provider: || {
                     let mut generator = ::jacquard_lexicon::schema::LexiconGenerator::new(#nsid);
-                    #name::lexicon_doc(&mut generator)
+                    <#name as ::jacquard_lexicon::schema::LexiconSchema>::lexicon_doc(&mut generator)
                 },
             }
         }

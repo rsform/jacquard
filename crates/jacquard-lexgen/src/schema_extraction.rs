@@ -1,0 +1,288 @@
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchemaRef;
+use miette::{IntoDiagnostic, Result};
+use std::collections::BTreeMap;
+use std::fs;
+use std::path::PathBuf;
+
+pub struct ExtractOptions {
+    pub output_dir: PathBuf,
+    pub verbose: bool,
+    pub filter: Option<String>,
+    pub validate: bool,
+    pub pretty: bool,
+}
+
+pub struct SchemaExtractor {
+    options: ExtractOptions,
+}
+
+impl SchemaExtractor {
+    pub fn new(options: ExtractOptions) -> Self {
+        Self { options }
+    }
+
+    /// Extract all schemas from inventory
+    pub fn extract_all(&self) -> Result<()> {
+        if self.options.verbose {
+            println!("Discovering schemas via inventory...");
+        }
+
+        // Collect all schema refs from inventory
+        let refs: Vec<&LexiconSchemaRef> = inventory::iter::<LexiconSchemaRef>().collect();
+
+        if self.options.verbose {
+            println!("Found {} schema types", refs.len());
+        }
+
+        // Group by base NSID
+        let grouped = self.group_by_base_nsid(&refs)?;
+
+        // Create output directory
+        fs::create_dir_all(&self.options.output_dir).into_diagnostic()?;
+
+        // Process each group
+        let mut written = 0;
+        for (base_nsid, group_refs) in grouped {
+            // Apply filter if specified
+            if let Some(filter) = &self.options.filter {
+                if !base_nsid.starts_with(filter) {
+                    continue;
+                }
+            }
+
+            if self.options.verbose {
+                println!("Processing {} ({} types)", base_nsid, group_refs.len());
+            }
+
+            self.write_lexicon(&base_nsid, &group_refs)?;
+            written += 1;
+        }
+
+        println!(
+            "✓ Wrote {} lexicon files to {}",
+            written,
+            self.options.output_dir.display()
+        );
+
+        Ok(())
+    }
+
+    /// Group refs by base NSID (strip fragment suffix)
+    fn group_by_base_nsid<'a>(
+        &self,
+        refs: &[&'a LexiconSchemaRef],
+    ) -> Result<BTreeMap<String, Vec<&'a LexiconSchemaRef>>> {
+        let mut groups: BTreeMap<String, Vec<&'a LexiconSchemaRef>> = BTreeMap::new();
+
+        for schema_ref in refs {
+            let nsid = schema_ref.nsid;
+
+            // Split on # to get base NSID
+            let base_nsid = if let Some(pos) = nsid.find('#') {
+                &nsid[..pos]
+            } else {
+                nsid
+            };
+
+            groups
+                .entry(base_nsid.to_string())
+                .or_default()
+                .push(schema_ref);
+        }
+
+        Ok(groups)
+    }
+
+    /// Write a single lexicon file
+    fn write_lexicon(&self, base_nsid: &str, refs: &[&LexiconSchemaRef]) -> Result<()> {
+        // Generate all schemas in this group
+        let mut all_defs = BTreeMap::new();
+        let mut primary_doc: Option<LexiconDoc> = None;
+
+        for schema_ref in refs {
+            let doc = (schema_ref.provider)();
+
+            // Determine if this is the primary def or a fragment
+            if schema_ref.nsid.contains('#') {
+                // Fragment - extract def name and add to defs
+                let fragment_name = schema_ref.nsid.split('#').nth(1).unwrap();
+
+                // Merge defs from fragment doc
+                for (def_name, def) in doc.defs {
+                    // Use fragment name if def is "main", otherwise use as-is
+                    let final_name = if def_name == "main" {
+                        fragment_name.to_string()
+                    } else {
+                        def_name.to_string()
+                    };
+                    all_defs.insert(final_name, def);
+                }
+            } else {
+                // Primary type - use as base doc
+                primary_doc = Some(doc);
+            }
+        }
+
+        // Build final doc
+        let mut final_doc = primary_doc.unwrap_or_else(|| {
+            // No primary doc - create one
+            use jacquard_lexicon::lexicon::Lexicon;
+            LexiconDoc {
+                lexicon: Lexicon::Lexicon1,
+                id: base_nsid.into(),
+                revision: None,
+                description: None,
+                defs: BTreeMap::new(),
+            }
+        });
+
+        // Merge in all defs (convert String keys to SmolStr)
+        for (k, v) in all_defs {
+            final_doc.defs.insert(k.into(), v);
+        }
+
+        // Validate if requested
+        if self.options.validate {
+            self.validate_schema(&final_doc)?;
+        }
+
+        // Serialize to JSON
+        let json = if self.options.pretty {
+            serde_json::to_string_pretty(&final_doc).into_diagnostic()?
+        } else {
+            serde_json::to_string(&final_doc).into_diagnostic()?
+        };
+
+        // Write to file
+        let filename = base_nsid.replace('.', "_") + ".json";
+        let path = self.options.output_dir.join(&filename);
+
+        fs::write(&path, json).into_diagnostic()?;
+
+        if self.options.verbose {
+            println!("  Wrote {} ({} defs)", filename, final_doc.defs.len());
+        }
+
+        Ok(())
+    }
+
+    /// Validate a schema document
+    fn validate_schema(&self, doc: &LexiconDoc) -> Result<()> {
+        // Must have at least one def
+        if doc.defs.is_empty() {
+            return Err(miette::miette!("lexicon {} has no defs", doc.id));
+        }
+
+        // Warn if no "main" def and doesn't follow .defs convention
+        if !doc.defs.contains_key("main") {
+            let id_str = doc.id.as_ref();
+            if !id_str.ends_with(".defs") {
+                eprintln!(
+                    "⚠️  Warning: lexicon {} has no 'main' def - consider naming it {}.defs",
+                    id_str, id_str
+                );
+                if self.options.verbose {
+                    eprintln!(
+                        "   Lexicons without a primary type should use the .defs suffix (e.g., app.bsky.actor.defs)"
+                    );
+                }
+            }
+        }
+
+        // Validate NSID format
+        if !is_valid_nsid(&doc.id) {
+            return Err(miette::miette!("invalid NSID format: {}", doc.id));
+        }
+
+        Ok(())
+    }
+
+    /// Watch mode - regenerate on file changes
+    pub fn watch(&self) -> Result<()> {
+        println!("Watch mode not yet implemented");
+        println!("Run with --help to see available options");
+        Ok(())
+    }
+}
+
+/// Validate NSID format: domain.name.record
+fn is_valid_nsid(nsid: &str) -> bool {
+    let parts: Vec<&str> = nsid.split('.').collect();
+
+    // Must have at least 3 parts
+    if parts.len() < 3 {
+        return false;
+    }
+
+    // Each part must be valid
+    for part in parts {
+        if part.is_empty() {
+            return false;
+        }
+
+        // Must be alphanumeric, hyphens, or underscores
+        if !part
+            .chars()
+            .all(|c| c.is_alphanumeric() || c == '-' || c == '_')
+        {
+            return false;
+        }
+    }
+
+    true
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_is_valid_nsid() {
+        assert!(is_valid_nsid("com.example.test"));
+        assert!(is_valid_nsid("app.bsky.feed.post"));
+        assert!(is_valid_nsid("com.example.with_underscore"));
+        assert!(is_valid_nsid("com.example.with-hyphen"));
+
+        assert!(!is_valid_nsid("com.example")); // Too short
+        assert!(!is_valid_nsid("com")); // Too short
+        assert!(!is_valid_nsid("com.example.invalid!")); // Invalid char
+        assert!(!is_valid_nsid("com..example")); // Empty segment
+    }
+
+    #[test]
+    fn test_group_by_base_nsid() {
+        let refs = vec![
+            LexiconSchemaRef {
+                nsid: "com.example.test",
+                provider: || todo!(),
+            },
+            LexiconSchemaRef {
+                nsid: "com.example.test#fragment",
+                provider: || todo!(),
+            },
+            LexiconSchemaRef {
+                nsid: "com.example.other",
+                provider: || todo!(),
+            },
+        ];
+
+        let ref_ptrs: Vec<&LexiconSchemaRef> = refs.iter().collect();
+
+        let extractor = SchemaExtractor::new(ExtractOptions {
+            output_dir: PathBuf::from("test"),
+            verbose: false,
+            filter: None,
+            validate: false,
+            pretty: true,
+        });
+
+        let grouped = extractor.group_by_base_nsid(&ref_ptrs).unwrap();
+
+        assert_eq!(grouped.len(), 2);
+        assert!(grouped.contains_key("com.example.test"));
+        assert!(grouped.contains_key("com.example.other"));
+        assert_eq!(grouped["com.example.test"].len(), 2);
+        assert_eq!(grouped["com.example.other"].len(), 1);
+    }
+}

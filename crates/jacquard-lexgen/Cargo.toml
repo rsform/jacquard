@@ -19,12 +19,18 @@ path = "src/bin/codegen.rs"
 name = "lex-fetch"
 path = "src/bin/lex_fetch.rs"
 
+[[bin]]
+name = "extract-schemas"
+path = "src/bin/extract_schemas.rs"
+
 [dependencies]
 async-trait = "0.1"
 clap.workspace = true
 glob = "0.3"
+inventory = "0.3"
 jacquard-api = { version = "0.8", git = "https://tangled.org/@nonbinary.computer/jacquard" }
 jacquard-common = { version = "0.8", features = [ "reqwest-client" ], git = "https://tangled.org/@nonbinary.computer/jacquard" }
+jacquard-derive = { version = "0.8", git = "https://tangled.org/@nonbinary.computer/jacquard" }
 jacquard-identity = { version = "0.8", git = "https://tangled.org/@nonbinary.computer/jacquard" }
 jacquard-lexicon = { version = "0.8",  git = "https://tangled.org/@nonbinary.computer/jacquard" }
 kdl = "6"

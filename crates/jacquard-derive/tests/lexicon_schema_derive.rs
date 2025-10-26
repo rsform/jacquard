@@ -9,7 +9,9 @@ fn test_simple_struct() {
     #[derive(LexiconSchema)]
     #[lexicon(nsid = "com.example.simple", record, key = "tid")]
     struct SimpleRecord<'a> {
+        #[allow(dead_code)]
         pub text: CowStr<'a>,
+        #[allow(dead_code)]
         pub created_at: Datetime,
     }
 
@@ -124,7 +126,9 @@ fn test_default_camel_case() {
     #[derive(LexiconSchema)]
     #[lexicon(nsid = "com.example.camel", record)]
     struct CamelCaseRecord {
+        #[allow(dead_code)]
         pub field_one: i64,
+        #[allow(dead_code)]
         pub field_two: i64,
     }
 
@@ -145,9 +149,11 @@ fn test_basic_enum() {
     #[lexicon(nsid = "com.example.union")]
     enum BasicUnion {
         #[nsid = "com.example.variant.one"]
+        #[allow(dead_code)]
         VariantOne,
 
         #[nsid = "com.example.variant.two"]
+        #[allow(dead_code)]
         VariantTwo,
     }
 
@@ -173,8 +179,10 @@ fn test_open_union() {
     #[open_union]
     enum OpenUnion<'a> {
         #[nsid = "com.example.variant"]
+        #[allow(dead_code)]
         Variant,
 
+        #[allow(dead_code)]
         Unknown(jacquard_common::types::value::Data<'a>),
     }
 
@@ -217,8 +225,10 @@ fn test_enum_fragment_inference() {
     #[lexicon(nsid = "com.example.fragments")]
     enum FragmentUnion {
         // Should generate com.example.fragments#variantOne
+        #[allow(dead_code)]
         VariantOne,
         // Should generate com.example.fragments#variantTwo
+        #[allow(dead_code)]
         VariantTwo,
     }
 
