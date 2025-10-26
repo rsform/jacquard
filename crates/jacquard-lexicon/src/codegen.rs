@@ -4,14 +4,14 @@ use crate::lexicon::{LexArrayItem, LexUserType};
 use proc_macro2::TokenStream;
 use quote::quote;
 
-mod utils;
-mod names;
-mod lifetime;
-mod types;
-mod structs;
-mod xrpc;
-mod output;
-mod schema_impl;
+pub mod lifetime;
+pub mod names;
+pub mod output;
+pub mod schema_impl;
+pub mod structs;
+pub mod types;
+pub mod utils;
+pub mod xrpc;
 
 /// Code generator for lexicon types
 pub struct CodeGenerator<'c> {
@@ -101,7 +101,8 @@ impl<'c> CodeGenerator<'c> {
                 if let LexArrayItem::Union(union) = &array.items {
                     let union_name = format!("{}Item", type_name);
                     let refs: Vec<_> = union.refs.iter().cloned().collect();
-                    let union_def = self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
+                    let union_def =
+                        self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
 
                     let union_ident = syn::Ident::new(&union_name, proc_macro2::Span::call_site());
                     if needs_lifetime {
@@ -180,7 +181,13 @@ impl<'c> CodeGenerator<'c> {
                 // Top-level union generates an enum
                 let type_name = self.def_to_type_name(nsid, def_name);
                 let refs: Vec<_> = union.refs.iter().cloned().collect();
-                self.generate_union(nsid, &type_name, &refs, union.description.as_ref().map(|d| d.as_ref()), union.closed)
+                self.generate_union(
+                    nsid,
+                    &type_name,
+                    &refs,
+                    union.description.as_ref().map(|d| d.as_ref()),
+                    union.closed,
+                )
             }
         }
     }
