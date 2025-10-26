@@ -131,3 +131,135 @@ pub struct PublicKey<'a> {
     #[builder(into)]
     pub key: jacquard_common::CowStr<'a>,
 }
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublicKey<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.knot.listKeys"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "sh.tangled.knot.listKeys".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
+                        description: None,
+                        parameters: Some(
+                            ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
+                                description: None,
+                                required: None,
+                                properties: {
+                                    let mut map = ::std::collections::BTreeMap::new();
+                                    map.insert(
+                                        "cursor".into(),
+                                        ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            description: None,
+                                            format: None,
+                                            default: None,
+                                            min_length: None,
+                                            max_length: None,
+                                            min_graphemes: None,
+                                            max_graphemes: None,
+                                            r#enum: None,
+                                            r#const: None,
+                                            known_values: None,
+                                        }),
+                                    );
+                                    map.insert(
+                                        "limit".into(),
+                                        ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                            description: None,
+                                            default: None,
+                                            minimum: None,
+                                            maximum: None,
+                                            r#enum: None,
+                                            r#const: None,
+                                        }),
+                                    );
+                                    map
+                                },
+                            }),
+                        ),
+                        output: None,
+                        errors: None,
+                    }),
+                );
+                map.insert(
+                    "publicKey".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec!["did".into(), "key".into(), "createdAt".into()],
+                        ),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "createdAt".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "did".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "key".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: Some(4096usize),
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
+}

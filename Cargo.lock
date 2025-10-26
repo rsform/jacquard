@@ -2279,16 +2279,18 @@ dependencies = [
  "bytes",
  "jacquard-common 0.8.0",
  "jacquard-derive 0.8.0",
+ "jacquard-lexicon 0.8.0",
  "miette",
  "serde",
  "serde_ipld_dagcbor",
  "thiserror 2.0.17",
+ "unicode-segmentation",
 ]
 
 [[package]]
 name = "jacquard-api"
 version = "0.8.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#097766048b9fb57946585c853ca65d38dd005a8b"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#1c7fc38baf8f100875ba178c19a255e34727b116"
 dependencies = [
  "bon",
  "bytes",
@@ -2378,7 +2380,7 @@ dependencies = [
 [[package]]
 name = "jacquard-common"
 version = "0.8.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#097766048b9fb57946585c853ca65d38dd005a8b"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#1c7fc38baf8f100875ba178c19a255e34727b116"
 dependencies = [
  "base64 0.22.1",
  "bon",
@@ -2431,7 +2433,7 @@ dependencies = [
 [[package]]
 name = "jacquard-derive"
 version = "0.8.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#097766048b9fb57946585c853ca65d38dd005a8b"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#1c7fc38baf8f100875ba178c19a255e34727b116"
 dependencies = [
  "heck 0.5.0",
  "jacquard-lexicon 0.8.0 (git+https://tangled.org/@nonbinary.computer/jacquard)",
@@ -2468,7 +2470,7 @@ dependencies = [
 [[package]]
 name = "jacquard-identity"
 version = "0.8.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#097766048b9fb57946585c853ca65d38dd005a8b"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#1c7fc38baf8f100875ba178c19a255e34727b116"
 dependencies = [
  "bon",
  "bytes",
@@ -2542,7 +2544,7 @@ dependencies = [
 [[package]]
 name = "jacquard-lexicon"
 version = "0.8.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard#097766048b9fb57946585c853ca65d38dd005a8b"
+source = "git+https://tangled.org/@nonbinary.computer/jacquard#1c7fc38baf8f100875ba178c19a255e34727b116"
 dependencies = [
  "glob",
  "heck 0.5.0",

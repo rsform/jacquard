@@ -99,3 +99,65 @@ impl jacquard_common::types::collection::Collection for ConfigurationRecord {
     const NSID: &'static str = "place.stream.metadata.configuration";
     type Record = ConfigurationRecord;
 }
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Configuration<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.metadata.configuration"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "place.stream.metadata.configuration".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                        description: None,
+                        key: Some("literal:self".into()),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                            description: None,
+                            required: None,
+                            nullable: None,
+                            properties: {
+                                let mut map = ::std::collections::BTreeMap::new();
+                                map.insert(
+                                    "contentRights".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "place.stream.metadata.contentRights".into(),
+                                    }),
+                                );
+                                map.insert(
+                                    "contentWarnings".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "place.stream.metadata.contentWarnings".into(),
+                                    }),
+                                );
+                                map.insert(
+                                    "distributionPolicy".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "place.stream.metadata.distributionPolicy".into(),
+                                    }),
+                                );
+                                map
+                            },
+                        }),
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
+}

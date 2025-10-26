@@ -200,6 +200,227 @@ impl jacquard_common::types::collection::Collection for EventRecord {
     type Record = EventRecord;
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
+    fn nsid() -> &'static str {
+        "community.lexicon.calendar.event"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "community.lexicon.calendar.event".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert("cancelled".into(), todo!("unsupported user type variant"));
+                map.insert("hybrid".into(), todo!("unsupported user type variant"));
+                map.insert("inperson".into(), todo!("unsupported user type variant"));
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                        description: None,
+                        key: Some("tid".into()),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                            description: None,
+                            required: Some(vec!["createdAt".into(), "name".into()]),
+                            nullable: None,
+                            properties: {
+                                let mut map = ::std::collections::BTreeMap::new();
+                                map.insert(
+                                    "createdAt".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "description".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "endsAt".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "locations".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                            description: None,
+                                            refs: vec![
+                                                "community.lexicon.calendar.event#uri".into(),
+                                                "community.lexicon.location.address".into(),
+                                                "community.lexicon.location.fsq".into(),
+                                                "community.lexicon.location.geo".into(),
+                                                "community.lexicon.location.hthree".into()
+                                            ],
+                                            closed: None,
+                                        }),
+                                        min_length: None,
+                                        max_length: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "mode".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "community.lexicon.calendar.event#mode".into(),
+                                    }),
+                                );
+                                map.insert(
+                                    "name".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "startsAt".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "status".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "community.lexicon.calendar.event#status".into(),
+                                    }),
+                                );
+                                map.insert(
+                                    "uris".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                            description: None,
+                                            r#ref: "community.lexicon.calendar.event#uri".into(),
+                                        }),
+                                        min_length: None,
+                                        max_length: None,
+                                    }),
+                                );
+                                map
+                            },
+                        }),
+                    }),
+                );
+                map.insert("mode".into(), todo!("unsupported user type variant"));
+                map.insert("planned".into(), todo!("unsupported user type variant"));
+                map.insert("postponed".into(), todo!("unsupported user type variant"));
+                map.insert("rescheduled".into(), todo!("unsupported user type variant"));
+                map.insert("scheduled".into(), todo!("unsupported user type variant"));
+                map.insert("status".into(), todo!("unsupported user type variant"));
+                map.insert(
+                    "uri".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["uri".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "name".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "uri".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert("virtual".into(), todo!("unsupported user type variant"));
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
+}
+
 /// The mode of the event.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Mode<'a> {
@@ -531,6 +752,227 @@ pub struct Uri<'a> {
     pub name: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Uri<'a> {
+    fn nsid() -> &'static str {
+        "community.lexicon.calendar.event"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "community.lexicon.calendar.event".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert("cancelled".into(), todo!("unsupported user type variant"));
+                map.insert("hybrid".into(), todo!("unsupported user type variant"));
+                map.insert("inperson".into(), todo!("unsupported user type variant"));
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                        description: None,
+                        key: Some("tid".into()),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                            description: None,
+                            required: Some(vec!["createdAt".into(), "name".into()]),
+                            nullable: None,
+                            properties: {
+                                let mut map = ::std::collections::BTreeMap::new();
+                                map.insert(
+                                    "createdAt".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "description".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "endsAt".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "locations".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                            description: None,
+                                            refs: vec![
+                                                "community.lexicon.calendar.event#uri".into(),
+                                                "community.lexicon.location.address".into(),
+                                                "community.lexicon.location.fsq".into(),
+                                                "community.lexicon.location.geo".into(),
+                                                "community.lexicon.location.hthree".into()
+                                            ],
+                                            closed: None,
+                                        }),
+                                        min_length: None,
+                                        max_length: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "mode".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "community.lexicon.calendar.event#mode".into(),
+                                    }),
+                                );
+                                map.insert(
+                                    "name".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "startsAt".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "status".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "community.lexicon.calendar.event#status".into(),
+                                    }),
+                                );
+                                map.insert(
+                                    "uris".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                            description: None,
+                                            r#ref: "community.lexicon.calendar.event#uri".into(),
+                                        }),
+                                        min_length: None,
+                                        max_length: None,
+                                    }),
+                                );
+                                map
+                            },
+                        }),
+                    }),
+                );
+                map.insert("mode".into(), todo!("unsupported user type variant"));
+                map.insert("planned".into(), todo!("unsupported user type variant"));
+                map.insert("postponed".into(), todo!("unsupported user type variant"));
+                map.insert("rescheduled".into(), todo!("unsupported user type variant"));
+                map.insert("scheduled".into(), todo!("unsupported user type variant"));
+                map.insert("status".into(), todo!("unsupported user type variant"));
+                map.insert(
+                    "uri".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["uri".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "name".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "uri".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert("virtual".into(), todo!("unsupported user type variant"));
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
 }
 
 /// A virtual event that takes place online.

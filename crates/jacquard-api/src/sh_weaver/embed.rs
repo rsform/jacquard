@@ -29,6 +29,99 @@ pub struct PercentSize<'a> {
     pub width: i64,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PercentSize<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.embed.defs"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "sh.weaver.embed.defs".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "percentSize".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["width".into(), "height".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "height".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: None,
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "width".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: None,
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "pixelSize".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["width".into(), "height".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "height".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: None,
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "width".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: None,
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
+}
+
 /// Pixel-exact embed size. The dimensions are logical pixels, subject to scaling, so 200px at X2 scale is 400px.
 #[jacquard_derive::lexicon]
 #[derive(
@@ -45,4 +138,97 @@ pub struct PercentSize<'a> {
 pub struct PixelSize<'a> {
     pub height: i64,
     pub width: i64,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PixelSize<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.embed.defs"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "sh.weaver.embed.defs".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "percentSize".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["width".into(), "height".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "height".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: None,
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "width".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: None,
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "pixelSize".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["width".into(), "height".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "height".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: None,
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "width".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: None,
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
 }

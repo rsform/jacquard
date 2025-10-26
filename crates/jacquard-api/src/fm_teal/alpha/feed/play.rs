@@ -157,3 +157,426 @@ impl jacquard_common::types::collection::Collection for PlayRecord {
     const NSID: &'static str = "fm.teal.alpha.feed.play";
     type Record = PlayRecord;
 }
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
+    fn nsid() -> &'static str {
+        "fm.teal.alpha.feed.play"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "fm.teal.alpha.feed.play".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                        description: None,
+                        key: Some("tid".into()),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                            description: None,
+                            required: Some(vec!["trackName".into()]),
+                            nullable: None,
+                            properties: {
+                                let mut map = ::std::collections::BTreeMap::new();
+                                map.insert(
+                                    "artistMbIds".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                            description: None,
+                                            format: None,
+                                            default: None,
+                                            min_length: None,
+                                            max_length: None,
+                                            min_graphemes: None,
+                                            max_graphemes: None,
+                                            r#enum: None,
+                                            r#const: None,
+                                            known_values: None,
+                                        }),
+                                        min_length: None,
+                                        max_length: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "artistNames".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                            description: None,
+                                            format: None,
+                                            default: None,
+                                            min_length: Some(1usize),
+                                            max_length: Some(256usize),
+                                            min_graphemes: None,
+                                            max_graphemes: Some(2560usize),
+                                            r#enum: None,
+                                            r#const: None,
+                                            known_values: None,
+                                        }),
+                                        min_length: None,
+                                        max_length: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "artists".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                            description: None,
+                                            r#ref: "fm.teal.alpha.feed.defs#artist".into(),
+                                        }),
+                                        min_length: None,
+                                        max_length: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "duration".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                        description: None,
+                                        default: None,
+                                        minimum: None,
+                                        maximum: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "isrc".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "musicServiceBaseDomain".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "originUrl".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "playedTime".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "recordingMbId".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "releaseDiscriminant".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(128usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(1280usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "releaseMbId".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "releaseName".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(256usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(2560usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "submissionClientAgent".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(256usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(2560usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "trackDiscriminant".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(128usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(1280usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "trackMbId".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "trackName".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: Some(1usize),
+                                        max_length: Some(256usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(2560usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map
+                            },
+                        }),
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.release_discriminant {
+            if value.len() > 128usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "release_discriminant",
+                    max: 128usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.release_discriminant {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1280usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "release_discriminant",
+                        max: 1280usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.release_name {
+            if value.len() > 256usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "release_name",
+                    max: 256usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.release_name {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2560usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "release_name",
+                        max: 2560usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.submission_client_agent {
+            if value.len() > 256usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "submission_client_agent",
+                    max: 256usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.submission_client_agent {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2560usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "submission_client_agent",
+                        max: 2560usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.track_discriminant {
+            if value.len() > 128usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "track_discriminant",
+                    max: 128usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.track_discriminant {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 1280usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "track_discriminant",
+                        max: 1280usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.track_name;
+            if value.len() > 256usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "track_name",
+                    max: 256usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.track_name;
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "track_name",
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.track_name;
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2560usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "track_name",
+                        max: 2560usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+}

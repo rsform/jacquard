@@ -18,3 +18,39 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HorizontalRule<'a> {}
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HorizontalRule<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.blocks.horizontalRule"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "pub.leaflet.blocks.horizontalRule".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec![]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
+}

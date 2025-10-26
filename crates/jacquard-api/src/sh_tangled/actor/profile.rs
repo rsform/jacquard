@@ -106,3 +106,250 @@ impl jacquard_common::types::collection::Collection for ProfileRecord {
     const NSID: &'static str = "sh.tangled.actor.profile";
     type Record = ProfileRecord;
 }
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
+    fn nsid() -> &'static str {
+        "sh.tangled.actor.profile"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "sh.tangled.actor.profile".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                        description: None,
+                        key: Some("literal:self".into()),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                            description: None,
+                            required: Some(vec!["bluesky".into()]),
+                            nullable: None,
+                            properties: {
+                                let mut map = ::std::collections::BTreeMap::new();
+                                map.insert(
+                                    "bluesky".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                        description: None,
+                                        default: None,
+                                        r#const: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "description".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(2560usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(256usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "links".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                            description: None,
+                                            format: Some(
+                                                ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                            ),
+                                            default: None,
+                                            min_length: None,
+                                            max_length: None,
+                                            min_graphemes: None,
+                                            max_graphemes: None,
+                                            r#enum: None,
+                                            r#const: None,
+                                            known_values: None,
+                                        }),
+                                        min_length: Some(0usize),
+                                        max_length: Some(5usize),
+                                    }),
+                                );
+                                map.insert(
+                                    "location".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(400usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(40usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "pinnedRepositories".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                            description: None,
+                                            format: Some(
+                                                ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                            ),
+                                            default: None,
+                                            min_length: None,
+                                            max_length: None,
+                                            min_graphemes: None,
+                                            max_graphemes: None,
+                                            r#enum: None,
+                                            r#const: None,
+                                            known_values: None,
+                                        }),
+                                        min_length: Some(0usize),
+                                        max_length: Some(6usize),
+                                    }),
+                                );
+                                map.insert(
+                                    "stats".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                            description: None,
+                                            format: None,
+                                            default: None,
+                                            min_length: None,
+                                            max_length: None,
+                                            min_graphemes: None,
+                                            max_graphemes: None,
+                                            r#enum: None,
+                                            r#const: None,
+                                            known_values: None,
+                                        }),
+                                        min_length: Some(0usize),
+                                        max_length: Some(2usize),
+                                    }),
+                                );
+                                map
+                            },
+                        }),
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.description {
+            if value.len() > 2560usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "description",
+                    max: 2560usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 256usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "description",
+                        max: 256usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.links {
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "links",
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.links {
+            if value.len() < 0usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "links",
+                    min: 0usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.location {
+            if value.len() > 400usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "location",
+                    max: 400usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.location {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 40usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "location",
+                        max: 40usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.pinned_repositories {
+            if value.len() > 6usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "pinned_repositories",
+                    max: 6usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.pinned_repositories {
+            if value.len() < 0usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "pinned_repositories",
+                    min: 0usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.stats {
+            if value.len() > 2usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "stats",
+                    max: 2usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.stats {
+            if value.len() < 0usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "stats",
+                    min: 0usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}

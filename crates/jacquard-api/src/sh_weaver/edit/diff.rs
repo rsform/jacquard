@@ -87,3 +87,68 @@ impl jacquard_common::types::collection::Collection for DiffRecord {
     const NSID: &'static str = "sh.weaver.edit.diff";
     type Record = DiffRecord;
 }
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Diff<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.diff"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "sh.weaver.edit.diff".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                        description: None,
+                        key: Some("tid".into()),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                            description: None,
+                            required: Some(
+                                vec!["snapshot".into(), "root".into(), "doc".into()],
+                            ),
+                            nullable: None,
+                            properties: {
+                                let mut map = ::std::collections::BTreeMap::new();
+                                map.insert(
+                                    "doc".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "sh.weaver.edit.defs#docRef".into(),
+                                    }),
+                                );
+                                map.insert(
+                                    "root".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.repo.strongRef".into(),
+                                    }),
+                                );
+                                map.insert(
+                                    "snapshot".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
+                                        description: None,
+                                        accept: None,
+                                        max_size: None,
+                                    }),
+                                );
+                                map
+                            },
+                        }),
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
+}

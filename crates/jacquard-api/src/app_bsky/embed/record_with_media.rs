@@ -45,6 +45,77 @@ pub enum RecordWithMediaMedia<'a> {
     External(Box<crate::app_bsky::embed::external::ExternalRecord<'a>>),
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordWithMedia<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.embed.recordWithMedia"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "app.bsky.embed.recordWithMedia".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["record".into(), "media".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "media".into(),
+                                todo!("unsupported object property variant"),
+                            );
+                            map.insert(
+                                "record".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.embed.record".into(),
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "view".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["record".into(), "media".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "media".into(),
+                                todo!("unsupported object property variant"),
+                            );
+                            map.insert(
+                                "record".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.embed.record#view".into(),
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -83,4 +154,75 @@ pub enum ViewMedia<'a> {
     VideoView(Box<crate::app_bsky::embed::video::View<'a>>),
     #[serde(rename = "app.bsky.embed.external#view")]
     ExternalView(Box<crate::app_bsky::embed::external::View<'a>>),
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.embed.recordWithMedia"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "app.bsky.embed.recordWithMedia".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["record".into(), "media".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "media".into(),
+                                todo!("unsupported object property variant"),
+                            );
+                            map.insert(
+                                "record".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.embed.record".into(),
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "view".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["record".into(), "media".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "media".into(),
+                                todo!("unsupported object property variant"),
+                            );
+                            map.insert(
+                                "record".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.embed.record#view".into(),
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
 }

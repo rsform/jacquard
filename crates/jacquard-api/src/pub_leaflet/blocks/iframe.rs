@@ -24,3 +24,86 @@ pub struct Iframe<'a> {
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
 }
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Iframe<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.blocks.iframe"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "pub.leaflet.blocks.iframe".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["url".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "height".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: Some(16i64),
+                                    maximum: Some(1600i64),
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "url".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.height {
+            if *value > 1600i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "height",
+                    max: 1600i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.height {
+            if *value < 16i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "height",
+                    min: 16i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}

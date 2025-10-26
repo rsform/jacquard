@@ -82,3 +82,107 @@ pub struct Suggestion<'a> {
     #[builder(into)]
     pub tag: jacquard_common::CowStr<'a>,
 }
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Suggestion<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.unspecced.getTaggedSuggestions"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "app.bsky.unspecced.getTaggedSuggestions".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
+                        description: None,
+                        parameters: Some(
+                            ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
+                                description: None,
+                                required: None,
+                                properties: {
+                                    let mut map = ::std::collections::BTreeMap::new();
+                                    map
+                                },
+                            }),
+                        ),
+                        output: None,
+                        errors: None,
+                    }),
+                );
+                map.insert(
+                    "suggestion".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec!["tag".into(), "subjectType".into(), "subject".into()],
+                        ),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "subject".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "subjectType".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "tag".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
+}

@@ -132,6 +132,79 @@ pub struct ContentWarnings<'a> {
     pub warnings: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentWarnings<'a> {
+    fn nsid() -> &'static str {
+        "place.stream.metadata.contentWarnings"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "place.stream.metadata.contentWarnings".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert("PII".into(), todo!("unsupported user type variant"));
+                map.insert("death".into(), todo!("unsupported user type variant"));
+                map.insert("drugUse".into(), todo!("unsupported user type variant"));
+                map.insert(
+                    "fantasyViolence".into(),
+                    todo!("unsupported user type variant"),
+                );
+                map.insert(
+                    "flashingLights".into(),
+                    todo!("unsupported user type variant"),
+                );
+                map.insert("language".into(), todo!("unsupported user type variant"));
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: None,
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "warnings".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert("nudity".into(), todo!("unsupported user type variant"));
+                map.insert("sexuality".into(), todo!("unsupported user type variant"));
+                map.insert("suffering".into(), todo!("unsupported user type variant"));
+                map.insert("violence".into(), todo!("unsupported user type variant"));
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
+}
+
 /// The content could be perceived as offensive due to nudity.
 #[derive(
     serde::Serialize,

@@ -84,3 +84,52 @@ impl jacquard_common::types::collection::Collection for BlobRecord {
     const NSID: &'static str = "sh.weaver.publish.blob";
     type Record = BlobRecord;
 }
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Blob<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.publish.blob"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "sh.weaver.publish.blob".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                        description: None,
+                        key: Some("tid".into()),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                            description: None,
+                            required: Some(vec!["upload".into()]),
+                            nullable: None,
+                            properties: {
+                                let mut map = ::std::collections::BTreeMap::new();
+                                map.insert(
+                                    "upload".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
+                                        description: None,
+                                        accept: None,
+                                        max_size: None,
+                                    }),
+                                );
+                                map
+                            },
+                        }),
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
+}

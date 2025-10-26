@@ -33,6 +33,359 @@ pub struct LabelerPolicies<'a> {
     pub label_values: Vec<crate::com_atproto::label::LabelValue<'a>>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerPolicies<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.labeler.defs"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "app.bsky.labeler.defs".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "labelerPolicies".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["labelValues".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "labelValueDefinitions".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#labelValueDefinition".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "labelValues".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#labelValue".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "labelerView".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                "uri".into(), "cid".into(), "creator".into(), "indexedAt"
+                                .into()
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "cid".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "creator".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.actor.defs#profileView".into(),
+                                }),
+                            );
+                            map.insert(
+                                "indexedAt".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "labels".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#label".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "likeCount".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: Some(0i64),
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "uri".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "viewer".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "#labelerViewerState".into(),
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "labelerViewDetailed".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                "uri".into(), "cid".into(), "creator".into(), "policies"
+                                .into(), "indexedAt".into()
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "cid".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "creator".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.actor.defs#profileView".into(),
+                                }),
+                            );
+                            map.insert(
+                                "indexedAt".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "labels".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#label".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "likeCount".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: Some(0i64),
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "policies".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.labeler.defs#labelerPolicies".into(),
+                                }),
+                            );
+                            map.insert(
+                                "reasonTypes".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.moderation.defs#reasonType".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "subjectCollections".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Nsid,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "subjectTypes".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.moderation.defs#subjectType".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "uri".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "viewer".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "#labelerViewerState".into(),
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "labelerViewerState".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: None,
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "like".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -64,6 +417,359 @@ pub struct LabelerView<'a> {
     #[builder(into)]
     #[serde(borrow)]
     pub viewer: Option<crate::app_bsky::labeler::LabelerViewerState<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerView<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.labeler.defs"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "app.bsky.labeler.defs".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "labelerPolicies".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["labelValues".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "labelValueDefinitions".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#labelValueDefinition".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "labelValues".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#labelValue".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "labelerView".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                "uri".into(), "cid".into(), "creator".into(), "indexedAt"
+                                .into()
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "cid".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "creator".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.actor.defs#profileView".into(),
+                                }),
+                            );
+                            map.insert(
+                                "indexedAt".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "labels".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#label".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "likeCount".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: Some(0i64),
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "uri".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "viewer".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "#labelerViewerState".into(),
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "labelerViewDetailed".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                "uri".into(), "cid".into(), "creator".into(), "policies"
+                                .into(), "indexedAt".into()
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "cid".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "creator".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.actor.defs#profileView".into(),
+                                }),
+                            );
+                            map.insert(
+                                "indexedAt".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "labels".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#label".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "likeCount".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: Some(0i64),
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "policies".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.labeler.defs#labelerPolicies".into(),
+                                }),
+                            );
+                            map.insert(
+                                "reasonTypes".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.moderation.defs#reasonType".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "subjectCollections".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Nsid,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "subjectTypes".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.moderation.defs#subjectType".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "uri".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "viewer".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "#labelerViewerState".into(),
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "labelerViewerState".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: None,
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "like".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -116,6 +822,359 @@ pub struct LabelerViewDetailed<'a> {
     pub viewer: Option<crate::app_bsky::labeler::LabelerViewerState<'a>>,
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerViewDetailed<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.labeler.defs"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "app.bsky.labeler.defs".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "labelerPolicies".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["labelValues".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "labelValueDefinitions".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#labelValueDefinition".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "labelValues".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#labelValue".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "labelerView".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                "uri".into(), "cid".into(), "creator".into(), "indexedAt"
+                                .into()
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "cid".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "creator".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.actor.defs#profileView".into(),
+                                }),
+                            );
+                            map.insert(
+                                "indexedAt".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "labels".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#label".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "likeCount".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: Some(0i64),
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "uri".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "viewer".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "#labelerViewerState".into(),
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "labelerViewDetailed".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                "uri".into(), "cid".into(), "creator".into(), "policies"
+                                .into(), "indexedAt".into()
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "cid".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "creator".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.actor.defs#profileView".into(),
+                                }),
+                            );
+                            map.insert(
+                                "indexedAt".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "labels".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#label".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "likeCount".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: Some(0i64),
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "policies".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.labeler.defs#labelerPolicies".into(),
+                                }),
+                            );
+                            map.insert(
+                                "reasonTypes".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.moderation.defs#reasonType".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "subjectCollections".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Nsid,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "subjectTypes".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.moderation.defs#subjectType".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "uri".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "viewer".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "#labelerViewerState".into(),
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "labelerViewerState".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: None,
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "like".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -132,4 +1191,357 @@ pub struct LabelerViewerState<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerViewerState<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.labeler.defs"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "app.bsky.labeler.defs".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "labelerPolicies".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["labelValues".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "labelValueDefinitions".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#labelValueDefinition".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "labelValues".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#labelValue".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "labelerView".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                "uri".into(), "cid".into(), "creator".into(), "indexedAt"
+                                .into()
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "cid".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "creator".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.actor.defs#profileView".into(),
+                                }),
+                            );
+                            map.insert(
+                                "indexedAt".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "labels".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#label".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "likeCount".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: Some(0i64),
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "uri".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "viewer".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "#labelerViewerState".into(),
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "labelerViewDetailed".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                "uri".into(), "cid".into(), "creator".into(), "policies"
+                                .into(), "indexedAt".into()
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "cid".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "creator".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.actor.defs#profileView".into(),
+                                }),
+                            );
+                            map.insert(
+                                "indexedAt".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "labels".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.label.defs#label".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "likeCount".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: Some(0i64),
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "policies".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "app.bsky.labeler.defs#labelerPolicies".into(),
+                                }),
+                            );
+                            map.insert(
+                                "reasonTypes".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.moderation.defs#reasonType".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "subjectCollections".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Nsid,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "subjectTypes".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.moderation.defs#subjectType".into(),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                "uri".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "viewer".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: "#labelerViewerState".into(),
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "labelerViewerState".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: None,
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "like".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
 }

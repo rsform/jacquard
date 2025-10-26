@@ -1,0 +1,151 @@
+{
+  "lexicon": 1,
+  "id": "social.flockfeeds.lexical.propertyvalue",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A property-value pair, e.g. representing a feature of a product or place. Use the 'name' property for the name of the property. If there is an additional human-readable version of the value, put that into the 'description' property.\\n\\n Always use specific schema.org properties when a) they exist and b) you can populate them. Using PropertyValue as a substitute will typically not trigger the same effect as using the original, specific property.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "properties": {
+          "additionalType": {
+            "type": "string",
+            "description": "An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the\n    use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href=\"https://schema.org/docs/styleguide.html\">style guide</a>."
+          },
+          "alternateName": {
+            "type": "string",
+            "description": "An alias for the item."
+          },
+          "description": {
+            "type": "union",
+            "description": "A description of the item.",
+            "refs": [
+              "social.flockfeeds.lexical.textobject",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "disambiguatingDescription": {
+            "type": "string",
+            "description": "A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation."
+          },
+          "identifier": {
+            "type": "union",
+            "description": "The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.",
+            "refs": [
+              "social.flockfeeds.lexical.propertyvalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "image": {
+            "type": "union",
+            "description": "An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].",
+            "refs": [
+              "social.flockfeeds.lexical.imageobject",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "mainEntityOfPage": {
+            "type": "union",
+            "description": "Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.",
+            "refs": [
+              "social.flockfeeds.lexical.creativework",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "maxValue": {
+            "type": "integer",
+            "description": "The upper value of some characteristic or property."
+          },
+          "measurementMethod": {
+            "type": "union",
+            "description": "A subproperty of [[measurementTechnique]] that can be used for specifying specific methods, in particular via [[MeasurementMethodEnum]].",
+            "refs": [
+              "social.flockfeeds.lexical.definedterm",
+              "social.flockfeeds.lexical.measurementmethodenum",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "measurementTechnique": {
+            "type": "union",
+            "description": "A technique, method or technology used in an [[Observation]], [[StatisticalVariable]] or [[Dataset]] (or [[DataDownload]], [[DataCatalog]]), corresponding to the method used for measuring the corresponding variable(s) (for datasets, described using [[variableMeasured]]; for [[Observation]], a [[StatisticalVariable]]). Often but not necessarily each [[variableMeasured]] will have an explicit representation as (or mapping to) an property such as those defined in Schema.org, or other RDF vocabularies and \"knowledge graphs\". In that case the subproperty of [[variableMeasured]] called [[measuredProperty]] is applicable.\n    \nThe [[measurementTechnique]] property helps when extra clarification is needed about how a [[measuredProperty]] was measured. This is oriented towards scientific and scholarly dataset publication but may have broader applicability; it is not intended as a full representation of measurement, but can often serve as a high level summary for dataset discovery. \n\nFor example, if [[variableMeasured]] is: molecule concentration, [[measurementTechnique]] could be: \"mass spectrometry\" or \"nmr spectroscopy\" or \"colorimetry\" or \"immunofluorescence\". If the [[variableMeasured]] is \"depression rating\", the [[measurementTechnique]] could be \"Zung Scale\" or \"HAM-D\" or \"Beck Depression Inventory\". \n\nIf there are several [[variableMeasured]] properties recorded for some given data object, use a [[PropertyValue]] for each [[variableMeasured]] and attach the corresponding [[measurementTechnique]]. The value can also be from an enumeration, organized as a [[MeasurementMetholdEnumeration]].",
+            "refs": [
+              "social.flockfeeds.lexical.definedterm",
+              "social.flockfeeds.lexical.measurementmethodenum",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "minValue": {
+            "type": "integer",
+            "description": "The lower value of some characteristic or property."
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the item."
+          },
+          "potentialAction": {
+            "type": "union",
+            "description": "Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.",
+            "refs": [
+              "social.flockfeeds.lexical.action",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "propertyID": {
+            "type": "string",
+            "description": "A commonly used identifier for the characteristic represented by the property, e.g. a manufacturer or a standard code for a property. propertyID can be\n(1) a prefixed string, mainly meant to be used with standards for product properties; (2) a site-specific, non-prefixed string (e.g. the primary key of the property or the vendor-specific ID of the property), or (3)\na URL indicating the type of the property, either pointing to an external vocabulary, or a Web resource that describes the property (e.g. a glossary entry).\nStandards bodies should promote a standard prefix for the identifiers of properties from their standards."
+          },
+          "sameAs": {
+            "type": "string",
+            "description": "URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.",
+            "format": "uri"
+          },
+          "subjectOf": {
+            "type": "union",
+            "description": "A CreativeWork or Event about this Thing.",
+            "refs": [
+              "social.flockfeeds.lexical.event",
+              "social.flockfeeds.lexical.creativework",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "unitCode": {
+            "type": "string",
+            "description": "The unit of measurement given using the UN/CEFACT Common Code (3 characters) or a URL. Other codes than the UN/CEFACT Common Code may be used with a prefix followed by a colon."
+          },
+          "unitText": {
+            "type": "string",
+            "description": "A string or text indicating the unit of measurement. Useful if you cannot provide a standard unit code for\n<a href='unitCode'>unitCode</a>."
+          },
+          "url": {
+            "type": "string",
+            "description": "URL of the item.",
+            "format": "uri"
+          },
+          "value": {
+            "type": "union",
+            "description": "The value of a [[QuantitativeValue]] (including [[Observation]]) or property value node.\\n\\n* For [[QuantitativeValue]] and [[MonetaryAmount]], the recommended type for values is 'Number'.\\n* For [[PropertyValue]], it can be 'Text', 'Number', 'Boolean', or 'StructuredValue'.\\n* Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similar Unicode symbols.\\n* Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.",
+            "refs": [
+              "social.flockfeeds.lexical.structuredvalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          },
+          "valueReference": {
+            "type": "union",
+            "description": "A secondary value that provides additional information on the original value, e.g. a reference temperature or a type of measurement.",
+            "refs": [
+              "social.flockfeeds.lexical.definedterm",
+              "social.flockfeeds.lexical.measurementtypeenumeration",
+              "social.flockfeeds.lexical.enumeration",
+              "social.flockfeeds.lexical.qualitativevalue",
+              "social.flockfeeds.lexical.quantitativevalue",
+              "social.flockfeeds.lexical.propertyvalue",
+              "social.flockfeeds.lexical.structuredvalue",
+              "social.flockfeeds.lexical.itemlist"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

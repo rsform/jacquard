@@ -38,7 +38,7 @@
         "replyTo": {
           "type": "union",
           "refs": [
-            "place.stream.chat.defs#messageView"
+            "#messageView"
           ]
         },
         "uri": {

@@ -19,6 +19,146 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DisableRule<'a> {}
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DisableRule<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.feed.postgate"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "app.bsky.feed.postgate".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "disableRule".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: None,
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                        description: None,
+                        key: Some("tid".into()),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                            description: None,
+                            required: Some(vec!["post".into(), "createdAt".into()]),
+                            nullable: None,
+                            properties: {
+                                let mut map = ::std::collections::BTreeMap::new();
+                                map.insert(
+                                    "createdAt".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "detachedEmbeddingUris".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                            description: None,
+                                            format: Some(
+                                                ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                            ),
+                                            default: None,
+                                            min_length: None,
+                                            max_length: None,
+                                            min_graphemes: None,
+                                            max_graphemes: None,
+                                            r#enum: None,
+                                            r#const: None,
+                                            known_values: None,
+                                        }),
+                                        min_length: None,
+                                        max_length: Some(50usize),
+                                    }),
+                                );
+                                map.insert(
+                                    "embeddingRules".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                            description: None,
+                                            refs: vec!["#disableRule".into()],
+                                            closed: None,
+                                        }),
+                                        min_length: None,
+                                        max_length: Some(5usize),
+                                    }),
+                                );
+                                map.insert(
+                                    "post".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map
+                            },
+                        }),
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.detached_embedding_uris {
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "detached_embedding_uris",
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.embedding_rules {
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "embedding_rules",
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 /// Record defining interaction rules for a post. The record key (rkey) of the postgate record must match the record key of the post, and that record must be in the same repository.
 #[jacquard_derive::lexicon]
 #[derive(
@@ -108,4 +248,144 @@ impl jacquard_common::xrpc::XrpcResp for PostgateRecord {
 impl jacquard_common::types::collection::Collection for PostgateRecord {
     const NSID: &'static str = "app.bsky.feed.postgate";
     type Record = PostgateRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Postgate<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.feed.postgate"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "app.bsky.feed.postgate".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "disableRule".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: None,
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                        description: None,
+                        key: Some("tid".into()),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                            description: None,
+                            required: Some(vec!["post".into(), "createdAt".into()]),
+                            nullable: None,
+                            properties: {
+                                let mut map = ::std::collections::BTreeMap::new();
+                                map.insert(
+                                    "createdAt".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "detachedEmbeddingUris".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                            description: None,
+                                            format: Some(
+                                                ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                            ),
+                                            default: None,
+                                            min_length: None,
+                                            max_length: None,
+                                            min_graphemes: None,
+                                            max_graphemes: None,
+                                            r#enum: None,
+                                            r#const: None,
+                                            known_values: None,
+                                        }),
+                                        min_length: None,
+                                        max_length: Some(50usize),
+                                    }),
+                                );
+                                map.insert(
+                                    "embeddingRules".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                            description: None,
+                                            refs: vec!["#disableRule".into()],
+                                            closed: None,
+                                        }),
+                                        min_length: None,
+                                        max_length: Some(5usize),
+                                    }),
+                                );
+                                map.insert(
+                                    "post".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map
+                            },
+                        }),
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.detached_embedding_uris {
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "detached_embedding_uris",
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.embedding_rules {
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "embedding_rules",
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
 }
