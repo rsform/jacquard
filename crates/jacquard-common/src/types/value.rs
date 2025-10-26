@@ -167,6 +167,14 @@ impl<'s> Data<'s> {
         matches!(self, Data::Null)
     }
 
+    /// Get the "$type" discriminator field if this is an object with a string "$type" field
+    ///
+    /// This is a shortcut for union type discrimination in AT Protocol.
+    /// Returns `None` if this is not an object or if the "$type" field is missing/not a string.
+    pub fn type_discriminator(&self) -> Option<&str> {
+        self.as_object()?.type_discriminator()
+    }
+
     /// Serialize to canonical DAG-CBOR bytes for CID computation
     ///
     /// This produces the deterministic CBOR encoding used for content-addressing.
@@ -350,6 +358,13 @@ impl<'s> Object<'s> {
     /// Get an iterator over the keys
     pub fn keys(&self) -> std::collections::btree_map::Keys<'_, SmolStr, Data<'s>> {
         self.0.keys()
+    }
+
+    /// Get the "$type" discriminator field if present and it's a string
+    ///
+    /// This is a shortcut for union type discrimination in AT Protocol.
+    pub fn type_discriminator(&self) -> Option<&str> {
+        self.get("$type")?.as_str()
     }
 
     /// Get an iterator over the values
@@ -568,6 +583,16 @@ impl<'d> RawData<'d> {
     /// Check if this is a null value
     pub fn is_null(&self) -> bool {
         matches!(self, RawData::Null)
+    }
+
+    /// Get the "$type" discriminator field if this is an object with a string "$type" field
+    ///
+    /// This is a shortcut for union type discrimination in AT Protocol.
+    /// Returns `None` if this is not an object or if the "$type" field is missing/not a string.
+    pub fn type_discriminator(&self) -> Option<&str> {
+        let obj = self.as_object()?;
+        let type_val = obj.get("$type")?;
+        type_val.as_str()
     }
 
     /// Serialize to canonical DAG-CBOR bytes for CID computation

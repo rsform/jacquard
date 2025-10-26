@@ -1282,3 +1282,44 @@ fn test_query_result_helpers() {
     let values: Vec<_> = result.values().collect();
     assert_eq!(values.len(), 1);
 }
+
+#[test]
+fn test_type_discriminator() {
+    // Object with $type field
+    let mut map = BTreeMap::new();
+    map.insert(
+        SmolStr::new_static("$type"),
+        Data::String(AtprotoStr::String(CowStr::new_static("app.bsky.feed.post"))),
+    );
+    map.insert(SmolStr::new_static("text"), Data::String(AtprotoStr::String(CowStr::new_static("hello"))));
+    let obj = Object(map);
+
+    assert_eq!(obj.type_discriminator(), Some("app.bsky.feed.post"));
+
+    let data = Data::Object(obj.clone());
+    assert_eq!(data.type_discriminator(), Some("app.bsky.feed.post"));
+
+    // Object without $type field
+    let mut map2 = BTreeMap::new();
+    map2.insert(SmolStr::new_static("foo"), Data::Integer(42));
+    let obj2 = Object(map2);
+
+    assert_eq!(obj2.type_discriminator(), None);
+
+    let data2 = Data::Object(obj2);
+    assert_eq!(data2.type_discriminator(), None);
+
+    // Non-object data
+    let data3 = Data::Integer(42);
+    assert_eq!(data3.type_discriminator(), None);
+
+    // RawData with $type
+    let mut raw_map = BTreeMap::new();
+    raw_map.insert(
+        SmolStr::new_static("$type"),
+        RawData::String(CowStr::new_static("test.type")),
+    );
+    let raw_obj = RawData::Object(raw_map);
+
+    assert_eq!(raw_obj.type_discriminator(), Some("test.type"));
+}

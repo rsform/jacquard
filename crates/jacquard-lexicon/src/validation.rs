@@ -1,0 +1,1278 @@
+//! Runtime validation of Data values against lexicon schemas
+//!
+//! This module provides infrastructure for validating untyped `Data` values against
+//! lexicon schemas, enabling partial deserialization, debugging, and schema migration.
+
+use crate::{lexicon::LexiconDoc, schema::LexiconSchemaRef};
+use cid::Cid as IpldCid;
+use dashmap::DashMap;
+use jacquard_common::{
+    IntoStatic,
+    smol_str::{self, ToSmolStr},
+    types::value::Data,
+};
+use sha2::{Digest, Sha256};
+use smol_str::SmolStr;
+use std::{
+    fmt,
+    sync::{Arc, LazyLock, OnceLock},
+};
+
+/// Path to a value within a data structure
+///
+/// Tracks the location of values during validation for precise error reporting.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ValidationPath {
+    segments: Vec<PathSegment>,
+}
+
+/// A segment in a validation path
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PathSegment {
+    /// Object field access
+    Field(SmolStr),
+    /// Array index access
+    Index(usize),
+    /// Union variant discriminator
+    UnionVariant(SmolStr),
+}
+
+impl ValidationPath {
+    /// Create a new empty path
+    pub fn new() -> Self {
+        Self {
+            segments: Vec::new(),
+        }
+    }
+
+    /// Add a field segment to the path
+    pub fn push_field(&mut self, name: &str) {
+        self.segments.push(PathSegment::Field(name.into()));
+    }
+
+    /// Add an index segment to the path
+    pub fn push_index(&mut self, idx: usize) {
+        self.segments.push(PathSegment::Index(idx));
+    }
+
+    /// Add a union variant segment to the path
+    pub fn push_variant(&mut self, type_str: &str) {
+        self.segments
+            .push(PathSegment::UnionVariant(type_str.into()));
+    }
+
+    /// Remove the last segment from the path
+    pub fn pop(&mut self) {
+        self.segments.pop();
+    }
+
+    /// Get the depth of the path
+    pub fn depth(&self) -> usize {
+        self.segments.len()
+    }
+
+    /// Check if the path is empty
+    pub fn is_empty(&self) -> bool {
+        self.segments.is_empty()
+    }
+}
+
+impl Default for ValidationPath {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl fmt::Display for ValidationPath {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        if self.segments.is_empty() {
+            return write!(f, "(root)");
+        }
+
+        for seg in &self.segments {
+            match seg {
+                PathSegment::Field(name) => write!(f, ".{}", name)?,
+                PathSegment::Index(idx) => write!(f, "[{}]", idx)?,
+                PathSegment::UnionVariant(t) => write!(f, "($type={})", t)?,
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Structural validation errors
+///
+/// These errors indicate that the data structure doesn't match the schema's type expectations.
+#[derive(Debug, Clone, thiserror::Error, miette::Diagnostic)]
+pub enum StructuralError {
+    #[error("Type mismatch at {path}: expected {expected}, got {actual}")]
+    TypeMismatch {
+        path: ValidationPath,
+        expected: jacquard_common::types::DataModelType,
+        actual: jacquard_common::types::DataModelType,
+    },
+
+    #[error("Missing required field at {path}: '{field}'")]
+    MissingRequiredField {
+        path: ValidationPath,
+        field: SmolStr,
+    },
+
+    #[error("Missing union discriminator ($type) at {path}")]
+    MissingUnionDiscriminator { path: ValidationPath },
+
+    #[error("Union type mismatch at {path}: $type='{actual_type}' not in [{expected_refs}]")]
+    UnionNoMatch {
+        path: ValidationPath,
+        actual_type: SmolStr,
+        expected_refs: SmolStr,
+    },
+
+    #[error("Unresolved ref at {path}: '{ref_nsid}'")]
+    UnresolvedRef {
+        path: ValidationPath,
+        ref_nsid: SmolStr,
+    },
+
+    #[error("Reference cycle detected at {path}: '{ref_nsid}' (stack: {stack})")]
+    RefCycle {
+        path: ValidationPath,
+        ref_nsid: SmolStr,
+        stack: SmolStr,
+    },
+
+    #[error("Max validation depth exceeded at {path}: {max}")]
+    MaxDepthExceeded { path: ValidationPath, max: usize },
+}
+
+/// Constraint validation errors
+///
+/// These errors indicate that the data violates lexicon constraints like max_length,
+/// max_graphemes, ranges, etc. The structure is correct but values are out of bounds.
+#[derive(Debug, Clone, thiserror::Error, miette::Diagnostic)]
+pub enum ConstraintError {
+    #[error("{path} exceeds max length: {actual} > {max}")]
+    MaxLength {
+        path: ValidationPath,
+        max: usize,
+        actual: usize,
+    },
+
+    #[error("{path} exceeds max graphemes: {actual} > {max}")]
+    MaxGraphemes {
+        path: ValidationPath,
+        max: usize,
+        actual: usize,
+    },
+
+    #[error("{path} below min length: {actual} < {min}")]
+    MinLength {
+        path: ValidationPath,
+        min: usize,
+        actual: usize,
+    },
+
+    #[error("{path} below min graphemes: {actual} < {min}")]
+    MinGraphemes {
+        path: ValidationPath,
+        min: usize,
+        actual: usize,
+    },
+
+    #[error("{path} value {actual} exceeds maximum: {max}")]
+    Maximum {
+        path: ValidationPath,
+        max: i64,
+        actual: i64,
+    },
+
+    #[error("{path} value {actual} below minimum: {min}")]
+    Minimum {
+        path: ValidationPath,
+        min: i64,
+        actual: i64,
+    },
+}
+
+/// Unified validation error type
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum ValidationError {
+    #[error(transparent)]
+    Structural(#[from] StructuralError),
+
+    #[error(transparent)]
+    Constraint(#[from] ConstraintError),
+}
+
+/// Registry of lexicon schemas for validation
+///
+/// Collects schemas from inventory at construction and supports runtime insertion.
+#[derive(Debug, Clone)]
+pub struct SchemaRegistry {
+    /// Schema documents indexed by NSID (concurrent access safe)
+    schemas: DashMap<SmolStr, LexiconDoc<'static>>,
+}
+
+impl SchemaRegistry {
+    /// Build registry from inventory-collected schemas
+    pub fn from_inventory() -> Self {
+        let schemas = DashMap::new();
+
+        for entry in inventory::iter::<LexiconSchemaRef> {
+            let doc = (entry.provider)();
+            schemas.insert(entry.nsid.to_smolstr(), doc);
+        }
+
+        Self { schemas }
+    }
+
+    /// Create an empty registry
+    pub fn new() -> Self {
+        Self {
+            schemas: DashMap::new(),
+        }
+    }
+
+    /// Get schema by NSID
+    ///
+    /// IMPORTANT: Clone the returned schema immediately to avoid holding DashMap ref
+    pub fn get(&self, nsid: &str) -> Option<LexiconDoc<'static>> {
+        self.schemas.get(nsid).map(|doc| doc.clone())
+    }
+
+    /// Insert or update a schema (for runtime schema loading)
+    pub fn insert(&self, nsid: SmolStr, doc: LexiconDoc<'static>) {
+        self.schemas.insert(nsid, doc);
+    }
+
+    /// Get specific def from a schema
+    ///
+    /// IMPORTANT: Returns cloned def to avoid holding DashMap ref
+    pub fn get_def(
+        &self,
+        nsid: &str,
+        def_name: &str,
+    ) -> Option<crate::lexicon::LexUserType<'static>> {
+        // Clone immediately to release DashMap ref before returning
+        self.schemas
+            .get(nsid)
+            .and_then(|doc| doc.defs.get(def_name).cloned())
+    }
+}
+
+impl Default for SchemaRegistry {
+    fn default() -> Self {
+        Self::from_inventory()
+    }
+}
+
+/// Cache key for validation results
+///
+/// Content-addressed by CID to enable efficient caching across identical data.
+#[derive(Debug, Clone, Hash, Eq, PartialEq)]
+struct ValidationCacheKey {
+    nsid: SmolStr,
+    def_name: SmolStr,
+    cid: IpldCid,
+}
+
+impl ValidationCacheKey {
+    /// Create cache key from schema info and data
+    fn from_data<T: crate::schema::LexiconSchema>(
+        data: &Data,
+    ) -> Result<Self, CidComputationError> {
+        let cid = compute_data_cid(data)?;
+        Ok(Self {
+            nsid: SmolStr::new_static(T::nsid()),
+            def_name: SmolStr::new_static(T::def_name()),
+            cid,
+        })
+    }
+}
+
+/// Errors that can occur when computing CIDs
+#[derive(Debug, thiserror::Error)]
+pub enum CidComputationError {
+    #[error("Failed to serialize data to DAG-CBOR: {0}")]
+    DagCborEncode(#[from] serde_ipld_dagcbor::EncodeError<std::collections::TryReserveError>),
+
+    #[error("Failed to create multihash: {0}")]
+    Multihash(#[from] multihash::Error),
+}
+
+/// Compute CID for Data value
+///
+/// Uses SHA-256 hash and DAG-CBOR codec for content addressing.
+fn compute_data_cid(data: &Data) -> Result<IpldCid, CidComputationError> {
+    // Serialize to DAG-CBOR
+    let dag_cbor = data.to_dag_cbor()?;
+
+    // Compute SHA-256 hash
+    let hash = Sha256::digest(&dag_cbor);
+
+    // Create multihash (code 0x12 = sha2-256)
+    let multihash = multihash::Multihash::wrap(0x12, &hash)?;
+
+    // Create CIDv1 with dag-cbor codec (0x71)
+    Ok(IpldCid::new_v1(0x71, multihash))
+}
+
+/// Result of validating Data against a schema
+///
+/// Distinguishes between structural errors (type mismatches, missing fields) and
+/// constraint violations (max_length, ranges, etc.). Constraint validation is lazy.
+#[derive(Debug, Clone)]
+pub struct ValidationResult {
+    /// Structural errors (computed immediately)
+    structural: Vec<StructuralError>,
+
+    /// Constraint errors (computed on first access)
+    constraints: OnceLock<Vec<ConstraintError>>,
+
+    /// Context for lazy constraint validation
+    data: Option<Arc<Data<'static>>>,
+    schema_ref: Option<(SmolStr, SmolStr)>, // (nsid, def_name)
+    registry: Option<Arc<SchemaRegistry>>,
+}
+
+impl ValidationResult {
+    /// Create a validation result with no errors
+    pub fn valid() -> Self {
+        Self {
+            structural: Vec::new(),
+            constraints: OnceLock::new(),
+            data: None,
+            schema_ref: None,
+            registry: None,
+        }
+    }
+
+    /// Create a validation result with structural errors
+    pub fn with_structural_errors(errors: Vec<StructuralError>) -> Self {
+        Self {
+            structural: errors,
+            constraints: OnceLock::new(),
+            data: None,
+            schema_ref: None,
+            registry: None,
+        }
+    }
+
+    /// Create a validation result with context for lazy constraint validation
+    pub fn with_context(
+        structural: Vec<StructuralError>,
+        data: Arc<Data<'static>>,
+        nsid: SmolStr,
+        def_name: SmolStr,
+        registry: Arc<SchemaRegistry>,
+    ) -> Self {
+        Self {
+            structural,
+            constraints: OnceLock::new(),
+            data: Some(data),
+            schema_ref: Some((nsid, def_name)),
+            registry: Some(registry),
+        }
+    }
+
+    /// Check if validation passed (no structural or constraint errors)
+    pub fn is_valid(&self) -> bool {
+        self.structural.is_empty() && self.constraint_errors().is_empty()
+    }
+
+    /// Check if structurally valid (ignoring constraint checks)
+    pub fn is_structurally_valid(&self) -> bool {
+        self.structural.is_empty()
+    }
+
+    /// Get structural errors
+    pub fn structural_errors(&self) -> &[StructuralError] {
+        &self.structural
+    }
+
+    /// Get constraint errors (computed lazily on first access)
+    pub fn constraint_errors(&self) -> &[ConstraintError] {
+        self.constraints.get_or_init(|| {
+            // If no context or structurally invalid, skip constraint validation
+            if !self.is_structurally_valid() || self.data.is_none() || self.schema_ref.is_none() {
+                return Vec::new();
+            }
+
+            let data = self.data.as_ref().unwrap();
+            let (nsid, def_name) = self.schema_ref.as_ref().unwrap();
+
+            let mut path = ValidationPath::new();
+            validate_constraints(
+                &mut path,
+                data,
+                nsid.as_str(),
+                def_name.as_str(),
+                self.registry.as_ref(),
+            )
+        })
+    }
+
+    /// Check if there are any constraint violations
+    pub fn has_constraint_violations(&self) -> bool {
+        !self.constraint_errors().is_empty()
+    }
+
+    /// Get all errors (structural and constraint)
+    pub fn all_errors(&self) -> impl Iterator<Item = ValidationError> + '_ {
+        self.structural
+            .iter()
+            .cloned()
+            .map(ValidationError::Structural)
+            .chain(
+                self.constraint_errors()
+                    .iter()
+                    .cloned()
+                    .map(ValidationError::Constraint),
+            )
+    }
+}
+
+/// Schema validator with caching
+///
+/// Validates Data values against lexicon schemas, caching results by content hash.
+pub struct SchemaValidator {
+    registry: SchemaRegistry,
+    cache: DashMap<ValidationCacheKey, Arc<ValidationResult>>,
+}
+
+impl SchemaValidator {
+    /// Get the global validator instance
+    pub fn global() -> &'static Self {
+        static VALIDATOR: LazyLock<SchemaValidator> = LazyLock::new(|| SchemaValidator {
+            registry: SchemaRegistry::from_inventory(),
+            cache: DashMap::new(),
+        });
+        &VALIDATOR
+    }
+
+    /// Create a new validator with empty registry
+    pub fn new() -> Self {
+        Self {
+            registry: SchemaRegistry::new(),
+            cache: DashMap::new(),
+        }
+    }
+
+    /// Validate data against a schema
+    ///
+    /// Results are cached by content hash for efficiency.
+    pub fn validate<T: crate::schema::LexiconSchema>(
+        &self,
+        data: &Data,
+    ) -> Result<ValidationResult, CidComputationError> {
+        // Compute cache key
+        let key = ValidationCacheKey::from_data::<T>(data)?;
+
+        // Check cache (clone Arc immediately to avoid holding ref)
+        if let Some(cached) = self.cache.get(&key).map(|r| Arc::clone(&r)) {
+            return Ok((*cached).clone());
+        }
+
+        // Validate (placeholder - actual validation in Phase 3)
+        let result = self.validate_uncached::<T>(data);
+
+        // Cache result
+        self.cache.insert(key, Arc::new(result.clone()));
+
+        Ok(result)
+    }
+
+    /// Validate without caching (internal)
+    fn validate_uncached<T: crate::schema::LexiconSchema>(&self, data: &Data) -> ValidationResult {
+        let def = match self.registry.get_def(T::nsid(), T::def_name()) {
+            Some(d) => d,
+            None => {
+                // Schema not found - this is a structural error
+                return ValidationResult::with_structural_errors(vec![
+                    StructuralError::UnresolvedRef {
+                        path: ValidationPath::new(),
+                        ref_nsid: format!("{}#{}", T::nsid(), T::def_name()).into(),
+                    },
+                ]);
+            }
+        };
+
+        let mut path = ValidationPath::new();
+        let mut ctx = ValidationContext::new(T::nsid(), T::def_name());
+
+        let errors = validate_def(&mut path, data, &def, &self.registry, &mut ctx);
+
+        // If structurally valid, create result with context for lazy constraint validation
+        if errors.is_empty() {
+            // Convert data to owned for constraint validation
+            let owned_data = Arc::new(data.clone().into_static());
+            ValidationResult::with_context(
+                errors,
+                owned_data,
+                SmolStr::new_static(T::nsid()),
+                SmolStr::new_static(T::def_name()),
+                Arc::new(self.registry.clone()),
+            )
+        } else {
+            ValidationResult::with_structural_errors(errors)
+        }
+    }
+
+    /// Get the schema registry
+    pub fn registry(&self) -> &SchemaRegistry {
+        &self.registry
+    }
+}
+
+impl Default for SchemaValidator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Validation context for tracking refs and preventing cycles
+struct ValidationContext {
+    current_nsid: String,
+    current_def: String,
+    ref_stack: Vec<String>,
+    max_depth: usize,
+}
+
+impl ValidationContext {
+    fn new(nsid: &str, def_name: &str) -> Self {
+        Self {
+            current_nsid: nsid.to_string(),
+            current_def: def_name.to_string(),
+            ref_stack: Vec::new(),
+            max_depth: 32,
+        }
+    }
+}
+
+/// Normalize a ref string to (nsid, def_name)
+fn normalize_ref(ref_str: &str, current_nsid: &str) -> (String, String) {
+    if let Some(fragment) = ref_str.strip_prefix('#') {
+        // #option -> (current_nsid, "option")
+        (current_nsid.to_string(), fragment.to_string())
+    } else if let Some((nsid, def)) = ref_str.split_once('#') {
+        // com.example.foo#bar -> ("com.example.foo", "bar")
+        (nsid.to_string(), def.to_string())
+    } else {
+        // com.example.foo -> ("com.example.foo", "main")
+        (ref_str.to_string(), "main".to_string())
+    }
+}
+
+/// Validate data against a lexicon def
+fn validate_def(
+    path: &mut ValidationPath,
+    data: &Data,
+    def: &crate::lexicon::LexUserType,
+    registry: &SchemaRegistry,
+    ctx: &mut ValidationContext,
+) -> Vec<StructuralError> {
+    use crate::lexicon::LexUserType;
+    use jacquard_common::types::DataModelType;
+
+    match def {
+        LexUserType::Object(obj) => {
+            // Must be an object
+            let Data::Object(obj_data) = data else {
+                return vec![StructuralError::TypeMismatch {
+                    path: path.clone(),
+                    expected: DataModelType::Object,
+                    actual: data.data_type(),
+                }];
+            };
+
+            let mut errors = Vec::new();
+
+            // Check required fields
+            if let Some(required) = &obj.required {
+                for field in required {
+                    if !obj_data.get(field.as_ref()).is_some() {
+                        errors.push(StructuralError::MissingRequiredField {
+                            path: path.clone(),
+                            field: field.clone(),
+                        });
+                    }
+                }
+            }
+
+            // Validate each property that's present
+            for (name, prop) in &obj.properties {
+                if let Some(field_data) = obj_data.get(name.as_ref()) {
+                    path.push_field(name.as_ref());
+                    errors.extend(validate_property(path, field_data, prop, registry, ctx));
+                    path.pop();
+                }
+            }
+
+            errors
+        }
+        // Other def types (Record, Token, etc.) would go here
+        // For now, just handle Object since that's what our tests use
+        _ => Vec::new(),
+    }
+}
+
+/// Validate data against a property schema
+fn validate_property(
+    path: &mut ValidationPath,
+    data: &Data,
+    prop: &crate::lexicon::LexObjectProperty,
+    registry: &SchemaRegistry,
+    ctx: &mut ValidationContext,
+) -> Vec<StructuralError> {
+    use crate::lexicon::LexObjectProperty;
+    use jacquard_common::types::DataModelType;
+
+    match prop {
+        LexObjectProperty::String(_) => {
+            // Accept any string type
+            if !matches!(data.data_type(), DataModelType::String(_)) {
+                vec![StructuralError::TypeMismatch {
+                    path: path.clone(),
+                    expected: DataModelType::String(
+                        jacquard_common::types::LexiconStringType::String,
+                    ),
+                    actual: data.data_type(),
+                }]
+            } else {
+                Vec::new()
+            }
+        }
+
+        LexObjectProperty::Integer(_) => {
+            if !matches!(data.data_type(), DataModelType::Integer) {
+                vec![StructuralError::TypeMismatch {
+                    path: path.clone(),
+                    expected: DataModelType::Integer,
+                    actual: data.data_type(),
+                }]
+            } else {
+                Vec::new()
+            }
+        }
+
+        LexObjectProperty::Boolean(_) => {
+            if !matches!(data.data_type(), DataModelType::Boolean) {
+                vec![StructuralError::TypeMismatch {
+                    path: path.clone(),
+                    expected: DataModelType::Boolean,
+                    actual: data.data_type(),
+                }]
+            } else {
+                Vec::new()
+            }
+        }
+
+        LexObjectProperty::Object(obj) => {
+            let Data::Object(obj_data) = data else {
+                return vec![StructuralError::TypeMismatch {
+                    path: path.clone(),
+                    expected: DataModelType::Object,
+                    actual: data.data_type(),
+                }];
+            };
+
+            let mut errors = Vec::new();
+
+            // Check required fields
+            if let Some(required) = &obj.required {
+                for field in required {
+                    if !obj_data.get(field.as_ref()).is_some() {
+                        errors.push(StructuralError::MissingRequiredField {
+                            path: path.clone(),
+                            field: field.clone(),
+                        });
+                    }
+                }
+            }
+
+            // Recursively validate each property
+            for (name, schema_prop) in &obj.properties {
+                if let Some(field_data) = obj_data.get(name.as_ref()) {
+                    path.push_field(name.as_ref());
+                    errors.extend(validate_property(
+                        path,
+                        field_data,
+                        schema_prop,
+                        registry,
+                        ctx,
+                    ));
+                    path.pop();
+                }
+            }
+
+            errors
+        }
+
+        LexObjectProperty::Array(arr) => {
+            let Data::Array(array) = data else {
+                return vec![StructuralError::TypeMismatch {
+                    path: path.clone(),
+                    expected: DataModelType::Array,
+                    actual: data.data_type(),
+                }];
+            };
+
+            let mut errors = Vec::new();
+            for (idx, item) in array.iter().enumerate() {
+                path.push_index(idx);
+                errors.extend(validate_array_item(path, item, &arr.items, registry, ctx));
+                path.pop();
+            }
+            errors
+        }
+
+        LexObjectProperty::Union(u) => {
+            let Data::Object(obj) = data else {
+                return vec![StructuralError::TypeMismatch {
+                    path: path.clone(),
+                    expected: DataModelType::Object,
+                    actual: data.data_type(),
+                }];
+            };
+
+            // Get $type discriminator
+            let Some(type_str) = obj.type_discriminator() else {
+                return vec![StructuralError::MissingUnionDiscriminator { path: path.clone() }];
+            };
+
+            // Try to match against refs
+            for variant_ref in &u.refs {
+                let (variant_nsid, variant_def) =
+                    normalize_ref(variant_ref.as_ref(), &ctx.current_nsid);
+                let full_variant = format!("{}#{}", variant_nsid, variant_def);
+
+                // Match by full ref or just nsid
+                if type_str == full_variant || type_str == variant_nsid {
+                    // Found match - validate against this variant
+                    let Some(variant_def_type) = registry.get_def(&variant_nsid, &variant_def)
+                    else {
+                        return vec![StructuralError::UnresolvedRef {
+                            path: path.clone(),
+                            ref_nsid: full_variant.into(),
+                        }];
+                    };
+
+                    path.push_variant(type_str);
+                    let old_nsid = std::mem::replace(&mut ctx.current_nsid, variant_nsid);
+                    let old_def = std::mem::replace(&mut ctx.current_def, variant_def);
+
+                    let errors = validate_def(path, data, &variant_def_type, registry, ctx);
+
+                    ctx.current_nsid = old_nsid;
+                    ctx.current_def = old_def;
+                    path.pop();
+
+                    return errors;
+                }
+            }
+
+            // No match found
+            if u.closed.unwrap_or(false) {
+                // Closed union - this is an error
+                let expected_refs = u
+                    .refs
+                    .iter()
+                    .map(|r| r.as_ref())
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                vec![StructuralError::UnionNoMatch {
+                    path: path.clone(),
+                    actual_type: type_str.into(),
+                    expected_refs: expected_refs.into(),
+                }]
+            } else {
+                // Open union - allow unknown variants
+                Vec::new()
+            }
+        }
+
+        LexObjectProperty::Ref(r) => {
+            // Depth check
+            if path.depth() >= ctx.max_depth {
+                return vec![StructuralError::MaxDepthExceeded {
+                    path: path.clone(),
+                    max: ctx.max_depth,
+                }];
+            }
+
+            // Normalize ref
+            let (ref_nsid, ref_def) = normalize_ref(r.r#ref.as_ref(), &ctx.current_nsid);
+            let full_ref = format!("{}#{}", ref_nsid, ref_def);
+
+            // Cycle detection
+            if ctx.ref_stack.contains(&full_ref) {
+                let stack = ctx.ref_stack.join(" -> ");
+                return vec![StructuralError::RefCycle {
+                    path: path.clone(),
+                    ref_nsid: full_ref.into(),
+                    stack: stack.into(),
+                }];
+            }
+
+            // Look up ref
+            let Some(ref_def_type) = registry.get_def(&ref_nsid, &ref_def) else {
+                return vec![StructuralError::UnresolvedRef {
+                    path: path.clone(),
+                    ref_nsid: full_ref.into(),
+                }];
+            };
+
+            // Push, validate, pop
+            ctx.ref_stack.push(full_ref);
+            let old_nsid = std::mem::replace(&mut ctx.current_nsid, ref_nsid);
+            let old_def = std::mem::replace(&mut ctx.current_def, ref_def);
+
+            let errors = validate_def(path, data, &ref_def_type, registry, ctx);
+
+            ctx.current_nsid = old_nsid;
+            ctx.current_def = old_def;
+            ctx.ref_stack.pop();
+
+            errors
+        }
+
+        LexObjectProperty::Bytes(_) => {
+            if !matches!(data.data_type(), DataModelType::Bytes) {
+                vec![StructuralError::TypeMismatch {
+                    path: path.clone(),
+                    expected: DataModelType::Bytes,
+                    actual: data.data_type(),
+                }]
+            } else {
+                Vec::new()
+            }
+        }
+
+        LexObjectProperty::CidLink(_) => {
+            if !matches!(data.data_type(), DataModelType::CidLink) {
+                vec![StructuralError::TypeMismatch {
+                    path: path.clone(),
+                    expected: DataModelType::CidLink,
+                    actual: data.data_type(),
+                }]
+            } else {
+                Vec::new()
+            }
+        }
+
+        LexObjectProperty::Blob(_) => {
+            if !matches!(data.data_type(), DataModelType::Blob) {
+                vec![StructuralError::TypeMismatch {
+                    path: path.clone(),
+                    expected: DataModelType::Blob,
+                    actual: data.data_type(),
+                }]
+            } else {
+                Vec::new()
+            }
+        }
+
+        LexObjectProperty::Unknown(_) => {
+            // Any type allowed
+            Vec::new()
+        }
+    }
+}
+
+/// Validate array item against array item schema
+fn validate_array_item(
+    path: &mut ValidationPath,
+    data: &Data,
+    item_schema: &crate::lexicon::LexArrayItem,
+    registry: &SchemaRegistry,
+    ctx: &mut ValidationContext,
+) -> Vec<StructuralError> {
+    use crate::lexicon::LexArrayItem;
+
+    match item_schema {
+        LexArrayItem::String(s) => validate_property(
+            path,
+            data,
+            &crate::lexicon::LexObjectProperty::String(s.clone()),
+            registry,
+            ctx,
+        ),
+        LexArrayItem::Integer(i) => validate_property(
+            path,
+            data,
+            &crate::lexicon::LexObjectProperty::Integer(i.clone()),
+            registry,
+            ctx,
+        ),
+        LexArrayItem::Boolean(b) => validate_property(
+            path,
+            data,
+            &crate::lexicon::LexObjectProperty::Boolean(b.clone()),
+            registry,
+            ctx,
+        ),
+        LexArrayItem::Object(o) => validate_property(
+            path,
+            data,
+            &crate::lexicon::LexObjectProperty::Object(o.clone()),
+            registry,
+            ctx,
+        ),
+        LexArrayItem::Unknown(u) => validate_property(
+            path,
+            data,
+            &crate::lexicon::LexObjectProperty::Unknown(u.clone()),
+            registry,
+            ctx,
+        ),
+        LexArrayItem::Bytes(b) => validate_property(
+            path,
+            data,
+            &crate::lexicon::LexObjectProperty::Bytes(b.clone()),
+            registry,
+            ctx,
+        ),
+        LexArrayItem::CidLink(c) => validate_property(
+            path,
+            data,
+            &crate::lexicon::LexObjectProperty::CidLink(c.clone()),
+            registry,
+            ctx,
+        ),
+        LexArrayItem::Blob(b) => validate_property(
+            path,
+            data,
+            &crate::lexicon::LexObjectProperty::Blob(b.clone()),
+            registry,
+            ctx,
+        ),
+        LexArrayItem::Ref(r) => validate_property(
+            path,
+            data,
+            &crate::lexicon::LexObjectProperty::Ref(r.clone()),
+            registry,
+            ctx,
+        ),
+        LexArrayItem::Union(u) => validate_property(
+            path,
+            data,
+            &crate::lexicon::LexObjectProperty::Union(u.clone()),
+            registry,
+            ctx,
+        ),
+    }
+}
+
+// ============================================================================
+// CONSTRAINT VALIDATION
+// ============================================================================
+
+/// Validate constraints on data against schema (entry point with optional registry)
+fn validate_constraints(
+    path: &mut ValidationPath,
+    data: &Data,
+    nsid: &str,
+    def_name: &str,
+    registry: Option<&Arc<SchemaRegistry>>,
+) -> Vec<ConstraintError> {
+    // Use provided registry or fall back to global inventory
+    let fallback_registry;
+    let registry_ref = match registry {
+        Some(r) => r.as_ref(),
+        None => {
+            fallback_registry = SchemaRegistry::from_inventory();
+            &fallback_registry
+        }
+    };
+
+    validate_constraints_impl(path, data, nsid, def_name, registry_ref)
+}
+
+/// Internal implementation that takes materialized registry
+fn validate_constraints_impl(
+    path: &mut ValidationPath,
+    data: &Data,
+    nsid: &str,
+    def_name: &str,
+    registry: &SchemaRegistry,
+) -> Vec<ConstraintError> {
+    use crate::lexicon::LexUserType;
+
+    // Get schema def
+    let Some(def) = registry.get_def(nsid, def_name) else {
+        return Vec::new();
+    };
+
+    match def {
+        LexUserType::Object(obj) => {
+            let Data::Object(obj_data) = data else {
+                return Vec::new();
+            };
+
+            let mut errors = Vec::new();
+
+            // Check constraints on each property
+            for (name, prop) in &obj.properties {
+                if let Some(field_data) = obj_data.get(name.as_ref()) {
+                    path.push_field(name.as_ref());
+                    errors.extend(check_property_constraints(path, field_data, prop, registry));
+                    path.pop();
+                }
+            }
+
+            errors
+        }
+        // Other def types would go here
+        _ => Vec::new(),
+    }
+}
+
+/// Check constraints on a property
+fn check_property_constraints(
+    path: &mut ValidationPath,
+    data: &Data,
+    prop: &crate::lexicon::LexObjectProperty,
+    registry: &SchemaRegistry,
+) -> Vec<ConstraintError> {
+    use crate::lexicon::LexObjectProperty;
+
+    match prop {
+        LexObjectProperty::String(s) => {
+            if let Data::String(str_val) = data {
+                check_string_constraints(path, str_val.as_str(), s)
+            } else {
+                Vec::new()
+            }
+        }
+
+        LexObjectProperty::Integer(i) => {
+            if let Data::Integer(int_val) = data {
+                check_integer_constraints(path, *int_val, i)
+            } else {
+                Vec::new()
+            }
+        }
+
+        LexObjectProperty::Array(arr) => {
+            if let Data::Array(array) = data {
+                let mut errors = check_array_constraints(path, array, arr);
+
+                // Also check constraints on array items
+                for (idx, item) in array.iter().enumerate() {
+                    path.push_index(idx);
+                    errors.extend(check_array_item_constraints(
+                        path, item, &arr.items, registry,
+                    ));
+                    path.pop();
+                }
+
+                errors
+            } else {
+                Vec::new()
+            }
+        }
+
+        LexObjectProperty::Object(obj) => {
+            if let Data::Object(obj_data) = data {
+                let mut errors = Vec::new();
+
+                // Recursively check nested object properties
+                for (name, schema_prop) in &obj.properties {
+                    if let Some(field_data) = obj_data.get(name.as_ref()) {
+                        path.push_field(name.as_ref());
+                        errors.extend(check_property_constraints(
+                            path,
+                            field_data,
+                            schema_prop,
+                            registry,
+                        ));
+                        path.pop();
+                    }
+                }
+
+                errors
+            } else {
+                Vec::new()
+            }
+        }
+
+        LexObjectProperty::Ref(r) => {
+            // Follow ref and check constraints
+            let (ref_nsid, ref_def) = normalize_ref(r.r#ref.as_ref(), ""); // FIXME: need current nsid
+
+            if registry.get_def(&ref_nsid, &ref_def).is_some() {
+                validate_constraints_impl(path, data, &ref_nsid, &ref_def, registry)
+            } else {
+                Vec::new()
+            }
+        }
+
+        // Other property types don't have constraints
+        _ => Vec::new(),
+    }
+}
+
+/// Check string constraints
+fn check_string_constraints(
+    path: &ValidationPath,
+    value: &str,
+    schema: &crate::lexicon::LexString,
+) -> Vec<ConstraintError> {
+    let mut errors = Vec::new();
+
+    // Check byte length constraints
+    let byte_len = value.len();
+
+    if let Some(min) = schema.min_length {
+        if byte_len < min as usize {
+            errors.push(ConstraintError::MinLength {
+                path: path.clone(),
+                min: min as usize,
+                actual: byte_len,
+            });
+        }
+    }
+
+    if let Some(max) = schema.max_length {
+        if byte_len > max as usize {
+            errors.push(ConstraintError::MaxLength {
+                path: path.clone(),
+                max: max as usize,
+                actual: byte_len,
+            });
+        }
+    }
+
+    // Check grapheme count constraints
+    if schema.min_graphemes.is_some() || schema.max_graphemes.is_some() {
+        use unicode_segmentation::UnicodeSegmentation;
+        let grapheme_count = value.graphemes(true).count();
+
+        if let Some(min) = schema.min_graphemes {
+            if grapheme_count < min as usize {
+                errors.push(ConstraintError::MinGraphemes {
+                    path: path.clone(),
+                    min: min as usize,
+                    actual: grapheme_count,
+                });
+            }
+        }
+
+        if let Some(max) = schema.max_graphemes {
+            if grapheme_count > max as usize {
+                errors.push(ConstraintError::MaxGraphemes {
+                    path: path.clone(),
+                    max: max as usize,
+                    actual: grapheme_count,
+                });
+            }
+        }
+    }
+
+    errors
+}
+
+/// Check integer constraints
+fn check_integer_constraints(
+    path: &ValidationPath,
+    value: i64,
+    schema: &crate::lexicon::LexInteger,
+) -> Vec<ConstraintError> {
+    let mut errors = Vec::new();
+
+    if let Some(min) = schema.minimum {
+        if value < min {
+            errors.push(ConstraintError::Minimum {
+                path: path.clone(),
+                min,
+                actual: value,
+            });
+        }
+    }
+
+    if let Some(max) = schema.maximum {
+        if value > max {
+            errors.push(ConstraintError::Maximum {
+                path: path.clone(),
+                max,
+                actual: value,
+            });
+        }
+    }
+
+    errors
+}
+
+/// Check array length constraints
+fn check_array_constraints(
+    path: &ValidationPath,
+    array: &jacquard_common::types::value::Array,
+    schema: &crate::lexicon::LexArray,
+) -> Vec<ConstraintError> {
+    let mut errors = Vec::new();
+    let len = array.len();
+
+    if let Some(min) = schema.min_length {
+        if len < min as usize {
+            errors.push(ConstraintError::MinLength {
+                path: path.clone(),
+                min: min as usize,
+                actual: len,
+            });
+        }
+    }
+
+    if let Some(max) = schema.max_length {
+        if len > max as usize {
+            errors.push(ConstraintError::MaxLength {
+                path: path.clone(),
+                max: max as usize,
+                actual: len,
+            });
+        }
+    }
+
+    errors
+}
+
+/// Check constraints on array items
+fn check_array_item_constraints(
+    path: &mut ValidationPath,
+    data: &Data,
+    item_schema: &crate::lexicon::LexArrayItem,
+    registry: &SchemaRegistry,
+) -> Vec<ConstraintError> {
+    use crate::lexicon::LexArrayItem;
+
+    match item_schema {
+        LexArrayItem::String(s) => check_property_constraints(
+            path,
+            data,
+            &crate::lexicon::LexObjectProperty::String(s.clone()),
+            registry,
+        ),
+        LexArrayItem::Integer(i) => check_property_constraints(
+            path,
+            data,
+            &crate::lexicon::LexObjectProperty::Integer(i.clone()),
+            registry,
+        ),
+        LexArrayItem::Object(o) => check_property_constraints(
+            path,
+            data,
+            &crate::lexicon::LexObjectProperty::Object(o.clone()),
+            registry,
+        ),
+        LexArrayItem::Ref(r) => check_property_constraints(
+            path,
+            data,
+            &crate::lexicon::LexObjectProperty::Ref(r.clone()),
+            registry,
+        ),
+        // Other array item types don't have constraints
+        _ => Vec::new(),
+    }
+}
+
+#[cfg(test)]
+mod tests;

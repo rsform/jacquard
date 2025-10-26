@@ -2435,18 +2435,23 @@ dependencies = [
 name = "jacquard-lexicon"
 version = "0.8.0"
 dependencies = [
+ "cid",
+ "dashmap",
  "glob",
  "heck 0.5.0",
  "inventory",
  "jacquard-common",
  "miette",
+ "multihash",
  "prettyplease",
  "proc-macro2",
  "quote",
  "serde",
+ "serde_ipld_dagcbor",
  "serde_json",
  "serde_repr",
  "serde_with",
+ "sha2",
  "syn 2.0.108",
  "tempfile",
  "thiserror 2.0.17",

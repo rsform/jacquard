@@ -45,6 +45,10 @@ pub fn generate_schema_impl(
                 #nsid
             }
 
+            fn def_name() -> &'static str {
+                #def_name
+            }
+
             fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
                 #doc_literal
             }

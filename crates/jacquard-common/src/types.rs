@@ -94,6 +94,22 @@ pub enum DataModelType {
     String(LexiconStringType),
 }
 
+impl std::fmt::Display for DataModelType {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            DataModelType::Null => write!(f, "null"),
+            DataModelType::Boolean => write!(f, "boolean"),
+            DataModelType::Integer => write!(f, "integer"),
+            DataModelType::Bytes => write!(f, "bytes"),
+            DataModelType::CidLink => write!(f, "cid-link"),
+            DataModelType::Blob => write!(f, "blob"),
+            DataModelType::Array => write!(f, "array"),
+            DataModelType::Object => write!(f, "object"),
+            DataModelType::String(s) => write!(f, "{}", s),
+        }
+    }
+}
+
 /// Lexicon string format types for typed strings in the AT Protocol data model
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Hash)]
 #[serde(rename_all = "kebab-case")]
@@ -125,6 +141,25 @@ pub enum LexiconStringType {
     String,
 }
 
+impl std::fmt::Display for LexiconStringType {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            LexiconStringType::Datetime => write!(f, "datetime"),
+            LexiconStringType::AtUri => write!(f, "at-uri"),
+            LexiconStringType::Did => write!(f, "did"),
+            LexiconStringType::Handle => write!(f, "handle"),
+            LexiconStringType::AtIdentifier => write!(f, "at-identifier"),
+            LexiconStringType::Nsid => write!(f, "nsid"),
+            LexiconStringType::Cid => write!(f, "cid"),
+            LexiconStringType::Language => write!(f, "language"),
+            LexiconStringType::Tid => write!(f, "tid"),
+            LexiconStringType::RecordKey => write!(f, "record-key"),
+            LexiconStringType::Uri(u) => write!(f, "uri({})", u),
+            LexiconStringType::String => write!(f, "string"),
+        }
+    }
+}
+
 /// URI scheme types for lexicon URI format constraints
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(tag = "type")]
@@ -143,4 +178,18 @@ pub enum UriType {
     Dns,
     /// Any valid URI
     Any,
+}
+
+impl std::fmt::Display for UriType {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            UriType::Did => write!(f, "did"),
+            UriType::At => write!(f, "at"),
+            UriType::Https => write!(f, "https"),
+            UriType::Wss => write!(f, "wss"),
+            UriType::Cid => write!(f, "cid"),
+            UriType::Dns => write!(f, "dns"),
+            UriType::Any => write!(f, "any"),
+        }
+    }
 }

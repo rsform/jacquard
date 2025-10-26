@@ -67,6 +67,15 @@ pub trait LexiconSchema {
     /// For fragments, this is the base NSID (without `#fragment`).
     fn nsid() -> &'static str;
 
+    /// The definition name within the lexicon document
+    ///
+    /// Returns "main" for the primary definition, or the fragment name for other defs.
+    /// For example, in a lexicon with multiple defs like `pub.leaflet.poll.definition`,
+    /// the main type returns "main" while the `Option` type returns "option".
+    fn def_name() -> &'static str {
+        "main"
+    }
+
     /// The schema ID for this type
     ///
     /// Defaults to NSID. Override for fragments to include `#fragment` suffix.

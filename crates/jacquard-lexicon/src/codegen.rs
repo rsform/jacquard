@@ -90,6 +90,10 @@ impl<'c> CodeGenerator<'c> {
                     #nsid
                 }
 
+                fn def_name() -> &'static str {
+                    #def_name
+                }
+
                 fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
                     #shared_fn_ident()
                 }

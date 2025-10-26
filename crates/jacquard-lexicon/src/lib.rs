@@ -13,6 +13,7 @@
 //! - [`union_registry`] - Tracks union types for collision detection
 //! - [`fs`] - Filesystem utilities for lexicon storage
 //! - [`derive_impl`] - Implementation functions for derive macros (used by jacquard-derive)
+//! - [`validation`] - Runtime validation of Data against lexicon schemas
 
 pub mod codegen;
 pub mod corpus;
@@ -22,3 +23,4 @@ pub mod fs;
 pub mod lexicon;
 pub mod schema;
 pub mod union_registry;
+pub mod validation;
