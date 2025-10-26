@@ -19,7 +19,7 @@ fn test_simple_struct() {
     assert_eq!(SimpleRecord::schema_id().as_ref(), "com.example.simple");
 
     let mut generator = LexiconGenerator::new(SimpleRecord::nsid());
-    let doc = SimpleRecord::lexicon_doc(&mut generator);
+    let doc = SimpleRecord::lexicon_doc();
 
     assert_eq!(doc.id.as_ref(), "com.example.simple");
     assert!(doc.defs.contains_key("main"));
@@ -47,7 +47,7 @@ fn test_struct_with_constraints() {
     }
 
     let mut generator = LexiconGenerator::new(ConstrainedRecord::nsid());
-    let doc = ConstrainedRecord::lexicon_doc(&mut generator);
+    let doc = ConstrainedRecord::lexicon_doc();
 
     let json = serde_json::to_string_pretty(&doc).unwrap();
     println!("{}", json);
@@ -111,7 +111,7 @@ fn test_serde_rename() {
     }
 
     let mut generator = LexiconGenerator::new(RenamedRecord::nsid());
-    let doc = RenamedRecord::lexicon_doc(&mut generator);
+    let doc = RenamedRecord::lexicon_doc();
 
     let json = serde_json::to_string_pretty(&doc).unwrap();
     println!("{}", json);
@@ -132,8 +132,7 @@ fn test_default_camel_case() {
         pub field_two: i64,
     }
 
-    let mut generator = LexiconGenerator::new(CamelCaseRecord::nsid());
-    let doc = CamelCaseRecord::lexicon_doc(&mut generator);
+    let doc = CamelCaseRecord::lexicon_doc();
 
     let json = serde_json::to_string_pretty(&doc).unwrap();
     println!("{}", json);
@@ -157,8 +156,7 @@ fn test_basic_enum() {
         VariantTwo,
     }
 
-    let mut generator = LexiconGenerator::new(BasicUnion::nsid());
-    let doc = BasicUnion::lexicon_doc(&mut generator);
+    let doc = BasicUnion::lexicon_doc();
 
     let json = serde_json::to_string_pretty(&doc).unwrap();
     println!("{}", json);
@@ -187,7 +185,7 @@ fn test_open_union() {
     }
 
     let mut generator = LexiconGenerator::new(OpenUnion::nsid());
-    let doc = OpenUnion::lexicon_doc(&mut generator);
+    let doc = OpenUnion::lexicon_doc();
 
     let json = serde_json::to_string_pretty(&doc).unwrap();
     println!("{}", json);
@@ -209,7 +207,7 @@ fn test_enum_with_serde_rename() {
     }
 
     let mut generator = LexiconGenerator::new(RenamedUnion::nsid());
-    let doc = RenamedUnion::lexicon_doc(&mut generator);
+    let doc = RenamedUnion::lexicon_doc();
 
     let json = serde_json::to_string_pretty(&doc).unwrap();
     println!("{}", json);
@@ -233,7 +231,7 @@ fn test_enum_fragment_inference() {
     }
 
     let mut generator = LexiconGenerator::new(FragmentUnion::nsid());
-    let doc = FragmentUnion::lexicon_doc(&mut generator);
+    let doc = FragmentUnion::lexicon_doc();
 
     let json = serde_json::to_string_pretty(&doc).unwrap();
     println!("{}", json);

@@ -94,148 +94,153 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Announcement<'a> {
     fn nsid() -> &'static str {
         "dev.fudgeu.experimental.atforumv1.forum.announcement"
     }
-    fn lexicon_doc(
-        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
-    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        ::jacquard_lexicon::lexicon::LexiconDoc {
-            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-            id: "dev.fudgeu.experimental.atforumv1.forum.announcement".into(),
-            revision: None,
-            description: None,
-            defs: {
-                let mut map = ::std::collections::BTreeMap::new();
-                map.insert(
-                    "main".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                        description: None,
-                        key: Some("any".into()),
-                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                            description: None,
-                            required: Some(
-                                vec![
-                                    "title".into(), "body".into(), "createdAt".into(),
-                                    "expiresAt".into()
-                                ],
-                            ),
-                            nullable: None,
-                            properties: {
-                                let mut map = ::std::collections::BTreeMap::new();
-                                map.insert(
-                                    "body".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: Some(1usize),
-                                        max_length: Some(10000usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "createdAt".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "expiresAt".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "title".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: Some(1usize),
-                                        max_length: Some(100usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map
-                            },
-                        }),
-                    }),
-                );
-                map
-            },
-        }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement()
     }
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.body;
-            if value.len() > 10000usize {
+            if value.as_ref().len() > 10000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "body",
                     max: 10000usize,
-                    actual: value.len(),
+                    actual: value.as_ref().len(),
                 });
             }
         }
         {
             let value = &self.body;
-            if value.len() < 1usize {
+            if value.as_ref().len() < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "body",
                     min: 1usize,
-                    actual: value.len(),
+                    actual: value.as_ref().len(),
                 });
             }
         }
         {
             let value = &self.title;
-            if value.len() > 100usize {
+            if value.as_ref().len() > 100usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "title",
                     max: 100usize,
-                    actual: value.len(),
+                    actual: value.as_ref().len(),
                 });
             }
         }
         {
             let value = &self.title;
-            if value.len() < 1usize {
+            if value.as_ref().len() < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "title",
                     min: 1usize,
-                    actual: value.len(),
+                    actual: value.as_ref().len(),
                 });
             }
         }
         Ok(())
+    }
+}
+
+fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
+    ::jacquard_lexicon::lexicon::LexiconDoc {
+        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+        id: "dev.fudgeu.experimental.atforumv1.forum.announcement".into(),
+        revision: None,
+        description: None,
+        defs: {
+            let mut map = ::std::collections::BTreeMap::new();
+            map.insert(
+                "main".into(),
+                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                    description: None,
+                    key: Some("any".into()),
+                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                "title".into(), "body".into(), "createdAt".into(),
+                                "expiresAt".into()
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "body".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: Some(1usize),
+                                    max_length: Some(10000usize),
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "createdAt".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "expiresAt".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "title".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: Some(1usize),
+                                    max_length: Some(100usize),
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                }),
+            );
+            map
+        },
     }
 }

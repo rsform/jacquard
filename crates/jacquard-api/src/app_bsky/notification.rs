@@ -34,320 +34,329 @@ pub struct ActivitySubscription<'a> {
     pub reply: bool,
 }
 
+fn lexicon_doc_app_bsky_notification_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
+    ::jacquard_lexicon::lexicon::LexiconDoc {
+        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+        id: "app.bsky.notification.defs".into(),
+        revision: None,
+        description: None,
+        defs: {
+            let mut map = ::std::collections::BTreeMap::new();
+            map.insert(
+                "activitySubscription".into(),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(vec!["post".into(), "reply".into()]),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            "post".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            "reply".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                "chatPreference".into(),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(vec!["include".into(), "push".into()]),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            "include".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            "push".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                "filterablePreference".into(),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(vec!["include".into(), "list".into(), "push".into()]),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            "include".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            "list".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            "push".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                "preference".into(),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(vec!["list".into(), "push".into()]),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            "list".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            "push".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                "preferences".into(),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            "chat".into(), "follow".into(), "like".into(),
+                            "likeViaRepost".into(), "mention".into(), "quote".into(),
+                            "reply".into(), "repost".into(), "repostViaRepost".into(),
+                            "starterpackJoined".into(), "subscribedPost".into(),
+                            "unverified".into(), "verified".into()
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            "chat".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: "#chatPreference".into(),
+                            }),
+                        );
+                        map.insert(
+                            "follow".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: "#filterablePreference".into(),
+                            }),
+                        );
+                        map.insert(
+                            "like".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: "#filterablePreference".into(),
+                            }),
+                        );
+                        map.insert(
+                            "likeViaRepost".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: "#filterablePreference".into(),
+                            }),
+                        );
+                        map.insert(
+                            "mention".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: "#filterablePreference".into(),
+                            }),
+                        );
+                        map.insert(
+                            "quote".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: "#filterablePreference".into(),
+                            }),
+                        );
+                        map.insert(
+                            "reply".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: "#filterablePreference".into(),
+                            }),
+                        );
+                        map.insert(
+                            "repost".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: "#filterablePreference".into(),
+                            }),
+                        );
+                        map.insert(
+                            "repostViaRepost".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: "#filterablePreference".into(),
+                            }),
+                        );
+                        map.insert(
+                            "starterpackJoined".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: "#preference".into(),
+                            }),
+                        );
+                        map.insert(
+                            "subscribedPost".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: "#preference".into(),
+                            }),
+                        );
+                        map.insert(
+                            "unverified".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: "#preference".into(),
+                            }),
+                        );
+                        map.insert(
+                            "verified".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: "#preference".into(),
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                "recordDeleted".into(),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: None,
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                "subjectActivitySubscription".into(),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec!["subject".into(), "activitySubscription".into()],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            "activitySubscription".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: "#activitySubscription".into(),
+                            }),
+                        );
+                        map.insert(
+                            "subject".into(),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map
+        },
+    }
+}
+
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActivitySubscription<'a> {
     fn nsid() -> &'static str {
         "app.bsky.notification.defs"
     }
-    fn lexicon_doc(
-        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
-    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        ::jacquard_lexicon::lexicon::LexiconDoc {
-            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-            id: "app.bsky.notification.defs".into(),
-            revision: None,
-            description: None,
-            defs: {
-                let mut map = ::std::collections::BTreeMap::new();
-                map.insert(
-                    "activitySubscription".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["post".into(), "reply".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "post".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "reply".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "chatPreference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["include".into(), "push".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "include".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "filterablePreference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec!["include".into(), "list".into(), "push".into()],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "include".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "list".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "preference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["list".into(), "push".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "list".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "preferences".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                "chat".into(), "follow".into(), "like".into(),
-                                "likeViaRepost".into(), "mention".into(), "quote".into(),
-                                "reply".into(), "repost".into(), "repostViaRepost".into(),
-                                "starterpackJoined".into(), "subscribedPost".into(),
-                                "unverified".into(), "verified".into()
-                            ],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "chat".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#chatPreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "follow".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "like".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "likeViaRepost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "mention".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "quote".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "reply".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "repost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "repostViaRepost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "starterpackJoined".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "subscribedPost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "unverified".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "verified".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "recordDeleted".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: None,
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "subjectActivitySubscription".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec!["subject".into(), "activitySubscription".into()],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "activitySubscription".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#activitySubscription".into(),
-                                }),
-                            );
-                            map.insert(
-                                "subject".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map
-            },
-        }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_defs()
     }
     fn validate(
         &self,
@@ -379,316 +388,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChatPreference<'a> {
     fn nsid() -> &'static str {
         "app.bsky.notification.defs"
     }
-    fn lexicon_doc(
-        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
-    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        ::jacquard_lexicon::lexicon::LexiconDoc {
-            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-            id: "app.bsky.notification.defs".into(),
-            revision: None,
-            description: None,
-            defs: {
-                let mut map = ::std::collections::BTreeMap::new();
-                map.insert(
-                    "activitySubscription".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["post".into(), "reply".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "post".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "reply".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "chatPreference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["include".into(), "push".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "include".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "filterablePreference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec!["include".into(), "list".into(), "push".into()],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "include".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "list".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "preference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["list".into(), "push".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "list".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "preferences".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                "chat".into(), "follow".into(), "like".into(),
-                                "likeViaRepost".into(), "mention".into(), "quote".into(),
-                                "reply".into(), "repost".into(), "repostViaRepost".into(),
-                                "starterpackJoined".into(), "subscribedPost".into(),
-                                "unverified".into(), "verified".into()
-                            ],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "chat".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#chatPreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "follow".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "like".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "likeViaRepost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "mention".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "quote".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "reply".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "repost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "repostViaRepost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "starterpackJoined".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "subscribedPost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "unverified".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "verified".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "recordDeleted".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: None,
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "subjectActivitySubscription".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec!["subject".into(), "activitySubscription".into()],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "activitySubscription".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#activitySubscription".into(),
-                                }),
-                            );
-                            map.insert(
-                                "subject".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map
-            },
-        }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_defs()
     }
     fn validate(
         &self,
@@ -721,316 +422,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FilterablePreference<'a> 
     fn nsid() -> &'static str {
         "app.bsky.notification.defs"
     }
-    fn lexicon_doc(
-        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
-    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        ::jacquard_lexicon::lexicon::LexiconDoc {
-            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-            id: "app.bsky.notification.defs".into(),
-            revision: None,
-            description: None,
-            defs: {
-                let mut map = ::std::collections::BTreeMap::new();
-                map.insert(
-                    "activitySubscription".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["post".into(), "reply".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "post".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "reply".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "chatPreference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["include".into(), "push".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "include".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "filterablePreference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec!["include".into(), "list".into(), "push".into()],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "include".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "list".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "preference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["list".into(), "push".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "list".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "preferences".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                "chat".into(), "follow".into(), "like".into(),
-                                "likeViaRepost".into(), "mention".into(), "quote".into(),
-                                "reply".into(), "repost".into(), "repostViaRepost".into(),
-                                "starterpackJoined".into(), "subscribedPost".into(),
-                                "unverified".into(), "verified".into()
-                            ],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "chat".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#chatPreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "follow".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "like".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "likeViaRepost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "mention".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "quote".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "reply".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "repost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "repostViaRepost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "starterpackJoined".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "subscribedPost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "unverified".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "verified".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "recordDeleted".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: None,
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "subjectActivitySubscription".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec!["subject".into(), "activitySubscription".into()],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "activitySubscription".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#activitySubscription".into(),
-                                }),
-                            );
-                            map.insert(
-                                "subject".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map
-            },
-        }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_defs()
     }
     fn validate(
         &self,
@@ -1060,316 +453,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preference<'a> {
     fn nsid() -> &'static str {
         "app.bsky.notification.defs"
     }
-    fn lexicon_doc(
-        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
-    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        ::jacquard_lexicon::lexicon::LexiconDoc {
-            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-            id: "app.bsky.notification.defs".into(),
-            revision: None,
-            description: None,
-            defs: {
-                let mut map = ::std::collections::BTreeMap::new();
-                map.insert(
-                    "activitySubscription".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["post".into(), "reply".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "post".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "reply".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "chatPreference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["include".into(), "push".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "include".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "filterablePreference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec!["include".into(), "list".into(), "push".into()],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "include".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "list".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "preference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["list".into(), "push".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "list".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "preferences".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                "chat".into(), "follow".into(), "like".into(),
-                                "likeViaRepost".into(), "mention".into(), "quote".into(),
-                                "reply".into(), "repost".into(), "repostViaRepost".into(),
-                                "starterpackJoined".into(), "subscribedPost".into(),
-                                "unverified".into(), "verified".into()
-                            ],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "chat".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#chatPreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "follow".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "like".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "likeViaRepost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "mention".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "quote".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "reply".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "repost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "repostViaRepost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "starterpackJoined".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "subscribedPost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "unverified".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "verified".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "recordDeleted".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: None,
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "subjectActivitySubscription".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec!["subject".into(), "activitySubscription".into()],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "activitySubscription".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#activitySubscription".into(),
-                                }),
-                            );
-                            map.insert(
-                                "subject".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map
-            },
-        }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_defs()
     }
     fn validate(
         &self,
@@ -1423,316 +508,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
     fn nsid() -> &'static str {
         "app.bsky.notification.defs"
     }
-    fn lexicon_doc(
-        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
-    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        ::jacquard_lexicon::lexicon::LexiconDoc {
-            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-            id: "app.bsky.notification.defs".into(),
-            revision: None,
-            description: None,
-            defs: {
-                let mut map = ::std::collections::BTreeMap::new();
-                map.insert(
-                    "activitySubscription".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["post".into(), "reply".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "post".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "reply".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "chatPreference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["include".into(), "push".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "include".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "filterablePreference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec!["include".into(), "list".into(), "push".into()],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "include".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "list".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "preference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["list".into(), "push".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "list".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "preferences".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                "chat".into(), "follow".into(), "like".into(),
-                                "likeViaRepost".into(), "mention".into(), "quote".into(),
-                                "reply".into(), "repost".into(), "repostViaRepost".into(),
-                                "starterpackJoined".into(), "subscribedPost".into(),
-                                "unverified".into(), "verified".into()
-                            ],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "chat".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#chatPreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "follow".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "like".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "likeViaRepost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "mention".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "quote".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "reply".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "repost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "repostViaRepost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "starterpackJoined".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "subscribedPost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "unverified".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "verified".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "recordDeleted".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: None,
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "subjectActivitySubscription".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec!["subject".into(), "activitySubscription".into()],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "activitySubscription".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#activitySubscription".into(),
-                                }),
-                            );
-                            map.insert(
-                                "subject".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map
-            },
-        }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_defs()
     }
     fn validate(
         &self,
@@ -1758,316 +535,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordDeleted<'a> {
     fn nsid() -> &'static str {
         "app.bsky.notification.defs"
     }
-    fn lexicon_doc(
-        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
-    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        ::jacquard_lexicon::lexicon::LexiconDoc {
-            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-            id: "app.bsky.notification.defs".into(),
-            revision: None,
-            description: None,
-            defs: {
-                let mut map = ::std::collections::BTreeMap::new();
-                map.insert(
-                    "activitySubscription".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["post".into(), "reply".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "post".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "reply".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "chatPreference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["include".into(), "push".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "include".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "filterablePreference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec!["include".into(), "list".into(), "push".into()],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "include".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "list".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "preference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["list".into(), "push".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "list".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "preferences".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                "chat".into(), "follow".into(), "like".into(),
-                                "likeViaRepost".into(), "mention".into(), "quote".into(),
-                                "reply".into(), "repost".into(), "repostViaRepost".into(),
-                                "starterpackJoined".into(), "subscribedPost".into(),
-                                "unverified".into(), "verified".into()
-                            ],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "chat".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#chatPreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "follow".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "like".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "likeViaRepost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "mention".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "quote".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "reply".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "repost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "repostViaRepost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "starterpackJoined".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "subscribedPost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "unverified".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "verified".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "recordDeleted".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: None,
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "subjectActivitySubscription".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec!["subject".into(), "activitySubscription".into()],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "activitySubscription".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#activitySubscription".into(),
-                                }),
-                            );
-                            map.insert(
-                                "subject".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map
-            },
-        }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_defs()
     }
     fn validate(
         &self,
@@ -2100,316 +569,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectActivitySubscripti
     fn nsid() -> &'static str {
         "app.bsky.notification.defs"
     }
-    fn lexicon_doc(
-        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
-    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        ::jacquard_lexicon::lexicon::LexiconDoc {
-            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-            id: "app.bsky.notification.defs".into(),
-            revision: None,
-            description: None,
-            defs: {
-                let mut map = ::std::collections::BTreeMap::new();
-                map.insert(
-                    "activitySubscription".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["post".into(), "reply".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "post".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "reply".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "chatPreference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["include".into(), "push".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "include".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "filterablePreference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec!["include".into(), "list".into(), "push".into()],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "include".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "list".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "preference".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(vec!["list".into(), "push".into()]),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "list".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map.insert(
-                                "push".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "preferences".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                "chat".into(), "follow".into(), "like".into(),
-                                "likeViaRepost".into(), "mention".into(), "quote".into(),
-                                "reply".into(), "repost".into(), "repostViaRepost".into(),
-                                "starterpackJoined".into(), "subscribedPost".into(),
-                                "unverified".into(), "verified".into()
-                            ],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "chat".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#chatPreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "follow".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "like".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "likeViaRepost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "mention".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "quote".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "reply".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "repost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "repostViaRepost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#filterablePreference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "starterpackJoined".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "subscribedPost".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "unverified".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map.insert(
-                                "verified".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#preference".into(),
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "recordDeleted".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: None,
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map
-                        },
-                    }),
-                );
-                map.insert(
-                    "subjectActivitySubscription".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec!["subject".into(), "activitySubscription".into()],
-                        ),
-                        nullable: None,
-                        properties: {
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                "activitySubscription".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#activitySubscription".into(),
-                                }),
-                            );
-                            map.insert(
-                                "subject".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                );
-                map
-            },
-        }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_notification_defs()
     }
     fn validate(
         &self,

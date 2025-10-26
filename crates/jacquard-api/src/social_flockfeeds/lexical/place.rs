@@ -1061,508 +1061,779 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Place<'a> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.place"
     }
-    fn lexicon_doc(
-        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
-    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        ::jacquard_lexicon::lexicon::LexiconDoc {
-            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-            id: "social.flockfeeds.lexical.place".into(),
-            revision: None,
-            description: None,
-            defs: {
-                let mut map = ::std::collections::BTreeMap::new();
-                map.insert(
-                    "main".into(),
-                    ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                        description: None,
-                        key: Some("tid".into()),
-                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                            description: None,
-                            required: None,
-                            nullable: None,
-                            properties: {
-                                let mut map = ::std::collections::BTreeMap::new();
-                                map.insert(
-                                    "additionalProperty".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "additionalType".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "address".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "aggregateRating".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "alternateName".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "amenityFeature".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "branchCode".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "containedIn".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "containedInPlace".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "containsPlace".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "description".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "disambiguatingDescription".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "event".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "events".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "faxNumber".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "geo".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "geoContains".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "geoCoveredBy".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "geoCovers".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "geoCrosses".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "geoDisjoint".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "geoEquals".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "geoIntersects".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "geoOverlaps".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "geoTouches".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "geoWithin".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "globalLocationNumber".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "hasCertification".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "hasDriveThroughService".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "hasGS1DigitalLink".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "hasMap".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "identifier".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "image".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "isAccessibleForFree".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "isicV4".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "keywords".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "latitude".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "logo".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "longitude".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "mainEntityOfPage".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "map".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "maps".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "maximumAttendeeCapacity".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "name".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "openingHoursSpecification".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "photo".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "photos".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "potentialAction".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "publicAccess".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "review".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "reviews".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "sameAs".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "slogan".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "smokingAllowed".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "specialOpeningHoursSpecification".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "subjectOf".into(),
-                                    todo!("unsupported object property variant"),
-                                );
-                                map.insert(
-                                    "telephone".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "tourBookingPage".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    "url".into(),
-                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    }),
-                                );
-                                map
-                            },
-                        }),
-                    }),
-                );
-                map
-            },
-        }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_social_flockfeeds_lexical_place()
     }
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         Ok(())
+    }
+}
+
+fn lexicon_doc_social_flockfeeds_lexical_place() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
+    ::jacquard_lexicon::lexicon::LexiconDoc {
+        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+        id: "social.flockfeeds.lexical.place".into(),
+        revision: None,
+        description: None,
+        defs: {
+            let mut map = ::std::collections::BTreeMap::new();
+            map.insert(
+                "main".into(),
+                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                    description: None,
+                    key: Some("tid".into()),
+                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: None,
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "additionalProperty".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.propertyvalue".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "additionalType".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "address".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.postaladdress".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "aggregateRating".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.aggregaterating".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "alternateName".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "amenityFeature".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.locationfeaturespecification"
+                                        .into(), "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "branchCode".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "containedIn".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.place".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "containedInPlace".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.place".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "containsPlace".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.place".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "description".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.textobject".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "disambiguatingDescription".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "event".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.event".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "events".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.event".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "faxNumber".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "geo".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.geoshape".into(),
+                                        "social.flockfeeds.lexical.geocoordinates".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "geoContains".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.place".into(),
+                                        "social.flockfeeds.lexical.geospatialgeometry".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "geoCoveredBy".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.geospatialgeometry".into(),
+                                        "social.flockfeeds.lexical.place".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "geoCovers".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.place".into(),
+                                        "social.flockfeeds.lexical.geospatialgeometry".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "geoCrosses".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.place".into(),
+                                        "social.flockfeeds.lexical.geospatialgeometry".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "geoDisjoint".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.geospatialgeometry".into(),
+                                        "social.flockfeeds.lexical.place".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "geoEquals".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.place".into(),
+                                        "social.flockfeeds.lexical.geospatialgeometry".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "geoIntersects".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.place".into(),
+                                        "social.flockfeeds.lexical.geospatialgeometry".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "geoOverlaps".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.place".into(),
+                                        "social.flockfeeds.lexical.geospatialgeometry".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "geoTouches".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.place".into(),
+                                        "social.flockfeeds.lexical.geospatialgeometry".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "geoWithin".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.geospatialgeometry".into(),
+                                        "social.flockfeeds.lexical.place".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "globalLocationNumber".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "hasCertification".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.certification".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "hasDriveThroughService".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                    description: None,
+                                    default: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "hasGS1DigitalLink".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "hasMap".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.map".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "identifier".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.propertyvalue".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "image".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.imageobject".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "isAccessibleForFree".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                    description: None,
+                                    default: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "isicV4".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "keywords".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.definedterm".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "latitude".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "logo".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.imageobject".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "longitude".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "mainEntityOfPage".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.creativework".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "map".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "maps".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "maximumAttendeeCapacity".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: None,
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "name".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "openingHoursSpecification".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.openinghoursspecification"
+                                        .into(), "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "photo".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.photograph".into(),
+                                        "social.flockfeeds.lexical.imageobject".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "photos".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.photograph".into(),
+                                        "social.flockfeeds.lexical.imageobject".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "potentialAction".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.action".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "publicAccess".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                    description: None,
+                                    default: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "review".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.review".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "reviews".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.review".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "sameAs".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "slogan".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "smokingAllowed".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                    description: None,
+                                    default: None,
+                                    r#const: None,
+                                }),
+                            );
+                            map.insert(
+                                "specialOpeningHoursSpecification".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.openinghoursspecification"
+                                        .into(), "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "subjectOf".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        "social.flockfeeds.lexical.event".into(),
+                                        "social.flockfeeds.lexical.creativework".into(),
+                                        "social.flockfeeds.lexical.itemlist".into()
+                                    ],
+                                    closed: None,
+                                }),
+                            );
+                            map.insert(
+                                "telephone".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "tourBookingPage".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                "url".into(),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                }),
+            );
+            map
+        },
     }
 }

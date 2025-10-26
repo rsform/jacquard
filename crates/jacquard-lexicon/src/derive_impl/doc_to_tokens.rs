@@ -140,7 +140,93 @@ fn user_type_to_tokens(ut: &LexUserType) -> TokenStream {
                 )
             }
         }
-        _ => quote! { todo!("unsupported user type variant") },
+        LexUserType::Blob(blob) => {
+            let accept = option_vec_mime_type_to_tokens(&blob.accept);
+            let max_size = option_to_tokens(&blob.max_size, |v| quote! { #v });
+            quote! {
+                ::jacquard_lexicon::lexicon::LexUserType::Blob(
+                    ::jacquard_lexicon::lexicon::LexBlob {
+                        description: None,
+                        accept: #accept,
+                        max_size: #max_size,
+                    }
+                )
+            }
+        }
+        LexUserType::Array(arr) => {
+            let items = array_item_to_tokens(&arr.items);
+            let min = option_to_tokens(&arr.min_length, |v| quote! { #v });
+            let max = option_to_tokens(&arr.max_length, |v| quote! { #v });
+            quote! {
+                ::jacquard_lexicon::lexicon::LexUserType::Array(
+                    ::jacquard_lexicon::lexicon::LexArray {
+                        description: None,
+                        items: #items,
+                        min_length: #min,
+                        max_length: #max,
+                    }
+                )
+            }
+        }
+        LexUserType::Token(_) => quote! {
+            ::jacquard_lexicon::lexicon::LexUserType::Token(
+                ::jacquard_lexicon::lexicon::LexToken { description: None }
+            )
+        },
+        LexUserType::Boolean(_) => quote! {
+            ::jacquard_lexicon::lexicon::LexUserType::Boolean(
+                ::jacquard_lexicon::lexicon::LexBoolean {
+                    description: None,
+                    default: None,
+                    r#const: None,
+                }
+            )
+        },
+        LexUserType::Integer(i) => {
+            let min = option_to_tokens(&i.minimum, |v| quote! { #v });
+            let max = option_to_tokens(&i.maximum, |v| quote! { #v });
+            quote! {
+                ::jacquard_lexicon::lexicon::LexUserType::Integer(
+                    ::jacquard_lexicon::lexicon::LexInteger {
+                        description: None,
+                        default: None,
+                        minimum: #min,
+                        maximum: #max,
+                        r#enum: None,
+                        r#const: None,
+                    }
+                )
+            }
+        }
+        LexUserType::String(s) => {
+            let string_tokens = lex_string_to_tokens(s);
+            quote! {
+                ::jacquard_lexicon::lexicon::LexUserType::String(#string_tokens)
+            }
+        }
+        LexUserType::Bytes(b) => {
+            let min = option_to_tokens(&b.min_length, |v| quote! { #v });
+            let max = option_to_tokens(&b.max_length, |v| quote! { #v });
+            quote! {
+                ::jacquard_lexicon::lexicon::LexUserType::Bytes(
+                    ::jacquard_lexicon::lexicon::LexBytes {
+                        description: None,
+                        max_length: #max,
+                        min_length: #min,
+                    }
+                )
+            }
+        }
+        LexUserType::CidLink(_) => quote! {
+            ::jacquard_lexicon::lexicon::LexUserType::CidLink(
+                ::jacquard_lexicon::lexicon::LexCidLink { description: None }
+            )
+        },
+        LexUserType::Unknown(_) => quote! {
+            ::jacquard_lexicon::lexicon::LexUserType::Unknown(
+                ::jacquard_lexicon::lexicon::LexUnknown { description: None }
+            )
+        },
     }
 }
 
@@ -172,6 +258,7 @@ fn properties_to_tokens(props: &BTreeMap<SmolStr, LexObjectProperty>) -> TokenSt
 
     quote! {
         {
+            #[allow(unused_mut)]
             let mut map = ::std::collections::BTreeMap::new();
             #(#prop_entries;)*
             map
@@ -271,7 +358,25 @@ fn object_property_to_tokens(prop: &LexObjectProperty) -> TokenStream {
                 )
             }
         }
-        _ => quote! { todo!("unsupported object property variant") },
+        LexObjectProperty::Union(union) => {
+            let refs: Vec<_> = union.refs.iter().map(|r| r.as_ref()).collect();
+            let closed = option_to_tokens(&union.closed, |c| quote! { #c });
+            quote! {
+                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(
+                    ::jacquard_lexicon::lexicon::LexRefUnion {
+                        description: None,
+                        refs: vec![#(#refs.into()),*],
+                        closed: #closed,
+                    }
+                )
+            }
+        }
+        LexObjectProperty::Object(obj) => {
+            let obj_tokens = object_to_tokens(obj);
+            quote! {
+                ::jacquard_lexicon::lexicon::LexObjectProperty::Object(#obj_tokens)
+            }
+        }
     }
 }
 
@@ -428,6 +533,7 @@ fn xrpc_parameters_to_tokens(params: &LexXrpcParameters) -> TokenStream {
             description: None,
             required: #required,
             properties: {
+                #[allow(unused_mut)]
                 let mut map = ::std::collections::BTreeMap::new();
                 #(#props;)*
                 map
@@ -581,22 +687,30 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
             let field_name_static = &check.field_name;
 
             // Generate the inner validation check
+            // For Vec types, use .len() directly; for strings/newtypes, use .as_ref().len()
+            let is_vec = check.field_type.starts_with("Vec<");
+            let len_expr = if is_vec {
+                quote! { value.len() }
+            } else {
+                quote! { value.as_ref().len() }
+            };
+
             let inner_check = match &check.check {
                 ConstraintCheck::MaxLength { max } => quote! {
-                    if value.as_ref().len() > #max {
+                    if #len_expr > #max {
                         return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                             field: #field_name_static,
                             max: #max,
-                            actual: value.as_ref().len(),
+                            actual: #len_expr,
                         });
                     }
                 },
                 ConstraintCheck::MinLength { min } => quote! {
-                    if value.as_ref().len() < #min {
+                    if #len_expr < #min {
                         return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                             field: #field_name_static,
                             min: #min,
-                            actual: value.as_ref().len(),
+                            actual: #len_expr,
                         });
                     }
                 },
@@ -706,6 +820,18 @@ fn option_vec_smol_str_to_tokens(opt: &Option<Vec<SmolStr>>) -> TokenStream {
         Some(v) => {
             let strs: Vec<_> = v.iter().map(|s| s.as_str()).collect();
             quote! { Some(vec![#(#strs.into()),*]) }
+        }
+        None => quote! { None },
+    }
+}
+
+fn option_vec_mime_type_to_tokens(
+    opt: &Option<Vec<jacquard_common::types::blob::MimeType>>,
+) -> TokenStream {
+    match opt {
+        Some(v) => {
+            let mime_strs: Vec<_> = v.iter().map(|m| m.0.as_ref()).collect();
+            quote! { Some(vec![#(jacquard_common::types::blob::MimeType(#mime_strs.into())),*]) }
         }
         None => quote! { None },
     }

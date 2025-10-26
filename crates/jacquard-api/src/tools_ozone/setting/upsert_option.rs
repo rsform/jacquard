@@ -56,7 +56,7 @@ pub struct UpsertOption<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct UpsertOptionOutput<'a> {
     #[serde(borrow)]
-    pub option: crate::tools_ozone::setting::Option<'a>,
+    pub option: crate::tools_ozone::setting::DefsOption<'a>,
 }
 
 /// Response type for

@@ -216,10 +216,9 @@ impl<'c> CodeGenerator<'c> {
                     }
                 };
 
-                // Generate LexiconSchema impl from original lexicon
-                let lex_doc = self.corpus.get(nsid).expect("nsid exists in corpus");
-                let schema_impl =
-                    super::schema_impl::generate_schema_impl(&type_name, lex_doc, "main", true);
+                // Generate LexiconSchema impl with shared lexicon_doc function
+                let (shared_fn, schema_impl) =
+                    self.generate_schema_impl_with_shared(&type_name, nsid, "main", true);
 
                 Ok(quote! {
                     #struct_def
@@ -236,6 +235,7 @@ impl<'c> CodeGenerator<'c> {
                     #record_marker
                     #collection_marker_impl
                     #schema_impl
+                    #shared_fn
                 })
             }
         }
@@ -339,14 +339,14 @@ impl<'c> CodeGenerator<'c> {
             }
         }
 
-        // Generate LexiconSchema impl from original lexicon
-        let lex_doc = self.corpus.get(nsid).expect("nsid exists in corpus");
-        let schema_impl =
-            super::schema_impl::generate_schema_impl(&type_name, lex_doc, def_name, true);
+        // Generate LexiconSchema impl with shared lexicon_doc function
+        let (shared_fn, schema_impl) =
+            self.generate_schema_impl_with_shared(&type_name, nsid, def_name, true);
 
         Ok(quote! {
             #struct_def
             #(#unions)*
+            #shared_fn
             #schema_impl
         })
     }

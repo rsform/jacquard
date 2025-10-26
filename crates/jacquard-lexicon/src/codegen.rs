@@ -22,6 +22,8 @@ pub struct CodeGenerator<'c> {
         std::cell::RefCell<std::collections::HashMap<String, std::collections::HashSet<String>>>,
     /// Track which file paths contain subscription endpoints
     subscription_files: std::cell::RefCell<std::collections::HashSet<std::path::PathBuf>>,
+    /// Track which NSIDs have already generated their shared lexicon_doc function
+    generated_shared_docs: std::cell::RefCell<std::collections::HashSet<String>>,
 }
 
 impl<'c> CodeGenerator<'c> {
@@ -32,12 +34,73 @@ impl<'c> CodeGenerator<'c> {
             root_module: root_module.into(),
             namespace_deps: std::cell::RefCell::new(std::collections::HashMap::new()),
             subscription_files: std::cell::RefCell::new(std::collections::HashSet::new()),
+            generated_shared_docs: std::cell::RefCell::new(std::collections::HashSet::new()),
         }
     }
 
     /// Generate doc comment from optional description (wrapper for utils function)
     fn generate_doc_comment(&self, desc: Option<&jacquard_common::CowStr>) -> TokenStream {
         utils::generate_doc_comment(desc)
+    }
+
+    /// Generate or reference the shared lexicon_doc function for this NSID
+    /// Returns (optional shared function, trait impl tokens)
+    pub(crate) fn generate_schema_impl_with_shared(
+        &self,
+        type_name: &str,
+        nsid: &str,
+        def_name: &str,
+        has_lifetime: bool,
+    ) -> (Option<TokenStream>, TokenStream) {
+        let lex_doc = self.corpus.get(nsid).expect("nsid exists in corpus");
+
+        // Generate shared function name from NSID (use sanitize_name for proper handling)
+        let shared_fn_name = format!("lexicon_doc_{}", utils::sanitize_name(nsid));
+        let shared_fn_ident = syn::Ident::new(&shared_fn_name, proc_macro2::Span::call_site());
+
+        // Check if we need to generate the shared function
+        let mut generated = self.generated_shared_docs.borrow_mut();
+        let shared_fn = if !generated.contains(nsid) {
+            generated.insert(nsid.to_string());
+            let doc_literal = crate::derive_impl::doc_to_tokens::doc_to_tokens(lex_doc);
+            Some(quote! {
+                fn #shared_fn_ident() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+                    #doc_literal
+                }
+            })
+        } else {
+            None
+        };
+
+        // Generate lightweight trait impl that calls shared function
+        let type_ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
+        let (impl_generics, type_generics) = if has_lifetime {
+            (quote! { <'a> }, quote! { <'a> })
+        } else {
+            (quote! {}, quote! {})
+        };
+
+        // Extract validation checks for this specific def
+        let validation_checks = schema_impl::extract_validation_checks(lex_doc, def_name);
+        let validation_code = crate::derive_impl::doc_to_tokens::validations_to_tokens(&validation_checks);
+
+        let trait_impl = quote! {
+            impl #impl_generics ::jacquard_lexicon::schema::LexiconSchema for #type_ident #type_generics {
+                fn nsid() -> &'static str {
+                    #nsid
+                }
+
+                fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+                    #shared_fn_ident()
+                }
+
+                fn validate(&self) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+                    #validation_code
+                }
+            }
+        };
+
+        (shared_fn, trait_impl)
     }
 
     /// Generate code for a lexicon def

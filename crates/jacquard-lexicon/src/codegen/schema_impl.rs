@@ -45,9 +45,7 @@ pub fn generate_schema_impl(
                 #nsid
             }
 
-            fn lexicon_doc(
-                _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator
-            ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+            fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
                 #doc_literal
             }
 
@@ -62,7 +60,7 @@ pub fn generate_schema_impl(
 ///
 /// Walks the lexicon structure and builds ValidationCheck structs for all
 /// constraint fields (max_length, max_graphemes, minimum, maximum, etc.)
-fn extract_validation_checks(doc: &LexiconDoc, def_name: &str) -> Vec<ValidationCheck> {
+pub(crate) fn extract_validation_checks(doc: &LexiconDoc, def_name: &str) -> Vec<ValidationCheck> {
     let mut checks = Vec::new();
 
     // Get the specified def

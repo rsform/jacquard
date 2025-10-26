@@ -1,10 +1,10 @@
-use jacquard_common::types::string::Datetime;
 use jacquard_common::CowStr;
+use jacquard_common::types::string::Datetime;
 use jacquard_lexicon::lexicon::{
-    Lexicon, LexObject, LexObjectProperty, LexRecord, LexRecordRecord, LexString,
-    LexStringFormat, LexUserType, LexiconDoc,
+    LexObject, LexObjectProperty, LexRecord, LexRecordRecord, LexString, LexStringFormat,
+    LexUserType, Lexicon, LexiconDoc,
 };
-use jacquard_lexicon::schema::{LexiconGenerator, LexiconSchema, ValidationError};
+use jacquard_lexicon::schema::{LexiconSchema, ValidationError};
 use std::collections::BTreeMap;
 
 // Simple test type
@@ -19,7 +19,7 @@ impl LexiconSchema for SimpleRecord<'_> {
         "com.example.simple"
     }
 
-    fn lexicon_doc(_generator: &mut LexiconGenerator) -> LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         let mut properties = BTreeMap::new();
 
         properties.insert(
@@ -95,8 +95,7 @@ impl LexiconSchema for SimpleRecord<'_> {
 
 #[test]
 fn test_manual_impl_generates_valid_schema() {
-    let mut generator = LexiconGenerator::new(SimpleRecord::nsid());
-    let doc = SimpleRecord::lexicon_doc(&mut generator);
+    let doc = SimpleRecord::lexicon_doc();
 
     // Verify structure
     assert_eq!(doc.id.as_ref(), "com.example.simple");

@@ -62,8 +62,8 @@ impl<'c> CodeGenerator<'c> {
         base_name
     }
 
-    /// Convert lexicon def name to Rust type name
-    pub(super) fn def_to_type_name(&self, nsid: &str, def_name: &str) -> String {
+    /// Convert lexicon def name to base Rust type name (without prelude collision handling)
+    fn def_to_base_type_name(&self, nsid: &str, def_name: &str) -> String {
         if def_name == "main" {
             // Use last segment of NSID
             let base_name = nsid.split('.').last().unwrap().to_pascal_case();
@@ -84,6 +84,40 @@ impl<'c> CodeGenerator<'c> {
         } else {
             def_name.to_pascal_case()
         }
+    }
+
+    /// Apply prelude collision fix if needed
+    fn apply_prelude_collision_fix(&self, nsid: &str, def_name: &str, base_name: String) -> String {
+        // Prelude types that would shadow if used as type names
+        const PRELUDE_TYPES: &[&str] = &[
+            "Option", "Result", "String", "Vec", "Box",
+            "Some", "None", "Ok", "Err",
+        ];
+
+        if !PRELUDE_TYPES.contains(&base_name.as_str()) {
+            return base_name;
+        }
+
+        // Add contextual prefix to avoid collision
+        if def_name == "main" {
+            // Use second-to-last NSID segment for main defs
+            let parts: Vec<_> = nsid.split('.').collect();
+            if parts.len() >= 2 {
+                format!("{}{}", parts[parts.len() - 2].to_pascal_case(), base_name)
+            } else {
+                format!("Lex{}", base_name) // fallback
+            }
+        } else {
+            // Use main def's type name as prefix for nested defs
+            let main_base = self.def_to_base_type_name(nsid, "main");
+            format!("{}{}", main_base, base_name)
+        }
+    }
+
+    /// Convert lexicon def name to Rust type name
+    pub(super) fn def_to_type_name(&self, nsid: &str, def_name: &str) -> String {
+        let base_name = self.def_to_base_type_name(nsid, def_name);
+        self.apply_prelude_collision_fix(nsid, def_name, base_name)
     }
 
     /// Convert NSID to file path relative to output directory
