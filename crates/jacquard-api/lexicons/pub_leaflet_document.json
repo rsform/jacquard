@@ -31,8 +31,7 @@
             "items": {
               "type": "union",
               "refs": [
-                "pub.leaflet.pages.linearDocument",
-                "pub.leaflet.pages.canvas"
+                "pub.leaflet.pages.linearDocument"
               ]
             }
           },

@@ -37,7 +37,7 @@
         "properties": {
           "color": {
             "type": "ref",
-            "ref": "#color"
+            "ref": "place.stream.chat.profile#color"
           }
         }
       }

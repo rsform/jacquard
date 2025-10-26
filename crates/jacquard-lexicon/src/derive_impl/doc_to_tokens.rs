@@ -579,29 +579,31 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
             // Use make_ident to handle keywords properly (adds r# prefix if needed)
             let field_ident = crate::codegen::utils::make_ident(&check.field_name);
             let field_name_static = &check.field_name;
-            match &check.check {
+
+            // Generate the inner validation check
+            let inner_check = match &check.check {
                 ConstraintCheck::MaxLength { max } => quote! {
-                    if self.#field_ident.len() > #max {
+                    if value.len() > #max {
                         return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                             field: #field_name_static,
                             max: #max,
-                            actual: self.#field_ident.len(),
+                            actual: value.len(),
                         });
                     }
                 },
                 ConstraintCheck::MinLength { min } => quote! {
-                    if self.#field_ident.len() < #min {
+                    if value.len() < #min {
                         return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                             field: #field_name_static,
                             min: #min,
-                            actual: self.#field_ident.len(),
+                            actual: value.len(),
                         });
                     }
                 },
                 ConstraintCheck::MaxGraphemes { max } => quote! {
                     {
                         let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                            self.#field_ident.as_ref(),
+                            value.as_ref(),
                             true
                         ).count();
                         if count > #max {
@@ -616,7 +618,7 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                 ConstraintCheck::MinGraphemes { min } => quote! {
                     {
                         let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                            self.#field_ident.as_ref(),
+                            value.as_ref(),
                             true
                         ).count();
                         if count < #min {
@@ -629,23 +631,41 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                     }
                 },
                 ConstraintCheck::Maximum { max } => quote! {
-                    if self.#field_ident > #max {
+                    if *value > #max {
                         return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
                             field: #field_name_static,
                             max: #max,
-                            actual: self.#field_ident,
+                            actual: *value,
                         });
                     }
                 },
                 ConstraintCheck::Minimum { min } => quote! {
-                    if self.#field_ident < #min {
+                    if *value < #min {
                         return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
                             field: #field_name_static,
                             min: #min,
-                            actual: self.#field_ident,
+                            actual: *value,
                         });
                     }
                 },
+            };
+
+            // Wrap in Option check if field is optional
+            if check.is_required {
+                // Required field: access directly
+                quote! {
+                    {
+                        let value = &self.#field_ident;
+                        #inner_check
+                    }
+                }
+            } else {
+                // Optional field: check if Some first
+                quote! {
+                    if let Some(ref value) = self.#field_ident {
+                        #inner_check
+                    }
+                }
             }
         })
         .collect();

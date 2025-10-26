@@ -14,11 +14,6 @@
           "updatedAt"
         ],
         "properties": {
-          "broadcaster": {
-            "type": "string",
-            "description": "did of the broadcaster that operates the server syndicating the livestream",
-            "format": "did"
-          },
           "irohTicket": {
             "type": "string",
             "description": "Iroh ticket that can be used to access the livestream from the server",
@@ -26,7 +21,7 @@
           },
           "server": {
             "type": "string",
-            "description": "did of the server that's currently rebroadcasting the livestream",
+            "description": "did:web of the server that's currently rebroadcasting the livestream",
             "format": "did"
           },
           "streamer": {
