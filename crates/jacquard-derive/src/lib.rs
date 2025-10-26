@@ -167,7 +167,7 @@ pub fn derive_xrpc_request(input: TokenStream) -> TokenStream {
 /// **What it generates:**
 /// - `impl LexiconSchema` with `nsid()`, `schema_id()`, and `lexicon_doc()` methods
 /// - `validate()` method that checks constraints at runtime
-/// - `inventory::submit!` registration for schema discovery (Phase 3)
+/// - `inventory::submit!` registration for schema discovery
 ///
 /// **Attributes:** `#[lexicon(...)]` and `#[nsid = "..."]` on types and fields.
 /// See crate docs for full attribute reference and examples.

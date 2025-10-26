@@ -117,6 +117,65 @@ impl<'s> Data<'s> {
         Data::from_json(&json).map(|data| data.into_static())
     }
 
+    /// Get as object if this is an Object variant
+    pub fn as_object(&self) -> Option<&Object<'s>> {
+        if let Data::Object(obj) = self {
+            Some(obj)
+        } else {
+            None
+        }
+    }
+
+    /// Get as array if this is an Array variant
+    pub fn as_array(&self) -> Option<&Array<'s>> {
+        if let Data::Array(arr) = self {
+            Some(arr)
+        } else {
+            None
+        }
+    }
+
+    /// Get as string if this is a String variant
+    pub fn as_str(&self) -> Option<&str> {
+        if let Data::String(s) = self {
+            Some(s.as_str())
+        } else {
+            None
+        }
+    }
+
+    /// Get as integer if this is an Integer variant
+    pub fn as_integer(&self) -> Option<i64> {
+        if let Data::Integer(i) = self {
+            Some(*i)
+        } else {
+            None
+        }
+    }
+
+    /// Get as boolean if this is a Boolean variant
+    pub fn as_boolean(&self) -> Option<bool> {
+        if let Data::Boolean(b) = self {
+            Some(*b)
+        } else {
+            None
+        }
+    }
+
+    /// Check if this is a null value
+    pub fn is_null(&self) -> bool {
+        matches!(self, Data::Null)
+    }
+
+    /// Serialize to canonical DAG-CBOR bytes for CID computation
+    ///
+    /// This produces the deterministic CBOR encoding used for content-addressing.
+    pub fn to_dag_cbor(
+        &self,
+    ) -> Result<Vec<u8>, serde_ipld_dagcbor::EncodeError<std::collections::TryReserveError>> {
+        serde_ipld_dagcbor::to_vec(self)
+    }
+
     /// Parse a Data value from an IPLD value (CBOR)
     pub fn from_cbor(cbor: &'s Ipld) -> Result<Self, AtDataError> {
         Ok(match cbor {
@@ -358,6 +417,56 @@ pub enum RawData<'s> {
 }
 
 impl<'d> RawData<'d> {
+    /// Get as object if this is an Object variant
+    pub fn as_object(&self) -> Option<&BTreeMap<SmolStr, RawData<'d>>> {
+        if let RawData::Object(obj) = self {
+            Some(obj)
+        } else {
+            None
+        }
+    }
+
+    /// Get as array if this is an Array variant
+    pub fn as_array(&self) -> Option<&Vec<RawData<'d>>> {
+        if let RawData::Array(arr) = self {
+            Some(arr)
+        } else {
+            None
+        }
+    }
+
+    /// Get as string if this is a String variant
+    pub fn as_str(&self) -> Option<&str> {
+        if let RawData::String(s) = self {
+            Some(s.as_ref())
+        } else {
+            None
+        }
+    }
+
+    /// Get as boolean if this is a Boolean variant
+    pub fn as_boolean(&self) -> Option<bool> {
+        if let RawData::Boolean(b) = self {
+            Some(*b)
+        } else {
+            None
+        }
+    }
+
+    /// Check if this is a null value
+    pub fn is_null(&self) -> bool {
+        matches!(self, RawData::Null)
+    }
+
+    /// Serialize to canonical DAG-CBOR bytes for CID computation
+    ///
+    /// This produces the deterministic CBOR encoding used for content-addressing.
+    pub fn to_dag_cbor(
+        &self,
+    ) -> Result<Vec<u8>, serde_ipld_dagcbor::EncodeError<std::collections::TryReserveError>> {
+        serde_ipld_dagcbor::to_vec(self)
+    }
+
     /// Convert a CBOR-encoded byte slice into a `RawData` value.
     /// Parse a Data value from an IPLD value (CBOR)
     pub fn from_cbor(cbor: &'d Ipld) -> Result<Self, AtDataError> {

@@ -813,3 +813,120 @@ fn test_option_vec_deserialization() {
     assert_eq!(result.text, "null test");
     assert_eq!(result.langs, None);
 }
+
+#[test]
+fn test_data_accessors() {
+    // Test as_object
+    let mut map = BTreeMap::new();
+    map.insert(SmolStr::new_static("key"), Data::Integer(42));
+    let obj_data = Data::Object(Object(map.clone()));
+    assert!(obj_data.as_object().is_some());
+    assert_eq!(obj_data.as_object().unwrap().0.len(), 1);
+    assert!(Data::Null.as_object().is_none());
+
+    // Test as_array
+    let arr_data = Data::Array(Array(vec![Data::Integer(1), Data::Integer(2)]));
+    assert!(arr_data.as_array().is_some());
+    assert_eq!(arr_data.as_array().unwrap().0.len(), 2);
+    assert!(Data::Null.as_array().is_none());
+
+    // Test as_str
+    let str_data = Data::String(AtprotoStr::String("hello".into()));
+    assert_eq!(str_data.as_str(), Some("hello"));
+    assert!(Data::Null.as_str().is_none());
+
+    // Test as_integer
+    let int_data = Data::Integer(42);
+    assert_eq!(int_data.as_integer(), Some(42));
+    assert!(Data::Null.as_integer().is_none());
+
+    // Test as_boolean
+    let bool_data = Data::Boolean(true);
+    assert_eq!(bool_data.as_boolean(), Some(true));
+    assert!(Data::Null.as_boolean().is_none());
+
+    // Test is_null
+    assert!(Data::Null.is_null());
+    assert!(!Data::Integer(0).is_null());
+}
+
+#[test]
+fn test_rawdata_accessors() {
+    // Test as_object
+    let mut map = BTreeMap::new();
+    map.insert(SmolStr::new_static("key"), RawData::SignedInt(42));
+    let obj_data = RawData::Object(map.clone());
+    assert!(obj_data.as_object().is_some());
+    assert_eq!(obj_data.as_object().unwrap().len(), 1);
+    assert!(RawData::Null.as_object().is_none());
+
+    // Test as_array
+    let arr_data = RawData::Array(vec![RawData::SignedInt(1), RawData::SignedInt(2)]);
+    assert!(arr_data.as_array().is_some());
+    assert_eq!(arr_data.as_array().unwrap().len(), 2);
+    assert!(RawData::Null.as_array().is_none());
+
+    // Test as_str
+    let str_data = RawData::String("hello".into());
+    assert_eq!(str_data.as_str(), Some("hello"));
+    assert!(RawData::Null.as_str().is_none());
+
+    // Test as_boolean
+    let bool_data = RawData::Boolean(true);
+    assert_eq!(bool_data.as_boolean(), Some(true));
+    assert!(RawData::Null.as_boolean().is_none());
+
+    // Test is_null
+    assert!(RawData::Null.is_null());
+    assert!(!RawData::SignedInt(0).is_null());
+}
+
+#[test]
+fn test_data_to_dag_cbor() {
+    // Test simple types
+    let null_data = Data::Null;
+    assert!(null_data.to_dag_cbor().is_ok());
+
+    let int_data = Data::Integer(42);
+    assert!(int_data.to_dag_cbor().is_ok());
+
+    let str_data = Data::String(AtprotoStr::String("hello".into()));
+    assert!(str_data.to_dag_cbor().is_ok());
+
+    // Test complex types
+    let mut map = BTreeMap::new();
+    map.insert(SmolStr::new_static("num"), Data::Integer(42));
+    map.insert(SmolStr::new_static("text"), Data::String(AtprotoStr::String("test".into())));
+    let obj_data = Data::Object(Object(map));
+    let cbor_result = obj_data.to_dag_cbor();
+    assert!(cbor_result.is_ok());
+    assert!(!cbor_result.unwrap().is_empty());
+
+    // Test array
+    let arr_data = Data::Array(Array(vec![Data::Integer(1), Data::Integer(2), Data::Integer(3)]));
+    let arr_cbor = arr_data.to_dag_cbor();
+    assert!(arr_cbor.is_ok());
+    assert!(!arr_cbor.unwrap().is_empty());
+}
+
+#[test]
+fn test_rawdata_to_dag_cbor() {
+    // Test simple types
+    let null_data = RawData::Null;
+    assert!(null_data.to_dag_cbor().is_ok());
+
+    let int_data = RawData::SignedInt(42);
+    assert!(int_data.to_dag_cbor().is_ok());
+
+    let str_data = RawData::String("hello".into());
+    assert!(str_data.to_dag_cbor().is_ok());
+
+    // Test complex types
+    let mut map = BTreeMap::new();
+    map.insert(SmolStr::new_static("num"), RawData::SignedInt(42));
+    map.insert(SmolStr::new_static("text"), RawData::String("test".into()));
+    let obj_data = RawData::Object(map);
+    let cbor_result = obj_data.to_dag_cbor();
+    assert!(cbor_result.is_ok());
+    assert!(!cbor_result.unwrap().is_empty());
+}

@@ -69,7 +69,6 @@ fn impl_for_struct(input: &DeriveInput) -> syn::Result<TokenStream> {
             }
 
             fn lexicon_doc(
-                _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator
             ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
                 #doc_tokens
             }
@@ -84,8 +83,7 @@ fn impl_for_struct(input: &DeriveInput) -> syn::Result<TokenStream> {
             ::jacquard_lexicon::schema::LexiconSchemaRef {
                 nsid: #nsid,
                 provider: || {
-                    let mut generator = ::jacquard_lexicon::schema::LexiconGenerator::new(#nsid);
-                    <#name as ::jacquard_lexicon::schema::LexiconSchema>::lexicon_doc(&mut generator)
+                    <#name as ::jacquard_lexicon::schema::LexiconSchema>::lexicon_doc()
                 },
             }
         }
@@ -124,7 +122,6 @@ fn impl_for_enum(input: &DeriveInput) -> syn::Result<TokenStream> {
             }
 
             fn lexicon_doc(
-                _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator
             ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
                 #doc_tokens
             }
@@ -138,8 +135,7 @@ fn impl_for_enum(input: &DeriveInput) -> syn::Result<TokenStream> {
             ::jacquard_lexicon::schema::LexiconSchemaRef {
                 nsid: #nsid,
                 provider: || {
-                    let mut generator = ::jacquard_lexicon::schema::LexiconGenerator::new(#nsid);
-                    <#name as ::jacquard_lexicon::schema::LexiconSchema>::lexicon_doc(&mut generator)
+                    <#name as ::jacquard_lexicon::schema::LexiconSchema>::lexicon_doc()
                 },
             }
         }

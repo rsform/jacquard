@@ -1,12 +1,10 @@
 use crate::error::Result;
 use crate::lexicon::{
-    LexArrayItem, LexInteger, LexObject, LexObjectProperty, LexRecord, LexString, LexUserType,
-    Lexicon, LexiconDoc,
+    LexArrayItem, LexInteger, LexObject, LexObjectProperty, LexRecord, LexString,
 };
 use heck::{ToPascalCase, ToSnakeCase};
 use proc_macro2::TokenStream;
 use quote::quote;
-use std::collections::BTreeMap;
 
 use super::CodeGenerator;
 use super::utils::{make_ident, value_to_variant_name};

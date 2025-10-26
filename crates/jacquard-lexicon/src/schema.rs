@@ -58,7 +58,7 @@ pub mod builder;
 pub mod from_ast;
 pub mod type_mapping;
 
-use crate::lexicon::{LexUserType, Lexicon, LexiconDoc};
+use crate::lexicon::LexiconDoc;
 
 /// Trait for types that can generate lexicon schemas
 pub trait LexiconSchema {

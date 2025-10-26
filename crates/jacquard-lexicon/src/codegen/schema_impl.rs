@@ -2,7 +2,7 @@
 
 use crate::derive_impl::doc_to_tokens;
 use crate::lexicon::{
-    LexArrayItem, LexInteger, LexObject, LexObjectProperty, LexRecord, LexRecordRecord, LexString,
+    LexInteger, LexObject, LexObjectProperty, LexRecordRecord, LexString,
     LexUserType, LexiconDoc,
 };
 use crate::schema::from_ast::{ConstraintCheck, ValidationCheck};

@@ -1,7 +1,7 @@
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_derive::{LexiconSchema, open_union};
-use jacquard_lexicon::schema::{LexiconGenerator, LexiconSchema as LexiconSchemaTrait};
+use jacquard_lexicon::schema::LexiconSchema as LexiconSchemaTrait;
 use serde::{Deserialize, Serialize};
 
 #[test]
@@ -18,7 +18,6 @@ fn test_simple_struct() {
     assert_eq!(SimpleRecord::nsid(), "com.example.simple");
     assert_eq!(SimpleRecord::schema_id().as_ref(), "com.example.simple");
 
-    let mut generator = LexiconGenerator::new(SimpleRecord::nsid());
     let doc = SimpleRecord::lexicon_doc();
 
     assert_eq!(doc.id.as_ref(), "com.example.simple");
@@ -46,7 +45,6 @@ fn test_struct_with_constraints() {
         pub score: i64,
     }
 
-    let mut generator = LexiconGenerator::new(ConstrainedRecord::nsid());
     let doc = ConstrainedRecord::lexicon_doc();
 
     let json = serde_json::to_string_pretty(&doc).unwrap();
@@ -109,8 +107,6 @@ fn test_serde_rename() {
         pub some_field: i64,
         pub another_field: i64,
     }
-
-    let mut generator = LexiconGenerator::new(RenamedRecord::nsid());
     let doc = RenamedRecord::lexicon_doc();
 
     let json = serde_json::to_string_pretty(&doc).unwrap();
@@ -184,7 +180,6 @@ fn test_open_union() {
         Unknown(jacquard_common::types::value::Data<'a>),
     }
 
-    let mut generator = LexiconGenerator::new(OpenUnion::nsid());
     let doc = OpenUnion::lexicon_doc();
 
     let json = serde_json::to_string_pretty(&doc).unwrap();
@@ -206,7 +201,6 @@ fn test_enum_with_serde_rename() {
         Video,
     }
 
-    let mut generator = LexiconGenerator::new(RenamedUnion::nsid());
     let doc = RenamedUnion::lexicon_doc();
 
     let json = serde_json::to_string_pretty(&doc).unwrap();
@@ -229,8 +223,6 @@ fn test_enum_fragment_inference() {
         #[allow(dead_code)]
         VariantTwo,
     }
-
-    let mut generator = LexiconGenerator::new(FragmentUnion::nsid());
     let doc = FragmentUnion::lexicon_doc();
 
     let json = serde_json::to_string_pretty(&doc).unwrap();
