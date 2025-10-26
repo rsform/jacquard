@@ -13,7 +13,12 @@ use quote::quote;
 ///
 /// Takes the original lexicon doc and type metadata to generate a complete
 /// impl with const literal and validation code.
-pub fn generate_schema_impl(type_name: &str, doc: &LexiconDoc, has_lifetime: bool) -> TokenStream {
+pub fn generate_schema_impl(
+    type_name: &str,
+    doc: &LexiconDoc,
+    def_name: &str,
+    has_lifetime: bool,
+) -> TokenStream {
     let nsid = doc.id.as_ref();
 
     // Generate lifetime parameter
@@ -26,8 +31,8 @@ pub fn generate_schema_impl(type_name: &str, doc: &LexiconDoc, has_lifetime: boo
     // Generate the lexicon doc literal using existing doc_to_tokens
     let doc_literal = doc_to_tokens::doc_to_tokens(doc);
 
-    // Extract validation checks from lexicon doc
-    let validation_checks = extract_validation_checks(doc);
+    // Extract validation checks from lexicon doc for the specific def
+    let validation_checks = extract_validation_checks(doc, def_name);
 
     // Generate validation code using existing validations_to_tokens
     let validation_code = doc_to_tokens::validations_to_tokens(&validation_checks);
@@ -57,12 +62,12 @@ pub fn generate_schema_impl(type_name: &str, doc: &LexiconDoc, has_lifetime: boo
 ///
 /// Walks the lexicon structure and builds ValidationCheck structs for all
 /// constraint fields (max_length, max_graphemes, minimum, maximum, etc.)
-fn extract_validation_checks(doc: &LexiconDoc) -> Vec<ValidationCheck> {
+fn extract_validation_checks(doc: &LexiconDoc, def_name: &str) -> Vec<ValidationCheck> {
     let mut checks = Vec::new();
 
-    // Get main def
-    if let Some(main_def) = doc.defs.get("main") {
-        match main_def {
+    // Get the specified def
+    if let Some(def) = doc.defs.get(def_name) {
+        match def {
             LexUserType::Record(rec) => {
                 match &rec.record {
                     LexRecordRecord::Object(obj) => {

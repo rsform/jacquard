@@ -219,7 +219,7 @@ impl<'c> CodeGenerator<'c> {
                 // Generate LexiconSchema impl from original lexicon
                 let lex_doc = self.corpus.get(nsid).expect("nsid exists in corpus");
                 let schema_impl =
-                    super::schema_impl::generate_schema_impl(&type_name, lex_doc, true);
+                    super::schema_impl::generate_schema_impl(&type_name, lex_doc, "main", true);
 
                 Ok(quote! {
                     #struct_def
@@ -341,7 +341,8 @@ impl<'c> CodeGenerator<'c> {
 
         // Generate LexiconSchema impl from original lexicon
         let lex_doc = self.corpus.get(nsid).expect("nsid exists in corpus");
-        let schema_impl = super::schema_impl::generate_schema_impl(&type_name, lex_doc, true);
+        let schema_impl =
+            super::schema_impl::generate_schema_impl(&type_name, lex_doc, def_name, true);
 
         Ok(quote! {
             #struct_def
