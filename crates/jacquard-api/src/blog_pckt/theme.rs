@@ -453,11 +453,52 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.font {
-            if value.len() > 100usize {
+        {
+            let value = &self.accent;
+            if value.len() > 7usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "font",
-                    max: 100usize,
+                    field: "accent",
+                    max: 7usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.background;
+            if value.len() > 7usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "background",
+                    max: 7usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.link;
+            if value.len() > 7usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "link",
+                    max: 7usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.surface_hover;
+            if value.len() > 7usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "surface_hover",
+                    max: 7usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.text;
+            if value.len() > 7usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "text",
+                    max: 7usize,
                     actual: value.len(),
                 });
             }

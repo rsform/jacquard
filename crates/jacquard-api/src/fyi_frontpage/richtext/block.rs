@@ -171,6 +171,33 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlaintextParagraph<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.text;
+            if value.len() > 100000usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "text",
+                    max: 100000usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.text;
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 10000usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "text",
+                        max: 10000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }

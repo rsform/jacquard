@@ -688,6 +688,26 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rating<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.value;
+            if *value > 10i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "value",
+                    max: 10i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.value;
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "value",
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }

@@ -431,6 +431,16 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Label<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.val;
+            if value.len() > 128usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "val",
+                    max: 128usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -967,6 +977,33 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinition<'a> 
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.identifier;
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "identifier",
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.identifier;
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 100usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "identifier",
+                        max: 100usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }
@@ -1369,6 +1406,60 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinitionStrin
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.description;
+            if value.len() > 100000usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "description",
+                    max: 100000usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.description;
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 10000usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "description",
+                        max: 10000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.name;
+            if value.len() > 640usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "name",
+                    max: 640usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "name",
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }
@@ -1764,6 +1855,16 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabel<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.val;
+            if value.len() > 128usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "val",
+                    max: 128usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -2158,6 +2259,16 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabels<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.values;
+            if value.len() > 10usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "values",
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }

@@ -355,28 +355,26 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Option<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.name;
+        if let Some(ref value) = self.text {
             if value.len() > 500usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "name",
+                    field: "text",
                     max: 500usize,
                     actual: value.len(),
                 });
             }
         }
-        {
-            let value = &self.name;
+        if let Some(ref value) = self.text {
             {
                 let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
                     .count();
-                if count > 100usize {
+                if count > 50usize {
                     return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "name",
-                        max: 100usize,
+                        field: "text",
+                        max: 50usize,
                         actual: count,
                     });
                 }

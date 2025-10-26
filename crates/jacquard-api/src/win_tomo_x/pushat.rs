@@ -181,6 +181,33 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeviceListItem<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.name;
+            if value.len() > 300usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "name",
+                    max: 300usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 30usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "name",
+                        max: 30usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }

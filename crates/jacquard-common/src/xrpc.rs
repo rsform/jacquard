@@ -124,12 +124,11 @@ pub trait XrpcRequest: Serialize {
     /// Decode the request body for procedures.
     ///
     /// Default implementation deserializes from JSON. Override for non-JSON encodings.
-    fn decode_body<'de>(body: &'de [u8]) -> XrpcResult<Box<Self>>
+    fn decode_body<'de>(body: &'de [u8]) -> Result<Box<Self>, DecodeError>
     where
         Self: Deserialize<'de>,
     {
-        let body: Self = serde_json::from_slice(body)
-            .map_err(|e| crate::error::ClientError::decode(format!("{:?}", e)))?;
+        let body: Self = serde_json::from_slice(body)?;
 
         Ok(Box::new(body))
     }

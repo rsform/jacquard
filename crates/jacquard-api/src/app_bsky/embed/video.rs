@@ -220,40 +220,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Caption<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.alt {
-            if value.len() > 10000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "alt",
-                    max: 10000usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.alt {
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 1000usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "alt",
-                        max: 1000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.captions {
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "captions",
-                    max: 20usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -775,15 +741,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
                         actual: count,
                     });
                 }
-            }
-        }
-        if let Some(ref value) = self.captions {
-            if value.len() > 20usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "captions",
-                    max: 20usize,
-                    actual: value.len(),
-                });
             }
         }
         Ok(())

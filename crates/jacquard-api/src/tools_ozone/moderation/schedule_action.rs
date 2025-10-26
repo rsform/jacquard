@@ -1564,6 +1564,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Takedown<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.policies {
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "policies",
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }

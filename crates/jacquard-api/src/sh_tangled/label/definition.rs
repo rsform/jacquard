@@ -540,40 +540,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ValueType<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.name;
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 40usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "name",
-                        max: 40usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        {
-            let value = &self.name;
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count < 1usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MinGraphemes {
-                        field: "name",
-                        min: 1usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
         Ok(())
     }
 }

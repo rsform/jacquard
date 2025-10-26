@@ -243,16 +243,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for External<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.embeds;
-            if value.len() > 48usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "embeds",
-                    max: 48usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -727,16 +717,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.embeds;
-            if value.len() > 48usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "embeds",
-                    max: 48usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -979,16 +959,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewExternal<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.embeds;
-            if value.len() > 48usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "embeds",
-                    max: 48usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }

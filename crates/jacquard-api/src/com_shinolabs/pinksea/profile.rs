@@ -447,60 +447,28 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileLink<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.bio {
-            if value.len() > 2400usize {
+        {
+            let value = &self.name;
+            if value.len() > 500usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "bio",
-                    max: 2400usize,
+                    field: "name",
+                    max: 500usize,
                     actual: value.len(),
                 });
             }
         }
-        if let Some(ref value) = self.bio {
+        {
+            let value = &self.name;
             {
                 let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
                         value.as_ref(),
                         true,
                     )
                     .count();
-                if count > 240usize {
+                if count > 50usize {
                     return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "bio",
-                        max: 240usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.links {
-            if value.len() > 5usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "links",
-                    max: 5usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.nickname {
-            if value.len() > 640usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "nickname",
-                    max: 640usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.nickname {
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "nickname",
-                        max: 64usize,
+                        field: "name",
+                        max: 50usize,
                         actual: count,
                     });
                 }

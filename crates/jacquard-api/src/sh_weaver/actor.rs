@@ -465,6 +465,31 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Author<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.display_name {
+            if value.len() > 640usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "display_name",
+                    max: 640usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "display_name",
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }
@@ -1426,6 +1451,99 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.description {
+            if value.len() > 2560usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "description",
+                    max: 2560usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 256usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "description",
+                        max: 256usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            if value.len() > 640usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "display_name",
+                    max: 640usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.display_name {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 64usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "display_name",
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.links {
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "links",
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.links {
+            if value.len() < 0usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "links",
+                    min: 0usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.location {
+            if value.len() > 400usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "location",
+                    max: 400usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.location {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 40usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "location",
+                        max: 40usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }
@@ -1905,6 +2023,110 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledProfileView<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.description {
+            if value.len() > 2560usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "description",
+                    max: 2560usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 256usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "description",
+                        max: 256usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.links {
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "links",
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.links {
+            if value.len() < 0usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "links",
+                    min: 0usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.location {
+            if value.len() > 400usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "location",
+                    max: 400usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.location {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 40usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "location",
+                        max: 40usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.pinned_repositories {
+            if value.len() > 6usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "pinned_repositories",
+                    max: 6usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.pinned_repositories {
+            if value.len() < 0usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "pinned_repositories",
+                    min: 0usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.stats {
+            if value.len() > 2usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "stats",
+                    max: 2usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.stats {
+            if value.len() < 0usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "stats",
+                    min: 0usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }

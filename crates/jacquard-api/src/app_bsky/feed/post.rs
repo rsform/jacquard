@@ -291,51 +291,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entity<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.langs {
-            if value.len() > 3usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "langs",
-                    max: 3usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.tags {
-            if value.len() > 8usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "tags",
-                    max: 8usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.text;
-            if value.len() > 3000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "text",
-                    max: 3000usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.text;
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 300usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "text",
-                        max: 300usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
         Ok(())
     }
 }
@@ -1070,51 +1025,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.langs {
-            if value.len() > 3usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "langs",
-                    max: 3usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.tags {
-            if value.len() > 8usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "tags",
-                    max: 8usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.text;
-            if value.len() > 3000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "text",
-                    max: 3000usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.text;
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 300usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "text",
-                        max: 300usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
         Ok(())
     }
 }
@@ -1398,49 +1308,24 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TextSlice<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.langs {
-            if value.len() > 3usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "langs",
-                    max: 3usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.tags {
-            if value.len() > 8usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "tags",
-                    max: 8usize,
-                    actual: value.len(),
+        {
+            let value = &self.end;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "end",
+                    min: 0i64,
+                    actual: *value,
                 });
             }
         }
         {
-            let value = &self.text;
-            if value.len() > 3000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "text",
-                    max: 3000usize,
-                    actual: value.len(),
+            let value = &self.start;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "start",
+                    min: 0i64,
+                    actual: *value,
                 });
-            }
-        }
-        {
-            let value = &self.text;
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 300usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "text",
-                        max: 300usize,
-                        actual: count,
-                    });
-                }
             }
         }
         Ok(())

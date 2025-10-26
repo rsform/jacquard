@@ -768,6 +768,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerView<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.like_count {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "like_count",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -1171,6 +1180,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerViewDetailed<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.like_count {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "like_count",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }

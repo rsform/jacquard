@@ -505,25 +505,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.description {
-            if value.len() > 2000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "description",
-                    max: 2000usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            if value.len() > 2000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "name",
-                    max: 2000usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -839,25 +820,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.description {
-            if value.len() > 2000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "description",
-                    max: 2000usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            if value.len() > 2000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "name",
-                    max: 2000usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }

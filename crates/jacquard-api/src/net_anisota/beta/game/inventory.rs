@@ -811,62 +811,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SourceDetails<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.item_id;
-            if value.len() > 100usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "item_id",
-                    max: 100usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.item_name {
-            if value.len() > 200usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "item_name",
-                    max: 200usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.item_type {
-            if value.len() > 50usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "item_type",
-                    max: 50usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.item_value {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "item_value",
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.max_stack {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "max_stack",
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.quantity;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "quantity",
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
         Ok(())
     }
 }

@@ -445,6 +445,16 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlogEntry<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.content;
+            if value.len() > 100000usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "content",
+                    max: 100000usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -664,6 +674,16 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.content;
+            if value.len() > 1000usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "content",
+                    max: 1000usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }

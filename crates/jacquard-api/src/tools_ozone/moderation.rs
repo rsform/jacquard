@@ -62533,6 +62533,26 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventPriorityScore<'a>
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.score;
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "score",
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.score;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "score",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -79890,6 +79910,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventTakedown<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.policies {
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "policies",
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -153383,6 +153412,24 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectStatusView<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.priority_score {
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "priority_score",
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.priority_score {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "priority_score",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }

@@ -650,10 +650,37 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActivitySummary<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.duration {
+        if let Some(ref value) = self.current_level {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "current_level",
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.current_xp {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "duration",
+                    field: "current_xp",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.total_events {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "total_events",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.xp_gained_this_session {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "xp_gained_this_session",
                     min: 0i64,
                     actual: *value,
                 });
@@ -1299,10 +1326,55 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameActions<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.duration {
+        if let Some(ref value) = self.daily_rewards_claimed {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "duration",
+                    field: "daily_rewards_claimed",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.feeds_loaded {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "feeds_loaded",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.items_collected {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "items_collected",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.level_ups {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "level_ups",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.posts_viewed {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "posts_viewed",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.specimens_collected {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "specimens_collected",
                     min: 0i64,
                     actual: *value,
                 });
@@ -2722,15 +2794,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.duration {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "duration",
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -3365,10 +3428,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PerformanceMetrics<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.duration {
+        if let Some(ref value) = self.average_response_time {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "duration",
+                    field: "average_response_time",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.error_count {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "error_count",
                     min: 0i64,
                     actual: *value,
                 });
@@ -4017,15 +4089,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SessionContext<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.duration {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "duration",
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
         Ok(())
     }
 }

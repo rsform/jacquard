@@ -569,6 +569,26 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Source<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.sha;
+            if value.len() > 40usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "sha",
+                    max: 40usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.sha;
+            if value.len() < 40usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "sha",
+                    min: 40usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }

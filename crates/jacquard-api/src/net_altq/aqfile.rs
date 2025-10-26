@@ -234,6 +234,26 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Checksum<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.algo;
+            if value.len() > 32usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "algo",
+                    max: 32usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.hash;
+            if value.len() > 128usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "hash",
+                    max: 128usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -476,6 +496,45 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for File<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.mime_type {
+            if value.len() > 255usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "mime_type",
+                    max: 255usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            if value.len() > 512usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "name",
+                    max: 512usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.size;
+            if *value > 1000000000i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "size",
+                    max: 1000000000i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.size;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "size",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }

@@ -661,44 +661,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PackHistoryEntry<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.longest_streak {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "longest_streak",
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.pack_history {
-            if value.len() > 30usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "pack_history",
-                    max: 30usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.streak;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "streak",
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.total_opens;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "total_opens",
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -973,44 +935,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReceivedItem<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.longest_streak {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "longest_streak",
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.pack_history {
-            if value.len() > 30usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "pack_history",
-                    max: 30usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.streak;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "streak",
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.total_opens;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "total_opens",
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
         Ok(())
     }
 }

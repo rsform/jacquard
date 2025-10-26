@@ -260,6 +260,16 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublicKey<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.key;
+            if value.len() > 4096usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "key",
+                    max: 4096usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }

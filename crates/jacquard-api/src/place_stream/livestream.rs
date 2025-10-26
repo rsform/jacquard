@@ -321,33 +321,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LivestreamView<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.title;
-            if value.len() > 1400usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "title",
-                    max: 1400usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 140usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "title",
-                        max: 140usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
         Ok(())
     }
 }
@@ -1088,33 +1061,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotificationSettings<'a> 
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.title;
-            if value.len() > 1400usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "title",
-                    max: 1400usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 140usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "title",
-                        max: 140usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
         Ok(())
     }
 }
@@ -1450,33 +1396,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StreamplaceAnything<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.title;
-            if value.len() > 1400usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "title",
-                    max: 1400usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 140usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "title",
-                        max: 140usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
         Ok(())
     }
 }
@@ -1784,33 +1703,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerCount<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.title;
-            if value.len() > 1400usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "title",
-                    max: 1400usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 140usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "title",
-                        max: 140usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
         Ok(())
     }
 }

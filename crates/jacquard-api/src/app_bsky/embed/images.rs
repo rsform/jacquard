@@ -211,16 +211,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.images;
-            if value.len() > 4usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "images",
-                    max: 4usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -859,16 +849,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewImage<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.images;
-            if value.len() > 4usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "images",
-                    max: 4usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }

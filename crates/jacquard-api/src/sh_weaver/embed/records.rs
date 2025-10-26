@@ -754,16 +754,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.records;
-            if value.len() > 48usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "records",
-                    max: 48usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -1123,16 +1113,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewBlocked<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.records;
-            if value.len() > 48usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "records",
-                    max: 48usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -1490,16 +1470,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewDetached<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.records;
-            if value.len() > 48usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "records",
-                    max: 48usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -1857,16 +1827,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewNotFound<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.records;
-            if value.len() > 48usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "records",
-                    max: 48usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -2278,16 +2238,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewRecord<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.records;
-            if value.len() > 48usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "records",
-                    max: 48usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }

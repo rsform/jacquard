@@ -1288,6 +1288,33 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.comment;
+            if value.len() > 100000usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "comment",
+                    max: 100000usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.comment;
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 10000usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "comment",
+                        max: 10000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }
@@ -1956,6 +1983,26 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.books_read;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "books_read",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.reviews;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "reviews",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -3276,6 +3323,107 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UserBook<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.authors;
+            if value.len() > 2048usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "authors",
+                    max: 2048usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.authors;
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "authors",
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            if value.len() > 5000usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "description",
+                    max: 5000usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.rating {
+            if *value > 1000i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "rating",
+                    max: 1000i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.rating {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "rating",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.review {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 15000usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "review",
+                        max: 15000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.stars {
+            if *value > 10i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "stars",
+                    max: 10i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.stars {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "stars",
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            if value.len() > 512usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "title",
+                    max: 512usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "title",
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }

@@ -1177,6 +1177,16 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Commit<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.ops;
+            if value.len() > 200usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "ops",
+                    max: 200usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }

@@ -2696,6 +2696,26 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PullRequestTriggerData<'a
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.source_sha;
+            if value.len() > 40usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "source_sha",
+                    max: 40usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.source_sha;
+            if value.len() < 40usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "source_sha",
+                    min: 40usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -3224,6 +3244,46 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.new_sha;
+            if value.len() > 40usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "new_sha",
+                    max: 40usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.new_sha;
+            if value.len() < 40usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "new_sha",
+                    min: 40usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.old_sha;
+            if value.len() > 40usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "old_sha",
+                    max: 40usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.old_sha;
+            if value.len() < 40usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "old_sha",
+                    min: 40usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }

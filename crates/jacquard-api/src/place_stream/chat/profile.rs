@@ -115,6 +115,66 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.blue;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "blue",
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.blue;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "blue",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.green;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "green",
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.green;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "green",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.red;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "red",
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.red;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "red",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }

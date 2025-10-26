@@ -3679,6 +3679,24 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedViewPost<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.feed_context {
+            if value.len() > 2000usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "feed_context",
+                    max: 2000usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.req_id {
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "req_id",
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -4886,6 +4904,40 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GeneratorView<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.description {
+            if value.len() > 3000usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "description",
+                    max: 3000usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 300usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "description",
+                        max: 300usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.like_count {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "like_count",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -7233,6 +7285,24 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interaction<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.feed_context {
+            if value.len() > 2000usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "feed_context",
+                    max: 2000usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.req_id {
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "req_id",
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -14525,6 +14595,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonFeedPost<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.feed_context {
+            if value.len() > 2000usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "feed_context",
+                    max: 2000usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }

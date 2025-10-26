@@ -500,6 +500,56 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SiweMessage<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.address;
+            if value.len() > 42usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "address",
+                    max: 42usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.address;
+            if value.len() < 42usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "address",
+                    min: 42usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.nonce;
+            if value.len() > 256usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "nonce",
+                    max: 256usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.nonce;
+            if value.len() < 8usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "nonce",
+                    min: 8usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.statement;
+            if value.len() < 78usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "statement",
+                    min: 78usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }

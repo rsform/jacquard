@@ -1772,6 +1772,60 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListView<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.description {
+            if value.len() > 3000usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "description",
+                    max: 3000usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 300usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "description",
+                        max: 300usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.list_item_count {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "list_item_count",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            if value.len() > 64usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "name",
+                    max: 64usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "name",
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -2598,6 +2652,35 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListViewBasic<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.list_item_count {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "list_item_count",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            if value.len() > 64usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "name",
+                    max: 64usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.name;
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "name",
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -5883,6 +5966,42 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StarterPackView<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.feeds {
+            if value.len() > 3usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "feeds",
+                    max: 3usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.joined_all_time_count {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "joined_all_time_count",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.joined_week_count {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "joined_week_count",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.list_items_sample {
+            if value.len() > 12usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "list_items_sample",
+                    max: 12usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -6704,6 +6823,33 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StarterPackViewBasic<'a> 
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.joined_all_time_count {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "joined_all_time_count",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.joined_week_count {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "joined_week_count",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.list_item_count {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "list_item_count",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }

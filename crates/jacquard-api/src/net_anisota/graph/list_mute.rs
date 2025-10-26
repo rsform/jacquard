@@ -209,24 +209,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentTypes<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.reason {
-            if value.len() > 300usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "reason",
-                    max: 300usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.target_feeds {
-            if value.len() > 50usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "target_feeds",
-                    max: 50usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }

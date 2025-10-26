@@ -327,6 +327,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RewriteRule<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.from;
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "from",
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.from;
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "from",
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.to;
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "to",
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -697,6 +727,42 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Webhook<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.description {
+            if value.len() > 500usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "description",
+                    max: 500usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.name {
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "name",
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.prefix {
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "prefix",
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.suffix {
+            if value.len() > 100usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "suffix",
+                    max: 100usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }

@@ -583,20 +583,20 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
             // Generate the inner validation check
             let inner_check = match &check.check {
                 ConstraintCheck::MaxLength { max } => quote! {
-                    if value.len() > #max {
+                    if value.as_ref().len() > #max {
                         return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                             field: #field_name_static,
                             max: #max,
-                            actual: value.len(),
+                            actual: value.as_ref().len(),
                         });
                     }
                 },
                 ConstraintCheck::MinLength { min } => quote! {
-                    if value.len() < #min {
+                    if value.as_ref().len() < #min {
                         return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                             field: #field_name_static,
                             min: #min,
-                            actual: value.len(),
+                            actual: value.as_ref().len(),
                         });
                     }
                 },

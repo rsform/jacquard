@@ -241,23 +241,66 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Locale<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.comments;
-            if value.len() < 1usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "comments",
-                    min: 1usize,
+        if let Some(ref value) = self.comment {
+            if value.len() > 100000usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "comment",
+                    max: 100000usize,
                     actual: value.len(),
                 });
             }
         }
-        if let Some(ref value) = self.tags {
-            if value.len() > 10usize {
+        if let Some(ref value) = self.comment {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 10000usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "comment",
+                        max: 10000usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.lang;
+            if value.len() > 6usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "tags",
-                    max: 10usize,
+                    field: "lang",
+                    max: 6usize,
                     actual: value.len(),
                 });
+            }
+        }
+        {
+            let value = &self.title;
+            if value.len() > 500usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "title",
+                    max: 500usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.title;
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 50usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "title",
+                        max: 50usize,
+                        actual: count,
+                    });
+                }
             }
         }
         Ok(())

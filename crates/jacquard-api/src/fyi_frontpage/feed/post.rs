@@ -345,33 +345,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlSubject<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.title;
-            if value.len() > 3000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "title",
-                    max: 3000usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.title;
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 300usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "title",
-                        max: 300usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
         Ok(())
     }
 }

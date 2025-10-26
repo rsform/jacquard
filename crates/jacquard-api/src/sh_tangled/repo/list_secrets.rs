@@ -226,6 +226,26 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Secret<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.key;
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "key",
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.key;
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "key",
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }

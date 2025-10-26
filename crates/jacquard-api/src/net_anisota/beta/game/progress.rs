@@ -988,54 +988,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.level;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "level",
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.previous_level {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "previous_level",
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.total_xp;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "total_xp",
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.xp_gained_since_last_save {
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "xp_gained_since_last_save",
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.xp_to_next_level;
-            if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "xp_to_next_level",
-                    min: 0i64,
-                    actual: *value,
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -1468,49 +1420,64 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.level;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "level",
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        if let Some(ref value) = self.previous_level {
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "previous_level",
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.total_xp;
+        if let Some(ref value) = self.daily_rewards_claimed {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "total_xp",
+                    field: "daily_rewards_claimed",
                     min: 0i64,
                     actual: *value,
                 });
             }
         }
-        if let Some(ref value) = self.xp_gained_since_last_save {
+        if let Some(ref value) = self.items_collected {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "xp_gained_since_last_save",
+                    field: "items_collected",
                     min: 0i64,
                     actual: *value,
                 });
             }
         }
-        {
-            let value = &self.xp_to_next_level;
+        if let Some(ref value) = self.posts_read_today {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "xp_to_next_level",
+                    field: "posts_read_today",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.posts_read_total {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "posts_read_total",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.posts_viewed {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "posts_viewed",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.shuffles_performed {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "shuffles_performed",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.specimens_collected {
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "specimens_collected",
                     min: 0i64,
                     actual: *value,
                 });

@@ -193,24 +193,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowerRule<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.allow {
-            if value.len() > 5usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "allow",
-                    max: 5usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.hidden_replies {
-            if value.len() > 300usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "hidden_replies",
-                    max: 300usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -403,24 +385,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowingRule<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.allow {
-            if value.len() > 5usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "allow",
-                    max: 5usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.hidden_replies {
-            if value.len() > 300usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "hidden_replies",
-                    max: 300usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -617,24 +581,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListRule<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.allow {
-            if value.len() > 5usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "allow",
-                    max: 5usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.hidden_replies {
-            if value.len() > 300usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "hidden_replies",
-                    max: 300usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -1137,24 +1083,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MentionRule<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.allow {
-            if value.len() > 5usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "allow",
-                    max: 5usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.hidden_replies {
-            if value.len() > 300usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "hidden_replies",
-                    max: 300usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }

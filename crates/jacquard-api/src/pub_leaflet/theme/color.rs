@@ -147,6 +147,66 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rgb<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.b;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "b",
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.b;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "b",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.g;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "g",
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.g;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "g",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.r;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "r",
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.r;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "r",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -294,6 +354,86 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rgba<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.a;
+            if *value > 100i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "a",
+                    max: 100i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.a;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "a",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.b;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "b",
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.b;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "b",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.g;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "g",
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.g;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "g",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.r;
+            if *value > 255i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
+                    field: "r",
+                    max: 255i64,
+                    actual: *value,
+                });
+            }
+        }
+        {
+            let value = &self.r;
+            if *value < 0i64 {
+                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
+                    field: "r",
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }

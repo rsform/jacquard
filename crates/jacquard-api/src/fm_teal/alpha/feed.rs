@@ -281,6 +281,43 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        {
+            let value = &self.artist_name;
+            if value.len() > 256usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "artist_name",
+                    max: 256usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.artist_name;
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "artist_name",
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.artist_name;
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2560usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "artist_name",
+                        max: 2560usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }
@@ -605,6 +642,93 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlayView<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if let Some(ref value) = self.release_name {
+            if value.len() > 256usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "release_name",
+                    max: 256usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.release_name {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2560usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "release_name",
+                        max: 2560usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.submission_client_agent {
+            if value.len() > 256usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "submission_client_agent",
+                    max: 256usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.submission_client_agent {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2560usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "submission_client_agent",
+                        max: 2560usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
+        {
+            let value = &self.track_name;
+            if value.len() > 256usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                    field: "track_name",
+                    max: 256usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.track_name;
+            if value.len() < 1usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
+                    field: "track_name",
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        {
+            let value = &self.track_name;
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 2560usize {
+                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                        field: "track_name",
+                        max: 2560usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }

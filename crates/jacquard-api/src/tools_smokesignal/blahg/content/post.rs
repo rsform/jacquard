@@ -173,40 +173,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attachment<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.langs {
-            if value.len() > 3usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "langs",
-                    max: 3usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.title {
-            if value.len() > 2000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "title",
-                    max: 2000usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        if let Some(ref value) = self.title {
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 200usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "title",
-                        max: 200usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
         Ok(())
     }
 }

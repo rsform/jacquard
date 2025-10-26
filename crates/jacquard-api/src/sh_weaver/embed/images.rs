@@ -155,12 +155,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        {
-            let value = &self.images;
-            if value.len() > 48usize {
+        if let Some(ref value) = self.blurhash {
+            if value.len() > 32usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "images",
-                    max: 48usize,
+                    field: "blurhash",
+                    max: 32usize,
                     actual: value.len(),
                 });
             }

@@ -15,7 +15,7 @@
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    bon::Builder,
+    bon::Builder
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Book<'a> {
@@ -75,7 +75,13 @@ impl<'a> Book<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BookGetRecordOutput<'a> {
@@ -299,7 +305,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Book<'a> {
             },
         }
     }
-    fn validate(&self) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.authors;
             if value.len() > 2048usize {
@@ -322,9 +330,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Book<'a> {
         }
         if let Some(ref value) = self.review {
             {
-                let count =
-                    ::unicode_segmentation::UnicodeSegmentation::graphemes(value.as_ref(), true)
-                        .count();
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
                 if count > 15000usize {
                     return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
                         field: "review",

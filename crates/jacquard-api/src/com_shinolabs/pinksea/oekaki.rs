@@ -175,15 +175,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.tags {
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "tags",
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -358,15 +349,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageLink<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
-        if let Some(ref value) = self.tags {
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "tags",
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
