@@ -930,3 +930,355 @@ fn test_rawdata_to_dag_cbor() {
     assert!(cbor_result.is_ok());
     assert!(!cbor_result.unwrap().is_empty());
 }
+
+#[test]
+fn test_object_methods() {
+    let mut map = BTreeMap::new();
+    map.insert(SmolStr::new_static("num"), Data::Integer(42));
+    map.insert(SmolStr::new_static("text"), Data::String(AtprotoStr::String("hello".into())));
+    let obj = Object(map);
+
+    // Test get
+    assert!(obj.get("num").is_some());
+    assert_eq!(obj.get("num"), Some(&Data::Integer(42)));
+    assert!(obj.get("missing").is_none());
+
+    // Test contains_key
+    assert!(obj.contains_key("num"));
+    assert!(!obj.contains_key("missing"));
+
+    // Test len/is_empty
+    assert_eq!(obj.len(), 2);
+    assert!(!obj.is_empty());
+
+    let empty_obj = Object(BTreeMap::new());
+    assert_eq!(empty_obj.len(), 0);
+    assert!(empty_obj.is_empty());
+
+    // Test indexing
+    assert_eq!(&obj["num"], &Data::Integer(42));
+
+    // Test iterators
+    assert_eq!(obj.keys().count(), 2);
+    assert_eq!(obj.values().count(), 2);
+    assert_eq!(obj.iter().count(), 2);
+}
+
+#[test]
+fn test_array_methods() {
+    let arr = Array(vec![Data::Integer(1), Data::Integer(2), Data::Integer(3)]);
+
+    // Test get
+    assert_eq!(arr.get(0), Some(&Data::Integer(1)));
+    assert_eq!(arr.get(2), Some(&Data::Integer(3)));
+    assert!(arr.get(3).is_none());
+
+    // Test len/is_empty
+    assert_eq!(arr.len(), 3);
+    assert!(!arr.is_empty());
+
+    let empty_arr = Array(vec![]);
+    assert_eq!(empty_arr.len(), 0);
+    assert!(empty_arr.is_empty());
+
+    // Test indexing
+    assert_eq!(&arr[1], &Data::Integer(2));
+
+    // Test iterator
+    assert_eq!(arr.iter().count(), 3);
+}
+
+#[test]
+fn test_get_at_path_simple() {
+    // Build nested structure: {"embed": {"alt": "test"}}
+    let mut inner = BTreeMap::new();
+    inner.insert(SmolStr::new_static("alt"), Data::String(AtprotoStr::String("test".into())));
+
+    let mut outer = BTreeMap::new();
+    outer.insert(SmolStr::new_static("embed"), Data::Object(Object(inner)));
+
+    let data = Data::Object(Object(outer));
+
+    // Test simple field access
+    let result = data.get_at_path("embed.alt");
+    assert!(result.is_some());
+    assert_eq!(result.unwrap().as_str(), Some("test"));
+
+    // Test with leading dot
+    let result2 = data.get_at_path(".embed.alt");
+    assert!(result2.is_some());
+    assert_eq!(result2.unwrap().as_str(), Some("test"));
+
+    // Test missing path
+    assert!(data.get_at_path("missing.field").is_none());
+    assert!(data.get_at_path("embed.missing").is_none());
+}
+
+#[test]
+fn test_get_at_path_arrays() {
+    // Build: {"items": [{"name": "first"}, {"name": "second"}]}
+    let mut item1 = BTreeMap::new();
+    item1.insert(SmolStr::new_static("name"), Data::String(AtprotoStr::String("first".into())));
+
+    let mut item2 = BTreeMap::new();
+    item2.insert(SmolStr::new_static("name"), Data::String(AtprotoStr::String("second".into())));
+
+    let items = Data::Array(Array(vec![
+        Data::Object(Object(item1)),
+        Data::Object(Object(item2)),
+    ]));
+
+    let mut outer = BTreeMap::new();
+    outer.insert(SmolStr::new_static("items"), items);
+    let data = Data::Object(Object(outer));
+
+    // Test array indexing
+    let result = data.get_at_path("items[0].name");
+    assert!(result.is_some());
+    assert_eq!(result.unwrap().as_str(), Some("first"));
+
+    let result2 = data.get_at_path("items[1].name");
+    assert!(result2.is_some());
+    assert_eq!(result2.unwrap().as_str(), Some("second"));
+
+    // Test out of bounds
+    assert!(data.get_at_path("items[2].name").is_none());
+}
+
+#[test]
+fn test_get_at_path_complex() {
+    // Build: {"post": {"embed": {"images": [{"alt": "img1"}, {"alt": "img2"}]}}}
+    let mut img1 = BTreeMap::new();
+    img1.insert(SmolStr::new_static("alt"), Data::String(AtprotoStr::String("img1".into())));
+
+    let mut img2 = BTreeMap::new();
+    img2.insert(SmolStr::new_static("alt"), Data::String(AtprotoStr::String("img2".into())));
+
+    let images = Data::Array(Array(vec![
+        Data::Object(Object(img1)),
+        Data::Object(Object(img2)),
+    ]));
+
+    let mut embed_map = BTreeMap::new();
+    embed_map.insert(SmolStr::new_static("images"), images);
+
+    let mut post_map = BTreeMap::new();
+    post_map.insert(SmolStr::new_static("embed"), Data::Object(Object(embed_map)));
+
+    let mut root = BTreeMap::new();
+    root.insert(SmolStr::new_static("post"), Data::Object(Object(post_map)));
+
+    let data = Data::Object(Object(root));
+
+    // Test complex nested path
+    let result = data.get_at_path("post.embed.images[1].alt");
+    assert!(result.is_some());
+    assert_eq!(result.unwrap().as_str(), Some("img2"));
+}
+
+#[test]
+fn test_rawdata_get_at_path() {
+    // Build nested RawData structure
+    let mut inner = BTreeMap::new();
+    inner.insert(SmolStr::new_static("value"), RawData::SignedInt(42));
+
+    let mut outer = BTreeMap::new();
+    outer.insert(SmolStr::new_static("nested"), RawData::Object(inner));
+
+    let data = RawData::Object(outer);
+
+    // Test simple field access
+    let result = data.get_at_path("nested.value");
+    assert!(result.is_some());
+    if let Some(RawData::SignedInt(n)) = result {
+        assert_eq!(*n, 42);
+    } else {
+        panic!("Expected SignedInt");
+    }
+}
+
+#[test]
+fn test_query_exact_path() {
+    let mut inner = BTreeMap::new();
+    inner.insert(SmolStr::new_static("handle"), Data::String(AtprotoStr::String("alice.bsky.social".into())));
+
+    let mut outer = BTreeMap::new();
+    outer.insert(SmolStr::new_static("author"), Data::Object(Object(inner)));
+
+    let data = Data::Object(Object(outer));
+
+    // Exact path should return Single
+    let result = data.query("author.handle");
+    assert!(matches!(result, QueryResult::Single(_)));
+    assert_eq!(result.single().unwrap().as_str(), Some("alice.bsky.social"));
+}
+
+#[test]
+fn test_query_wildcard_array() {
+    // Build: {"actors": [{"handle": "alice"}, {"handle": "bob"}, {"name": "carol"}]}
+    let mut actor1 = BTreeMap::new();
+    actor1.insert(SmolStr::new_static("handle"), Data::String(AtprotoStr::String("alice".into())));
+
+    let mut actor2 = BTreeMap::new();
+    actor2.insert(SmolStr::new_static("handle"), Data::String(AtprotoStr::String("bob".into())));
+
+    let mut actor3 = BTreeMap::new();
+    actor3.insert(SmolStr::new_static("name"), Data::String(AtprotoStr::String("carol".into())));
+
+    let actors = Data::Array(Array(vec![
+        Data::Object(Object(actor1)),
+        Data::Object(Object(actor2)),
+        Data::Object(Object(actor3)),
+    ]));
+
+    let mut root = BTreeMap::new();
+    root.insert(SmolStr::new_static("actors"), actors);
+    let data = Data::Object(Object(root));
+
+    // Wildcard over array
+    let result = data.query("actors.[..]");
+    assert!(matches!(result, QueryResult::Multiple(_)));
+    let matches = result.multiple().unwrap();
+    assert_eq!(matches.len(), 3);
+    assert_eq!(matches[0].path.as_str(), "actors[0]");
+    assert_eq!(matches[1].path.as_str(), "actors[1]");
+    assert_eq!(matches[2].path.as_str(), "actors[2]");
+}
+
+#[test]
+fn test_query_wildcard_object() {
+    // Build: {"embed": {"images": {...}, "video": {...}}}
+    let mut images = BTreeMap::new();
+    images.insert(SmolStr::new_static("alt"), Data::String(AtprotoStr::String("img".into())));
+
+    let mut video = BTreeMap::new();
+    video.insert(SmolStr::new_static("alt"), Data::String(AtprotoStr::String("vid".into())));
+
+    let mut embed = BTreeMap::new();
+    embed.insert(SmolStr::new_static("images"), Data::Object(Object(images)));
+    embed.insert(SmolStr::new_static("video"), Data::Object(Object(video)));
+
+    let mut root = BTreeMap::new();
+    root.insert(SmolStr::new_static("embed"), Data::Object(Object(embed)));
+    let data = Data::Object(Object(root));
+
+    // Wildcard over object values
+    let result = data.query("embed.[..]");
+    assert!(matches!(result, QueryResult::Multiple(_)));
+    let matches = result.multiple().unwrap();
+    assert_eq!(matches.len(), 2); // images and video
+}
+
+#[test]
+fn test_query_scoped_recursion() {
+    // Build: {"post": {"author": {"profile": {"handle": "alice"}}}}
+    let mut handle_map = BTreeMap::new();
+    handle_map.insert(SmolStr::new_static("handle"), Data::String(AtprotoStr::String("alice".into())));
+
+    let mut profile_map = BTreeMap::new();
+    profile_map.insert(SmolStr::new_static("profile"), Data::Object(Object(handle_map)));
+
+    let mut author_map = BTreeMap::new();
+    author_map.insert(SmolStr::new_static("author"), Data::Object(Object(profile_map)));
+
+    let mut post_map = BTreeMap::new();
+    post_map.insert(SmolStr::new_static("post"), Data::Object(Object(author_map)));
+
+    let data = Data::Object(Object(post_map));
+
+    // Scoped recursion: find handle within post
+    let result = data.query("post..handle");
+    assert!(matches!(result, QueryResult::Single(_)));
+    assert_eq!(result.single().unwrap().as_str(), Some("alice"));
+    assert_eq!(result.first().unwrap().as_str(), Some("alice"));
+}
+
+#[test]
+fn test_query_global_recursion() {
+    // Build structure with multiple 'cid' fields at different depths
+    let mut inner1 = BTreeMap::new();
+    inner1.insert(SmolStr::new_static("cid"), Data::String(AtprotoStr::String("cid1".into())));
+
+    let mut inner2 = BTreeMap::new();
+    inner2.insert(SmolStr::new_static("cid"), Data::String(AtprotoStr::String("cid2".into())));
+
+    let mut middle = BTreeMap::new();
+    middle.insert(SmolStr::new_static("post"), Data::Object(Object(inner1)));
+    middle.insert(SmolStr::new_static("reply"), Data::Object(Object(inner2)));
+
+    let mut root = BTreeMap::new();
+    root.insert(SmolStr::new_static("thread"), Data::Object(Object(middle)));
+    root.insert(SmolStr::new_static("cid"), Data::String(AtprotoStr::String("cid3".into())));
+
+    let data = Data::Object(Object(root));
+
+    // Global recursion: find all cids
+    let result = data.query("...cid");
+    assert!(matches!(result, QueryResult::Multiple(_)));
+    let matches = result.multiple().unwrap();
+    assert_eq!(matches.len(), 3);
+
+    // Check values
+    let values: Vec<_> = result.values().map(|d| d.as_str().unwrap()).collect();
+    assert!(values.contains(&"cid1"));
+    assert!(values.contains(&"cid2"));
+    assert!(values.contains(&"cid3"));
+}
+
+#[test]
+fn test_query_combined_wildcard_field() {
+    // Build: {"actors": [{"handle": "alice"}, {"handle": "bob"}]}
+    let mut actor1 = BTreeMap::new();
+    actor1.insert(SmolStr::new_static("handle"), Data::String(AtprotoStr::String("alice".into())));
+
+    let mut actor2 = BTreeMap::new();
+    actor2.insert(SmolStr::new_static("handle"), Data::String(AtprotoStr::String("bob".into())));
+
+    let actors = Data::Array(Array(vec![
+        Data::Object(Object(actor1)),
+        Data::Object(Object(actor2)),
+    ]));
+
+    let mut root = BTreeMap::new();
+    root.insert(SmolStr::new_static("actors"), actors);
+    let data = Data::Object(Object(root));
+
+    // Wildcard + field: collect handle from each actor
+    let result = data.query("actors.[..].handle");
+    assert!(matches!(result, QueryResult::Multiple(_)));
+    let matches = result.multiple().unwrap();
+    assert_eq!(matches.len(), 2);
+    assert_eq!(matches[0].value.unwrap().as_str(), Some("alice"));
+    assert_eq!(matches[1].value.unwrap().as_str(), Some("bob"));
+}
+
+#[test]
+fn test_query_no_match() {
+    let mut map = BTreeMap::new();
+    map.insert(SmolStr::new_static("foo"), Data::Integer(42));
+    let data = Data::Object(Object(map));
+
+    // Field doesn't exist
+    let result = data.query("missing");
+    assert!(matches!(result, QueryResult::None));
+    assert!(result.is_empty());
+    assert!(result.single().is_none());
+    assert!(result.first().is_none());
+}
+
+#[test]
+fn test_query_result_helpers() {
+    let mut map = BTreeMap::new();
+    map.insert(SmolStr::new_static("value"), Data::Integer(42));
+    let data = Data::Object(Object(map));
+
+    let result = data.query("value");
+
+    // Test helper methods
+    assert!(!result.is_empty());
+    assert!(result.single().is_some());
+    assert_eq!(result.first().unwrap().as_integer(), Some(42));
+
+    let values: Vec<_> = result.values().collect();
+    assert_eq!(values.len(), 1);
+}

@@ -176,6 +176,47 @@ impl<'s> Data<'s> {
         serde_ipld_dagcbor::to_vec(self)
     }
 
+    /// Get a value at a path within nested Data structures
+    ///
+    /// Path syntax:
+    /// - `.field` or `field` - access object field
+    /// - `[0]` - access array index
+    /// - Combined: `embed.images[0].alt`
+    ///
+    /// # Example
+    /// ```ignore
+    /// let data: Data = ...;
+    /// if let Some(alt_text) = data.get_at_path("embed.images[0].alt") {
+    ///     println!("Alt text: {}", alt_text.as_str().unwrap());
+    /// }
+    /// ```
+    pub fn get_at_path(&'s self, path: &str) -> Option<&'s Data<'s>> {
+        parse_and_traverse_path(self, path)
+    }
+
+    /// Query data with pattern matching
+    ///
+    /// Pattern syntax:
+    /// - `field.nested` - exact path navigation
+    /// - `[..]` - wildcard over collection (array elements or object values)
+    /// - `field..nested` - scoped recursion (find nested within field, expect one)
+    /// - `...field` - global recursion (find all occurrences anywhere)
+    ///
+    /// # Examples
+    /// ```ignore
+    /// // Exact path with wildcard
+    /// let alts = data.query("embed.[..].alt");
+    ///
+    /// // Scoped recursion
+    /// let handle = data.query("post..handle"); // finds post.author.handle
+    ///
+    /// // Global recursion
+    /// let all_cids = data.query("...cid"); // all CIDs anywhere
+    /// ```
+    pub fn query(&'s self, pattern: &str) -> QueryResult<'s> {
+        query_data(self, pattern)
+    }
+
     /// Parse a Data value from an IPLD value (CBOR)
     pub fn from_cbor(cbor: &'s Ipld) -> Result<Self, AtDataError> {
         Ok(match cbor {
@@ -223,6 +264,26 @@ impl IntoStatic for Array<'_> {
 }
 
 impl<'s> Array<'s> {
+    /// Get the number of elements in the array
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    /// Check if the array is empty
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    /// Get an element by index
+    pub fn get(&self, index: usize) -> Option<&Data<'s>> {
+        self.0.get(index)
+    }
+
+    /// Get an iterator over the array elements
+    pub fn iter(&self) -> std::slice::Iter<'_, Data<'s>> {
+        self.0.iter()
+    }
+
     /// Parse an array from JSON values
     pub fn from_json(json: &'s Vec<serde_json::Value>) -> Result<Self, AtDataError> {
         let mut array = Vec::with_capacity(json.len());
@@ -241,6 +302,14 @@ impl<'s> Array<'s> {
     }
 }
 
+impl<'s> std::ops::Index<usize> for Array<'s> {
+    type Output = Data<'s>;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index]
+    }
+}
+
 /// Object/map of AT Protocol data values
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Object<'s>(pub BTreeMap<SmolStr, Data<'s>>);
@@ -253,6 +322,41 @@ impl IntoStatic for Object<'_> {
 }
 
 impl<'s> Object<'s> {
+    /// Get a value by key
+    pub fn get(&self, key: &str) -> Option<&Data<'s>> {
+        self.0.get(key)
+    }
+
+    /// Check if a key exists in the object
+    pub fn contains_key(&self, key: &str) -> bool {
+        self.0.contains_key(key)
+    }
+
+    /// Get the number of key-value pairs in the object
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    /// Check if the object is empty
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    /// Get an iterator over the key-value pairs
+    pub fn iter(&self) -> std::collections::btree_map::Iter<'_, SmolStr, Data<'s>> {
+        self.0.iter()
+    }
+
+    /// Get an iterator over the keys
+    pub fn keys(&self) -> std::collections::btree_map::Keys<'_, SmolStr, Data<'s>> {
+        self.0.keys()
+    }
+
+    /// Get an iterator over the values
+    pub fn values(&self) -> std::collections::btree_map::Values<'_, SmolStr, Data<'s>> {
+        self.0.values()
+    }
+
     /// Parse an object from a JSON map with type inference
     ///
     /// Uses key names to infer the appropriate AT Protocol types for values.
@@ -381,6 +485,14 @@ impl<'s> Object<'s> {
     }
 }
 
+impl<'s> std::ops::Index<&str> for Object<'s> {
+    type Output = Data<'s>;
+
+    fn index(&self, key: &str) -> &Self::Output {
+        &self.0[key]
+    }
+}
+
 /// Level 1 deserialization of raw atproto data
 ///
 /// Maximally permissive with zero inference for cases where you just want to pass through the data
@@ -465,6 +577,24 @@ impl<'d> RawData<'d> {
         &self,
     ) -> Result<Vec<u8>, serde_ipld_dagcbor::EncodeError<std::collections::TryReserveError>> {
         serde_ipld_dagcbor::to_vec(self)
+    }
+
+    /// Get a value at a path within nested RawData structures
+    ///
+    /// Path syntax:
+    /// - `.field` or `field` - access object field
+    /// - `[0]` - access array index
+    /// - Combined: `embed.images[0].alt`
+    ///
+    /// # Example
+    /// ```ignore
+    /// let data: RawData = ...;
+    /// if let Some(alt_text) = data.get_at_path("embed.images[0].alt") {
+    ///     println!("Alt text: {}", alt_text.as_str().unwrap());
+    /// }
+    /// ```
+    pub fn get_at_path(&'d self, path: &str) -> Option<&'d RawData<'d>> {
+        parse_and_traverse_raw_path(self, path)
     }
 
     /// Convert a CBOR-encoded byte slice into a `RawData` value.
@@ -683,4 +813,382 @@ where
         message: e.to_string(),
     })?;
     raw.try_into()
+}
+
+/// Parse and traverse a path through nested Data structures
+fn parse_and_traverse_path<'s>(data: &'s Data<'s>, path: &str) -> Option<&'s Data<'s>> {
+    let mut current = data;
+    let mut path = path.trim_start_matches('.');
+
+    while !path.is_empty() {
+        if path.starts_with('[') {
+            // Array index: [N]
+            let idx_end = path.find(']')?;
+            let idx_str = &path[1..idx_end];
+            let idx: usize = idx_str.parse().ok()?;
+
+            current = current.as_array()?.get(idx)?;
+            path = &path[idx_end + 1..].trim_start_matches('.');
+        } else {
+            // Field access: extract next segment (up to '.' or '[')
+            let next_sep = path.find(&['.', '['][..]).unwrap_or(path.len());
+            let field = &path[..next_sep];
+
+            if field.is_empty() {
+                break;
+            }
+
+            current = current.as_object()?.get(field)?;
+            path = &path[next_sep..].trim_start_matches('.');
+        }
+    }
+
+    Some(current)
+}
+
+/// Parse and traverse a path through nested RawData structures
+fn parse_and_traverse_raw_path<'d>(data: &'d RawData<'d>, path: &str) -> Option<&'d RawData<'d>> {
+    let mut current = data;
+    let mut path = path.trim_start_matches('.');
+
+    while !path.is_empty() {
+        if path.starts_with('[') {
+            // Array index: [N]
+            let idx_end = path.find(']')?;
+            let idx_str = &path[1..idx_end];
+            let idx: usize = idx_str.parse().ok()?;
+
+            current = current.as_array()?.get(idx)?;
+            path = &path[idx_end + 1..].trim_start_matches('.');
+        } else {
+            // Field access: extract next segment (up to '.' or '[')
+            let next_sep = path.find(&['.', '['][..]).unwrap_or(path.len());
+            let field = &path[..next_sep];
+
+            if field.is_empty() {
+                break;
+            }
+
+            current = current.as_object()?.get(field as &str)?;
+            path = &path[next_sep..].trim_start_matches('.');
+        }
+    }
+
+    Some(current)
+}
+
+/// Result of a data query operation
+#[derive(Debug, Clone, PartialEq)]
+pub enum QueryResult<'s> {
+    /// Single value expected and found
+    Single(&'s Data<'s>),
+
+    /// Multiple values from wildcard or global recursion
+    Multiple(Vec<QueryMatch<'s>>),
+
+    /// No matches found
+    None,
+}
+
+impl<'s> QueryResult<'s> {
+    /// Get single value if available
+    pub fn single(&self) -> Option<&'s Data<'s>> {
+        match self {
+            QueryResult::Single(data) => Some(data),
+            _ => None,
+        }
+    }
+
+    /// Get multiple matches if available
+    pub fn multiple(&self) -> Option<&[QueryMatch<'s>]> {
+        match self {
+            QueryResult::Multiple(matches) => Some(matches),
+            _ => None,
+        }
+    }
+
+    /// Get first value regardless of result type
+    pub fn first(&self) -> Option<&'s Data<'s>> {
+        match self {
+            QueryResult::Single(data) => Some(data),
+            QueryResult::Multiple(matches) => matches.first().and_then(|m| m.value),
+            QueryResult::None => None,
+        }
+    }
+
+    /// Check if any results were found
+    pub fn is_empty(&self) -> bool {
+        matches!(self, QueryResult::None)
+    }
+
+    /// Get all values as an iterator (flattens single/multiple)
+    pub fn values(&self) -> impl Iterator<Item = &'s Data<'s>> {
+        match self {
+            QueryResult::Single(data) => vec![*data].into_iter(),
+            QueryResult::Multiple(matches) => matches
+                .iter()
+                .filter_map(|m| m.value)
+                .collect::<Vec<_>>()
+                .into_iter(),
+            QueryResult::None => vec![].into_iter(),
+        }
+    }
+}
+
+/// A single match from a query operation
+#[derive(Debug, Clone, PartialEq)]
+pub struct QueryMatch<'s> {
+    /// Path where this value was found (e.g., "actors[0].handle")
+    pub path: SmolStr,
+    /// The value (None if field was missing during wildcard iteration)
+    pub value: Option<&'s Data<'s>>,
+}
+
+/// Query pattern segment
+#[derive(Debug, Clone, PartialEq)]
+enum QuerySegment {
+    /// Exact field name
+    Field(SmolStr),
+    /// Wildcard [..]
+    Wildcard,
+    /// Scoped recursion ..field
+    ScopedRecursion(SmolStr),
+    /// Global recursion ...field
+    GlobalRecursion(SmolStr),
+}
+
+/// Parse a query pattern into segments
+fn parse_query_pattern(pattern: &str) -> Vec<QuerySegment> {
+    let mut segments = Vec::new();
+    let mut remaining = pattern;
+
+    // Skip single leading dot if present
+    if remaining.starts_with('.') && !remaining.starts_with("..") {
+        remaining = &remaining[1..];
+    }
+
+    while !remaining.is_empty() {
+        if remaining.starts_with("...") {
+            // Global recursion
+            let rest = &remaining[3..];
+            let end = rest.find(&['.', '['][..]).unwrap_or(rest.len());
+            let field = SmolStr::new(&rest[..end]);
+            segments.push(QuerySegment::GlobalRecursion(field));
+            remaining = &rest[end..];
+            // Skip single dot separator
+            if remaining.starts_with('.') && !remaining.starts_with("..") {
+                remaining = &remaining[1..];
+            }
+        } else if remaining.starts_with("..") {
+            // Scoped recursion
+            let rest = &remaining[2..];
+            let end = rest.find(&['.', '['][..]).unwrap_or(rest.len());
+            let field = SmolStr::new(&rest[..end]);
+            segments.push(QuerySegment::ScopedRecursion(field));
+            remaining = &rest[end..];
+            // Skip single dot separator
+            if remaining.starts_with('.') && !remaining.starts_with("..") {
+                remaining = &remaining[1..];
+            }
+        } else if remaining.starts_with("[..]") {
+            // Wildcard
+            segments.push(QuerySegment::Wildcard);
+            remaining = &remaining[4..];
+            // Skip single dot separator
+            if remaining.starts_with('.') && !remaining.starts_with("..") {
+                remaining = &remaining[1..];
+            }
+        } else {
+            // Regular field
+            let end = remaining.find(&['.', '['][..]).unwrap_or(remaining.len());
+            let field = &remaining[..end];
+            if !field.is_empty() {
+                segments.push(QuerySegment::Field(SmolStr::new(field)));
+            }
+            remaining = &remaining[end..];
+            // Skip single dot separator
+            if remaining.starts_with('.') && !remaining.starts_with("..") {
+                remaining = &remaining[1..];
+            }
+        }
+    }
+
+    segments
+}
+
+/// Execute a query on data
+fn query_data<'s>(data: &'s Data<'s>, pattern: &str) -> QueryResult<'s> {
+    let segments = parse_query_pattern(pattern);
+    if segments.is_empty() {
+        return QueryResult::None;
+    }
+
+    let mut results = vec![QueryMatch {
+        path: SmolStr::new_static(""),
+        value: Some(data),
+    }];
+
+    // Determine result type based on segment types before consuming segments
+    let has_wildcard = segments.iter().any(|s| matches!(s, QuerySegment::Wildcard));
+    let has_global = segments.iter().any(|s| matches!(s, QuerySegment::GlobalRecursion(_)));
+
+    for segment in segments {
+        results = execute_segment(&results, &segment);
+        if results.is_empty() {
+            return QueryResult::None;
+        }
+    }
+
+    if has_wildcard || has_global || results.len() > 1 {
+        QueryResult::Multiple(results)
+    } else if results.len() == 1 {
+        if let Some(value) = results[0].value {
+            QueryResult::Single(value)
+        } else {
+            QueryResult::None
+        }
+    } else {
+        QueryResult::None
+    }
+}
+
+/// Execute a single segment on current results
+fn execute_segment<'s>(current: &[QueryMatch<'s>], segment: &QuerySegment) -> Vec<QueryMatch<'s>> {
+    let mut next = Vec::new();
+
+    for qm in current {
+        let Some(data) = qm.value else { continue };
+
+        match segment {
+            QuerySegment::Field(field) => {
+                if let Some(obj) = data.as_object() {
+                    if let Some(value) = obj.get(field.as_str()) {
+                        let new_path = append_path(&qm.path, field.as_str());
+                        next.push(QueryMatch {
+                            path: new_path,
+                            value: Some(value),
+                        });
+                    }
+                }
+            }
+
+            QuerySegment::Wildcard => match data {
+                Data::Array(arr) => {
+                    for (idx, item) in arr.iter().enumerate() {
+                        let new_path = append_path(&qm.path, &format!("[{}]", idx));
+                        next.push(QueryMatch {
+                            path: new_path,
+                            value: Some(item),
+                        });
+                    }
+                }
+                Data::Object(obj) => {
+                    for (key, value) in obj.iter() {
+                        let new_path = append_path(&qm.path, key.as_str());
+                        next.push(QueryMatch {
+                            path: new_path,
+                            value: Some(value),
+                        });
+                    }
+                }
+                _ => {}
+            },
+
+            QuerySegment::ScopedRecursion(field) => {
+                if let Some(found) = find_field_recursive(data, field.as_str(), &qm.path) {
+                    next.push(found);
+                }
+            }
+
+            QuerySegment::GlobalRecursion(field) => {
+                find_all_fields_recursive(data, field.as_str(), &qm.path, &mut next);
+            }
+        }
+    }
+
+    next
+}
+
+/// Recursively find first occurrence of a field (scoped recursion)
+fn find_field_recursive<'s>(
+    data: &'s Data<'s>,
+    field: &str,
+    base_path: &SmolStr,
+) -> Option<QueryMatch<'s>> {
+    match data {
+        Data::Object(obj) => {
+            // Check direct children first
+            if let Some(value) = obj.get(field) {
+                let new_path = append_path(base_path, field);
+                return Some(QueryMatch {
+                    path: new_path,
+                    value: Some(value),
+                });
+            }
+
+            // Recurse into nested objects
+            for (key, value) in obj.iter() {
+                let new_path = append_path(base_path, key.as_str());
+                if let Some(found) = find_field_recursive(value, field, &new_path) {
+                    return Some(found);
+                }
+            }
+        }
+        Data::Array(arr) => {
+            for (idx, item) in arr.iter().enumerate() {
+                let new_path = append_path(base_path, &format!("[{}]", idx));
+                if let Some(found) = find_field_recursive(item, field, &new_path) {
+                    return Some(found);
+                }
+            }
+        }
+        _ => {}
+    }
+
+    None
+}
+
+/// Recursively find all occurrences of a field (global recursion)
+fn find_all_fields_recursive<'s>(
+    data: &'s Data<'s>,
+    field: &str,
+    base_path: &SmolStr,
+    results: &mut Vec<QueryMatch<'s>>,
+) {
+    match data {
+        Data::Object(obj) => {
+            // Check direct children
+            if let Some(value) = obj.get(field) {
+                let new_path = append_path(base_path, field);
+                results.push(QueryMatch {
+                    path: new_path,
+                    value: Some(value),
+                });
+            }
+
+            // Recurse into all nested values
+            for (key, value) in obj.iter() {
+                let new_path = append_path(base_path, key.as_str());
+                find_all_fields_recursive(value, field, &new_path, results);
+            }
+        }
+        Data::Array(arr) => {
+            for (idx, item) in arr.iter().enumerate() {
+                let new_path = append_path(base_path, &format!("[{}]", idx));
+                find_all_fields_recursive(item, field, &new_path, results);
+            }
+        }
+        _ => {}
+    }
+}
+
+/// Append a segment to a path
+fn append_path(base: &SmolStr, segment: &str) -> SmolStr {
+    if base.is_empty() {
+        SmolStr::new(segment)
+    } else if segment.starts_with('[') {
+        SmolStr::new(format!("{}{}", base, segment))
+    } else {
+        SmolStr::new(format!("{}.{}", base, segment))
+    }
 }
