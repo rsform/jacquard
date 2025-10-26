@@ -2279,6 +2279,7 @@ dependencies = [
  "bytes",
  "jacquard-common 0.8.0",
  "jacquard-derive 0.8.0",
+ "jacquard-lexicon 0.8.0",
  "miette",
  "serde",
  "serde_ipld_dagcbor",
