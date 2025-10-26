@@ -155,11 +155,10 @@ impl WorkspaceDiscovery {
 
             // Use schema builder based on kind
             let built = match schema_info.kind {
-                SchemaKind::Struct => {
-                    jacquard_lexicon::schema::from_ast::build_struct_schema(&ast)?
-                }
+                SchemaKind::Struct => jacquard_lexicon::schema::from_ast::build_struct_schema(&ast)
+                    .into_diagnostic()?,
                 SchemaKind::Enum => {
-                    jacquard_lexicon::schema::from_ast::build_enum_schema(&ast)?
+                    jacquard_lexicon::schema::from_ast::build_enum_schema(&ast).into_diagnostic()?
                 }
             };
 
@@ -210,8 +209,11 @@ impl WorkspaceDiscovery {
     }
 
     /// Group schemas by base NSID (strip fragment suffix)
-    fn group_by_base_nsid(&self, schemas: &[GeneratedSchema]) -> BTreeMap<String, Vec<&GeneratedSchema>> {
-        let mut groups: BTreeMap<String, Vec<&GeneratedSchema>> = BTreeMap::new();
+    fn group_by_base_nsid<'a>(
+        &self,
+        schemas: &'a [GeneratedSchema],
+    ) -> BTreeMap<String, Vec<&'a GeneratedSchema>> {
+        let mut groups: BTreeMap<String, Vec<&'a GeneratedSchema>> = BTreeMap::new();
 
         for schema in schemas {
             // Split on # to get base NSID
@@ -297,7 +299,7 @@ impl WorkspaceDiscovery {
 
     /// Serialize a lexicon doc with "main" def first
     fn serialize_with_main_first(&self, doc: &LexiconDoc) -> Result<String> {
-        use serde_json::{json, Map, Value};
+        use serde_json::{Map, Value, json};
 
         // Build defs map with main first
         let mut defs_map = Map::new();
@@ -533,7 +535,8 @@ impl WorkspaceDiscovery {
                         lex_attrs.key = Some(lit.value());
                     }
                     Ok(())
-                }).into_diagnostic()?;
+                })
+                .into_diagnostic()?;
             }
         }
 

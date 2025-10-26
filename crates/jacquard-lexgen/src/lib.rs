@@ -36,7 +36,5 @@ pub mod cli;
 pub mod fetch;
 pub mod schema_discovery;
 pub mod schema_extraction;
-#[cfg(any(test, debug_assertions))]
-pub mod test_schemas;
 
 pub use fetch::{Config, Fetcher};
