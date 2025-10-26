@@ -68,6 +68,71 @@ pub enum RecordWithMediaRecord<'a> {
     Records(Box<crate::sh_weaver::embed::records::Records<'a>>),
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordWithMedia<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.embed.recordWithMedia"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "sh.weaver.embed.recordWithMedia".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["record".into(), "media".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "media".into(),
+                                todo!("unsupported object property variant"),
+                            );
+                            map.insert(
+                                "record".into(),
+                                todo!("unsupported object property variant"),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "view".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["record".into(), "media".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "media".into(),
+                                todo!("unsupported object property variant"),
+                            );
+                            map.insert(
+                                "record".into(),
+                                todo!("unsupported object property variant"),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -129,4 +194,69 @@ pub enum ViewRecord<'a> {
     RecordsView(Box<crate::sh_weaver::embed::records::View<'a>>),
     #[serde(rename = "app.bsky.embed.record#view")]
     RecordView(Box<crate::app_bsky::embed::record::View<'a>>),
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.embed.recordWithMedia"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "sh.weaver.embed.recordWithMedia".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["record".into(), "media".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "media".into(),
+                                todo!("unsupported object property variant"),
+                            );
+                            map.insert(
+                                "record".into(),
+                                todo!("unsupported object property variant"),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map.insert(
+                    "view".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(vec!["record".into(), "media".into()]),
+                        nullable: None,
+                        properties: {
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                "media".into(),
+                                todo!("unsupported object property variant"),
+                            );
+                            map.insert(
+                                "record".into(),
+                                todo!("unsupported object property variant"),
+                            );
+                            map
+                        },
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
 }

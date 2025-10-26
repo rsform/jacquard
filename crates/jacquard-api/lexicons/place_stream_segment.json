@@ -59,9 +59,21 @@
               "ref": "#audio"
             }
           },
+          "contentRights": {
+            "type": "ref",
+            "ref": "place.stream.metadata.contentRights"
+          },
+          "contentWarnings": {
+            "type": "ref",
+            "ref": "place.stream.metadata.contentWarnings"
+          },
           "creator": {
             "type": "string",
             "format": "did"
+          },
+          "distributionPolicy": {
+            "type": "ref",
+            "ref": "place.stream.metadata.distributionPolicy"
           },
           "duration": {
             "type": "integer",

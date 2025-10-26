@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "record",
-      "description": "Record created by a Streamplace broadcaster to indicate that they will be replicating a livestream",
+      "description": "Record created by a Streamplace broadcaster to indicate that they will be replicating a livestream. NYI",
       "key": "tid",
       "record": {
         "type": "object",

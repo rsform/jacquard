@@ -1,0 +1,85 @@
+{
+  "lexicon": 1,
+  "id": "social.flockfeeds.lexical.speakablespecification",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A SpeakableSpecification indicates (typically via [[xpath]] or [[cssSelector]]) sections of a document that are highlighted as particularly [[speakable]]. Instances of this type are expected to be used primarily as values of the [[speakable]] property.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "properties": {
+          "additionalType": {
+            "type": "string",
+            "description": "An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the\n    use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href=\"https://schema.org/docs/styleguide.html\">style guide</a>."
+          },
+          "alternateName": {
+            "type": "string",
+            "description": "An alias for the item."
+          },
+          "cssSelector": {
+            "type": "ref",
+            "description": "A CSS selector, e.g. of a [[SpeakableSpecification]] or [[WebPageElement]]. In the latter case, multiple matches within a page can constitute a single conceptual \"Web page element\".",
+            "ref": "social.flockfeeds.lexical.cssselectortype"
+          },
+          "description": {
+            "type": "ref",
+            "description": "A description of the item.",
+            "ref": "social.flockfeeds.lexical.textobject"
+          },
+          "disambiguatingDescription": {
+            "type": "string",
+            "description": "A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation."
+          },
+          "identifier": {
+            "type": "ref",
+            "description": "The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.",
+            "ref": "social.flockfeeds.lexical.propertyvalue"
+          },
+          "image": {
+            "type": "ref",
+            "description": "An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].",
+            "ref": "social.flockfeeds.lexical.imageobject"
+          },
+          "mainEntityOfPage": {
+            "type": "ref",
+            "description": "Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.",
+            "ref": "social.flockfeeds.lexical.creativework"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the item."
+          },
+          "potentialAction": {
+            "type": "ref",
+            "description": "Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.",
+            "ref": "social.flockfeeds.lexical.action"
+          },
+          "sameAs": {
+            "type": "string",
+            "description": "URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.",
+            "format": "uri"
+          },
+          "subjectOf": {
+            "type": "union",
+            "description": "A CreativeWork or Event about this Thing.",
+            "refs": [
+              "social.flockfeeds.lexical.event",
+              "social.flockfeeds.lexical.creativework"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "description": "URL of the item.",
+            "format": "uri"
+          },
+          "xpath": {
+            "type": "ref",
+            "description": "An XPath, e.g. of a [[SpeakableSpecification]] or [[WebPageElement]]. In the latter case, multiple matches within a page can constitute a single conceptual \"Web page element\".",
+            "ref": "social.flockfeeds.lexical.xpathtype"
+          }
+        }
+      }
+    }
+  }
+}

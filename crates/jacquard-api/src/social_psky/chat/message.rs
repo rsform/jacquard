@@ -96,3 +96,116 @@ impl jacquard_common::types::collection::Collection for MessageRecord {
     const NSID: &'static str = "social.psky.chat.message";
     type Record = MessageRecord;
 }
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
+    fn nsid() -> &'static str {
+        "social.psky.chat.message"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "social.psky.chat.message".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                        description: None,
+                        key: Some("tid".into()),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                            description: None,
+                            required: Some(vec!["content".into(), "room".into()]),
+                            nullable: None,
+                            properties: {
+                                let mut map = ::std::collections::BTreeMap::new();
+                                map.insert(
+                                    "content".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(20480usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(2048usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "facets".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        description: None,
+                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                            description: None,
+                                            r#ref: "social.psky.richtext.facet".into(),
+                                        }),
+                                        min_length: None,
+                                        max_length: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "reply".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: "com.atproto.repo.strongRef".into(),
+                                    }),
+                                );
+                                map.insert(
+                                    "room".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map
+                            },
+                        }),
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if self.content.len() > 20480usize {
+            return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                field: "content",
+                max: 20480usize,
+                actual: self.content.len(),
+            });
+        }
+        {
+            let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                    self.content.as_ref(),
+                    true,
+                )
+                .count();
+            if count > 2048usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                    field: "content",
+                    max: 2048usize,
+                    actual: count,
+                });
+            }
+        }
+        Ok(())
+    }
+}

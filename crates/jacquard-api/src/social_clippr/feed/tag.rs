@@ -97,3 +97,169 @@ impl jacquard_common::types::collection::Collection for TagRecord {
     const NSID: &'static str = "social.clippr.feed.tag";
     type Record = TagRecord;
 }
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
+    fn nsid() -> &'static str {
+        "social.clippr.feed.tag"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "social.clippr.feed.tag".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                        description: None,
+                        key: Some("any".into()),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                            description: None,
+                            required: Some(vec!["name".into(), "createdAt".into()]),
+                            nullable: None,
+                            properties: {
+                                let mut map = ::std::collections::BTreeMap::new();
+                                map.insert(
+                                    "color".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(70usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(7usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "createdAt".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "description".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(50000usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(5000usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map.insert(
+                                    "name".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(640usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(64usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map
+                            },
+                        }),
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        if self.color.len() > 70usize {
+            return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                field: "color",
+                max: 70usize,
+                actual: self.color.len(),
+            });
+        }
+        {
+            let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                    self.color.as_ref(),
+                    true,
+                )
+                .count();
+            if count > 7usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                    field: "color",
+                    max: 7usize,
+                    actual: count,
+                });
+            }
+        }
+        if self.description.len() > 50000usize {
+            return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                field: "description",
+                max: 50000usize,
+                actual: self.description.len(),
+            });
+        }
+        {
+            let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                    self.description.as_ref(),
+                    true,
+                )
+                .count();
+            if count > 5000usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                    field: "description",
+                    max: 5000usize,
+                    actual: count,
+                });
+            }
+        }
+        if self.name.len() > 640usize {
+            return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
+                field: "name",
+                max: 640usize,
+                actual: self.name.len(),
+            });
+        }
+        {
+            let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                    self.name.as_ref(),
+                    true,
+                )
+                .count();
+            if count > 64usize {
+                return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
+                    field: "name",
+                    max: 64usize,
+                    actual: count,
+                });
+            }
+        }
+        Ok(())
+    }
+}

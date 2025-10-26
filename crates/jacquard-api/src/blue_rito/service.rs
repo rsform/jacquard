@@ -4,3 +4,4 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod get_schema;
+pub mod schema;

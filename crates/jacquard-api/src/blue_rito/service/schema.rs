@@ -5,8 +5,39 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-///This record defines the schema associated with a specific NSID.
+/// This record defines the schema associated with a specific NSID.
 #[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    bon::Builder
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Schema<'a> {
+    /// The AppView URL for the NSID. For example, if the NSID is uk.skyblur.post, the URL should be https://skyblur.uk/post/{did}/{rkey}
+    #[serde(borrow)]
+    pub schema: jacquard_common::types::string::Uri<'a>,
+}
+
+impl<'a> Schema<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, SchemaRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
+    }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
     serde::Serialize,
     serde::Deserialize,
@@ -17,12 +48,97 @@
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct Schema<'a> {
-    ///The AppView URL for the NSID. For example, if the NSID is uk.skyblur.post, the URL should be https://skyblur.uk/post/{did}/{rkey}
+pub struct SchemaGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub schema: jacquard_common::types::string::Uri<'a>,
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Schema<'a>,
+}
+
+impl From<SchemaGetRecordOutput<'_>> for Schema<'_> {
+    fn from(output: SchemaGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
 }
 
 impl jacquard_common::types::collection::Collection for Schema<'_> {
     const NSID: &'static str = "blue.rito.service.schema";
+    type Record = SchemaRecord;
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct SchemaRecord;
+impl jacquard_common::xrpc::XrpcResp for SchemaRecord {
+    const NSID: &'static str = "blue.rito.service.schema";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = SchemaGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl jacquard_common::types::collection::Collection for SchemaRecord {
+    const NSID: &'static str = "blue.rito.service.schema";
+    type Record = SchemaRecord;
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Schema<'a> {
+    fn nsid() -> &'static str {
+        "blue.rito.service.schema"
+    }
+    fn lexicon_doc(
+        _generator: &mut ::jacquard_lexicon::schema::LexiconGenerator,
+    ) -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        ::jacquard_lexicon::lexicon::LexiconDoc {
+            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+            id: "blue.rito.service.schema".into(),
+            revision: None,
+            description: None,
+            defs: {
+                let mut map = ::std::collections::BTreeMap::new();
+                map.insert(
+                    "main".into(),
+                    ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                        description: None,
+                        key: Some("nsid".into()),
+                        record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                            description: None,
+                            required: Some(vec!["schema".into()]),
+                            nullable: None,
+                            properties: {
+                                let mut map = ::std::collections::BTreeMap::new();
+                                map.insert(
+                                    "schema".into(),
+                                    ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                );
+                                map
+                            },
+                        }),
+                    }),
+                );
+                map
+            },
+        }
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+        Ok(())
+    }
 }

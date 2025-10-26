@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "pub.leaflet.poll.vote",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring a vote on a poll",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "poll",
+          "option"
+        ],
+        "properties": {
+          "option": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "poll": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}
