@@ -16,7 +16,10 @@
         "properties": {
           "categoryType": {
             "type": "string",
-            "maxLength": 30
+            "enum": [
+              "discussion",
+              "question"
+            ]
           },
           "description": {
             "type": "string",

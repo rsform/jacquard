@@ -30,18 +30,13 @@
             "pub.leaflet.blocks.math",
             "pub.leaflet.blocks.code",
             "pub.leaflet.blocks.horizontalRule",
-            "pub.leaflet.blocks.bskyPost",
-            "pub.leaflet.blocks.page",
-            "pub.leaflet.blocks.poll"
+            "pub.leaflet.blocks.bskyPost"
           ]
         }
       }
     },
     "main": {
       "type": "object",
-      "required": [
-        "blocks"
-      ],
       "properties": {
         "blocks": {
           "type": "array",
@@ -49,9 +44,6 @@
             "type": "ref",
             "ref": "#block"
           }
-        },
-        "id": {
-          "type": "string"
         }
       }
     },

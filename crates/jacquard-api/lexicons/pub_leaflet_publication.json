@@ -13,7 +13,8 @@
         ],
         "properties": {
           "base_path": {
-            "type": "string"
+            "type": "string",
+            "format": "uri"
           },
           "description": {
             "type": "string",

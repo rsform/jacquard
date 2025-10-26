@@ -62,7 +62,8 @@
       ],
       "properties": {
         "uri": {
-          "type": "string"
+          "type": "string",
+          "format": "uri"
         }
       }
     },

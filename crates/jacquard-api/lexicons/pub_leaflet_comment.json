@@ -50,9 +50,6 @@
               "ref": "pub.leaflet.richtext.facet"
             }
           },
-          "onPage": {
-            "type": "string"
-          },
           "plaintext": {
             "type": "string"
           },
