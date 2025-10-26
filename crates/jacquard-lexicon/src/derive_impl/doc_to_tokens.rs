@@ -182,7 +182,7 @@ fn properties_to_tokens(props: &BTreeMap<SmolStr, LexObjectProperty>) -> TokenSt
 /// Convert LexObjectProperty to tokens
 fn object_property_to_tokens(prop: &LexObjectProperty) -> TokenStream {
     match prop {
-        LexObjectProperty::Boolean(b) => quote! {
+        LexObjectProperty::Boolean(_) => quote! {
             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
                 ::jacquard_lexicon::lexicon::LexBoolean {
                     description: None,
@@ -374,11 +374,19 @@ fn lex_string_to_tokens(s: &LexString) -> TokenStream {
         LexStringFormat::AtUri => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::AtUri },
         LexStringFormat::Nsid => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Nsid },
         LexStringFormat::Cid => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Cid },
-        LexStringFormat::Datetime => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Datetime },
-        LexStringFormat::Language => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Language },
+        LexStringFormat::Datetime => {
+            quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Datetime }
+        }
+        LexStringFormat::Language => {
+            quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Language }
+        }
         LexStringFormat::Tid => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Tid },
-        LexStringFormat::RecordKey => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::RecordKey },
-        LexStringFormat::AtIdentifier => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::AtIdentifier },
+        LexStringFormat::RecordKey => {
+            quote! { ::jacquard_lexicon::lexicon::LexStringFormat::RecordKey }
+        }
+        LexStringFormat::AtIdentifier => {
+            quote! { ::jacquard_lexicon::lexicon::LexStringFormat::AtIdentifier }
+        }
         LexStringFormat::Uri => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Uri },
     });
     let min_len = option_to_tokens(&s.min_length, |v| quote! { #v });
@@ -457,7 +465,7 @@ fn xrpc_param_property_to_tokens(prop: &LexXrpcParametersProperty) -> TokenStrea
             quote! {
                 ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(#string_tokens)
             }
-        },
+        }
         LexXrpcParametersProperty::Unknown(_) => quote! {
             ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Unknown(
                 ::jacquard_lexicon::lexicon::LexUnknown { description: None }
@@ -510,7 +518,7 @@ fn xrpc_param_property_to_tokens(prop: &LexXrpcParametersProperty) -> TokenStrea
                     }
                 )
             }
-        },
+        }
     }
 }
 
