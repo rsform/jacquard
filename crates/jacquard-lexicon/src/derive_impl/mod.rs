@@ -3,7 +3,7 @@
 //! These functions are used by the `jacquard-derive` proc-macro crate but are also
 //! available for runtime code generation in `jacquard-lexicon`.
 
-mod doc_to_tokens;
+pub mod doc_to_tokens;
 pub mod helpers;
 pub mod into_static;
 pub mod lexicon_attr;

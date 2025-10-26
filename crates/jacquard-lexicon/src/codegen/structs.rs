@@ -1,10 +1,12 @@
 use crate::error::Result;
 use crate::lexicon::{
-    LexArrayItem, LexInteger, LexObject, LexObjectProperty, LexRecord, LexString,
+    LexArrayItem, LexInteger, LexObject, LexObjectProperty, LexRecord, LexString, LexUserType,
+    Lexicon, LexiconDoc,
 };
 use heck::{ToPascalCase, ToSnakeCase};
 use proc_macro2::TokenStream;
 use quote::quote;
+use std::collections::BTreeMap;
 
 use super::CodeGenerator;
 use super::utils::{make_ident, value_to_variant_name};
@@ -214,6 +216,11 @@ impl<'c> CodeGenerator<'c> {
                     }
                 };
 
+                // Generate LexiconSchema impl from original lexicon
+                let lex_doc = self.corpus.get(nsid).expect("nsid exists in corpus");
+                let schema_impl =
+                    super::schema_impl::generate_schema_impl(&type_name, lex_doc, true);
+
                 Ok(quote! {
                     #struct_def
 
@@ -228,6 +235,7 @@ impl<'c> CodeGenerator<'c> {
                     #collection_impl
                     #record_marker
                     #collection_marker_impl
+                    #schema_impl
                 })
             }
         }
@@ -331,9 +339,14 @@ impl<'c> CodeGenerator<'c> {
             }
         }
 
+        // Generate LexiconSchema impl from original lexicon
+        let lex_doc = self.corpus.get(nsid).expect("nsid exists in corpus");
+        let schema_impl = super::schema_impl::generate_schema_impl(&type_name, lex_doc, true);
+
         Ok(quote! {
             #struct_def
             #(#unions)*
+            #schema_impl
         })
     }
 

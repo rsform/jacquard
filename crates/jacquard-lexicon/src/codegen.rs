@@ -11,6 +11,7 @@ mod types;
 mod structs;
 mod xrpc;
 mod output;
+mod schema_impl;
 
 /// Code generator for lexicon types
 pub struct CodeGenerator<'c> {
