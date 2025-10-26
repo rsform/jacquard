@@ -17,10 +17,10 @@ pub fn generate_schema_impl(type_name: &str, doc: &LexiconDoc, has_lifetime: boo
     let nsid = doc.id.as_ref();
 
     // Generate lifetime parameter
-    let lifetime = if has_lifetime {
-        quote! { <'_> }
+    let (impl_generics, type_generics) = if has_lifetime {
+        (quote! { <'a> }, quote! { <'a> })
     } else {
-        quote! {}
+        (quote! {}, quote! {})
     };
 
     // Generate the lexicon doc literal using existing doc_to_tokens
@@ -35,7 +35,7 @@ pub fn generate_schema_impl(type_name: &str, doc: &LexiconDoc, has_lifetime: boo
     let type_ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
 
     quote! {
-        impl #lifetime ::jacquard_lexicon::schema::LexiconSchema for #type_ident #lifetime {
+        impl #impl_generics ::jacquard_lexicon::schema::LexiconSchema for #type_ident #type_generics {
             fn nsid() -> &'static str {
                 #nsid
             }
