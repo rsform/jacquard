@@ -576,7 +576,8 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
     let check_tokens: Vec<_> = checks
         .iter()
         .map(|check| {
-            let field_ident = syn::Ident::new(&check.field_name, proc_macro2::Span::call_site());
+            // Use make_ident to handle keywords properly (adds r# prefix if needed)
+            let field_ident = crate::codegen::utils::make_ident(&check.field_name);
             let field_name_static = &check.field_name;
             match &check.check {
                 ConstraintCheck::MaxLength { max } => quote! {

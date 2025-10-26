@@ -246,23 +246,13 @@ fn extract_integer_validations(
     checks
 }
 
-/// Convert schema field name to the Rust field identifier as it appears in generated code
+/// Convert schema field name to the Rust field identifier
 ///
-/// This matches the codegen logic: snake_case + keyword handling
+/// Returns snake_case field name without r# prefix
+/// (the r# will be added by make_ident when generating tokens)
 fn field_name_from_schema(schema_name: &str) -> String {
     use heck::ToSnakeCase;
-
-    let snake = schema_name.to_snake_case();
-
-    // Check if it's a Rust keyword that needs r# prefix
-    // Using syn to parse will tell us if it needs raw identifier
-    match syn::parse_str::<syn::Ident>(&snake) {
-        Ok(_) => snake, // Not a keyword
-        Err(_) => {
-            // It's a keyword, need r# prefix
-            format!("r#{}", snake)
-        }
-    }
+    schema_name.to_snake_case()
 }
 
 #[cfg(test)]
@@ -274,7 +264,7 @@ mod tests {
         assert_eq!(field_name_from_schema("createdAt"), "created_at");
         assert_eq!(field_name_from_schema("maxLength"), "max_length");
         assert_eq!(field_name_from_schema("text"), "text");
-        assert_eq!(field_name_from_schema("ref"), "r#ref");
-        assert_eq!(field_name_from_schema("type"), "r#type");
+        assert_eq!(field_name_from_schema("ref"), "ref"); // r# added by make_ident later
+        assert_eq!(field_name_from_schema("type"), "type"); // r# added by make_ident later
     }
 }

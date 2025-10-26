@@ -50,7 +50,7 @@ pub(super) fn sanitize_name(s: &str) -> String {
 }
 
 /// Create an identifier, using raw identifier if necessary for keywords
-pub(super) fn make_ident(s: &str) -> syn::Ident {
+pub fn make_ident(s: &str) -> syn::Ident {
     if s.is_empty() {
         eprintln!("Warning: Empty identifier encountered, using 'unknown' as fallback");
         return syn::Ident::new("unknown", proc_macro2::Span::call_site());
