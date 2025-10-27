@@ -1,65 +1,9 @@
 //! Generate LexiconSchema trait implementations for generated types
 
-use crate::derive_impl::doc_to_tokens;
 use crate::lexicon::{
-    LexInteger, LexObject, LexObjectProperty, LexRecordRecord, LexString,
-    LexUserType, LexiconDoc,
+    LexInteger, LexObject, LexObjectProperty, LexRecordRecord, LexString, LexUserType, LexiconDoc,
 };
 use crate::schema::from_ast::{ConstraintCheck, ValidationCheck};
-use proc_macro2::TokenStream;
-use quote::quote;
-
-/// Generate LexiconSchema impl for a generated type
-///
-/// Takes the original lexicon doc and type metadata to generate a complete
-/// impl with const literal and validation code.
-pub fn generate_schema_impl(
-    type_name: &str,
-    doc: &LexiconDoc,
-    def_name: &str,
-    has_lifetime: bool,
-) -> TokenStream {
-    let nsid = doc.id.as_ref();
-
-    // Generate lifetime parameter
-    let (impl_generics, type_generics) = if has_lifetime {
-        (quote! { <'a> }, quote! { <'a> })
-    } else {
-        (quote! {}, quote! {})
-    };
-
-    // Generate the lexicon doc literal using existing doc_to_tokens
-    // Codegen from JSON doesn't have union_fields (those are for Rust -> lexicon derive)
-    let doc_literal = doc_to_tokens::doc_to_tokens(doc, &std::collections::BTreeMap::new());
-
-    // Extract validation checks from lexicon doc for the specific def
-    let validation_checks = extract_validation_checks(doc, def_name);
-
-    // Generate validation code using existing validations_to_tokens
-    let validation_code = doc_to_tokens::validations_to_tokens(&validation_checks);
-
-    let type_ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
-
-    quote! {
-        impl #impl_generics ::jacquard_lexicon::schema::LexiconSchema for #type_ident #type_generics {
-            fn nsid() -> &'static str {
-                #nsid
-            }
-
-            fn def_name() -> &'static str {
-                #def_name
-            }
-
-            fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-                #doc_literal
-            }
-
-            fn validate(&self) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-                #validation_code
-            }
-        }
-    }
-}
 
 /// Extract validation checks from a LexiconDoc
 ///
@@ -71,13 +15,11 @@ pub(crate) fn extract_validation_checks(doc: &LexiconDoc, def_name: &str) -> Vec
     // Get the specified def
     if let Some(def) = doc.defs.get(def_name) {
         match def {
-            LexUserType::Record(rec) => {
-                match &rec.record {
-                    LexRecordRecord::Object(obj) => {
-                        checks.extend(extract_object_validations(obj));
-                    }
+            LexUserType::Record(rec) => match &rec.record {
+                LexRecordRecord::Object(obj) => {
+                    checks.extend(extract_object_validations(obj));
                 }
-            }
+            },
             LexUserType::Object(obj) => {
                 checks.extend(extract_object_validations(obj));
             }
@@ -269,18 +211,4 @@ fn extract_integer_validations(
 fn field_name_from_schema(schema_name: &str) -> String {
     use heck::ToSnakeCase;
     schema_name.to_snake_case()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_field_name_from_schema() {
-        assert_eq!(field_name_from_schema("createdAt"), "created_at");
-        assert_eq!(field_name_from_schema("maxLength"), "max_length");
-        assert_eq!(field_name_from_schema("text"), "text");
-        assert_eq!(field_name_from_schema("ref"), "ref"); // r# added by make_ident later
-        assert_eq!(field_name_from_schema("type"), "type"); // r# added by make_ident later
-    }
 }

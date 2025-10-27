@@ -4,17 +4,17 @@ use crate::lexicon::{LexArrayItem, LexUserType};
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub mod builder_heuristics;
-pub mod lifetime;
-pub mod names;
-pub mod nsid_utils;
-pub mod output;
-pub mod schema_impl;
-pub mod structs;
-pub mod types;
-pub mod union_codegen;
-pub mod utils;
-pub mod xrpc;
+pub(crate) mod builder_heuristics;
+pub(crate) mod lifetime;
+pub(crate) mod names;
+pub(crate) mod nsid_utils;
+pub(crate) mod output;
+pub(crate) mod schema_impl;
+pub(crate) mod structs;
+pub(crate) mod types;
+pub(crate) mod union_codegen;
+pub(crate) mod utils;
+pub(crate) mod xrpc;
 
 /// Code generator for lexicon types
 pub struct CodeGenerator<'c> {
@@ -66,7 +66,10 @@ impl<'c> CodeGenerator<'c> {
         let shared_fn = if !generated.contains(nsid) {
             generated.insert(nsid.to_string());
             // Codegen from JSON doesn't have union_fields (those are for Rust -> lexicon derive)
-            let doc_literal = crate::derive_impl::doc_to_tokens::doc_to_tokens(lex_doc, &std::collections::BTreeMap::new());
+            let doc_literal = crate::derive_impl::doc_to_tokens::doc_to_tokens(
+                lex_doc,
+                &std::collections::BTreeMap::new(),
+            );
             Some(quote! {
                 fn #shared_fn_ident() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
                     #doc_literal
@@ -86,7 +89,8 @@ impl<'c> CodeGenerator<'c> {
 
         // Extract validation checks for this specific def
         let validation_checks = schema_impl::extract_validation_checks(lex_doc, def_name);
-        let validation_code = crate::derive_impl::doc_to_tokens::validations_to_tokens(&validation_checks);
+        let validation_code =
+            crate::derive_impl::doc_to_tokens::validations_to_tokens(&validation_checks);
 
         let trait_impl = quote! {
             impl #impl_generics ::jacquard_lexicon::schema::LexiconSchema for #type_ident #type_generics {
@@ -514,9 +518,7 @@ mod tests {
             LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
         let codegen = CodeGenerator::new(&corpus, "jacquard_api");
 
-        let doc = corpus
-            .get("app.bsky.embed.images")
-            .expect("get images");
+        let doc = corpus.get("app.bsky.embed.images").expect("get images");
         let def = doc.defs.get("viewImage").expect("get viewImage def");
 
         let tokens = codegen
@@ -539,9 +541,7 @@ mod tests {
             LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
         let codegen = CodeGenerator::new(&corpus, "jacquard_api");
 
-        let doc = corpus
-            .get("test.array.types")
-            .expect("get array types");
+        let doc = corpus.get("test.array.types").expect("get array types");
         let def = doc.defs.get("main").expect("get main def");
 
         let tokens = codegen
@@ -569,9 +569,7 @@ mod tests {
             LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
         let codegen = CodeGenerator::new(&corpus, "jacquard_api");
 
-        let doc = corpus
-            .get("test.binary.types")
-            .expect("get binary types");
+        let doc = corpus.get("test.binary.types").expect("get binary types");
         let def = doc.defs.get("main").expect("get main def");
 
         let tokens = codegen
@@ -597,9 +595,7 @@ mod tests {
             LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
         let codegen = CodeGenerator::new(&corpus, "jacquard_api");
 
-        let doc = corpus
-            .get("test.empty.object")
-            .expect("get empty object");
+        let doc = corpus.get("test.empty.object").expect("get empty object");
         let def = doc.defs.get("emptyDef").expect("get emptyDef");
 
         let tokens = codegen
@@ -655,7 +651,10 @@ mod tests {
         let vote_file: syn::File = syn::parse2(vote_tokens).expect("parse vote tokens");
         let vote_formatted = prettyplease::unparse(&vote_file);
         println!("\nVote:\n{}\n", vote_formatted);
-        assert!(vote_formatted.contains("struct DefinitionVote") || vote_formatted.contains("struct Vote"));
+        assert!(
+            vote_formatted.contains("struct DefinitionVote")
+                || vote_formatted.contains("struct Vote")
+        );
         assert!(vote_formatted.contains("pub poll_ref"));
         assert!(vote_formatted.contains("pub option_index"));
     }
@@ -713,7 +712,8 @@ mod tests {
         // Local ref #option should resolve to DefinitionOption type (fully qualified or local)
         assert!(
             formatted.contains("Vec<DefinitionOption")
-                || formatted.contains("Vec<jacquard_api::pub_leaflet::poll::definition::DefinitionOption")
+                || formatted
+                    .contains("Vec<jacquard_api::pub_leaflet::poll::definition::DefinitionOption")
         );
     }
 
@@ -723,9 +723,7 @@ mod tests {
             LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
         let codegen = CodeGenerator::new(&corpus, "jacquard_api");
 
-        let doc = corpus
-            .get("test.binary.types")
-            .expect("get binary types");
+        let doc = corpus.get("test.binary.types").expect("get binary types");
         let def = doc.defs.get("main").expect("get main def");
 
         let tokens = codegen

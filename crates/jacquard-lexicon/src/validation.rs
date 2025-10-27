@@ -3,8 +3,8 @@
 //! This module provides infrastructure for validating untyped `Data` values against
 //! lexicon schemas, enabling partial deserialization, debugging, and schema migration.
 
-use crate::codegen::nsid_utils::RefPath;
 use crate::lexicon::{LexArrayItem, LexObjectProperty};
+use crate::ref_utils::RefPath;
 use crate::schema::SchemaRegistry;
 use cid::Cid as IpldCid;
 use dashmap::DashMap;

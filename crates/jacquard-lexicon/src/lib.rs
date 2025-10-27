@@ -15,12 +15,18 @@
 //! - [`derive_impl`] - Implementation functions for derive macros (used by jacquard-derive)
 //! - [`validation`] - Runtime validation of Data against lexicon schemas
 
+#[cfg(feature = "codegen")]
 pub mod codegen;
+#[cfg(feature = "codegen")]
 pub mod corpus;
+#[cfg(feature = "codegen")]
+#[doc(hidden)]
 pub mod derive_impl;
+#[cfg(feature = "codegen")]
 pub mod error;
+#[cfg(feature = "codegen")]
 pub mod fs;
 pub mod lexicon;
+pub mod ref_utils;
 pub mod schema;
-pub mod union_registry;
 pub mod validation;

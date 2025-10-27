@@ -74,7 +74,9 @@
 //! - **Validation**: Runtime constraint checking via `validate()` method
 
 pub mod builder;
+#[cfg(feature = "codegen")]
 pub mod from_ast;
+#[cfg(feature = "codegen")]
 pub mod type_mapping;
 
 use crate::lexicon::LexiconDoc;

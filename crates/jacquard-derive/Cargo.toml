@@ -16,7 +16,7 @@ proc-macro = true
 
 [dependencies]
 heck.workspace = true
-jacquard-lexicon = { version = "0.8", path = "../jacquard-lexicon" }
+jacquard-lexicon = { version = "0.8", path = "../jacquard-lexicon", features = ["codegen"] }
 proc-macro2.workspace = true
 quote.workspace = true
 syn.workspace = true

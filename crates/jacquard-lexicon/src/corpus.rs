@@ -1,4 +1,4 @@
-use crate::codegen::nsid_utils::RefPath;
+use crate::ref_utils::RefPath;
 use crate::error::Result;
 use crate::lexicon::{LexUserType, LexiconDoc};
 use jacquard_common::{into_static::IntoStatic, smol_str::SmolStr};
