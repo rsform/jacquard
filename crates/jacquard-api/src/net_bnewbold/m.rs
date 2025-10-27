@@ -104,13 +104,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for M<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.common_name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2560usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "common_name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "common_name",
+                    ),
                     max: 2560usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -125,8 +127,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for M<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "common_name",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "common_name",
+                        ),
                         max: 256usize,
                         actual: count,
                     });
@@ -136,8 +140,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for M<'a> {
         if let Some(ref value) = self.species {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2560usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "species",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "species",
+                    ),
                     max: 2560usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -151,8 +157,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for M<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "species",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "species",
+                        ),
                         max: 256usize,
                         actual: count,
                     });

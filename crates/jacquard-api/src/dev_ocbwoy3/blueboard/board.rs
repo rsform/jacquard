@@ -105,7 +105,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Board<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.description;
             {
@@ -115,8 +115,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Board<'a> {
                     )
                     .count();
                 if count > 30usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "description",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
                         max: 30usize,
                         actual: count,
                     });
@@ -127,8 +129,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Board<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "title",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });

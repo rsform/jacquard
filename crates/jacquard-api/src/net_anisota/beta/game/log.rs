@@ -982,11 +982,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionData<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.time_since_generation {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "time_since_generation",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "time_since_generation",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -994,8 +996,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionData<'a> {
         }
         if let Some(ref value) = self.time_since_viewed {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "time_since_viewed",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "time_since_viewed",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1047,11 +1051,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DailyRewardsData<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.rewards_count {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "rewards_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rewards_count",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -1059,8 +1065,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DailyRewardsData<'a> {
         }
         if let Some(ref value) = self.streak {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "streak",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "streak",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -1068,8 +1076,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DailyRewardsData<'a> {
         }
         if let Some(ref value) = self.time_since_last_claim {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "time_since_last_claim",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "time_since_last_claim",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1120,11 +1130,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedContext<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.game_card_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "game_card_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "game_card_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1132,8 +1144,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedContext<'a> {
         }
         if let Some(ref value) = self.post_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "post_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "post_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1141,8 +1155,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedContext<'a> {
         }
         if let Some(ref value) = self.scroll_position {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "scroll_position",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "scroll_position",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1206,11 +1222,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameCardData<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.injection_position {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "injection_position",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "injection_position",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1218,8 +1236,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameCardData<'a> {
         }
         if let Some(ref value) = self.quantity {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "quantity",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "quantity",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -1275,11 +1295,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItemUsageData<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.quantity_used {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "quantity_used",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "quantity_used",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -1287,8 +1309,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItemUsageData<'a> {
         }
         if let Some(ref value) = self.remaining_quantity {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "remaining_quantity",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "remaining_quantity",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1447,13 +1471,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Log<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.session_id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "session_id",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "session_id",
+                    ),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1508,11 +1534,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.network_latency {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "network_latency",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "network_latency",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1558,11 +1586,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RewardItem<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.quantity {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "quantity",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "quantity",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });

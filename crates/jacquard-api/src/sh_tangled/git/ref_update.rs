@@ -400,7 +400,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommitCountBreakdown<'a> 
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -436,7 +436,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndividualEmailCommitCoun
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -472,7 +472,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndividualLanguageSize<'a
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -509,7 +509,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LangBreakdown<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -627,13 +627,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.new_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "new_sha",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "new_sha",
+                    ),
                     max: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -643,8 +645,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
             let value = &self.new_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "new_sha",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "new_sha",
+                    ),
                     min: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -654,8 +658,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
             let value = &self.old_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "old_sha",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "old_sha",
+                    ),
                     max: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -665,8 +671,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
             let value = &self.old_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "old_sha",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "old_sha",
+                    ),
                     min: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -676,8 +684,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
             let value = &self.r#ref;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2560usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "ref",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "ref",
+                    ),
                     max: 2560usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -692,8 +702,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "ref",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "ref",
+                        ),
                         max: 256usize,
                         actual: count,
                     });
@@ -738,7 +750,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Meta<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

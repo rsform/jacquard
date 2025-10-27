@@ -21,7 +21,7 @@ update-api:
     cargo run -p jacquard-lexgen --bin lex-fetch -- -v
 
 generate-api:
-    cargo run -p jacquard-lexgen --bin jacquard-codegen -- -i crates/jacquard-api/lexicons -o crates/jacquard-api/src -r crate
+    cargo run -p jacquard-lexgen --bin jacquard-codegen -- -i crates/jacquard-api/lexicons -o crates/jacquard-api/src
 
 lex-gen *ARGS:
     cargo run -p jacquard-lexgen --bin lex-fetch -- {{ARGS}}
@@ -30,7 +30,7 @@ lex-fetch *ARGS:
     cargo run -p jacquard-lexgen --bin lex-fetch -- --no-codegen {{ARGS}}
 
 codegen *ARGS:
-    cargo run -p jacquard-lexgen --bin jacquard-codegen -- -r crate {{ARGS}}
+    cargo run -p jacquard-lexgen --bin jacquard-codegen -- {{ARGS}}
 
 # Package binaries for distribution (creates tar.xz archives)
 package-binaries:

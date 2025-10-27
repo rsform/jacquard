@@ -120,13 +120,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Slice<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.domain;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "domain",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "domain",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -136,8 +138,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Slice<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -582,7 +586,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SliceView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -616,12 +620,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparklinePoint<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.count;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });

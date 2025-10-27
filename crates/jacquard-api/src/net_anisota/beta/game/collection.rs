@@ -169,12 +169,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.common_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "common_name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "common_name",
+                    ),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -183,8 +185,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
         if let Some(ref value) = self.family {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "family",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "family",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -193,8 +197,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
         if let Some(ref value) = self.genus {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "genus",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "genus",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -203,8 +209,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
         {
             let value = &self.quantity;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "quantity",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "quantity",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -213,8 +221,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
         if let Some(ref value) = self.scientific_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "scientific_name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "scientific_name",
+                    ),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -223,8 +233,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
         if let Some(ref value) = self.species {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "species",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "species",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -234,8 +246,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
             let value = &self.specimen_id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "specimen_id",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "specimen_id",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -798,7 +812,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SourceDetails<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -839,7 +853,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpecimenData<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

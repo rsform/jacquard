@@ -149,7 +149,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             {
                 let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -158,8 +158,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
                     )
                     .count();
                 if count > 140usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "description",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
                         max: 140usize,
                         actual: count,
                     });
@@ -174,8 +176,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
                     )
                     .count();
                 if count < 1usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MinGraphemes {
-                        field: "description",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
                         min: 1usize,
                         actual: count,
                     });

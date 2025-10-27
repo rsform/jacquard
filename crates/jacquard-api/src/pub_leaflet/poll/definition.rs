@@ -102,13 +102,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -123,8 +125,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
                     )
                     .count();
                 if count > 100usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "name",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
                         max: 100usize,
                         actual: count,
                     });
@@ -276,12 +280,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefinitionOption<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.text {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "text",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -295,8 +301,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefinitionOption<'a> {
                     )
                     .count();
                 if count > 50usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "text",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "text",
+                        ),
                         max: 50usize,
                         actual: count,
                     });

@@ -117,11 +117,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pack<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.longest_streak {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "longest_streak",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "longest_streak",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -130,8 +132,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pack<'a> {
         if let Some(ref value) = self.pack_history {
             #[allow(unused_comparisons)]
             if value.len() > 30usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "pack_history",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "pack_history",
+                    ),
                     max: 30usize,
                     actual: value.len(),
                 });
@@ -140,8 +144,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pack<'a> {
         {
             let value = &self.streak;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "streak",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "streak",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -150,8 +156,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pack<'a> {
         {
             let value = &self.total_opens;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "total_opens",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "total_opens",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -505,7 +513,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PackHistoryEntry<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -549,7 +557,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReceivedItem<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

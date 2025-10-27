@@ -133,12 +133,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.bio {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "bio",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "bio",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -147,8 +149,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
         if let Some(ref value) = self.born_in {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "born_in",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "born_in",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -158,8 +162,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -169,8 +175,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -713,11 +721,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArtistViewBasic<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.play_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "play_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "play_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -725,8 +735,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArtistViewBasic<'a> {
         }
         if let Some(ref value) = self.unique_listeners {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "unique_listeners",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "unique_listeners",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -789,11 +801,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArtistViewDetailed<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.play_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "play_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "play_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -801,8 +815,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArtistViewDetailed<'a> {
         }
         if let Some(ref value) = self.unique_listeners {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "unique_listeners",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "unique_listeners",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });

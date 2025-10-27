@@ -249,7 +249,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowerRule<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -280,7 +280,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowingRule<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -315,7 +315,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListRule<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -446,12 +446,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Threadgate<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.allow {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "allow",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "allow",
+                    ),
                     max: 5usize,
                     actual: value.len(),
                 });
@@ -460,8 +462,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Threadgate<'a> {
         if let Some(ref value) = self.hidden_replies {
             #[allow(unused_comparisons)]
             if value.len() > 300usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "hidden_replies",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "hidden_replies",
+                    ),
                     max: 300usize,
                     actual: value.len(),
                 });
@@ -497,7 +501,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MentionRule<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

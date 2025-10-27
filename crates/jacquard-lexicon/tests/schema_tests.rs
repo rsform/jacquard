@@ -4,7 +4,8 @@ use jacquard_lexicon::lexicon::{
     LexObject, LexObjectProperty, LexRecord, LexRecordRecord, LexString, LexStringFormat,
     LexUserType, Lexicon, LexiconDoc,
 };
-use jacquard_lexicon::schema::{LexiconSchema, ValidationError};
+use jacquard_lexicon::schema::LexiconSchema;
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use std::collections::BTreeMap;
 
 // Simple test type
@@ -80,11 +81,11 @@ impl LexiconSchema for SimpleRecord<'_> {
         }
     }
 
-    fn validate(&self) -> Result<(), ValidationError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         // Check text length
         if self.text.len() > 1000 {
-            return Err(ValidationError::MaxLength {
-                field: "text",
+            return Err(ConstraintError::MaxLength {
+                path: ValidationPath::from_field("text"),
                 max: 1000,
                 actual: self.text.len(),
             });
@@ -122,7 +123,7 @@ fn test_validation_works() {
     assert!(result.is_err());
 
     let err = result.unwrap_err();
-    assert!(matches!(err, ValidationError::MaxLength { .. }));
+    assert!(matches!(err, ConstraintError::MaxLength { .. }));
 }
 
 #[test]

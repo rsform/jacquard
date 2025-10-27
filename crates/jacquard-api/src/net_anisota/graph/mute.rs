@@ -260,7 +260,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentTypes<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -378,12 +378,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mute<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.reason {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "reason",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "reason",
+                    ),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -392,8 +394,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mute<'a> {
         if let Some(ref value) = self.target_feeds {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "target_feeds",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "target_feeds",
+                    ),
                     max: 50usize,
                     actual: value.len(),
                 });

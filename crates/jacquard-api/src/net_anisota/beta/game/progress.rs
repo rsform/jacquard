@@ -152,12 +152,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.level;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "level",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -165,8 +167,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
         }
         if let Some(ref value) = self.previous_level {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "previous_level",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "previous_level",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -175,8 +179,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
         {
             let value = &self.total_xp;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "total_xp",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "total_xp",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -184,8 +190,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
         }
         if let Some(ref value) = self.xp_gained_since_last_save {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "xp_gained_since_last_save",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "xp_gained_since_last_save",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -194,8 +202,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
         {
             let value = &self.xp_to_next_level;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "xp_to_next_level",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "xp_to_next_level",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -723,7 +733,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -782,11 +792,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.daily_rewards_claimed {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "daily_rewards_claimed",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "daily_rewards_claimed",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -794,8 +806,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
         }
         if let Some(ref value) = self.items_collected {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "items_collected",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "items_collected",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -803,8 +817,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
         }
         if let Some(ref value) = self.posts_read_today {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "posts_read_today",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "posts_read_today",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -812,8 +828,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
         }
         if let Some(ref value) = self.posts_read_total {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "posts_read_total",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "posts_read_total",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -821,8 +839,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
         }
         if let Some(ref value) = self.posts_viewed {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "posts_viewed",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "posts_viewed",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -830,8 +850,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
         }
         if let Some(ref value) = self.shuffles_performed {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "shuffles_performed",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "shuffles_performed",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -839,8 +861,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
         }
         if let Some(ref value) = self.specimens_collected {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "specimens_collected",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "specimens_collected",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });

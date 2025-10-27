@@ -388,7 +388,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entity<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -545,12 +545,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.langs {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "langs",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "langs",
+                    ),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -559,8 +561,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
         if let Some(ref value) = self.tags {
             #[allow(unused_comparisons)]
             if value.len() > 8usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "tags",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
                     max: 8usize,
                     actual: value.len(),
                 });
@@ -570,8 +574,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
             let value = &self.text;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "text",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -586,8 +592,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "text",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "text",
+                        ),
                         max: 300usize,
                         actual: count,
                     });
@@ -629,7 +637,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -664,12 +672,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TextSlice<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.end;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "end",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "end",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -678,8 +688,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TextSlice<'a> {
         {
             let value = &self.start;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "start",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "start",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });

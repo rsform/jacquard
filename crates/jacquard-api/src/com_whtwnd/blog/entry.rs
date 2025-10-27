@@ -129,13 +129,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.content;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "content",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "content",
+                    ),
                     max: 100000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -144,8 +146,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
         if let Some(ref value) = self.subtitle {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "subtitle",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "subtitle",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -154,8 +158,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
         if let Some(ref value) = self.title {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "title",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });

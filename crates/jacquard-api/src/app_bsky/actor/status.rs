@@ -126,11 +126,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Status<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.duration_minutes {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "duration_minutes",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "duration_minutes",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });

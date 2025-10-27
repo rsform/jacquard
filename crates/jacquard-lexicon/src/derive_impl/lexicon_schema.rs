@@ -96,7 +96,7 @@ fn impl_for_struct(input: &DeriveInput) -> syn::Result<TokenStream> {
                 #doc_tokens
             }
 
-            fn validate(&self) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+            fn validate(&self) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
                 #validation_tokens
             }
         }
@@ -150,7 +150,7 @@ fn impl_for_enum(input: &DeriveInput) -> syn::Result<TokenStream> {
                 #doc_tokens
             }
 
-            fn validate(&self) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+            fn validate(&self) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
                 Ok(())
             }
         }

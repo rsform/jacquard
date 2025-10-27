@@ -113,7 +113,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pull<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -384,13 +384,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Source<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "sha",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sha",
+                    ),
                     max: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -400,8 +402,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Source<'a> {
             let value = &self.sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "sha",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "sha",
+                    ),
                     min: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -443,7 +447,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Target<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

@@ -95,11 +95,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Iframe<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.height {
             if *value > 1600i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
-                    field: "height",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "height",
+                    ),
                     max: 1600i64,
                     actual: *value,
                 });
@@ -107,8 +109,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Iframe<'a> {
         }
         if let Some(ref value) = self.height {
             if *value < 16i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "height",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "height",
+                    ),
                     min: 16i64,
                     actual: *value,
                 });

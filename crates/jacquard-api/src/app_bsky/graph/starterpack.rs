@@ -212,7 +212,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedItem<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -326,12 +326,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Starterpack<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "description",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -345,8 +347,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Starterpack<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "description",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
                         max: 300usize,
                         actual: count,
                     });
@@ -356,8 +360,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Starterpack<'a> {
         if let Some(ref value) = self.feeds {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "feeds",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "feeds",
+                    ),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -367,8 +373,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Starterpack<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -378,8 +386,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Starterpack<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -394,8 +404,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Starterpack<'a> {
                     )
                     .count();
                 if count > 50usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "name",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
                         max: 50usize,
                         actual: count,
                     });

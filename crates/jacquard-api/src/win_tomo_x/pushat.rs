@@ -225,13 +225,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeviceListItem<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -246,8 +248,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeviceListItem<'a> {
                     )
                     .count();
                 if count > 30usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "name",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
                         max: 30usize,
                         actual: count,
                     });
@@ -299,7 +303,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotifyBody<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

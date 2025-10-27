@@ -97,13 +97,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Coolthingtwo<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.status;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "status",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "status",
+                    ),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -113,8 +115,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Coolthingtwo<'a> {
             let value = &self.status;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "status",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "status",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -129,8 +133,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Coolthingtwo<'a> {
                     )
                     .count();
                 if count > 1usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "status",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "status",
+                        ),
                         max: 1usize,
                         actual: count,
                     });

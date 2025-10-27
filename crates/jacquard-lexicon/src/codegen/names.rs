@@ -1,5 +1,5 @@
 use super::nsid_utils::NsidPath;
-use super::utils::sanitize_name;
+use super::utils::{namespace_prefix, sanitize_name, sanitize_name_cow};
 use super::CodeGenerator;
 use heck::{ToPascalCase, ToSnakeCase};
 
@@ -140,7 +140,7 @@ impl<'c> CodeGenerator<'c> {
 
         if nsid_path.is_defs() && parts.len() >= 3 {
             // defs go in parent module: com.atproto.label.defs → com_atproto/label.rs
-            let first_two = format!("{}_{}", sanitize_name(parts[0]), sanitize_name(parts[1]));
+            let first_two = namespace_prefix(parts[0], parts[1]);
             if parts.len() == 3 {
                 // com.atproto.defs → com_atproto.rs
                 format!("{}.rs", first_two).into()
@@ -149,21 +149,21 @@ impl<'c> CodeGenerator<'c> {
                 let middle: Vec<&str> = parts[2..parts.len() - 1].iter().copied().collect();
                 let mut path = std::path::PathBuf::from(first_two);
                 for segment in &middle[..middle.len() - 1] {
-                    path.push(sanitize_name(segment));
+                    path.push(sanitize_name_cow(segment).as_ref());
                 }
-                path.push(format!("{}.rs", sanitize_name(middle.last().unwrap())));
+                path.push(format!("{}.rs", sanitize_name_cow(middle.last().unwrap())));
                 path
             }
         } else {
             // Regular path: app.bsky.feed.post → app_bsky/feed/post.rs
-            let first_two = format!("{}_{}", sanitize_name(parts[0]), sanitize_name(parts[1]));
+            let first_two = namespace_prefix(parts[0], parts[1]);
             let mut path = std::path::PathBuf::from(first_two);
 
             for segment in &parts[2..parts.len() - 1] {
-                path.push(sanitize_name(segment));
+                path.push(sanitize_name_cow(segment).as_ref());
             }
 
-            path.push(format!("{}.rs", sanitize_name(&last.to_snake_case())));
+            path.push(format!("{}.rs", sanitize_name_cow(&last.to_snake_case())));
             path
         }
     }

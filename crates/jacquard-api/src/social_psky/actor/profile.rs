@@ -98,12 +98,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.nickname {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 320usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "nickname",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "nickname",
+                    ),
                     max: 320usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -117,8 +119,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "nickname",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "nickname",
+                        ),
                         max: 32usize,
                         actual: count,
                     });

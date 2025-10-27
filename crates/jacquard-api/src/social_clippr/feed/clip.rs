@@ -127,13 +127,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.description;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40960usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "description",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 40960usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -148,8 +150,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
                     )
                     .count();
                 if count > 4096usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "description",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
                         max: 4096usize,
                         actual: count,
                     });
@@ -159,8 +163,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
         if let Some(ref value) = self.languages {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "languages",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "languages",
+                    ),
                     max: 5usize,
                     actual: value.len(),
                 });
@@ -169,8 +175,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
         if let Some(ref value) = self.notes {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "notes",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "notes",
+                    ),
                     max: 100000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -184,8 +192,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
                     )
                     .count();
                 if count > 10000usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "notes",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "notes",
+                        ),
                         max: 10000usize,
                         actual: count,
                     });
@@ -196,8 +206,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20480usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "title",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 20480usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -212,8 +224,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "title",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "title",
+                        ),
                         max: 2048usize,
                         actual: count,
                     });
@@ -224,8 +238,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
             let value = &self.url;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "url",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "url",
+                    ),
                     max: 20000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -240,8 +256,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
                     )
                     .count();
                 if count > 2000usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "url",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "url",
+                        ),
                         max: 2000usize,
                         actual: count,
                     });

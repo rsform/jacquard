@@ -195,11 +195,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for JobStatus<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.progress {
             if *value > 100i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
-                    field: "progress",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "progress",
+                    ),
                     max: 100i64,
                     actual: *value,
                 });
@@ -207,8 +209,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for JobStatus<'a> {
         }
         if let Some(ref value) = self.progress {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "progress",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "progress",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });

@@ -113,11 +113,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Header<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.level {
             if *value > 6i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
-                    field: "level",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
                     max: 6i64,
                     actual: *value,
                 });
@@ -125,8 +127,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Header<'a> {
         }
         if let Some(ref value) = self.level {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "level",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });

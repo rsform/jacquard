@@ -255,7 +255,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Caption<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -303,12 +303,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "alt",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "alt",
+                    ),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -322,8 +324,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "alt",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "alt",
+                        ),
                         max: 1000usize,
                         actual: count,
                     });
@@ -333,8 +337,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
         if let Some(ref value) = self.captions {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "captions",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "captions",
+                    ),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -387,12 +393,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "alt",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "alt",
+                    ),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -406,8 +414,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
                     )
                     .count();
                 if count > 1000usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "alt",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "alt",
+                        ),
                         max: 1000usize,
                         actual: count,
                     });

@@ -19,10 +19,34 @@ pub(super) fn value_to_variant_name(value: &str) -> String {
     }
 }
 
-/// Sanitize a string to be safe for identifiers and filenames
-pub(super) fn sanitize_name(s: &str) -> String {
+/// Check if a string is already a valid identifier (alphanumeric + underscore, not starting with digit)
+#[inline]
+fn is_valid_identifier(s: &str) -> bool {
     if s.is_empty() {
-        return "unknown".to_string();
+        return false;
+    }
+
+    let mut chars = s.chars();
+    let first = chars.next().unwrap();
+
+    // Must start with letter or underscore
+    if !first.is_ascii_alphabetic() && first != '_' {
+        return false;
+    }
+
+    // Rest must be alphanumeric or underscore
+    chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
+}
+
+/// Sanitize a string to be safe for identifiers and filenames, returning CowStr.
+/// Borrows if already valid, allocates if modifications needed.
+pub(super) fn sanitize_name_cow(s: &str) -> CowStr<'_> {
+    if is_valid_identifier(s) {
+        return CowStr::Borrowed(s);
+    }
+
+    if s.is_empty() {
+        return CowStr::Owned(jacquard_common::smol_str::SmolStr::new_static("unknown"));
     }
 
     // Replace invalid characters with underscores
@@ -46,7 +70,37 @@ pub(super) fn sanitize_name(s: &str) -> String {
         sanitized = format!("_{}", sanitized);
     }
 
+    CowStr::Owned(sanitized.into())
+}
+
+/// Sanitize a string to be safe for identifiers and filenames, always returning String.
+/// Convenience wrapper around sanitize_name_cow for existing callsites.
+pub(super) fn sanitize_name(s: &str) -> String {
+    sanitize_name_cow(s).to_string()
+}
+
+/// Build namespace prefix from first two NSID segments (e.g., "com", "atproto" → "com_atproto")
+pub(super) fn namespace_prefix(first: &str, second: &str) -> String {
+    format!("{}_{}", sanitize_name_cow(first), sanitize_name_cow(second))
+}
+
+/// Join NSID segments into a module path (e.g., ["repo", "admin"] → "repo::admin")
+pub(super) fn join_module_path(segments: &[&str]) -> String {
+    let sanitized: Vec<_> = segments.iter().map(|s| sanitize_name_cow(s)).collect();
     sanitized
+        .iter()
+        .map(|s| s.as_ref())
+        .collect::<Vec<_>>()
+        .join("::")
+}
+
+/// Join already-processed strings into a Rust module path (e.g., ["crate", "foo", "Bar"] → "crate::foo::Bar")
+pub(super) fn join_path_parts(parts: &[impl AsRef<str>]) -> String {
+    parts
+        .iter()
+        .map(|p| p.as_ref())
+        .collect::<Vec<_>>()
+        .join("::")
 }
 
 /// Create an identifier, using raw identifier if necessary for keywords

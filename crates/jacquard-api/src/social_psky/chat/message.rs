@@ -109,13 +109,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.content;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20480usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "content",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "content",
+                    ),
                     max: 20480usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -130,8 +132,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
                     )
                     .count();
                 if count > 2048usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "content",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "content",
+                        ),
                         max: 2048usize,
                         actual: count,
                     });

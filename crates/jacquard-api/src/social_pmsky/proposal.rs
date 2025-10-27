@@ -137,13 +137,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Proposal<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.val;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "val",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "val",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });

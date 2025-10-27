@@ -47,6 +47,13 @@ impl ValidationPath {
         }
     }
 
+    /// Create a path with a single field segment
+    pub fn from_field(name: &str) -> Self {
+        let mut path = Self::new();
+        path.push_field(name);
+        path
+    }
+
     /// Add a field segment to the path
     pub fn push_field(&mut self, name: &str) {
         self.segments.push(PathSegment::Field(name.into()));

@@ -799,7 +799,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -849,13 +849,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.comment;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "comment",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "comment",
+                    ),
                     max: 100000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -870,8 +872,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
                     )
                     .count();
                 if count > 10000usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "comment",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "comment",
+                        ),
                         max: 10000usize,
                         actual: count,
                     });
@@ -961,12 +965,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.books_read;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "books_read",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "books_read",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -975,8 +981,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
         {
             let value = &self.reviews;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "reviews",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "reviews",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1049,7 +1057,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1133,13 +1141,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UserBook<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.authors;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "authors",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "authors",
+                    ),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1149,8 +1159,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UserBook<'a> {
             let value = &self.authors;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "authors",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "authors",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1159,8 +1171,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UserBook<'a> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "description",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1168,8 +1182,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UserBook<'a> {
         }
         if let Some(ref value) = self.rating {
             if *value > 1000i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
-                    field: "rating",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
                     max: 1000i64,
                     actual: *value,
                 });
@@ -1177,8 +1193,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UserBook<'a> {
         }
         if let Some(ref value) = self.rating {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "rating",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1192,8 +1210,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UserBook<'a> {
                     )
                     .count();
                 if count > 15000usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "review",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "review",
+                        ),
                         max: 15000usize,
                         actual: count,
                     });
@@ -1202,8 +1222,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UserBook<'a> {
         }
         if let Some(ref value) = self.stars {
             if *value > 10i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
-                    field: "stars",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "stars",
+                    ),
                     max: 10i64,
                     actual: *value,
                 });
@@ -1211,8 +1233,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UserBook<'a> {
         }
         if let Some(ref value) = self.stars {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "stars",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "stars",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -1222,8 +1246,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UserBook<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "title",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1233,8 +1259,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UserBook<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "title",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });

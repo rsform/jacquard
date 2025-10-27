@@ -1444,7 +1444,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlockedAuthor<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1481,7 +1481,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlockedPost<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1660,12 +1660,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedViewPost<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.feed_context {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "feed_context",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "feed_context",
+                    ),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1674,8 +1676,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedViewPost<'a> {
         if let Some(ref value) = self.req_id {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "req_id",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "req_id",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1754,12 +1758,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GeneratorView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "description",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1773,8 +1779,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GeneratorView<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "description",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
                         max: 300usize,
                         actual: count,
                     });
@@ -1783,8 +1791,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GeneratorView<'a> {
         }
         if let Some(ref value) = self.like_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "like_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "like_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1824,7 +1834,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GeneratorViewerState<'a> 
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1870,12 +1880,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interaction<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.feed_context {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "feed_context",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "feed_context",
+                    ),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1884,8 +1896,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interaction<'a> {
         if let Some(ref value) = self.req_id {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "req_id",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "req_id",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2033,7 +2047,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotFoundPost<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2130,7 +2144,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PostView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2160,7 +2174,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonPin<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2203,7 +2217,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonRepost<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2286,7 +2300,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2384,12 +2398,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonFeedPost<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.feed_context {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "feed_context",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "feed_context",
+                    ),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2424,7 +2440,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonReasonPin<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2458,7 +2474,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonReasonRepost<'a> 
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2494,7 +2510,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadContext<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2582,7 +2598,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadViewPost<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2626,7 +2642,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadgateView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2675,7 +2691,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

@@ -119,12 +119,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lexicon<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "description",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -134,8 +136,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lexicon<'a> {
             let value = &self.nsid;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "nsid",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "nsid",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });

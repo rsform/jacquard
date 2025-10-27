@@ -156,13 +156,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.item_id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "item_id",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "item_id",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -171,8 +173,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
         if let Some(ref value) = self.item_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "item_name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "item_name",
+                    ),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -181,8 +185,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
         if let Some(ref value) = self.item_type {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "item_type",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "item_type",
+                    ),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -190,8 +196,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
         }
         if let Some(ref value) = self.item_value {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "item_value",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "item_value",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -199,8 +207,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
         }
         if let Some(ref value) = self.max_stack {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "max_stack",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "max_stack",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -209,8 +219,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
         {
             let value = &self.quantity;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "quantity",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "quantity",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -629,7 +641,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SourceDetails<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

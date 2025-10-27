@@ -135,12 +135,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.blue;
             if *value > 255i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
-                    field: "blue",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "blue",
+                    ),
                     max: 255i64,
                     actual: *value,
                 });
@@ -149,8 +151,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
         {
             let value = &self.blue;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "blue",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "blue",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -159,8 +163,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
         {
             let value = &self.green;
             if *value > 255i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
-                    field: "green",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "green",
+                    ),
                     max: 255i64,
                     actual: *value,
                 });
@@ -169,8 +175,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
         {
             let value = &self.green;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "green",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "green",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -179,8 +187,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
         {
             let value = &self.red;
             if *value > 255i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
-                    field: "red",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "red",
+                    ),
                     max: 255i64,
                     actual: *value,
                 });
@@ -189,8 +199,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
         {
             let value = &self.red;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "red",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "red",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -293,7 +305,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

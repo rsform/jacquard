@@ -105,12 +105,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.font {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "font",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "font",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -359,13 +361,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.accent;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "accent",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "accent",
+                    ),
                     max: 7usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -375,8 +379,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
             let value = &self.background;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "background",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "background",
+                    ),
                     max: 7usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -386,8 +392,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
             let value = &self.link;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "link",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "link",
+                    ),
                     max: 7usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -397,8 +405,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
             let value = &self.surface_hover;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "surface_hover",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "surface_hover",
+                    ),
                     max: 7usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -408,8 +418,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
             let value = &self.text;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "text",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "text",
+                    ),
                     max: 7usize,
                     actual: <str>::len(value.as_ref()),
                 });

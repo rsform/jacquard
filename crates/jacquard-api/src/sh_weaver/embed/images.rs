@@ -188,12 +188,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.blurhash {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "blurhash",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "blurhash",
+                    ),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -232,13 +234,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Images<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.images;
             #[allow(unused_comparisons)]
             if value.len() > 48usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "images",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "images",
+                    ),
                     max: 48usize,
                     actual: value.len(),
                 });

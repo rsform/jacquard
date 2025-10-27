@@ -597,7 +597,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CloneOpts<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -694,7 +694,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pipeline<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -729,7 +729,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManualTriggerData<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -765,7 +765,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pair<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -805,13 +805,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PullRequestTriggerData<'a
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.source_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "source_sha",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "source_sha",
+                    ),
                     max: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -821,8 +823,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PullRequestTriggerData<'a
             let value = &self.source_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "source_sha",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "source_sha",
+                    ),
                     min: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -865,13 +869,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.new_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "new_sha",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "new_sha",
+                    ),
                     max: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -881,8 +887,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
             let value = &self.new_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "new_sha",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "new_sha",
+                    ),
                     min: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -892,8 +900,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
             let value = &self.old_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "old_sha",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "old_sha",
+                    ),
                     max: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -903,8 +913,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
             let value = &self.old_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "old_sha",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "old_sha",
+                    ),
                     min: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -958,7 +970,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerMetadata<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1001,7 +1013,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerRepo<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1044,7 +1056,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Workflow<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

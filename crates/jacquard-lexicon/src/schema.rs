@@ -122,65 +122,10 @@ pub trait LexiconSchema {
     ///
     /// Checks runtime constraints like `max_length`, `max_graphemes`, `minimum`, etc.
     /// Returns `Ok(())` if valid, `Err` with details if invalid.
-    fn validate(&self) -> Result<(), ValidationError> {
+    fn validate(&self) -> Result<(), crate::validation::ConstraintError> {
         // Default impl: no constraints to check
         Ok(())
     }
-}
-
-/// Error type for validation failures
-#[derive(Debug, Clone, thiserror::Error, miette::Diagnostic)]
-pub enum ValidationError {
-    #[error("field `{field}` exceeds maximum length: {actual} > {max}")]
-    MaxLength {
-        field: &'static str,
-        max: usize,
-        actual: usize,
-    },
-
-    #[error("field `{field}` exceeds maximum grapheme count: {actual} > {max}")]
-    MaxGraphemes {
-        field: &'static str,
-        max: usize,
-        actual: usize,
-    },
-
-    #[error("field `{field}` below minimum length: {actual} < {min}")]
-    MinLength {
-        field: &'static str,
-        min: usize,
-        actual: usize,
-    },
-
-    #[error("field `{field}` below minimum grapheme count: {actual} < {min}")]
-    MinGraphemes {
-        field: &'static str,
-        min: usize,
-        actual: usize,
-    },
-
-    #[error("field `{field}` value {actual} exceeds maximum: {max}")]
-    Maximum {
-        field: &'static str,
-        max: i64,
-        actual: i64,
-    },
-
-    #[error("field `{field}` value {actual} below minimum: {min}")]
-    Minimum {
-        field: &'static str,
-        min: i64,
-        actual: i64,
-    },
-
-    #[error("field `{field}` has invalid value: {message}")]
-    InvalidValue {
-        field: &'static str,
-        message: String,
-    },
-
-    #[error("multiple validation errors: {0:?}")]
-    Multiple(Vec<ValidationError>),
 }
 
 /// Registry entry for schema discovery via inventory
@@ -284,25 +229,25 @@ pub fn global_registry() -> &'static SchemaRegistry {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::validation::{ConstraintError, ValidationPath};
 
     #[test]
     fn test_validation_max_length() {
-        let err = ValidationError::MaxLength {
-            field: "text",
+        let err = ConstraintError::MaxLength {
+            path: ValidationPath::from_field("text"),
             max: 100,
             actual: 150,
         };
-        assert!(err.to_string().contains("exceeds maximum length"));
+        assert!(err.to_string().contains("exceeds max length"));
     }
 
     #[test]
     fn test_validation_max_graphemes() {
-        let err = ValidationError::MaxGraphemes {
-            field: "text",
+        let err = ConstraintError::MaxGraphemes {
+            path: ValidationPath::from_field("text"),
             max: 50,
             actual: 75,
         };
-        assert!(err.to_string().contains("exceeds maximum grapheme count"));
+        assert!(err.to_string().contains("exceeds max graphemes"));
     }
 }

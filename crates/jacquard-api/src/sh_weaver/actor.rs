@@ -543,12 +543,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Author<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.display_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "display_name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
                     max: 640usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -562,8 +564,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Author<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "display_name",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "display_name",
+                        ),
                         max: 64usize,
                         actual: count,
                     });
@@ -622,7 +626,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileDataView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -694,12 +698,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2560usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "description",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 2560usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -713,8 +719,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "description",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
                         max: 256usize,
                         actual: count,
                     });
@@ -724,8 +732,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
         if let Some(ref value) = self.display_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "display_name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
                     max: 640usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -739,8 +749,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
                     )
                     .count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "display_name",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "display_name",
+                        ),
                         max: 64usize,
                         actual: count,
                     });
@@ -750,8 +762,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
         if let Some(ref value) = self.links {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "links",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "links",
+                    ),
                     max: 5usize,
                     actual: value.len(),
                 });
@@ -760,8 +774,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
         if let Some(ref value) = self.links {
             #[allow(unused_comparisons)]
             if value.len() < 0usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "links",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "links",
+                    ),
                     min: 0usize,
                     actual: value.len(),
                 });
@@ -770,8 +786,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
         if let Some(ref value) = self.location {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 400usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "location",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "location",
+                    ),
                     max: 400usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -785,8 +803,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
                     )
                     .count();
                 if count > 40usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "location",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "location",
+                        ),
                         max: 40usize,
                         actual: count,
                     });
@@ -853,12 +873,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledProfileView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2560usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "description",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 2560usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -872,8 +894,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledProfileView<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "description",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
                         max: 256usize,
                         actual: count,
                     });
@@ -883,8 +907,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledProfileView<'a> {
         if let Some(ref value) = self.links {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "links",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "links",
+                    ),
                     max: 5usize,
                     actual: value.len(),
                 });
@@ -893,8 +919,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledProfileView<'a> {
         if let Some(ref value) = self.links {
             #[allow(unused_comparisons)]
             if value.len() < 0usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "links",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "links",
+                    ),
                     min: 0usize,
                     actual: value.len(),
                 });
@@ -903,8 +931,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledProfileView<'a> {
         if let Some(ref value) = self.location {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 400usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "location",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "location",
+                    ),
                     max: 400usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -918,8 +948,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledProfileView<'a> {
                     )
                     .count();
                 if count > 40usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "location",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "location",
+                        ),
                         max: 40usize,
                         actual: count,
                     });
@@ -929,8 +961,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledProfileView<'a> {
         if let Some(ref value) = self.pinned_repositories {
             #[allow(unused_comparisons)]
             if value.len() > 6usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "pinned_repositories",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "pinned_repositories",
+                    ),
                     max: 6usize,
                     actual: value.len(),
                 });
@@ -939,8 +973,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledProfileView<'a> {
         if let Some(ref value) = self.pinned_repositories {
             #[allow(unused_comparisons)]
             if value.len() < 0usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "pinned_repositories",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "pinned_repositories",
+                    ),
                     min: 0usize,
                     actual: value.len(),
                 });
@@ -949,8 +985,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledProfileView<'a> {
         if let Some(ref value) = self.stats {
             #[allow(unused_comparisons)]
             if value.len() > 2usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "stats",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "stats",
+                    ),
                     max: 2usize,
                     actual: value.len(),
                 });
@@ -959,8 +997,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledProfileView<'a> {
         if let Some(ref value) = self.stats {
             #[allow(unused_comparisons)]
             if value.len() < 0usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "stats",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "stats",
+                    ),
                     min: 0usize,
                     actual: value.len(),
                 });

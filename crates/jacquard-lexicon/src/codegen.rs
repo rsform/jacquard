@@ -4,6 +4,7 @@ use crate::lexicon::{LexArrayItem, LexUserType};
 use proc_macro2::TokenStream;
 use quote::quote;
 
+pub mod builder_heuristics;
 pub mod lifetime;
 pub mod names;
 pub mod nsid_utils;
@@ -11,6 +12,7 @@ pub mod output;
 pub mod schema_impl;
 pub mod structs;
 pub mod types;
+pub mod union_codegen;
 pub mod utils;
 pub mod xrpc;
 
@@ -100,7 +102,7 @@ impl<'c> CodeGenerator<'c> {
                     #shared_fn_ident()
                 }
 
-                fn validate(&self) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+                fn validate(&self) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
                     #validation_code
                 }
             }

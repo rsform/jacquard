@@ -994,7 +994,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItemView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1146,12 +1146,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "description",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1165,8 +1167,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListView<'a> {
                     )
                     .count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "description",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
                         max: 300usize,
                         actual: count,
                     });
@@ -1175,8 +1179,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListView<'a> {
         }
         if let Some(ref value) = self.list_item_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "list_item_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "list_item_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1186,8 +1192,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListView<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1197,8 +1205,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListView<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1262,11 +1272,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListViewBasic<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.list_item_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "list_item_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "list_item_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1276,8 +1288,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListViewBasic<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1287,8 +1301,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListViewBasic<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1330,7 +1346,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListViewerState<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1384,7 +1400,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotFoundActor<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1447,7 +1463,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Relationship<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1510,12 +1526,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StarterPackView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.feeds {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "feeds",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "feeds",
+                    ),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -1523,8 +1541,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StarterPackView<'a> {
         }
         if let Some(ref value) = self.joined_all_time_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "joined_all_time_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "joined_all_time_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1532,8 +1552,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StarterPackView<'a> {
         }
         if let Some(ref value) = self.joined_week_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "joined_week_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "joined_week_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1542,8 +1564,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StarterPackView<'a> {
         if let Some(ref value) = self.list_items_sample {
             #[allow(unused_comparisons)]
             if value.len() > 12usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "list_items_sample",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "list_items_sample",
+                    ),
                     max: 12usize,
                     actual: value.len(),
                 });
@@ -1602,11 +1626,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StarterPackViewBasic<'a> 
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.joined_all_time_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "joined_all_time_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "joined_all_time_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1614,8 +1640,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StarterPackViewBasic<'a> 
         }
         if let Some(ref value) = self.joined_week_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "joined_week_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "joined_week_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1623,8 +1651,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StarterPackViewBasic<'a> 
         }
         if let Some(ref value) = self.list_item_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "list_item_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "list_item_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });

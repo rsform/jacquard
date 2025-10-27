@@ -795,8 +795,8 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                 ConstraintCheck::MaxLength { max } => quote! {
                     #[allow(unused_comparisons)]
                     if #len_expr > #max {
-                        return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                            field: #field_name_literal,
+                        return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
                             max: #max,
                             actual: #len_expr,
                         });
@@ -805,8 +805,8 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                 ConstraintCheck::MinLength { min } => quote! {
                     #[allow(unused_comparisons)]
                     if #len_expr < #min {
-                        return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                            field: #field_name_literal,
+                        return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
                             min: #min,
                             actual: #len_expr,
                         });
@@ -819,8 +819,8 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                             true
                         ).count();
                         if count > #max {
-                            return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                                field: #field_name_literal,
+                            return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                                path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
                                 max: #max,
                                 actual: count,
                             });
@@ -834,8 +834,8 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                             true
                         ).count();
                         if count < #min {
-                            return Err(::jacquard_lexicon::schema::ValidationError::MinGraphemes {
-                                field: #field_name_literal,
+                            return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
+                                path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
                                 min: #min,
                                 actual: count,
                             });
@@ -844,8 +844,8 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                 },
                 ConstraintCheck::Maximum { max } => quote! {
                     if *value > #max {
-                        return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
-                            field: #field_name_literal,
+                        return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
                             max: #max,
                             actual: *value,
                         });
@@ -853,8 +853,8 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                 },
                 ConstraintCheck::Minimum { min } => quote! {
                     if *value < #min {
-                        return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                            field: #field_name_literal,
+                        return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
                             min: #min,
                             actual: *value,
                         });

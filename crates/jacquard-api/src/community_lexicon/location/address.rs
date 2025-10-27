@@ -204,13 +204,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Address<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.country;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "country",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "country",
+                    ),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -220,8 +222,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Address<'a> {
             let value = &self.country;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 2usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "country",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "country",
+                    ),
                     min: 2usize,
                     actual: <str>::len(value.as_ref()),
                 });

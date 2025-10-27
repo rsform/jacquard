@@ -145,13 +145,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.authors;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "authors",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "authors",
+                    ),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -161,8 +163,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
             let value = &self.authors;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "authors",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "authors",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -171,8 +175,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "description",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -180,8 +186,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
         }
         if let Some(ref value) = self.rating {
             if *value > 1000i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
-                    field: "rating",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
                     max: 1000i64,
                     actual: *value,
                 });
@@ -189,8 +197,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
         }
         if let Some(ref value) = self.rating {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "rating",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });
@@ -200,8 +210,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "title",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -211,8 +223,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "title",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });

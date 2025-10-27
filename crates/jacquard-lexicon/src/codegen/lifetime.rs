@@ -132,11 +132,6 @@ impl<'c> CodeGenerator<'c> {
         }
     }
 
-    /// Check if a lexicon def needs a lifetime parameter
-    pub(super) fn def_needs_lifetime(&self, def: &LexUserType<'_>) -> bool {
-        def.needs_lifetime(self)
-    }
-
     /// Check if xrpc params need a lifetime parameter
     pub(super) fn params_need_lifetime(
         &self,

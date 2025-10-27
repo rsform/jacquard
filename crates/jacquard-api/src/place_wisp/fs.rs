@@ -261,13 +261,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Directory<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.entries;
             #[allow(unused_comparisons)]
             if value.len() > 500usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "entries",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "entries",
+                    ),
                     max: 500usize,
                     actual: value.len(),
                 });
@@ -328,13 +330,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -377,7 +381,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for File<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -480,11 +484,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fs<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.file_count {
             if *value > 1000i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
-                    field: "file_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "file_count",
+                    ),
                     max: 1000i64,
                     actual: *value,
                 });
@@ -492,8 +498,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fs<'a> {
         }
         if let Some(ref value) = self.file_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "file_count",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "file_count",
+                    ),
                     min: 0i64,
                     actual: *value,
                 });

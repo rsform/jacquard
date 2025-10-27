@@ -119,12 +119,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.languages {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "languages",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "languages",
+                    ),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -134,8 +136,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 320usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
                     max: 320usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -150,8 +154,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
                     )
                     .count();
                 if count > 32usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "name",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
                         max: 32usize,
                         actual: count,
                     });
@@ -161,8 +167,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
         if let Some(ref value) = self.tags {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "tags",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "tags",
+                    ),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -171,8 +179,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
         if let Some(ref value) = self.topic {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2560usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "topic",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "topic",
+                    ),
                     max: 2560usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -186,8 +196,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
                     )
                     .count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "topic",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "topic",
+                        ),
                         max: 256usize,
                         actual: count,
                     });
@@ -412,7 +424,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModlistRef<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

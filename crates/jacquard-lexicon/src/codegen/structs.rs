@@ -2,11 +2,12 @@ use crate::error::Result;
 use crate::lexicon::{
     LexArrayItem, LexInteger, LexObject, LexObjectProperty, LexRecord, LexString,
 };
-use heck::{ToPascalCase, ToSnakeCase};
+use heck::ToSnakeCase;
+use jacquard_common::smol_str::SmolStr;
 use proc_macro2::TokenStream;
 use quote::quote;
+use std::collections::BTreeMap;
 
-use super::nsid_utils::{NsidPath, RefPath};
 use super::CodeGenerator;
 use super::utils::{make_ident, value_to_variant_name};
 
@@ -19,44 +20,78 @@ pub(super) enum EnumVariantKind {
     Struct(Vec<String>),
 }
 
-/// Check if a type name conflicts with types referenced by bon::Builder macro.
-/// bon::Builder generates code that uses unqualified `Option` and `Result`,
-/// so structs with these names cause compilation errors.
-pub(crate) fn conflicts_with_builder_macro(type_name: &str) -> bool {
-    matches!(type_name, "Option" | "Result")
-}
+impl<'c> CodeGenerator<'c> {
+    /// Generate all nested type definitions (unions, objects) for an object's properties.
+    /// This consolidates the pattern of iterating properties to find unions and nested objects
+    /// that need their own type definitions.
+    ///
+    /// # Parameters
+    /// - `include_nested_objects`: If false, skips generating nested object types (used by XRPC)
+    pub(super) fn generate_nested_types(
+        &self,
+        nsid: &str,
+        parent_type_name: &str,
+        properties: &BTreeMap<SmolStr, LexObjectProperty<'static>>,
+        include_nested_objects: bool,
+    ) -> Result<Vec<TokenStream>> {
+        let mut nested = Vec::new();
 
-/// Count the number of required fields in a lexicon object.
-/// Used to determine whether to generate builders or Default impls.
-pub(crate) fn count_required_fields(obj: &LexObject<'static>) -> usize {
-    let required = obj.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
-    required.len()
-}
+        for (field_name, field_type) in properties {
+            match field_type {
+                LexObjectProperty::Union(union) => {
+                    // Skip empty, single-variant unions unless they're self-referential
+                    if !union.refs.is_empty()
+                        && (union.refs.len() > 1
+                            || self.is_self_referential_union(nsid, parent_type_name, &union))
+                    {
+                        let union_name =
+                            self.generate_field_type_name(nsid, parent_type_name, field_name, "");
+                        let refs: Vec<_> = union.refs.iter().cloned().collect();
+                        let union_def = self.generate_union(
+                            nsid,
+                            &union_name,
+                            &refs,
+                            None,
+                            union.closed,
+                        )?;
+                        nested.push(union_def);
+                    }
+                }
+                LexObjectProperty::Object(nested_obj) if include_nested_objects => {
+                    let object_name =
+                        self.generate_field_type_name(nsid, parent_type_name, field_name, "");
+                    let obj_def = self.generate_object(nsid, &object_name, &nested_obj)?;
+                    nested.push(obj_def);
+                }
+                LexObjectProperty::Array(array) => {
+                    if let LexArrayItem::Union(union) = &array.items {
+                        // Skip single-variant array unions
+                        if union.refs.len() > 1 {
+                            let union_name = self.generate_field_type_name(
+                                nsid,
+                                parent_type_name,
+                                field_name,
+                                "Item",
+                            );
+                            let refs: Vec<_> = union.refs.iter().cloned().collect();
+                            let union_def = self.generate_union(
+                                nsid,
+                                &union_name,
+                                &refs,
+                                None,
+                                union.closed,
+                            )?;
+                            nested.push(union_def);
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
 
-/// Check if a field property is a plain string that can default to empty.
-/// Returns true for bare CowStr fields (no format constraints).
-fn is_defaultable_string(prop: &LexObjectProperty<'static>) -> bool {
-    matches!(prop, LexObjectProperty::String(s) if s.format.is_none())
-}
-
-/// Check if all required fields in an object are defaultable strings.
-pub(crate) fn all_required_are_defaultable_strings(obj: &LexObject<'static>) -> bool {
-    let required = obj.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
-
-    if required.is_empty() {
-        return false; // Handled separately by count check
+        Ok(nested)
     }
 
-    required.iter().all(|field_name| {
-        let field_name_str: &str = field_name.as_ref();
-        obj.properties
-            .get(field_name_str)
-            .map(is_defaultable_string)
-            .unwrap_or(false)
-    })
-}
-
-impl<'c> CodeGenerator<'c> {
     pub(super) fn generate_record(
         &self,
         nsid: &str,
@@ -71,7 +106,8 @@ impl<'c> CodeGenerator<'c> {
                 // Records always get a lifetime since they have the #[lexicon] attribute
                 // which adds extra_data: BTreeMap<..., Data<'a>>
                 // Skip bon::Builder for types that conflict with the macro's unqualified type references
-                let has_builder = !conflicts_with_builder_macro(&type_name);
+                let has_builder =
+                    !super::builder_heuristics::conflicts_with_builder_macro(&type_name);
 
                 // Generate main struct fields
                 let fields = self.generate_object_fields(nsid, &type_name, obj, has_builder)?;
@@ -100,56 +136,7 @@ impl<'c> CodeGenerator<'c> {
                 };
 
                 // Generate union types and nested object types for this record
-                let mut unions = Vec::new();
-                for (field_name, field_type) in &obj.properties {
-                    match field_type {
-                        LexObjectProperty::Union(union) => {
-                            // Skip empty, single-variant unions unless they're self-referential
-                            if !union.refs.is_empty()
-                                && (union.refs.len() > 1
-                                    || self.is_self_referential_union(nsid, &type_name, union))
-                            {
-                                let union_name =
-                                    self.generate_field_type_name(nsid, &type_name, field_name, "");
-                                let refs: Vec<_> = union.refs.iter().cloned().collect();
-                                let union_def = self.generate_union(
-                                    nsid,
-                                    &union_name,
-                                    &refs,
-                                    None,
-                                    union.closed,
-                                )?;
-                                unions.push(union_def);
-                            }
-                        }
-                        LexObjectProperty::Object(nested_obj) => {
-                            let object_name =
-                                self.generate_field_type_name(nsid, &type_name, field_name, "");
-                            let obj_def = self.generate_object(nsid, &object_name, nested_obj)?;
-                            unions.push(obj_def);
-                        }
-                        LexObjectProperty::Array(array) => {
-                            if let LexArrayItem::Union(union) = &array.items {
-                                // Skip single-variant array unions
-                                if union.refs.len() > 1 {
-                                    let union_name = self.generate_field_type_name(
-                                        nsid, &type_name, field_name, "Item",
-                                    );
-                                    let refs: Vec<_> = union.refs.iter().cloned().collect();
-                                    let union_def = self.generate_union(
-                                        nsid,
-                                        &union_name,
-                                        &refs,
-                                        None,
-                                        union.closed,
-                                    )?;
-                                    unions.push(union_def);
-                                }
-                            }
-                        }
-                        _ => {}
-                    }
-                }
+                let unions = self.generate_nested_types(nsid, &type_name, &obj.properties, true)?;
 
                 // Generate typed GetRecordOutput wrapper
                 let output_type_name = format!("{}GetRecordOutput", type_name);
@@ -257,10 +244,9 @@ impl<'c> CodeGenerator<'c> {
         // - 0 required fields: Default instead of builder
         // - All required fields are bare strings: Default instead of builder
         // - 1+ required fields (not all strings): bon::Builder (but not if name conflicts)
-        let required_count = count_required_fields(obj);
-        let has_default = required_count == 0 || all_required_are_defaultable_strings(obj);
-        let has_builder =
-            required_count >= 1 && !has_default && !conflicts_with_builder_macro(&type_name);
+        let decision = super::builder_heuristics::should_generate_builder(&type_name, obj);
+        let has_builder = decision.has_builder;
+        let has_default = decision.has_default;
 
         let fields = self.generate_object_fields(nsid, &type_name, obj, has_builder)?;
         let doc = self.generate_doc_comment(obj.description.as_ref());
@@ -298,45 +284,7 @@ impl<'c> CodeGenerator<'c> {
         };
 
         // Generate union types and nested object types for this object
-        let mut unions = Vec::new();
-        for (field_name, field_type) in &obj.properties {
-            match field_type {
-                LexObjectProperty::Union(union) => {
-                    // Skip empty, single-variant unions unless they're self-referential
-                    if !union.refs.is_empty()
-                        && (union.refs.len() > 1
-                            || self.is_self_referential_union(nsid, &type_name, union))
-                    {
-                        let union_name =
-                            self.generate_field_type_name(nsid, &type_name, field_name, "");
-                        let refs: Vec<_> = union.refs.iter().cloned().collect();
-                        let union_def =
-                            self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
-                        unions.push(union_def);
-                    }
-                }
-                LexObjectProperty::Object(nested_obj) => {
-                    let object_name =
-                        self.generate_field_type_name(nsid, &type_name, field_name, "");
-                    let obj_def = self.generate_object(nsid, &object_name, nested_obj)?;
-                    unions.push(obj_def);
-                }
-                LexObjectProperty::Array(array) => {
-                    if let LexArrayItem::Union(union) = &array.items {
-                        // Skip single-variant array unions
-                        if union.refs.len() > 1 {
-                            let union_name =
-                                self.generate_field_type_name(nsid, &type_name, field_name, "Item");
-                            let refs: Vec<_> = union.refs.iter().cloned().collect();
-                            let union_def =
-                                self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
-                            unions.push(union_def);
-                        }
-                    }
-                }
-                _ => {}
-            }
-        }
+        let unions = self.generate_nested_types(nsid, &type_name, &obj.properties, true)?;
 
         // Generate LexiconSchema impl with shared lexicon_doc function
         let (shared_fn, schema_impl) =
@@ -467,121 +415,15 @@ impl<'c> CodeGenerator<'c> {
     ) -> Result<TokenStream> {
         let enum_ident = syn::Ident::new(union_name, proc_macro2::Span::call_site());
 
-        // Extract namespace prefix from current NSID (first two segments: "sh.weaver" from "sh.weaver.embed.recordWithMedia")
-        let current_nsid_path = NsidPath::parse(current_nsid);
-        let current_namespace = current_nsid_path.namespace();
+        // Build variants using the union_codegen module
+        let ctx = super::union_codegen::UnionGenContext {
+            corpus: self.corpus,
+            namespace_deps: &self.namespace_deps,
+            current_nsid,
+        };
 
-        // First pass: collect all variant names and detect collisions
-        #[derive(Debug)]
-        struct VariantInfo {
-            ref_str: String,
-            ref_nsid: String,
-            simple_name: String,
-            is_current_namespace: bool,
-        }
-
-        let mut variant_infos = Vec::new();
-        for ref_str in refs {
-            // Normalize local refs (starting with #) by prepending current NSID
-            let normalized_ref = RefPath::normalize(ref_str, current_nsid);
-
-            // Parse ref to get NSID and def name
-            let ref_path = RefPath::parse(&normalized_ref, None);
-            let ref_nsid_str = ref_path.nsid();
-            let ref_def = ref_path.def();
-
-            // Skip unknown refs - they'll be handled by Unknown variant
-            if !self.corpus.ref_exists(&normalized_ref) {
-                continue;
-            }
-
-            // Check if ref is in current namespace and if it's the same module
-            let is_current_namespace = ref_nsid_str.starts_with(&current_namespace);
-            let is_same_module = ref_nsid_str == current_nsid;
-
-            // Generate simple variant name (without namespace prefix)
-            let last_segment = ref_nsid_str.split('.').last().unwrap();
-            let simple_name = if ref_def == "main" {
-                // For main, use the last NSID segment
-                // e.g. app.bsky.embed.images#main -> Images
-                last_segment.to_pascal_case()
-            } else if last_segment == "defs" {
-                // For defs modules, just use the fragment name without "Defs" prefix
-                // e.g. app.bsky.embed.defs#images -> Images (not DefsImages)
-                ref_def.to_pascal_case()
-            } else if is_same_module {
-                // For same-module refs, just use the fragment name to avoid redundancy
-                // e.g. sh.weaver.embed.records#viewRecord in records.rs -> ViewRecord (not RecordsViewRecord)
-                ref_def.to_pascal_case()
-            } else {
-                // For other fragments, include the last NSID segment to avoid collisions
-                // e.g. app.bsky.embed.images#view -> ImagesView
-                //      app.bsky.embed.video#view -> VideoView
-                format!(
-                    "{}{}",
-                    last_segment.to_pascal_case(),
-                    ref_def.to_pascal_case()
-                )
-            };
-
-            variant_infos.push(VariantInfo {
-                ref_str: normalized_ref.clone(),
-                ref_nsid: ref_nsid_str.to_string(),
-                simple_name,
-                is_current_namespace,
-            });
-        }
-
-        // Second pass: detect collisions and disambiguate
-        use std::collections::HashMap;
-        let mut name_counts: HashMap<String, usize> = HashMap::new();
-        for info in &variant_infos {
-            *name_counts.entry(info.simple_name.clone()).or_insert(0) += 1;
-        }
-
-        let mut variants = Vec::new();
-        for info in variant_infos {
-            let has_collision = name_counts.get(&info.simple_name).copied().unwrap_or(0) > 1;
-
-            // Track namespace dependency for foreign refs
-            if !info.is_current_namespace {
-                let ref_nsid_path = NsidPath::parse(&info.ref_nsid);
-                let foreign_namespace = ref_nsid_path.namespace();
-                self.namespace_deps
-                    .borrow_mut()
-                    .entry(current_namespace.clone())
-                    .or_default()
-                    .insert(foreign_namespace);
-            }
-
-            // Disambiguate: add second NSID segment prefix only to foreign refs when there's a collision
-            let variant_name = if has_collision && !info.is_current_namespace {
-                // Get second segment (namespace identifier: "bsky" from "app.bsky.embed.images")
-                let ref_nsid_path = NsidPath::parse(&info.ref_nsid);
-                let segments = ref_nsid_path.segments();
-                let prefix = if segments.len() >= 2 {
-                    segments[1].to_pascal_case()
-                } else {
-                    // Fallback: use first segment if only one exists
-                    segments[0].to_pascal_case()
-                };
-                format!("{}{}", prefix, info.simple_name)
-            } else {
-                info.simple_name.clone()
-            };
-
-            let variant_ident = syn::Ident::new(&variant_name, proc_macro2::Span::call_site());
-
-            // Get the Rust type for this ref
-            let rust_type = self.ref_to_rust_type(&info.ref_str)?;
-
-            // Add serde rename for the full NSID
-            let ref_str_literal = &info.ref_str;
-            variants.push(quote! {
-                #[serde(rename = #ref_str_literal)]
-                #variant_ident(Box<#rust_type>)
-            });
-        }
+        let union_variants = ctx.build_union_variants(refs, |ref_str| self.ref_to_rust_type(ref_str))?;
+        let variants = super::union_codegen::generate_variant_tokens(&union_variants);
 
         let doc = description
             .map(|d| quote! { #[doc = #d] })

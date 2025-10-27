@@ -244,13 +244,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Secret<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.key;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "key",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "key",
+                    ),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -260,8 +262,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Secret<'a> {
             let value = &self.key;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "key",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "key",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });

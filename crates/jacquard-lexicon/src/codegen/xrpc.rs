@@ -1,13 +1,12 @@
 use crate::error::Result;
 use crate::lexicon::{
-    LexArrayItem, LexObjectProperty, LexXrpcBody, LexXrpcBodySchema, LexXrpcError,
-    LexXrpcProcedure, LexXrpcQuery, LexXrpcSubscription, LexXrpcSubscriptionMessageSchema,
+    LexXrpcBody, LexXrpcBodySchema, LexXrpcError, LexXrpcProcedure, LexXrpcQuery,
+    LexXrpcSubscription, LexXrpcSubscriptionMessageSchema,
 };
 use heck::{ToPascalCase, ToSnakeCase};
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use super::nsid_utils::{NsidPath, RefPath};
 use super::CodeGenerator;
 use super::utils::make_ident;
 
@@ -224,43 +223,31 @@ impl<'c> CodeGenerator<'c> {
                 let enum_name = format!("{}Message", type_base);
                 let enum_ident = syn::Ident::new(&enum_name, proc_macro2::Span::call_site());
 
-                let mut variants = Vec::new();
-                let mut decode_arms = Vec::new();
+                // Build variants using the union_codegen module (simple mode, no collision detection)
+                let ctx = super::union_codegen::UnionGenContext {
+                    corpus: self.corpus,
+                    namespace_deps: &self.namespace_deps,
+                    current_nsid: nsid,
+                };
 
-                for ref_str in &union.refs {
-                    let ref_str_s = ref_str.as_ref();
+                let union_variants = ctx.build_simple_union_variants(&union.refs, |ref_str| self.ref_to_rust_type(ref_str))?;
+                let variants = super::union_codegen::generate_variant_tokens(&union_variants);
 
-                    // Normalize local refs (starting with #) by prepending current NSID
-                    let normalized_ref = RefPath::normalize(ref_str, nsid);
-
-                    // Parse ref to get NSID and def name
-                    let ref_path = RefPath::parse(&normalized_ref, None);
-                    let ref_nsid = ref_path.nsid();
-                    let ref_def = ref_path.def();
-
-                    let variant_name = if ref_def == "main" {
-                        let ref_nsid_path = NsidPath::parse(ref_nsid);
-                        ref_nsid_path.last_segment().to_pascal_case()
-                    } else {
-                        ref_def.to_pascal_case()
-                    };
-                    let variant_ident =
-                        syn::Ident::new(&variant_name, proc_macro2::Span::call_site());
-                    let type_path = self.ref_to_rust_type(&normalized_ref)?;
-
-                    variants.push(quote! {
-                        #[serde(rename = #ref_str_s)]
-                        #variant_ident(Box<#type_path>)
-                    });
-
-                    // Generate decode arm for framed decoding
-                    decode_arms.push(quote! {
-                        #ref_str_s => {
-                            let variant = serde_ipld_dagcbor::from_slice(body)?;
-                            Ok(Self::#variant_ident(Box::new(variant)))
+                // Generate decode arms for framed decoding
+                let decode_arms: Vec<_> = union_variants
+                    .iter()
+                    .map(|variant| {
+                        let ref_str_literal = &variant.ref_str;
+                        let variant_ident =
+                            syn::Ident::new(&variant.variant_name, proc_macro2::Span::call_site());
+                        quote! {
+                            #ref_str_literal => {
+                                let variant = serde_ipld_dagcbor::from_slice(body)?;
+                                Ok(Self::#variant_ident(Box::new(variant)))
+                            }
                         }
-                    });
-                }
+                    })
+                    .collect();
 
                 let doc = self.generate_doc_comment(union.description.as_ref());
 
@@ -314,57 +301,7 @@ impl<'c> CodeGenerator<'c> {
                 };
 
                 // Generate union types for this message
-                let mut unions = Vec::new();
-                for (field_name, field_type) in &obj.properties {
-                    match field_type {
-                        LexObjectProperty::Union(union) => {
-                            // Skip empty, single-variant unions unless they're self-referential
-                            if !union.refs.is_empty()
-                                && (union.refs.len() > 1
-                                    || self.is_self_referential_union(nsid, &struct_name, union))
-                            {
-                                let union_name = self.generate_field_type_name(
-                                    nsid,
-                                    &struct_name,
-                                    field_name,
-                                    "",
-                                );
-                                let refs: Vec<_> = union.refs.iter().cloned().collect();
-                                let union_def = self.generate_union(
-                                    nsid,
-                                    &union_name,
-                                    &refs,
-                                    None,
-                                    union.closed,
-                                )?;
-                                unions.push(union_def);
-                            }
-                        }
-                        LexObjectProperty::Array(array) => {
-                            if let LexArrayItem::Union(union) = &array.items {
-                                // Skip single-variant array unions
-                                if union.refs.len() > 1 {
-                                    let union_name = self.generate_field_type_name(
-                                        nsid,
-                                        &struct_name,
-                                        field_name,
-                                        "Item",
-                                    );
-                                    let refs: Vec<_> = union.refs.iter().cloned().collect();
-                                    let union_def = self.generate_union(
-                                        nsid,
-                                        &union_name,
-                                        &refs,
-                                        None,
-                                        union.closed,
-                                    )?;
-                                    unions.push(union_def);
-                                }
-                            }
-                        }
-                        _ => {}
-                    }
-                }
+                let unions = self.generate_nested_types(nsid, &struct_name, &obj.properties, false)?;
 
                 Ok(quote! {
                     #struct_def
@@ -496,15 +433,8 @@ impl<'c> CodeGenerator<'c> {
         let (has_default, has_builder) = if is_binary_body {
             (false, true)
         } else if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
-            use crate::codegen::structs::{
-                all_required_are_defaultable_strings, conflicts_with_builder_macro,
-                count_required_fields,
-            };
-            let required_count = count_required_fields(obj);
-            let can_default = required_count == 0 || all_required_are_defaultable_strings(obj);
-            let can_builder =
-                required_count >= 1 && !can_default && !conflicts_with_builder_macro(type_base);
-            (can_default, can_builder)
+            let decision = super::builder_heuristics::should_generate_builder(type_base, obj);
+            (decision.has_default, decision.has_builder)
         } else {
             (false, false)
         };
@@ -574,46 +504,11 @@ impl<'c> CodeGenerator<'c> {
         };
 
         // Generate union types if schema is an Object
-        let mut unions = Vec::new();
-        if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
-            for (field_name, field_type) in &obj.properties {
-                match field_type {
-                    LexObjectProperty::Union(union) => {
-                        // Skip empty, single-variant unions unless they're self-referential
-                        if !union.refs.is_empty()
-                            && (union.refs.len() > 1
-                                || self.is_self_referential_union(nsid, type_base, union))
-                        {
-                            let union_name =
-                                self.generate_field_type_name(nsid, type_base, field_name, "");
-                            let refs: Vec<_> = union.refs.iter().cloned().collect();
-                            let union_def =
-                                self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
-                            unions.push(union_def);
-                        }
-                    }
-                    LexObjectProperty::Array(array) => {
-                        if let LexArrayItem::Union(union) = &array.items {
-                            // Skip single-variant array unions
-                            if union.refs.len() > 1 {
-                                let union_name = self
-                                    .generate_field_type_name(nsid, type_base, field_name, "Item");
-                                let refs: Vec<_> = union.refs.iter().cloned().collect();
-                                let union_def = self.generate_union(
-                                    nsid,
-                                    &union_name,
-                                    &refs,
-                                    None,
-                                    union.closed,
-                                )?;
-                                unions.push(union_def);
-                            }
-                        }
-                    }
-                    _ => {}
-                }
-            }
-        }
+        let unions = if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
+            self.generate_nested_types(nsid, type_base, &obj.properties, false)?
+        } else {
+            Vec::new()
+        };
 
         Ok(quote! {
             #struct_def
@@ -645,11 +540,7 @@ impl<'c> CodeGenerator<'c> {
         // Check if schema is an Object and apply heuristics
         let has_default = if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema
         {
-            use crate::codegen::structs::{
-                all_required_are_defaultable_strings, count_required_fields,
-            };
-            let required_count = count_required_fields(obj);
-            required_count == 0 || all_required_are_defaultable_strings(obj)
+            super::builder_heuristics::should_generate_builder(&struct_name, obj).has_default
         } else {
             false
         };
@@ -688,49 +579,11 @@ impl<'c> CodeGenerator<'c> {
         };
 
         // Generate union types if schema is an Object
-        let mut unions = Vec::new();
-        if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
-            for (field_name, field_type) in &obj.properties {
-                match field_type {
-                    LexObjectProperty::Union(union) => {
-                        // Skip single-variant unions unless they're self-referential
-                        if union.refs.len() > 1
-                            || self.is_self_referential_union(nsid, &struct_name, union)
-                        {
-                            let union_name =
-                                self.generate_field_type_name(nsid, &struct_name, field_name, "");
-                            let refs: Vec<_> = union.refs.iter().cloned().collect();
-                            let union_def =
-                                self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
-                            unions.push(union_def);
-                        }
-                    }
-                    LexObjectProperty::Array(array) => {
-                        if let LexArrayItem::Union(union) = &array.items {
-                            // Skip single-variant array unions
-                            if union.refs.len() > 1 {
-                                let union_name = self.generate_field_type_name(
-                                    nsid,
-                                    &struct_name,
-                                    field_name,
-                                    "Item",
-                                );
-                                let refs: Vec<_> = union.refs.iter().cloned().collect();
-                                let union_def = self.generate_union(
-                                    nsid,
-                                    &union_name,
-                                    &refs,
-                                    None,
-                                    union.closed,
-                                )?;
-                                unions.push(union_def);
-                            }
-                        }
-                    }
-                    _ => {}
-                }
-            }
-        }
+        let unions = if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
+            self.generate_nested_types(nsid, &struct_name, &obj.properties, false)?
+        } else {
+            Vec::new()
+        };
 
         Ok(quote! {
             #struct_def

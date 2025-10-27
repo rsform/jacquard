@@ -54,7 +54,7 @@ pub fn generate_schema_impl(
                 #doc_literal
             }
 
-            fn validate(&self) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+            fn validate(&self) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
                 #validation_code
             }
         }

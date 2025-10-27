@@ -117,12 +117,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "description",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "description",
+                    ),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -131,8 +133,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         {
             let value = &self.rating;
             if *value > 5i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
-                    field: "rating",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
                     max: 5i64,
                     actual: *value,
                 });
@@ -141,8 +145,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         {
             let value = &self.rating;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "rating",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "rating",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });
@@ -151,8 +157,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.title {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "title",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "title",
+                    ),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });

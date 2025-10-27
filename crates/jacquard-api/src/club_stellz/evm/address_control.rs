@@ -295,7 +295,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AddressControl<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -354,13 +354,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SiweMessage<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.address;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 42usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "address",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "address",
+                    ),
                     max: 42usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -370,8 +372,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SiweMessage<'a> {
             let value = &self.address;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 42usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "address",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "address",
+                    ),
                     min: 42usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -381,8 +385,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SiweMessage<'a> {
             let value = &self.nonce;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "nonce",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "nonce",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -392,8 +398,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SiweMessage<'a> {
             let value = &self.nonce;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 8usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "nonce",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "nonce",
+                    ),
                     min: 8usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -403,8 +411,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SiweMessage<'a> {
             let value = &self.statement;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 78usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "statement",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "statement",
+                    ),
                     min: 78usize,
                     actual: <str>::len(value.as_ref()),
                 });

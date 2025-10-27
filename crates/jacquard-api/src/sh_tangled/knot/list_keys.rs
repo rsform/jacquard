@@ -286,13 +286,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublicKey<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.key;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 4096usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "key",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "key",
+                    ),
                     max: 4096usize,
                     actual: <str>::len(value.as_ref()),
                 });

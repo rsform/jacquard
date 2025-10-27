@@ -4,8 +4,9 @@ use heck::ToSnakeCase;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use super::nsid_utils::{NsidPath, RefPath};
 use super::CodeGenerator;
+use super::nsid_utils::{NsidPath, RefPath};
+use super::utils::{join_module_path, join_path_parts, namespace_prefix, sanitize_name_cow};
 
 impl<'c> CodeGenerator<'c> {
     /// Convert a property type to Rust type
@@ -178,7 +179,6 @@ impl<'c> CodeGenerator<'c> {
 
     /// Convert ref to Rust type path
     pub(super) fn ref_to_rust_type(&self, ref_str: &str) -> Result<TokenStream> {
-        use super::utils::sanitize_name;
         use crate::error::CodegenError;
 
         // Parse ref to get NSID and def
@@ -205,40 +205,28 @@ impl<'c> CodeGenerator<'c> {
 
         let path_str = if nsid_path.is_defs() && parts.len() >= 3 {
             // defs types go in parent module
-            let first_two = format!("{}_{}", sanitize_name(parts[0]), sanitize_name(parts[1]));
+            let first_two = namespace_prefix(parts[0], parts[1]);
             if parts.len() == 3 {
                 // com.atproto.defs -> com_atproto::TypeName
-                format!("{}::{}::{}", self.root_module, first_two, type_name)
+                join_path_parts(&[&self.root_module, &first_two, &type_name])
             } else {
                 // app.bsky.actor.defs -> app_bsky::actor::TypeName
-                let middle: Vec<_> = parts[2..parts.len() - 1]
-                    .iter()
-                    .copied()
-                    .map(|s| sanitize_name(s))
-                    .collect();
-                format!(
-                    "{}::{}::{}::{}",
-                    self.root_module,
-                    first_two,
-                    middle.join("::"),
-                    type_name
-                )
+                let middle = &parts[2..parts.len() - 1];
+                let middle_path = join_module_path(middle);
+                join_path_parts(&[&self.root_module, &first_two, &middle_path, &type_name])
             }
         } else {
             // Regular types go in their own module file
             let (module_path, file_module) = if parts.len() >= 3 {
                 // Join first two segments with underscore
-                let first_two = format!("{}_{}", sanitize_name(parts[0]), sanitize_name(parts[1]));
-                let file_name = sanitize_name(last_segment).to_snake_case();
+                let first_two = namespace_prefix(parts[0], parts[1]);
+                let file_name = sanitize_name_cow(last_segment).to_string().to_snake_case();
 
                 if parts.len() > 3 {
                     // Middle segments form the module path
-                    let middle: Vec<_> = parts[2..parts.len() - 1]
-                        .iter()
-                        .copied()
-                        .map(|s| sanitize_name(s))
-                        .collect();
-                    let base_path = format!("{}::{}", first_two, middle.join("::"));
+                    let middle = &parts[2..parts.len() - 1];
+                    let middle_path = join_module_path(middle);
+                    let base_path = join_path_parts(&[&first_two, &middle_path]);
                     (base_path, file_name)
                 } else {
                     // Only 3 parts: com.atproto.label -> com_atproto, file: label
@@ -246,17 +234,14 @@ impl<'c> CodeGenerator<'c> {
                 }
             } else if parts.len() == 2 {
                 // e.g., "com.example" -> "com_example", file: example
-                let first = sanitize_name(parts[0]);
-                let file_name = sanitize_name(parts[1]).to_snake_case();
+                let first = sanitize_name_cow(parts[0]).to_string();
+                let file_name = sanitize_name_cow(parts[1]).to_string().to_snake_case();
                 (first, file_name)
             } else {
                 (parts[0].to_string(), "main".to_string())
             };
 
-            format!(
-                "{}::{}::{}::{}",
-                self.root_module, module_path, file_module, type_name
-            )
+            join_path_parts(&[&self.root_module, &module_path, &file_module, &type_name])
         };
 
         let path: syn::Path = syn::parse_str(&path_str).map_err(|e| CodegenError::Other {

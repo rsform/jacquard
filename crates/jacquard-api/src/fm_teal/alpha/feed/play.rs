@@ -170,12 +170,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.release_discriminant {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "release_discriminant",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "release_discriminant",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -189,8 +191,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
                     )
                     .count();
                 if count > 1280usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "release_discriminant",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "release_discriminant",
+                        ),
                         max: 1280usize,
                         actual: count,
                     });
@@ -200,8 +204,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
         if let Some(ref value) = self.release_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "release_name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "release_name",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -215,8 +221,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
                     )
                     .count();
                 if count > 2560usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "release_name",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "release_name",
+                        ),
                         max: 2560usize,
                         actual: count,
                     });
@@ -226,8 +234,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
         if let Some(ref value) = self.submission_client_agent {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "submission_client_agent",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "submission_client_agent",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -241,8 +251,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
                     )
                     .count();
                 if count > 2560usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "submission_client_agent",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "submission_client_agent",
+                        ),
                         max: 2560usize,
                         actual: count,
                     });
@@ -252,8 +264,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
         if let Some(ref value) = self.track_discriminant {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "track_discriminant",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "track_discriminant",
+                    ),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -267,8 +281,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
                     )
                     .count();
                 if count > 1280usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "track_discriminant",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "track_discriminant",
+                        ),
                         max: 1280usize,
                         actual: count,
                     });
@@ -279,8 +295,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
             let value = &self.track_name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "track_name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "track_name",
+                    ),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -290,8 +308,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
             let value = &self.track_name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
-                    field: "track_name",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "track_name",
+                    ),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -306,8 +326,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
                     )
                     .count();
                 if count > 2560usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "track_name",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "track_name",
+                        ),
                         max: 2560usize,
                         actual: count,
                     });

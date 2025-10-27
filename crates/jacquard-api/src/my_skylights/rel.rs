@@ -106,7 +106,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rel<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -344,7 +344,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Note<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -378,12 +378,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rating<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.value;
             if *value > 10i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Maximum {
-                    field: "value",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "value",
+                    ),
                     max: 10i64,
                     actual: *value,
                 });
@@ -392,8 +394,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rating<'a> {
         {
             let value = &self.value;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::schema::ValidationError::Minimum {
-                    field: "value",
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "value",
+                    ),
                     min: 1i64,
                     actual: *value,
                 });

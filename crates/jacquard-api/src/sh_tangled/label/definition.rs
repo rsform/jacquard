@@ -113,7 +113,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             {
@@ -123,8 +123,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
                     )
                     .count();
                 if count > 40usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "name",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
                         max: 40usize,
                         actual: count,
                     });
@@ -140,8 +142,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
                     )
                     .count();
                 if count < 1usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MinGraphemes {
-                        field: "name",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
                         min: 1usize,
                         actual: count,
                     });
@@ -410,7 +414,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ValueType<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

@@ -103,7 +103,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledString<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.contents;
             {
@@ -113,8 +113,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledString<'a> {
                     )
                     .count();
                 if count < 1usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MinGraphemes {
-                        field: "contents",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "contents",
+                        ),
                         min: 1usize,
                         actual: count,
                     });
@@ -130,8 +132,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledString<'a> {
                     )
                     .count();
                 if count > 280usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "description",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
                         max: 280usize,
                         actual: count,
                     });
@@ -147,8 +151,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledString<'a> {
                     )
                     .count();
                 if count > 140usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MaxGraphemes {
-                        field: "filename",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "filename",
+                        ),
                         max: 140usize,
                         actual: count,
                     });
@@ -164,8 +170,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledString<'a> {
                     )
                     .count();
                 if count < 1usize {
-                    return Err(::jacquard_lexicon::schema::ValidationError::MinGraphemes {
-                        field: "filename",
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "filename",
+                        ),
                         min: 1usize,
                         actual: count,
                     });

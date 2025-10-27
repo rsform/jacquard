@@ -98,13 +98,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FavClient<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.fav_client;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
-                    field: "fav_client",
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "fav_client",
+                    ),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
