@@ -78,11 +78,21 @@
           crane = {
             args = {
               buildInputs = commonBuildInputs;
+            };
+          };
+        };
+        "jacquard-lexgen" = {
+          imports = [globalCrateConfig];
+          autoWire = ["crate" "clippy"];
+          path = ./../../crates/jacquard-lexgen;
+          crane = {
+            args = {
+              buildInputs = commonBuildInputs;
               nativeBuildInputs = [pkgs.installShellFiles];
-              doCheck = false;  # Tests require lexicon corpus files not available in nix build
+              doCheck = false; # Tests require lexicon corpus files not available in nix build
               postInstall = ''
                 # Install man pages and completions from build script output
-                for outdir in target/release/build/jacquard-lexicon-*/out; do
+                for outdir in target/release/build/jacquard-lexgen-*/out; do
                   if [ -d "$outdir/man" ]; then
                     installManPage $outdir/man/*.1
                   fi
@@ -99,7 +109,7 @@
                 done
 
                 # Install example lexicons.kdl config
-                install -Dm644 ${./../../crates/jacquard-lexicon/lexicons.kdl.example} $out/share/doc/jacquard-lexicon/lexicons.kdl.example
+                install -Dm644 ${./../../crates/jacquard-lexgen/lexicons.kdl.example} $out/share/doc/jacquard-lexgen/lexicons.kdl.example
               '';
             };
           };
@@ -144,8 +154,18 @@
             };
           };
         };
+        "jacquard-repo" = {
+          imports = [globalCrateConfig];
+          autoWire = ["crate" "clippy"];
+          path = ./../../crates/jacquard-repo;
+          crane = {
+            args = {
+              buildInputs = commonBuildInputs;
+            };
+          };
+        };
       };
     };
-    packages.default = self'.packages.jacquard-lexicon;
+    packages.default = self'.packages.jacquard-lexgen;
   };
 }

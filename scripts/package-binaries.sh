@@ -158,7 +158,7 @@ package_binary() {
         # Only include example config for lex-fetch
         if [[ "$BINARY" == "lex-fetch" ]]; then
             mkdir -p "$STAGE_DIR/examples"
-            cp crates/jacquard-lexicon/lexicons.kdl.example "$STAGE_DIR/examples/" 2>/dev/null || true
+            cp crates/jacquard-lexgen/lexicons.kdl.example "$STAGE_DIR/examples/" 2>/dev/null || true
         fi
     else
         # Unix (Linux/macOS): binary, man page, completions, README, LICENSE
@@ -198,7 +198,7 @@ package_binary() {
         # Only include example config for lex-fetch
         if [[ "$BINARY" == "lex-fetch" ]]; then
             mkdir -p "$STAGE_DIR/share/doc/jacquard-lexicon"
-            cp crates/jacquard-lexicon/lexicons.kdl.example "$STAGE_DIR/share/doc/jacquard-lexicon/" 2>/dev/null || true
+            cp crates/jacquard-lexgen/lexicons.kdl.example "$STAGE_DIR/share/doc/jacquard-lexgen/" 2>/dev/null || true
         fi
     fi
 

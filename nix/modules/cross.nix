@@ -1,7 +1,13 @@
 {inputs, ...}: {
   imports = [inputs.rust-flake.flakeModules.nixpkgs];
 
-  perSystem = {pkgs, lib, config, system, ...}: let
+  perSystem = {
+    pkgs,
+    lib,
+    config,
+    system,
+    ...
+  }: let
     # Get the filtered source from rust-project
     src = config.rust-project.src;
 
@@ -15,7 +21,7 @@
     mkCrossPackage = {
       crossSystem,
       rustTarget,
-      extraArgs ? {}
+      extraArgs ? {},
     }: let
       # Import nixpkgs with cross-compilation configured (no overlays)
       pkgs-cross = import inputs.nixpkgs {
@@ -32,38 +38,40 @@
       craneLib = (inputs.crane.mkLib pkgs-cross).overrideToolchain rustToolchain;
 
       # Common crane args
-      commonArgs = {
-        inherit src;
-        pname = "jacquard-lexicon";
-        strictDeps = true;
-        doCheck = false;  # Tests require lexicon corpus files
+      commonArgs =
+        {
+          inherit src;
+          pname = "jacquard-lexgen";
+          strictDeps = true;
+          doCheck = false; # Tests require lexicon corpus files
 
-        # Native build inputs (tools that run during build)
-        nativeBuildInputs = with pkgs; [
-          installShellFiles
-        ];
+          # Native build inputs (tools that run during build)
+          nativeBuildInputs = with pkgs; [
+            installShellFiles
+          ];
 
-        postInstall = ''
-          # Install man pages and completions from build script output
-          for outdir in target/${rustTarget}/release/build/jacquard-lexicon-*/out; do
-            if [ -d "$outdir/man" ]; then
-              installManPage $outdir/man/*.1
-            fi
-            if [ -d "$outdir/completions" ]; then
-              for completion in $outdir/completions/*; do
-                case "$(basename "$completion")" in
-                  *.bash) installShellCompletion --bash "$completion" ;;
-                  *.fish) installShellCompletion --fish "$completion" ;;
-                  _*) installShellCompletion --zsh "$completion" ;;
-                esac
-              done
-            fi
-          done
+          postInstall = ''
+            # Install man pages and completions from build script output
+            for outdir in target/${rustTarget}/release/build/jacquard-lexgen-*/out; do
+              if [ -d "$outdir/man" ]; then
+                installManPage $outdir/man/*.1
+              fi
+              if [ -d "$outdir/completions" ]; then
+                for completion in $outdir/completions/*; do
+                  case "$(basename "$completion")" in
+                    *.bash) installShellCompletion --bash "$completion" ;;
+                    *.fish) installShellCompletion --fish "$completion" ;;
+                    _*) installShellCompletion --zsh "$completion" ;;
+                  esac
+                done
+              fi
+            done
 
-          # Install example lexicons.kdl config
-          install -Dm644 ${./../../crates/jacquard-lexicon/lexicons.kdl.example} $out/share/doc/jacquard-lexicon/lexicons.kdl.example
-        '';
-      } // extraArgs;
+            # Install example lexicons.kdl config
+            install -Dm644 ${./../../crates/jacquard-lexgen/lexicons.kdl.example} $out/share/doc/jacquard-lexgen/lexicons.kdl.example
+          '';
+        }
+        // extraArgs;
     in
       craneLib.buildPackage commonArgs;
   in {
