@@ -4,6 +4,7 @@ use heck::ToSnakeCase;
 use proc_macro2::TokenStream;
 use quote::quote;
 
+use super::nsid_utils::{NsidPath, RefPath};
 use super::CodeGenerator;
 
 impl<'c> CodeGenerator<'c> {
@@ -90,13 +91,8 @@ impl<'c> CodeGenerator<'c> {
                     };
 
                     // Parse ref to get type name
-                    let (ref_nsid, ref_def) =
-                        if let Some((nsid_part, fragment)) = ref_str.split_once('#') {
-                            (nsid_part, fragment)
-                        } else {
-                            (ref_str.as_str(), "main")
-                        };
-                    let ref_type_name = self.def_to_type_name(ref_nsid, ref_def);
+                    let ref_path = RefPath::parse(&ref_str, None);
+                    let ref_type_name = self.def_to_type_name(ref_path.nsid(), ref_path.def());
 
                     // If self-referential, keep union for indirection (variants are boxed)
                     if ref_type_name == parent_type_name {
@@ -185,12 +181,10 @@ impl<'c> CodeGenerator<'c> {
         use super::utils::sanitize_name;
         use crate::error::CodegenError;
 
-        // Parse NSID and fragment
-        let (ref_nsid, ref_def) = if let Some((nsid, fragment)) = ref_str.split_once('#') {
-            (nsid, fragment)
-        } else {
-            (ref_str, "main")
-        };
+        // Parse ref to get NSID and def
+        let ref_path = RefPath::parse(ref_str, None);
+        let ref_nsid = ref_path.nsid();
+        let ref_def = ref_path.def();
 
         // Check if ref exists
         if !self.corpus.ref_exists(ref_str) {
@@ -198,16 +192,18 @@ impl<'c> CodeGenerator<'c> {
             return Ok(quote! { jacquard_common::types::value::Data<'a> });
         }
 
+        // Parse NSID into components
+        let nsid_path = NsidPath::parse(ref_nsid);
+        let parts = nsid_path.segments();
+        let last_segment = nsid_path.last_segment();
+
         // Convert NSID to module path
         // com.atproto.repo.strongRef -> com_atproto::repo::strong_ref::StrongRef
         // app.bsky.richtext.facet -> app_bsky::richtext::facet::Facet
         // app.bsky.actor.defs#nux -> app_bsky::actor::Nux (defs go in parent module)
-        let parts: Vec<&str> = ref_nsid.split('.').collect();
-        let last_segment = parts.last().unwrap();
-
         let type_name = self.def_to_type_name(ref_nsid, ref_def);
 
-        let path_str = if *last_segment == "defs" && parts.len() >= 3 {
+        let path_str = if nsid_path.is_defs() && parts.len() >= 3 {
             // defs types go in parent module
             let first_two = format!("{}_{}", sanitize_name(parts[0]), sanitize_name(parts[1]));
             if parts.len() == 3 {

@@ -3,6 +3,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
+use super::nsid_utils::NsidPath;
 use super::utils::{make_ident, sanitize_name};
 use super::CodeGenerator;
 
@@ -249,12 +250,8 @@ impl<'c> CodeGenerator<'c> {
 
         // Collect all namespaces from the corpus (first two segments of each NSID)
         for (nsid, _doc) in self.corpus.iter() {
-            let parts: Vec<_> = nsid.as_str().splitn(3, '.').collect();
-            let namespace = if parts.len() >= 2 {
-                format!("{}.{}", parts[0], parts[1])
-            } else {
-                nsid.to_string()
-            };
+            let nsid_path = NsidPath::parse(nsid.as_str());
+            let namespace = nsid_path.namespace();
             all_namespaces.insert(namespace);
         }
 

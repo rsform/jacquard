@@ -1,3 +1,4 @@
+use super::nsid_utils::NsidPath;
 use super::utils::sanitize_name;
 use super::CodeGenerator;
 use heck::{ToPascalCase, ToSnakeCase};
@@ -66,7 +67,8 @@ impl<'c> CodeGenerator<'c> {
     fn def_to_base_type_name(&self, nsid: &str, def_name: &str) -> String {
         if def_name == "main" {
             // Use last segment of NSID
-            let base_name = nsid.split('.').last().unwrap().to_pascal_case();
+            let nsid_path = NsidPath::parse(nsid);
+            let base_name = nsid_path.last_segment().to_pascal_case();
 
             // Check if any other def would collide with this name
             if let Some(doc) = self.corpus.get(nsid) {
@@ -101,7 +103,8 @@ impl<'c> CodeGenerator<'c> {
         // Add contextual prefix to avoid collision
         if def_name == "main" {
             // Use second-to-last NSID segment for main defs
-            let parts: Vec<_> = nsid.split('.').collect();
+            let nsid_path = NsidPath::parse(nsid);
+            let parts = nsid_path.segments();
             if parts.len() >= 2 {
                 format!("{}{}", parts[parts.len() - 2].to_pascal_case(), base_name)
             } else {
@@ -125,16 +128,17 @@ impl<'c> CodeGenerator<'c> {
     /// - `app.bsky.feed.post` → `app_bsky/feed/post.rs`
     /// - `com.atproto.label.defs` → `com_atproto/label.rs` (defs go in parent)
     pub(super) fn nsid_to_file_path(&self, nsid: &str) -> std::path::PathBuf {
-        let parts: Vec<&str> = nsid.split('.').collect();
+        let nsid_path = NsidPath::parse(nsid);
+        let parts = nsid_path.segments();
 
         if parts.len() < 2 {
             // Shouldn't happen with valid NSIDs, but handle gracefully
             return format!("{}.rs", sanitize_name(parts[0])).into();
         }
 
-        let last = parts.last().unwrap();
+        let last = nsid_path.last_segment();
 
-        if *last == "defs" && parts.len() >= 3 {
+        if nsid_path.is_defs() && parts.len() >= 3 {
             // defs go in parent module: com.atproto.label.defs → com_atproto/label.rs
             let first_two = format!("{}_{}", sanitize_name(parts[0]), sanitize_name(parts[1]));
             if parts.len() == 3 {

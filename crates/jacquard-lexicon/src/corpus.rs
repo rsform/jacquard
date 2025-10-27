@@ -1,3 +1,4 @@
+use crate::codegen::nsid_utils::RefPath;
 use crate::error::Result;
 use crate::lexicon::{LexUserType, LexiconDoc};
 use jacquard_common::{into_static::IntoStatic, smol_str::SmolStr};
@@ -64,14 +65,9 @@ impl LexiconCorpus {
         &self,
         ref_str: &str,
     ) -> Option<(&LexiconDoc<'static>, &LexUserType<'static>)> {
-        let (nsid, def_name) = if let Some((nsid, fragment)) = ref_str.split_once('#') {
-            (nsid, fragment)
-        } else {
-            (ref_str, "main")
-        };
-
-        let doc = self.get(nsid)?;
-        let def = doc.defs.get(def_name)?;
+        let ref_path = RefPath::parse(ref_str, None);
+        let doc = self.get(ref_path.nsid())?;
+        let def = doc.defs.get(ref_path.def())?;
         Some((doc, def))
     }
 

@@ -6,6 +6,7 @@ use quote::quote;
 
 pub mod lifetime;
 pub mod names;
+pub mod nsid_utils;
 pub mod output;
 pub mod schema_impl;
 pub mod structs;

@@ -7,6 +7,7 @@ use heck::{ToPascalCase, ToSnakeCase};
 use proc_macro2::TokenStream;
 use quote::quote;
 
+use super::nsid_utils::{NsidPath, RefPath};
 use super::CodeGenerator;
 use super::utils::make_ident;
 
@@ -230,22 +231,16 @@ impl<'c> CodeGenerator<'c> {
                     let ref_str_s = ref_str.as_ref();
 
                     // Normalize local refs (starting with #) by prepending current NSID
-                    let normalized_ref = if ref_str.starts_with('#') {
-                        format!("{}{}", nsid, ref_str)
-                    } else {
-                        ref_str.to_string()
-                    };
+                    let normalized_ref = RefPath::normalize(ref_str, nsid);
 
                     // Parse ref to get NSID and def name
-                    let (ref_nsid, ref_def) =
-                        if let Some((nsid_part, fragment)) = normalized_ref.split_once('#') {
-                            (nsid_part, fragment)
-                        } else {
-                            (normalized_ref.as_str(), "main")
-                        };
+                    let ref_path = RefPath::parse(&normalized_ref, None);
+                    let ref_nsid = ref_path.nsid();
+                    let ref_def = ref_path.def();
 
                     let variant_name = if ref_def == "main" {
-                        ref_nsid.split('.').last().unwrap().to_pascal_case()
+                        let ref_nsid_path = NsidPath::parse(ref_nsid);
+                        ref_nsid_path.last_segment().to_pascal_case()
                     } else {
                         ref_def.to_pascal_case()
                     };

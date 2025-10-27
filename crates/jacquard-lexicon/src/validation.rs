@@ -3,6 +3,8 @@
 //! This module provides infrastructure for validating untyped `Data` values against
 //! lexicon schemas, enabling partial deserialization, debugging, and schema migration.
 
+use crate::codegen::nsid_utils::RefPath;
+use crate::lexicon::{LexArrayItem, LexObjectProperty};
 use crate::schema::SchemaRegistry;
 use cid::Cid as IpldCid;
 use dashmap::DashMap;
@@ -255,6 +257,32 @@ fn compute_data_cid(data: &Data) -> Result<IpldCid, CidComputationError> {
     Ok(IpldCid::new_v1(0x71, multihash))
 }
 
+/// Trait for converting lexicon types to object properties
+///
+/// This enables type-safe conversion between array items and object properties
+/// for unified validation logic.
+trait IntoObjectProperty<'a> {
+    /// Convert this type to an equivalent object property
+    fn into_object_property(self) -> LexObjectProperty<'a>;
+}
+
+impl<'a> IntoObjectProperty<'a> for LexArrayItem<'a> {
+    fn into_object_property(self) -> LexObjectProperty<'a> {
+        match self {
+            LexArrayItem::String(s) => LexObjectProperty::String(s),
+            LexArrayItem::Integer(i) => LexObjectProperty::Integer(i),
+            LexArrayItem::Boolean(b) => LexObjectProperty::Boolean(b),
+            LexArrayItem::Object(o) => LexObjectProperty::Object(o),
+            LexArrayItem::Unknown(u) => LexObjectProperty::Unknown(u),
+            LexArrayItem::Bytes(b) => LexObjectProperty::Bytes(b),
+            LexArrayItem::CidLink(c) => LexObjectProperty::CidLink(c),
+            LexArrayItem::Blob(b) => LexObjectProperty::Blob(b),
+            LexArrayItem::Ref(r) => LexObjectProperty::Ref(r),
+            LexArrayItem::Union(u) => LexObjectProperty::Union(u),
+        }
+    }
+}
+
 /// Result of validating Data against a schema
 ///
 /// Distinguishes between structural errors (type mismatches, missing fields) and
@@ -487,19 +515,6 @@ impl ValidationContext {
     }
 }
 
-/// Normalize a ref string to (nsid, def_name)
-fn normalize_ref(ref_str: &str, current_nsid: &str) -> (String, String) {
-    if let Some(fragment) = ref_str.strip_prefix('#') {
-        // #option -> (current_nsid, "option")
-        (current_nsid.to_string(), fragment.to_string())
-    } else if let Some((nsid, def)) = ref_str.split_once('#') {
-        // com.example.foo#bar -> ("com.example.foo", "bar")
-        (nsid.to_string(), def.to_string())
-    } else {
-        // com.example.foo -> ("com.example.foo", "main")
-        (ref_str.to_string(), "main".to_string())
-    }
-}
 
 /// Validate data against a lexicon def
 fn validate_def(
@@ -720,9 +735,10 @@ fn validate_property(
 
             // Try to match against refs
             for variant_ref in &u.refs {
-                let (variant_nsid, variant_def) =
-                    normalize_ref(variant_ref.as_ref(), &ctx.current_nsid);
-                let full_variant = format!("{}#{}", variant_nsid, variant_def);
+                let ref_path = RefPath::parse(variant_ref.as_ref(), Some(&ctx.current_nsid));
+                let variant_nsid = ref_path.nsid().to_string();
+                let variant_def = ref_path.def().to_string();
+                let full_variant = ref_path.full_ref();
 
                 // Match by full ref or just nsid
                 if type_str == full_variant || type_str == variant_nsid {
@@ -779,8 +795,10 @@ fn validate_property(
             }
 
             // Normalize ref
-            let (ref_nsid, ref_def) = normalize_ref(r.r#ref.as_ref(), &ctx.current_nsid);
-            let full_ref = format!("{}#{}", ref_nsid, ref_def);
+            let ref_path = RefPath::parse(r.r#ref.as_ref(), Some(&ctx.current_nsid));
+            let ref_nsid = ref_path.nsid().to_string();
+            let ref_def = ref_path.def().to_string();
+            let full_ref = ref_path.full_ref();
 
             // Cycle detection
             if ctx.ref_stack.contains(&full_ref) {
@@ -861,84 +879,17 @@ fn validate_property(
 fn validate_array_item(
     path: &mut ValidationPath,
     data: &Data,
-    item_schema: &crate::lexicon::LexArrayItem,
+    item_schema: &LexArrayItem,
     registry: &SchemaRegistry,
     ctx: &mut ValidationContext,
 ) -> Vec<StructuralError> {
-    use crate::lexicon::LexArrayItem;
-
-    match item_schema {
-        LexArrayItem::String(s) => validate_property(
-            path,
-            data,
-            &crate::lexicon::LexObjectProperty::String(s.clone()),
-            registry,
-            ctx,
-        ),
-        LexArrayItem::Integer(i) => validate_property(
-            path,
-            data,
-            &crate::lexicon::LexObjectProperty::Integer(i.clone()),
-            registry,
-            ctx,
-        ),
-        LexArrayItem::Boolean(b) => validate_property(
-            path,
-            data,
-            &crate::lexicon::LexObjectProperty::Boolean(b.clone()),
-            registry,
-            ctx,
-        ),
-        LexArrayItem::Object(o) => validate_property(
-            path,
-            data,
-            &crate::lexicon::LexObjectProperty::Object(o.clone()),
-            registry,
-            ctx,
-        ),
-        LexArrayItem::Unknown(u) => validate_property(
-            path,
-            data,
-            &crate::lexicon::LexObjectProperty::Unknown(u.clone()),
-            registry,
-            ctx,
-        ),
-        LexArrayItem::Bytes(b) => validate_property(
-            path,
-            data,
-            &crate::lexicon::LexObjectProperty::Bytes(b.clone()),
-            registry,
-            ctx,
-        ),
-        LexArrayItem::CidLink(c) => validate_property(
-            path,
-            data,
-            &crate::lexicon::LexObjectProperty::CidLink(c.clone()),
-            registry,
-            ctx,
-        ),
-        LexArrayItem::Blob(b) => validate_property(
-            path,
-            data,
-            &crate::lexicon::LexObjectProperty::Blob(b.clone()),
-            registry,
-            ctx,
-        ),
-        LexArrayItem::Ref(r) => validate_property(
-            path,
-            data,
-            &crate::lexicon::LexObjectProperty::Ref(r.clone()),
-            registry,
-            ctx,
-        ),
-        LexArrayItem::Union(u) => validate_property(
-            path,
-            data,
-            &crate::lexicon::LexObjectProperty::Union(u.clone()),
-            registry,
-            ctx,
-        ),
-    }
+    validate_property(
+        path,
+        data,
+        &item_schema.clone().into_object_property(),
+        registry,
+        ctx,
+    )
 }
 
 // ============================================================================
@@ -1115,10 +1066,12 @@ fn check_property_constraints(
 
         LexObjectProperty::Ref(r) => {
             // Follow ref and check constraints
-            let (ref_nsid, ref_def) = normalize_ref(r.r#ref.as_ref(), current_nsid);
+            let ref_path = RefPath::parse(r.r#ref.as_ref(), Some(current_nsid));
+            let ref_nsid = ref_path.nsid();
+            let ref_def = ref_path.def();
 
-            if registry.get_def(&ref_nsid, &ref_def).is_some() {
-                validate_constraints_impl(path, data, &ref_nsid, &ref_def, registry)
+            if registry.get_def(ref_nsid, ref_def).is_some() {
+                validate_constraints_impl(path, data, ref_nsid, ref_def, registry)
             } else {
                 Vec::new()
             }
@@ -1256,44 +1209,17 @@ fn check_array_constraints(
 fn check_array_item_constraints(
     path: &mut ValidationPath,
     data: &Data,
-    item_schema: &crate::lexicon::LexArrayItem,
+    item_schema: &LexArrayItem,
     current_nsid: &str,
     registry: &SchemaRegistry,
 ) -> Vec<ConstraintError> {
-    use crate::lexicon::LexArrayItem;
-
-    match item_schema {
-        LexArrayItem::String(s) => check_property_constraints(
-            path,
-            data,
-            &crate::lexicon::LexObjectProperty::String(s.clone()),
-            current_nsid,
-            registry,
-        ),
-        LexArrayItem::Integer(i) => check_property_constraints(
-            path,
-            data,
-            &crate::lexicon::LexObjectProperty::Integer(i.clone()),
-            current_nsid,
-            registry,
-        ),
-        LexArrayItem::Object(o) => check_property_constraints(
-            path,
-            data,
-            &crate::lexicon::LexObjectProperty::Object(o.clone()),
-            current_nsid,
-            registry,
-        ),
-        LexArrayItem::Ref(r) => check_property_constraints(
-            path,
-            data,
-            &crate::lexicon::LexObjectProperty::Ref(r.clone()),
-            current_nsid,
-            registry,
-        ),
-        // Other array item types don't have constraints
-        _ => Vec::new(),
-    }
+    check_property_constraints(
+        path,
+        data,
+        &item_schema.clone().into_object_property(),
+        current_nsid,
+        registry,
+    )
 }
 
 #[cfg(test)]

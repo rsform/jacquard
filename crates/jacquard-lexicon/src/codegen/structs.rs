@@ -6,6 +6,7 @@ use heck::{ToPascalCase, ToSnakeCase};
 use proc_macro2::TokenStream;
 use quote::quote;
 
+use super::nsid_utils::{NsidPath, RefPath};
 use super::CodeGenerator;
 use super::utils::{make_ident, value_to_variant_name};
 
@@ -467,12 +468,8 @@ impl<'c> CodeGenerator<'c> {
         let enum_ident = syn::Ident::new(union_name, proc_macro2::Span::call_site());
 
         // Extract namespace prefix from current NSID (first two segments: "sh.weaver" from "sh.weaver.embed.recordWithMedia")
-        let parts: Vec<_> = current_nsid.splitn(3, '.').collect();
-        let current_namespace = if parts.len() >= 2 {
-            format!("{}.{}", parts[0], parts[1])
-        } else {
-            current_nsid.to_string()
-        };
+        let current_nsid_path = NsidPath::parse(current_nsid);
+        let current_namespace = current_nsid_path.namespace();
 
         // First pass: collect all variant names and detect collisions
         #[derive(Debug)]
@@ -486,19 +483,12 @@ impl<'c> CodeGenerator<'c> {
         let mut variant_infos = Vec::new();
         for ref_str in refs {
             // Normalize local refs (starting with #) by prepending current NSID
-            let normalized_ref = if ref_str.starts_with('#') {
-                format!("{}{}", current_nsid, ref_str)
-            } else {
-                ref_str.to_string()
-            };
+            let normalized_ref = RefPath::normalize(ref_str, current_nsid);
 
             // Parse ref to get NSID and def name
-            let (ref_nsid_str, ref_def) =
-                if let Some((nsid, fragment)) = normalized_ref.split_once('#') {
-                    (nsid, fragment)
-                } else {
-                    (normalized_ref.as_str(), "main")
-                };
+            let ref_path = RefPath::parse(&normalized_ref, None);
+            let ref_nsid_str = ref_path.nsid();
+            let ref_def = ref_path.def();
 
             // Skip unknown refs - they'll be handled by Unknown variant
             if !self.corpus.ref_exists(&normalized_ref) {
@@ -555,12 +545,8 @@ impl<'c> CodeGenerator<'c> {
 
             // Track namespace dependency for foreign refs
             if !info.is_current_namespace {
-                let parts: Vec<_> = info.ref_nsid.splitn(3, '.').collect();
-                let foreign_namespace = if parts.len() >= 2 {
-                    format!("{}.{}", parts[0], parts[1])
-                } else {
-                    info.ref_nsid.to_string()
-                };
+                let ref_nsid_path = NsidPath::parse(&info.ref_nsid);
+                let foreign_namespace = ref_nsid_path.namespace();
                 self.namespace_deps
                     .borrow_mut()
                     .entry(current_namespace.clone())
@@ -571,7 +557,8 @@ impl<'c> CodeGenerator<'c> {
             // Disambiguate: add second NSID segment prefix only to foreign refs when there's a collision
             let variant_name = if has_collision && !info.is_current_namespace {
                 // Get second segment (namespace identifier: "bsky" from "app.bsky.embed.images")
-                let segments: Vec<&str> = info.ref_nsid.split('.').collect();
+                let ref_nsid_path = NsidPath::parse(&info.ref_nsid);
+                let segments = ref_nsid_path.segments();
                 let prefix = if segments.len() >= 2 {
                     segments[1].to_pascal_case()
                 } else {
