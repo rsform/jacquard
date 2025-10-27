@@ -23,12 +23,12 @@ echo "Current system: $CURRENT_SYSTEM"
 
 # Map target triples to nix package names
 declare -A TARGET_TO_PACKAGE=(
-    ["x86_64-unknown-linux-gnu"]="jacquard-lexicon-x86_64-linux"
-    ["aarch64-unknown-linux-gnu"]="jacquard-lexicon-aarch64-linux"
-    ["x86_64-apple-darwin"]="jacquard-lexicon-x86_64-darwin"
-    ["aarch64-apple-darwin"]="jacquard-lexicon-aarch64-darwin"
-    ["x86_64-pc-windows-gnu"]="jacquard-lexicon-x86_64-windows"
-    ["aarch64-pc-windows-gnullvm"]="jacquard-lexicon-aarch64-windows"
+    ["x86_64-unknown-linux-gnu"]="jacquard-lexgen-x86_64-linux"
+    ["aarch64-unknown-linux-gnu"]="jacquard-lexgen-aarch64-linux"
+    ["x86_64-apple-darwin"]="jacquard-lexgen-x86_64-darwin"
+    ["aarch64-apple-darwin"]="jacquard-lexgen-aarch64-darwin"
+    ["x86_64-pc-windows-gnu"]="jacquard-lexgen-x86_64-windows"
+    ["aarch64-pc-windows-gnullvm"]="jacquard-lexgen-aarch64-windows"
 )
 
 # Determine which targets we can build from the current system

@@ -77,14 +77,14 @@
   in {
     packages = {
       # Linux targets
-      jacquard-lexicon-x86_64-linux = mkCrossPackage {
+      jacquard-lexgen-x86_64-linux = mkCrossPackage {
         crossSystem = {
           config = "x86_64-unknown-linux-gnu";
         };
         rustTarget = "x86_64-unknown-linux-gnu";
       };
 
-      jacquard-lexicon-aarch64-linux = mkCrossPackage {
+      jacquard-lexgen-aarch64-linux = mkCrossPackage {
         crossSystem = {
           config = "aarch64-unknown-linux-gnu";
         };
@@ -92,14 +92,14 @@
       };
 
       # macOS targets
-      jacquard-lexicon-x86_64-darwin = mkCrossPackage {
+      jacquard-lexgen-x86_64-darwin = mkCrossPackage {
         crossSystem = {
           config = "x86_64-apple-darwin";
         };
         rustTarget = "x86_64-apple-darwin";
       };
 
-      jacquard-lexicon-aarch64-darwin = mkCrossPackage {
+      jacquard-lexgen-aarch64-darwin = mkCrossPackage {
         crossSystem = {
           config = "aarch64-apple-darwin";
         };
@@ -107,7 +107,7 @@
       };
 
       # Windows targets
-      jacquard-lexicon-x86_64-windows = mkCrossPackage {
+      jacquard-lexgen-x86_64-windows = mkCrossPackage {
         crossSystem = {
           config = "x86_64-w64-mingw32";
           libc = "msvcrt";
@@ -119,7 +119,7 @@
       # Issue: mingw-w64-pthreads build fails with missing winver.h header
       # The aarch64-w64-mingw32 toolchain setup in nixpkgs is incomplete
       # Workaround: build on actual Windows with MSVC or wait for nixpkgs fix
-      # jacquard-lexicon-aarch64-windows = mkCrossPackage {
+      # jacquard-lexgen-aarch64-windows = mkCrossPackage {
       #   crossSystem = {
       #     config = "aarch64-w64-mingw32";
       #     useLLVM = true;
